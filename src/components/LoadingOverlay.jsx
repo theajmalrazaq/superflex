@@ -1,21 +1,37 @@
-import React, { useEffect, useState } from 'react';
-import '../styles/loading.css';
+import React, { useEffect, useState } from "react";
+import "../styles/loading.css";
 
 function LoadingOverlay() {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    window.addEventListener('load', () => {
+    // Check if document is already loaded
+    if (document.readyState === "complete") {
       setVisible(false);
-    });
+      return;
+    }
 
-    const timer = setTimeout(() => {
+    // Handler function to hide overlay
+    const hideOverlay = () => {
       setVisible(false);
-    }, 8000);
+    };
 
-    return () => clearTimeout(timer);
+    // Add event listener
+    window.addEventListener("load", hideOverlay);
+
+    // Fallback timeout (3 seconds)
+    const timeoutId = setTimeout(() => {
+      setVisible(false);
+    }, 3000);
+
+    // Cleanup function
+    return () => {
+      window.removeEventListener("load", hideOverlay);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
+  // Don't render anything if not visible
   if (!visible) return null;
 
   return (
