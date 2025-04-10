@@ -7,6 +7,237 @@ function MarksPage() {
   useEffect(() => {
     // Style semester selection form
     const styleMarksPageElements = () => {
+      const parseFloatOrZero = (value) => {
+        if (!value || value === "-" || value.trim() === "") return 0;
+        const parsedValue = parseFloat(value);
+        return isNaN(parsedValue) ? 0 : parsedValue;
+      };
+
+      const calculateMarks = (courseId, id) => {
+        const course = document.getElementById(courseId);
+        if (!course) return;
+
+        const sections = course.querySelectorAll(
+          `div[id^="${courseId}"]:not([id$="Grand_Total_Marks"])`
+        );
+        if (!sections.length) return;
+
+        let globalWeightage = 0;
+        let globalObtained = 0;
+        let globalAverage = 0;
+        let globalMinimum = 0;
+        let globalMaximum = 0;
+        let globalStdDev = 0;
+
+        // Function to check for best off marks
+        const checkBestOff = (section, weightage) => {
+          const calculationRows = section.querySelectorAll(`.calculationrow`);
+          let weightsOfAssessments = 0;
+          let count = 0;
+          for (let row of calculationRows) {
+            const weightageOfAssessment = parseFloatOrZero(
+              row.querySelector(".weightage")?.textContent
+            );
+            weightsOfAssessments += weightageOfAssessment;
+
+            if (weightage < weightsOfAssessments) {
+              return count;
+            }
+            count++;
+          }
+          return count;
+        };
+
+        // Function to reorder calculation rows based on obtained marks
+        const reorderCalculationRows = (section, bestOff) => {
+          const sectionArray = Array.from(
+            section.querySelectorAll(`.calculationrow`)
+          );
+          sectionArray.sort((a, b) => {
+            const aObtained = parseFloatOrZero(
+              a.querySelector(".ObtMarks")?.textContent
+            );
+            const bObtained = parseFloatOrZero(
+              b.querySelector(".ObtMarks")?.textContent
+            );
+            return bObtained - aObtained;
+          });
+          return sectionArray.slice(0, bestOff);
+        };
+
+        sections.forEach((section) => {
+          // Find the total row for this section
+          const totalRows = section.querySelectorAll("[class*='totalColumn_']");
+          if (!totalRows.length) return;
+
+          const totalRow = totalRows[totalRows.length - 1]; // Use the last total row
+          if (!totalRow) return;
+
+          // Extract values from the section's total row
+          const localWeightage = parseFloatOrZero(
+            totalRow.querySelector(".totalColweightage")?.textContent
+          );
+          const localObtained = parseFloatOrZero(
+            totalRow.querySelector(".totalColObtMarks")?.textContent
+          );
+
+          if (localWeightage > 0) {
+            globalWeightage += localWeightage;
+            globalObtained += localObtained;
+
+            // Check if there are any best off marks
+            const bestOff = checkBestOff(section, localWeightage);
+            const calculationRows = reorderCalculationRows(section, bestOff);
+
+            calculationRows.forEach((row) => {
+              const weightage = parseFloatOrZero(
+                row.querySelector(".weightage")?.textContent
+              );
+
+              const total = parseFloatOrZero(
+                row.querySelector(".GrandTotal")?.textContent
+              );
+              const average = parseFloatOrZero(
+                row.querySelector(".AverageMarks")?.textContent
+              );
+              const minimum = parseFloatOrZero(
+                row.querySelector(".MinMarks")?.textContent
+              );
+              const maximum = parseFloatOrZero(
+                row.querySelector(".MaxMarks")?.textContent
+              );
+              const stdDev = parseFloatOrZero(
+                row.querySelector(".StdDev")?.textContent
+              );
+
+              // Calculate global statistics using the weightage/total ratio
+              if (total > 0) {
+                globalAverage += average * (weightage / total);
+                globalMinimum += minimum * (weightage / total);
+                globalMaximum += maximum * (weightage / total);
+                globalStdDev += stdDev * (weightage / total);
+              }
+            });
+          }
+        });
+
+        // Find or create the grand total table body
+        const grandTotalSection = document.getElementById(
+          `${courseId}-Grand_Total_Marks`
+        );
+        if (!grandTotalSection) return;
+
+        // Find the table inside the grand total section
+        const table = grandTotalSection.querySelector("table");
+        if (!table) return;
+
+        const tableBody = table.querySelector("tbody");
+        if (!tableBody) return;
+
+        // Clear any existing rows
+        tableBody.innerHTML = "";
+
+        // Create grand total row
+        const totalRow = document.createElement("tr");
+        totalRow.className = `totalColumn_${id} !bg-black !hover:bg-white/5 !transition-colors`;
+
+        // Helper to create a cell
+        const createTd = (value, className) => {
+          const td = document.createElement("td");
+          td.className = `text-center ${className} !p-3 !text-white/80 !border-y !border-white/10`;
+          td.textContent = typeof value === "number" ? value.toFixed(2) : value;
+          return td;
+        };
+
+        // Create and add cells
+        totalRow.appendChild(createTd(globalWeightage, "GrandtotalColMarks"));
+
+        // Apply color to obtained marks based on percentage
+        const obtTd = createTd(globalObtained, "GrandtotalObtMarks");
+        const percentage = (globalObtained / globalWeightage) * 100;
+        if (percentage < 50) {
+          obtTd.classList.add("!text-rose-400");
+        } else if (percentage < 70) {
+          obtTd.classList.add("!text-amber-400");
+        } else {
+          obtTd.classList.add("!text-emerald-400");
+        }
+        totalRow.appendChild(obtTd);
+
+        // Add remaining statistics
+        totalRow.appendChild(createTd(globalAverage, "GrandtotalClassAvg"));
+        totalRow.appendChild(createTd(globalMinimum, "GrandtotalClassMin"));
+        totalRow.appendChild(createTd(globalMaximum, "GrandtotalClassMax"));
+        totalRow.appendChild(createTd(globalStdDev, "GrandtotalClassStdDev"));
+
+        // Add the row to the table
+        tableBody.appendChild(totalRow);
+      };
+
+      // Attach event listeners to Grand Total accordions
+      document
+        .querySelectorAll('button[data-target*="Grand_Total_Marks"]')
+        .forEach((btn) => {
+          // Extract course ID and assessment ID
+          const targetId = btn.getAttribute("data-target");
+          if (!targetId) return;
+
+          const courseId = targetId.split("-")[0];
+          const onclick = btn.getAttribute("onclick");
+
+          if (onclick && onclick.includes("ftn_calculateMarks")) {
+            // Extract ID from the onclick attribute
+            const idMatch = onclick.match(/ftn_calculateMarks\('(\d+)'\)/);
+            if (idMatch && idMatch[1]) {
+              const id = idMatch[1];
+
+              // Replace the onclick handler
+              btn.removeAttribute("onclick");
+              btn.addEventListener("click", () => calculateMarks(courseId, id));
+
+              // Also trigger calculation when the accordion is expanded
+              btn.addEventListener("click", () => {
+                setTimeout(() => {
+                  if (btn.getAttribute("aria-expanded") === "true") {
+                    calculateMarks(courseId, id);
+                  }
+                }, 100);
+              });
+            }
+          }
+        });
+
+      // Auto-calculate all grand totals on page load
+      setTimeout(() => {
+        document
+          .querySelectorAll('[id$="Grand_Total_Marks"]')
+          .forEach((section) => {
+            const courseId = section.id.split("-")[0];
+
+            // Find an ID from a total row in this course
+            const courseElement = document.getElementById(courseId);
+            if (!courseElement) return;
+
+            let id = null;
+            const totalColumnElements = courseElement.querySelectorAll(
+              '[class*="totalColumn_"]'
+            );
+            if (totalColumnElements.length > 0) {
+              const classNames = totalColumnElements[0].className.split(" ");
+              for (const className of classNames) {
+                if (className.startsWith("totalColumn_")) {
+                  id = className.replace("totalColumn_", "");
+                  break;
+                }
+              }
+            }
+
+            if (id) {
+              calculateMarks(courseId, id);
+            }
+          });
+      }, 500);
+
       // Move the semester selection form to the portlet head
       const semesterForm = document.querySelector(
         'form[action="/Student/StudentMarks"]'
@@ -166,6 +397,7 @@ function MarksPage() {
           "!border",
           "!border-white/10",
           "!rounded-2xl",
+          "!p-4",
           "!mb-4"
         );
 
@@ -175,8 +407,7 @@ function MarksPage() {
           cardHeader.classList.add(
             "!bg-black",
             "!border-b",
-            "!border-white/10",
-            "!p-4"
+            "!border-white/10"
           );
 
           // Style the accordion button
@@ -195,24 +426,45 @@ function MarksPage() {
             // Add icon before button text
             const buttonText = accordionBtn.textContent.trim();
             accordionBtn.innerHTML = `
-                            <div class="h-8 w-8 rounded-lg bg-x mr-2 flex items-center justify-center">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
-                                    <path d="M12 5v14M5 12h14"/>
-                                </svg>
-                            </div>
-                            ${buttonText}
-                        `;
+                <div class="h-8 w-8 rounded-lg bg-x mr-2 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="plus-icon text-white">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="minus-icon text-white hidden">
+                        <path d="M5 12h14"/>
+                    </svg>
+                </div>
+                ${buttonText}
+            `;
+
+            // Force all accordions to be collapsed initially
+            // This will override any "aria-expanded" attributes
+            if (accordionBtn.getAttribute("aria-expanded") === "true") {
+              accordionBtn.setAttribute("aria-expanded", "false");
+              const collapseTarget = document.querySelector(
+                accordionBtn.getAttribute("data-target")
+              );
+              if (collapseTarget) {
+                collapseTarget.classList.remove("show");
+              }
+            }
 
             // Change icon for expanded state
             accordionBtn.addEventListener("click", function () {
               setTimeout(() => {
                 const isExpanded =
                   this.getAttribute("aria-expanded") === "true";
-                const iconContainer = this.querySelector("svg");
-                if (isExpanded && iconContainer) {
-                  iconContainer.innerHTML = '<path d="M5 12h14"/>';
-                } else if (iconContainer) {
-                  iconContainer.innerHTML = '<path d="M12 5v14M5 12h14"/>';
+                const plusIcon = this.querySelector(".plus-icon");
+                const minusIcon = this.querySelector(".minus-icon");
+
+                if (plusIcon && minusIcon) {
+                  if (isExpanded) {
+                    plusIcon.classList.add("hidden");
+                    minusIcon.classList.remove("hidden");
+                  } else {
+                    plusIcon.classList.remove("hidden");
+                    minusIcon.classList.add("hidden");
+                  }
                 }
               }, 100);
             });
@@ -226,7 +478,7 @@ function MarksPage() {
             "!p-4",
             "!bg-black",
             "!border",
-            "!border-white/10"
+            "!border-white/0"
           );
         }
       });
@@ -310,21 +562,8 @@ function MarksPage() {
                       cell.classList.add("!text-emerald-400");
                     }
 
-                    // Add percentage badge
-                    cell.innerHTML = `
-                                            <div class="flex items-center gap-2">
-                                                <span>${marks}</span>
-                                                <span class="text-xs px-2 py-1 rounded-md ${
-                                                  percentage < 50
-                                                    ? "bg-rose-500/20 text-rose-400"
-                                                    : percentage < 70
-                                                    ? "bg-amber-500/20 text-amber-400"
-                                                    : "bg-emerald-500/20 text-emerald-400"
-                                                }">
-                                                    ${percentage.toFixed(0)}%
-                                                </span>
-                                            </div>
-                                        `;
+                    // Set just the marks without percentage badge
+                    cell.textContent = marks;
                   }
                 }
               }
@@ -428,7 +667,7 @@ function MarksPage() {
         ?.classList.add(
           "!bg-black",
           "!border",
-          "!border-white/10",
+          "!border-white/0",
           "!rounded-3xl",
           "!p-4",
           "!shadow-lg"
