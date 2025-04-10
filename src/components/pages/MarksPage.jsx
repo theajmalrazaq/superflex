@@ -7,13 +7,35 @@ function MarksPage() {
   useEffect(() => {
     // Style semester selection form
     const styleMarksPageElements = () => {
+      // Define all variables at the beginning to prevent hoisting issues
+      let portletHead, semesterForm, formClone, selectElement, tabsNav;
+      let tabItems, tabContent, accordionCards, marksTables;
+      let styleElement;
+
+      // Helper functions
       const parseFloatOrZero = (value) => {
         if (!value || value === "-" || value.trim() === "") return 0;
         const parsedValue = parseFloat(value);
         return isNaN(parsedValue) ? 0 : parsedValue;
       };
 
+      // Helper function to get cell value (either from text content or input)
+      const getCellValue = (cell) => {
+        if (!cell) return 0;
+        return parseFloatOrZero(cell.textContent);
+      };
+
+      // Helper function to format decimal numbers properly
+      const formatDecimal = (value) => {
+        if (typeof value !== "number") {
+          value = parseFloatOrZero(value);
+        }
+        // Format to 2 decimal places and remove trailing zeros
+        return parseFloat(value.toFixed(2)).toString();
+      };
+
       const calculateMarks = (courseId, id) => {
+        console.log(`Calculating marks for course ${courseId}`);
         const course = document.getElementById(courseId);
         if (!course) return;
 
@@ -29,66 +51,84 @@ function MarksPage() {
         let globalMaximum = 0;
         let globalStdDev = 0;
 
-        // Function to check for best off marks
-        const checkBestOff = (section, weightage) => {
-          const calculationRows = section.querySelectorAll(`.calculationrow`);
-          let weightsOfAssessments = 0;
-          let count = 0;
-          for (let row of calculationRows) {
-            const weightageOfAssessment = parseFloatOrZero(
-              row.querySelector(".weightage")?.textContent
-            );
-            weightsOfAssessments += weightageOfAssessment;
-
-            if (weightage < weightsOfAssessments) {
-              return count;
-            }
-            count++;
-          }
-          return count;
-        };
-
-        // Function to reorder calculation rows based on obtained marks
-        const reorderCalculationRows = (section, bestOff) => {
-          const sectionArray = Array.from(
-            section.querySelectorAll(`.calculationrow`)
-          );
-          sectionArray.sort((a, b) => {
-            const aObtained = parseFloatOrZero(
-              a.querySelector(".ObtMarks")?.textContent
-            );
-            const bObtained = parseFloatOrZero(
-              b.querySelector(".ObtMarks")?.textContent
-            );
-            return bObtained - aObtained;
-          });
-          return sectionArray.slice(0, bestOff);
-        };
-
         sections.forEach((section) => {
-          // Find the total row for this section
           const totalRows = section.querySelectorAll("[class*='totalColumn_']");
           if (!totalRows.length) return;
 
           const totalRow = totalRows[totalRows.length - 1]; // Use the last total row
           if (!totalRow) return;
 
-          // Extract values from the section's total row
+          const totalObtMarksCell = totalRow.querySelector(".totalColObtMarks");
+          const totalWeightCell = totalRow.querySelector(".totalColweightage");
+
+          if (totalObtMarksCell && totalWeightCell) {
+            const existingObtMarks = parseFloatOrZero(
+              totalObtMarksCell.textContent
+            );
+            const existingWeight = parseFloatOrZero(
+              totalWeightCell.textContent
+            );
+
+            // If both obtained marks and total weight are valid values, skip calculation for this section
+            if (existingObtMarks > 0 && existingWeight > 0) {
+              // Just add to global totals without recalculating
+              globalWeightage += existingWeight;
+              globalObtained += existingObtMarks;
+
+              // Extract other statistics if they exist
+              const calculationRows =
+                section.querySelectorAll(".calculationrow");
+              calculationRows.forEach((row) => {
+                const weightage = parseFloatOrZero(
+                  row.querySelector(".weightage")?.textContent
+                );
+                const total = parseFloatOrZero(
+                  row.querySelector(".GrandTotal")?.textContent
+                );
+                const average = parseFloatOrZero(
+                  row.querySelector(".AverageMarks")?.textContent
+                );
+                const minimum = parseFloatOrZero(
+                  row.querySelector(".MinMarks")?.textContent
+                );
+                const maximum = parseFloatOrZero(
+                  row.querySelector(".MaxMarks")?.textContent
+                );
+                const stdDev = parseFloatOrZero(
+                  row.querySelector(".StdDev")?.textContent
+                );
+
+                // Calculate global statistics using the weightage/total ratio
+                if (total > 0) {
+                  globalAverage += average * (weightage / total);
+                  globalMinimum += minimum * (weightage / total);
+                  globalMaximum += maximum * (weightage / total);
+                  globalStdDev += stdDev * (weightage / total);
+                }
+              });
+
+              return; // Skip further calculation for this section
+            }
+          }
+
+          // If we reach here, we need to calculate for this section
+          // Skip recalculating section's total based on current marks
+          // Instead, just extract the values we need for the grand total
+
+          // Extract values from the section's total row for grand total calculations
           const localWeightage = parseFloatOrZero(
             totalRow.querySelector(".totalColweightage")?.textContent
           );
-          const localObtained = parseFloatOrZero(
-            totalRow.querySelector(".totalColObtMarks")?.textContent
+          const localObtained = getCellValue(
+            totalRow.querySelector(".totalColObtMarks")
           );
 
           if (localWeightage > 0) {
             globalWeightage += localWeightage;
             globalObtained += localObtained;
 
-            // Check if there are any best off marks
-            const bestOff = checkBestOff(section, localWeightage);
-            const calculationRows = reorderCalculationRows(section, bestOff);
-
+            // Extract statistics from calculation rows without recalculating section totals
+            const calculationRows = section.querySelectorAll(".calculationrow");
             calculationRows.forEach((row) => {
               const weightage = parseFloatOrZero(
                 row.querySelector(".weightage")?.textContent
@@ -145,7 +185,8 @@ function MarksPage() {
         const createTd = (value, className) => {
           const td = document.createElement("td");
           td.className = `text-center ${className} !p-3 !text-white/80 !border-y !border-white/10`;
-          td.textContent = typeof value === "number" ? value.toFixed(2) : value;
+          td.textContent =
+            typeof value === "number" ? formatDecimal(value) : value;
           return td;
         };
 
@@ -172,6 +213,97 @@ function MarksPage() {
 
         // Add the row to the table
         tableBody.appendChild(totalRow);
+
+        // Update course summary card with new calculation results
+        updateCourseSummaryCard(courseId, globalObtained, globalWeightage);
+
+        return { globalObtained, globalWeightage, percentage };
+      };
+
+      // Function to update a course's summary card after recalculation
+      const updateCourseSummaryCard = (courseId, obtained, weightage) => {
+        if (!courseId || !obtained || !weightage) return;
+
+        // Find the tab pane containing this course
+        const tabPane = document
+          .querySelector(`#${courseId}`)
+          .closest(".tab-pane");
+        if (!tabPane) return;
+
+        // Find the summary card
+        const summaryCard = tabPane.querySelector(".bg-zinc-900.rounded-2xl");
+        if (!summaryCard) return;
+
+        // Calculate percentage and determine grade
+        const percentage = (obtained / weightage) * 100;
+        let grade = "N/A";
+        let gradeColor = "text-white";
+
+        // Determine grade based on percentage
+        if (percentage >= 90) {
+          grade = "A";
+          gradeColor = "text-emerald-400";
+        } else if (percentage >= 80) {
+          grade = "B+";
+          gradeColor = "text-emerald-400";
+        } else if (percentage >= 70) {
+          grade = "B";
+          gradeColor = "text-blue-400";
+        } else if (percentage >= 60) {
+          grade = "C+";
+          gradeColor = "text-blue-400";
+        } else if (percentage >= 50) {
+          grade = "C";
+          gradeColor = "text-amber-400";
+        } else {
+          grade = "F";
+          gradeColor = "text-rose-400";
+        }
+
+        // Update grade display
+        const gradeDisplay = summaryCard.querySelector(".text-2xl.font-bold");
+        if (gradeDisplay) {
+          gradeDisplay.textContent = grade;
+          gradeDisplay.className = `text-2xl font-bold ${gradeColor}`;
+        }
+
+        // Update progress percentage text
+        const progressText = summaryCard.querySelector(
+          ".text-sm.text-white\\/70"
+        );
+        if (progressText) {
+          progressText.textContent = `Progress (${percentage.toFixed(1)}%)`;
+        }
+
+        // Update obtained/weight text
+        const obtainedText = summaryCard.querySelector(".text-sm.font-bold");
+        if (obtainedText) {
+          obtainedText.textContent = `${formatDecimal(
+            obtained
+          )}/${formatDecimal(weightage)}`;
+          obtainedText.className = `text-sm font-bold ${
+            percentage < 50
+              ? "text-rose-400"
+              : percentage < 70
+              ? "text-amber-400"
+              : "text-emerald-400"
+          }`;
+        }
+
+        // Update progress bar
+        const progressBar = summaryCard.querySelector(
+          ".w-full.h-2.bg-black .h-full"
+        );
+        if (progressBar) {
+          progressBar.style.width = `${percentage}%`;
+          progressBar.className = `h-full rounded-full ${
+            percentage < 50
+              ? "bg-rose-400"
+              : percentage < 70
+              ? "bg-amber-400"
+              : "bg-emerald-400"
+          }`;
+        }
       };
 
       // Attach event listeners to Grand Total accordions
@@ -239,14 +371,14 @@ function MarksPage() {
       }, 500);
 
       // Move the semester selection form to the portlet head
-      const semesterForm = document.querySelector(
+      portletHead = document.querySelector(".m-portlet__head");
+      semesterForm = document.querySelector(
         'form[action="/Student/StudentMarks"]'
       );
-      const portletHead = document.querySelector(".m-portlet__head");
 
       if (semesterForm && portletHead) {
         // Clone the form before removing it
-        const formClone = semesterForm.cloneNode(true);
+        formClone = semesterForm.cloneNode(true);
         // Remove the original form
         semesterForm.remove();
         // Add the form to the portlet head
@@ -257,7 +389,7 @@ function MarksPage() {
         formClone.classList.add("ml-4", "flex-1");
 
         // Make the select control match the theme
-        const selectElement = formClone.querySelector("select");
+        selectElement = formClone.querySelector("select");
         if (selectElement) {
           selectElement.classList.add(
             "!bg-black",
@@ -279,9 +411,7 @@ function MarksPage() {
       }
 
       // Style course tabs UI with modern design
-      const tabsNav = document.querySelector(
-        ".nav.nav-tabs.m-tabs.m-tabs-line"
-      );
+      tabsNav = document.querySelector(".nav.nav-tabs.m-tabs.m-tabs-line");
       if (tabsNav) {
         tabsNav.classList.add(
           "!flex",
@@ -293,7 +423,7 @@ function MarksPage() {
         );
 
         // Style individual course tabs
-        const tabItems = tabsNav.querySelectorAll(".nav-item.m-tabs__item");
+        tabItems = tabsNav.querySelectorAll(".nav-item.m-tabs__item");
         tabItems.forEach((tab) => {
           tab.classList.add("!m-0");
 
@@ -377,7 +507,7 @@ function MarksPage() {
       }
 
       // Style tab content area
-      const tabContent = document.querySelector(".tab-content");
+      tabContent = document.querySelector(".tab-content");
       if (tabContent) {
         tabContent.classList.add(
           "max-h-fit",
@@ -390,7 +520,7 @@ function MarksPage() {
       }
 
       // Style accordion elements for assessment categories
-      const accordionCards = document.querySelectorAll("#accordion .card");
+      accordionCards = document.querySelectorAll("#accordion .card");
       accordionCards.forEach((card) => {
         card.classList.add(
           "!bg-black",
@@ -404,11 +534,7 @@ function MarksPage() {
         // Style the card header
         const cardHeader = card.querySelector(".card-header");
         if (cardHeader) {
-          cardHeader.classList.add(
-            "!bg-black",
-            "!border-b",
-            "!border-white/10"
-          );
+          cardHeader.classList.add("!bg-black", "!border-none");
 
           // Style the accordion button
           const accordionBtn = cardHeader.querySelector(".btn-link");
@@ -438,7 +564,6 @@ function MarksPage() {
             `;
 
             // Force all accordions to be collapsed initially
-            // This will override any "aria-expanded" attributes
             if (accordionBtn.getAttribute("aria-expanded") === "true") {
               accordionBtn.setAttribute("aria-expanded", "false");
               const collapseTarget = document.querySelector(
@@ -484,7 +609,7 @@ function MarksPage() {
       });
 
       // Style the marks tables
-      const marksTables = document.querySelectorAll(".sum_table");
+      marksTables = document.querySelectorAll(".sum_table");
       marksTables.forEach((table) => {
         // Create a container for the table with modern styling
         const tableContainer = document.createElement("div");
@@ -542,15 +667,20 @@ function MarksPage() {
 
               // Style obtained marks with color indicators based on performance
               if (cell.classList.contains("ObtMarks")) {
-                const marks = cell.textContent.trim();
-                if (marks !== "-") {
-                  // Calculate percentage if possible
-                  const obtMarks = parseFloat(marks);
-                  const totalMarksCell = row.querySelector(".GrandTotal");
-                  if (totalMarksCell) {
-                    const totalMarks = parseFloat(
-                      totalMarksCell.textContent.trim()
-                    );
+                const originalMarks = cell.textContent.trim();
+
+                // Apply color based on percentage to the text
+                const totalMarksCell = row.querySelector(".GrandTotal");
+                if (totalMarksCell && originalMarks !== "-") {
+                  const totalMarks = parseFloat(
+                    totalMarksCell.textContent.trim()
+                  );
+                  const obtMarks = parseFloat(originalMarks);
+                  if (
+                    !isNaN(obtMarks) &&
+                    !isNaN(totalMarks) &&
+                    totalMarks > 0
+                  ) {
                     const percentage = (obtMarks / totalMarks) * 100;
 
                     // Apply color based on percentage
@@ -561,33 +691,16 @@ function MarksPage() {
                     } else {
                       cell.classList.add("!text-emerald-400");
                     }
-
-                    // Set just the marks without percentage badge
-                    cell.textContent = marks;
                   }
                 }
               }
             });
           });
         }
-
-        // Style table footer
-        const tfoot = table.querySelector("tfoot");
-        if (tfoot) {
-          const footerRows = tfoot.querySelectorAll("tr");
-          footerRows.forEach((row) => {
-            row.classList.add("!bg-zinc-900", "!font-bold");
-
-            const cells = row.querySelectorAll("td");
-            cells.forEach((cell) => {
-              cell.classList.add("!p-3", "!text-white");
-            });
-          });
-        }
       });
 
       // Add custom scrollbar styling
-      const styleElement = document.createElement("style");
+      styleElement = document.createElement("style");
       styleElement.textContent = `
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 8px;
@@ -615,19 +728,6 @@ function MarksPage() {
                     align-items: center;
                     gap: 0.75rem;
                 }
-                
-                .tab-pane h5:before {
-                    content: "";
-                    display: block;
-                    width: 40px;
-                    height: 40px;
-                    background-color: rgb(16, 185, 129);
-                    border-radius: 12px;
-                    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 19.5A2.5 2.5 0 0 1 6.5 17H20'%3E%3C/path%3E%3Cpath d='M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z'%3E%3C/path%3E%3C/svg%3E");
-                    mask-repeat: no-repeat;
-                    mask-position: center;
-                    mask-size: 24px;
-                }
             `;
       document.head.appendChild(styleElement);
 
@@ -647,19 +747,21 @@ function MarksPage() {
           "!mb-4"
         );
 
-      document.querySelector(".m-portlet__body")?.classList.add(
-        "!bg-black",
-        "!rounded-b-3xl",
-        "!p-8",
-        "!border",
-        "!border-white/10",
-        "!shadow-lg",
-        "!text-white",
-        "!h-[calc(100vh-220px)]", // Fixed height calculation
-        "!max-h-[800px]", // Maximum height limit
-        "!overflow-y-auto", // Enable vertical scrolling
-        "custom-scrollbar" // Apply custom scrollbar styling
-      );
+      document
+        .querySelector(".m-portlet__body")
+        ?.classList.add(
+          "!bg-black",
+          "!rounded-b-3xl",
+          "!p-8",
+          "!border",
+          "!border-white/10",
+          "!shadow-lg",
+          "!text-white",
+          "!h-[calc(100vh-220px)]",
+          "!max-h-[800px]",
+          "!overflow-y-auto",
+          "custom-scrollbar"
+        );
 
       // Make the main portlet match the theme
       document
