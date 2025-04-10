@@ -1,44 +1,55 @@
 import React, { useEffect, useState } from "react";
 import "../styles/loading.css";
 
-function LoadingOverlay() {
-  const [visible, setVisible] = useState(true);
+const LoadingOverlay = ({ show = true }) => {
+  const [isVisible, setIsVisible] = useState(show);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if document is already loaded
-    if (document.readyState === "complete") {
-      setVisible(false);
-      return;
-    }
+    // Set a timeout to hide the loading overlay after 2 seconds
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
 
-    // Handler function to hide overlay
-    const hideOverlay = () => {
-      setVisible(false);
-    };
+    // Listen for when the page has finished loading
+    window.addEventListener("load", () => {
+      setLoading(false);
+    });
 
-    // Add event listener
-    window.addEventListener("load", hideOverlay);
-
-    // Fallback timeout (3 seconds)
-    const timeoutId = setTimeout(() => {
-      setVisible(false);
-    }, 3000);
-
-    // Cleanup function
     return () => {
-      window.removeEventListener("load", hideOverlay);
-      clearTimeout(timeoutId);
+      clearTimeout(timer);
+      window.removeEventListener("load", () => {
+        setLoading(false);
+      });
     };
   }, []);
 
-  // Don't render anything if not visible
-  if (!visible) return null;
+  useEffect(() => {
+    if (!show || !loading) {
+      // Add a small delay before hiding to allow animation to complete
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    } else {
+      setIsVisible(true);
+    }
+  }, [show, loading]);
+
+  if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50 opacity-100 transition-opacity duration-500">
-      <div className="spinner"></div>
+    <div
+      className={`loading-overlay h-screen ${
+        !show || !loading ? "fade-out" : ""
+      }`}
+    >
+      <div className="absolute inset-0 bg-black flex items-center justify-center"></div>
+      <div className="flex flex-col items-center">
+        <div className="spinner mb-4"></div>
+      </div>
     </div>
   );
-}
+};
 
 export default LoadingOverlay;
