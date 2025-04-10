@@ -144,6 +144,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound }) {
         ".m-grid__item.m-grid__item--fluid.m-grid.m-grid--ver-desktop.m-grid--desktop.m-body"
       )
       .forEach((element) => {
+        element.classList.remove("m-grid--desktop", "m-body");
         element.classList.add(
           "!bg-dark",
           "!bg-black",
