@@ -150,9 +150,13 @@ function NavBar({ currentPage = "", onAttendanceLinkFound }) {
           "!bg-black",
           "!rounded-3xl",
           "!shadow-md",
-          "!p-4"
+          "!p-4",
+          "h-screen"
         );
       });
+    document.querySelectorAll(".m-content").forEach((element) => {
+      element.classList.add("!p-4");
+    });
 
     document.querySelector(".m-subheader")?.remove();
     // Remove the close button
