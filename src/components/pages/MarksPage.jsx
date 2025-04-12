@@ -393,7 +393,7 @@ function MarksPage() {
       const accordionCards = document.querySelectorAll("#accordion .card");
       accordionCards.forEach((card) => {
         card.classList.add(
-          "!bg-black",
+          "!bg-white/10",
           "!border",
           "!border-white/10",
           "!rounded-2xl",
@@ -404,7 +404,7 @@ function MarksPage() {
         // Style the card header
         const cardHeader = card.querySelector(".card-header");
         if (cardHeader) {
-          cardHeader.classList.add("!bg-black", "!border-b", "!border-white/0");
+          cardHeader.classList.add("!bg-black", "!border-none", "!p-0");
 
           // Style the accordion button
           const accordionBtn = cardHeader.querySelector(".btn-link");
@@ -415,6 +415,7 @@ function MarksPage() {
               "!w-full",
               "!text-left",
               "!flex",
+              "!bg-white/10",
               "!items-center",
               "!font-medium"
             );
@@ -491,7 +492,8 @@ function MarksPage() {
             "!p-4",
             "!bg-black",
             "!border",
-            "!border-white/0"
+            "!border-white/0",
+            "!rounded-[22px]"
           );
         }
       });
@@ -502,7 +504,7 @@ function MarksPage() {
         // Create a container for the table with modern styling
         const tableContainer = document.createElement("div");
         tableContainer.className =
-          "rounded-xl overflow-hidden !border !border-white/10 mb-4";
+          "rounded-xl overflow-hidden !border !border-white/10";
         table.parentNode.insertBefore(tableContainer, table);
         tableContainer.appendChild(table);
 
