@@ -29,8 +29,6 @@ function FeeDetailsPage() {
             );
         }
 
-
-
         // Style the portlet head
         const portletHead = element.querySelector(".m-portlet__head");
         if (portletHead) {
@@ -115,12 +113,6 @@ function FeeDetailsPage() {
                 );
             }
 
-            // Add flex to col-lg-3 elements
-            const colDiv = header.querySelector('.col-lg-3');
-            if (colDiv) {
-                colDiv.classList.add("!flex", "!items-center");
-            }
-
             // Style the expand/collapse buttons
             const expandBtn = header.querySelector("[id^='BtnhideshowInternal']");
             if (expandBtn) {
@@ -134,7 +126,7 @@ function FeeDetailsPage() {
                 );
                 expandBtn.classList.add(
                     "!bg-x",
-                    "!rounded-lg",
+                    "!rounded-full",
                     "!w-8",
                     "!h-8",
                     "!flex",
@@ -144,8 +136,7 @@ function FeeDetailsPage() {
                     "!border-none",
                     "!shadow-lg",
                     "!transition-all",
-                    "!duration-300",
-                    "!p-0"
+                    "!duration-300"
                 );
 
                 // Add animation for rotation on click
@@ -170,8 +161,7 @@ function FeeDetailsPage() {
                 semesterLabel.classList.add(
                     "!text-white",
                     "!font-medium",
-                    "!text-lg",
-                    "!mb-0"
+                    "!text-lg"
                 );
             }
 
@@ -208,17 +198,6 @@ function FeeDetailsPage() {
             });
         });
 
-        // Add null checks to prevent errors if elements don't exist
-        const sampleStdFeeDetail = document.getElementById("sample_StdFeeDetail");
-        if (sampleStdFeeDetail) {
-            sampleStdFeeDetail.classList.add("!p-6");
-        }
-
-        const sumhead = document.getElementById("rowStdDetailHeaderRow_0");
-        if (sumhead) {
-            sumhead.classList.add("!p-2", "!bg-white/10", "!mb-2");
-        }
-
         // Style the semester detail sections
         const semesterDetails = element.querySelectorAll("[id^='rowStdDetail_']");
         semesterDetails.forEach(detail => {
@@ -229,113 +208,442 @@ function FeeDetailsPage() {
                 "!overflow-hidden"
             );
 
-            // Improve Fee Details Row Layout - convert from side-by-side to column layout
-            const feeDetailsRow = detail.querySelector('.row');
-            if (feeDetailsRow) {
-                // Change row to column flex layout with full width
-                feeDetailsRow.classList.add('!flex', '!flex-col', '!w-full', '!gap-6');
-                feeDetailsRow.classList.remove('row');
+            // Create a modern grid layout for the Fee In Semester and Registration Log sections
+            const feeAndRegSections = detail.querySelectorAll(".col-lg-5, .col-lg-7");
+            if (feeAndRegSections.length === 2) {
+                // Convert the row layout to flex container
+                const container = document.createElement('div');
+                container.className = 'flex flex-col lg:flex-row gap-6 w-full';
 
-                // Make both sections full width
-                const feeInSemesterCol = feeDetailsRow.querySelector('.col-lg-5');
-                const registrationLogCol = feeDetailsRow.querySelector('.col-lg-7');
+                // Get parent element to replace children
+                const parentElement = feeAndRegSections[0].parentElement;
 
-                if (feeInSemesterCol) {
-                    feeInSemesterCol.classList.remove('col-lg-5');
-                    feeInSemesterCol.classList.add('!w-full');
+                // Add the sections to the new container
+                feeAndRegSections.forEach(section => {
+                    container.appendChild(section.cloneNode(true));
+                });
 
-                    // Style Fee In Semester section
-                    const feeInSemesterHeader = feeInSemesterCol.querySelector('h4');
-                    if (feeInSemesterHeader) {
-                        feeInSemesterHeader.classList.add('!text-xl', '!font-bold', '!text-white', '!mb-3');
+                // Replace original elements with the new container
+                if (parentElement) {
+                    while (parentElement.firstChild) {
+                        parentElement.removeChild(parentElement.firstChild);
+                    }
+                    parentElement.appendChild(container);
+
+                    // Style the Fee In Semester section
+                    const feeSection = container.querySelector(".col-lg-5");
+                    if (feeSection) {
+                        feeSection.className = "w-full lg:w-5/12 flex-none";
+
+                        // Style the heading
+                        const heading = feeSection.querySelector("h4");
+                        if (heading) {
+                            heading.classList.add(
+                                "!text-x",
+                                "!text-xl",
+                                "!font-bold",
+                                "!mb-4"
+                            );
+                            // Remove the hr tag after the heading
+                            const hr = heading.nextElementSibling;
+                            if (hr && hr.tagName === 'HR') {
+                                hr.remove();
+                            }
+                        }
+
+                        // Style the main container
+                        const feeContainer = feeSection.querySelector(".border.border-secondary");
+                        if (feeContainer) {
+                            feeContainer.classList.remove("border", "border-secondary", "col-md-12");
+                            feeContainer.classList.add(
+                                "!bg-zinc-900/30",
+                                "!rounded-xl",
+                                "!p-4",
+                                "!border",
+                                "!border-white/10",
+                                "!shadow-lg"
+                            );
+
+                            // Create a new layout for fee items (A-G)
+                            const feeItems = feeContainer.querySelectorAll("[id^='row']");
+                            feeItems.forEach(item => {
+                                // Get label and value elements
+                                const labelElement = item.querySelector("label:first-of-type");
+                                const valueElement = item.querySelector("label:last-of-type");
+
+                                if (labelElement && valueElement) {
+                                    // Create a modern card for each fee item
+                                    item.classList.add(
+                                        "!bg-black/20",
+                                        "!rounded-lg",
+                                        "!p-3",
+                                        "!mb-3",
+                                        "!border",
+                                        "!border-white/5"
+                                    );
+
+                                    // Style the row
+                                    const row = item.querySelector(".row");
+                                    if (row) {
+                                        row.classList.add(
+                                            "!flex",
+                                            "!justify-between",
+                                            "!items-center",
+                                            "!gap-2"
+                                        );
+
+                                        // Style columns
+                                        const cols = row.querySelectorAll("[class^='col-']");
+                                        cols.forEach(col => {
+                                            col.className = col.classList.contains("float-right") ?
+                                                "text-right" : "";
+                                        });
+                                    }
+
+                                    // Style labels
+                                    if (labelElement) {
+                                        labelElement.classList.add("!text-white/80", "!font-medium");
+                                        const boldText = labelElement.querySelector("b");
+                                        if (boldText) {
+                                            boldText.classList.add("!text-x", "!font-bold", "!mr-1");
+                                        }
+                                    }
+
+                                    // Style values based on content
+                                    if (valueElement) {
+                                        valueElement.classList.add("!font-bold");
+
+                                        // Get the numeric value
+                                        const value = valueElement.textContent.trim();
+                                        const numericValue = parseFloat(value.replace(/[^0-9.-]/g, ''));
+
+                                        // Style based on the type of fee and value
+                                        if (item.id.includes("Collection")) {
+                                            valueElement.classList.add("!text-emerald-400");
+                                        } else if (item.id.includes("Balance")) {
+                                            if (numericValue < 0) {
+                                                valueElement.classList.add("!text-rose-400");
+                                            } else if (numericValue > 0) {
+                                                valueElement.classList.add("!text-amber-400");
+                                            } else {
+                                                valueElement.classList.add("!text-white");
+                                            }
+                                        } else if (item.id.includes("Arrears") && numericValue < 0) {
+                                            valueElement.classList.add("!text-rose-400");
+                                        } else {
+                                            valueElement.classList.add("!text-white");
+                                        }
+                                    }
+                                }
+
+                                // Style lists (for due in semester, discount, etc.)
+                                const list = item.querySelector("ul");
+                                if (list) {
+                                    list.classList.add(
+                                        "!mt-2",
+                                        "!pl-6",
+                                        "!text-white/70"
+                                    );
+
+                                    const listItems = list.querySelectorAll("li");
+                                    listItems.forEach(li => {
+                                        li.classList.add("!mb-1");
+
+                                        // Style the amounts in list items
+                                        const bold = li.querySelector("b");
+                                        if (bold) {
+                                            bold.classList.add("!text-white", "!font-medium");
+                                        }
+                                    });
+                                }
+                            });
+                        }
                     }
 
-                    // Improve layout of fee breakdown container
-                    const feeBreakdownContainer = feeInSemesterCol.querySelector('.border.border-secondary');
-                    if (feeBreakdownContainer) {
-                        feeBreakdownContainer.classList.remove('border', 'border-secondary');
-                        feeBreakdownContainer.classList.add(
-                            '!bg-zinc-900/40',
-                            '!rounded-xl',
-                            '!p-5',
-                            '!border',
-                            '!border-white/10'
-                        );
-                    }
+                    // Style the Registration Log section
+                    const regSection = container.querySelector(".col-lg-7");
+                    if (regSection) {
+                        regSection.className = "w-full lg:w-7/12 flex-none";
 
-                    // Improve layout of fee items
-                    const feeItems = feeInSemesterCol.querySelectorAll('.row');
-                    feeItems.forEach(row => {
-                        row.classList.add('!flex', '!justify-between', '!items-center', '!mb-3');
-
-                        // Style labels and values
-                        const labels = row.querySelectorAll('label');
-                        labels.forEach(label => {
-                            label.removeAttribute('style');
-                            label.classList.add('!text-white/80', '!font-medium');
-
-                            // Style section letters (A, B, C, etc.)
-                            const boldText = label.querySelector('b');
-                            if (boldText && boldText.textContent.match(/[A-G]\)/)) {
-                                boldText.classList.add('!text-x', '!font-bold', '!mr-1');
+                        // Style the heading
+                        const heading = regSection.querySelector("h4");
+                        if (heading) {
+                            heading.classList.add(
+                                "!text-x",
+                                "!text-xl",
+                                "!font-bold",
+                                "!mb-4"
+                            );
+                            // Remove the hr tag after the heading
+                            const hr = heading.nextElementSibling;
+                            if (hr && hr.tagName === 'HR') {
+                                hr.remove();
                             }
-                        });
-                    });
+                        }
 
-                    // Style fee breakdown lists
-                    const feeLists = feeInSemesterCol.querySelectorAll('ul');
-                    feeLists.forEach(list => {
-                        list.classList.add('!pl-6', '!mt-1', '!mb-3', '!text-white/70');
+                        // Style the main container
+                        const regContainer = regSection.querySelector(".border.border-secondary");
+                        if (regContainer) {
+                            regContainer.classList.remove("border", "border-secondary", "col-lg-12");
+                            regContainer.classList.add(
+                                "!bg-zinc-900/30",
+                                "!rounded-xl",
+                                "!p-4",
+                                "!border",
+                                "!border-white/10",
+                                "!shadow-lg"
+                            );
 
-                        const listItems = list.querySelectorAll('li');
-                        listItems.forEach(item => {
-                            item.classList.add('!mb-1');
+                            // Create a flex container for SGPA and CGPA
+                            const sgpaRow = regContainer.querySelector(".row:first-of-type");
+                            const cgpaRow = regContainer.querySelector(".row:nth-of-type(2)");
 
-                            // Make the amounts bold
-                            const boldAmount = item.querySelector('b');
-                            if (boldAmount) {
-                                boldAmount.classList.add('!text-white', '!font-medium');
+                            if (sgpaRow && cgpaRow) {
+                                // Create a card container for academic indicators
+                                const academicCard = document.createElement('div');
+                                academicCard.className = 'flex flex-col sm:flex-row gap-3 mb-4';
+
+                                // SGPA Card
+                                const sgpaLabel = sgpaRow.querySelector("label:first-of-type");
+                                const sgpaValue = sgpaRow.querySelector("label:last-of-type");
+                                if (sgpaLabel && sgpaValue) {
+                                    const sgpaCard = document.createElement('div');
+                                    sgpaCard.className = 'bg-black/20 rounded-lg p-3 flex-1 !border !border-white/5';
+                                    sgpaCard.innerHTML = `
+                                        <span class="block text-xs text-white/60 mb-1">${sgpaLabel.textContent}</span>
+                                        <div class="flex items-center">
+                                            <span class="text-lg font-bold text-blue-400">${sgpaValue.textContent}</span>
+                                        </div>
+                                    `;
+                                    academicCard.appendChild(sgpaCard);
+                                }
+
+                                // CGPA Card
+                                const cgpaLabel = cgpaRow.querySelector("label:first-of-type");
+                                const cgpaValue = cgpaRow.querySelector("label:last-of-type");
+                                if (cgpaLabel && cgpaValue) {
+                                    const cgpaCard = document.createElement('div');
+                                    cgpaCard.className = 'bg-black/20 rounded-lg p-3 flex-1 !border !border-white/5';
+
+                                    // Get numeric CGPA for color coding
+                                    const cgpaNumeric = parseFloat(cgpaValue.textContent);
+                                    let cgpaColorClass = "text-blue-400"; // Default
+
+                                    if (!isNaN(cgpaNumeric)) {
+                                        if (cgpaNumeric >= 3.5) {
+                                            cgpaColorClass = "text-emerald-400";
+                                        } else if (cgpaNumeric >= 2.5) {
+                                            cgpaColorClass = "text-blue-400";
+                                        } else if (cgpaNumeric >= 2.0) {
+                                            cgpaColorClass = "text-amber-400";
+                                        } else {
+                                            cgpaColorClass = "text-rose-400";
+                                        }
+                                    }
+
+                                    cgpaCard.innerHTML = `
+                                        <span class="block text-xs text-white/60 mb-1">${cgpaLabel.textContent}</span>
+                                        <div class="flex items-center">
+                                            <span class="text-lg font-bold ${cgpaColorClass}">${cgpaValue.textContent}</span>
+                                        </div>
+                                    `;
+                                    academicCard.appendChild(cgpaCard);
+                                }
+
+                                // Insert before the tables
+                                sgpaRow.parentNode.insertBefore(academicCard, sgpaRow);
+
+                                // Remove original rows
+                                sgpaRow.remove();
+                                cgpaRow.remove();
                             }
-                        });
-                    });
-                }
 
-                if (registrationLogCol) {
-                    registrationLogCol.classList.remove('col-lg-7');
-                    registrationLogCol.classList.add('!w-full');
+                            // Style the registration table
+                            const registerTable = regContainer.querySelector('#tblRegisteredCoursesDetail_0');
+                            if (registerTable) {
+                                registerTable.classList.add(
+                                    "!w-full",
+                                    "!border-collapse",
+                                    "!rounded-lg",
+                                    "!overflow-hidden",
+                                    "!border",
+                                    "!border-white/10",
+                                    "!mb-4"
+                                );
 
-                    // Style Registration Log section
-                    const regLogHeader = registrationLogCol.querySelector('h4');
-                    if (regLogHeader) {
-                        regLogHeader.classList.add('!text-xl', '!font-bold', '!text-white', '!mb-3');
-                    }
+                                // Remove bootstrap classes
+                                registerTable.classList.remove(
+                                    "table",
+                                    "table-responsive",
+                                    "m-table",
+                                    "m-table--border-info",
+                                    "m-table--head-bg-info"
+                                );
 
-                    // Style the hr elements
-                    const hrElements = registrationLogCol.querySelectorAll('hr');
-                    hrElements.forEach(hr => {
-                        hr.classList.add('!border-white/10', '!mb-4');
-                    });
+                                // Style table header
+                                const thead = registerTable.querySelector('thead');
+                                if (thead) {
+                                    thead.classList.add("!bg-zinc-900");
 
-                    // Improve GPA display
-                    const gpaRows = registrationLogCol.querySelectorAll('.row:not(:last-child)');
-                    gpaRows.forEach(row => {
-                        row.classList.add('!flex', '!items-center', '!mb-2');
+                                    const headerRow = thead.querySelector('tr');
+                                    if (headerRow) {
+                                        headerRow.removeAttribute('style');
+                                        headerRow.classList.add("!border-b", "!border-white/10");
 
-                        const labels = row.querySelectorAll('label');
-                        labels.forEach((label, index) => {
-                            label.removeAttribute('style');
-                            if (index === 0) {
-                                label.classList.add('!text-white/70', '!font-medium', '!mr-2', '!min-w-[50px]');
-                            } else {
-                                label.classList.add('!text-white', '!font-bold');
+                                        const headerCells = headerRow.querySelectorAll('th');
+                                        headerCells.forEach(cell => {
+                                            cell.removeAttribute('style');
+                                            cell.classList.add(
+                                                "!text-gray-400",
+                                                "!font-medium",
+                                                "!p-3",
+                                                "!text-left",
+                                                "!bg-transparent"
+                                            );
+                                        });
+                                    }
+                                }
+
+                                // Style table body
+                                const tbody = registerTable.querySelector('tbody');
+                                if (tbody) {
+                                    tbody.classList.add("!divide-y", "!divide-white/10");
+
+                                    const rows = tbody.querySelectorAll('tr');
+                                    rows.forEach(row => {
+                                        row.classList.add(
+                                            "!bg-black/40",
+                                            "!hover:bg-white/5",
+                                            "!transition-colors"
+                                        );
+
+                                        const cells = row.querySelectorAll('td');
+                                        cells.forEach((cell, index) => {
+                                            cell.classList.add(
+                                                "!p-3",
+                                                "!text-white/80",
+                                                "!border-y",
+                                                "!border-white/10"
+                                            );
+
+                                            // Style course title (typically the 2nd column)
+                                            if (index === 1) {
+                                                cell.classList.add("!font-medium", "!text-white");
+                                            }
+
+                                            // Style status column (typically the 4th column)
+                                            if (index === 3) {
+                                                const status = cell.textContent.trim();
+                                                cell.innerHTML = `<span class="bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded-md text-sm font-medium">${status}</span>`;
+                                            }
+
+                                            // Style date column (typically the 5th column)
+                                            if (index === 4) {
+                                                cell.classList.add("!text-blue-400");
+                                            }
+                                        });
+                                    });
+                                }
                             }
-                        });
-                    });
 
-                    // Style installment section
-                    const installmentHeader = registrationLogCol.querySelector('#lbIsntallmentHead_0');
-                    if (installmentHeader) {
-                        installmentHeader.classList.add('!text-lg', '!font-bold', '!text-white', '!mt-4', '!mb-3');
+                            // Style the installment section
+                            const installmentSection = regContainer.querySelector('#rowInstallment_0');
+                            if (installmentSection) {
+                                // Style the heading
+                                const installmentHeading = installmentSection.querySelector('h4');
+                                if (installmentHeading) {
+                                    installmentHeading.classList.add(
+                                        "!text-white",
+                                        "!text-lg",
+                                        "!font-bold",
+                                        "!mt-4",
+                                        "!mb-3"
+                                    );
+                                }
+
+                                // Style the installment table
+                                const installmentTable = installmentSection.querySelector('#tblInstallmentDetail_0');
+                                if (installmentTable) {
+                                    installmentTable.classList.add(
+                                        "!w-full",
+                                        "!border-collapse",
+                                        "!rounded-lg",
+                                        "!overflow-hidden",
+                                        "!border",
+                                        "!border-white/10"
+                                    );
+
+                                    // Remove bootstrap classes
+                                    installmentTable.classList.remove(
+                                        "table",
+                                        "table-responsive",
+                                        "m-table",
+                                        "m-table--border-info",
+                                        "m-table--head-bg-info"
+                                    );
+
+                                    // Style table header
+                                    const thead = installmentTable.querySelector('thead');
+                                    if (thead) {
+                                        thead.classList.add("!bg-zinc-900");
+
+                                        const headerCells = thead.querySelectorAll('th');
+                                        headerCells.forEach(cell => {
+                                            cell.classList.add(
+                                                "!text-gray-400",
+                                                "!font-medium",
+                                                "!p-3",
+                                                "!text-left",
+                                                "!bg-transparent",
+                                                "!border-b",
+                                                "!border-white/10"
+                                            );
+                                        });
+                                    }
+
+                                    // Style table body
+                                    const tbody = installmentTable.querySelector('tbody');
+                                    if (tbody) {
+                                        tbody.classList.add("!divide-y", "!divide-white/10");
+
+                                        const rows = tbody.querySelectorAll('tr');
+                                        rows.forEach(row => {
+                                            row.classList.add(
+                                                "!bg-black/40",
+                                                "!hover:bg-white/5",
+                                                "!transition-colors"
+                                            );
+
+                                            const cells = row.querySelectorAll('td');
+                                            cells.forEach((cell, index) => {
+                                                cell.classList.add(
+                                                    "!p-3",
+                                                    "!text-white/80",
+                                                    "!border-y",
+                                                    "!border-white/10"
+                                                );
+
+                                                // Style amount column (index 1)
+                                                if (index === 1) {
+                                                    cell.classList.add("!font-medium", "!text-emerald-400");
+                                                }
+
+                                                // Style status column (index 4)
+                                                if (index === 4) {
+                                                    const status = cell.textContent.trim();
+                                                    cell.innerHTML = `<span class="bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded-md text-sm font-medium">${status}</span>`;
+                                                }
+
+                                                // Style due date (index 3)
+                                                if (index === 3) {
+                                                    cell.classList.add("!text-blue-400");
+                                                }
+                                            });
+                                        });
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -544,7 +852,7 @@ function FeeDetailsPage() {
 
         // Add a summary card at the top
         const summaryContainer = document.createElement("div");
-        summaryContainer.className = "bg-zinc-900 rounded-2xl p-6 mb-6 !border !border-white/10";
+        summaryContainer.className = "bg-zinc-900/50 rounded-2xl p-6 mb-6 !border !border-white/10 shadow-lg";
 
         // Calculate total paid
         let totalPaid = 0;
@@ -556,6 +864,9 @@ function FeeDetailsPage() {
             }
         });
 
+        // Count total number of transactions
+        const transactionCount = element.querySelectorAll("#sample_CollectionDetail tbody tr").length;
+
         // Find the latest payment
         const latestPaymentRow = element.querySelector("#sample_CollectionDetail tbody tr");
         let latestPaymentInfo = "";
@@ -563,16 +874,27 @@ function FeeDetailsPage() {
             const semester = latestPaymentRow.querySelector("td:nth-child(2)")?.textContent || "";
             const amount = latestPaymentRow.querySelector("td:nth-child(6)")?.textContent || "";
             const date = latestPaymentRow.querySelector("td:nth-child(8)")?.textContent || "";
+            const challanNo = latestPaymentRow.querySelector("td:nth-child(3)")?.textContent || "";
 
             latestPaymentInfo = `
                 <div class="mt-4 pt-4 !border-t !border-white/10">
                     <h4 class="text-sm font-medium text-white/70 mb-2">Latest Payment</h4>
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <span class="block text-white font-medium">${semester}</span>
-                            <span class="text-sm text-white/70">${date}</span>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="bg-black/40 rounded-xl p-3 !border !border-white/5">
+                            <span class="block text-xs text-white/60 mb-1">Semester</span>
+                            <span class="text-white font-medium">${semester}</span>
                         </div>
-                        <span class="text-lg font-bold text-emerald-400">${amount}</span>
+                        <div class="bg-black/40 rounded-xl p-3 !border !border-white/5">
+                            <span class="block text-xs text-white/60 mb-1">Challan No.</span>
+                            <span class="text-white font-medium">${challanNo}</span>
+                        </div>
+                        <div class="bg-black/40 rounded-xl p-3 !border !border-white/5 flex justify-between items-center">
+                            <div>
+                                <span class="block text-xs text-white/60 mb-1">Payment Date</span>
+                                <span class="text-white font-medium">${date}</span>
+                            </div>
+                            <span class="text-lg font-bold text-emerald-400">${amount}</span>
+                        </div>
                     </div>
                 </div>
             `;
@@ -582,17 +904,17 @@ function FeeDetailsPage() {
             <div class="flex flex-col md:flex-row justify-between items-start gap-4">
                 <div class="flex items-start gap-4">
                     <div class="h-12 w-12 rounded-xl bg-x flex items-center justify-center">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
                             <rect x="2" y="5" width="20" height="14" rx="2"></rect>
                             <line x1="2" y1="10" x2="22" y2="10"></line>
                         </svg>
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-white">Fee Payment Summary</h3>
-                        <p class="text-sm text-white/70 mt-1">Showing all fee transactions</p>
+                        <p class="text-sm text-white/70 mt-1">Showing ${transactionCount} fee transactions</p>
                     </div>
                 </div>
-                <div class="bg-black rounded-xl px-6 py-3 !border !border-white/10 text-center w-full md:w-auto">
+                <div class="bg-black/40 rounded-xl px-6 py-4 !border !border-white/10 text-center w-full md:w-auto">
                     <span class="block text-xs text-white/70 mb-1">Total Paid</span>
                     <span class="text-2xl font-bold text-emerald-400">Rs. ${totalPaid.toLocaleString()}</span>
                 </div>
@@ -604,6 +926,129 @@ function FeeDetailsPage() {
         if (portletBody && portletBody.firstChild) {
             portletBody.insertBefore(summaryContainer, portletBody.firstChild);
         }
+
+        semesterHeaders.forEach((header) => {
+            const row = header.querySelector('.row');
+            if (row) {
+                row.classList.add(
+                    "!bg-black/40",
+                    "!rounded-xl",
+                    "!p-4",
+                    "!border",
+                    "!border-white/10",
+                    "!mb-4",
+                    "!flex",
+                    "!items-center",
+                    "!gap-2",
+                    "!transition-colors",
+                    "!duration-300",
+                    "!hover:bg-white/5"
+                );
+            }
+
+            // Style the expand/collapse buttons
+            const expandBtn = header.querySelector("[id^='BtnhideshowInternal']");
+            if (expandBtn) {
+                expandBtn.classList.remove(
+                    "btn-brand",
+                    "m-btn",
+                    "m-btn--custom",
+                    "m-btn--icon",
+                    "m-btn--pill",
+                    "m-btn--air"
+                );
+                expandBtn.classList.add(
+                    "!bg-x/80",
+                    "!rounded-xl",
+                    "!w-8",
+                    "!h-8",
+                    "!flex",
+                    "!items-center",
+                    "!justify-center",
+                    "!mr-2",
+                    "!border-none",
+                    "!shadow-lg",
+                    "!transition-all",
+                    "!duration-300",
+                    "!hover:bg-x"
+                );
+
+                // Add animation for rotation on click
+                expandBtn.addEventListener('click', function () {
+                    const icon = this.querySelector('i');
+                    const targetId = this.getAttribute('onclick').match(/ftn_ShowHideDivandData\((\d+)/)[1];
+                    const targetDiv = document.getElementById(`rowStdDetail_${targetId}`);
+
+                    if (targetDiv.style.display === 'none') {
+                        icon.classList.remove('fa-angle-right');
+                        icon.classList.add('fa-angle-down', 'transform', 'transition-transform', 'duration-300');
+                    } else {
+                        icon.classList.remove('fa-angle-down');
+                        icon.classList.add('fa-angle-right', 'transform', 'transition-transform', 'duration-300');
+                    }
+                });
+            }
+
+            // Style semester labels
+            const semesterLabel = header.querySelector('label');
+            if (semesterLabel) {
+                semesterLabel.classList.add(
+                    "!text-white",
+                    "!font-medium",
+                    "!text-lg"
+                );
+            }
+
+            // Create a grid layout for the financial summaries in the header
+            const allColumns = header.querySelectorAll('.row > div:not(:first-child)');
+            const columnContainer = document.createElement('div');
+            columnContainer.className = 'flex-1 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 mt-2';
+
+            // Style the amount text cells and move them to the grid
+            const columnTitles = ['Arrears', 'Due', 'Discount', 'Sponsored', 'Collection', 'Balance'];
+            allColumns.forEach((column, colIndex) => {
+                const title = columnTitles[colIndex];
+                const value = column.querySelector('p')?.textContent.trim() || '0';
+                const amount = parseFloat(value.replace(/[(),%]/g, ''));
+
+                const card = document.createElement('div');
+                card.className = 'bg-black/40 rounded-lg p-2 !border !border-white/5';
+
+                let valueClass = '!text-white/80 !font-medium';
+
+                // Style based on content and column type
+                if (!isNaN(amount)) {
+                    // Collection (index 4)
+                    if (colIndex === 4) {
+                        valueClass = "!text-emerald-400 !font-bold";
+                    }
+                    // Balance (index 5)
+                    else if (colIndex === 5) {
+                        valueClass = amount < 0 ? "!text-rose-400" :
+                            amount > 0 ? "!text-amber-400" : "!text-white/80";
+                    }
+                    // Arrears (index 0)
+                    else if (colIndex === 0 && amount < 0) {
+                        valueClass = "!text-rose-400";
+                    }
+                }
+
+                card.innerHTML = `
+                    <span class="block text-xs text-white/60 mb-1">${title}</span>
+                    <span class="${valueClass}">${value}</span>
+                `;
+
+                columnContainer.appendChild(card);
+                column.remove(); // Remove the original column
+            });
+
+            // Add the grid container after the semester label
+            const firstColumn = header.querySelector('.row > div:first-child');
+            if (firstColumn) {
+                firstColumn.after(columnContainer);
+                firstColumn.classList.add('flex', 'items-center');
+            }
+        });
     };
 
     return (
