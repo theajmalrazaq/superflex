@@ -321,7 +321,7 @@ function RetakeExamPage() {
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                        <line x1="12" y1="15" x2="12.01" y2="15"></line>
                     </svg>
                 `;
                 downloadBtn.classList.add("!w-10", "!h-10", "!p-0", "!justify-center");
@@ -409,6 +409,7 @@ function RetakeExamPage() {
         document.querySelectorAll(".modal-dialog").forEach(modal => {
             modal.classList.add("!border", "!border-white/10", "!rounded-2xl", "!shadow-lg", "!bg-black", "!p-4");
         });
+        document.querySelector("#DataErrormsgdiv_RetakeModalReason").remove();
 
         // Style the buttons
         const buttons = element.querySelectorAll(".btn");
@@ -548,9 +549,7 @@ function RetakeExamPage() {
 
                     const uploadIcon = document.createElement("div");
                     uploadIcon.innerHTML = `
-                        <svg class="mx-auto h-12 w-12 text-x/30" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H8m36-12h-4m4 0H20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
+                       <svg xmlns="http://www.w3.org/2000/svg" width="24" class="mx-auto h-12 w-12 text-x/30" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload-icon lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                     `;
 
                     const text = document.createElement("div");
