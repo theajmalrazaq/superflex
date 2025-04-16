@@ -407,6 +407,12 @@ function CourseWithdrawPage() {
       if (thead) {
         thead.classList.add("!bg-zinc-900", "!sticky", "!top-0", "!z-10");
 
+        // Remove the checkbox column header
+        const checkboxHeader = thead.querySelector("#Checkallhide_Show");
+        if (checkboxHeader) {
+          checkboxHeader.innerHTML = "Select";
+        }
+
         const headers = thead.querySelectorAll("th");
         headers.forEach((header) => {
           header.classList.add(
