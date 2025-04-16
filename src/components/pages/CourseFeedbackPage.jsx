@@ -68,7 +68,7 @@ function CourseFeedbackPage() {
         iconElement.classList.add(
           "!text-white",
           "!text-2xl",
-          "!bg-amber-500",
+          "!bg-x",
           "!rounded-full",
           "!p-2",
           "!w-12",
@@ -139,7 +139,7 @@ function CourseFeedbackPage() {
         // Style the strong element
         const strongElement = alertText.querySelector("strong");
         if (strongElement) {
-          strongElement.classList.add("!text-amber-400");
+          strongElement.classList.add("!text-x");
         }
       }
     });

@@ -98,7 +98,8 @@ function NavBar({ currentPage = "", onAttendanceLinkFound }) {
           }
         });
       }
-      return links;
+      // Filter out "Grade Report" links
+      return links.filter((link) => link.text.trim() !== "Grade Report");
     };
 
     // Extract links first

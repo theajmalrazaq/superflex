@@ -278,8 +278,7 @@ function RetakeExamPage() {
         "!border-white/10",
         "!shadow-lg",
         "!text-white",
-        "!h-[calc(100vh-220px)]",
-        "!max-h-[800px]",
+        "!h-[400px]",
         "!overflow-y-auto",
         "custom-scrollbar"
       );

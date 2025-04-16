@@ -371,8 +371,7 @@ function CourseWithdrawPage() {
         "!border-white/10",
         "!shadow-lg",
         "!text-white",
-        "!h-[calc(100vh-220px)]",
-        "!max-h-[800px]",
+        "!h-[500px]",
         "!overflow-y-auto",
         "custom-scrollbar"
       );

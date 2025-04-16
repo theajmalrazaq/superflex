@@ -172,6 +172,119 @@ function MarksPage() {
 
         // Add the row to the table
         tableBody.appendChild(totalRow);
+
+        // Additional calculations for each section's table
+        sections.forEach((section) => {
+          // Find all tables in this section
+          const tables = section.querySelectorAll(".sum_table");
+
+          tables.forEach((table) => {
+            // Get all calculation rows
+            const calculationRows = table.querySelectorAll(".calculationrow");
+
+            // Values for weighted calculations
+            let weightedAvgSum = 0;
+            let weightedMinSum = 0;
+            let weightedMaxSum = 0;
+
+            calculationRows.forEach((row) => {
+              const weightage = parseFloatOrZero(
+                row.querySelector(".weightage")?.textContent
+              );
+              const totalMarks = parseFloatOrZero(
+                row.querySelector(".GrandTotal")?.textContent
+              );
+              const average = parseFloatOrZero(
+                row.querySelector(".AverageMarks")?.textContent
+              );
+              const minimum = parseFloatOrZero(
+                row.querySelector(".MinMarks")?.textContent
+              );
+              const maximum = parseFloatOrZero(
+                row.querySelector(".MaxMarks")?.textContent
+              );
+
+              if (totalMarks > 0 && average > 0) {
+                // Calculate weighted values
+                weightedAvgSum += average * (weightage / totalMarks);
+                weightedMinSum += minimum * (weightage / totalMarks);
+                weightedMaxSum += maximum * (weightage / totalMarks);
+              }
+            });
+
+            // Try to find footer row in tfoot
+            const tfoot = table.querySelector("tfoot");
+            if (tfoot && tfoot.querySelector("tr")) {
+              const footerRow = tfoot.querySelector("tr");
+              // Update footer cells with weighted calculations
+              const avgCell = footerRow.querySelector(".totalColAverageMarks");
+              const minCell = footerRow.querySelector(".totalColMinMarks");
+              const maxCell = footerRow.querySelector(".totalColMaxMarks");
+
+              if (avgCell) avgCell.textContent = weightedAvgSum.toFixed(2);
+              if (minCell) minCell.textContent = weightedMinSum.toFixed(2);
+              if (maxCell) maxCell.textContent = weightedMaxSum.toFixed(2);
+            } else {
+              // If no tfoot exists, find the last row in tbody and update it
+              const tbody = table.querySelector("tbody");
+              if (tbody) {
+                const rows = tbody.querySelectorAll("tr");
+                if (rows.length > 0) {
+                  const lastRow = rows[rows.length - 1];
+                  // Check if this is a total row by looking for specific classes
+                  const isTotalRow =
+                    lastRow.className.includes("totalColumn_") ||
+                    lastRow.querySelector(".totalColweightage") !== null;
+
+                  if (isTotalRow) {
+                    // Update last row cells with weighted calculations
+                    const avgCell =
+                      lastRow.querySelector(".totalColAverageMarks") ||
+                      lastRow.querySelector("td:nth-child(5)"); // 5th cell is usually average
+                    const minCell =
+                      lastRow.querySelector(".totalColMinMarks") ||
+                      lastRow.querySelector("td:nth-child(7)"); // 7th cell is usually min
+                    const maxCell =
+                      lastRow.querySelector(".totalColMaxMarks") ||
+                      lastRow.querySelector("td:nth-child(8)"); // 8th cell is usually max
+
+                    if (avgCell)
+                      avgCell.textContent = weightedAvgSum.toFixed(2);
+                    if (minCell)
+                      minCell.textContent = weightedMinSum.toFixed(2);
+                    if (maxCell)
+                      maxCell.textContent = weightedMaxSum.toFixed(2);
+                  } else {
+                    // Create a new row for totals if the last row isn't a total row
+                    const newTotalRow = document.createElement("tr");
+                    newTotalRow.className = `totalColumn_${id} !bg-zinc-900 !font-bold`;
+
+                    // Create cells for the new row
+                    newTotalRow.innerHTML = `
+                      <td class="text-center !p-3 !text-white">Total</td>
+                      <td class="text-center totalColweightage !p-3 !text-white"></td>
+                      <td class="text-center totalColObtMarks !p-3 !text-white"></td>
+                      <td class="text-center totalColGrandTotal !p-3 !text-white"></td>
+                      <td class="text-center totalColAverageMarks !p-3 !text-white">${weightedAvgSum.toFixed(
+                        2
+                      )}</td>
+                      <td class="text-center totalColStdDev !p-3 !text-white"></td>
+                      <td class="text-center totalColMinMarks !p-3 !text-white">${weightedMinSum.toFixed(
+                        2
+                      )}</td>
+                      <td class="text-center totalColMaxMarks !p-3 !text-white">${weightedMaxSum.toFixed(
+                        2
+                      )}</td>
+                    `;
+
+                    // Add the new row to tbody
+                    tbody.appendChild(newTotalRow);
+                  }
+                }
+              }
+            }
+          });
+        });
       };
 
       // Attach event listeners to Grand Total accordions
