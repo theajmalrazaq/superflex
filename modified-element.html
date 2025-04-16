@@ -1,0 +1,30 @@
+<div class="m-portlet__head-caption !flex !gap-4">
+  <div class="m-portlet__head-title">
+    <h3 class="m-portlet__head-text !text-white !text-xl !font-bold">
+      Grade Change Request
+    </h3>
+  </div>
+  <div>
+    <form
+      action="/Student/GradeChangeRequest"
+      id="FormGradeChange"
+      method="post"
+      class="!ml-4"
+    >
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <select
+            class="!bg-black !text-white !border !border-white/10 !rounded-xl !px-4 !py-2 !cursor-pointer !focus:ring-2 !focus:ring-x !focus:outline-none !w-64"
+            id="SemId"
+            name="SemId"
+            onchange="this.form.submit();"
+          >
+            <option selected="selected" value="20251">Spring 2025</option>
+            <option value="20243">Fall 2024</option>
+            <option value="20242">Summer 2024</option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
