@@ -303,12 +303,11 @@ function GradeChangePage() {
       portletBody.classList.add(
         "!bg-black",
         "!rounded-b-3xl",
-        "!p-6",
         "!border",
         "!border-white/10",
         "!shadow-lg",
         "!text-white",
-        "!h-[500px]",
+        "!h-[400px]",
         "!overflow-y-auto",
         "custom-scrollbar"
       );
