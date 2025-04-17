@@ -33,6 +33,24 @@ function StudyPlanPage() {
       contentRef.current.querySelectorAll(".semester-header");
 
     accordionHeaders.forEach((header) => {
+      // Add the new styling classes to each header
+      header.classList.add(
+        "cursor-pointer",
+        "bg-black/50",
+        "!rounded-xl",
+        "!p-6",
+        "!mb-2",
+        "!flex",
+        "!items-center",
+        "!justify-between",
+        "!border",
+        "!border-white/10",
+        "!text-white",
+        "!font-bold",
+        "!text-lg",
+        "!bg-white/10"
+      );
+
       header.addEventListener("click", function () {
         // Find the closest parent col and then find the accordion content within it
         const parentCol = this.closest(".semester-container")?.querySelector(
@@ -125,20 +143,7 @@ function StudyPlanPage() {
         margin-bottom: 1.5rem;
       }
       
-      .semester-header {
-        cursor: pointer;
-        background-color: rgba(0,0,0,0.5);
-        border-radius: 0.75rem;
-        padding: 0.75rem;
-        margin-bottom: 0.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: white;
-        font-weight: 700;
-        font-size: 1.125rem;
-      }
+     
       
       .studyplan-table {
         border-spacing: 0;

@@ -59,7 +59,7 @@ function CourseFeedbackPage() {
         "!flex",
         "!justify-between",
         "!items-center",
-        "!mb-6"
+        "!m-6"
       );
 
       // Style alert icon
@@ -199,7 +199,7 @@ function CourseFeedbackPage() {
       portletBody.classList.add(
         "!bg-black",
         "!rounded-b-3xl",
-        "!p-6",
+        "!p-0",
         "!border",
         "!border-white/10",
         "!shadow-lg",
@@ -220,10 +220,13 @@ function CourseFeedbackPage() {
     // Style the table
     const table = element.querySelector(".table");
     if (table) {
+      table.querySelectorAll('.table td, .table th').forEach(el => {
+        el.classList.add('!border-none');
+      });
       // Create a container for the table with modern styling
       const tableContainer = document.createElement("div");
       tableContainer.className =
-        "rounded-xl overflow-hidden !border !border-white/10 mb-6";
+        "overflow-hidden mb-6";
       table.parentNode.insertBefore(tableContainer, table);
       tableContainer.appendChild(table);
 

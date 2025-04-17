@@ -22,6 +22,7 @@ function GradeChangePage() {
     // Keep track of style elements we add
     const addedStyles = [];
 
+
     // Hide or remove error divs that should be hidden initially
     const errorDivs = element.querySelectorAll(
       "#DataErrorId, #CheckBoxErrorId, #GradeChangeReasonErrorId"
@@ -29,30 +30,6 @@ function GradeChangePage() {
     errorDivs.forEach((div) => {
       div.style.display = "none";
     });
-
-    // Add custom scrollbar styling
-    const styleElement = document.createElement("style");
-    styleElement.textContent = `
-            .custom-scrollbar::-webkit-scrollbar {
-                width: 8px;
-                height: 8px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-track {
-                background: rgba(255, 255, 255, 0.05);
-                border-radius: 10px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 10px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                background: rgba(255, 255, 255, 0.3);
-            }
-        `;
-    // Mark as our custom style
-    styleElement.setAttribute("data-custom-style", "true");
-    document.head.appendChild(styleElement);
-    addedStyles.push(styleElement);
 
     // Style alert messages
     const alertElements = element.querySelectorAll(".m-alert");
@@ -304,6 +281,7 @@ function GradeChangePage() {
         "!bg-black",
         "!rounded-b-3xl",
         "!border",
+        "!p-0",
         "!border-white/10",
         "!shadow-lg",
         "!text-white",
@@ -319,16 +297,22 @@ function GradeChangePage() {
       }
     }
 
+
     // Style the table
     const table = element.querySelector(".table");
     if (table) {
       // Create a container for the table with modern styling
       const tableContainer = document.createElement("div");
       tableContainer.className =
-        "rounded-xl overflow-hidden !border !border-white/10 mb-6";
+        "overflow-hidden mb-6";
       table.parentNode.insertBefore(tableContainer, table);
       tableContainer.appendChild(table);
 
+
+
+      table.querySelectorAll('.table td, .table th').forEach(el => {
+        el.classList.add('!border-none');
+      });
       // Style the table
       table.classList.add("!w-full", "!border-collapse", "!border-0");
       table.classList.remove(

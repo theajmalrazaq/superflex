@@ -273,7 +273,7 @@ function RetakeExamPage() {
             portletBody.classList.add(
                 "!bg-black",
                 "!rounded-b-3xl",
-                "!p-6",
+                "!p-0",
                 "!border",
                 "!border-white/10",
                 "!shadow-lg",
@@ -288,9 +288,8 @@ function RetakeExamPage() {
         const retakeReasonSection = element.querySelector(".m-section");
         if (retakeReasonSection) {
             retakeReasonSection.classList.add(
-                "!bg-zinc-900/30",
                 "!rounded-xl",
-                "!p-4",
+                "!p-0",
                 "!border-none",
                 "!mb-6"
             );
@@ -408,10 +407,13 @@ function RetakeExamPage() {
         // Style the table
         const table = element.querySelector(".table");
         if (table) {
+            table.querySelectorAll('.table td, .table th').forEach(el => {
+                el.classList.add('!border-none');
+            });
             // Create a container for the table with modern styling
             const tableContainer = document.createElement("div");
             tableContainer.className =
-                "rounded-xl overflow-hidden !border !border-white/10 mb-6";
+                "overflow-hidden mb-6";
             table.parentNode.insertBefore(tableContainer, table);
             tableContainer.appendChild(table);
 
