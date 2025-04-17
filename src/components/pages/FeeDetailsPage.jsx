@@ -6,11 +6,36 @@ function FeeDetailsPage() {
   const contentLoaded = useRef(false);
   const [loadingError, setLoadingError] = useState(false);
 
-  const loadContent = () => {
+  const loadContent = async () => {
     setLoadingError(false);
-    const targetElement = document.querySelector(
+
+    // First, check if the element exists
+    let targetElement = document.querySelector(
       ".m-grid.m-grid--hor.m-grid--root.m-page"
     );
+
+    // If element doesn't exist immediately, wait for it with a timeout
+    if (!targetElement) {
+      // Set up a promise that resolves either when element is found or timeout occurs
+      const waitForElement = new Promise((resolve) => {
+        let attempts = 0;
+        const maxAttempts = 30; // 30 seconds max wait time
+
+        const checkInterval = setInterval(() => {
+          targetElement = document.querySelector(
+            ".m-grid.m-grid--hor.m-grid--root.m-page"
+          );
+          attempts++;
+
+          if (targetElement || attempts >= maxAttempts) {
+            clearInterval(checkInterval);
+            resolve(targetElement);
+          }
+        }, 1000); // Check every second
+      });
+
+      targetElement = await waitForElement;
+    }
 
     const customCssLink = document.querySelector(
       'link[href="/Assets/CustomCss.css"]'
@@ -29,19 +54,62 @@ function FeeDetailsPage() {
   };
 
   useEffect(() => {
-    loadContent();
+    const initializeContent = async () => {
+      await loadContent();
+    };
+
+    initializeContent();
   }, []);
 
   // Second useEffect to apply styling after the content is loaded
   useEffect(() => {
     if (elemContent && !contentLoaded.current) {
-      // Wait a short time for the DOM to be fully rendered
-      const stylingTimeout = setTimeout(() => {
-        applyCustomStyling();
-        contentLoaded.current = true;
-      }, 300); // 300ms delay should be enough for the DOM to render
+      // Create a function to check if all images are loaded
+      const checkForCompleteRender = () => {
+        const contentContainer = document.querySelector(
+          ".m-grid.m-grid--hor.m-grid--root.m-page"
+        );
 
-      return () => clearTimeout(stylingTimeout);
+        if (!contentContainer) return false;
+
+        // Check if tables have been populated
+        const tables = contentContainer.querySelectorAll("table");
+        const hasPopulatedTables = Array.from(tables).some(
+          table => table.querySelectorAll("tbody tr").length > 0
+        );
+
+        return hasPopulatedTables;
+      };
+
+      // Try to apply styling after short delay to allow initial render
+      const initialStylingTimeout = setTimeout(() => {
+        // If content appears ready, apply styling
+        if (checkForCompleteRender()) {
+          applyCustomStyling();
+          contentLoaded.current = true;
+        } else {
+          // Content not fully ready, set up a longer polling interval
+          const stylingInterval = setInterval(() => {
+            if (checkForCompleteRender()) {
+              clearInterval(stylingInterval);
+              applyCustomStyling();
+              contentLoaded.current = true;
+            }
+          }, 500); // Check every 500ms
+
+          // Stop checking after 15 seconds to prevent infinite loop
+          setTimeout(() => {
+            clearInterval(stylingInterval);
+            // Apply styling anyway as a fallback
+            if (!contentLoaded.current) {
+              applyCustomStyling();
+              contentLoaded.current = true;
+            }
+          }, 15000);
+        }
+      }, 500);
+
+      return () => clearTimeout(initialStylingTimeout);
     }
   }, [elemContent]);
 
@@ -51,6 +119,10 @@ function FeeDetailsPage() {
       ".m-grid.m-grid--hor.m-grid--root.m-page"
     );
     if (!element) return;
+
+    document.querySelectorAll(".col-lg-7").forEach((col) => {
+      col.classList.add("!w-full", "!max-w-full");
+    });
 
     // Style the portlet container
     const portlet = element.querySelector(".m-portlet");

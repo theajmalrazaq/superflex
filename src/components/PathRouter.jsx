@@ -12,6 +12,8 @@ import RetakeExamPage from "./pages/RetakeExamPage";
 import CourseWithdrawPage from "./pages/CourseWithdrawPage";
 import GradeChangePage from "./pages/GradeChangePage";
 import StudyPlanPage from "./pages/StudyPlanPage";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function PathRouter() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
@@ -82,7 +84,12 @@ function PathRouter() {
       return <StudyPlanPage />;
     }
 
-    return <HomePage />;
+    if (currentPath.includes("/Student/ChangePassword")) {
+      return <ChangePasswordPage />;
+    }
+
+    // Return 404 page for unknown routes instead of defaulting to HomePage
+    return <NotFoundPage />;
   };
 
   return renderComponent();

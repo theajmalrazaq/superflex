@@ -216,16 +216,14 @@ function NavBar({ currentPage = "", onAttendanceLinkFound }) {
                       <a
                         href={link.href}
                         className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 text-sm no-underline hover:no-underline
-                                                    ${
-                                                      isActive
-                                                        ? "bg-x text-white "
-                                                        : "text-slate-300 hover:bg-white/10 hover:text-white"
-                                                    }`}
+                                                    ${isActive
+                            ? "bg-x text-white "
+                            : "text-slate-300 hover:bg-white/10 hover:text-white"
+                          }`}
                       >
                         <span
-                          className={`${
-                            isActive ? "text-white" : "text-slate-400"
-                          }`}
+                          className={`${isActive ? "text-white" : "text-slate-400"
+                            }`}
                         >
                           {getIcon(link)}
                         </span>
