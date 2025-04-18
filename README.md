@@ -19,9 +19,9 @@
 
 ## Overview
 
-OMG y'all! 💅 SuperFlex is the ultimate glow-up for that crusty university Flex portal at NUCES that was giving major 2005 vibes. It's literally a browser extension that said "challenge accepted" and transformed the ancient interface into this sleek, dark-mode masterpiece. It's not just a pretty face though - we've added so many features that your productivity is about to be *chef's kiss* 🔥
+SuperFlex is the ultimate glow-up for that crusty university Flex portal at NUCES that was giving major 2005 vibes. It's literally a browser extension that said "challenge accepted" and transformed the ancient interface into this sleek, dark-mode masterpiece. It's not just a pretty face though - we've added so many features that your productivity is about to be *chef's kiss* 🔥
 
-This bad boy works by sneaking React components into the boring old LMS pages, basically performing plastic surgery on the UI. No cap, it's the ultimate college life hack that the administration wasn't ready for. Flex portal? More like FLEX on your classmates with this aesthetic upgrade! 😎
+This bad boy works by sneaking React components into the boring old LMS pages, basically performing plastic surgery on the UI. No cap, it's the ultimate uni life hack that the administration wasn't ready for. Flex portal? More like FLEX on your classmates with this aesthetic upgrade! 😎
 
 ## Features
 
