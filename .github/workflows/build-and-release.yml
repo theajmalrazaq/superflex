@@ -10,6 +10,9 @@ on:
         required: true
         default: '1.0.0'
 
+permissions:
+  contents: write
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
@@ -49,7 +52,7 @@ jobs:
           body: |
             SuperFlex Chrome Extension Release
             Built on: ${{ steps.date.outputs.date }}
-          files: superflex.zip
+          files: superflex.zip_TOKEN }}
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
