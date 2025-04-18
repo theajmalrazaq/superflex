@@ -1,0 +1,55 @@
+name: Build and Release SuperFlex
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build
+      
+      - name: Zip dist folder
+        run: |
+          cd dist
+          zip -r ../superflex.zip .
+          cd ..
+      
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+      
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.version || format('v{0}', github.run_number) }}
+          name: SuperFlex ${{ github.event.inputs.version || format('v{0}', github.run_number) }}
+          body: |
+            SuperFlex Chrome Extension Release
+            Built on: ${{ steps.date.outputs.date }}
+          files: superflex.zip
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
