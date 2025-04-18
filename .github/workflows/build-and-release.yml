@@ -34,14 +34,11 @@ jobs:
         run: npm run build
       
       - name: Zip dist folder
-        run: |
-          cd dist
-          zip -r ../superflex.zip .
-          cd ..
+        run: zip -r superflex.zip dist
       
       - name: Get current date
         id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
       
       - name: Create Release
         id: create_release
@@ -52,7 +49,7 @@ jobs:
           body: |
             SuperFlex Chrome Extension Release
             Built on: ${{ steps.date.outputs.date }}
-          files: superflex.zip_TOKEN }}
+          files: superflex.zip
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
