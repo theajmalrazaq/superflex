@@ -4,7 +4,7 @@
   
   <p>
     <a href="https://github.com/ajmalrazaqbhatti/superflex"><img src="https://img.shields.io/github/stars/ajmalrazaqbhatti/superflex?style=for-the-badge&color=orange" alt="GitHub stars"></a>
-    <a href="https://github.com/ajmalrazaqbhatti/superflex/issues"><img src="https://img.shields.io/github/issues/ajmalrazaqbhatti/superflex?style=for-the-badge&color=blue" alt="GitHub issues"></a>
+    <a href="https://github.com/ajmalrazaqbhatti/superflex/issues"><img src="https://img.shields.io/github/issues-raw/ajmalrazaqbhatti/superflex?style=for-the-badge&color=blue" alt="GitHub issues"></a>
     <a href="https://github.com/ajmalrazaqbhatti/superflex/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="License"></a>
   </p>
   
