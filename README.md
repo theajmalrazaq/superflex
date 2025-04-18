@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/superflex-logo.png" alt="SuperFlex Logo" width="300" />
+  <img src="public/logo.svg" alt="SuperFlex Logo" width="300" />
   <h1>SuperFlex</h1>
   <p>A modern interface enhancement extension for university learning management systems</p>
   
@@ -20,7 +20,7 @@
 
 ## Overview
 
-SuperFlex is a browser extension that transforms the outdated university learning management system interface into a modern, dark-themed, user-friendly experience. It enhances the existing functionality while adding new features to improve student productivity.
+SuperFlex is a browser extension that transforms the outdated university learning management system interface (Flex portal of NUCES university) into a modern, dark-themed, user-friendly experience. It enhances the existing functionality while adding new features to improve student productivity.
 
 The extension works by injecting custom React components and styles into the LMS pages, completely overhauling the visual appearance and adding quality-of-life improvements for students.
 
@@ -42,10 +42,6 @@ The extension works by injecting custom React components and styles into the LMS
 - **Collapsible Sections**: Better organize content with expandable accordions
 - **Custom Navigation**: Streamlined access to important features
 
-### 🚀 Performance Optimizations
-- **Faster Loading**: Optimized code for quicker page rendering
-- **Reduced Resource Usage**: Minimized unnecessary API calls
-- **Efficient DOM Manipulation**: Smart updates without full page reloads
 
 ## Supported Pages
 
@@ -167,3 +163,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 Ajmal Razaq Bhatti - [@ajmalrazaqbhatti](https://github.com/ajmalrazaqbhatti)
 
 Project Link: [https://github.com/ajmalrazaqbhatti/superflex](https://github.com/ajmalrazaqbhatti/superflex)
+
+## Disclaimer
+
+SuperFlex is an independent project that redesigns the Flex portal of NUCES university. This extension is not affiliated with, endorsed by, or sponsored by NUCES university.
+
+This is my personal project intended to enhance my learning experience. I did not hack anything or intend to do so. SuperFlex merely applies cosmetic changes to the user interface without compromising any security measures or accessing unauthorized data. This project should not warrant any academic warnings or disciplinary actions as it respects the system's integrity and security.
+
+Users are using this extension at their own consent and responsibility. The creator of SuperFlex is not responsible for any issues that may arise from using this extension, including but not limited to academic discrepancies, data inaccuracies, or system incompatibilities.
+
+By installing SuperFlex, you acknowledge that you are using a third-party modification to the university's official system and do so at your own risk.
