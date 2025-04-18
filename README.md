@@ -1,6 +1,5 @@
 <div align="center">
   <img src="public/logo.svg" alt="SuperFlex Logo" width="300" />
-  <h1>SuperFlex</h1>
   <p>A modern interface enhancement extension for university learning management systems</p>
   
   <p>
