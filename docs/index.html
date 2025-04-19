@@ -28,6 +28,80 @@
         body, h1, h2, h3, h4, h5, h6, span, a, button {
             font-family: 'Product Sans', sans-serif;
         }
+        
+        /* Video modal styles */
+        .modal {
+            visibility: hidden;
+            opacity: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.8);
+            transition: all 0.3s ease-in-out;
+            z-index: 9999;
+            padding: 1.5rem;
+        }
+        
+        .modal.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            background: #111;
+            overflow: hidden;
+            transform: scale(0.8);
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+        }
+        
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
     </style>
 </head>
 
@@ -79,12 +153,12 @@
              <i data-lucide="download" class="w-5 h-5"></i>
           </a>
 
-          <!-- GitHub button -->
-          <a href="https://github.com/ajmalrazaqbhatti/superflex" 
+          <a href="#" 
+             id="how-to-use-btn"
              class="group relative bg-white/10 backdrop-blur-sm  px-7 py-3.5 rounded-xl font-semibold text-white
              hover:bg-white/20 hover:border-white/40 
              transition-all duration-300 flex items-center gap-3"
-             aria-label="Visit the SuperFlex GitHub repository">
+             aria-label="Watch how to use SuperFlex">
              <span class="font-light">How To Use</span>
              <i data-lucide="play" class="w-5 h-5"></i>
         
@@ -131,9 +205,59 @@
         
     </div>
 
+    <!-- Video Modal -->
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-close" id="closeVideoModal">
+                <i data-lucide="x" class="w-5 h-5 text-white"></i>
+            </div>
+            <div class="video-container">
+                <video id="tutorialVideo" controls>
+                    <source src="video.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
+
     <script>
       // Initialize Lucide icons
       lucide.createIcons();
+
+      // Video modal functionality
+      const modal = document.getElementById('videoModal');
+      const btn = document.getElementById('how-to-use-btn');
+      const closeBtn = document.getElementById('closeVideoModal');
+      const video = document.getElementById('tutorialVideo');
+
+      btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          modal.classList.add('show');
+          // Auto play video when modal opens
+          video.play();
+      });
+
+      closeBtn.addEventListener('click', function() {
+          modal.classList.remove('show');
+          // Pause video when modal closes
+          video.pause();
+      });
+
+      // Close modal when clicking outside the content
+      modal.addEventListener('click', function(e) {
+          if (e.target === modal) {
+              modal.classList.remove('show');
+              video.pause();
+          }
+      });
+
+      // Close modal with ESC key
+      document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && modal.classList.contains('show')) {
+              modal.classList.remove('show');
+              video.pause();
+          }
+      });
     </script>
 </body>
 </html>
