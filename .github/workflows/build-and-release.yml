@@ -33,8 +33,11 @@ jobs:
       - name: Build
         run: npm run build
       
-      - name: Zip dist folder
-        run: zip -r superflex.zip dist
+      - name: Rename and zip folder
+        run: |
+          cp -r dist superflex
+          zip -r superflex.zip superflex
+          rm -rf superflex
       
       - name: Get current date
         id: date
