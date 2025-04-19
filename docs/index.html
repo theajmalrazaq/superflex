@@ -3,9 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <meta name="description" content="SuperFlex - A powerful Flex Portal Extension">
+    <meta name="keywords" content="GPA calculator, academic performance, SuperFlex, Ajmal Razaq Bhatti">
+    <meta name="author" content="Ajmal Razaq Bhatti">
+    <meta name="theme-color" content="#FF2E00">
+    <link rel="icon" href="res/favicon.svg" type="image/x-icon">
+    <title>SuperFlex</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        @font-face {
+            font-family: 'Product Sans';
+            src: url('https://fonts.gstatic.com/s/productsans/v5/HYvgU2fE2nRJvZ5JFAumwegdm0LZdjqr5-oayXSOefg.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Product Sans';
+            src: url('https://fonts.gstatic.com/s/productsans/v5/HYvgU2fE2nRJvZ5JFAumwfgOOjDsY3gO68rh1JZDsAg.woff2') format('woff2');
+            font-weight: 700;
+            font-style: normal;
+        }
+        body, h1, h2, h3, h4, h5, h6, span, a, button {
+            font-family: 'Product Sans', sans-serif;
+        }
+    </style>
 </head>
-<body>
-    hello
+
+<body class="bg-black">
+    
+    <div class="bg-[url('res/intro.svg')] bg-cover bg-center h-screen flex items-center justify-center text-white  flex-col gap-8">
+      
+<button
+  class="group relative dark:bg-neutral-800 bg-neutral-200 rounded-full p-px overflow-hidden cursor-pointer transition-all duration-200 ease-in-out"
+>
+
+  <span
+    class="flex items-center justify-center gap-1 relative z-[1] dark:bg-neutral-950/90 bg-neutral-50/90 rounded-full py-2 px-4 pl-2 w-full"
+  >
+    <span
+      class="relative group-hover:scale-105 transition-transform group-hover:rotate-[360deg] duration-500"
+    >
+      <i data-lucide="star" class="w-5 h-5 text-neutral-950 dark:text-neutral-50"></i>
+      <span
+        class="rounded-full size-11 absolute opacity-0 dark:opacity-30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-lg"
+        style="animation: 14s ease-in-out 0s infinite alternate none running star-shine; 
+               background: #FF2E00;"
+      ></span>
+    </span>
+    <span
+      class="bg-gradient-to-b ml-1.5 dark:from-white dark:to-white/50 from-neutral-950 to-neutral-950/50 bg-clip-text text-xs text-transparent group-hover:scale-105 transition transform-gpu"
+    >
+      Star SuperFlex on Github
+    </span>
+  </span>
+</button>
+
+       <div class="flex flex-col gap-4 justify-center items-center text-center">
+        <div class="h-20 w-20 bg-[url('res/bg.png')] bg-white bg-cover rounded-[29px] flex items-center justify-center ">
+             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="84" height="84" fill="none"><style>@keyframes splash{0%{transform:scale(.2);opacity:.8}80%{transform:scale(1.2);opacity:0}to{transform:scale(2.2);opacity:0}}</style><path fill="#FF2E00" d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z" style="animation:splash 1.5s cubic-bezier(.165,.84,.44,1) infinite both;transform-origin:center center"/></svg>
+        </div>
+        <img src="res/logo.svg" alt="" class="w-80">
+        <p class="font-mono">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em </p>
+        
+                <p>By <a href="https://github.com/ajmalrazaqbhatti" target="_blank" class="text-[#FF2E00]">Ajmal Razaq Bhatti</a>  </p>
+    </div>
+        <div class="flex flex-row gap-4 mt-8">
+          <!-- Primary download button -->
+          <a href="https://github.com/ajmalrazaqbhatti/superflex/releases/download/1.0.0/superflex.zip" 
+             class="bg-[#FF2E00] px-7 py-3.5 rounded-2xl font-semibold  text-white shadow-2xl 
+              shadow-[#FF2E00]/40 
+             transition-all duration-300 flex items-center gap-3 group">
+             <span class="font-light">Download Now</span>
+             <i data-lucide="download" class="w-5 h-5"></i>
+          </a>
+
+          <!-- GitHub button -->
+          <a href="https://github.com/ajmalrazaqbhatti/superflex" 
+             class="group relative bg-white/10 backdrop-blur-sm  px-7 py-3.5 rounded-xl font-semibold text-white
+             hover:bg-white/20 hover:border-white/40 
+             transition-all duration-300 flex items-center gap-3"
+             aria-label="Visit the SuperFlex GitHub repository">
+             <span class="font-light">How To Use</span>
+             <i data-lucide="play" class="w-5 h-5"></i>
+        
+          </a>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl w-full px-6">
+            <div class="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-md border border-white/20 rounded-3xl p-5 hover:shadow-lg hover:shadow-[#FF2E00]/10 transition duration-300 group">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="bg-[#FF2E00] p-2.5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition duration-300">
+                        <i data-lucide="calculator" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <h3 class="text-base font-semibold">Advanced GPA Tools</h3>
+                </div>
+                <p class="text-white/80 text-sm leading-relaxed">Calculate semester GPA, plan target CGPA, and track your academic progress with ease.</p>
+
+            </div>
+            
+            <div class="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-md border border-white/20 rounded-3xl p-5 hover:shadow-lg hover:shadow-[#FF2E00]/10 transition duration-300 group">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="bg-[#FF2E00] p-2.5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition duration-300">
+                        <i data-lucide="bar-chart-4" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <h3 class="text-base font-semibold">Statistical Insights</h3>
+                </div>
+                <p class="text-white/80 text-sm leading-relaxed">View grand total, sessional averages, min/max scores and complete performance analytics.</p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-md border border-white/20 rounded-3xl p-5 hover:shadow-lg hover:shadow-[#FF2E00]/10 transition duration-300 group">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="bg-[#FF2E00] p-2.5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition duration-300">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <h3 class="text-base font-semibold">Modern UI/UX</h3>
+                </div>
+                <p class="text-white/80 text-sm leading-relaxed">Sleek interface with dark mode, customizable themes and intuitive navigation controls.</p>
+            </div>
+        </div>
+        
+        <!-- Consider adding a "See all features" link -->
+        <a href="https://github.com/ajmalrazaqbhatti/superflex" class="text-[#FF2E00] text-sm hover:text-white transition-colors duration-200 flex items-center gap-1 mt-3">
+            Explore Repository <i data-lucide="arrow-right" class="w-3 h-3"></i>
+        </a>
+        
+    </div>
+
+    <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+    </script>
 </body>
 </html>
