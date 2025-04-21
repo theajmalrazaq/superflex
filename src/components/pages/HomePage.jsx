@@ -755,16 +755,16 @@ function HomePage() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mb-3">
             {/* Registered Courses */}
-            <div className="bg-x p-4 rounded-3xl !border !border-white/10">
+            <div className="bg-x p-2 rounded-xl !border !border-white/10">
               <div className="flex items-center space-x-4">
-                <div className="bg-white p-3 rounded-full">
+                <div className="bg-white p-2 rounded-full">
                   <BookOpen className="text-black" size={24} />
                 </div>
                 <div>
                   <div className="flex items-baseline">
-                    <span className="text-4xl font-bold text-white">
+                    <span className="text-2xl font-bold text-white">
                       {stats.totalCourses}
                     </span>
                   </div>
@@ -777,14 +777,14 @@ function HomePage() {
               </div>
             </div>
             {/* Present Count */}
-            <div className="bg-x p-4 rounded-3xl !border !border-white/10">
+            <div className="bg-x p-2 rounded-xl !border !border-white/10">
               <div className="flex items-center space-x-4">
-                <div className="bg-white p-3 rounded-full">
+                <div className="bg-white p-2 rounded-full">
                   <CheckCircle className="text-black" size={24} />
                 </div>
                 <div>
                   <div className="flex items-baseline">
-                    <span className="text-4xl font-bold text-white">
+                    <span className="text-2xl font-bold text-white">
                       {stats.totalPresent}
                     </span>
                   </div>
@@ -795,14 +795,14 @@ function HomePage() {
               </div>
             </div>
             {/* Absent Count */}
-            <div className="bg-x p-4 rounded-3xl !border !border-white/10">
+            <div className="bg-x p-2 rounded-xl !border !border-white/10">
               <div className="flex items-center space-x-4">
-                <div className="bg-white p-3 rounded-full">
+                <div className="bg-white p-2 rounded-full">
                   <XCircle className="text-black" size={24} />
                 </div>
                 <div>
                   <div className="flex items-baseline">
-                    <span className="text-4xl font-bold text-white">
+                    <span className="text-2xl font-bold text-white">
                       {stats.totalAbsent}
                     </span>
                   </div>
@@ -813,14 +813,14 @@ function HomePage() {
               </div>
             </div>
             {/* Subjects < 80% Attendance */}
-            <div className="bg-x p-4 rounded-3xl !border !border-white/10">
+            <div className="bg-x p-2 rounded-xl !border !border-white/10">
               <div className="flex items-center space-x-4">
-                <div className="bg-white p-3 rounded-full">
+                <div className="bg-white p-2 rounded-full">
                   <Activity className="text-black" size={24} />
                 </div>
                 <div>
                   <div className="flex items-baseline">
-                    <span className="text-4xl font-bold text-white">
+                    <span className="text-2xl font-bold text-white">
                       {stats.coursesBelow80}
                     </span>
                   </div>
@@ -835,12 +835,12 @@ function HomePage() {
           </div>
 
           {/* University Information and Attendance Table in a 2-column layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
             <div className="lg:col-span-2">
-              <h2 className="text-xl font-semibold text-white mb-6">
+              <h2 className="text-xl font-semibold text-white mb-3">
                 Attendance Details
               </h2>
-              <div className="bg-black rounded-3xl !border !border-white/10 p-6 h-96 overflow-hidden">
+              <div className="bg-black rounded-3xl !border !border-white/10 p-4 h-[420px] overflow-hidden">
                 {isLoadingAttendance ? (
                   <div className="flex flex-col justify-center items-center py-16">
                     <div className="w-16 h-16 rounded-full !border-4 !border-gray-800 !border-t-x animate-spin mb-6"></div>
@@ -850,7 +850,7 @@ function HomePage() {
                   </div>
                 ) : attendanceData &&
                   Object.keys(attendanceSummary).length > 0 ? (
-                  <div className="h-full overflow-y-auto custom-scrollbar">
+                  <div className="h-full overflow-y-auto custom-scrollbar pr-1">
                     <table className="w-full table-auto">
                       <thead className="sticky top-0 bg-black z-10">
                         <tr className="text-gray-400 text-left border-b border-gray-800">
@@ -860,7 +860,7 @@ function HomePage() {
                           <th className="px-4 py-3 font-medium">Status</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-700/50 overflow-scroll h-96 scrollbar-hide">
+                      <tbody className="divide-y divide-slate-700/50">
                         {Object.entries(attendanceSummary).map(([id, data]) => {
                           const percentage = parseFloat(
                             data.attendancePercentage
@@ -929,10 +929,10 @@ function HomePage() {
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold text-white mb-6">
+              <h2 className="text-xl font-semibold text-white mb-3">
                 University Info
               </h2>
-              <div className="bg-black rounded-3xl !border !border-white/10 p-6 h-96 overflow-scroll scrollbar-hide flex flex-col">
+              <div className="bg-black rounded-3xl !border !border-white/10 p-4 h-[420px] overflow-scroll scrollbar-hide flex flex-col">
                 {/* University Header */}
                 <div className="mb-4 pb-4 border-b border-white/10">
                   <div className="flex items-start gap-4">
@@ -951,7 +951,7 @@ function HomePage() {
                 </div>
 
                 {/* Info content with scroll */}
-                <div className="flex-1 h-96 overflow-y-scroll custom-scrollbar">
+                <div className="flex-1 overflow-y-scroll custom-scrollbar pb-4">
                   {universityInfo ? (
                     <div className="space-y-3">
                       {Object.entries(universityInfo).map(([key, value]) => {
