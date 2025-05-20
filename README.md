@@ -3,10 +3,20 @@
   <p>A modern interface enhancement extension for university learning management systems</p>
   
   <p>
-    <a href="https://github.com/ajmalrazaqbhatti/superflex"><img src="https://img.shields.io/github/stars/ajmalrazaqbhatti/superflex?style=for-the-badge&color=orange" alt="GitHub stars"></a>
-    <a href="https://github.com/ajmalrazaqbhatti/superflex/issues"><img src="https://img.shields.io/github/issues-raw/ajmalrazaqbhatti/superflex?style=for-the-badge&color=blue" alt="GitHub issues"></a>
-    <a href="https://github.com/ajmalrazaqbhatti/superflex/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="License"></a>
-  </p>
+  <a href="https://github.com/ajmalrazaqbhatti/superflex/releases">
+    <img src="https://img.shields.io/github/downloads/ajmalrazaqbhatti/superflex/total?style=for-the-badge" alt="GitHub all downloads">
+  </a>
+  <a href="https://github.com/ajmalrazaqbhatti/superflex">
+    <img src="https://img.shields.io/github/stars/ajmalrazaqbhatti/superflex?style=for-the-badge&color=orange" alt="GitHub stars">
+  </a>
+  <a href="https://github.com/ajmalrazaqbhatti/superflex/issues">
+    <img src="https://img.shields.io/github/issues-raw/ajmalrazaqbhatti/superflex?style=for-the-badge&color=blue" alt="GitHub issues">
+  </a>
+  <a href="https://github.com/ajmalrazaqbhatti/superflex/blob/master/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="License">
+  </a>
+</p>
+
   
   <p>
     <a href="https://ajmalrazaqbhatti.github.io/superflex">Website</a> •
