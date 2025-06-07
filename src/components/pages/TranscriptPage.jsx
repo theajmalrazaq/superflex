@@ -181,9 +181,13 @@ function TranscriptPage() {
       ?.classList.add("!text-white", "!text-xl", "!font-bold");
 
     // Add a Plan CGPA button to the portlet head caption
-    const portletHeadCaption = document.querySelector(".m-portlet__head-caption");
+    const portletHeadCaption = document.querySelector(
+      ".m-portlet__head-caption"
+    );
     if (portletHeadCaption) {
-      const portletHeadTitle = portletHeadCaption.querySelector(".m-portlet__head-title");
+      const portletHeadTitle = portletHeadCaption.querySelector(
+        ".m-portlet__head-title"
+      );
 
       // Create a flex container for the heading and button
       const titleContainer = document.createElement("div");
@@ -196,7 +200,8 @@ function TranscriptPage() {
 
       // Create the Plan CGPA button
       const planCGPAButton = document.createElement("button");
-      planCGPAButton.className = "px-4 py-2 bg-x text-white text-sm rounded-lg flex items-center gap-2 hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md";
+      planCGPAButton.className =
+        "px-4 py-2 bg-x text-white text-sm rounded-lg flex items-center gap-2 hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md";
       planCGPAButton.id = "portletPlanCGPAButton";
       planCGPAButton.innerHTML = `
         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -548,8 +553,9 @@ function TranscriptPage() {
                   }
                 } else {
                   // Expand
-                  tableContainer.style.maxHeight = `${tableContainer.scrollHeight + 30
-                    }px`; // Add padding
+                  tableContainer.style.maxHeight = `${
+                    tableContainer.scrollHeight + 30
+                  }px`; // Add padding
                   tableContainer.style.opacity = "1";
                   tableContainer.dataset.expanded = "true";
 
@@ -609,21 +615,28 @@ function TranscriptPage() {
         const getSelectHTML = (currGrade) => {
           return `<select class="grade-select bg-zinc-900 !border !border-white/20 rounded p-1 text-white w-full">
             <option value="-1">-</option>
-            <option value="4" ${currGrade === "A+" || currGrade === "A" ? "selected" : ""
+            <option value="4" ${
+              currGrade === "A+" || currGrade === "A" ? "selected" : ""
             }>A/A+</option>
-            <option value="3.67" ${currGrade === "A-" ? "selected" : ""
+            <option value="3.67" ${
+              currGrade === "A-" ? "selected" : ""
             }>A-</option>
-            <option value="3.33" ${currGrade === "B+" ? "selected" : ""
+            <option value="3.33" ${
+              currGrade === "B+" ? "selected" : ""
             }>B+</option>
             <option value="3" ${currGrade === "B" ? "selected" : ""}>B</option>
-            <option value="2.67" ${currGrade === "B-" ? "selected" : ""
+            <option value="2.67" ${
+              currGrade === "B-" ? "selected" : ""
             }>B-</option>
-            <option value="2.33" ${currGrade === "C+" ? "selected" : ""
+            <option value="2.33" ${
+              currGrade === "C+" ? "selected" : ""
             }>C+</option>
             <option value="2" ${currGrade === "C" ? "selected" : ""}>C</option>
-            <option value="1.67" ${currGrade === "C-" ? "selected" : ""
+            <option value="1.67" ${
+              currGrade === "C-" ? "selected" : ""
             }>C-</option>
-            <option value="1.33" ${currGrade === "D+" ? "selected" : ""
+            <option value="1.33" ${
+              currGrade === "D+" ? "selected" : ""
             }>D+</option>
             <option value="1" ${currGrade === "D" ? "selected" : ""}>D</option>
             <option value="0" ${currGrade === "F" ? "selected" : ""}>F</option>
@@ -646,13 +659,18 @@ function TranscriptPage() {
         // Add CGPA planner calculator to help plan future semesters
         const addCGPAPlannerCalculator = () => {
           // Get the button we added to the portlet head
-          const portletPlanCGPAButton = document.getElementById("portletPlanCGPAButton");
+          const portletPlanCGPAButton = document.getElementById(
+            "portletPlanCGPAButton"
+          );
 
           // If the semester header version of the button exists, let's remove it
           // since we now have the button in the portlet head
-          const headerRow = lastSemesterContainer.querySelector(".semester-header");
+          const headerRow =
+            lastSemesterContainer.querySelector(".semester-header");
           if (headerRow) {
-            const existingPlannerButton = headerRow.querySelector(".cgpa-planner-button");
+            const existingPlannerButton = headerRow.querySelector(
+              ".cgpa-planner-button"
+            );
             if (existingPlannerButton) {
               existingPlannerButton.remove();
             }
@@ -661,7 +679,8 @@ function TranscriptPage() {
           // Extract current CGPA and credit hours from the page
           const extractCGPAData = () => {
             // Get spans containing credit info and CGPA
-            const spans = lastSemesterContainer.querySelectorAll(".pull-right span");
+            const spans =
+              lastSemesterContainer.querySelectorAll(".pull-right span");
             let currentCGPA = 0;
             let currentCreditHours = 0;
 
@@ -679,7 +698,7 @@ function TranscriptPage() {
 
             return {
               currentCGPA,
-              currentCreditHours
+              currentCreditHours,
             };
           };
 
@@ -694,7 +713,8 @@ function TranscriptPage() {
             // Create modal container
             const modalOverlay = document.createElement("div");
             modalOverlay.id = "cgpaPlannerModal";
-            modalOverlay.className = "fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn";
+            modalOverlay.className =
+              "fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn";
             modalOverlay.style.backdropFilter = "blur(5px)";
 
             // Get current values
@@ -702,7 +722,8 @@ function TranscriptPage() {
 
             // Create modal content
             const modalContent = document.createElement("div");
-            modalContent.className = "bg-zinc-900 !rounded-2xl !border !border-white/10 !shadow-xl !w-full !max-w-md !mx-4 !animate-scaleIn";
+            modalContent.className =
+              "bg-zinc-900 !rounded-2xl !border !border-white/10 !shadow-xl !w-full !max-w-md !mx-4 !animate-scaleIn";
 
             // Modal header
             modalContent.innerHTML = `
@@ -734,7 +755,9 @@ function TranscriptPage() {
                   
                   <div class="mb-3">
                     <label class="block text-gray-400 text-sm mb-1">Current CGPA</label>
-                    <input type="number" id="currentCGPA" value="${currentCGPA.toFixed(2)}" class="w-full bg-black !border !border-white/20 !rounded-lg p-2 text-white" step="0.01" placeholder="e.g., 3.50">
+                    <input type="number" id="currentCGPA" value="${currentCGPA.toFixed(
+                      2
+                    )}" class="w-full bg-black !border !border-white/20 !rounded-lg p-2 text-white" step="0.01" placeholder="e.g., 3.50">
                   </div>
                   
                   <div class="mb-3">
@@ -764,7 +787,7 @@ function TranscriptPage() {
             document.body.appendChild(modalOverlay);
 
             // Add custom styles for animations
-            const styleElement = document.createElement('style');
+            const styleElement = document.createElement("style");
             styleElement.textContent = `
               .animate-fadeIn {
                 animation: fadeIn 0.3s ease-out forwards;
@@ -807,7 +830,9 @@ function TranscriptPage() {
               }, 200);
             };
 
-            document.getElementById("closeModal").addEventListener("click", closeModal);
+            document
+              .getElementById("closeModal")
+              .addEventListener("click", closeModal);
             modalOverlay.addEventListener("click", (e) => {
               if (e.target === modalOverlay) {
                 closeModal();
@@ -815,30 +840,40 @@ function TranscriptPage() {
             });
 
             // Handle form submission
-            document.getElementById("cgpaPlannerForm").addEventListener("submit", (e) => {
-              e.preventDefault();
+            document
+              .getElementById("cgpaPlannerForm")
+              .addEventListener("submit", (e) => {
+                e.preventDefault();
 
-              const currentCH = parseFloat(document.getElementById("currentCreditHours").value);
-              const currentCGPA = parseFloat(document.getElementById("currentCGPA").value);
-              const targetCGPA = parseFloat(document.getElementById("targetCGPA").value);
-              const nextCH = parseFloat(document.getElementById("nextCreditHours").value);
+                const currentCH = parseFloat(
+                  document.getElementById("currentCreditHours").value
+                );
+                const currentCGPA = parseFloat(
+                  document.getElementById("currentCGPA").value
+                );
+                const targetCGPA = parseFloat(
+                  document.getElementById("targetCGPA").value
+                );
+                const nextCH = parseFloat(
+                  document.getElementById("nextCreditHours").value
+                );
 
-              const resultElement = document.getElementById("plannerResult");
+                const resultElement = document.getElementById("plannerResult");
 
-              // Validate inputs
-              if (
-                isNaN(currentCH) ||
-                isNaN(currentCGPA) ||
-                isNaN(targetCGPA) ||
-                isNaN(nextCH) ||
-                currentCH <= 0 ||
-                nextCH <= 0 ||
-                currentCGPA < 0 ||
-                currentCGPA > 4 ||
-                targetCGPA < 0 ||
-                targetCGPA > 4
-              ) {
-                resultElement.innerHTML = `
+                // Validate inputs
+                if (
+                  isNaN(currentCH) ||
+                  isNaN(currentCGPA) ||
+                  isNaN(targetCGPA) ||
+                  isNaN(nextCH) ||
+                  currentCH <= 0 ||
+                  nextCH <= 0 ||
+                  currentCGPA < 0 ||
+                  currentCGPA > 4 ||
+                  targetCGPA < 0 ||
+                  targetCGPA > 4
+                ) {
+                  resultElement.innerHTML = `
                   <div class="text-red-400 font-medium">Please enter valid values:</div>
                   <ul class="list-disc list-inside text-gray-300 text-sm mt-2">
                     <li>Credit hours must be positive numbers</li>
@@ -846,23 +881,28 @@ function TranscriptPage() {
                     <li>All fields are required</li>
                   </ul>
                 `;
-                resultElement.classList.remove("hidden");
-                return;
-              }
+                  resultElement.classList.remove("hidden");
+                  return;
+                }
 
-              // Calculate required GPA
-              const requiredGPA = (targetCGPA * (currentCH + nextCH) - currentCGPA * currentCH) / nextCH;
+                // Calculate required GPA
+                const requiredGPA =
+                  (targetCGPA * (currentCH + nextCH) -
+                    currentCGPA * currentCH) /
+                  nextCH;
 
-              // Check if the target is achievable
-              if (requiredGPA > 4.0) {
-                resultElement.innerHTML = `
+                // Check if the target is achievable
+                if (requiredGPA > 4.0) {
+                  resultElement.innerHTML = `
                   <div class="flex items-start">
                     <svg class="w-5 h-5 text-amber-400 mr-2 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                     </svg>
                     <div>
                       <div class="text-amber-400 font-bold text-lg">Target CGPA not achievable in one semester</div>
-                      <div class="text-gray-300 mt-1">You would need a GPA of ${requiredGPA.toFixed(2)} next semester, which exceeds the maximum of 4.0.</div>
+                      <div class="text-gray-300 mt-1">You would need a GPA of ${requiredGPA.toFixed(
+                        2
+                      )} next semester, which exceeds the maximum of 4.0.</div>
                       <div class="text-gray-300 mt-2">Consider:</div>
                       <ul class="list-disc list-inside text-gray-300 text-sm mt-1">
                         <li>Setting a lower target CGPA</li>
@@ -872,8 +912,8 @@ function TranscriptPage() {
                     </div>
                   </div>
                 `;
-              } else if (requiredGPA < 0) {
-                resultElement.innerHTML = `
+                } else if (requiredGPA < 0) {
+                  resultElement.innerHTML = `
                   <div class="flex items-start">
                     <svg class="w-5 h-5 text-green-400 mr-2 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -881,48 +921,55 @@ function TranscriptPage() {
                     <div>
                       <div class="text-green-400 font-bold text-lg">Target already achieved!</div>
                       <div class="text-gray-300 mt-1">Your current CGPA is already higher than your target.</div>
-                      <div class="text-gray-300 mt-2">You need any GPA greater than ${Math.max(0, requiredGPA).toFixed(2)} to maintain your target.</div>
+                      <div class="text-gray-300 mt-2">You need any GPA greater than ${Math.max(
+                        0,
+                        requiredGPA
+                      ).toFixed(2)} to maintain your target.</div>
                     </div>
                   </div>
                 `;
-              } else {
-                // Determine difficulty level
-                let difficultyColor = "text-green-400";
-                let difficultyText = "Easily achievable";
+                } else {
+                  // Determine difficulty level
+                  let difficultyColor = "text-green-400";
+                  let difficultyText = "Easily achievable";
 
-                if (requiredGPA > 3.7) {
-                  difficultyColor = "text-red-400";
-                  difficultyText = "Challenging";
-                } else if (requiredGPA > 3.0) {
-                  difficultyColor = "text-amber-400";
-                  difficultyText = "Moderate";
-                }
+                  if (requiredGPA > 3.7) {
+                    difficultyColor = "text-red-400";
+                    difficultyText = "Challenging";
+                  } else if (requiredGPA > 3.0) {
+                    difficultyColor = "text-amber-400";
+                    difficultyText = "Moderate";
+                  }
 
-                resultElement.innerHTML = `
+                  resultElement.innerHTML = `
                   <div class="flex items-start">
                     <svg class="w-5 h-5 text-x mr-2 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     <div>
-                      <div class="text-white font-bold text-lg">Required GPA: <span class="${difficultyColor}">${requiredGPA.toFixed(2)}</span></div>
+                      <div class="text-white font-bold text-lg">Required GPA: <span class="${difficultyColor}">${requiredGPA.toFixed(
+                    2
+                  )}</span></div>
                       <div class="text-gray-300 mt-1">Difficulty: <span class="${difficultyColor} font-medium">${difficultyText}</span></div>
-                      <div class="text-gray-300 mt-2">To achieve a CGPA of ${targetCGPA.toFixed(2)} from your current ${currentCGPA.toFixed(2)},</div> 
-                      <div class="text-gray-300">you need a GPA of at least ${requiredGPA.toFixed(2)} in your next ${nextCH} credit hours.</div>
+                      <div class="text-gray-300 mt-2">To achieve a CGPA of ${targetCGPA.toFixed(
+                        2
+                      )} from your current ${currentCGPA.toFixed(2)},</div> 
+                      <div class="text-gray-300">you need a GPA of at least ${requiredGPA.toFixed(
+                        2
+                      )} in your next ${nextCH} credit hours.</div>
                     </div>
                   </div>
                 `;
-              }
+                }
 
-              resultElement.classList.remove("hidden");
-            });
+                resultElement.classList.remove("hidden");
+              });
           };
 
           // Add click event to open the modal
           if (portletPlanCGPAButton) {
             portletPlanCGPAButton.addEventListener("click", createPlannerModal);
           }
-
-
         };
 
         // Call the CGPA planner calculator function
@@ -943,47 +990,138 @@ function TranscriptPage() {
           }
         });
 
-        // Helper function to get credit hours for a grade select
-        const getCorrespondingCreditHours = (selectElem) => {
-          const creditCell = selectElem
-            .closest("tr")
-            .querySelector("td:nth-child(4)");
-          return parseInt(creditCell.innerText) || 0;
-        };
-
         // Function to calculate and update the GPAs when grades change
         const handleSelectChange = () => {
-          const selects = lastSemesterContainer.querySelectorAll(
-            "select.grade-select"
-          );
+          const rows = lastSemesterContainer.querySelectorAll("tbody > tr");
           let totalCreditHours = 0;
           let totalGradePoints = 0;
 
-          selects.forEach((select) => {
-            if (select.value !== "-1") {
-              const creditHours = getCorrespondingCreditHours(select);
-              totalCreditHours += creditHours;
-              totalGradePoints += creditHours * parseFloat(select.value);
+          // Process all rows in the semester table
+          rows.forEach((row) => {
+            // Get the grade cell (typically the second text-center td)
+            const gradeCells = row.querySelectorAll("td.text-center");
+            if (gradeCells.length < 2) return;
 
-              // Update the points cell
-              const pointsCell = select
-                .closest("tr")
-                .querySelector("td:nth-child(6)");
-              if (pointsCell) {
-                pointsCell.innerText = select.value;
+            const gradeCell = gradeCells[1];
+            const creditCell = row.querySelector("td:nth-child(4)");
+            const pointsCell = row.querySelector("td:nth-child(6)");
+
+            if (!creditCell || !pointsCell) return;
+
+            const creditHours = parseInt(creditCell.innerText) || 0;
+            if (creditHours === 0) return;
+
+            let gradePoints = 0;
+            let isGraded = false;
+
+            // Check if this row has a dropdown select (incomplete grade)
+            const selectElement = gradeCell.querySelector(
+              "select.grade-select"
+            );
+
+            if (selectElement) {
+              // For rows with dropdowns, use the selected value
+              if (selectElement.value !== "-1") {
+                gradePoints = parseFloat(selectElement.value);
+                isGraded = true;
+
+                // Update the points cell
+                pointsCell.innerText = gradePoints;
                 pointsCell.style.fontWeight = "bold";
                 pointsCell.classList.add("text-x");
               }
             } else {
-              // Reset points if no grade selected
-              const pointsCell = select
-                .closest("tr")
-                .querySelector("td:nth-child(6)");
-              if (pointsCell) {
-                pointsCell.innerText = "0";
-                pointsCell.style.fontWeight = "normal";
-                pointsCell.classList.remove("text-x");
+              // For rows with existing grades, convert letter grades to points
+              const gradeText = gradeCell.textContent.trim();
+
+              // Skip non-GPA grades
+              if (["S", "U", "W", "I", "-"].includes(gradeText)) {
+                return;
               }
+
+              // Convert letter grade to grade points
+              if (gradeText === "A+" || gradeText === "A") {
+                gradePoints = 4.0;
+                isGraded = true;
+              } else if (gradeText === "A-") {
+                gradePoints = 3.67;
+                isGraded = true;
+              } else if (gradeText === "B+") {
+                gradePoints = 3.33;
+                isGraded = true;
+              } else if (gradeText === "B") {
+                gradePoints = 3.0;
+                isGraded = true;
+              } else if (gradeText === "B-") {
+                gradePoints = 2.67;
+                isGraded = true;
+              } else if (gradeText === "C+") {
+                gradePoints = 2.33;
+                isGraded = true;
+              } else if (gradeText === "C") {
+                gradePoints = 2.0;
+                isGraded = true;
+              } else if (gradeText === "C-") {
+                gradePoints = 1.67;
+                isGraded = true;
+              } else if (gradeText === "D+") {
+                gradePoints = 1.33;
+                isGraded = true;
+              } else if (gradeText === "D") {
+                gradePoints = 1.0;
+                isGraded = true;
+              } else if (gradeText === "F") {
+                gradePoints = 0.0;
+                isGraded = true;
+              }
+
+              // For badge-styled grades, check for the text content inside the badge
+              if (!isGraded) {
+                const badgeElement = gradeCell.querySelector(".grade-badge");
+                if (badgeElement) {
+                  const badgeText = badgeElement.textContent.trim();
+                  if (badgeText === "A+" || badgeText === "A") {
+                    gradePoints = 4.0;
+                    isGraded = true;
+                  } else if (badgeText === "A-") {
+                    gradePoints = 3.67;
+                    isGraded = true;
+                  } else if (badgeText === "B+") {
+                    gradePoints = 3.33;
+                    isGraded = true;
+                  } else if (badgeText === "B") {
+                    gradePoints = 3.0;
+                    isGraded = true;
+                  } else if (badgeText === "B-") {
+                    gradePoints = 2.67;
+                    isGraded = true;
+                  } else if (badgeText === "C+") {
+                    gradePoints = 2.33;
+                    isGraded = true;
+                  } else if (badgeText === "C") {
+                    gradePoints = 2.0;
+                    isGraded = true;
+                  } else if (badgeText === "C-") {
+                    gradePoints = 1.67;
+                    isGraded = true;
+                  } else if (badgeText === "D+") {
+                    gradePoints = 1.33;
+                    isGraded = true;
+                  } else if (badgeText === "D") {
+                    gradePoints = 1.0;
+                    isGraded = true;
+                  } else if (badgeText === "F") {
+                    gradePoints = 0.0;
+                    isGraded = true;
+                  }
+                }
+              }
+            }
+
+            // If we have a valid grade, add to the totals
+            if (isGraded) {
+              totalCreditHours += creditHours;
+              totalGradePoints += creditHours * gradePoints;
             }
           });
 
@@ -1169,8 +1307,9 @@ function TranscriptPage() {
           headerRow.addEventListener("click", () => {
             if (tableContainer.style.maxHeight === "0px") {
               // Show the table container with smooth animation
-              tableContainer.style.maxHeight = `${tableContainer.scrollHeight + 50
-                }px`; // Add padding for safety
+              tableContainer.style.maxHeight = `${
+                tableContainer.scrollHeight + 50
+              }px`; // Add padding for safety
               tableContainer.style.opacity = "1";
               setTimeout(() => {
                 tableContainer.style.overflow = "visible";
