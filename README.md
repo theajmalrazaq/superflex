@@ -3,21 +3,21 @@
   <p>A modern interface enhancement extension for university learning management systems</p>
   
 <p>
-  <a href="https://github.com/ajmalrazaqbhatti/superflex/releases">
-    <img src="https://img.shields.io/github/downloads/ajmalrazaqbhatti/superflex/total?style=for-the-badge&color=f92b04" alt="GitHub all downloads">
+  <a href="https://github.com/theajmalrazaq/superflex/releases">
+    <img src="https://img.shields.io/github/downloads/theajmalrazaq/superflex/total?style=for-the-badge&color=f92b04" alt="GitHub all downloads">
   </a>
   
-  <a href="https://github.com/ajmalrazaqbhatti/superflex">
-    <img src="https://img.shields.io/github/stars/ajmalrazaqbhatti/superflex?style=for-the-badge&color=f92b04" alt="GitHub stars">
-  </a>
-
-  
-  <a href="https://github.com/ajmalrazaqbhatti/superflex/issues">
-    <img src="https://img.shields.io/github/issues-raw/ajmalrazaqbhatti/superflex?style=for-the-badge&color=f92b04" alt="GitHub issues">
+  <a href="https://github.com/theajmalrazaq/superflex">
+    <img src="https://img.shields.io/github/stars/theajmalrazaq/superflex?style=for-the-badge&color=f92b04" alt="GitHub stars">
   </a>
 
   
-  <a href="https://github.com/ajmalrazaqbhatti/superflex/blob/master/LICENSE">
+  <a href="https://github.com/theajmalrazaq/superflex/issues">
+    <img src="https://img.shields.io/github/issues-raw/theajmalrazaq/superflex?style=for-the-badge&color=f92b04" alt="GitHub issues">
+  </a>
+
+  
+  <a href="https://github.com/theajmalrazaq/superflex/blob/master/LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-f92b04?style=for-the-badge" alt="License">
   </a>
 </p>
@@ -26,7 +26,7 @@
 
   
   <p>
-    <a href="https://ajmalrazaqbhatti.github.io/superflex">Website</a> •
+    <a href="https://theajmalrazaq.github.io/superflex">Website</a> •
     <a href="#features">Features</a> •
     <a href="#installation">Installation</a> •
     <a href="#development">Development</a> •
@@ -75,7 +75,7 @@ SuperFlex enhances the following university LMS pages:
 
 
 ### Installation
-1. Download the latest release from the [GitHub Releases page](https://github.com/ajmalrazaqbhatti/superflex/releases)
+1. Download the latest release from the [GitHub Releases page](https://github.com/theajmalrazaq/superflex/releases)
 2. Unzip the downloaded file
 3. Open Chrome and go to `chrome://extensions/`
 4. Enable "Developer Mode" in the top right
@@ -99,7 +99,7 @@ SuperFlex is built with modern web technologies:
 ### Setup Development Environment
 1. Clone the repository:
 ```bash
-git clone https://github.com/ajmalrazaqbhatti/superflex.git
+git clone https://github.com/theajmalrazaq/superflex.git
 cd superflex
 ```
 
@@ -176,9 +176,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-Ajmal Razaq Bhatti - [@ajmalrazaqbhatti](https://github.com/ajmalrazaqbhatti)
+Ajmal Razaq Bhatti - [@theajmalrazaq](https://github.com/theajmalrazaq)
 
-Project Link: [https://github.com/ajmalrazaqbhatti/superflex](https://github.com/ajmalrazaqbhatti/superflex)
+Project Link: [https://github.com/theajmalrazaq/superflex](https://github.com/theajmalrazaq/superflex)
 
 ## Disclaimer
 
