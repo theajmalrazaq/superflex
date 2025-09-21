@@ -63,9 +63,15 @@ document.body.style.backgroundImage = `url("${chrome.runtime.getURL(
 document.body.style.backgroundRepeat = "no-repeat";
 
 // Render the components
+
+
 root.render(
   <>
     <LoadingOverlay />
     {isLoginPage ? <LoginPageStyles /> : <PathRouter />}
   </>
 );
+
+setTimeout(() => {
+  document.body.classList.add("!visible");
+}, 0);
