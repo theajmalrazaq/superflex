@@ -1,4 +1,3 @@
-import React from "react";
 import { createRoot } from "react-dom/client";
 import LoadingOverlay from "./components/LoadingOverlay";
 import LoginPageStyles from "./components/LoginPageStyles";
@@ -15,20 +14,18 @@ const root = createRoot(container);
 // Detect which page we're on
 const isLoginPage = window.location.href.includes("Login");
 
-// Create a style element for the @font-face declaration
-const fontStyle = document.createElement("style");
-fontStyle.textContent = `
-  @font-face {
-    font-family: 'Product Sans';
-    src: url('https://fonts.gstatic.com/s/productsans/v5/HYvgU2fE2nRJvZ5JFAumwegdm0LZdjqr5-oayXSOefg.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-  }
-`;
-
-// Add the style element to the head
-document.head.appendChild(fontStyle);
+// Product Sans font usage commented out. Using Figtree font instead.
+// const fontStyle = document.createElement("style");
+// fontStyle.textContent = `
+//   @font-face {
+//     font-family: 'Product Sans';
+//     src: url('https://fonts.gstatic.com/s/productsans/v5/HYvgU2fE2nRJvZ5JFAumwegdm0LZdjqr5-oayXSOefg.woff2') format('woff2');
+//     font-weight: normal;
+//     font-style: normal;
+//     font-display: swap;
+//   }
+// `;
+// document.head.appendChild(fontStyle);
 if (document.getElementById("overlay23")) {
   document.getElementById("overlay23").remove(); // Remove the overlay element
 }
@@ -44,13 +41,13 @@ favicon.href = `${chrome.runtime.getURL("public/favicon.svg")}`;
 if (document.querySelector(".m-grid__item.m-footer")) {
   document.querySelector(".m-grid__item.m-footer").remove(); // Remove the footer element
 }
-// Apply the font to elements
-document.body.style.fontFamily = "'Product Sans', sans-serif";
+// Apply the Figtree font to elements
+document.body.style.fontFamily = "'Figtree', sans-serif";
 document.querySelectorAll("input").forEach((input) => {
-  input.style.fontFamily = "'Product Sans', sans-serif";
+  input.style.fontFamily = "'Figtree', sans-serif";
 });
 document.querySelectorAll("button").forEach((button) => {
-  button.style.fontFamily = "'Product Sans', sans-serif";
+  button.style.fontFamily = "'Figtree', sans-serif";
 });
 
 // Apply global Tailwind dark mode and background
@@ -62,8 +59,6 @@ document.body.style.backgroundImage = `url("${chrome.runtime.getURL(
 )}")`;
 document.body.style.backgroundRepeat = "no-repeat";
 
-// Render the components
-
 
 root.render(
   <>
@@ -74,4 +69,5 @@ root.render(
 
 setTimeout(() => {
   document.body.classList.add("!visible");
+  document.body.classList.add("!overflow-auto");
 }, 0);

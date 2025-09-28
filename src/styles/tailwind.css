@@ -1,21 +1,20 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer components {
-  .spinner {
-    @apply border-4 border-white/30 rounded-full border-t-x w-10 h-10 animate-spin;
-  }
+@import "tailwindcss";
+@font-face {
+  font-family: 'Figtree';
+  src: url('https://fonts.gstatic.com/s/figtree/v8/_Xms-HUzqDCFdgfMm4S9DQ.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  unicode-range:
+    U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F,
+    U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+@theme{
+  --color-x: #a098ff;
+   --font-figtree: 'Figtree', sans-serif;
 }
+
 .scrollbar-hide {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
@@ -35,4 +34,14 @@
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: rgba(255, 255, 255, 0.2);
+}
+button:focus {
+  outline: none !important;
+}
+a{
+  color: unset;
+  text-decoration: unset !important;
+}
+a:hover{
+  background: unset;
 }

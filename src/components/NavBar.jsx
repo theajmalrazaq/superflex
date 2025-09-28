@@ -20,28 +20,28 @@ import {
   Lock,
 } from "lucide-react";
 
-function NavBar({ currentPage = "", onAttendanceLinkFound }) {
+function NavBar({ currentPage = "", onAttendanceLinkFound ,onTranscriptLinkFound}) {
   const [menuLinks, setMenuLinks] = useState([]);
-  const [username, setUsername] = useState("");
 
   // Icon mapping based on link text or path
+  const iconStyle = "h-12 w-12 rounded-2xl flex text-x items-center !bg-[#161616] justify-center";
   const iconMapping = {
-    Home: <Home size={20} />,
-    "Course Registration": <BookOpen size={20} />,
-    Attendance: <Calendar size={20} />,
-    Marks: <Award size={20} />,
-    "Marks PLO Report": <BarChart size={20} />,
-    Transcript: <FileText size={20} />,
-    "Fee Challan": <Receipt size={20} />,
-    "Fee Details": <DollarSign size={20} />,
-    "Course Feedback": <MessageSquare size={20} />,
-    "Retake Exam Request": <Clock size={20} />,
-    "Course Withdraw": <XCircle size={20} />,
-    "Grade Change Request": <RefreshCw size={20} />,
-    "Tentative Study Plan": <ListChecks size={20} />,
-    "Grade Report": <GraduationCap size={20} />,
+    Home: <span className={iconStyle}><Home size={20} /></span>,
+    "Course Registration": <span className={iconStyle}><BookOpen size={20} /></span>,
+    Attendance: <span className={iconStyle}><Calendar size={20} /></span>,
+    Marks: <span className={iconStyle}><Award size={20} /></span>,
+    "Marks PLO Report": <span className={iconStyle}><BarChart size={20} /></span>,
+    Transcript: <span className={iconStyle}><FileText size={20} /></span>,
+    "Fee Challan": <span className={iconStyle}><Receipt size={20} /></span>,
+    "Fee Details": <span className={iconStyle}><DollarSign size={20} /></span>,
+    "Course Feedback": <span className={iconStyle}><MessageSquare size={20} /></span>,
+    "Retake Exam Request": <span className={iconStyle}><Clock size={20} /></span>,
+    "Course Withdraw": <span className={iconStyle}><XCircle size={20} /></span>,
+    "Grade Change Request": <span className={iconStyle}><RefreshCw size={20} /></span>,
+    "Tentative Study Plan": <span className={iconStyle}><ListChecks size={20} /></span>,
+    "Grade Report": <span className={iconStyle}><GraduationCap size={20} /></span>,
     // Fallback icon for any unmatched menu items
-    default: <FileText size={20} />,
+    default: <span className={iconStyle}><FileText size={20} /></span>,
   };
 
   // Function to determine which icon to use
@@ -110,18 +110,14 @@ function NavBar({ currentPage = "", onAttendanceLinkFound }) {
       const attendanceLink = links.find(
         (link) => link.text.trim() === "Attendance"
       );
-      if (attendanceLink && onAttendanceLinkFound) {
+    const transcriptLink = links.find((link) => link.text.trim() === "Transcript");
+    
+      if (attendanceLink && onAttendanceLinkFound && onTranscriptLinkFound && transcriptLink) {
         onAttendanceLinkFound(attendanceLink.href);
+        onTranscriptLinkFound(transcriptLink.href);
       }
     }
 
-    // Extract username
-    const usernameElement = document.querySelector(
-      ".m-topbar__username.m--hidden-tablet.m--hidden-mobile.m--padding-right-15"
-    );
-    if (usernameElement) {
-      setUsername(usernameElement.textContent.trim());
-    }
 
     // Now it's safe to remove elements after extraction
     document.querySelectorAll("header").forEach((element) => {
@@ -162,7 +158,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound }) {
     document.querySelector(".m-subheader")?.remove();
     // Remove the close button
     document.querySelector("#m_aside_left_close_btn")?.remove();
-  }, [onAttendanceLinkFound]);
+  }, [onAttendanceLinkFound, onTranscriptLinkFound]);
 
   // For debugging
   useEffect(() => {
@@ -174,18 +170,18 @@ function NavBar({ currentPage = "", onAttendanceLinkFound }) {
   }, [menuLinks]);
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col  px-1 pt-4 pb-1 h-screen">
       {/* Logo Section with Gradient Background */}
-      <div className="px-6 pt-3 pb-0">
+      <div className="px-3 pb-0">
         <img
           src={chrome.runtime.getURL("public/logo.svg")}
           alt="Logo"
-          className="h-10 w-auto filter"
+          className="h-16 w-auto filter"
         />
       </div>
 
       {/* Divider */}
-      <div className="h-px bg-gradient-to-r from-transparent via-slate-600/50 to-transparent my-3 mx-4"></div>
+      <div className="h-px bg-gradient-to-r via-slate-600/50 from-transparent to-transparent my-3 mx-4"></div>
 
       {/* Navigation Links */}
       <div className="flex-1 overflow-hidden flex flex-col">
@@ -215,15 +211,14 @@ function NavBar({ currentPage = "", onAttendanceLinkFound }) {
                     <li key={index}>
                       <a
                         href={link.href}
-                        className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-300 text-sm no-underline hover:no-underline
+                        className={`flex items-center gap-3 pr-4 pl-2 py-1.5 rounded-2xl transition-all duration-300 text-sm no-underline hover:no-underline
                                                     ${isActive
-                            ? "bg-x text-white "
-                            : "text-slate-300 hover:bg-white/10 hover:text-white"
+                            ? "!bg-x !text-white"
+                            : "!text-slate-300 hover:!bg-[#161616] hover:text-white"
                           }`}
                       >
                         <span
-                          className={`${isActive ? "text-white" : "text-slate-400"
-                            }`}
+                          className={`rounded-2xl flex items-center justify-center`}
                         >
                           {getIcon(link)}
                         </span>
@@ -242,46 +237,20 @@ function NavBar({ currentPage = "", onAttendanceLinkFound }) {
 
         {/* User Profile and Logout Section */}
         <div className="mt-auto py-8 px-4">
-          <div className="rounded-2xl overflow-hidden  !border !border-white/10">
-            {/* User Profile Section */}
-            <div className="p-4 flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl overflow-hidden border-2 border-white/10  flex-shrink-0">
-                <img
-                  src="/Login/GetImage"
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                  onError={({ currentTarget }) => {
-                    currentTarget.onerror = null;
-                    currentTarget.src =
-                      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236b7280'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E";
-                  }}
-                />
+          {/* Profile Card with Logout Button */}
+          <div className="rounded-2xl overflow-visible bg-white/2 relative flex flex-col items-center w-full">
+            <div className="w-full flex flex-col items-center" style={{position:'relative'}}>
+              <div className="flex items-center gap-3 p-3 w-full">
+                
+               
+                <a
+                  href="/Login/logout"
+                  className="ml-2 flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 backdrop-blur-md border border-white/5 text-white font-medium text-sm no-underline hover:bg-slate-100 transition-all duration-200"
+                >
+                  <LogOut size={18} className="text-x" />
+                  Logout
+                </a>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-slate-100 font-medium truncate">
-                  {username || "Student"}
-                </div>
-                <div className="text-slate-400 text-xs">Student Portal</div>
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className="h-px bg-slate-700/70 mx-3"></div>
-
-            {/* Logout and Change Password Buttons */}
-            <div className="p-3 flex gap-2">
-              <a
-                href="https://flexstudent.nu.edu.pk/Student/ChangePassword"
-                className="flex items-center justify-center bg-white text-black py-2.5 px-2 w-1/3 rounded-xl transition-all duration-300"
-              >
-                <Lock size={18} />
-              </a>
-              <a
-                href="/Login/logout"
-                className="flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white py-2.5 px-4 w-2/3 rounded-xl transition-all duration-300 font-medium text-sm no-underline"
-              >
-                <LogOut size={18} />
-              </a>
             </div>
           </div>
         </div>

@@ -81,7 +81,7 @@ function LoginPageStyles() {
     let logodiv = document.createElement("div");
     // eslint-disable-next-line no-undef
     logodiv.innerHTML = `<img src="${chrome.runtime.getURL(
-      "public/logo.svg"
+      "public/logo_sec.svg"
     )}" class="logo" alt="Logo" />`;
     logodiv.classList.add("!pb-4", "!border-b", "!border-white/10","!w-[20rem]");
 
@@ -112,7 +112,7 @@ function LoginPageStyles() {
 
     // Replace inline styles with Tailwind classes
     logintitle.innerHTML =
-      "<h1 class='!text-2xl !font-black'>Welcome Back!</h1> <br/> <p class='!text-base'>Enter Your Login Details</p>";
+      "<h1 class='!text-2xl !font-bold'>Welcome Back!</h1> <br/> <p class='!text-base'>Enter Your Login Details</p>";
     logintitle.classList.add("!text-center");
     logintitle.style.lineHeight = "0.7"; // Keep this as it's specific
 

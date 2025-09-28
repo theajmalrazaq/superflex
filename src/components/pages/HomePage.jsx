@@ -4,24 +4,25 @@ import React, { useEffect, useState } from "react";
 import PageLayout from "../layouts/PageLayout";
 import {
   Calendar,
-  CheckCircle,
-  XCircle,
+  Check,
+  X,
   GraduationCap,
   User,
   Users,
   MapPin,
   UserCheck,
-  X,
   Building,
   BookOpen,
   Activity,
   ChevronRight,
-  Zap,
   Award,
-  Github,
+  Github, 
   Globe,
   Instagram,
+  TrendingUp,
+  FileText,
 } from "lucide-react";
+import ReviewCarousel from "../ReviewCarousel";
 
 // Add custom scrollbar styles
 const scrollbarStyle = `
@@ -56,7 +57,6 @@ const getWelcomeMessage = () => {
 };
 
 function HomePage() {
-  // Add the style to the document
   useEffect(() => {
     const styleElement = document.createElement("style");
     styleElement.textContent = scrollbarStyle;
@@ -71,13 +71,18 @@ function HomePage() {
   const [attendanceData, setAttendanceData] = useState(null);
   const [attendanceSummary, setAttendanceSummary] = useState({});
   const [isLoadingAttendance, setIsLoadingAttendance] = useState(false);
+  const [transcriptLink, setTranscriptLink] = useState(null);
+  const [transcriptData, setTranscriptData] = useState(null);
+  const [transcriptSummary, setTranscriptSummary] = useState({});
+  const [isLoadingTranscript, setIsLoadingTranscript] = useState(false);
   const [universityInfo, setUniversityInfo] = useState(null);
   const [personalInfo, setPersonalInfo] = useState(null);
   const [contactInfo, setContactInfo] = useState(null);
   const [familyInfo, setFamilyInfo] = useState(null);
 
-  // Replace single profile state with individual popup states
+  // Separate state for modal and dropdown
   const [activePopup, setActivePopup] = useState(null);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
   // Add the style to the document and remove problematic border class
   useEffect(() => {
@@ -219,12 +224,26 @@ function HomePage() {
     }
   }, [attendanceLink]);
 
+  // Function to fetch transcript data when the link is available
+  useEffect(() => {
+    if (transcriptLink) {
+      fetchTranscriptData();
+    }
+  }, [transcriptLink]);
+
   // Process attendance data after it's loaded
   useEffect(() => {
     if (attendanceData) {
       processAttendanceData();
     }
   }, [attendanceData]);
+
+  // Process transcript data after it's loaded
+  useEffect(() => {
+    if (transcriptData) {
+      processTranscriptData();
+    }
+  }, [transcriptData]);
 
   const fetchAttendanceData = async () => {
     setIsLoadingAttendance(true);
@@ -248,6 +267,29 @@ function HomePage() {
       console.error("Error fetching attendance data:", error);
     } finally {
       setIsLoadingAttendance(false);
+    }
+  };
+
+  const fetchTranscriptData = async () => {
+    setIsLoadingTranscript(true);
+    try {
+      const response = await fetch(transcriptLink);
+      const html = await response.text();
+
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+      const transcriptContent = doc.querySelector(".m-content");
+
+      if (transcriptContent) {
+        const scripts = transcriptContent.querySelectorAll("script");
+        scripts.forEach((script) => script.remove());
+
+        setTranscriptData(transcriptContent.innerHTML);
+      }
+    } catch (error) {
+      console.error("Error fetching transcript data:", error);
+    } finally {
+      setIsLoadingTranscript(false);
     }
   };
 
@@ -322,232 +364,403 @@ function HomePage() {
     setAttendanceSummary(summaryData);
   };
 
+  const processTranscriptData = () => {
+    const tempElement = document.createElement("div");
+    tempElement.innerHTML = transcriptData;
+
+    const summaryData = {
+      semesters: [],
+      overallStats: {}
+    };
+
+    // Extract student info from the first row
+    const studentInfoRow = tempElement.querySelector(".row .m-portlet__body");
+    if (studentInfoRow) {
+      const infoColumns = studentInfoRow.querySelectorAll(".col-md-2, .col-md-3");
+      const studentInfo = {};
+      
+      infoColumns.forEach((col) => {
+        const label = col.querySelector(".m--font-boldest")?.textContent.trim().replace(":", "");
+        const value = col.querySelector("span:not(.m--font-boldest)")?.textContent.trim();
+        if (label && value) {
+          studentInfo[label] = value;
+        }
+      });
+      summaryData.studentInfo = studentInfo;
+    }
+
+    // Process each semester
+    const semesterColumns = tempElement.querySelectorAll(".col-md-6");
+    
+    semesterColumns.forEach((column) => {
+      const semesterHeader = column.querySelector("h5");
+      if (!semesterHeader) return;
+
+      const semesterName = semesterHeader.textContent.trim();
+      
+      // Extract semester stats (Cr. Att, Cr. Ernd, CGPA, SGPA)
+      const statsDiv = column.querySelector(".pull-right");
+      const stats = {};
+      
+      if (statsDiv) {
+        const spans = statsDiv.querySelectorAll("span");
+        spans.forEach((span) => {
+          const text = span.textContent.trim();
+          if (text.includes("Cr. Att:")) {
+            stats.creditsAttempted = text.replace("Cr. Att:", "").trim();
+          } else if (text.includes("Cr. Ernd:")) {
+            stats.creditsEarned = text.replace("Cr. Ernd:", "").trim();
+          } else if (text.includes("CGPA:")) {
+            stats.cgpa = text.replace("CGPA:", "").trim();
+          } else if (text.includes("SGPA:")) {
+            stats.sgpa = text.replace("SGPA:", "").trim();
+          }
+        });
+      }
+
+      // Extract courses for this semester
+      const courses = [];
+      const table = column.querySelector("table");
+      
+      if (table) {
+        const rows = table.querySelectorAll("tbody tr");
+        
+        rows.forEach((row) => {
+          const cells = row.querySelectorAll("td");
+          if (cells.length >= 6) {
+            const course = {
+              code: cells[0].textContent.trim(),
+              name: cells[1].textContent.trim(),
+              section: cells[2].textContent.trim(),
+              creditHours: cells[3].textContent.trim(),
+              grade: cells[4].textContent.trim(),
+              points: cells[5].textContent.trim(),
+              type: cells[6]?.textContent.trim() || "N/A",
+              remarks: cells[7]?.textContent.trim() || ""
+            };
+            courses.push(course);
+          }
+        });
+      }
+
+      summaryData.semesters.push({
+        name: semesterName,
+        stats,
+        courses,
+        courseCount: courses.length
+      });
+    });
+
+    // Calculate overall statistics
+    if (summaryData.semesters.length > 0) {
+      const latestSemester = summaryData.semesters[summaryData.semesters.length - 1];
+      const totalCourses = summaryData.semesters.reduce((sum, sem) => sum + sem.courseCount, 0);
+      
+      summaryData.overallStats = {
+        totalSemesters: summaryData.semesters.length,
+        totalCourses,
+        currentCGPA: latestSemester.stats.cgpa || "N/A",
+        totalCreditsEarned: latestSemester.stats.creditsEarned || "0"
+      };
+    }
+
+    setTranscriptSummary(summaryData);
+  };
+
   const handleAttendanceLinkFound = (link) => {
     setAttendanceLink(link);
   };
 
-  // Define color themes for the dashboard
+  const handleTranscriptLinkFound = (link) => {
+    setTranscriptLink(link);
+  };
 
-  // Calculate quick stats based on attendance data
+  // Calculate quick stats based on attendance and transcript data
   const calculateStats = () => {
+    const attendanceStats = calculateAttendanceStats();
+    const transcriptStats = calculateTranscriptStats();
+    
+    return { ...attendanceStats, ...transcriptStats };
+  };
+
+  const calculateAttendanceStats = () => {
     if (!attendanceSummary || Object.keys(attendanceSummary).length === 0) {
       return {
         avgAttendance: 0,
-        totalPresent: 0,
-        totalAbsent: 0,
         totalCourses: 0,
-        coursesBelow80: 0,
-        coursesBelowThreshold: 0,
-        coursesWithTooManyAbsents: 0,
+        bestSubject: null,
+        worstSubject: null,
+        attendanceWarnings: 0,
       };
     }
 
     const courses = Object.values(attendanceSummary);
     const totalCourses = courses.length;
 
-    const totalPresent = courses.reduce(
-      (sum, course) => sum + course.presentCount,
-      0
-    );
-    const totalAbsent = courses.reduce(
-      (sum, course) => sum + course.absentCount,
-      0
-    );
+    // Average attendance
+    const avgAttendance = (
+      courses.reduce((sum, course) => sum + parseFloat(course.attendancePercentage), 0) / totalCourses
+    ).toFixed(1);
 
-    const totalPercentage = courses.reduce(
-      (sum, course) => sum + parseFloat(course.attendancePercentage),
-      0
-    );
-    const avgAttendance = totalPercentage / totalCourses;
+    // Best performing subject (highest attendance)
+    const bestSubject = courses.reduce((max, course) =>
+      parseFloat(course.attendancePercentage) > parseFloat(max.attendancePercentage) ? course : max
+    , courses[0]);
 
-    const coursesBelow80 = courses.filter(
+    // Worst performing subject (lowest attendance)
+    const worstSubject = courses.reduce((min, course) =>
+      parseFloat(course.attendancePercentage) < parseFloat(min.attendancePercentage) ? course : min
+    , courses[0]);
+
+    // Attendance warnings (subjects below 80%)
+    const attendanceWarnings = courses.filter(
       (course) => parseFloat(course.attendancePercentage) < 80
     ).length;
 
-    const coursesBelowThreshold = courses.filter(
-      (course) => parseFloat(course.attendancePercentage) < 75
-    ).length;
+    return {
+      avgAttendance,
+      totalCourses,
+      bestSubject,
+      worstSubject,
+      attendanceWarnings,
+    };
+  };
 
-    // Count courses with too many absents (>6 for regular courses, >3 for labs)
-    const coursesWithTooManyAbsents = courses.filter((course) => {
-      const isLab = course.title.toLowerCase().includes("lab");
-      return isLab ? course.absentCount > 3 : course.absentCount > 6;
-    }).length;
+  const calculateTranscriptStats = () => {
+    if (!transcriptSummary.semesters || transcriptSummary.semesters.length === 0) {
+      return {
+        currentCGPA: "N/A",
+        totalSemesters: 0,
+        totalCreditsEarned: 0,
+        totalCoursesCompleted: 0
+      };
+    }
 
     return {
-      avgAttendance: avgAttendance.toFixed(1),
-      totalPresent,
-      totalAbsent,
-      totalCourses,
-      coursesBelow80,
-      coursesBelowThreshold,
-      coursesWithTooManyAbsents,
+      currentCGPA: transcriptSummary.overallStats?.currentCGPA || "N/A",
+      totalSemesters: transcriptSummary.overallStats?.totalSemesters || 0,
+      totalCreditsEarned: transcriptSummary.overallStats?.totalCreditsEarned || 0,
+      totalCoursesCompleted: transcriptSummary.overallStats?.totalCourses || 0
     };
   };
 
   const stats = calculateStats();
+  // Loading state for stats
+  const isStatsLoading = (!attendanceSummary || Object.keys(attendanceSummary).length === 0) && 
+                         (!transcriptSummary.semesters || transcriptSummary.semesters.length === 0);
+
+  // Loading SVG component
+  const LoadingSplash = () => (
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="34" height="34" fill="none">
+      <path className="animate-splash" fill="#a098ff" d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"/>
+    </svg>
+  );
 
   // Function to render popups based on activePopup state
   const renderActivePopup = () => {
     if (!activePopup) return null;
 
     return (
-      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-2 transition-all duration-300">
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300">
         <div
-          className={`bg-black rounded-2xl overflow-hidden shadow-2xl !border !border-white/10 w-full ${
-            activePopup === "about" ? "max-w-2xl" : "max-w-md"
-          } relative`}
+          className={`bg-[#161616] rounded-3xl overflow-hidden  border border-white/10 w-full ${
+            activePopup === "about" ? "max-w-3xl" : "max-w-lg"
+          } relative backdrop-blur-xl`}
         >
-          <div className="py-3 px-4 flex items-center justify-between !border-b !border-white/10">
-            <h2 className="font-bold text-white text-lg">
+          <div className="py-4 px-6 flex items-center justify-between border-b border-white/10 bg-white/5">
+            <h2 className="font-bold text-white text-xl">
               {activePopup === "personal" && "Personal Information"}
               {activePopup === "contact" && "Contact Information"}
               {activePopup === "family" && "Family Information"}
+              {activePopup === "university" && "University Information"}
               {activePopup === "about" && "About SuperFlex"}
             </h2>
             <button
               onClick={() => setActivePopup(null)}
-              className="p-1.5 rounded-full hover:bg-white/5 transition-colors"
+              className="p-2 rounded-full hover:bg-white/10 transition-colors"
             >
               <X className="h-5 w-5 text-white/70" />
             </button>
           </div>
 
-          <div className="p-4 max-h-[70vh] overflow-auto custom-scrollbar">
+          <div className="p-6 max-h-[75vh] overflow-auto custom-scrollbar">
             {/* Personal Info Popup */}
             {activePopup === "personal" && (
               <div className="animate-fadeIn">
-                <table className="w-full border-collapse">
-                  <tbody className="divide-y divide-white/10">
-                    {personalInfo &&
-                      Object.entries(personalInfo).map(([key, value]) => (
-                        <tr key={key} className="hover:bg-white/5">
-                          <td className="py-3 px-2 text-white/50 text-xs font-medium w-1/3">
-                            {key}
-                          </td>
-                          <td className="py-3 px-2 text-white">
-                            <span className="font-medium">
+                <div className="space-y-4">
+                  {personalInfo &&
+                    Object.entries(personalInfo).map(([key, value]) => (
+                      <div key={key} className="flex items-center justify-between py-4 px-5 rounded-2xl bg-white/5 hover:bg-white/10 transition-all duration-200 border border-white/10">
+                        <div className="flex items-center gap-4">
+                          <div className="h-10 w-10 rounded-xl bg-[#161616] flex items-center justify-center">
+                            <User className="h-5 w-5 text-blue-400" />
+                          </div>
+                          <div>
+                            <p className="text-white/60 text-sm font-medium uppercase tracking-wide">
+                              {key}
+                            </p>
+                            <p className="text-white font-semibold text-lg">
                               {value || "N/A"}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
                 {!personalInfo ||
                   (Object.keys(personalInfo).length === 0 && (
-                    <div className="text-center py-6 text-white/50">
-                      No personal information available
+                    <div className="text-center py-12 text-white/50">
+                      <User className="h-16 w-16 mx-auto mb-4 text-white/20" />
+                      <p className="text-lg">No personal information available</p>
                     </div>
                   ))}
               </div>
             )}
+
             {/* Contact Info Popup */}
             {activePopup === "contact" && (
-              <div className="animate-fadeIn">
+              <div className="animate-fadeIn space-y-8">
                 {/* Permanent Address */}
-                <h4 className="text-white/70 text-sm font-medium mb-2 px-2">
-                  Permanent Address
-                </h4>
-                <table className="w-full border-collapse mb-6">
-                  <tbody className="divide-y divide-white/10">
+                <div>
+                  <h4 className="text-white text-lg font-semibold mb-4 flex items-center gap-2">
+                    <MapPin className="h-5 w-5 text-blue-400" />
+                    Permanent Address
+                  </h4>
+                  <div className="space-y-3">
                     {contactInfo?.permanent &&
-                      Object.entries(contactInfo.permanent).map(
-                        ([key, value]) => (
-                          <tr key={key} className="hover:bg-white/5">
-                            <td className="py-3 px-2 text-white/50 text-xs font-medium w-1/3">
-                              {key}
-                            </td>
-                            <td className="py-3 px-2 text-white">
-                              <span className="font-medium">
-                                {value || "N/A"}
-                              </span>
-                            </td>
-                          </tr>
-                        )
-                      )}
-                  </tbody>
-                </table>
+                      Object.entries(contactInfo.permanent).map(([key, value]) => (
+                        <div key={key} className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all border border-white/5">
+                          <span className="text-white/60 text-sm font-medium">{key}</span>
+                          <span className="text-white font-semibold">{value || "N/A"}</span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
 
                 {/* Current Address */}
-                <h4 className="text-white/70 text-sm font-medium mb-2 px-2">
-                  Current Address
-                </h4>
-                <table className="w-full border-collapse">
-                  <tbody className="divide-y divide-white/10">
+                <div>
+                  <h4 className="text-white text-lg font-semibold mb-4 flex items-center gap-2">
+                    <MapPin className="h-5 w-5 text-green-400" />
+                    Current Address
+                  </h4>
+                  <div className="space-y-3">
                     {contactInfo?.current &&
-                      Object.entries(contactInfo.current).map(
-                        ([key, value]) => (
-                          <tr key={key} className="hover:bg-white/5">
-                            <td className="py-3 px-2 text-white/50 text-xs font-medium w-1/3">
-                              {key}
-                            </td>
-                            <td className="py-3 px-2 text-white">
-                              <span className="font-medium">
-                                {value || "N/A"}
-                              </span>
-                            </td>
-                          </tr>
-                        )
-                      )}
-                  </tbody>
-                </table>
+                      Object.entries(contactInfo.current).map(([key, value]) => (
+                        <div key={key} className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all border border-white/5">
+                          <span className="text-white/60 text-sm font-medium">{key}</span>
+                          <span className="text-white font-semibold">{value || "N/A"}</span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
 
-                {(!contactInfo ||
-                  (!contactInfo.permanent && !contactInfo.current)) && (
-                  <div className="text-center py-6 text-white/50">
-                    No contact information available
+                {(!contactInfo || (!contactInfo.permanent && !contactInfo.current)) && (
+                  <div className="text-center py-12 text-white/50">
+                    <MapPin className="h-16 w-16 mx-auto mb-4 text-white/20" />
+                    <p className="text-lg">No contact information available</p>
                   </div>
                 )}
               </div>
             )}
+
             {/* Family Info Popup */}
             {activePopup === "family" && (
               <div className="animate-fadeIn">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b border-white/10">
-                      <th className="text-left py-3 px-2 text-white/50 text-xs font-medium">
-                        Relation
-                      </th>
-                      <th className="text-left py-3 px-2 text-white/50 text-xs font-medium">
-                        Name
-                      </th>
-                      <th className="text-left py-3 px-2 text-white/50 text-xs font-medium">
-                        CNIC
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/10">
-                    {familyInfo?.map((member, index) => (
-                      <tr key={index} className="hover:bg-white/5">
-                        <td className="py-3 px-2 text-white">
-                          <span className="font-medium">{member.relation}</span>
-                        </td>
-                        <td className="py-3 px-2 text-white">
-                          <span className="font-medium">{member.name}</span>
-                        </td>
-                        <td className="py-3 px-2 text-white">
-                          <span className="font-medium">{member.cnic}</span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className="space-y-4">
+                  {familyInfo?.map((member, index) => (
+                    <div key={index} className="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/10">
+                      <div className="h-12 w-12 rounded-xl bg-[#161616] flex items-center justify-center">
+                        <Users className="h-6 w-6 text-purple-400" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-white font-semibold text-lg">{member.name}</span>
+                          <span className="text-white/60 text-sm">{member.cnic}</span>
+                        </div>
+                        <span className="text-purple-400 text-sm font-medium">{member.relation}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
                 {(!familyInfo || familyInfo.length === 0) && (
-                  <div className="text-center py-6 text-white/50">
-                    No family information available
+                  <div className="text-center py-12 text-white/50">
+                    <Users className="h-16 w-16 mx-auto mb-4 text-white/20" />
+                    <p className="text-lg">No family information available</p>
                   </div>
                 )}
               </div>
             )}
+
+            {/* University Info Popup */}
+            {activePopup === "university" && (
+              <div className="animate-fadeIn">
+                <div className="space-y-4">
+                  {universityInfo ? (
+                    Object.entries(universityInfo).map(([key, value]) => {
+                      let icon;
+                      let iconColor;
+                      switch (key) {
+                        case "Roll No":
+                          icon = <UserCheck size={22} />;
+                          iconColor = "text-blue-400";
+                          break;
+                        case "Section":
+                          icon = <Users size={22} />;
+                          iconColor = "text-green-400";
+                          break;
+                        case "Degree":
+                          icon = <Award size={22} />;
+                          iconColor = "text-yellow-400";
+                          break;
+                        case "Session":
+                          icon = <Calendar size={22} />;
+                          iconColor = "text-purple-400";
+                          break;
+                        case "Department":
+                          icon = <Building size={22} />;
+                          iconColor = "text-red-400";
+                          break;
+                        default:
+                          icon = <ChevronRight size={22} />;
+                          iconColor = "text-gray-400";
+                      }
+
+                      return (
+                        <div
+                          key={key}
+                          className="flex items-center gap-4 py-5 px-6 rounded-2xl bg-white/5 hover:bg-white/10 transition-all duration-200 border border-white/10"
+                        >
+                          <div className={`h-12 w-12 rounded-xl bg-[#161616] flex items-center justify-center ${iconColor}`}>
+                            {icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white/60 text-sm font-medium uppercase tracking-wide mb-1">
+                              {key}
+                            </p>
+                            <p className="text-white font-bold text-lg truncate">
+                              {value}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="text-center py-12">
+                      <LoadingSplash />
+                      <p className="text-white/50 mt-4">Loading university information...</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* About Popup */}
             {activePopup === "about" && (
               <div className="animate-fadeIn">
                 <div className="flex flex-col items-center mb-10">
                   <div className="w-70 relative">
-                    <div className="absolute inset-0 bg-gradient-to-br from-x to-x opacity-20 rounded-full blur-xl"></div>
+                    
                     <img
                       src={chrome.runtime.getURL("public/logo.svg")}
                       alt="SuperFlex Logo"
@@ -563,24 +776,15 @@ function HomePage() {
 
                 <div className="flex justify-center items-center m-4 gap-2">
                   <a
-                    className="flex justify-center items-center px-6 py-2 border !border-white/10 text-white rounded-full gap-4 bg-gradient-to-br from-white/10 to-white/5 hover:no-underline"
-                    href="https://github.com/ajmalrazaqbhatti/superflex"
-                  >
-                    {" "}
-                    <Github className="h-6 w-6" /> Github
-                  </a>
-                  <a
-                    className="flex justify-center items-center px-6 py-2 border !border-white/10 text-white rounded-full gap-4 bg-gradient-to-br from-white/10 to-white/5 hover:no-underline"
+                    className="flex justify-center items-center px-6 py-2 border !border-white/10 text-white rounded-full gap-4 bg-[#161616] hover:no-underline"
                     href="https://ajmalrazaqbhatti.github.io/superflex"
                   >
-                    {" "}
                     <Globe className="h-6 w-6" /> Website
                   </a>
                   <a
-                    className="flex justify-center items-center px-6 py-2 border !border-white/10 text-white rounded-full gap-4 bg-gradient-to-br from-white/10 to-white/5 hover:no-underline"
+                    className="flex justify-center items-center px-6 py-2 border !border-white/10 text-white rounded-full gap-4 bg-[#161616] hover:no-underline"
                     href="https://instagram.com/superflexbyajmal"
                   >
-                    {" "}
                     <Instagram className="h-6 w-6" /> Instagram
                   </a>
                 </div>
@@ -620,9 +824,9 @@ function HomePage() {
                     </g>
                   </svg>
                 </h4>
-                <div className="bg-gradient-to-br from-white/10 to-white/5 rounded-2xl p-6 mb-10 border border-white/10 transform transition-all">
+                <div className="bg-[#161616] rounded-2xl p-6 mb-10 border border-white/10 transform transition-all">
                   <div className="flex items-center">
-                    <div className="w-16 h-16 overflow-hidden rounded-xl mr-4">
+                    <div className="w-16 h-16  rounded-xl mr-4">
                       <img
                         src={chrome.runtime.getURL("public/dev.png")}
                         alt="Developer"
@@ -696,7 +900,7 @@ function HomePage() {
                   </h4>
                   <div className="bg-gradient-to-br from-red-900/50 to-red-800/30 border border-red-700/30 p-6 rounded-2xl text-center">
                     <div className="flex justify-center mb-4">
-                      <div className="w-12 h-12 bg-x rounded-full flex items-center justify-center">
+                      <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
@@ -721,7 +925,7 @@ function HomePage() {
                         href="https://alkhidmat.org/appeal/emergency-appeal-palestine-save-lives-in-gaza-today"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="bg-x text-white px-5 py-2.5 rounded-lg font-medium text-base flex items-center gap-2 hover:no-underline"
+                        className="bg-white/5 text-white px-5 py-2.5 rounded-lg font-medium text-base flex items-center gap-2 hover:no-underline"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -747,7 +951,7 @@ function HomePage() {
                   <h4 className="text-white text-lg font-medium mb-4 flex items-center gap-2">
                     Disclaimer
                   </h4>
-                  <div className="space-y-3 bg-gradient-to-br from-white/10 to-white/5 p-6 rounded-2xl border border-white/10">
+                  <div className="space-y-3 bg-[#161616] p-6 rounded-2xl border border-white/10">
                     <p className="text-base text-white/80 leading-relaxed">
                       SuperFlex is an independent project and is not affiliated
                       with, endorsed by, or connected to your university or its
@@ -770,346 +974,483 @@ function HomePage() {
     <PageLayout
       currentPage={window.location.pathname}
       onAttendanceLinkFound={handleAttendanceLinkFound}
+      onTranscriptLinkFound={handleTranscriptLinkFound}
     >
       {renderActivePopup()}
-      <div className="flex h-full w-full overflow-hidden">
+      <div className="flex pb-12 w-full">
         {/* Main Content */}
-
-        <div className=" bg-black rounded-3xl shadow-md p-4 w-full">
+        <div className="p-6 w-full flex flex-col">
           {/* Header */}
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-4">
-              <div>
-                <img
-                  src="/Login/GetImage"
-                  alt=""
-                  className="h-24 w-24 rounded-3xl"
-                />
-              </div>
-              <div>
-                <h1 className="text-2xl font-semibold text-white">
-                  {getWelcomeMessage()} {personalInfo?.["Name"] || "Student"} 👋
-                </h1>
-                <p className="text-white/70 mb-3">
-                  Welcome to SuperFlex By{" "}
-                  <a
-                    href="https://ajmalrazaqbhatti.github.io"
-                    className="text-x hover:no-underline hover:text-white"
-                  >
-                    Ajmal Razaq Bhatti
-                  </a>
-                </p>
-
-                {/* Profile Action Buttons */}
-                <div className="flex flex-wrap gap-2 mt-2">
-                  <button
-                    onClick={() => setActivePopup("personal")}
-                    className="flex items-center gap-1.5 bg-gradient-to-br from-white/10 to-white/5  transition-colors px-3 py-1.5 rounded-lg !border !border-white/10 text-sm text-white"
-                  >
-                    <User className="h-3.5 w-3.5" />
-                    <span>Personal</span>
-                  </button>
-
-                  <button
-                    onClick={() => setActivePopup("contact")}
-                    className="flex items-center gap-1.5 bg-gradient-to-br from-white/10 to-white/5  transition-colors px-3 py-1.5 rounded-lg !border !border-white/10 text-sm text-white"
-                  >
-                    <MapPin className="h-3.5 w-3.5" />
-                    <span>Contact</span>
-                  </button>
-
-                  <button
-                    onClick={() => setActivePopup("family")}
-                    className="flex items-center gap-1.5 bg-gradient-to-br from-white/10 to-white/5  transition-colors px-3 py-1.5 rounded-lg !border !border-white/10 text-sm text-white"
-                  >
-                    <Users className="h-3.5 w-3.5" />
-                    <span>Family</span>
-                  </button>
-
-                  <button
-                    onClick={() => setActivePopup("about")}
-                    className="flex items-center gap-1.5 bg-x  transition-colors px-3 py-1.5 rounde text-sm text-white"
-                  >
-                    <Zap className="h-3.5 w-3.5" />
-                    <span>About SuperFlex</span>
-                  </button>
-                </div>
+          <div className="flex justify-between items-center mb-8">
+            {/* Welcome column */}
+            <div className="flex flex-col gap-2 flex-1">
+              <h1 className="!text-4xl !font-semibold text-white">
+                {getWelcomeMessage()} <span className="text-x">{personalInfo?.["Name"] || "Student"}</span> 🎓
+              </h1>
+              <p className="text-white/70 !font-medium text-lg mb-4">
+                Welcome to SuperFlex By{" "}
+                <a
+                  href="https://theajmalrazaq.github.io"
+                  className="text-x hover:no-underline hover:text-white transition-colors"
+                >
+                  Ajmal Razaq Bhatti
+                </a>
+              </p>
+              <ReviewCarousel />
+            </div>
+            {/* Profile column */}
+            <div className="flex flex-col items-end">
+              <div className="relative">
+                <button
+                  className="flex items-center gap-4 px-3 py-3 rounded-3xl bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] border border-[#2a2a2a] hover:border-white/20 transition-all duration-300"
+                  onClick={() => setIsProfileDropdownOpen((open) => !open)}
+                >
+                  {/* Profile icon */}
+                  <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-x/20 to-x/10 flex items-center justify-center text-white font-bold text-lg border border-x/20">
+                    <img
+                      src="/Login/GetImage"
+                      alt="Profile"
+                      className="h-12 w-12 rounded-2xl object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className="font-bold text-white text-lg">
+                      {personalInfo?.["Name"] || "Student"}
+                    </span>
+                    <span className="text-x text-sm font-semibold">
+                      {universityInfo?.["Roll No"] || personalInfo?.["RollNo"]}
+                    </span>
+                  </div>
+                  {/* Dropdown arrow */}
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="ml-2 transition-transform duration-200" style={{ transform: isProfileDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                    <path d="M6 8L10 12L14 8" stroke="#a098ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                {/* Dropdown menu */}
+                {isProfileDropdownOpen && (
+                  <div className="absolute right-0 mt-3 !w-[200px] bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f]  rounded-3xl border border-white/10 z-50 flex flex-col justify-start py-3 backdrop-blur-xl">
+                    <button
+                      onClick={() => { setActivePopup("personal"); setIsProfileDropdownOpen(false); }}
+                      className="flex gap-3 pl-3 py-3 text-sm text-white hover:bg-x/20 transition-colors rounded-xl mx-2"
+                    >
+                      <User className="h-5 w-5 text-x" /> Personal Info
+                    </button>
+                    <button
+                      onClick={() => { setActivePopup("family"); setIsProfileDropdownOpen(false); }}
+                      className="flex items-center gap-3 pl-3 py-3 text-sm text-white hover:bg-x/20 transition-colors rounded-xl mx-2"
+                    >
+                      <Users className="h-5 w-5 text-x" /> Family Info
+                    </button>
+                    <button
+                      onClick={() => { setActivePopup("contact"); setIsProfileDropdownOpen(false); }}
+                      className="flex items-center gap-3 pl-3 py-3 text-sm text-white hover:bg-x/20 transition-colors rounded-xl mx-2"
+                    >
+                      <MapPin className="h-5 w-5 text-x" /> Contact Info
+                    </button>
+                    <button
+                      onClick={() => { setActivePopup("university"); setIsProfileDropdownOpen(false); }}
+                      className="flex items-center gap-3 pl-3 py-3 text-sm text-white hover:bg-x/20 transition-colors rounded-xl mx-2"
+                    >
+                      <GraduationCap className="h-5 w-5 text-x" /> University Info
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mb-3">
+          {/* Modern Stats Cards - Enhanced UI/UX */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
             {/* Registered Courses */}
-            <div className="bg-x p-2 rounded-3xl !border !border-white/10">
-              <div className="flex items-center space-x-4">
-                <div className="bg-white/40 backdrop-blur-md p-2 rounded-full">
-                  <BookOpen className="text-black" size={24} />
-                </div>
-                <div>
-                  <div className="flex items-baseline">
-                    <span className="text-2xl font-bold text-white">
-                      {stats.totalCourses}
-                    </span>
+            <div className="group p-8 rounded-[30px] border-2 border-[#1c1c1c] bg-[#161616] ">
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="bg-white/5 p-3 rounded-2xl">
+                    <BookOpen className="text-x" size={28} />
                   </div>
-                  <div className="mt-1">
-                    <p className="text-sm text-white/70">
-                      Total Registered Courses
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-baseline space-x-2 min-h-[50px]">
+                    {isStatsLoading ? (
+                      <span className="w-full flex justify-center">
+                        <LoadingSplash />
+                      </span>
+                    ) : (
+                      <>
+                        <span className="text-4xl font-bold text-white tracking-tight">
+                          {stats.totalCourses}
+                        </span>
+                        <span className="text-white/50 text-base font-medium">courses</span>
+                      </>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-base font-semibold text-white/90 leading-relaxed">
+                      Registered Courses
                     </p>
+                    <div className="w-16 h-1 bg-gradient-to-r from-x to-transparent mt-3 group-hover:w-20 transition-all duration-300 rounded-full"></div>
                   </div>
                 </div>
               </div>
             </div>
-            {/* Present Count */}
-            <div className="bg-x p-2 rounded-3xl !border !border-white/10">
-              <div className="flex items-center space-x-4">
-                <div className="bg-white/40 backdrop-blur-md p-2 rounded-full">
-                  <CheckCircle className="text-black" size={24} />
-                </div>
-                <div>
-                  <div className="flex items-baseline">
-                    <span className="text-2xl font-bold text-white">
-                      {stats.totalPresent}
-                    </span>
-                  </div>
-                  <div className="mt-1">
-                    <p className="text-sm text-white/70">Total Present</p>
+
+            {/* Average Attendance */}
+            <div className="group p-8 rounded-[30px] border-2 border-[#1c1c1c] bg-[#161616] ">
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="bg-white/5 p-3 rounded-2xl">
+                    <Activity className="text-x" size={28} />
                   </div>
                 </div>
-              </div>
-            </div>
-            {/* Absent Count */}
-            <div className="bg-x p-2 rounded-3xl !border !border-white/10">
-              <div className="flex items-center space-x-4">
-                <div className="bg-white/40 backdrop-blur-md p-2 rounded-full">
-                  <XCircle className="text-black" size={24} />
-                </div>
-                <div>
-                  <div className="flex items-baseline">
-                    <span className="text-2xl font-bold text-white">
-                      {stats.totalAbsent}
-                    </span>
+                <div className="space-y-3">
+                  <div className="flex items-baseline space-x-2 min-h-[50px]">
+                    {isStatsLoading ? (
+                      <span className="w-full flex justify-center">
+                        <LoadingSplash />
+                      </span>
+                    ) : (
+                      <>
+                        <span className="text-4xl font-bold text-white tracking-tight">
+                          {stats.avgAttendance}
+                        </span>
+                        <span className="text-white text-xl font-bold">%</span>
+                      </>
+                    )}
                   </div>
-                  <div className="mt-1">
-                    <p className="text-sm text-white/70">Total Absent</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* Subjects < 80% Attendance */}
-            <div className="bg-x p-2 rounded-3xl !border !border-white/10">
-              <div className="flex items-center space-x-4">
-                <div className="bg-white/40 backdrop-blur-md p-2 rounded-full">
-                  <Activity className="text-black" size={24} />
-                </div>
-                <div>
-                  <div className="flex items-baseline">
-                    <span className="text-2xl font-bold text-white">
-                      {stats.coursesBelow80}
-                    </span>
-                  </div>
-                  <div className="mt-1">
-                    <p className="text-sm text-white/70">
-                      {"Subjects < 80% Attendance"}
+                  <div>
+                    <p className="text-base font-semibold text-white/90 leading-relaxed">
+                      Average Attendance
                     </p>
+                    <div className="w-16 h-1 bg-gradient-to-r from-x to-transparent mt-3 group-hover:w-20 transition-all duration-300 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Current CGPA */}
+            <div className="group p-8 rounded-[30px] border-2 border-[#1c1c1c] bg-[#161616] ">
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="bg-white/5 p-3 rounded-2xl">
+                    <TrendingUp className="text-x" size={28} />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-baseline space-x-2 min-h-[50px]">
+                    {isStatsLoading ? (
+                      <span className="w-full flex justify-center">
+                        <LoadingSplash />
+                      </span>
+                    ) : (
+                      <>
+                        <span className="text-4xl font-bold text-white tracking-tight">
+                          {stats.currentCGPA}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-base font-semibold text-white/90 leading-relaxed">
+                      Current CGPA
+                    </p>
+                    <div className="w-16 h-1 bg-gradient-to-r from-x to-transparent mt-3 group-hover:w-20 transition-all duration-300 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Total Semesters */}
+            <div className="group p-8 rounded-[30px] border-2 border-[#1c1c1c] bg-[#161616] ">
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="bg-white/5 p-3 rounded-2xl">
+                    <Calendar className="text-x" size={28} />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-baseline space-x-2 min-h-[50px]">
+                    {isStatsLoading ? (
+                      <span className="w-full flex justify-center">
+                        <LoadingSplash />
+                      </span>
+                    ) : (
+                      <>
+                        <span className="text-4xl font-bold text-white tracking-tight">
+                          {stats.totalSemesters}
+                        </span>
+                        <span className="text-white/50 text-base font-medium">sems</span>
+                      </>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-base font-semibold text-white/90 leading-relaxed">
+                      Total Semesters
+                    </p>
+                    <div className="w-16 h-1 bg-gradient-to-r from-x to-transparent mt-3 group-hover:w-20 transition-all duration-300 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Attendance Warnings */}
+            <div className="group p-8 rounded-[30px] border-2 border-[#1c1c1c] bg-[#161616] ">
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="bg-white/5 p-3 rounded-2xl">
+                    <X className="text-x" size={28} />
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="space-y-1 min-h-[50px]">
+                    {isStatsLoading ? (
+                      <span className="w-full flex justify-center">
+                        <LoadingSplash />
+                      </span>
+                    ) : (
+                      <span className="text-4xl font-bold text-white tracking-tight">
+                        {stats.attendanceWarnings}
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-base font-semibold text-white/90 leading-relaxed">
+                      Subjects &lt; 80%
+                    </p>
+                    <div className="w-16 h-1 bg-gradient-to-r from-x to-transparent mt-3 group-hover:w-20 transition-all duration-300 rounded-full"></div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* University Information and Attendance Table in a 2-column layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-            <div className="lg:col-span-2">
-              <h2 className="text-xl font-semibold text-white mb-3">
-                Attendance Details
-              </h2>
-              <div className="bg-black rounded-3xl !border !border-white/10 p-4 h-[420px] overflow-hidden">
+          {/* Two Column Layout for Data */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            
+            {/* Attendance Overview */}
+            <div className="rounded-3xl border border-white/10 p-0 flex flex-col">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-[#1a1a1a] to-[#161616] rounded-t-3xl px-8 py-6 flex items-center gap-5 border-b border-white/10">
+                <div className="h-14 w-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10">
+                  <Activity className="text-x" size={32} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-white">Current Attendance</h3>
+                  <p className="text-base text-white/80">Track your progress across subjects</p>
+                </div>
+              </div>
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar px-8 py-6 max-h-[600px]">
                 {isLoadingAttendance ? (
-                  <div className="flex flex-col justify-center items-center py-16">
-                    <div className="w-16 h-16 rounded-full !border-4 !border-gray-800 !border-t-x animate-spin mb-6"></div>
-                    <span className="text-gray-300 font-medium">
-                      Loading attendance data...
-                    </span>
+                  <div className="h-full flex flex-col items-center justify-center text-center">
+                    <LoadingSplash />
+                    <p className="text-white/50 mt-4 text-lg">Loading attendance data...</p>
                   </div>
-                ) : attendanceData &&
-                  Object.keys(attendanceSummary).length > 0 ? (
-                  <div className="h-full overflow-y-auto custom-scrollbar pr-1">
-                    <table className="w-full table-auto">
-                      <thead className="sticky top-0 bg-black z-10">
-                        <tr className="text-gray-400 text-left border-b border-gray-800">
-                          <th className="px-4 py-3 font-medium">Course</th>
-                          <th className="px-4 py-3 font-medium">Present</th>
-                          <th className="px-4 py-3 font-medium">Absent</th>
-                          <th className="px-4 py-3 font-medium">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-700/50">
-                        {Object.entries(attendanceSummary).map(([id, data]) => {
-                          const percentage = parseFloat(
-                            data.attendancePercentage
-                          );
+                ) : attendanceData && Object.keys(attendanceSummary).length > 0 ? (
+                  <div className="space-y-4">
+                    {Object.entries(attendanceSummary).map(([id, data]) => {
+                      const percentage = parseFloat(data.attendancePercentage);
+                      let statusConfig;
+                      
+                      if (percentage >= 85) {
+                        statusConfig = {
+                          icon: <Check size={20} className="text-emerald-400" />,
+                          progressColor: 'rgb(16,185,129)',
+                          status: 'Excellent',
+                          statusColor: 'text-emerald-400'
+                        };
+                      } else if (percentage >= 75) {
+                        statusConfig = {
+                          icon: <Activity size={20} className="text-amber-400" />,
+                          progressColor: 'rgb(245,158,11)',
+                          status: 'Warning',
+                          statusColor: 'text-amber-400'
+                        };
+                      } else {
+                        statusConfig = {
+                           icon: <X size={20} className="text-red-400" />,
+                          progressColor: 'rgb(225,29,72)',
+                          status: 'Critical',
+                          statusColor: 'text-red-400'
+                        };
+                      }
 
-                          return (
-                            <tr
-                              key={id}
-                              className="hover:bg-white/5 rounded-xl transition-colors"
-                            >
-                              <td className="px-4 py-3 text-white font-medium">
-                                {data.title}
-                              </td>
-                              <td className="px-4 py-3 text-slate-300">
-                                {data.presentCount}
-                              </td>
-                              <td className="px-4 py-3 text-slate-300">
-                                {data.absentCount}
-                              </td>
-                              <td className="px-4 py-3">
-                                <div className="flex items-center">
-                                  <div className="w-16 bg-slate-700 rounded-full h-2 mr-3">
-                                    <div
-                                      className={`h-full rounded-full ${
-                                        percentage >= 85
-                                          ? "bg-emerald-500"
-                                          : percentage >= 75
-                                          ? "bg-amber-500"
-                                          : "bg-rose-500"
-                                      }`}
-                                      style={{ width: `${percentage}%` }}
-                                    ></div>
-                                  </div>
-                                  <span
-                                    className={`text-xs font-medium ${
-                                      percentage >= 85
-                                        ? "text-emerald-400"
-                                        : percentage >= 75
-                                        ? "text-amber-400"
-                                        : "text-rose-400"
-                                    }`}
-                                  >
-                                    {percentage}%
-                                  </span>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+                      return (
+                        <div 
+                          key={id} 
+                          className="p-5 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] hover:from-white/10 hover:to-white/5 transition-all duration-300 border border-white/10 hover:border-white/20"
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 rounded-xl bg-[#161616] flex items-center justify-center border border-white/10">
+                                {statusConfig.icon}
+                              </div>
+                              <div>
+                                <h4 className="text-white font-bold text-base truncate max-w-[180px]" title={data.title}>
+                                  {data.title}
+                                </h4>
+                                <span className={`text-xs font-semibold ${statusConfig.statusColor}`}>
+                                  {statusConfig.status}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-xl font-bold text-white">{percentage}%</span>
+                            </div>
+                          </div>
+                          
+                          {/* Progress bar */}
+                          <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden mb-3">
+                            <div 
+                              className="h-full rounded-full transition-all duration-500 ease-out" 
+                              style={{ 
+                                width: `${percentage}%`, 
+                                backgroundColor: statusConfig.progressColor 
+                              }}
+                            ></div>
+                          </div>
+                          
+                          {/* Stats */}
+                          <div className="flex justify-between items-center text-xs">
+                            <div className="flex gap-4">
+                              <span className="text-emerald-400 font-semibold">
+                                P: {data.presentCount}
+                              </span>
+                              <span className="text-red-400 font-semibold">
+                                A: {data.absentCount}
+                              </span>
+                            </div>
+                            <span className="text-white/50 font-medium">
+                              Total: {data.totalLectures}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <div className="h-20 w-20 rounded-full bg-slate-800 flex items-center justify-center mb-5 !border !border-white/10">
-                      <Calendar className="h-10 w-10 text-slate-500" />
-                    </div>
-                    <h3 className="text-slate-300 font-medium text-lg mb-2">
-                      No attendance data available
-                    </h3>
-                    <p className="text-slate-500 max-w-md text-sm">
-                      Your attendance records will appear here once they're
-                      available in the system
-                    </p>
+                  <div className="h-full flex flex-col items-center justify-center text-center py-12">
+                    <Activity className="h-16 w-16 text-white/20 mb-4" />
+                    <p className="text-white/50 text-base">No attendance data available</p>
+                    <p className="text-white/30 text-sm mt-2">Data will appear once attendance records are loaded</p>
                   </div>
                 )}
               </div>
             </div>
 
-            <div>
-              <h2 className="text-xl font-semibold text-white mb-3">
-                University Info
-              </h2>
-              <div className="bg-black rounded-3xl !border !border-white/10 p-4 h-[420px] overflow-scroll scrollbar-hide flex flex-col">
-                {/* University Header */}
-                <div className="mb-4 pb-4 border-b border-white/10">
-                  <div className="flex items-start gap-4">
-                    <div className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center">
-                      <GraduationCap className="text-blue-400" size={24} />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-white">
-                        {universityInfo?.["Degree"] || "Student"}
-                      </h3>
-                      <p className="text-sm text-white/60">
-                        {universityInfo?.["Session"] || "Current Session"}
-                      </p>
-                    </div>
-                  </div>
+            {/* Transcript Overview */}
+            <div className="rounded-3xl border border-white/10 p-0 flex flex-col">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-[#1a1a1a] to-[#161616] rounded-t-3xl px-8 py-6 flex items-center gap-5 border-b border-white/10">
+                <div className="h-14 w-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10">
+                  <FileText className="text-x" size={32} />
                 </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-white">Academic Transcript</h3>
+                  <p className="text-base text-white/80">View your academic history</p>
+                </div>
+              </div>
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar px-8 py-6 max-h-[600px]">
+                {isLoadingTranscript ? (
+                  <div className="h-full flex flex-col items-center justify-center text-center">
+                    <LoadingSplash />
+                    <p className="text-white/50 mt-4 text-lg">Loading transcript data...</p>
+                  </div>
+                ) : transcriptData && transcriptSummary.semesters && transcriptSummary.semesters.length > 0 ? (
+                  <div className="space-y-4">
+                    {transcriptSummary.semesters.map((semester, index) => {
+                      const cgpa = parseFloat(semester.stats.cgpa || "0");
+                      
+                      let gradeConfig;
+                      if (cgpa >= 3.5) {
+                        gradeConfig = {
+                          icon: <Award size={20} className="text-emerald-400" />,
+                          bgColor: 'bg-emerald-500/10',
+                          borderColor: 'border-emerald-500/20',
+                          status: 'Excellent',
+                          statusColor: 'text-emerald-400'
+                        };
+                      } else if (cgpa >= 3.0) {
+                        gradeConfig = {
+                          icon: <TrendingUp size={20} className="text-blue-400" />,
+                          bgColor: 'bg-blue-500/10',
+                          borderColor: 'border-blue-500/20',
+                          status: 'Good',
+                          statusColor: 'text-blue-400'
+                        };
+                      } else if (cgpa >= 2.5) {
+                        gradeConfig = {
+                          icon: <Activity size={20} className="text-amber-400" />,
+                          bgColor: 'bg-amber-500/10',
+                          borderColor: 'border-amber-500/20',
+                          status: 'Average',
+                          statusColor: 'text-amber-400'
+                        };
+                      } else {
+                        gradeConfig = {
+                          icon: <X size={20} className="text-red-400" />,
+                          bgColor: 'bg-red-500/10',
+                          borderColor: 'border-red-500/20',
+                          status: 'Needs Improvement',
+                          statusColor: 'text-red-400'
+                        };
+                      }
 
-                {/* Info content with scroll */}
-                <div className="flex-1 overflow-y-scroll custom-scrollbar pb-4">
-                  {universityInfo ? (
-                    <div className="space-y-3">
-                      {Object.entries(universityInfo).map(([key, value]) => {
-                        // Select an appropriate icon for each info type
-                        let icon;
-                        switch (key) {
-                          case "Roll No":
-                            icon = (
-                              <UserCheck
-                                size={16}
-                                className="text-indigo-400"
-                              />
-                            );
-                            break;
-                          case "Section":
-                            icon = (
-                              <Users size={16} className="text-emerald-400" />
-                            );
-                            break;
-                          case "Degree":
-                            icon = (
-                              <Award size={16} className="text-blue-400" />
-                            );
-                            break;
-                          case "Session":
-                            icon = (
-                              <Calendar size={16} className="text-amber-400" />
-                            );
-                            break;
-                          case "Department":
-                            icon = (
-                              <Building size={16} className="text-purple-400" />
-                            );
-                            break;
-                          default:
-                            icon = (
-                              <ChevronRight
-                                size={16}
-                                className="text-slate-400"
-                              />
-                            );
-                        }
-
-                        return (
-                          <div
-                            key={key}
-                            className="flex items-center p-3 rounded-xl hover:bg-white/5 transition-colors"
-                          >
-                            <div className="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center mr-3">
-                              {icon}
+                      return (
+                        <div 
+                          key={index}
+                          className={`p-5 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] hover:from-white/10 hover:to-white/5 transition-all duration-300 border border-white/10 hover:border-white/20`}
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 rounded-xl bg-[#161616] flex items-center justify-center border border-white/10">
+                                {gradeConfig.icon}
+                              </div>
+                              <div>
+                                <h4 className="text-white font-bold text-base">
+                                  {semester.name}
+                                </h4>
+                                <span className={`text-xs font-semibold ${gradeConfig.statusColor}`}>
+                                  {gradeConfig.status}
+                                </span>
+                              </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs text-white/50 mb-0.5">
-                                {key}
-                              </p>
-                              <p className="text-sm font-medium text-white truncate">
-                                {value}
-                              </p>
+                            <div className="text-right">
+                              <span className="text-xl font-bold text-white">{semester.stats.cgpa || "N/A"}</span>
+                              <p className="text-xs text-white/50">CGPA</p>
                             </div>
                           </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="h-full flex flex-col items-center justify-center text-center p-4">
-                      <Building className="h-10 w-10 text-white/20 mb-3" />
-                      <p className="text-white/50 text-sm">
-                        University information is loading...
-                      </p>
-                    </div>
-                  )}
-                </div>
+                          
+                          {/* Stats */}
+                          <div className="grid grid-cols-2 gap-3 text-xs">
+                            <div className="flex justify-between">
+                              <span className="text-white/60">SGPA:</span>
+                              <span className="text-white font-semibold">{semester.stats.sgpa || "N/A"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-white/60">Courses:</span>
+                              <span className="text-white font-semibold">{semester.courseCount}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-white/60">Cr. Att:</span>
+                              <span className="text-white font-semibold">{semester.stats.creditsAttempted || "N/A"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-white/60">Cr. Ernd:</span>
+                              <span className="text-white font-semibold">{semester.stats.creditsEarned || "N/A"}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-center py-12">
+                    <FileText className="h-16 w-16 text-white/20 mb-4" />
+                    <p className="text-white/50 text-base">No transcript data available</p>
+                    <p className="text-white/30 text-sm mt-2">Data will appear once transcript records are loaded</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

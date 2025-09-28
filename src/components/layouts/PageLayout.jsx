@@ -1,16 +1,17 @@
 import React from "react";
 import NavBar from "../NavBar";
 
-function PageLayout({ children, currentPage, onAttendanceLinkFound }) {
+function PageLayout({ children, currentPage, onAttendanceLinkFound,onTranscriptLinkFound }) {
   return (
     <div className="flex h-screen">
-      <div className="fixed h-full p-3">
+      <div className="fixed h-full">
         <NavBar
           currentPage={currentPage}
           onAttendanceLinkFound={onAttendanceLinkFound}
+          onTranscriptLinkFound={onTranscriptLinkFound}
         />
       </div>
-      <div className="ml-[250px] flex-1 p-5 overflow-hidden">{children}</div>
+      <div className="ml-[250px] flex-1 !p-5">{children}</div>
     </div>
   );
 }
