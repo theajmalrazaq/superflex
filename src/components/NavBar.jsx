@@ -20,7 +20,7 @@ import {
   Lock,
 } from "lucide-react";
 
-function NavBar({ currentPage = "", onAttendanceLinkFound ,onTranscriptLinkFound}) {
+function NavBar({currentPage = "", onAttendanceLinkFound }) {
   const [menuLinks, setMenuLinks] = useState([]);
 
   // Icon mapping based on link text or path
@@ -110,11 +110,11 @@ function NavBar({ currentPage = "", onAttendanceLinkFound ,onTranscriptLinkFound
       const attendanceLink = links.find(
         (link) => link.text.trim() === "Attendance"
       );
-    const transcriptLink = links.find((link) => link.text.trim() === "Transcript");
-    
-      if (attendanceLink && onAttendanceLinkFound && onTranscriptLinkFound && transcriptLink) {
+
+
+      if (attendanceLink && onAttendanceLinkFound) {
         onAttendanceLinkFound(attendanceLink.href);
-        onTranscriptLinkFound(transcriptLink.href);
+       
       }
     }
 
@@ -158,7 +158,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound ,onTranscriptLinkFound
     document.querySelector(".m-subheader")?.remove();
     // Remove the close button
     document.querySelector("#m_aside_left_close_btn")?.remove();
-  }, [onAttendanceLinkFound, onTranscriptLinkFound]);
+  }, [onAttendanceLinkFound]);
 
   // For debugging
   useEffect(() => {

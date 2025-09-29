@@ -19,8 +19,6 @@ import {
   Github, 
   Globe,
   Instagram,
-  TrendingUp,
-  FileText,
 } from "lucide-react";
 import ReviewCarousel from "../ReviewCarousel";
 
@@ -71,10 +69,6 @@ function HomePage() {
   const [attendanceData, setAttendanceData] = useState(null);
   const [attendanceSummary, setAttendanceSummary] = useState({});
   const [isLoadingAttendance, setIsLoadingAttendance] = useState(false);
-  const [transcriptLink, setTranscriptLink] = useState(null);
-  const [transcriptData, setTranscriptData] = useState(null);
-  const [transcriptSummary, setTranscriptSummary] = useState({});
-  const [isLoadingTranscript, setIsLoadingTranscript] = useState(false);
   const [universityInfo, setUniversityInfo] = useState(null);
   const [personalInfo, setPersonalInfo] = useState(null);
   const [contactInfo, setContactInfo] = useState(null);
@@ -118,6 +112,9 @@ function HomePage() {
   }, []);
 
   useEffect(() => {
+
+    
+
     const targetElement = document.querySelector(
       ".m-grid.m-grid--hor.m-grid--root.m-page"
     );
@@ -125,6 +122,10 @@ function HomePage() {
       const scriptTags = targetElement.querySelectorAll("script");
       scriptTags.forEach((script) => script.remove());
       targetElement.querySelector("#NotificationDetail")?.remove();
+      const scrollTopEl = document.querySelector(".m-scroll-top.m-scroll-top--skin-top");
+      if (scrollTopEl) {
+        scrollTopEl.remove();
+      }
 
       // Process rows to extract university info and academic calendar
       let uniInfo = {};
@@ -224,26 +225,12 @@ function HomePage() {
     }
   }, [attendanceLink]);
 
-  // Function to fetch transcript data when the link is available
-  useEffect(() => {
-    if (transcriptLink) {
-      fetchTranscriptData();
-    }
-  }, [transcriptLink]);
-
   // Process attendance data after it's loaded
   useEffect(() => {
     if (attendanceData) {
       processAttendanceData();
     }
   }, [attendanceData]);
-
-  // Process transcript data after it's loaded
-  useEffect(() => {
-    if (transcriptData) {
-      processTranscriptData();
-    }
-  }, [transcriptData]);
 
   const fetchAttendanceData = async () => {
     setIsLoadingAttendance(true);
@@ -267,29 +254,6 @@ function HomePage() {
       console.error("Error fetching attendance data:", error);
     } finally {
       setIsLoadingAttendance(false);
-    }
-  };
-
-  const fetchTranscriptData = async () => {
-    setIsLoadingTranscript(true);
-    try {
-      const response = await fetch(transcriptLink);
-      const html = await response.text();
-
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, "text/html");
-      const transcriptContent = doc.querySelector(".m-content");
-
-      if (transcriptContent) {
-        const scripts = transcriptContent.querySelectorAll("script");
-        scripts.forEach((script) => script.remove());
-
-        setTranscriptData(transcriptContent.innerHTML);
-      }
-    } catch (error) {
-      console.error("Error fetching transcript data:", error);
-    } finally {
-      setIsLoadingTranscript(false);
     }
   };
 
@@ -364,126 +328,12 @@ function HomePage() {
     setAttendanceSummary(summaryData);
   };
 
-  const processTranscriptData = () => {
-    const tempElement = document.createElement("div");
-    tempElement.innerHTML = transcriptData;
-
-    const summaryData = {
-      semesters: [],
-      overallStats: {}
-    };
-
-    // Extract student info from the first row
-    const studentInfoRow = tempElement.querySelector(".row .m-portlet__body");
-    if (studentInfoRow) {
-      const infoColumns = studentInfoRow.querySelectorAll(".col-md-2, .col-md-3");
-      const studentInfo = {};
-      
-      infoColumns.forEach((col) => {
-        const label = col.querySelector(".m--font-boldest")?.textContent.trim().replace(":", "");
-        const value = col.querySelector("span:not(.m--font-boldest)")?.textContent.trim();
-        if (label && value) {
-          studentInfo[label] = value;
-        }
-      });
-      summaryData.studentInfo = studentInfo;
-    }
-
-    // Process each semester
-    const semesterColumns = tempElement.querySelectorAll(".col-md-6");
-    
-    semesterColumns.forEach((column) => {
-      const semesterHeader = column.querySelector("h5");
-      if (!semesterHeader) return;
-
-      const semesterName = semesterHeader.textContent.trim();
-      
-      // Extract semester stats (Cr. Att, Cr. Ernd, CGPA, SGPA)
-      const statsDiv = column.querySelector(".pull-right");
-      const stats = {};
-      
-      if (statsDiv) {
-        const spans = statsDiv.querySelectorAll("span");
-        spans.forEach((span) => {
-          const text = span.textContent.trim();
-          if (text.includes("Cr. Att:")) {
-            stats.creditsAttempted = text.replace("Cr. Att:", "").trim();
-          } else if (text.includes("Cr. Ernd:")) {
-            stats.creditsEarned = text.replace("Cr. Ernd:", "").trim();
-          } else if (text.includes("CGPA:")) {
-            stats.cgpa = text.replace("CGPA:", "").trim();
-          } else if (text.includes("SGPA:")) {
-            stats.sgpa = text.replace("SGPA:", "").trim();
-          }
-        });
-      }
-
-      // Extract courses for this semester
-      const courses = [];
-      const table = column.querySelector("table");
-      
-      if (table) {
-        const rows = table.querySelectorAll("tbody tr");
-        
-        rows.forEach((row) => {
-          const cells = row.querySelectorAll("td");
-          if (cells.length >= 6) {
-            const course = {
-              code: cells[0].textContent.trim(),
-              name: cells[1].textContent.trim(),
-              section: cells[2].textContent.trim(),
-              creditHours: cells[3].textContent.trim(),
-              grade: cells[4].textContent.trim(),
-              points: cells[5].textContent.trim(),
-              type: cells[6]?.textContent.trim() || "N/A",
-              remarks: cells[7]?.textContent.trim() || ""
-            };
-            courses.push(course);
-          }
-        });
-      }
-
-      summaryData.semesters.push({
-        name: semesterName,
-        stats,
-        courses,
-        courseCount: courses.length
-      });
-    });
-
-    // Calculate overall statistics
-    if (summaryData.semesters.length > 0) {
-      const latestSemester = summaryData.semesters[summaryData.semesters.length - 1];
-      const totalCourses = summaryData.semesters.reduce((sum, sem) => sum + sem.courseCount, 0);
-      
-      summaryData.overallStats = {
-        totalSemesters: summaryData.semesters.length,
-        totalCourses,
-        currentCGPA: latestSemester.stats.cgpa || "N/A",
-        totalCreditsEarned: latestSemester.stats.creditsEarned || "0"
-      };
-    }
-
-    setTranscriptSummary(summaryData);
-  };
-
   const handleAttendanceLinkFound = (link) => {
     setAttendanceLink(link);
   };
 
-  const handleTranscriptLinkFound = (link) => {
-    setTranscriptLink(link);
-  };
-
-  // Calculate quick stats based on attendance and transcript data
+  // Calculate quick stats based on attendance data
   const calculateStats = () => {
-    const attendanceStats = calculateAttendanceStats();
-    const transcriptStats = calculateTranscriptStats();
-    
-    return { ...attendanceStats, ...transcriptStats };
-  };
-
-  const calculateAttendanceStats = () => {
     if (!attendanceSummary || Object.keys(attendanceSummary).length === 0) {
       return {
         avgAttendance: 0,
@@ -526,28 +376,9 @@ function HomePage() {
     };
   };
 
-  const calculateTranscriptStats = () => {
-    if (!transcriptSummary.semesters || transcriptSummary.semesters.length === 0) {
-      return {
-        currentCGPA: "N/A",
-        totalSemesters: 0,
-        totalCreditsEarned: 0,
-        totalCoursesCompleted: 0
-      };
-    }
-
-    return {
-      currentCGPA: transcriptSummary.overallStats?.currentCGPA || "N/A",
-      totalSemesters: transcriptSummary.overallStats?.totalSemesters || 0,
-      totalCreditsEarned: transcriptSummary.overallStats?.totalCreditsEarned || 0,
-      totalCoursesCompleted: transcriptSummary.overallStats?.totalCourses || 0
-    };
-  };
-
   const stats = calculateStats();
   // Loading state for stats
-  const isStatsLoading = (!attendanceSummary || Object.keys(attendanceSummary).length === 0) && 
-                         (!transcriptSummary.semesters || transcriptSummary.semesters.length === 0);
+  const isStatsLoading = !attendanceSummary || Object.keys(attendanceSummary).length === 0;
 
   // Loading SVG component
   const LoadingSplash = () => (
@@ -777,6 +608,12 @@ function HomePage() {
                 <div className="flex justify-center items-center m-4 gap-2">
                   <a
                     className="flex justify-center items-center px-6 py-2 border !border-white/10 text-white rounded-full gap-4 bg-[#161616] hover:no-underline"
+                    href="https://github.com/ajmalrazaqbhatti/superflex"
+                  >
+                    <Github className="h-6 w-6" /> Github
+                  </a>
+                  <a
+                    className="flex justify-center items-center px-6 py-2 border !border-white/10 text-white rounded-full gap-4 bg-[#161616] hover:no-underline"
                     href="https://ajmalrazaqbhatti.github.io/superflex"
                   >
                     <Globe className="h-6 w-6" /> Website
@@ -974,7 +811,6 @@ function HomePage() {
     <PageLayout
       currentPage={window.location.pathname}
       onAttendanceLinkFound={handleAttendanceLinkFound}
-      onTranscriptLinkFound={handleTranscriptLinkFound}
     >
       {renderActivePopup()}
       <div className="flex pb-12 w-full">
@@ -1002,7 +838,7 @@ function HomePage() {
             <div className="flex flex-col items-end">
               <div className="relative">
                 <button
-                  className="flex items-center gap-4 px-3 py-3 rounded-3xl bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f] border border-[#2a2a2a] hover:border-white/20 transition-all duration-300"
+                  className="flex items-center gap-4 px-3 py-3 rounded-3xl bg-[#161616] border border-[#1c1c1c] hover:border-x/30 transition-colors"
                   onClick={() => setIsProfileDropdownOpen((open) => !open)}
                 >
                   {/* Profile icon */}
@@ -1028,7 +864,7 @@ function HomePage() {
                 </button>
                 {/* Dropdown menu */}
                 {isProfileDropdownOpen && (
-                  <div className="absolute right-0 mt-3 !w-[200px] bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f]  rounded-3xl border border-white/10 z-50 flex flex-col justify-start py-3 backdrop-blur-xl">
+                  <div className="absolute right-0 mt-3 !w-[200px] bg-[#161616] border-2 border-[#1c1c1c] rounded-3xl z-50 flex flex-col justify-start py-3 backdrop-blur-xl">
                     <button
                       onClick={() => { setActivePopup("personal"); setIsProfileDropdownOpen(false); }}
                       className="flex gap-3 pl-3 py-3 text-sm text-white hover:bg-x/20 transition-colors rounded-xl mx-2"
@@ -1060,9 +896,10 @@ function HomePage() {
           </div>
 
           {/* Modern Stats Cards - Enhanced UI/UX */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* Registered Courses */}
             <div className="group p-8 rounded-[30px] border-2 border-[#1c1c1c] bg-[#161616] ">
+             
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
                   <div className="bg-white/5 p-3 rounded-2xl">
@@ -1099,7 +936,7 @@ function HomePage() {
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
                   <div className="bg-white/5 p-3 rounded-2xl">
-                    <Activity className="text-x" size={28} />
+                    <Award className="text-x" size={28} />
                   </div>
                 </div>
                 <div className="space-y-3">
@@ -1127,64 +964,35 @@ function HomePage() {
               </div>
             </div>
 
-            {/* Current CGPA */}
+            {/* Best Performing Subject */}
             <div className="group p-8 rounded-[30px] border-2 border-[#1c1c1c] bg-[#161616] ">
+              
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
                   <div className="bg-white/5 p-3 rounded-2xl">
-                    <TrendingUp className="text-x" size={28} />
+                    <Check className="text-x" size={28} />
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <div className="flex items-baseline space-x-2 min-h-[50px]">
+                  <div className="space-y-2 min-h-[50px]">
                     {isStatsLoading ? (
                       <span className="w-full flex justify-center">
                         <LoadingSplash />
                       </span>
                     ) : (
                       <>
-                        <span className="text-4xl font-bold text-white tracking-tight">
-                          {stats.currentCGPA}
+                        <span className="text-lg font-bold text-white leading-tight block truncate">
+                          {stats.bestSubject ? stats.bestSubject.title : "No data"}
+                        </span>
+                        <span className="text-3xl font-bold text-white tracking-tight">
+                          {stats.bestSubject ? `${stats.bestSubject.attendancePercentage}%` : "-"}
                         </span>
                       </>
                     )}
                   </div>
                   <div>
                     <p className="text-base font-semibold text-white/90 leading-relaxed">
-                      Current CGPA
-                    </p>
-                    <div className="w-16 h-1 bg-gradient-to-r from-x to-transparent mt-3 group-hover:w-20 transition-all duration-300 rounded-full"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Total Semesters */}
-            <div className="group p-8 rounded-[30px] border-2 border-[#1c1c1c] bg-[#161616] ">
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="bg-white/5 p-3 rounded-2xl">
-                    <Calendar className="text-x" size={28} />
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-baseline space-x-2 min-h-[50px]">
-                    {isStatsLoading ? (
-                      <span className="w-full flex justify-center">
-                        <LoadingSplash />
-                      </span>
-                    ) : (
-                      <>
-                        <span className="text-4xl font-bold text-white tracking-tight">
-                          {stats.totalSemesters}
-                        </span>
-                        <span className="text-white/50 text-base font-medium">sems</span>
-                      </>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-base font-semibold text-white/90 leading-relaxed">
-                      Total Semesters
+                      Best Attendance
                     </p>
                     <div className="w-16 h-1 bg-gradient-to-r from-x to-transparent mt-3 group-hover:w-20 transition-all duration-300 rounded-full"></div>
                   </div>
@@ -1194,6 +1002,7 @@ function HomePage() {
 
             {/* Attendance Warnings */}
             <div className="group p-8 rounded-[30px] border-2 border-[#1c1c1c] bg-[#161616] ">
+              
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
                   <div className="bg-white/5 p-3 rounded-2xl">
@@ -1223,103 +1032,74 @@ function HomePage() {
             </div>
           </div>
 
-          {/* Two Column Layout for Data */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            
-            {/* Attendance Overview */}
-            <div className="rounded-3xl border border-white/10 p-0 flex flex-col">
-              {/* Header */}
-              <div className="bg-gradient-to-r from-[#1a1a1a] to-[#161616] rounded-t-3xl px-8 py-6 flex items-center gap-5 border-b border-white/10">
-                <div className="h-14 w-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10">
-                  <Activity className="text-x" size={32} />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-white">Current Attendance</h3>
-                  <p className="text-base text-white/80">Track your progress across subjects</p>
-                </div>
-              </div>
+          {/* Attendance Details - Full Width */}
+          <div className="w-full">
+            <h2 className="!text-2xl !font-semibold text-white mb-6 flex items-center gap-3">
+              Attendance Overview
+            </h2>
+             
               {/* Content */}
-              <div className="flex-1 overflow-y-auto custom-scrollbar px-8 py-6 max-h-[600px]">
+              <div className="flex-1 overflow-y-auto custom-scrollbar py-6">
                 {isLoadingAttendance ? (
                   <div className="h-full flex flex-col items-center justify-center text-center">
                     <LoadingSplash />
                     <p className="text-white/50 mt-4 text-lg">Loading attendance data...</p>
                   </div>
                 ) : attendanceData && Object.keys(attendanceSummary).length > 0 ? (
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {Object.entries(attendanceSummary).map(([id, data]) => {
                       const percentage = parseFloat(data.attendancePercentage);
-                      let statusConfig;
-                      
+                      let progressColor;
                       if (percentage >= 85) {
-                        statusConfig = {
-                          icon: <Check size={20} className="text-emerald-400" />,
-                          progressColor: 'rgb(16,185,129)',
-                          status: 'Excellent',
-                          statusColor: 'text-emerald-400'
-                        };
-                      } else if (percentage >= 75) {
-                        statusConfig = {
-                          icon: <Activity size={20} className="text-amber-400" />,
-                          progressColor: 'rgb(245,158,11)',
-                          status: 'Warning',
-                          statusColor: 'text-amber-400'
-                        };
+                        progressColor = 'rgb(16,185,129)';
+                      } else if (percentage >= 80) {
+                        progressColor = 'rgb(245,158,11)'; 
                       } else {
-                        statusConfig = {
-                           icon: <X size={20} className="text-red-400" />,
-                          progressColor: 'rgb(225,29,72)',
-                          status: 'Critical',
-                          statusColor: 'text-red-400'
-                        };
+                        progressColor = 'rgb(225,29,72)'; 
                       }
-
                       return (
                         <div 
                           key={id} 
-                          className="p-5 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] hover:from-white/10 hover:to-white/5 transition-all duration-300 border border-white/10 hover:border-white/20"
+                          className="p-6 rounded-[30px] bg-[#161616] border-2 border-[#1c1c1c] "
                         >
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className="h-10 w-10 rounded-xl bg-[#161616] flex items-center justify-center border border-white/10">
-                                {statusConfig.icon}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-4">
+                              <div 
+                                className="h-12 w-12 rounded-2xl flex items-center justify-center border bg-white/5 p-2"
+                              >
+                                <BookOpen size={24} className="text-x" />
                               </div>
                               <div>
-                                <h4 className="text-white font-bold text-base truncate max-w-[180px]" title={data.title}>
+                                <h4 className="text-white font-bold text-lg truncate max-w-[200px]" title={data.title}>
                                   {data.title}
                                 </h4>
-                                <span className={`text-xs font-semibold ${statusConfig.statusColor}`}>
-                                  {statusConfig.status}
-                                </span>
                               </div>
                             </div>
                             <div className="text-right">
-                              <span className="text-xl font-bold text-white">{percentage}%</span>
+                              <span className="text-2xl font-bold text-white">{percentage}%</span>
                             </div>
                           </div>
-                          
                           {/* Progress bar */}
-                          <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden mb-3">
+                          <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden mb-4">
                             <div 
                               className="h-full rounded-full transition-all duration-500 ease-out" 
                               style={{ 
                                 width: `${percentage}%`, 
-                                backgroundColor: statusConfig.progressColor 
+                                backgroundColor: progressColor 
                               }}
                             ></div>
                           </div>
-                          
                           {/* Stats */}
-                          <div className="flex justify-between items-center text-xs">
-                            <div className="flex gap-4">
-                              <span className="text-emerald-400 font-semibold">
-                                P: {data.presentCount}
+                          <div className="flex justify-between items-center">
+                            <div className="flex gap-6">
+                              <span className="text-sm text-emerald-400 font-semibold">
+                                Present: {data.presentCount}
                               </span>
-                              <span className="text-red-400 font-semibold">
-                                A: {data.absentCount}
+                              <span className="text-sm text-red-400 font-semibold">
+                                Absent: {data.absentCount}
                               </span>
                             </div>
-                            <span className="text-white/50 font-medium">
+                            <span className="text-sm text-white/50 font-medium">
                               Total: {data.totalLectures}
                             </span>
                           </div>
@@ -1328,131 +1108,13 @@ function HomePage() {
                     })}
                   </div>
                 ) : (
-                  <div className="h-full flex flex-col items-center justify-center text-center py-12">
-                    <Activity className="h-16 w-16 text-white/20 mb-4" />
-                    <p className="text-white/50 text-base">No attendance data available</p>
+                  <div className="h-full flex flex-col items-center justify-center text-center">
+                    <Building className="h-20 w-20 text-white/20 mb-6" />
+                    <p className="text-white/50 text-lg">No attendance data available</p>
                     <p className="text-white/30 text-sm mt-2">Data will appear once attendance records are loaded</p>
                   </div>
                 )}
               </div>
-            </div>
-
-            {/* Transcript Overview */}
-            <div className="rounded-3xl border border-white/10 p-0 flex flex-col">
-              {/* Header */}
-              <div className="bg-gradient-to-r from-[#1a1a1a] to-[#161616] rounded-t-3xl px-8 py-6 flex items-center gap-5 border-b border-white/10">
-                <div className="h-14 w-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10">
-                  <FileText className="text-x" size={32} />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-white">Academic Transcript</h3>
-                  <p className="text-base text-white/80">View your academic history</p>
-                </div>
-              </div>
-              {/* Content */}
-              <div className="flex-1 overflow-y-auto custom-scrollbar px-8 py-6 max-h-[600px]">
-                {isLoadingTranscript ? (
-                  <div className="h-full flex flex-col items-center justify-center text-center">
-                    <LoadingSplash />
-                    <p className="text-white/50 mt-4 text-lg">Loading transcript data...</p>
-                  </div>
-                ) : transcriptData && transcriptSummary.semesters && transcriptSummary.semesters.length > 0 ? (
-                  <div className="space-y-4">
-                    {transcriptSummary.semesters.map((semester, index) => {
-                      const cgpa = parseFloat(semester.stats.cgpa || "0");
-                      
-                      let gradeConfig;
-                      if (cgpa >= 3.5) {
-                        gradeConfig = {
-                          icon: <Award size={20} className="text-emerald-400" />,
-                          bgColor: 'bg-emerald-500/10',
-                          borderColor: 'border-emerald-500/20',
-                          status: 'Excellent',
-                          statusColor: 'text-emerald-400'
-                        };
-                      } else if (cgpa >= 3.0) {
-                        gradeConfig = {
-                          icon: <TrendingUp size={20} className="text-blue-400" />,
-                          bgColor: 'bg-blue-500/10',
-                          borderColor: 'border-blue-500/20',
-                          status: 'Good',
-                          statusColor: 'text-blue-400'
-                        };
-                      } else if (cgpa >= 2.5) {
-                        gradeConfig = {
-                          icon: <Activity size={20} className="text-amber-400" />,
-                          bgColor: 'bg-amber-500/10',
-                          borderColor: 'border-amber-500/20',
-                          status: 'Average',
-                          statusColor: 'text-amber-400'
-                        };
-                      } else {
-                        gradeConfig = {
-                          icon: <X size={20} className="text-red-400" />,
-                          bgColor: 'bg-red-500/10',
-                          borderColor: 'border-red-500/20',
-                          status: 'Needs Improvement',
-                          statusColor: 'text-red-400'
-                        };
-                      }
-
-                      return (
-                        <div 
-                          key={index}
-                          className={`p-5 rounded-2xl bg-gradient-to-br from-white/5 to-white/[0.02] hover:from-white/10 hover:to-white/5 transition-all duration-300 border border-white/10 hover:border-white/20`}
-                        >
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className="h-10 w-10 rounded-xl bg-[#161616] flex items-center justify-center border border-white/10">
-                                {gradeConfig.icon}
-                              </div>
-                              <div>
-                                <h4 className="text-white font-bold text-base">
-                                  {semester.name}
-                                </h4>
-                                <span className={`text-xs font-semibold ${gradeConfig.statusColor}`}>
-                                  {gradeConfig.status}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <span className="text-xl font-bold text-white">{semester.stats.cgpa || "N/A"}</span>
-                              <p className="text-xs text-white/50">CGPA</p>
-                            </div>
-                          </div>
-                          
-                          {/* Stats */}
-                          <div className="grid grid-cols-2 gap-3 text-xs">
-                            <div className="flex justify-between">
-                              <span className="text-white/60">SGPA:</span>
-                              <span className="text-white font-semibold">{semester.stats.sgpa || "N/A"}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-white/60">Courses:</span>
-                              <span className="text-white font-semibold">{semester.courseCount}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-white/60">Cr. Att:</span>
-                              <span className="text-white font-semibold">{semester.stats.creditsAttempted || "N/A"}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-white/60">Cr. Ernd:</span>
-                              <span className="text-white font-semibold">{semester.stats.creditsEarned || "N/A"}</span>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="h-full flex flex-col items-center justify-center text-center py-12">
-                    <FileText className="h-16 w-16 text-white/20 mb-4" />
-                    <p className="text-white/50 text-base">No transcript data available</p>
-                    <p className="text-white/30 text-sm mt-2">Data will appear once transcript records are loaded</p>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
         </div>
       </div>
