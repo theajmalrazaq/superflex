@@ -24,24 +24,24 @@ function NavBar({currentPage = "", onAttendanceLinkFound }) {
   const [menuLinks, setMenuLinks] = useState([]);
 
   // Icon mapping based on link text or path
-  const iconStyle = "h-12 w-12 rounded-2xl flex text-x items-center !bg-[#161616] justify-center";
+  const iconStyle = "h-10 w-10 rounded-xl flex text-x items-center !bg-[#161616] justify-center";
   const iconMapping = {
-    Home: <span className={iconStyle}><Home size={20} /></span>,
-    "Course Registration": <span className={iconStyle}><BookOpen size={20} /></span>,
-    Attendance: <span className={iconStyle}><Calendar size={20} /></span>,
-    Marks: <span className={iconStyle}><Award size={20} /></span>,
-    "Marks PLO Report": <span className={iconStyle}><BarChart size={20} /></span>,
-    Transcript: <span className={iconStyle}><FileText size={20} /></span>,
-    "Fee Challan": <span className={iconStyle}><Receipt size={20} /></span>,
-    "Fee Details": <span className={iconStyle}><DollarSign size={20} /></span>,
-    "Course Feedback": <span className={iconStyle}><MessageSquare size={20} /></span>,
-    "Retake Exam Request": <span className={iconStyle}><Clock size={20} /></span>,
-    "Course Withdraw": <span className={iconStyle}><XCircle size={20} /></span>,
-    "Grade Change Request": <span className={iconStyle}><RefreshCw size={20} /></span>,
-    "Tentative Study Plan": <span className={iconStyle}><ListChecks size={20} /></span>,
-    "Grade Report": <span className={iconStyle}><GraduationCap size={20} /></span>,
+    Home: <span className={iconStyle}><Home size={18} /></span>,
+    "Course Registration": <span className={iconStyle}><BookOpen size={18} /></span>,
+    Attendance: <span className={iconStyle}><Calendar size={18} /></span>,
+    Marks: <span className={iconStyle}><Award size={18} /></span>,
+    "Marks PLO Report": <span className={iconStyle}><BarChart size={18} /></span>,
+    Transcript: <span className={iconStyle}><FileText size={18} /></span>,
+    "Fee Challan": <span className={iconStyle}><Receipt size={18} /></span>,
+    "Fee Details": <span className={iconStyle}><DollarSign size={18} /></span>,
+    "Course Feedback": <span className={iconStyle}><MessageSquare size={18} /></span>,
+    "Retake Exam Request": <span className={iconStyle}><Clock size={18} /></span>,
+    "Course Withdraw": <span className={iconStyle}><XCircle size={18} /></span>,
+    "Grade Change Request": <span className={iconStyle}><RefreshCw size={18} /></span>,
+    "Tentative Study Plan": <span className={iconStyle}><ListChecks size={18} /></span>,
+    "Grade Report": <span className={iconStyle}><GraduationCap size={18} /></span>,
     // Fallback icon for any unmatched menu items
-    default: <span className={iconStyle}><FileText size={20} /></span>,
+    default: <span className={iconStyle}><FileText size={18} /></span>,
   };
 
   // Function to determine which icon to use
@@ -172,11 +172,11 @@ function NavBar({currentPage = "", onAttendanceLinkFound }) {
   return (
     <div className="flex flex-col  px-1 pt-4 pb-1 h-screen">
       {/* Logo Section with Gradient Background */}
-      <div className="px-3 pb-0">
+      <div className="px-4 pb-0 flex justify-center items-center">
         <img
           src={chrome.runtime.getURL("public/logo.svg")}
           alt="Logo"
-          className="h-16 w-auto filter"
+          className="h-14 w-auto filter"
         />
       </div>
 

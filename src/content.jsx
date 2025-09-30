@@ -4,11 +4,22 @@ import LoginPageStyles from "./components/LoginPageStyles";
 import PathRouter from "./components/PathRouter";
 import "./styles/tailwind.css";
 
+(() => {
+  const script = document.createElement("script")
+  // eslint-disable-next-line no-undef
+  script.src = chrome.runtime.getURL("umami.js")
+  script.defer = true
+  script.dataset.websiteId = "17490ccf-0b15-4d8a-a908-5e774ad648de"
+  document.head.appendChild(script)
+})()
+
+
+
+
 const container = document.createElement("div");
 container.id = "react-chrome-app";
 document.body.insertBefore(container, document.body.firstChild);
 
-// Create a React root
 const root = createRoot(container);
 
 // Detect which page we're on
@@ -42,12 +53,12 @@ if (document.querySelector(".m-grid__item.m-footer")) {
   document.querySelector(".m-grid__item.m-footer").remove(); // Remove the footer element
 }
 // Apply the Figtree font to elements
-document.body.style.fontFamily = "'Figtree', sans-serif";
+document.body.style.fontFamily = "Garnett Regular";
 document.querySelectorAll("input").forEach((input) => {
-  input.style.fontFamily = "'Figtree', sans-serif";
+  input.style.fontFamily = "Garnett Medium";
 });
 document.querySelectorAll("button").forEach((button) => {
-  button.style.fontFamily = "'Figtree', sans-serif";
+  button.style.fontFamily = "Garnett Medium";
 });
 
 // Apply global Tailwind dark mode and background
@@ -70,4 +81,5 @@ root.render(
 setTimeout(() => {
   document.body.classList.add("!visible");
   document.body.classList.add("!overflow-auto");
-}, 0);
+}, 500);
+

@@ -21,6 +21,10 @@ import {
   Instagram,
 } from "lucide-react";
 import ReviewCarousel from "../ReviewCarousel";
+import { Settings } from "lucide-react";
+import { Info } from "lucide-react";
+import { Download } from "lucide-react";
+import { PcCaseIcon } from "lucide-react";
 
 // Add custom scrollbar styles
 const scrollbarStyle = `
@@ -77,6 +81,7 @@ function HomePage() {
   // Separate state for modal and dropdown
   const [activePopup, setActivePopup] = useState(null);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [isSettingsDropdownOpen, setIsSettingsDropdownOpen] = useState(false);
 
   // Add the style to the document and remove problematic border class
   useEffect(() => {
@@ -392,7 +397,7 @@ function HomePage() {
     if (!activePopup) return null;
 
     return (
-      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300">
+      <div className="fixed inset-0 dark:bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300">
         <div
           className={`bg-[#161616] rounded-3xl overflow-hidden  border border-white/10 w-full ${
             activePopup === "about" ? "max-w-3xl" : "max-w-lg"
@@ -823,7 +828,7 @@ function HomePage() {
               <h1 className="!text-4xl !font-semibold text-white">
                 {getWelcomeMessage()} <span className="text-x">{personalInfo?.["Name"] || "Student"}</span> 🎓
               </h1>
-              <p className="text-white/70 !font-medium text-lg mb-4">
+              <p className="text-white/70 !font-medium !text-base mb-4">
                 Welcome to SuperFlex By{" "}
                 <a
                   href="https://theajmalrazaq.github.io"
@@ -834,9 +839,9 @@ function HomePage() {
               </p>
               <ReviewCarousel />
             </div>
-            {/* Profile column */}
-            <div className="flex flex-col items-end">
-              <div className="relative">
+            {/* Profile and Settings column */}
+            <div className="flex flex-col items-end gap-3">
+              <div className="relative mb-2">
                 <button
                   className="flex items-center gap-4 px-3 py-3 rounded-3xl bg-[#161616] border border-[#1c1c1c] hover:border-x/30 transition-colors"
                   onClick={() => setIsProfileDropdownOpen((open) => !open)}
@@ -862,7 +867,7 @@ function HomePage() {
                     <path d="M6 8L10 12L14 8" stroke="#a098ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </button>
-                {/* Dropdown menu */}
+                {/* Profile Dropdown menu */}
                 {isProfileDropdownOpen && (
                   <div className="absolute right-0 mt-3 !w-[200px] bg-[#161616] border-2 border-[#1c1c1c] rounded-3xl z-50 flex flex-col justify-start py-3 backdrop-blur-xl">
                     <button
@@ -892,13 +897,52 @@ function HomePage() {
                   </div>
                 )}
               </div>
+              {/* Settings Dropdown */}
+              <div className="relative">
+                <button
+                  className="flex items-center gap-3 px-3 py-3 rounded-3xl bg-[#161616] border border-[#1c1c1c] hover:border-x/30 transition-colors"
+                  onClick={() => setIsSettingsDropdownOpen((open) => !open)}
+                  aria-label="Settings"
+                >
+                  <Settings className="h-6 w-6 text-x" />
+                  <span className="font-bold text-white text-lg">Settings</span>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="ml-2 transition-transform duration-200" style={{ transform: isSettingsDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                    <path d="M6 8L10 12L14 8" stroke="#a098ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+                {/* Settings Dropdown menu */}
+                {isSettingsDropdownOpen && (
+                  <div className="absolute right-0 mt-3 !w-[200px] bg-[#161616] border-2 border-[#1c1c1c] rounded-3xl z-50 flex flex-col justify-start py-3 backdrop-blur-xl">
+                    <button
+                      onClick={() => { /* TODO: Implement theme change logic */ setIsSettingsDropdownOpen(false); }}
+                      className="flex gap-3 pl-3 py-3 text-sm text-white hover:bg-x/20 transition-colors rounded-xl mx-2"
+                    >
+                     <PcCaseIcon className="h-5 w-5 text-x" />
+                       Change Theme
+                    </button>
+                    <button
+                      onClick={() => { setActivePopup("about"); setIsSettingsDropdownOpen(false); }}
+                      className="flex gap-3 pl-3 py-3 text-sm text-white hover:bg-x/20 transition-colors rounded-xl mx-2"
+                    >
+                      <Info className="h-5 w-5 text-x" />
+                       About
+                    </button>
+                    <button
+                      onClick={() => { /* TODO: Implement check update logic */ setIsSettingsDropdownOpen(false); }}
+                      className="flex gap-3 pl-3 py-3 text-sm text-white hover:bg-x/20 transition-colors rounded-xl mx-2"
+                    >
+                     <Download className="h-5 w-5 text-x" /> Check Update
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Modern Stats Cards - Enhanced UI/UX */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* Registered Courses */}
-            <div className="group p-8 rounded-[30px] border-2 border-[#1c1c1c] bg-[#161616] ">
+            <div className="group p-8 rounded-[30px] border-2 border-[#1c1c1c] dark:bg-[#161616] bg-[#ffffff]">
              
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
@@ -1034,7 +1078,7 @@ function HomePage() {
 
           {/* Attendance Details - Full Width */}
           <div className="w-full">
-            <h2 className="!text-2xl !font-semibold text-white mb-6 flex items-center gap-3">
+            <h2 className="!text-xl !font-semibold text-white mb-6 flex items-center gap-3">
               Attendance Overview
             </h2>
              
@@ -1070,7 +1114,7 @@ function HomePage() {
                                 <BookOpen size={24} className="text-x" />
                               </div>
                               <div>
-                                <h4 className="text-white font-bold text-lg truncate max-w-[200px]" title={data.title}>
+                                <h4 className="text-white !font-semibold text-lg truncate max-w-[200px]" title={data.title}>
                                   {data.title}
                                 </h4>
                               </div>
