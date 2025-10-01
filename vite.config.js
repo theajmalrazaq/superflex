@@ -9,6 +9,13 @@ export default defineConfig({
     crx({ manifest })
   ],
   css: {
-    postcss: './postcss.config.js',
+    postcss: './postcss.config.mjs',
+  },
+  server: {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+      'Access-Control-Allow-Headers': '*',
+    }
   }
 })

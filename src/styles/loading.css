@@ -1,4 +1,8 @@
-body { visibility: hidden !important; }
+body { 
+visibility: hidden !important;
+overflow: hidden;
+background: black;
+}
 .loading-overlay {
   position: fixed;
   top: 0;
