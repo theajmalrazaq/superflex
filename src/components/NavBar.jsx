@@ -142,18 +142,8 @@ function NavBar({currentPage = "", onAttendanceLinkFound }) {
       )
       .forEach((element) => {
         element.classList.remove("m-grid--desktop", "m-body");
-        element.classList.add(
-          "!bg-dark",
-          "!bg-black",
-          "!rounded-3xl",
-          "!shadow-md",
-          "!p-4",
-          "h-screen"
-        );
       });
-    document.querySelectorAll(".m-content").forEach((element) => {
-      element.classList.add("!p-4");
-    });
+
 
     document.querySelector(".m-subheader")?.remove();
     // Remove the close button

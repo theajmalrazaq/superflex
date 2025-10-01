@@ -1,6 +1,23 @@
 import React, { useEffect, useState } from "react";
 import PageLayout from "../layouts/PageLayout";
 
+// Add custom scrollbar styles (consistent with HomePage)
+const scrollbarStyle = `
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+`;
+
 function AttendancePage() {
   const [elemContent, setElemContent] = useState(null);
 
@@ -8,6 +25,11 @@ function AttendancePage() {
     "M12 16v-4 M12 8h.01 M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z";
 
   useEffect(() => {
+    // Add custom scrollbar styles (consistent with HomePage)
+    const styleElement = document.createElement("style");
+    styleElement.textContent = scrollbarStyle;
+    document.head.appendChild(styleElement);
+
     const alertElement = document.querySelector(
       ".m-alert.m-alert--icon.m-alert--icon-solid.m-alert--outline.alert.alert-info.alert-dismissible.fade.show"
     );
@@ -26,7 +48,10 @@ function AttendancePage() {
       alertElement.style.visibility = "visible";
       alertElement.style.display = "block";
     }
-
+ const scrollTopEl = document.querySelector(".m-scroll-top.m-scroll-top--skin-top");
+      if (scrollTopEl) {
+        scrollTopEl.remove();
+      }
     const iconElement = alertElement?.querySelector(".m-alert__icon");
     if (iconElement) {
       iconElement.classList.add(
@@ -146,39 +171,56 @@ function AttendancePage() {
           ".m-portlet.m-portlet--tabs.m-portlet--brand.m-portlet--border-bottom-brand.m-portlet--head-solid-bg.m-portlet--head-sm"
         )
         .classList.add(
-          "!bg-black",
+          "!bg-transparent",
           "!border",
           "!border-white/0",
-          "!rounded-3xl",
-          "!p-4",
           "!shadow-lg"
         );
 
-      // Make the select control match the theme
+      // Enhanced select control styling to match HomePage theme
       const selectElement = formClone.querySelector("select");
       if (selectElement) {
         selectElement.classList.add(
-          "!bg-black",
+          "!bg-[#161616]",
           "!text-white",
-          "!border",
-          "!border-white/10",
-          "!rounded-xl",
-          "!px-4",
-          "!py-2",
+          "!border-2",
+          "!border-[#1c1c1c]",
+          "!rounded-3xl",
+          "!min-w-fit",
+          "!px-6",
+          "!py-3",
+          "!text-base",
+          "!font-medium",
           "!cursor-pointer",
+          "!transition-all",
+          "!duration-300",
+          "!hover:border-x/30",
           "!focus:ring-2",
-          "!focus:ring-x",
+          "!focus:ring-x/20",
+          "!focus:border-x",
           "!focus:outline-none"
         );
 
-        // Remove background image styling and keep default select appearance
-        selectElement.style.paddingRight = "1rem";
+        // Enhanced styling and proper padding
+        selectElement.style.paddingRight = "2.5rem";
+        selectElement.style.minWidth = "200px";
+      }
+      
+      // Style the form label if it exists
+      const formLabel = formClone.querySelector("label");
+      if (formLabel) {
+        formLabel.classList.add(
+          "!text-white",
+          "!font-semibold", 
+          "!text-base",
+          "!mb-2"
+        );
       }
     }
 
     // Style course tabs UI with modern design
     const styleCourseElements = () => {
-      // Style the tabs navigation
+      // Enhanced tabs navigation styling
       const tabsNav = document.querySelector(
         ".nav.nav-tabs.m-tabs.m-tabs-line"
       );
@@ -186,13 +228,11 @@ function AttendancePage() {
         tabsNav.classList.add(
           "!flex",
           "!flex-wrap",
-          "!gap-2",
+          "!gap-4",
           "!border-0",
-          "!border-b",
-          "!border-white/10"
         );
 
-        // Style individual course tabs
+        // Enhanced individual course tabs styling
         const tabItems = tabsNav.querySelectorAll(".nav-item.m-tabs__item");
         tabItems.forEach((tab) => {
           tab.classList.add("!m-0");
@@ -200,29 +240,33 @@ function AttendancePage() {
           const tabLink = tab.querySelector(".nav-link");
           if (tabLink) {
             tabLink.classList.add(
-              "!border",
-              "!border-white/10",
-              "!rounded-xl",
-              "!px-4",
-              "!py-2",
+              "!border-2",
+              "!border-[#1c1c1c]",
+              "!rounded-3xl",
+              "!px-6",
+              "!py-4",
               "!text-white",
-              "!font-medium",
+              "!font-semibold",
+              "!text-base",
               "!transition-all",
-              "!duration-300"
+              "!duration-300",
+              "!min-w-fit",
+              "!whitespace-nowrap"
             );
 
-            // Set proper active styling for initial state
+            // Enhanced active styling for initial state
             if (tabLink.classList.contains("active")) {
-              tabLink.classList.add("!bg-x", "!border-white/20", "!shadow-lg");
+              tabLink.classList.add("!bg-x", "!border-x/30", "!shadow-xl", "!text-white");
               // Remove any conflicting background classes
               tabLink.classList.remove(
+                "!bg-[#161616]",
                 "!bg-black",
                 "!bg-zinc-800",
                 "!bg-white/10"
               );
             } else {
-              tabLink.classList.add("!bg-black");
-              tabLink.classList.remove("!bg-x", "!bg-white/10", "!bg-zinc-800");
+              tabLink.classList.add("!bg-[#161616]");
+              tabLink.classList.remove("!bg-x", "!bg-white/10", "!bg-zinc-800", "!bg-black");
             }
 
             // Add click event listener to handle tab switching
@@ -246,20 +290,21 @@ function AttendancePage() {
                 }
               });
 
-              // Apply active styling to clicked tab
+              // Apply enhanced active styling to clicked tab
               this.classList.remove(
+                "!bg-[#161616]",
                 "!bg-black",
                 "!bg-white/10",
                 "!bg-zinc-800"
               );
-              this.classList.add("!bg-x", "!border-white/20", "!shadow-lg");
+              this.classList.add("!bg-x", "!border-x/30", "!shadow-xl", "!text-white");
             });
 
             // Enhanced hover effect with smoother transitions
             tabLink.addEventListener("mouseover", () => {
               if (!tabLink.classList.contains("active")) {
-                tabLink.classList.remove("!bg-black", "!bg-zinc-800");
-                tabLink.classList.add("!bg-white/10", "!border-white/20");
+                tabLink.classList.remove("!bg-[#161616]", "!bg-black", "!bg-zinc-800");
+                tabLink.classList.add("!bg-white/10", "!border-x/20");
               }
             });
 
@@ -268,45 +313,48 @@ function AttendancePage() {
                 tabLink.classList.remove(
                   "!bg-white/10",
                   "!bg-zinc-800",
-                  "!border-white/20"
+                  "!border-x/20"
                 );
-                tabLink.classList.add("!bg-black", "!border-white/10");
+                tabLink.classList.add("!bg-[#161616]", "!border-[#1c1c1c]");
               }
             });
           }
         });
       }
 
-      // Add custom styling to make nav tabs more accessible
-      const style = document.createElement("style");
-      style.textContent = `
+      // Enhanced custom styling for nav tabs with HomePage consistency
+      const tabStyle = document.createElement("style");
+      tabStyle.textContent = `
         .nav-tabs .nav-link {
           position: relative;
           overflow: hidden;
+          backdrop-filter: blur(10px);
         }
         .nav-tabs .nav-link:focus {
           outline: none;
-          box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+          box-shadow: 0 0 0 3px rgba(160, 152, 255, 0.3);
         }
-        .nav-tabs .nav-link::after {
-          content: '';
-          position: absolute;
-          bottom: -2px;
-          left: 50%;
-          width: 0;
-          height: 2px;
-          background: white;
-          transition: all 0.3s ease;
-          opacity: 0;
-          transform: translateX(-50%);
+        /* Remove any unwanted before/after content */
+        .nav-tabs .nav-link::before,
+        .nav-tabs .nav-link::after,
+        .nav-tabs::before,
+        .nav-tabs::after,
+        .m-tabs::before,
+        .m-tabs::after,
+        .m-tabs-line::before,
+        .m-tabs-line::after {
+          display: none !important;
+          content: none !important;
         }
-        .nav-tabs .nav-link:hover::after,
-        .nav-tabs .nav-link.active::after {
-          width: 80%;
-          opacity: 0.7;
+        /* Custom hover gradient effect */
+        .nav-tabs .nav-link:hover {
+          background: linear-gradient(135deg, rgba(160, 152, 255, 0.1) 0%, rgba(160, 152, 255, 0.05) 100%) !important;
+        }
+        .nav-tabs .nav-link.active {
+          background: linear-gradient(135deg, rgba(160, 152, 255, 0.2) 0%, rgba(160, 152, 255, 0.1) 100%) !important;
         }
       `;
-      document.head.appendChild(style);
+      document.head.appendChild(tabStyle);
 
       document.querySelectorAll(".col-md-2").forEach((col) => {
         col.remove();
@@ -316,9 +364,6 @@ function AttendancePage() {
       const tabContent = document.querySelector(".tab-content");
       if (tabContent) {
         tabContent.classList.add(
-          "max-h-fit",
-          "overflow-y-auto",
-          "overflow-x-hidden",
           "rounded-xl",
           "custom-scrollbar",
           "w-full"
@@ -331,15 +376,15 @@ function AttendancePage() {
       );
 
       tables.forEach((table) => {
-        // Create a card container for the table
+        // Create enhanced card container for the table
         const tableCard = document.createElement("div");
-        tableCard.className = "!bg-black !rounded-2xl p-4 shadow-lg !w-full";
+        tableCard.className = "w-full p-8 rounded-[30px] border-2 border-[#1c1c1c] bg-[#161616] mb-6 backdrop-blur-xl overflow-hidden";
         table.parentNode.insertBefore(tableCard, table);
 
-        // Add header with title and stats
+        // Enhanced header with title and stats
         const tableHeader = document.createElement("div");
         tableHeader.className =
-          "flex flex-col gap-4 mb-4 pb-4 border-b border-white/10";
+          "flex flex-col gap-6 mb-8 ";
 
         // Get course title from nearest tab pane
         const tabPane = table.closest(".tab-pane");
@@ -387,30 +432,27 @@ function AttendancePage() {
 
         tableHeader.innerHTML = `
           <div class="flex justify-between items-center">
-            <div class="flex items-center gap-3">
-              <div class="h-10 w-10 rounded-lg bg-x flex items-center justify-center">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
-                  <path d="M12 20h9"></path>
-                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                </svg>
+            <div class="flex items-center gap-4">
+              <div class="flex flex-col">
+                <h3 class="!text-xl !font-bold text-white !tracking-tight">${courseTitle}</h3>
+                <p class="!text-white/70 !text-sm !font-medium">Course Attendance Details</p>
               </div>
-              <h3 class="text-lg font-bold text-white">${courseTitle}</h3>
             </div>
-            <div class="bg-zinc-900 rounded-xl px-3 py-2 flex items-center gap-2 !border !border-white/10">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400">
+            <div class="bg-[#1c1c1c] border-2 border-white/10 rounded-2xl px-4 py-3 flex items-center gap-3">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-x">
                 <circle cx="12" cy="12" r="10"></circle>
                 <polyline points="12 6 12 12 16 14"></polyline>
               </svg>
-              <span class="text-sm text-white/70">Attendance Log</span>
+              <span class="text-base font-semibold text-white">Attendance Log</span>
             </div>
           </div>
           <div class="w-full">
-            <div class="flex justify-between items-center mb-2">
-              <span class="text-sm text-white/70">Attendance Progress</span>
-              <span class="text-sm font-bold" style="color: ${color}">${attendancePercentage}%</span>
+            <div class="flex justify-between items-center mb-3">
+              <span class="text-base font-semibold text-white/90">Attendance Progress</span>
+              <span class="text-lg font-bold" style="color: ${color}">${attendancePercentage}%</span>
             </div>
-            <div class="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
-              <div class="h-full rounded-full" style="width: ${attendancePercentage}%; background-color: ${color};"></div>
+            <div class="w-full h-3 bg-[#1c1c1c] rounded-full overflow-hidden !border !border-white/5">
+              <div class="h-full rounded-full transition-all duration-500 ease-out shadow-lg" style="width: ${attendancePercentage}%; background-color: ${color};"></div>
             </div>
           </div>
         `;
@@ -418,12 +460,12 @@ function AttendancePage() {
 
         // Remove existing classes and add new ones
         table.className = "w-full table-auto";
-        table.classList.add("!rounded-xl", "!border-collapse", "!border-0");
+        table.classList.add("!rounded-xl", "!border-collapse", "!border-0", "!overflow-x-hidden");
 
-        // Style table headers - make them sticky like in HomePage
+        // Enhanced table headers styling
         const thead = table.querySelector("thead");
         if (thead) {
-          thead.classList.add("sticky", "top-0", "bg-black", "z-10");
+          thead.classList.add("bg-[#161616]", "z-10", "backdrop-blur-xl","!rounded-t-2xl","!p-2");
 
           document.querySelectorAll(".col-md-8").forEach((col) => {
             col.classList.remove("col-md-8");
@@ -437,38 +479,52 @@ function AttendancePage() {
           });
 
           const headers = thead.querySelectorAll("th");
-          headers.forEach((header) => {
+          headers.forEach((header, index) => {
             header.className = ""; // Reset existing classes
             header.classList.add(
               "px-4",
               "py-3",
-              "font-medium",
+              "font-semibold",
               "text-left",
-              "text-gray-400",
-              "border-b",
-              "border-gray-800",
-              "bg-black" // Ensure background color matches heading
+              "text-white/90",
+              "text-sm",
+              "border-b-2",
+              "border-white/10",
+              "bg-[#161616]",
+              "tracking-tight",
+              "h-12",
+              "align-middle"
             );
+            
+            // Add different styling for first and last headers
+            if (index === 0) {
+              header.classList.add("rounded-tl-2xl");
+            }
+            if (index === headers.length - 1) {
+              header.classList.add("rounded-tr-2xl");
+            }
           });
         }
 
-        // Style table body for scrolling
+        // Enhanced table body styling for scrolling
         const tbody = table.querySelector("tbody");
         if (tbody) {
-          tbody.className = "divide-y divide-slate-700/50";
+          tbody.className = "divide-y divide-white/5";
 
-          // Add a style tag for better table rendering
+          // Enhanced style tag for better table rendering
           const tableStyle = document.createElement("style");
           tableStyle.innerHTML = `
             .attendance-table {
               width: 100% !important;
               table-layout: fixed !important;
+              border-radius: 20px !important;
+              overflow-x: hidden !important;
             }
             .attendance-table tbody {
               display: block !important;
               width: 100% !important;
-              max-height: 150px !important;
               overflow-y: auto !important;
+              overflow-x: hidden !important;
             }
             .attendance-table thead, .attendance-table tbody tr {
               display: table !important;
@@ -478,7 +534,19 @@ function AttendancePage() {
             .attendance-table th, .attendance-table td {
               overflow: hidden !important;
               text-overflow: ellipsis !important;
+              padding: 12px 24px !important;
+              height: 50px !important;
+              vertical-align: middle !important;
             }
+            .attendance-table tbody tr {
+              height: 50px !important;
+              min-height: 50px !important;
+              max-height: 50px !important;
+            }
+            .attendance-table tbody tr:nth-child(even) {
+              background-color: rgba(255, 255, 255, 0.02) !important;
+            }
+            
           `;
           document.head.appendChild(tableStyle);
 
@@ -486,39 +554,45 @@ function AttendancePage() {
           table.classList.add("attendance-table");
           tbody.classList.add("custom-scrollbar");
 
-          // Style table rows
+          // Enhanced table rows styling
           const rows = tbody.querySelectorAll("tr");
-          rows.forEach((row) => {
-            row.className = "hover:bg-white/5 transition-colors";
+          rows.forEach((row, rowIndex) => {
+            row.className = "transition-all duration-200 ease-in-out cursor-pointer";
             row.style.display = "table"; // Makes the row behave like a table
             row.style.width = "100%"; // Full width rows
             row.style.tableLayout = "fixed"; // Consistent cell widths
 
-            // Style cells
+            // Enhanced cell styling
             const cells = row.querySelectorAll("td");
             cells.forEach((cell, cellIndex) => {
               cell.className = ""; // Reset existing classes
-              cell.classList.add("px-4", "py-3");
+              cell.classList.add("px-4", "py-2", "text-sm", "h-12", "align-middle");
 
               if (cellIndex === 0) {
                 // First column - Course/date cell
-                cell.classList.add("text-white", "font-medium");
+                cell.classList.add("text-white", "font-semibold", "tracking-tight");
               } else {
-                cell.classList.add("text-slate-300");
+                cell.classList.add("text-white/80", "font-medium");
               }
 
-              // Style attendance markers (P/A) to match HomePage styling
+              // Enhanced attendance markers styling
               const attendanceLabel = cell.querySelector("label");
               if (attendanceLabel && attendanceLabel.textContent === "P") {
                 attendanceLabel.className = ""; // Reset
                 attendanceLabel.classList.add(
-                  "bg-emerald-500/20",
-                  "text-emerald-400",
-                  "px-2",
-                  "py-1",
-                  "rounded-md",
-                  "font-medium",
-                  "inline-block"
+                  "bg-gradient-to-r",
+                  "from-emerald-500/20",
+                  "to-emerald-400/20",
+                  "text-emerald-300",
+                  "px-3",
+                  "py-2",
+                  "rounded-xl",
+                  "font-bold",
+                  "inline-block",
+                  "text-sm",
+                  "!border",
+                  "border-emerald-500/30",
+                  "backdrop-blur-sm"
                 );
               } else if (
                 cell.querySelector("b") &&
@@ -527,13 +601,19 @@ function AttendancePage() {
                 const absentElement = cell.querySelector("b");
                 absentElement.className = ""; // Reset
                 absentElement.classList.add(
-                  "bg-rose-500/20",
-                  "text-rose-400",
-                  "px-2",
-                  "py-1",
-                  "rounded-md",
-                  "font-medium",
-                  "inline-block"
+                  "bg-gradient-to-r",
+                  "from-rose-500/20",
+                  "to-rose-400/20",
+                  "text-rose-300",
+                  "px-3",
+                  "py-2",
+                  "rounded-xl",
+                  "font-bold",
+                  "inline-block",
+                  "text-sm",
+                  "!border",
+                  "border-rose-500/30",
+                  "backdrop-blur-sm"
                 );
               }
             });
@@ -567,32 +647,34 @@ function AttendancePage() {
     // Call the function after a short delay to ensure DOM is fully loaded
     setTimeout(styleCourseElements, 300);
 
-    document
-      .querySelector(".m-portlet__head")
-      ?.classList.add(
-        "!bg-black",
-        "!border",
-        "!border-white/10",
-        "!rounded-t-3xl",
+    // Enhanced portlet head styling with consistent typography
+    const mainPortletHead = document.querySelector(".m-portlet__head");
+    if (mainPortletHead) {
+      mainPortletHead.classList.add(
+        "!bg-transparent",
+        "!border-none",
         "!h-fit",
-        "!p-4",
+        "!p-0",
         "!flex",
         "!items-center",
         "!justify-between",
-        "!mb-4"
+        "!mb-8"
       );
+      
+      // Add title styling if exists
+      const title = mainPortletHead.querySelector(".m-portlet__head-caption .m-portlet__head-title")?.remove();
+    }
 
-    document
-      .querySelector(".m-portlet__body")
-      ?.classList.add(
-        "!bg-black",
-        "!rounded-b-3xl",
-        "!p-8",
-        "!border",
-        "!border-white/10",
-        "!shadow-lg",
+    // Enhanced portlet body styling
+    const portletBody = document.querySelector(".m-portlet__body");
+    if (portletBody) {
+      portletBody.classList.add(
+        "!bg-transparent",
+        "!border-0",
+        "!p-0",
         "!text-white"
       );
+    }
 
     // Force a specific max-width for the table container if needed
     const tableContainers = document.querySelectorAll(".table-responsive");
@@ -613,12 +695,16 @@ function AttendancePage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      {elemContent && (
-        <div
-          className="m-grid m-grid--hor m-grid--root m-page"
-          dangerouslySetInnerHTML={{ __html: elemContent }}
-        />
-      )}
+      <div className="flex pb-12 w-full">
+        <div className="p-6 w-full flex flex-col">
+          {elemContent && (
+            <div
+              className="m-grid m-grid--hor m-grid--root m-page"
+              dangerouslySetInnerHTML={{ __html: elemContent }}
+            />
+          )}
+        </div>
+      </div>
     </PageLayout>
   );
 }
