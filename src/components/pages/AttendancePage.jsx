@@ -556,7 +556,7 @@ function AttendancePage() {
 
           // Enhanced table rows styling
           const rows = tbody.querySelectorAll("tr");
-          rows.forEach((row, rowIndex) => {
+          rows.forEach((row) => {
             row.className = "transition-all duration-200 ease-in-out cursor-pointer";
             row.style.display = "table"; // Makes the row behave like a table
             row.style.width = "100%"; // Full width rows
@@ -660,9 +660,8 @@ function AttendancePage() {
         "!justify-between",
         "!mb-8"
       );
-      
-      // Add title styling if exists
-      const title = mainPortletHead.querySelector(".m-portlet__head-caption .m-portlet__head-title")?.remove();
+
+       mainPortletHead.querySelector(".m-portlet__head-caption .m-portlet__head-title")?.remove();
     }
 
     // Enhanced portlet body styling
