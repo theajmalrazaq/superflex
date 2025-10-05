@@ -139,7 +139,7 @@ function MarksPage() {
 
         // Create grand total row
         const totalRow = document.createElement("tr");
-        totalRow.className = `totalColumn_${id} !bg-black !hover:bg-white/5 !transition-colors`;
+        totalRow.className = `totalColumn_${id} !bg-transparent !transition-colors`;
 
         // Helper to create a cell
         const createTd = (value, className) => {
@@ -155,12 +155,17 @@ function MarksPage() {
         // Apply color to obtained marks based on percentage
         const obtTd = createTd(globalObtained, "GrandtotalObtMarks");
         const percentage = (globalObtained / globalWeightage) * 100;
+        
+        // Apply modern color scheme with percentage indicator
         if (percentage < 50) {
-          obtTd.classList.add("!text-rose-400");
+          obtTd.classList.add("!text-rose-400", "!font-medium");
+          obtTd.innerHTML = `<span class="inline-flex items-center">${globalObtained.toFixed(2)} <span class="ml-1 text-xs opacity-70">(${percentage.toFixed(0)}%)</span></span>`;
         } else if (percentage < 70) {
-          obtTd.classList.add("!text-amber-400");
+          obtTd.classList.add("!text-amber-400", "!font-medium");
+          obtTd.innerHTML = `<span class="inline-flex items-center">${globalObtained.toFixed(2)} <span class="ml-1 text-xs opacity-70">(${percentage.toFixed(0)}%)</span></span>`;
         } else {
-          obtTd.classList.add("!text-emerald-400");
+          obtTd.classList.add("!text-emerald-400", "!font-semibold");
+          obtTd.innerHTML = `<span class="inline-flex items-center">${globalObtained.toFixed(2)} <span class="ml-1 text-xs opacity-70">(${percentage.toFixed(0)}%)</span></span>`;
         }
         totalRow.appendChild(obtTd);
 
@@ -257,22 +262,22 @@ function MarksPage() {
                   } else {
                     // Create a new row for totals if the last row isn't a total row
                     const newTotalRow = document.createElement("tr");
-                    newTotalRow.className = `totalColumn_${id} !bg-zinc-900 !font-bold`;
+                    newTotalRow.className = `totalColumn_${id} !font-medium !text-white/90`;
 
                     // Create cells for the new row
                     newTotalRow.innerHTML = `
-                      <td class="text-center !p-3 !text-white">Total</td>
-                      <td class="text-center totalColweightage !p-3 !text-white"></td>
-                      <td class="text-center totalColObtMarks !p-3 !text-white"></td>
-                      <td class="text-center totalColGrandTotal !p-3 !text-white"></td>
-                      <td class="text-center totalColAverageMarks !p-3 !text-white">${weightedAvgSum.toFixed(
+                      <td class="text-center !py-4 !px-4 !text-white">Total</td>
+                      <td class="text-center totalColweightage !py-4 !px-4 !text-white/90"></td>
+                      <td class="text-center totalColObtMarks !py-4 !px-4 !text-white/90 !font-semibold"></td>
+                      <td class="text-center totalColGrandTotal !py-4 !px-4 !text-white/90"></td>
+                      <td class="text-center totalColAverageMarks !py-4 !px-4 !text-white/90">${weightedAvgSum.toFixed(
                         2
                       )}</td>
-                      <td class="text-center totalColStdDev !p-3 !text-white"></td>
-                      <td class="text-center totalColMinMarks !p-3 !text-white">${weightedMinSum.toFixed(
+                      <td class="text-center totalColStdDev !py-4 !px-4 !text-white/90"></td>
+                      <td class="text-center totalColMinMarks !py-4 !px-4 !text-white/90">${weightedMinSum.toFixed(
                         2
                       )}</td>
-                      <td class="text-center totalColMaxMarks !p-3 !text-white">${weightedMaxSum.toFixed(
+                      <td class="text-center totalColMaxMarks !py-4 !px-4 !text-white/90">${weightedMaxSum.toFixed(
                         2
                       )}</td>
                     `;
@@ -369,29 +374,56 @@ function MarksPage() {
         // Apply additional styling to the form inside portlet head
         formClone.classList.add("ml-4", "flex-1");
 
-        // Make the select control match the theme
+        // Add modern styles to the portlet container
+        const bgelem = document
+          .querySelector(
+            ".m-portlet.m-portlet--brand.m-portlet--head-solid-bg.m-portlet--border-bottom-metal.m-portlet--head-sm"
+          );
+          bgelem?.classList.add("!bg-transparent", "!border", "!border-none","scrollbar-hide");
+          bgelem?.classList.remove("m-portlet--head-solid-bg", "m-portlet--border-bottom-metal", "m-portlet");
+
+
+        // Enhanced select control styling to match AttendancePage theme
         const selectElement = formClone.querySelector("select");
         if (selectElement) {
           selectElement.classList.add(
-            "!bg-black",
+            "!bg-[#161616]",
             "!text-white",
-            "!border",
-            "!border-white/10",
-            "!rounded-xl",
-            "!px-4",
-            "!py-2",
+            "!border-2",
+            "!border-[#1c1c1c]",
+            "!rounded-3xl",
+            "!px-6",
+            "!py-3",
+            "!text-base",
+            "!font-medium",
             "!cursor-pointer",
+            "!transition-all",
+            "!duration-300",
+            "!hover:border-x/30",
             "!focus:ring-2",
-            "!focus:ring-x",
+            "!focus:ring-x/20",
+            "!focus:border-x",
             "!focus:outline-none"
           );
 
-          // Remove background image styling and keep default select appearance
-          selectElement.style.paddingRight = "1rem";
+          // Enhanced styling and proper padding
+          selectElement.style.paddingRight = "2.5rem";
+          selectElement.style.minWidth = "200px";
+        }
+        
+        // Style the form label if it exists
+        const formLabel = formClone.querySelector("label");
+        if (formLabel) {
+          formLabel.classList.add(
+            "!text-white",
+            "!font-semibold", 
+            "!text-base",
+            "!mb-2"
+          );
         }
       }
 
-      // Style course tabs UI with modern design
+      // Enhanced tabs navigation styling
       const tabsNav = document.querySelector(
         ".nav.nav-tabs.m-tabs.m-tabs-line"
       );
@@ -399,13 +431,12 @@ function MarksPage() {
         tabsNav.classList.add(
           "!flex",
           "!flex-wrap",
-          "!gap-2",
-          "!border-0",
-          "!border-b",
-          "!border-white/0"
+          "!m-0",
+          "!gap-4",
+          "!border-0"
         );
 
-        // Style individual course tabs
+        // Enhanced individual course tabs styling
         const tabItems = tabsNav.querySelectorAll(".nav-item.m-tabs__item");
         tabItems.forEach((tab) => {
           tab.classList.add("!m-0");
@@ -413,28 +444,33 @@ function MarksPage() {
           const tabLink = tab.querySelector(".nav-link");
           if (tabLink) {
             tabLink.classList.add(
-              "!border",
-              "!border-white/10",
-              "!rounded-xl",
-              "!px-4",
-              "!py-2",
+              "!border-2",
+              "!border-[#1c1c1c]",
+              "!rounded-3xl",
+              "!px-6",
+              "!py-4",
               "!text-white",
-              "!font-medium",
+              "!font-semibold",
+              "!text-base",
               "!transition-all",
-              "!duration-300"
+              "!duration-300",
+              "!min-w-fit",
+              "!whitespace-nowrap"
             );
 
-            // Set proper active styling for initial state
+            // Enhanced active styling for initial state
             if (tabLink.classList.contains("active")) {
-              tabLink.classList.add("!bg-x", "!border-white/20", "!shadow-lg");
+              tabLink.classList.add("!bg-x", "!border-x/30", "!shadow-xl", "!text-white");
+              // Remove any conflicting background classes
               tabLink.classList.remove(
+                "!bg-[#161616]",
                 "!bg-black",
                 "!bg-zinc-800",
                 "!bg-white/10"
               );
             } else {
-              tabLink.classList.add("!bg-black");
-              tabLink.classList.remove("!bg-x", "!bg-white/10", "!bg-zinc-800");
+              tabLink.classList.add("!bg-[#161616]");
+              tabLink.classList.remove("!bg-x", "!bg-white/10", "!bg-zinc-800", "!bg-black");
             }
 
             // Add click event listener to handle tab switching
@@ -458,20 +494,21 @@ function MarksPage() {
                 }
               });
 
-              // Apply active styling to clicked tab
+              // Apply enhanced active styling to clicked tab
               this.classList.remove(
+                "!bg-[#161616]",
                 "!bg-black",
                 "!bg-white/10",
                 "!bg-zinc-800"
               );
-              this.classList.add("!bg-x", "!border-white/20", "!shadow-lg");
+              this.classList.add("!bg-x", "!border-x/30", "!shadow-xl", "!text-white");
             });
 
             // Enhanced hover effect with smoother transitions
             tabLink.addEventListener("mouseover", () => {
               if (!tabLink.classList.contains("active")) {
-                tabLink.classList.remove("!bg-black", "!bg-zinc-800");
-                tabLink.classList.add("!bg-white/10", "!border-white/20");
+                tabLink.classList.remove("!bg-[#161616]", "!bg-black", "!bg-zinc-800");
+                tabLink.classList.add("!bg-white/10", "!border-x/20");
               }
             });
 
@@ -480,44 +517,91 @@ function MarksPage() {
                 tabLink.classList.remove(
                   "!bg-white/10",
                   "!bg-zinc-800",
-                  "!border-white/20"
+                  "!border-x/20"
                 );
-                tabLink.classList.add("!bg-black", "!border-white/10");
+                tabLink.classList.add("!bg-[#161616]", "!border-[#1c1c1c]");
               }
             });
           }
         });
       }
 
-      // Style tab content area
+      // Enhanced custom styling for nav tabs with AttendancePage consistency
+      const tabStyle = document.createElement("style");
+      tabStyle.textContent = `
+        .nav-tabs .nav-link {
+          position: relative;
+          overflow: hidden;
+          backdrop-filter: blur(10px);
+        }
+        .nav-tabs .nav-link:focus {
+          outline: none;
+          box-shadow: 0 0 0 3px rgba(160, 152, 255, 0.3);
+        }
+        /* Remove any unwanted before/after content */
+        .nav-tabs .nav-link::before,
+        .nav-tabs .nav-link::after,
+        .nav-tabs::before,
+        .nav-tabs::after,
+        .m-tabs::before,
+        .m-tabs::after,
+        .m-tabs-line::before,
+        .m-tabs-line::after {
+          display: none !important;
+          content: none !important;
+        }
+        /* Custom hover gradient effect */
+        .nav-tabs .nav-link:hover {
+          background: linear-gradient(135deg, rgba(160, 152, 255, 0.1) 0%, rgba(160, 152, 255, 0.05) 100%) !important;
+        }
+        .nav-tabs .nav-link.active {
+          background: linear-gradient(135deg, rgba(160, 152, 255, 0.2) 0%, rgba(160, 152, 255, 0.1) 100%) !important;
+        }
+      `;
+      document.head.appendChild(tabStyle);
+
+      // Make tab content area scrollable and responsive
       const tabContent = document.querySelector(".tab-content");
       if (tabContent) {
         tabContent.classList.add(
-          "max-h-fit",
-          "overflow-y-auto",
-          "overflow-x-hidden",
           "rounded-xl",
           "custom-scrollbar",
           "w-full"
         );
+        
+        // Make each tab pane responsive
+        const tabPanes = tabContent.querySelectorAll(".tab-pane");
+        tabPanes.forEach(pane => {
+          pane.classList.add("max-w-full");
+          
+          // Add responsive wrappers around each table container
+          pane.querySelectorAll(".sum_table").forEach(table => {
+            const parent = table.parentElement;
+            if (parent && !parent.classList.contains("overflow-auto")) {
+              parent.classList.add("overflow-x-auto", "custom-scrollbar", "max-w-full", "rounded-xl");
+            }
+          });
+        });
       }
 
       // Style accordion elements for assessment categories
       const accordionCards = document.querySelectorAll("#accordion .card");
       accordionCards.forEach((card) => {
         card.classList.add(
-          "!bg-white/10",
-          "!border",
-          "!border-white/10",
-          "!rounded-2xl",
+          "!bg-[#161616]",
+          "!border-2",
+          "!border-[#1c1c1c]",
+          "!rounded-[30px]",
           "!p-4",
-          "!mb-4"
+          "!mb-6",
+          "!overflow-hidden",
+          "backdrop-blur-xl"
         );
 
         // Style the card header
         const cardHeader = card.querySelector(".card-header");
         if (cardHeader) {
-          cardHeader.classList.add("!bg-black", "!border-none", "!p-0");
+          cardHeader.classList.add("!bg-transparent", "!border-none", "!p-4");
 
           // Style the accordion button
           const accordionBtn = cardHeader.querySelector(".btn-link");
@@ -528,23 +612,39 @@ function MarksPage() {
               "!w-full",
               "!text-left",
               "!flex",
-              "!bg-white/10",
+              "!bg-transparent",
               "!items-center",
-              "!font-medium"
+              "!font-semibold",
+              "!text-xl",
+              "!tracking-tight",
+              "!p-0",
+              "!transition-all",
+              "!duration-300"
             );
 
             // Add icon before button text
             const buttonText = accordionBtn.textContent.trim();
             accordionBtn.innerHTML = `
-                <div class="h-8 w-8 rounded-lg bg-x mr-2 flex items-center justify-center">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="plus-icon text-white">
-                        <path d="M12 5v14M5 12h14"/>
+                <div class="flex items-center gap-4 w-full">
+                
+
+  <div class="bg-[#1c1c1c] border-2 border-white/10 rounded-2xl px-4 py-3 w-fit flex items-center gap-3">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-x plus-icon">
+                      <path d="M12 5v14M5 12h14"/>
                     </svg>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="minus-icon text-white hidden">
-                        <path d="M5 12h14"/>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-x minus-icon hidden">
+                      <path d="M5 12h14"/>
                     </svg>
+                   
+                  </div>
+
+
+                  <div class="flex flex-col">
+                    <h3 class="!text-lg !font-semibold text-white tracking-tight">${buttonText}</h3>
+                    <p class="text-white/70 !text-sm !font-medium !m-0">Marks breakdown and statistics</p>
+                  </div>
+                  
                 </div>
-                ${buttonText}
             `;
 
             const updateIconState = (button) => {
@@ -602,11 +702,9 @@ function MarksPage() {
         const cardBody = card.querySelector(".card-body");
         if (cardBody) {
           cardBody.classList.add(
-            "!p-4",
-            "!bg-black",
-            "!border",
-            "!border-white/0",
-            "!rounded-[22px]"
+            "!p-0",
+            "!bg-transparent",
+            "!border-0"
           );
         }
       });
@@ -614,58 +712,82 @@ function MarksPage() {
       // Style the marks tables
       const marksTables = document.querySelectorAll(".sum_table");
       marksTables.forEach((table) => {
-        // Create a container for the table with modern styling
+        // Create a responsive container for the table with modern styling
         const tableContainer = document.createElement("div");
         tableContainer.className =
-          "rounded-xl overflow-hidden !border !border-white/10";
+          "!overflow-auto !rounded-xl !mb-0 shadow-lg !backdrop-blur-sm !border !border-white/10";
         table.parentNode.insertBefore(tableContainer, table);
         tableContainer.appendChild(table);
 
-        // Style the table
-        table.classList.add("!w-full", "!border-collapse", "!border-0");
+        // Style the table with modern, minimal design
+        table.classList.add(
+          "!w-full", 
+          "!border-collapse", 
+          "!border-spacing-0",
+          "!border-0",
+          "!mb-0"
+        );
         table.classList.remove("table-bordered");
 
         // Style the table headers
         const thead = table.querySelector("thead");
         if (thead) {
-          thead.classList.add("!bg-zinc-900", "!sticky", "!top-0", "!z-10");
+          thead.classList.add(
+            "!bg-black/40", 
+            "!sticky", 
+            "!top-0", 
+            "!z-10", 
+            "!backdrop-blur-md"
+          );
 
           const headers = thead.querySelectorAll("th");
           headers.forEach((header) => {
             header.classList.add(
-              "bg-transparent",
-              "!text-gray-400",
+              "!bg-transparent",
+              "!text-gray-300",
               "!font-medium",
-              "!p-3",
+              "!py-4",
+              "!px-4",
               "!text-left",
+              "!text-xs",
+              "!uppercase",
+              "!tracking-wider",
               "!border-b",
-              "!border-white/0"
+              "!border-white/10"
             );
           });
         }
 
-        // Style the table body
+        // Style the table body with cleaner, more minimal approach
         const tbody = table.querySelector("tbody");
         if (tbody) {
-          tbody.classList.add("!divide-y", "!divide-white/10");
+          tbody.classList.add("!bg-black/20");
 
           // Style table rows
           const rows = tbody.querySelectorAll("tr");
-          rows.forEach((row) => {
+          rows.forEach((row, index) => {
+            // Alternate row background for better readability
+            if (index % 2 === 0) {
+              row.classList.add("!bg-black/10");
+            } else {
+              row.classList.add("!bg-transparent");
+            }
+            
             row.classList.add(
-              "!bg-black",
               "!hover:bg-white/5",
-              "!transition-colors"
+              "!transition-all",
+              "!duration-200"
             );
 
-            // Style cells
+            // Style cells with more consistent padding and typography
             const cells = row.querySelectorAll("td");
             cells.forEach((cell) => {
               cell.classList.add(
-                "!p-3",
+                "!py-3",
+                "!px-4",
                 "!text-white/80",
-                "!border-y",
-                "!border-white/10"
+                "!text-sm",
+                "!border-0"
               );
 
               // Style obtained marks with color indicators based on performance
@@ -681,17 +803,32 @@ function MarksPage() {
                     );
                     const percentage = (obtMarks / totalMarks) * 100;
 
-                    // Apply color based on percentage
+                    // Apply enhanced color and styling for marks based on percentage
+                    cell.classList.add("!font-medium");
+                    
                     if (percentage < 50) {
                       cell.classList.add("!text-rose-400");
+                      // Add percentage in small text
+                      cell.innerHTML = `<span class="flex items-center gap-1">
+                        ${marks}
+                        <span class="text-xs opacity-70">(${percentage.toFixed(0)}%)</span>
+                      </span>`;
                     } else if (percentage < 70) {
                       cell.classList.add("!text-amber-400");
+                      // Add percentage in small text
+                      cell.innerHTML = `<span class="flex items-center gap-1">
+                        ${marks}
+                        <span class="text-xs opacity-70">(${percentage.toFixed(0)}%)</span>
+                      </span>`;
                     } else {
-                      cell.classList.add("!text-emerald-400");
+                      cell.classList.add("!text-emerald-400", "!font-semibold");
+                      // Add percentage in small text with checkmark for high scores
+                      cell.innerHTML = `<span class="flex items-center gap-1">
+                        ${marks}
+                        <span class="text-xs opacity-70">(${percentage.toFixed(0)}%)</span>
+                        ${percentage >= 90 ? '<svg class="w-3 h-3 text-emerald-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>' : ''}
+                      </span>`;
                     }
-
-                    // Set just the marks without percentage badge
-                    cell.textContent = marks;
                   }
                 }
               }
@@ -699,100 +836,135 @@ function MarksPage() {
           });
         }
 
-        // Style table footer
+        // Style table footer with more distinct appearance
         const tfoot = table.querySelector("tfoot");
         if (tfoot) {
+          tfoot.classList.add("!border-t-2", "!border-white/20");
+          
           const footerRows = tfoot.querySelectorAll("tr");
           footerRows.forEach((row) => {
-            row.classList.add("!bg-zinc-900", "!font-bold");
+            row.classList.add(
+              "!bg-gradient-to-r",
+              "!from-black/60",
+              "!to-black/40",
+              "!backdrop-blur-md"
+            );
 
             const cells = row.querySelectorAll("td");
             cells.forEach((cell) => {
-              cell.classList.add("!p-3", "!text-white");
+              cell.classList.add(
+                "!py-4",
+                "!px-4",
+                "!text-white/90",
+                "!font-medium",
+                "!text-sm"
+              );
             });
           });
         }
       });
 
-      // Add custom scrollbar styling
+      // Add custom scrollbar and table styles (consistent with AttendancePage)
       const styleElement = document.createElement("style");
       styleElement.textContent = `
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 8px;
-                    height: 8px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: rgba(255, 255, 255, 0.05);
-                    border-radius: 10px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: rgba(255, 255, 255, 0.2);
-                    border-radius: 10px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: rgba(255, 255, 255, 0.3);
-                }
-                
-                /* Style course headings */
-                .tab-pane h5 {
-                    font-size: 1.25rem;
-                    font-weight: 700;
-                    color: white;
-                    margin-bottom: 1rem;
-                    display: flex;
-                    align-items: center;
-                    gap: 0.75rem;
-                }
-                
-               
-            `;
+        /* Custom Scrollbar Styling */
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background-color: rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Enhanced Table Styling */
+        .sum_table {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+          border-radius: 0.75rem;
+          overflow: hidden;
+        }
+        
+        .sum_table thead th {
+          position: sticky;
+          top: 0;
+          z-index: 10;
+          font-size: 0.75rem;
+          font-weight: 500;
+          letter-spacing: 0.025em;
+          text-transform: uppercase;
+          color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .sum_table tbody tr:last-child td {
+          border-bottom: none;
+        }
+        
+        /* Add subtle animation to row hover */
+        .sum_table tbody tr {
+          transition: all 0.2s ease;
+        }
+        
+        .sum_table tbody tr:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Add colored left border for visual hierarchy */
+        .sum_table tbody tr.calculationrow td:first-child {
+          border-left: 3px solid transparent;
+        }
+        
+        .sum_table tbody tr.calculationrow:hover td:first-child {
+          border-left-color: rgba(160, 152, 255, 0.5);
+        }
+        
+        /* Style the total rows differently */
+        .sum_table tr[class*="totalColumn_"] {
+          font-weight: 600;
+          background: linear-gradient(90deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4)) !important;
+        }
+      `;
       document.head.appendChild(styleElement);
 
-      // Style portlet containers
-      document
-        .querySelector(".m-portlet__head")
-        ?.classList.add(
-          "!bg-black",
-          "!border",
-          "!border-white/10",
-          "!rounded-t-3xl",
+      // Enhanced portlet head styling with consistent typography
+      const mainPortletHead = document.querySelector(".m-portlet__head");
+      if (mainPortletHead) {
+        mainPortletHead.classList.add(
+          "!bg-transparent",
+          "!border-none",
           "!h-fit",
-          "!p-4",
+          "!p-0",
           "!flex",
           "!items-center",
           "!justify-between",
-          "!mb-4"
+          "!mb-8"
         );
 
-      document.querySelector(".m-portlet__body")?.classList.add(
-        "!bg-black",
-        "!rounded-b-3xl",
-        "!p-8",
-        "!border",
-        "!border-white/10",
-        "!shadow-lg",
-        "!text-white",
-        "!h-[calc(100vh-220px)]", // Fixed height calculation
-        "!max-h-[800px]", // Maximum height limit
-        "!overflow-y-auto", // Enable vertical scrolling
-        "custom-scrollbar" // Apply custom scrollbar styling
-      );
+        // Remove title if exists to match AttendancePage
+        mainPortletHead.querySelector(".m-portlet__head-caption .m-portlet__head-title")?.remove();
+      }
 
-      // Make the main portlet match the theme
-      document
-        .querySelector(".m-portlet")
-        ?.classList.add(
-          "!bg-black",
-          "!border",
-          "!border-white/0",
-          "!rounded-3xl",
-          "!p-4",
-          "!shadow-lg"
+      // Enhanced portlet body styling
+      const portletBody = document.querySelector(".m-portlet__body");
+      if (portletBody) {
+        portletBody.classList.add(
+          "!bg-transparent",
+          "!border-0",
+          "!p-0",
+          "!text-white"
         );
+      }
 
       // Add grading summary cards to each tab pane
       document.querySelectorAll(".tab-pane").forEach((tabPane) => {
-        const courseTitle = tabPane.querySelector("h5")?.textContent;
+        const courseTitle = tabPane.querySelector("h5");
+        courseTitle.classList.add("!text-white", "!font-semibold", "!text-2xl","!mb-4");
         if (courseTitle) {
           // Find all total marks from this tab
           const totalMarkRows = tabPane.querySelectorAll(".totalColumn_");
@@ -926,12 +1098,16 @@ function MarksPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      {elemContent && (
-        <div
-          className="m-grid m-grid--hor m-grid--root m-page"
-          dangerouslySetInnerHTML={{ __html: elemContent }}
-        />
-      )}
+      <div className="flex pb-12 w-full">
+        <div className="p-6 w-full flex flex-col">
+          {elemContent && (
+            <div
+              className="m-grid m-grid--hor m-grid--root m-page"
+              dangerouslySetInnerHTML={{ __html: elemContent }}
+            />
+          )}
+        </div>
+      </div>
     </PageLayout>
   );
 }

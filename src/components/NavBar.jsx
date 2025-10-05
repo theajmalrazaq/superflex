@@ -166,7 +166,7 @@ function NavBar({currentPage = "", onAttendanceLinkFound }) {
         <img
           src={chrome.runtime.getURL("public/logo.svg")}
           alt="Logo"
-          className="h-14 w-auto filter"
+          className="h-10 w-auto"
         />
       </div>
 

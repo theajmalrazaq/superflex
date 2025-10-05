@@ -10,7 +10,7 @@ function PageLayout({ children, currentPage, onAttendanceLinkFound }) {
           onAttendanceLinkFound={onAttendanceLinkFound}
         />
       </div>
-      <div className="ml-[250px] flex-1 !p-5">{children}</div>
+      <div className="ml-[250px] flex-1 !p-5 scrollbar-hide">{children}</div>
     </div>
   );
 }

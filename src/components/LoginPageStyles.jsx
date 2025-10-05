@@ -81,9 +81,9 @@ function LoginPageStyles() {
     let logodiv = document.createElement("div");
     // eslint-disable-next-line no-undef
     logodiv.innerHTML = `<img src="${chrome.runtime.getURL(
-      "public/logo_sec.svg"
+      "public/logo.svg"
     )}" class="logo" alt="Logo" />`;
-    logodiv.classList.add("!pb-4", "!border-b", "!border-white/10","!w-[20rem]");
+    logodiv.classList.add("!pb-4", "!border-b", "!border-white/10","!w-[16rem]");
 
     document.querySelector(".m-login__logo").remove();
 
@@ -112,7 +112,7 @@ function LoginPageStyles() {
 
     // Replace inline styles with Tailwind classes
     logintitle.innerHTML =
-      "<h1 class='!text-2xl !font-bold'>Welcome Back!</h1> <br/> <p class='!text-base'>Enter Your Login Details</p>";
+      "<h1 class='!text-2xl !font-bold'>Welcome Back!</h1> <p class='!text-base'>Enter Your Login Details</p>";
     logintitle.classList.add("!text-center");
     logintitle.style.lineHeight = "0.7"; // Keep this as it's specific
 
@@ -121,7 +121,7 @@ function LoginPageStyles() {
 
     // Apply Tailwind classes instead of inline styles
     bglogin.classList.add(
-      "!bg-black",
+      "!bg-black/50",
       "!p-8",
       "!rounded-[32px]",
       "!border",
