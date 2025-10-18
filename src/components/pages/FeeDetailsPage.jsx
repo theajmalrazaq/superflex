@@ -11,7 +11,7 @@ function FeeDetailsPage() {
 
     // First, check if the element exists
     let targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page"
+      ".m-grid.m-grid--hor.m-grid--root.m-page",
     );
 
     // If element doesn't exist immediately, wait for it with a timeout
@@ -23,7 +23,7 @@ function FeeDetailsPage() {
 
         const checkInterval = setInterval(() => {
           targetElement = document.querySelector(
-            ".m-grid.m-grid--hor.m-grid--root.m-page"
+            ".m-grid.m-grid--hor.m-grid--root.m-page",
           );
           attempts++;
 
@@ -38,7 +38,7 @@ function FeeDetailsPage() {
     }
 
     const customCssLink = document.querySelector(
-      'link[href="/Assets/CustomCss.css"]'
+      'link[href="/Assets/CustomCss.css"]',
     );
     if (customCssLink) {
       customCssLink.remove();
@@ -67,7 +67,7 @@ function FeeDetailsPage() {
       // Create a function to check if all images are loaded
       const checkForCompleteRender = () => {
         const contentContainer = document.querySelector(
-          ".m-grid.m-grid--hor.m-grid--root.m-page"
+          ".m-grid.m-grid--hor.m-grid--root.m-page",
         );
 
         if (!contentContainer) return false;
@@ -75,7 +75,7 @@ function FeeDetailsPage() {
         // Check if tables have been populated
         const tables = contentContainer.querySelectorAll("table");
         const hasPopulatedTables = Array.from(tables).some(
-          table => table.querySelectorAll("tbody tr").length > 0
+          (table) => table.querySelectorAll("tbody tr").length > 0,
         );
 
         return hasPopulatedTables;
@@ -116,7 +116,7 @@ function FeeDetailsPage() {
   const applyCustomStyling = () => {
     // Get the rendered content element
     const element = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page"
+      ".m-grid.m-grid--hor.m-grid--root.m-page",
     );
     if (!element) return;
 
@@ -132,7 +132,7 @@ function FeeDetailsPage() {
         "!border-none",
         "!rounded-3xl",
         "!p-4",
-        "!shadow-lg"
+        "!shadow-lg",
       );
     }
 
@@ -149,7 +149,7 @@ function FeeDetailsPage() {
         "!flex",
         "!items-center",
         "!justify-between",
-        "!mb-4"
+        "!mb-4",
       );
 
       // Find and style the heading
@@ -174,7 +174,7 @@ function FeeDetailsPage() {
         "!h-[calc(100vh-220px)]",
         "!max-h-[800px]",
         "!overflow-y-auto",
-        "custom-scrollbar"
+        "custom-scrollbar",
       );
     }
 
@@ -201,7 +201,7 @@ function FeeDetailsPage() {
 
     // Style the semester header sections
     const semesterHeaders = element.querySelectorAll(
-      "[id^='rowStdDetailHeader_']"
+      "[id^='rowStdDetailHeader_']",
     );
     semesterHeaders.forEach((header) => {
       const row = header.querySelector(".row");
@@ -214,7 +214,7 @@ function FeeDetailsPage() {
           "!border-white/10",
           "!mb-4",
           "!flex",
-          "!items-center"
+          "!items-center",
         );
       }
 
@@ -233,7 +233,7 @@ function FeeDetailsPage() {
           "m-btn--custom",
           "m-btn--icon",
           "m-btn--pill",
-          "m-btn--air"
+          "m-btn--air",
         );
         expandBtn.classList.add(
           "!bg-x",
@@ -248,14 +248,14 @@ function FeeDetailsPage() {
           "!shadow-lg",
           "!transition-all",
           "!duration-300",
-          "!p-0"
+          "!p-0",
         );
 
         // Add animation for rotation on click
         expandBtn.addEventListener("click", function () {
           const icon = this.querySelector("i");
           const targetId = this.getAttribute("onclick").match(
-            /ftn_ShowHideDivandData\((\d+)/
+            /ftn_ShowHideDivandData\((\d+)/,
           )[1];
           const targetDiv = document.getElementById(`rowStdDetail_${targetId}`);
 
@@ -276,7 +276,7 @@ function FeeDetailsPage() {
           "!text-white",
           "!font-medium",
           "!text-lg",
-          "!mb-0"
+          "!mb-0",
         );
       }
 
@@ -348,25 +348,25 @@ function FeeDetailsPage() {
               "!text-xl",
               "!font-bold",
               "!text-white",
-              "!mb-3"
+              "!mb-3",
             );
           }
 
           // Improve layout of fee breakdown container
           const feeBreakdownContainer = feeInSemesterCol.querySelector(
-            ".border.border-secondary"
+            ".border.border-secondary",
           );
           if (feeBreakdownContainer) {
             feeBreakdownContainer.classList.remove(
               "border",
-              "border-secondary"
+              "border-secondary",
             );
             feeBreakdownContainer.classList.add(
               "!bg-zinc-900/40",
               "!rounded-xl",
               "!p-5",
               "!border",
-              "!border-white/10"
+              "!border-white/10",
             );
           }
 
@@ -377,7 +377,7 @@ function FeeDetailsPage() {
               "!flex",
               "!justify-between",
               "!items-center",
-              "!mb-3"
+              "!mb-3",
             );
 
             // Style labels and values
@@ -423,7 +423,7 @@ function FeeDetailsPage() {
               "!text-xl",
               "!font-bold",
               "!text-white",
-              "!mb-3"
+              "!mb-3",
             );
           }
 
@@ -435,7 +435,7 @@ function FeeDetailsPage() {
 
           // Improve GPA display
           const gpaRows = registrationLogCol.querySelectorAll(
-            ".row:not(:last-child)"
+            ".row:not(:last-child)",
           );
           gpaRows.forEach((row) => {
             row.classList.add("!flex", "!items-center", "!mb-2");
@@ -448,7 +448,7 @@ function FeeDetailsPage() {
                   "!text-white/70",
                   "!font-medium",
                   "!mr-2",
-                  "!min-w-[50px]"
+                  "!min-w-[50px]",
                 );
               } else {
                 label.classList.add("!text-white", "!font-bold");
@@ -458,7 +458,7 @@ function FeeDetailsPage() {
 
           // Style installment section
           const installmentHeader = registrationLogCol.querySelector(
-            "#lbIsntallmentHead_0"
+            "#lbIsntallmentHead_0",
           );
           if (installmentHeader) {
             installmentHeader.classList.add(
@@ -466,7 +466,7 @@ function FeeDetailsPage() {
               "!font-bold",
               "!text-white",
               "!mt-4",
-              "!mb-3"
+              "!mb-3",
             );
           }
         }
@@ -480,7 +480,7 @@ function FeeDetailsPage() {
 
       // Style border containers
       const borderContainers = detail.querySelectorAll(
-        ".border.border-secondary"
+        ".border.border-secondary",
       );
       borderContainers.forEach((container) => {
         container.classList.remove("border", "border-secondary");
@@ -490,7 +490,7 @@ function FeeDetailsPage() {
           "!rounded-xl",
           "!p-4",
           "!bg-zinc-900/30",
-          "!mb-4"
+          "!mb-4",
         );
       });
 
@@ -517,14 +517,14 @@ function FeeDetailsPage() {
           "!overflow-hidden",
           "!border",
           "!border-white/10",
-          "!mb-4"
+          "!mb-4",
         );
 
         // Remove bootstrap classes
         table.classList.remove(
           "table-responsive",
           "m-table--border-info",
-          "m-table--head-bg-info"
+          "m-table--head-bg-info",
         );
 
         // Style table headers
@@ -545,7 +545,7 @@ function FeeDetailsPage() {
                 "!font-medium",
                 "!p-3",
                 "!text-left",
-                "!bg-transparent"
+                "!bg-transparent",
               );
             });
           });
@@ -561,7 +561,7 @@ function FeeDetailsPage() {
             row.classList.add(
               "!bg-black",
               "!hover:bg-white/5",
-              "!transition-colors"
+              "!transition-colors",
             );
 
             const cells = row.querySelectorAll("td");
@@ -570,7 +570,7 @@ function FeeDetailsPage() {
                 "!p-3",
                 "!text-white/80",
                 "!border-y",
-                "!border-white/10"
+                "!border-white/10",
               );
             });
           });
@@ -606,7 +606,7 @@ function FeeDetailsPage() {
             "!p-3",
             "!text-left",
             "!border-b",
-            "!border-white/10"
+            "!border-white/10",
           );
         });
       }
@@ -621,7 +621,7 @@ function FeeDetailsPage() {
           row.classList.add(
             "!bg-black",
             "!hover:bg-white/5",
-            "!transition-colors"
+            "!transition-colors",
           );
 
           const cells = row.querySelectorAll("td");
@@ -630,7 +630,7 @@ function FeeDetailsPage() {
               "!p-4",
               "!text-white/80",
               "!border-y",
-              "!border-white/10"
+              "!border-white/10",
             );
 
             // Style amount column (typically the 6th column)
@@ -659,7 +659,7 @@ function FeeDetailsPage() {
                   "!font-medium",
                   "!hover:text-x/80",
                   "!transition-colors",
-                  "!cursor-pointer"
+                  "!cursor-pointer",
                 );
               }
             }
@@ -676,7 +676,7 @@ function FeeDetailsPage() {
     // Calculate total paid
     let totalPaid = 0;
     const paymentAmounts = element.querySelectorAll(
-      "#sample_CollectionDetail tbody tr td:nth-child(6)"
+      "#sample_CollectionDetail tbody tr td:nth-child(6)",
     );
     paymentAmounts.forEach((cell) => {
       const amount = parseFloat(cell.textContent.replace(/[^0-9.-]+/g, ""));
@@ -687,7 +687,7 @@ function FeeDetailsPage() {
 
     // Find the latest payment
     const latestPaymentRow = element.querySelector(
-      "#sample_CollectionDetail tbody tr"
+      "#sample_CollectionDetail tbody tr",
     );
     let latestPaymentInfo = "";
     if (latestPaymentRow) {

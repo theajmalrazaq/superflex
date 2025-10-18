@@ -31,7 +31,7 @@ function AttendancePage() {
     document.head.appendChild(styleElement);
 
     const alertElement = document.querySelector(
-      ".m-alert.m-alert--icon.m-alert--icon-solid.m-alert--outline.alert.alert-info.alert-dismissible.fade.show"
+      ".m-alert.m-alert--icon.m-alert--icon-solid.m-alert--outline.alert.alert-info.alert-dismissible.fade.show",
     );
     if (alertElement) {
       alertElement.classList.add(
@@ -43,15 +43,17 @@ function AttendancePage() {
         "!rounded-3xl",
         "!flex",
         "!justify-between",
-        "!items-center"
+        "!items-center",
       );
       alertElement.style.visibility = "visible";
       alertElement.style.display = "block";
     }
- const scrollTopEl = document.querySelector(".m-scroll-top.m-scroll-top--skin-top");
-      if (scrollTopEl) {
-        scrollTopEl.remove();
-      }
+    const scrollTopEl = document.querySelector(
+      ".m-scroll-top.m-scroll-top--skin-top",
+    );
+    if (scrollTopEl) {
+      scrollTopEl.remove();
+    }
     const iconElement = alertElement?.querySelector(".m-alert__icon");
     if (iconElement) {
       iconElement.classList.add(
@@ -64,7 +66,7 @@ function AttendancePage() {
         "!h-12",
         "!flex",
         "!items-center",
-        "!justify-center"
+        "!justify-center",
       );
 
       // Create SVG element
@@ -82,7 +84,7 @@ function AttendancePage() {
       // Create path element
       const path = document.createElementNS(
         "http://www.w3.org/2000/svg",
-        "path"
+        "path",
       );
       path.setAttribute("d", badgeAlertPath);
 
@@ -94,7 +96,7 @@ function AttendancePage() {
 
     // Find the close button and add the close icon SVG
     const closeButton = alertElement?.querySelector(
-      'button.close[data-dismiss="alert"]'
+      'button.close[data-dismiss="alert"]',
     );
     if (closeButton) {
       // Hide the ::before pseudo-element
@@ -108,7 +110,7 @@ function AttendancePage() {
       // Create SVG element for close button
       const closeSvg = document.createElementNS(
         "http://www.w3.org/2000/svg",
-        "svg"
+        "svg",
       );
       closeSvg.setAttribute("width", "24");
       closeSvg.setAttribute("height", "24");
@@ -123,7 +125,7 @@ function AttendancePage() {
       // Create paths for X shape
       const line1 = document.createElementNS(
         "http://www.w3.org/2000/svg",
-        "line"
+        "line",
       );
       line1.setAttribute("x1", "18");
       line1.setAttribute("y1", "6");
@@ -132,7 +134,7 @@ function AttendancePage() {
 
       const line2 = document.createElementNS(
         "http://www.w3.org/2000/svg",
-        "line"
+        "line",
       );
       line2.setAttribute("x1", "6");
       line2.setAttribute("y1", "6");
@@ -149,7 +151,7 @@ function AttendancePage() {
 
     // Find and move the semester selection form to portlet head
     const semesterForm = document.querySelector(
-      'form[action="/Student/StudentAttendance"]'
+      'form[action="/Student/StudentAttendance"]',
     );
     const portletHead = document.querySelector(".m-portlet__head");
 
@@ -168,13 +170,13 @@ function AttendancePage() {
       // Add modern styles to the portlet container
       document
         .querySelector(
-          ".m-portlet.m-portlet--tabs.m-portlet--brand.m-portlet--border-bottom-brand.m-portlet--head-solid-bg.m-portlet--head-sm"
+          ".m-portlet.m-portlet--tabs.m-portlet--brand.m-portlet--border-bottom-brand.m-portlet--head-solid-bg.m-portlet--head-sm",
         )
         .classList.add(
           "!bg-transparent",
           "!border",
           "!border-white/0",
-          "!shadow-lg"
+          "!shadow-lg",
         );
 
       // Enhanced select control styling to match HomePage theme
@@ -198,22 +200,22 @@ function AttendancePage() {
           "!focus:ring-2",
           "!focus:ring-x/20",
           "!focus:border-x",
-          "!focus:outline-none"
+          "!focus:outline-none",
         );
 
         // Enhanced styling and proper padding
         selectElement.style.paddingRight = "2.5rem";
         selectElement.style.minWidth = "200px";
       }
-      
+
       // Style the form label if it exists
       const formLabel = formClone.querySelector("label");
       if (formLabel) {
         formLabel.classList.add(
           "!text-white",
-          "!font-semibold", 
+          "!font-semibold",
           "!text-base",
-          "!mb-2"
+          "!mb-2",
         );
       }
     }
@@ -222,15 +224,10 @@ function AttendancePage() {
     const styleCourseElements = () => {
       // Enhanced tabs navigation styling
       const tabsNav = document.querySelector(
-        ".nav.nav-tabs.m-tabs.m-tabs-line"
+        ".nav.nav-tabs.m-tabs.m-tabs-line",
       );
       if (tabsNav) {
-        tabsNav.classList.add(
-          "!flex",
-          "!flex-wrap",
-          "!gap-4",
-          "!border-0",
-        );
+        tabsNav.classList.add("!flex", "!flex-wrap", "!gap-4", "!border-0");
 
         // Enhanced individual course tabs styling
         const tabItems = tabsNav.querySelectorAll(".nav-item.m-tabs__item");
@@ -251,22 +248,32 @@ function AttendancePage() {
               "!transition-all",
               "!duration-300",
               "!min-w-fit",
-              "!whitespace-nowrap"
+              "!whitespace-nowrap",
             );
 
             // Enhanced active styling for initial state
             if (tabLink.classList.contains("active")) {
-              tabLink.classList.add("!bg-x", "!border-x/30", "!shadow-xl", "!text-white");
+              tabLink.classList.add(
+                "!bg-x",
+                "!border-x/30",
+                "!shadow-xl",
+                "!text-white",
+              );
               // Remove any conflicting background classes
               tabLink.classList.remove(
                 "!bg-[#161616]",
                 "!bg-black",
                 "!bg-zinc-800",
-                "!bg-white/10"
+                "!bg-white/10",
               );
             } else {
               tabLink.classList.add("!bg-[#161616]");
-              tabLink.classList.remove("!bg-x", "!bg-white/10", "!bg-zinc-800", "!bg-black");
+              tabLink.classList.remove(
+                "!bg-x",
+                "!bg-white/10",
+                "!bg-zinc-800",
+                "!bg-black",
+              );
             }
 
             // Add click event listener to handle tab switching
@@ -280,7 +287,7 @@ function AttendancePage() {
                     "!bg-x",
                     "!bg-white/10",
                     "!bg-zinc-800",
-                    "!shadow-lg"
+                    "!shadow-lg",
                   );
                   // Reset border style
                   link.classList.remove("!border-white/20");
@@ -295,15 +302,24 @@ function AttendancePage() {
                 "!bg-[#161616]",
                 "!bg-black",
                 "!bg-white/10",
-                "!bg-zinc-800"
+                "!bg-zinc-800",
               );
-              this.classList.add("!bg-x", "!border-x/30", "!shadow-xl", "!text-white");
+              this.classList.add(
+                "!bg-x",
+                "!border-x/30",
+                "!shadow-xl",
+                "!text-white",
+              );
             });
 
             // Enhanced hover effect with smoother transitions
             tabLink.addEventListener("mouseover", () => {
               if (!tabLink.classList.contains("active")) {
-                tabLink.classList.remove("!bg-[#161616]", "!bg-black", "!bg-zinc-800");
+                tabLink.classList.remove(
+                  "!bg-[#161616]",
+                  "!bg-black",
+                  "!bg-zinc-800",
+                );
                 tabLink.classList.add("!bg-white/10", "!border-x/20");
               }
             });
@@ -313,7 +329,7 @@ function AttendancePage() {
                 tabLink.classList.remove(
                   "!bg-white/10",
                   "!bg-zinc-800",
-                  "!border-x/20"
+                  "!border-x/20",
                 );
                 tabLink.classList.add("!bg-[#161616]", "!border-[#1c1c1c]");
               }
@@ -363,28 +379,24 @@ function AttendancePage() {
       // Make tab content area scrollable
       const tabContent = document.querySelector(".tab-content");
       if (tabContent) {
-        tabContent.classList.add(
-          "rounded-xl",
-          "custom-scrollbar",
-          "w-full"
-        );
+        tabContent.classList.add("rounded-xl", "custom-scrollbar", "w-full");
       }
 
       // Restyle attendance tables to match HomePage
       const tables = document.querySelectorAll(
-        ".table.table-bordered.table-responsive"
+        ".table.table-bordered.table-responsive",
       );
 
       tables.forEach((table) => {
         // Create enhanced card container for the table
         const tableCard = document.createElement("div");
-        tableCard.className = "w-full p-8 rounded-[30px] border-2 border-[#1c1c1c] bg-[#161616] mb-6 backdrop-blur-xl overflow-hidden";
+        tableCard.className =
+          "w-full p-8 rounded-[30px] border-2 border-[#1c1c1c] bg-[#161616] mb-6 backdrop-blur-xl overflow-hidden";
         table.parentNode.insertBefore(tableCard, table);
 
         // Enhanced header with title and stats
         const tableHeader = document.createElement("div");
-        tableHeader.className =
-          "flex flex-col gap-6 mb-8 ";
+        tableHeader.className = "flex flex-col gap-6 mb-8 ";
 
         // Get course title from nearest tab pane
         const tabPane = table.closest(".tab-pane");
@@ -409,7 +421,7 @@ function AttendancePage() {
             const bar = progressBar.querySelector(".progress-bar");
             if (bar) {
               attendancePercentage = parseInt(
-                bar.getAttribute("aria-valuenow")
+                bar.getAttribute("aria-valuenow"),
               );
             }
           }
@@ -460,12 +472,23 @@ function AttendancePage() {
 
         // Remove existing classes and add new ones
         table.className = "w-full table-auto";
-        table.classList.add("!rounded-xl", "!border-collapse", "!border-0", "!overflow-x-hidden");
+        table.classList.add(
+          "!rounded-xl",
+          "!border-collapse",
+          "!border-0",
+          "!overflow-x-hidden",
+        );
 
         // Enhanced table headers styling
         const thead = table.querySelector("thead");
         if (thead) {
-          thead.classList.add("bg-[#161616]", "z-10", "backdrop-blur-xl","!rounded-t-2xl","!p-2");
+          thead.classList.add(
+            "bg-[#161616]",
+            "z-10",
+            "backdrop-blur-xl",
+            "!rounded-t-2xl",
+            "!p-2",
+          );
 
           document.querySelectorAll(".col-md-8").forEach((col) => {
             col.classList.remove("col-md-8");
@@ -474,7 +497,7 @@ function AttendancePage() {
               "flex",
               "flex-col",
               "justify-between",
-              "items-center"
+              "items-center",
             );
           });
 
@@ -493,9 +516,9 @@ function AttendancePage() {
               "bg-[#161616]",
               "tracking-tight",
               "h-12",
-              "align-middle"
+              "align-middle",
             );
-            
+
             // Add different styling for first and last headers
             if (index === 0) {
               header.classList.add("rounded-tl-2xl");
@@ -557,7 +580,8 @@ function AttendancePage() {
           // Enhanced table rows styling
           const rows = tbody.querySelectorAll("tr");
           rows.forEach((row) => {
-            row.className = "transition-all duration-200 ease-in-out cursor-pointer";
+            row.className =
+              "transition-all duration-200 ease-in-out cursor-pointer";
             row.style.display = "table"; // Makes the row behave like a table
             row.style.width = "100%"; // Full width rows
             row.style.tableLayout = "fixed"; // Consistent cell widths
@@ -566,11 +590,21 @@ function AttendancePage() {
             const cells = row.querySelectorAll("td");
             cells.forEach((cell, cellIndex) => {
               cell.className = ""; // Reset existing classes
-              cell.classList.add("px-4", "py-2", "text-sm", "h-12", "align-middle");
+              cell.classList.add(
+                "px-4",
+                "py-2",
+                "text-sm",
+                "h-12",
+                "align-middle",
+              );
 
               if (cellIndex === 0) {
                 // First column - Course/date cell
-                cell.classList.add("text-white", "font-semibold", "tracking-tight");
+                cell.classList.add(
+                  "text-white",
+                  "font-semibold",
+                  "tracking-tight",
+                );
               } else {
                 cell.classList.add("text-white/80", "font-medium");
               }
@@ -592,7 +626,7 @@ function AttendancePage() {
                   "text-sm",
                   "!border",
                   "border-emerald-500/30",
-                  "backdrop-blur-sm"
+                  "backdrop-blur-sm",
                 );
               } else if (
                 cell.querySelector("b") &&
@@ -613,7 +647,7 @@ function AttendancePage() {
                   "text-sm",
                   "!border",
                   "border-rose-500/30",
-                  "backdrop-blur-sm"
+                  "backdrop-blur-sm",
                 );
               }
             });
@@ -637,7 +671,7 @@ function AttendancePage() {
               "w-full",
               "flex",
               "justify-between",
-              "items-center"
+              "items-center",
             );
           });
         });
@@ -658,10 +692,12 @@ function AttendancePage() {
         "!flex",
         "!items-center",
         "!justify-between",
-        "!mb-8"
+        "!mb-8",
       );
 
-       mainPortletHead.querySelector(".m-portlet__head-caption .m-portlet__head-title")?.remove();
+      mainPortletHead
+        .querySelector(".m-portlet__head-caption .m-portlet__head-title")
+        ?.remove();
     }
 
     // Enhanced portlet body styling
@@ -671,7 +707,7 @@ function AttendancePage() {
         "!bg-transparent",
         "!border-0",
         "!p-0",
-        "!text-white"
+        "!text-white",
       );
     }
 
@@ -683,7 +719,7 @@ function AttendancePage() {
     });
 
     const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page"
+      ".m-grid.m-grid--hor.m-grid--root.m-page",
     );
 
     if (targetElement) {

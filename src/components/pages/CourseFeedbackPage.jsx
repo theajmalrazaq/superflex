@@ -6,7 +6,7 @@ function CourseFeedbackPage() {
 
   useEffect(() => {
     const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page"
+      ".m-grid.m-grid--hor.m-grid--root.m-page",
     );
 
     if (targetElement) {
@@ -59,7 +59,7 @@ function CourseFeedbackPage() {
         "!flex",
         "!justify-between",
         "!items-center",
-        "!m-6"
+        "!m-6",
       );
 
       // Style alert icon
@@ -75,14 +75,14 @@ function CourseFeedbackPage() {
           "!h-12",
           "!flex",
           "!items-center",
-          "!justify-center"
+          "!justify-center",
         );
 
         // Replace icon with SVG
         const createSvgIcon = (path) => {
           const svg = document.createElementNS(
             "http://www.w3.org/2000/svg",
-            "svg"
+            "svg",
           );
           svg.setAttribute("width", "24");
           svg.setAttribute("height", "24");
@@ -96,7 +96,7 @@ function CourseFeedbackPage() {
 
           const pathElement = document.createElementNS(
             "http://www.w3.org/2000/svg",
-            "path"
+            "path",
           );
           pathElement.setAttribute("d", path);
           svg.appendChild(pathElement);
@@ -152,7 +152,7 @@ function CourseFeedbackPage() {
         "!border-none",
         "!rounded-3xl",
         "!p-4",
-        "!shadow-lg"
+        "!shadow-lg",
       );
 
       // Remove unnecessary classes
@@ -160,7 +160,7 @@ function CourseFeedbackPage() {
         "m-portlet--primary",
         "m-portlet--head-solid-bg",
         "m-portlet--border-bottom-info",
-        "m-portlet--head-sm"
+        "m-portlet--head-sm",
       );
     }
 
@@ -177,7 +177,7 @@ function CourseFeedbackPage() {
         "!flex",
         "!items-center",
         "!justify-between",
-        "!mb-4"
+        "!mb-4",
       );
 
       // Find and style the heading
@@ -207,7 +207,7 @@ function CourseFeedbackPage() {
         "!h-[calc(100vh-220px)]",
         "!max-h-[800px]",
         "!overflow-y-auto",
-        "custom-scrollbar"
+        "custom-scrollbar",
       );
 
       // Style section content
@@ -220,13 +220,12 @@ function CourseFeedbackPage() {
     // Style the table
     const table = element.querySelector(".table");
     if (table) {
-      table.querySelectorAll('.table td, .table th').forEach(el => {
-        el.classList.add('!border-none');
+      table.querySelectorAll(".table td, .table th").forEach((el) => {
+        el.classList.add("!border-none");
       });
       // Create a container for the table with modern styling
       const tableContainer = document.createElement("div");
-      tableContainer.className =
-        "overflow-hidden mb-6";
+      tableContainer.className = "overflow-hidden mb-6";
       table.parentNode.insertBefore(tableContainer, table);
       tableContainer.appendChild(table);
 
@@ -235,7 +234,7 @@ function CourseFeedbackPage() {
       table.classList.remove(
         "m-table",
         "m-table--head-bg-metal",
-        "table-responsive"
+        "table-responsive",
       );
 
       // Style the table headers
@@ -252,7 +251,7 @@ function CourseFeedbackPage() {
             "!p-3",
             "!text-left",
             "!border-b",
-            "!border-white/10"
+            "!border-white/10",
           );
         });
       }
@@ -267,7 +266,7 @@ function CourseFeedbackPage() {
           row.classList.add(
             "!bg-black",
             "!hover:bg-white/5",
-            "!transition-colors"
+            "!transition-colors",
           );
 
           const cells = row.querySelectorAll("td");
@@ -276,7 +275,7 @@ function CourseFeedbackPage() {
               "!p-3",
               "!text-white/80",
               "!border-y",
-              "!border-white/10"
+              "!border-white/10",
             );
 
             // Style success text

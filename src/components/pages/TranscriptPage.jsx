@@ -10,7 +10,7 @@ function TranscriptPage() {
 
     // Style the alert message
     const alertElement = document.querySelector(
-      ".m-alert.m-alert--icon.m-alert--icon-solid.m-alert--outline.alert.alert-info"
+      ".m-alert.m-alert--icon.m-alert--icon-solid.m-alert--outline.alert.alert-info",
     );
     if (alertElement) {
       alertElement.classList.add(
@@ -22,7 +22,7 @@ function TranscriptPage() {
         "!rounded-3xl",
         "!flex",
         "!justify-between",
-        "!items-center"
+        "!items-center",
       );
       alertElement.style.visibility = "visible";
       alertElement.style.display = "block";
@@ -41,7 +41,7 @@ function TranscriptPage() {
         "!h-12",
         "!flex",
         "!items-center",
-        "!justify-center"
+        "!justify-center",
       );
 
       // Create SVG element for info icon
@@ -59,7 +59,7 @@ function TranscriptPage() {
       // Create circle for info icon
       const circle = document.createElementNS(
         "http://www.w3.org/2000/svg",
-        "circle"
+        "circle",
       );
       circle.setAttribute("cx", "12");
       circle.setAttribute("cy", "12");
@@ -68,7 +68,7 @@ function TranscriptPage() {
       // Create line for info icon
       const line1 = document.createElementNS(
         "http://www.w3.org/2000/svg",
-        "line"
+        "line",
       );
       line1.setAttribute("x1", "12");
       line1.setAttribute("y1", "16");
@@ -78,7 +78,7 @@ function TranscriptPage() {
       // Create dot for info icon
       const line2 = document.createElementNS(
         "http://www.w3.org/2000/svg",
-        "line"
+        "line",
       );
       line2.setAttribute("x1", "12");
       line2.setAttribute("y1", "8");
@@ -107,7 +107,7 @@ function TranscriptPage() {
 
     // Style close button in alert
     const closeButton = alertElement?.querySelector(
-      'button.close[data-dismiss="alert"]'
+      'button.close[data-dismiss="alert"]',
     );
     if (closeButton) {
       // Hide the ::before pseudo-element
@@ -121,7 +121,7 @@ function TranscriptPage() {
       // Create SVG element for close button
       const closeSvg = document.createElementNS(
         "http://www.w3.org/2000/svg",
-        "svg"
+        "svg",
       );
       closeSvg.setAttribute("width", "24");
       closeSvg.setAttribute("height", "24");
@@ -136,7 +136,7 @@ function TranscriptPage() {
       // Create paths for X shape
       const line1 = document.createElementNS(
         "http://www.w3.org/2000/svg",
-        "line"
+        "line",
       );
       line1.setAttribute("x1", "18");
       line1.setAttribute("y1", "6");
@@ -145,7 +145,7 @@ function TranscriptPage() {
 
       const line2 = document.createElementNS(
         "http://www.w3.org/2000/svg",
-        "line"
+        "line",
       );
       line2.setAttribute("x1", "6");
       line2.setAttribute("y1", "6");
@@ -173,7 +173,7 @@ function TranscriptPage() {
         "!flex",
         "!items-center",
         "!justify-between",
-        "!mb-4"
+        "!mb-4",
       );
 
     document
@@ -182,11 +182,11 @@ function TranscriptPage() {
 
     // Add a Plan CGPA button to the portlet head caption
     const portletHeadCaption = document.querySelector(
-      ".m-portlet__head-caption"
+      ".m-portlet__head-caption",
     );
     if (portletHeadCaption) {
       const portletHeadTitle = portletHeadCaption.querySelector(
-        ".m-portlet__head-title"
+        ".m-portlet__head-title",
       );
 
       // Create a flex container for the heading and button
@@ -221,7 +221,7 @@ function TranscriptPage() {
     // Add background to the main portlet container
     document
       .querySelector(
-        ".m-portlet.m-portlet--brand.m-portlet--head-solid-bg.m-portlet--border-bottom-brand.m-portlet--head-sm"
+        ".m-portlet.m-portlet--brand.m-portlet--head-solid-bg.m-portlet--border-bottom-brand.m-portlet--head-sm",
       )
       ?.classList.add("!bg-black", "!border-none");
 
@@ -237,7 +237,7 @@ function TranscriptPage() {
         "!text-white",
         "!h-[450px]",
         "!overflow-y-auto",
-        "custom-scrollbar"
+        "custom-scrollbar",
       );
 
     // Style tables with MarksPage-like design
@@ -254,7 +254,7 @@ function TranscriptPage() {
             "underline",
             "transition-colors",
             "duration-200",
-            "hover:text-x"
+            "hover:text-x",
           );
         });
 
@@ -271,7 +271,7 @@ function TranscriptPage() {
               "bg-zinc-900",
               "!rounded-t-lg",
               "top-0",
-              "z-10"
+              "z-10",
             );
 
             const headers = thead.querySelectorAll("th");
@@ -283,7 +283,7 @@ function TranscriptPage() {
                 "p-3",
                 "text-left",
                 "border-b",
-                "border-white/10"
+                "border-white/10",
               );
             });
           }
@@ -299,7 +299,7 @@ function TranscriptPage() {
                 "bg-black",
                 "transition-colors",
                 "duration-200",
-                "hover:bg-white/5"
+                "hover:bg-white/5",
               );
 
               // Style cells
@@ -309,7 +309,7 @@ function TranscriptPage() {
                   "p-3",
                   "text-white/80",
                   "border-b",
-                  "border-white/10"
+                  "border-white/10",
                 );
 
                 // Apply grade-specific styling
@@ -348,7 +348,7 @@ function TranscriptPage() {
               "w-full",
               "bg-black",
               "!p-4",
-              "!border-none"
+              "!border-none",
             );
 
             // Move the semester content into the container
@@ -371,7 +371,7 @@ function TranscriptPage() {
                   "!text-white",
                   "!font-bold",
                   "!text-lg",
-                  "!mb-0"
+                  "!mb-0",
                 );
               });
               // Add collapse/expand icon
@@ -397,7 +397,7 @@ function TranscriptPage() {
                 // Wrap the title in the container with the icon
                 semesterTitle.parentNode.insertBefore(
                   titleWrapper,
-                  semesterTitle
+                  semesterTitle,
                 );
                 titleWrapper.appendChild(collapseIcon);
                 titleWrapper.appendChild(semesterTitle);
@@ -516,7 +516,7 @@ function TranscriptPage() {
               "!text-white",
               "!font-bold",
               "!text-lg",
-              "!bg-white/10"
+              "!bg-white/10",
             );
             const tableContainer =
               semesterCol.querySelector(".accordion-content");
@@ -574,7 +574,7 @@ function TranscriptPage() {
       const addGradeCalculator = () => {
         // Get all semester containers
         const semesterContainers = document.querySelectorAll(
-          ".semester-container"
+          ".semester-container",
         );
         if (semesterContainers.length === 0) return;
 
@@ -660,7 +660,7 @@ function TranscriptPage() {
         const addCGPAPlannerCalculator = () => {
           // Get the button we added to the portlet head
           const portletPlanCGPAButton = document.getElementById(
-            "portletPlanCGPAButton"
+            "portletPlanCGPAButton",
           );
 
           // If the semester header version of the button exists, let's remove it
@@ -669,7 +669,7 @@ function TranscriptPage() {
             lastSemesterContainer.querySelector(".semester-header");
           if (headerRow) {
             const existingPlannerButton = headerRow.querySelector(
-              ".cgpa-planner-button"
+              ".cgpa-planner-button",
             );
             if (existingPlannerButton) {
               existingPlannerButton.remove();
@@ -756,7 +756,7 @@ function TranscriptPage() {
                   <div class="mb-3">
                     <label class="block text-gray-400 text-sm mb-1">Current CGPA</label>
                     <input type="number" id="currentCGPA" value="${currentCGPA.toFixed(
-                      2
+                      2,
                     )}" class="w-full bg-black !border !border-white/20 !rounded-lg p-2 text-white" step="0.01" placeholder="e.g., 3.50">
                   </div>
                   
@@ -846,16 +846,16 @@ function TranscriptPage() {
                 e.preventDefault();
 
                 const currentCH = parseFloat(
-                  document.getElementById("currentCreditHours").value
+                  document.getElementById("currentCreditHours").value,
                 );
                 const currentCGPA = parseFloat(
-                  document.getElementById("currentCGPA").value
+                  document.getElementById("currentCGPA").value,
                 );
                 const targetCGPA = parseFloat(
-                  document.getElementById("targetCGPA").value
+                  document.getElementById("targetCGPA").value,
                 );
                 const nextCH = parseFloat(
-                  document.getElementById("nextCreditHours").value
+                  document.getElementById("nextCreditHours").value,
                 );
 
                 const resultElement = document.getElementById("plannerResult");
@@ -901,7 +901,7 @@ function TranscriptPage() {
                     <div>
                       <div class="text-amber-400 font-bold text-lg">Target CGPA not achievable in one semester</div>
                       <div class="text-gray-300 mt-1">You would need a GPA of ${requiredGPA.toFixed(
-                        2
+                        2,
                       )} next semester, which exceeds the maximum of 4.0.</div>
                       <div class="text-gray-300 mt-2">Consider:</div>
                       <ul class="list-disc list-inside text-gray-300 text-sm mt-1">
@@ -923,7 +923,7 @@ function TranscriptPage() {
                       <div class="text-gray-300 mt-1">Your current CGPA is already higher than your target.</div>
                       <div class="text-gray-300 mt-2">You need any GPA greater than ${Math.max(
                         0,
-                        requiredGPA
+                        requiredGPA,
                       ).toFixed(2)} to maintain your target.</div>
                     </div>
                   </div>
@@ -948,14 +948,14 @@ function TranscriptPage() {
                     </svg>
                     <div>
                       <div class="text-white font-bold text-lg">Required GPA: <span class="${difficultyColor}">${requiredGPA.toFixed(
-                    2
-                  )}</span></div>
+                        2,
+                      )}</span></div>
                       <div class="text-gray-300 mt-1">Difficulty: <span class="${difficultyColor} font-medium">${difficultyText}</span></div>
                       <div class="text-gray-300 mt-2">To achieve a CGPA of ${targetCGPA.toFixed(
-                        2
+                        2,
                       )} from your current ${currentCGPA.toFixed(2)},</div> 
                       <div class="text-gray-300">you need a GPA of at least ${requiredGPA.toFixed(
-                        2
+                        2,
                       )} in your next ${nextCH} credit hours.</div>
                     </div>
                   </div>
@@ -1016,7 +1016,7 @@ function TranscriptPage() {
 
             // Check if this row has a dropdown select (incomplete grade)
             const selectElement = gradeCell.querySelector(
-              "select.grade-select"
+              "select.grade-select",
             );
 
             if (selectElement) {
@@ -1142,10 +1142,10 @@ function TranscriptPage() {
 
           // Update the GPA displays
           cgpaElem.innerHTML = `CGPA: <span class="text-x font-bold">${calculatedCGPA.toFixed(
-            2
+            2,
           )}</span>`;
           sgpaElem.innerHTML = `SGPA: <span class="text-x font-bold">${calculatedSGPA.toFixed(
-            2
+            2,
           )}</span>`;
 
           // Highlight the GPA values
@@ -1189,7 +1189,7 @@ function TranscriptPage() {
               "!p-3",
               "!text-left",
               "!border-b",
-              "!border-white/10"
+              "!border-white/10",
             );
           });
         }
@@ -1202,7 +1202,7 @@ function TranscriptPage() {
             row.classList.add(
               "!bg-black",
               "!hover:bg-white/5",
-              "!transition-colors"
+              "!transition-colors",
             );
 
             // Style the cells
@@ -1212,7 +1212,7 @@ function TranscriptPage() {
                 "!p-3",
                 "!text-white/80",
                 "!border-y",
-                "!border-white/10"
+                "!border-white/10",
               );
 
               // Style grades with color indicators
@@ -1339,7 +1339,7 @@ function TranscriptPage() {
     setTimeout(styleTranscriptTables, 300);
 
     const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page"
+      ".m-grid.m-grid--hor.m-grid--root.m-page",
     );
 
     if (targetElement) {

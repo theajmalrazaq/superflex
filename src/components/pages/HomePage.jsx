@@ -16,7 +16,7 @@ import {
   Activity,
   ChevronRight,
   Award,
-  Github, 
+  Github,
   Globe,
   Instagram,
 } from "lucide-react";
@@ -117,17 +117,16 @@ function HomePage() {
   }, []);
 
   useEffect(() => {
-
-    
-
     const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page"
+      ".m-grid.m-grid--hor.m-grid--root.m-page",
     );
     if (targetElement) {
       const scriptTags = targetElement.querySelectorAll("script");
       scriptTags.forEach((script) => script.remove());
       targetElement.querySelector("#NotificationDetail")?.remove();
-      const scrollTopEl = document.querySelector(".m-scroll-top.m-scroll-top--skin-top");
+      const scrollTopEl = document.querySelector(
+        ".m-scroll-top.m-scroll-top--skin-top",
+      );
       if (scrollTopEl) {
         scrollTopEl.remove();
       }
@@ -246,7 +245,7 @@ function HomePage() {
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, "text/html");
       const attendanceContent = doc.querySelector(
-        ".m-grid.m-grid--hor.m-grid--root.m-page"
+        ".m-grid.m-grid--hor.m-grid--root.m-page",
       );
 
       if (attendanceContent) {
@@ -267,7 +266,7 @@ function HomePage() {
     tempElement.innerHTML = attendanceData;
 
     const attendanceTables = tempElement.querySelectorAll(
-      ".table.table-bordered.table-responsive.m-table.m-table--border-info.m-table--head-bg-info"
+      ".table.table-bordered.table-responsive.m-table.m-table--border-info.m-table--head-bg-info",
     );
 
     const summaryData = {};
@@ -354,22 +353,35 @@ function HomePage() {
 
     // Average attendance
     const avgAttendance = (
-      courses.reduce((sum, course) => sum + parseFloat(course.attendancePercentage), 0) / totalCourses
+      courses.reduce(
+        (sum, course) => sum + parseFloat(course.attendancePercentage),
+        0,
+      ) / totalCourses
     ).toFixed(1);
 
     // Best performing subject (highest attendance)
-    const bestSubject = courses.reduce((max, course) =>
-      parseFloat(course.attendancePercentage) > parseFloat(max.attendancePercentage) ? course : max
-    , courses[0]);
+    const bestSubject = courses.reduce(
+      (max, course) =>
+        parseFloat(course.attendancePercentage) >
+        parseFloat(max.attendancePercentage)
+          ? course
+          : max,
+      courses[0],
+    );
 
     // Worst performing subject (lowest attendance)
-    const worstSubject = courses.reduce((min, course) =>
-      parseFloat(course.attendancePercentage) < parseFloat(min.attendancePercentage) ? course : min
-    , courses[0]);
+    const worstSubject = courses.reduce(
+      (min, course) =>
+        parseFloat(course.attendancePercentage) <
+        parseFloat(min.attendancePercentage)
+          ? course
+          : min,
+      courses[0],
+    );
 
     // Attendance warnings (subjects below 80%)
     const attendanceWarnings = courses.filter(
-      (course) => parseFloat(course.attendancePercentage) < 80
+      (course) => parseFloat(course.attendancePercentage) < 80,
     ).length;
 
     return {
@@ -383,12 +395,23 @@ function HomePage() {
 
   const stats = calculateStats();
   // Loading state for stats
-  const isStatsLoading = !attendanceSummary || Object.keys(attendanceSummary).length === 0;
+  const isStatsLoading =
+    !attendanceSummary || Object.keys(attendanceSummary).length === 0;
 
   // Loading SVG component
   const LoadingSplash = () => (
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="34" height="34" fill="none">
-      <path className="animate-splash" fill="#a098ff" d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"/>
+    <svg
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      width="34"
+      height="34"
+      fill="none"
+    >
+      <path
+        className="animate-splash"
+        fill="#a098ff"
+        d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
+      />
     </svg>
   );
 
@@ -426,7 +449,10 @@ function HomePage() {
                 <div className="space-y-4">
                   {personalInfo &&
                     Object.entries(personalInfo).map(([key, value]) => (
-                      <div key={key} className="flex items-center justify-between py-4 px-5 rounded-2xl bg-white/5 hover:bg-white/10 transition-all duration-200 border border-white/10">
+                      <div
+                        key={key}
+                        className="flex items-center justify-between py-4 px-5 rounded-2xl bg-white/5 hover:bg-white/10 transition-all duration-200 border border-white/10"
+                      >
                         <div className="flex items-center gap-4">
                           <div className="h-10 w-10 rounded-xl bg-[#161616] flex items-center justify-center">
                             <User className="h-5 w-5 text-blue-400" />
@@ -447,7 +473,9 @@ function HomePage() {
                   (Object.keys(personalInfo).length === 0 && (
                     <div className="text-center py-12 text-white/50">
                       <User className="h-16 w-16 mx-auto mb-4 text-white/20" />
-                      <p className="text-lg">No personal information available</p>
+                      <p className="text-lg">
+                        No personal information available
+                      </p>
                     </div>
                   ))}
               </div>
@@ -464,12 +492,21 @@ function HomePage() {
                   </h4>
                   <div className="space-y-3">
                     {contactInfo?.permanent &&
-                      Object.entries(contactInfo.permanent).map(([key, value]) => (
-                        <div key={key} className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all border border-white/5">
-                          <span className="text-white/60 text-sm font-medium">{key}</span>
-                          <span className="text-white font-semibold">{value || "N/A"}</span>
-                        </div>
-                      ))}
+                      Object.entries(contactInfo.permanent).map(
+                        ([key, value]) => (
+                          <div
+                            key={key}
+                            className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all border border-white/5"
+                          >
+                            <span className="text-white/60 text-sm font-medium">
+                              {key}
+                            </span>
+                            <span className="text-white font-semibold">
+                              {value || "N/A"}
+                            </span>
+                          </div>
+                        ),
+                      )}
                   </div>
                 </div>
 
@@ -481,16 +518,26 @@ function HomePage() {
                   </h4>
                   <div className="space-y-3">
                     {contactInfo?.current &&
-                      Object.entries(contactInfo.current).map(([key, value]) => (
-                        <div key={key} className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all border border-white/5">
-                          <span className="text-white/60 text-sm font-medium">{key}</span>
-                          <span className="text-white font-semibold">{value || "N/A"}</span>
-                        </div>
-                      ))}
+                      Object.entries(contactInfo.current).map(
+                        ([key, value]) => (
+                          <div
+                            key={key}
+                            className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all border border-white/5"
+                          >
+                            <span className="text-white/60 text-sm font-medium">
+                              {key}
+                            </span>
+                            <span className="text-white font-semibold">
+                              {value || "N/A"}
+                            </span>
+                          </div>
+                        ),
+                      )}
                   </div>
                 </div>
 
-                {(!contactInfo || (!contactInfo.permanent && !contactInfo.current)) && (
+                {(!contactInfo ||
+                  (!contactInfo.permanent && !contactInfo.current)) && (
                   <div className="text-center py-12 text-white/50">
                     <MapPin className="h-16 w-16 mx-auto mb-4 text-white/20" />
                     <p className="text-lg">No contact information available</p>
@@ -504,16 +551,25 @@ function HomePage() {
               <div className="animate-fadeIn">
                 <div className="space-y-4">
                   {familyInfo?.map((member, index) => (
-                    <div key={index} className="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/10">
+                    <div
+                      key={index}
+                      className="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/10"
+                    >
                       <div className="h-12 w-12 rounded-xl bg-[#161616] flex items-center justify-center">
                         <Users className="h-6 w-6 text-purple-400" />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-white font-semibold text-lg">{member.name}</span>
-                          <span className="text-white/60 text-sm">{member.cnic}</span>
+                          <span className="text-white font-semibold text-lg">
+                            {member.name}
+                          </span>
+                          <span className="text-white/60 text-sm">
+                            {member.cnic}
+                          </span>
                         </div>
-                        <span className="text-purple-400 text-sm font-medium">{member.relation}</span>
+                        <span className="text-purple-400 text-sm font-medium">
+                          {member.relation}
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -567,7 +623,9 @@ function HomePage() {
                           key={key}
                           className="flex items-center gap-4 py-5 px-6 rounded-2xl bg-white/5 hover:bg-white/10 transition-all duration-200 border border-white/10"
                         >
-                          <div className={`h-12 w-12 rounded-xl bg-[#161616] flex items-center justify-center ${iconColor}`}>
+                          <div
+                            className={`h-12 w-12 rounded-xl bg-[#161616] flex items-center justify-center ${iconColor}`}
+                          >
                             {icon}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -584,7 +642,9 @@ function HomePage() {
                   ) : (
                     <div className="text-center py-12">
                       <LoadingSplash />
-                      <p className="text-white/50 mt-4">Loading university information...</p>
+                      <p className="text-white/50 mt-4">
+                        Loading university information...
+                      </p>
                     </div>
                   )}
                 </div>
@@ -596,7 +656,6 @@ function HomePage() {
               <div className="animate-fadeIn">
                 <div className="flex flex-col items-center mb-10">
                   <div className="w-70 relative">
-                    
                     <img
                       src={chrome.runtime.getURL("public/logo.svg")}
                       alt="SuperFlex Logo"
@@ -826,7 +885,11 @@ function HomePage() {
             {/* Welcome column */}
             <div className="flex flex-col gap-2 flex-1">
               <h1 className="!text-4xl !font-semibold text-white">
-                {getWelcomeMessage()} <span className="text-x">{personalInfo?.["Name"] || "Student"}</span> 🎓
+                {getWelcomeMessage()}{" "}
+                <span className="text-x">
+                  {personalInfo?.["Name"] || "Student"}
+                </span>{" "}
+                🎓
               </h1>
               <p className="text-white/70 !font-medium !text-base mb-4">
                 Welcome to SuperFlex By{" "}
@@ -863,36 +926,66 @@ function HomePage() {
                     </span>
                   </div>
                   {/* Dropdown arrow */}
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="ml-2 transition-transform duration-200" style={{ transform: isProfileDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                    <path d="M6 8L10 12L14 8" stroke="#a098ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    className="ml-2 transition-transform duration-200"
+                    style={{
+                      transform: isProfileDropdownOpen
+                        ? "rotate(180deg)"
+                        : "rotate(0deg)",
+                    }}
+                  >
+                    <path
+                      d="M6 8L10 12L14 8"
+                      stroke="#a098ff"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </button>
                 {/* Profile Dropdown menu */}
                 {isProfileDropdownOpen && (
                   <div className="absolute right-0 mt-3 !w-[200px] bg-[#161616] border-2 border-[#1c1c1c] rounded-3xl z-50 flex flex-col justify-start py-3 backdrop-blur-xl">
                     <button
-                      onClick={() => { setActivePopup("personal"); setIsProfileDropdownOpen(false); }}
+                      onClick={() => {
+                        setActivePopup("personal");
+                        setIsProfileDropdownOpen(false);
+                      }}
                       className="flex gap-3 pl-3 py-3 text-sm text-white hover:bg-x/20 transition-colors rounded-xl mx-2"
                     >
                       <User className="h-5 w-5 text-x" /> Personal Info
                     </button>
                     <button
-                      onClick={() => { setActivePopup("family"); setIsProfileDropdownOpen(false); }}
+                      onClick={() => {
+                        setActivePopup("family");
+                        setIsProfileDropdownOpen(false);
+                      }}
                       className="flex items-center gap-3 pl-3 py-3 text-sm text-white hover:bg-x/20 transition-colors rounded-xl mx-2"
                     >
                       <Users className="h-5 w-5 text-x" /> Family Info
                     </button>
                     <button
-                      onClick={() => { setActivePopup("contact"); setIsProfileDropdownOpen(false); }}
+                      onClick={() => {
+                        setActivePopup("contact");
+                        setIsProfileDropdownOpen(false);
+                      }}
                       className="flex items-center gap-3 pl-3 py-3 text-sm text-white hover:bg-x/20 transition-colors rounded-xl mx-2"
                     >
                       <MapPin className="h-5 w-5 text-x" /> Contact Info
                     </button>
                     <button
-                      onClick={() => { setActivePopup("university"); setIsProfileDropdownOpen(false); }}
+                      onClick={() => {
+                        setActivePopup("university");
+                        setIsProfileDropdownOpen(false);
+                      }}
                       className="flex items-center gap-3 pl-3 py-3 text-sm text-white hover:bg-x/20 transition-colors rounded-xl mx-2"
                     >
-                      <GraduationCap className="h-5 w-5 text-x" /> University Info
+                      <GraduationCap className="h-5 w-5 text-x" /> University
+                      Info
                     </button>
                   </div>
                 )}
@@ -906,32 +999,60 @@ function HomePage() {
                 >
                   <Settings className="h-6 w-6 text-x" />
                   <span className="font-bold text-white text-lg">Settings</span>
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="ml-2 transition-transform duration-200" style={{ transform: isSettingsDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                    <path d="M6 8L10 12L14 8" stroke="#a098ff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    className="ml-2 transition-transform duration-200"
+                    style={{
+                      transform: isSettingsDropdownOpen
+                        ? "rotate(180deg)"
+                        : "rotate(0deg)",
+                    }}
+                  >
+                    <path
+                      d="M6 8L10 12L14 8"
+                      stroke="#a098ff"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </button>
                 {/* Settings Dropdown menu */}
                 {isSettingsDropdownOpen && (
                   <div className="absolute right-0 mt-3 !w-[200px] bg-[#161616] border-2 border-[#1c1c1c] rounded-3xl z-50 flex flex-col justify-start py-3 backdrop-blur-xl">
                     <button
-                      onClick={() => { /* TODO: Implement theme change logic */ setIsSettingsDropdownOpen(false); }}
+                      onClick={() => {
+                        /* TODO: Implement theme change logic */ setIsSettingsDropdownOpen(
+                          false,
+                        );
+                      }}
                       className="flex gap-3 pl-3 py-3 text-sm text-white hover:bg-x/20 transition-colors rounded-xl mx-2"
                     >
-                     <PcCaseIcon className="h-5 w-5 text-x" />
-                       Change Theme
+                      <PcCaseIcon className="h-5 w-5 text-x" />
+                      Change Theme
                     </button>
                     <button
-                      onClick={() => { setActivePopup("about"); setIsSettingsDropdownOpen(false); }}
+                      onClick={() => {
+                        setActivePopup("about");
+                        setIsSettingsDropdownOpen(false);
+                      }}
                       className="flex gap-3 pl-3 py-3 text-sm text-white hover:bg-x/20 transition-colors rounded-xl mx-2"
                     >
                       <Info className="h-5 w-5 text-x" />
-                       About
+                      About
                     </button>
                     <button
-                      onClick={() => { /* TODO: Implement check update logic */ setIsSettingsDropdownOpen(false); }}
+                      onClick={() => {
+                        /* TODO: Implement check update logic */ setIsSettingsDropdownOpen(
+                          false,
+                        );
+                      }}
                       className="flex gap-3 pl-3 py-3 text-sm text-white hover:bg-x/20 transition-colors rounded-xl mx-2"
                     >
-                     <Download className="h-5 w-5 text-x" /> Check Update
+                      <Download className="h-5 w-5 text-x" /> Check Update
                     </button>
                   </div>
                 )}
@@ -943,7 +1064,6 @@ function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* Registered Courses */}
             <div className="group p-8 rounded-[30px] border-2 border-[#1c1c1c] dark:bg-[#161616] bg-[#ffffff]">
-             
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
                   <div className="bg-white/5 p-3 rounded-2xl">
@@ -961,7 +1081,9 @@ function HomePage() {
                         <span className="text-4xl font-bold text-white tracking-tight">
                           {stats.totalCourses}
                         </span>
-                        <span className="text-white/50 text-base font-medium">courses</span>
+                        <span className="text-white/50 text-base font-medium">
+                          courses
+                        </span>
                       </>
                     )}
                   </div>
@@ -1010,7 +1132,6 @@ function HomePage() {
 
             {/* Best Performing Subject */}
             <div className="group p-8 rounded-[30px] border-2 border-[#1c1c1c] bg-[#161616] ">
-              
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
                   <div className="bg-white/5 p-3 rounded-2xl">
@@ -1026,10 +1147,14 @@ function HomePage() {
                     ) : (
                       <>
                         <span className="text-lg font-bold text-white leading-tight block truncate">
-                          {stats.bestSubject ? stats.bestSubject.title : "No data"}
+                          {stats.bestSubject
+                            ? stats.bestSubject.title
+                            : "No data"}
                         </span>
                         <span className="text-3xl font-bold text-white tracking-tight">
-                          {stats.bestSubject ? `${stats.bestSubject.attendancePercentage}%` : "-"}
+                          {stats.bestSubject
+                            ? `${stats.bestSubject.attendancePercentage}%`
+                            : "-"}
                         </span>
                       </>
                     )}
@@ -1046,7 +1171,6 @@ function HomePage() {
 
             {/* Attendance Warnings */}
             <div className="group p-8 rounded-[30px] border-2 border-[#1c1c1c] bg-[#161616] ">
-              
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-6">
                   <div className="bg-white/5 p-3 rounded-2xl">
@@ -1081,84 +1205,94 @@ function HomePage() {
             <h2 className="!text-xl !font-semibold text-white mb-6 flex items-center gap-3">
               Attendance Overview
             </h2>
-             
-              {/* Content */}
-              <div className="flex-1 overflow-y-auto custom-scrollbar py-6">
-                {isLoadingAttendance ? (
-                  <div className="h-full flex flex-col items-center justify-center text-center">
-                    <LoadingSplash />
-                    <p className="text-white/50 mt-4 text-lg">Loading attendance data...</p>
-                  </div>
-                ) : attendanceData && Object.keys(attendanceSummary).length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {Object.entries(attendanceSummary).map(([id, data]) => {
-                      const percentage = parseFloat(data.attendancePercentage);
-                      let progressColor;
-                      if (percentage >= 85) {
-                        progressColor = 'rgb(16,185,129)';
-                      } else if (percentage >= 80) {
-                        progressColor = 'rgb(245,158,11)'; 
-                      } else {
-                        progressColor = 'rgb(225,29,72)'; 
-                      }
-                      return (
-                        <div 
-                          key={id} 
-                          className="p-6 rounded-[30px] bg-[#161616] border-2 border-[#1c1c1c] "
-                        >
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-4">
-                              <div 
-                                className="h-12 w-12 rounded-2xl flex items-center justify-center border bg-white/5 p-2"
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar py-6">
+              {isLoadingAttendance ? (
+                <div className="h-full flex flex-col items-center justify-center text-center">
+                  <LoadingSplash />
+                  <p className="text-white/50 mt-4 text-lg">
+                    Loading attendance data...
+                  </p>
+                </div>
+              ) : attendanceData &&
+                Object.keys(attendanceSummary).length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {Object.entries(attendanceSummary).map(([id, data]) => {
+                    const percentage = parseFloat(data.attendancePercentage);
+                    let progressColor;
+                    if (percentage >= 85) {
+                      progressColor = "rgb(16,185,129)";
+                    } else if (percentage >= 80) {
+                      progressColor = "rgb(245,158,11)";
+                    } else {
+                      progressColor = "rgb(225,29,72)";
+                    }
+                    return (
+                      <div
+                        key={id}
+                        className="p-6 rounded-[30px] bg-[#161616] border-2 border-[#1c1c1c] "
+                      >
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-4">
+                            <div className="h-12 w-12 rounded-2xl flex items-center justify-center border bg-white/5 p-2">
+                              <BookOpen size={24} className="text-x" />
+                            </div>
+                            <div>
+                              <h4
+                                className="text-white !font-semibold text-lg truncate max-w-[200px]"
+                                title={data.title}
                               >
-                                <BookOpen size={24} className="text-x" />
-                              </div>
-                              <div>
-                                <h4 className="text-white !font-semibold text-lg truncate max-w-[200px]" title={data.title}>
-                                  {data.title}
-                                </h4>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <span className="text-2xl font-bold text-white">{percentage}%</span>
+                                {data.title}
+                              </h4>
                             </div>
                           </div>
-                          {/* Progress bar */}
-                          <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden mb-4">
-                            <div 
-                              className="h-full rounded-full transition-all duration-500 ease-out" 
-                              style={{ 
-                                width: `${percentage}%`, 
-                                backgroundColor: progressColor 
-                              }}
-                            ></div>
-                          </div>
-                          {/* Stats */}
-                          <div className="flex justify-between items-center">
-                            <div className="flex gap-6">
-                              <span className="text-sm text-emerald-400 font-semibold">
-                                Present: {data.presentCount}
-                              </span>
-                              <span className="text-sm text-red-400 font-semibold">
-                                Absent: {data.absentCount}
-                              </span>
-                            </div>
-                            <span className="text-sm text-white/50 font-medium">
-                              Total: {data.totalLectures}
+                          <div className="text-right">
+                            <span className="text-2xl font-bold text-white">
+                              {percentage}%
                             </span>
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="h-full flex flex-col items-center justify-center text-center">
-                    <Building className="h-20 w-20 text-white/20 mb-6" />
-                    <p className="text-white/50 text-lg">No attendance data available</p>
-                    <p className="text-white/30 text-sm mt-2">Data will appear once attendance records are loaded</p>
-                  </div>
-                )}
-              </div>
+                        {/* Progress bar */}
+                        <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden mb-4">
+                          <div
+                            className="h-full rounded-full transition-all duration-500 ease-out"
+                            style={{
+                              width: `${percentage}%`,
+                              backgroundColor: progressColor,
+                            }}
+                          ></div>
+                        </div>
+                        {/* Stats */}
+                        <div className="flex justify-between items-center">
+                          <div className="flex gap-6">
+                            <span className="text-sm text-emerald-400 font-semibold">
+                              Present: {data.presentCount}
+                            </span>
+                            <span className="text-sm text-red-400 font-semibold">
+                              Absent: {data.absentCount}
+                            </span>
+                          </div>
+                          <span className="text-sm text-white/50 font-medium">
+                            Total: {data.totalLectures}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-center">
+                  <Building className="h-20 w-20 text-white/20 mb-6" />
+                  <p className="text-white/50 text-lg">
+                    No attendance data available
+                  </p>
+                  <p className="text-white/30 text-sm mt-2">
+                    Data will appear once attendance records are loaded
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

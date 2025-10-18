@@ -6,7 +6,7 @@ function CourseWithdrawPage() {
 
   useEffect(() => {
     const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page"
+      ".m-grid.m-grid--hor.m-grid--root.m-page",
     );
 
     if (targetElement) {
@@ -93,7 +93,7 @@ function CourseWithdrawPage() {
         "!flex",
         "!justify-between",
         "!items-center",
-        "!mb-6"
+        "!mb-6",
       );
 
       // Style alert icon
@@ -109,14 +109,14 @@ function CourseWithdrawPage() {
           "!h-12",
           "!flex",
           "!items-center",
-          "!justify-center"
+          "!justify-center",
         );
 
         // Replace icon with SVG
         const createSvgIcon = (path) => {
           const svg = document.createElementNS(
             "http://www.w3.org/2000/svg",
-            "svg"
+            "svg",
           );
           svg.setAttribute("width", "24");
           svg.setAttribute("height", "24");
@@ -130,7 +130,7 @@ function CourseWithdrawPage() {
 
           const pathElement = document.createElementNS(
             "http://www.w3.org/2000/svg",
-            "path"
+            "path",
           );
           pathElement.setAttribute("d", path);
           svg.appendChild(pathElement);
@@ -183,7 +183,7 @@ function CourseWithdrawPage() {
             "!font-bold",
             "!underline",
             "hover:!text-white",
-            "!transition-colors"
+            "!transition-colors",
           );
         }
       }
@@ -208,7 +208,7 @@ function CourseWithdrawPage() {
           "!focus:ring-2",
           "!focus:ring-x",
           "!focus:outline-none",
-          "!w-64"
+          "!w-64",
         );
 
         // Remove bootstrap classes
@@ -216,7 +216,7 @@ function CourseWithdrawPage() {
           "m-dropdown__toggle",
           "btn",
           "btn-brand",
-          "dropdown-toggle"
+          "dropdown-toggle",
         );
       }
 
@@ -235,7 +235,7 @@ function CourseWithdrawPage() {
         "!border-none",
         "!rounded-3xl",
         "!p-4",
-        "!shadow-lg"
+        "!shadow-lg",
       );
 
       // Remove unnecessary classes
@@ -243,7 +243,7 @@ function CourseWithdrawPage() {
         "m-portlet--primary",
         "m-portlet--head-solid-bg",
         "m-portlet--border-bottom-info",
-        "m-portlet--head-sm"
+        "m-portlet--head-sm",
       );
     }
 
@@ -260,7 +260,7 @@ function CourseWithdrawPage() {
         "!flex",
         "!items-center",
         "!justify-between",
-        "!mb-4"
+        "!mb-4",
       );
 
       // Find and style the heading
@@ -336,7 +336,7 @@ function CourseWithdrawPage() {
               "btn btn-primary btn-sm !bg-x hover:!bg-x/80 !text-white !text-sm !w-10 !h-10 !p-0 !flex !justify-center !items-center !rounded-xl !border-0";
             downloadButton.setAttribute(
               "onclick",
-              "ftn_PrintCourseWithdrawForm();"
+              "ftn_PrintCourseWithdrawForm();",
             );
 
             // Only add the icon SVG, no text
@@ -373,7 +373,7 @@ function CourseWithdrawPage() {
         "!text-white",
         "!h-[400px]",
         "!overflow-y-auto",
-        "custom-scrollbar"
+        "custom-scrollbar",
       );
 
       // Style section content
@@ -386,13 +386,12 @@ function CourseWithdrawPage() {
     // Style the table
     const table = element.querySelector(".table");
     if (table) {
-      table.querySelectorAll('.table td, .table th').forEach(el => {
-        el.classList.add('!border-none');
+      table.querySelectorAll(".table td, .table th").forEach((el) => {
+        el.classList.add("!border-none");
       });
       // Create a container for the table with modern styling
       const tableContainer = document.createElement("div");
-      tableContainer.className =
-        "overflow-hidden mb-6";
+      tableContainer.className = "overflow-hidden mb-6";
       table.parentNode.insertBefore(tableContainer, table);
       tableContainer.appendChild(table);
 
@@ -401,7 +400,7 @@ function CourseWithdrawPage() {
       table.classList.remove(
         "m-table",
         "m-table--head-bg-metal",
-        "table-responsive"
+        "table-responsive",
       );
 
       // Style the table headers
@@ -424,7 +423,7 @@ function CourseWithdrawPage() {
             "!p-3",
             "!text-left",
             "!border-b",
-            "!border-white/10"
+            "!border-white/10",
           );
         });
       }
@@ -439,7 +438,7 @@ function CourseWithdrawPage() {
           row.classList.add(
             "!bg-black",
             "!hover:bg-white/5",
-            "!transition-colors"
+            "!transition-colors",
           );
 
           const cells = row.querySelectorAll("td");
@@ -448,7 +447,7 @@ function CourseWithdrawPage() {
               "!p-3",
               "!text-white/80",
               "!border-y",
-              "!border-white/10"
+              "!border-white/10",
             );
 
             // Style checkboxes
@@ -458,7 +457,7 @@ function CourseWithdrawPage() {
                 "cursor-pointer",
                 "w-4",
                 "h-4",
-                "accent-x"
+                "accent-x",
               );
             }
           });
@@ -488,7 +487,7 @@ function CourseWithdrawPage() {
                 "!gap-2",
                 "!border-0",
                 "!mt-0",
-                "!mr-2"
+                "!mr-2",
               );
 
               // Remove unnecessary styles
@@ -539,7 +538,7 @@ function CourseWithdrawPage() {
         "!border-2",
         "!border-white/10",
         "!p-5",
-        "!shadow-none"
+        "!shadow-none",
       );
 
       // Style modal header
@@ -552,7 +551,7 @@ function CourseWithdrawPage() {
           "!p-4",
           "!flex",
           "!items-center",
-          "!justify-between"
+          "!justify-between",
         );
 
         // Remove inline styles
@@ -594,7 +593,7 @@ function CourseWithdrawPage() {
           "!p-6",
           "!max-h-[500px]",
           "!overflow-y-auto",
-          "custom-scrollbar"
+          "custom-scrollbar",
         );
 
         // Enhance file upload fields
@@ -609,7 +608,7 @@ function CourseWithdrawPage() {
               "!text-white",
               "!font-medium",
               "!mb-2",
-              "!block"
+              "!block",
             );
             label.style.fontWeight = "normal";
 
@@ -669,7 +668,7 @@ function CourseWithdrawPage() {
               "!focus:border-x",
               "!focus:outline-none",
               "!resize-none",
-              "!h-24"
+              "!h-24",
             );
           }
 
@@ -679,7 +678,7 @@ function CourseWithdrawPage() {
               "!text-white",
               "!font-medium",
               "!mb-2",
-              "!block"
+              "!block",
             );
             label.style.fontWeight = "normal";
           }
@@ -700,7 +699,7 @@ function CourseWithdrawPage() {
           "!p-4",
           "!flex",
           "!justify-end",
-          "!gap-3"
+          "!gap-3",
         );
 
         // Style primary action button (submit button)
@@ -717,7 +716,7 @@ function CourseWithdrawPage() {
             "!rounded-xl",
             "!transition-colors",
             "!border-0",
-            "!cursor-pointer"
+            "!cursor-pointer",
           );
 
           // Remove inline styles
@@ -739,7 +738,7 @@ function CourseWithdrawPage() {
             "!h-10",
             "!rounded-xl",
             "!transition-colors",
-            "!border-0"
+            "!border-0",
           );
 
           // Remove inline styles

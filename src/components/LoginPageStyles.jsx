@@ -4,7 +4,7 @@ function LoginPageStyles() {
   useEffect(() => {
     document
       .querySelectorAll(
-        ".m-grid.m-grid--hor:not(.m-grid--desktop):not(.m-grid--desktop-and-tablet):not(.m-grid--tablet):not(.m-grid--tablet-and-mobile):not(.m-grid--mobile) > .m-grid__item.m-grid__item--fluid"
+        ".m-grid.m-grid--hor:not(.m-grid--desktop):not(.m-grid--desktop-and-tablet):not(.m-grid--tablet):not(.m-grid--tablet-and-mobile):not(.m-grid--mobile) > .m-grid__item.m-grid__item--fluid",
       )
       .forEach((element) => {
         element.classList.add("!justify-center", "!w-full");
@@ -12,7 +12,7 @@ function LoginPageStyles() {
 
     document
       .querySelectorAll(
-        ".m-grid.m-grid--ver-desktop.m-grid--desktop > .m-grid__item.m-grid__item--fluid"
+        ".m-grid.m-grid--ver-desktop.m-grid--desktop > .m-grid__item.m-grid__item--fluid",
       )
       .forEach((element) => {
         element.classList.add("!hidden", "!w-full");
@@ -24,7 +24,7 @@ function LoginPageStyles() {
 
     document
       .querySelector(
-        ".m-grid__item.m-grid__item--order-tablet-and-mobile-2.m-login__aside"
+        ".m-grid__item.m-grid__item--order-tablet-and-mobile-2.m-login__aside",
       )
       .classList.add("!w-full", "!p-0");
 
@@ -38,7 +38,7 @@ function LoginPageStyles() {
         "!flex-col",
         "!items-center",
         "!w-fit",
-        "!p-0"
+        "!p-0",
       );
     });
 
@@ -70,7 +70,7 @@ function LoginPageStyles() {
         "!placeholder:opacity-100",
         "!h-[40px]",
         "!px-3",
-        "!w-full"
+        "!w-full",
       );
     });
 
@@ -81,9 +81,14 @@ function LoginPageStyles() {
     let logodiv = document.createElement("div");
     // eslint-disable-next-line no-undef
     logodiv.innerHTML = `<img src="${chrome.runtime.getURL(
-      "public/logo.svg"
+      "public/logo.svg",
     )}" class="logo" alt="Logo" />`;
-    logodiv.classList.add("!pb-4", "!border-b", "!border-white/10","!w-[16rem]");
+    logodiv.classList.add(
+      "!pb-4",
+      "!border-b",
+      "!border-white/10",
+      "!w-[16rem]",
+    );
 
     document.querySelector(".m-login__logo").remove();
 
@@ -102,7 +107,7 @@ function LoginPageStyles() {
         "justify-center",
         "items-center",
         "!shadow-none",
-        "hover:shadow-none"
+        "hover:shadow-none",
       );
       button.style.fontFamily = "'Product Sans', sans-serif";
     });
@@ -130,16 +135,18 @@ function LoginPageStyles() {
       "!flex",
       "!flex-col",
       "!items-center",
-      "!justify-center"
+      "!justify-center",
     );
 
     // Update password toggle functionality
-    const passwordInputs = document.querySelectorAll('.m-input-icon--right input[type="password"]');
+    const passwordInputs = document.querySelectorAll(
+      '.m-input-icon--right input[type="password"]',
+    );
     passwordInputs.forEach((input) => {
       const toggleButton = document.createElement("button");
       toggleButton.type = "button";
-      
-      const icon = document.createElement('span');
+
+      const icon = document.createElement("span");
       icon.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
@@ -157,10 +164,10 @@ function LoginPageStyles() {
         "text-white/50",
         "hover:text-white",
         "focus:outline-none",
-        "z-10"
+        "z-10",
       );
 
-      const inputGroup = input.closest('.input-group');
+      const inputGroup = input.closest(".input-group");
       if (inputGroup) {
         inputGroup.style.position = "relative";
         inputGroup.appendChild(toggleButton);
@@ -168,15 +175,17 @@ function LoginPageStyles() {
         toggleButton.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
-          const type = input.getAttribute("type") === "password" ? "text" : "password";
+          const type =
+            input.getAttribute("type") === "password" ? "text" : "password";
           input.setAttribute("type", type);
-          
-          icon.innerHTML = type === "password" 
-            ? `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+          icon.innerHTML =
+            type === "password"
+              ? `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
                 <circle cx="12" cy="12" r="3"/>
               </svg>`
-            : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-10-7-10-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
                 <line x1="1" y1="1" x2="23" y2="23"/>
               </svg>`;

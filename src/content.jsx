@@ -5,16 +5,13 @@ import PathRouter from "./components/PathRouter";
 import "./styles/tailwind.css";
 
 (() => {
-  const script = document.createElement("script")
+  const script = document.createElement("script");
   // eslint-disable-next-line no-undef
-  script.src = chrome.runtime.getURL("umami.js")
-  script.defer = true
-  script.dataset.websiteId = "17490ccf-0b15-4d8a-a908-5e774ad648de"
-  document.head.appendChild(script)
-})()
-
-
-
+  script.src = chrome.runtime.getURL("umami.js");
+  script.defer = true;
+  script.dataset.websiteId = "17490ccf-0b15-4d8a-a908-5e774ad648de";
+  document.head.appendChild(script);
+})();
 
 const container = document.createElement("div");
 container.id = "react-chrome-app";
@@ -66,20 +63,18 @@ document.documentElement.classList.add("dark");
 document.body.style.backgroundColor = "black";
 // eslint-disable-next-line no-undef
 document.body.style.backgroundImage = `url("${chrome.runtime.getURL(
-  "public/overlay.png"
+  "public/overlay.png",
 )}")`;
 document.body.style.backgroundRepeat = "no-repeat";
-
 
 root.render(
   <>
     <LoadingOverlay />
     {isLoginPage ? <LoginPageStyles /> : <PathRouter />}
-  </>
+  </>,
 );
 
 setTimeout(() => {
   document.body.classList.add("!visible");
   document.body.classList.add("!overflow-auto");
 }, 500);
-

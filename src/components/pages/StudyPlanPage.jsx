@@ -7,7 +7,7 @@ function StudyPlanPage() {
 
   useEffect(() => {
     const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page"
+      ".m-grid.m-grid--hor.m-grid--root.m-page",
     );
 
     if (targetElement) {
@@ -48,13 +48,13 @@ function StudyPlanPage() {
         "!text-white",
         "!font-bold",
         "!text-lg",
-        "!bg-white/10"
+        "!bg-white/10",
       );
 
       header.addEventListener("click", function () {
         // Find the closest parent col and then find the accordion content within it
         const parentCol = this.closest(".semester-container")?.querySelector(
-          ".accordion-content"
+          ".accordion-content",
         );
         if (!parentCol) return;
 
@@ -191,7 +191,7 @@ function StudyPlanPage() {
         "!border-none",
         "!rounded-3xl",
         "!p-4",
-        "!shadow-lg"
+        "!shadow-lg",
       );
 
       // Remove unnecessary classes
@@ -199,7 +199,7 @@ function StudyPlanPage() {
         "m-portlet--brand",
         "m-portlet--head-solid-bg",
         "m-portlet--border-bottom-brand",
-        "m-portlet--head-sm"
+        "m-portlet--head-sm",
       );
     }
 
@@ -216,7 +216,7 @@ function StudyPlanPage() {
         "!flex",
         "!items-center",
         "!justify-between",
-        "!mb-4"
+        "!mb-4",
       );
 
       // Style the heading
@@ -240,7 +240,7 @@ function StudyPlanPage() {
         "!h-[calc(100vh-220px)]",
         "!max-h-[800px]",
         "!overflow-y-auto",
-        "custom-scrollbar"
+        "custom-scrollbar",
       );
     }
 
@@ -259,7 +259,7 @@ function StudyPlanPage() {
           "w-full",
           "bg-black",
           "!p-4",
-          "!border-none"
+          "!border-none",
         );
 
         // Move the semester content into the container
@@ -312,7 +312,7 @@ function StudyPlanPage() {
               "!text-white",
               "!font-bold",
               "!text-lg",
-              "!mb-0"
+              "!mb-0",
             );
 
             // Style the small text
@@ -345,7 +345,7 @@ function StudyPlanPage() {
             "table-bordered",
             "table-striped",
             "table-responsive",
-            "span12"
+            "span12",
           );
 
           // Style the table head
@@ -355,7 +355,7 @@ function StudyPlanPage() {
               "bg-zinc-900",
               "!rounded-t-lg",
               "top-0",
-              "z-10"
+              "z-10",
             );
 
             const headers = thead.querySelectorAll("th");
@@ -367,7 +367,7 @@ function StudyPlanPage() {
                 "!p-3",
                 "!text-left",
                 "!border-b",
-                "!border-white/10"
+                "!border-white/10",
               );
             });
           }
@@ -382,7 +382,7 @@ function StudyPlanPage() {
               row.classList.add(
                 "!bg-black",
                 "!hover:bg-white/5",
-                "!transition-colors"
+                "!transition-colors",
               );
 
               // Style cells
@@ -392,7 +392,7 @@ function StudyPlanPage() {
                   "!p-3",
                   "!text-white/80",
                   "!border-y",
-                  "!border-white/10"
+                  "!border-white/10",
                 );
 
                 // Apply special styling to credit hours (centered column)

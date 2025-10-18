@@ -20,7 +20,7 @@ function MarksPloReportPage() {
 
     // Style semester selection form
     const semesterForm = document.querySelector(
-      ".row:has(.col-md-12.text-center select#SemId)"
+      ".row:has(.col-md-12.text-center select#SemId)",
     );
     if (semesterForm) {
       // Add modern styling to the form container
@@ -44,7 +44,7 @@ function MarksPloReportPage() {
         // Remove extra spacing
         formContentDiv.innerHTML = formContentDiv.innerHTML.replace(
           /&nbsp;/g,
-          ""
+          "",
         );
 
         // Style the select element
@@ -61,7 +61,7 @@ function MarksPloReportPage() {
             "!cursor-pointer",
             "!focus:ring-2",
             "!focus:ring-x",
-            "!focus:outline-none"
+            "!focus:outline-none",
           );
 
           // Remove bootstrap and metronic classes
@@ -69,7 +69,7 @@ function MarksPloReportPage() {
             "m-dropdown__toggle",
             "btn",
             "btn-brand",
-            "dropdown-toggle"
+            "dropdown-toggle",
           );
 
           // Clean up select styling
@@ -137,7 +137,7 @@ function MarksPloReportPage() {
         "!w-full",
         "!border-collapse",
         "!border-0",
-        "!bg-black"
+        "!bg-black",
       );
 
       // Remove bootstrap classes
@@ -147,7 +147,7 @@ function MarksPloReportPage() {
         "table-responsive",
         "m-table",
         "m-table--head-bg-info",
-        "table"
+        "table",
       );
 
       // Style the table header
@@ -158,7 +158,7 @@ function MarksPloReportPage() {
           "!sticky",
           "!top-0",
           "!z-10",
-          "!border-none"
+          "!border-none",
         );
 
         let headerrow = thead.querySelectorAll("tr");
@@ -172,7 +172,7 @@ function MarksPloReportPage() {
               "!font-medium",
               "!p-3",
               "!text-center",
-              "!border-none"
+              "!border-none",
             );
             header.style.cssText = "border: none !important;";
           });
@@ -186,7 +186,7 @@ function MarksPloReportPage() {
             "!font-bold",
             "!text-lg",
             "!py-4",
-            "!bg-zinc-800"
+            "!bg-zinc-800",
           );
         }
 
@@ -198,7 +198,7 @@ function MarksPloReportPage() {
           domainHeader.classList.add(
             "!bg-zinc-800/50",
             "!text-white",
-            "!font-medium"
+            "!font-medium",
           );
         }
 
@@ -206,13 +206,13 @@ function MarksPloReportPage() {
           ploHeader.classList.add(
             "!bg-zinc-800/50",
             "!text-white",
-            "!font-medium"
+            "!font-medium",
           );
         }
 
         // Style PLO number headers
         const ploNumberHeaders = thead.querySelectorAll(
-          "th[style*='white-space: nowrap']"
+          "th[style*='white-space: nowrap']",
         );
         ploNumberHeaders.forEach((header) => {
           header.classList.add("!whitespace-nowrap", "!px-4", "!py-2");
@@ -232,7 +232,7 @@ function MarksPloReportPage() {
             "!font-medium",
             "!text-white",
             "!pl-4",
-            "!bg-zinc-900/30"
+            "!bg-zinc-900/30",
           );
           cell.removeAttribute("style");
         });
@@ -243,7 +243,7 @@ function MarksPloReportPage() {
           row.classList.add(
             "!bg-black",
             "!hover:bg-white/5",
-            "!transition-colors"
+            "!transition-colors",
           );
 
           // Style cells
@@ -253,7 +253,7 @@ function MarksPloReportPage() {
               "!p-3",
               "!text-white/80",
               "!border-y",
-              "!border-white/10"
+              "!border-white/10",
             );
 
             // Style CLO cell
@@ -286,7 +286,7 @@ function MarksPloReportPage() {
 
         // Style total row with blue background
         const totalRows = tbody.querySelectorAll(
-          "tr[style*='background: #36a3f7']"
+          "tr[style*='background: #36a3f7']",
         );
         totalRows.forEach((row) => {
           row.classList.add("!bg-x/80", "!text-white", "!font-medium");
@@ -373,11 +373,11 @@ function MarksPloReportPage() {
                         value < 30
                           ? "text-rose-400"
                           : value < 60
-                          ? "text-amber-400"
-                          : "text-emerald-400"
+                            ? "text-amber-400"
+                            : "text-emerald-400"
                       }">${value}%</div>
                     </div>
-                  `
+                  `,
                     )
                     .join("")}
                 </div>
@@ -405,8 +405,8 @@ function MarksPloReportPage() {
                     percentage < 30
                       ? "text-rose-400"
                       : percentage < 60
-                      ? "text-amber-400"
-                      : "text-emerald-400"
+                        ? "text-amber-400"
+                        : "text-emerald-400"
                   }">${percentage}%</span>
                 </div>
                 <div class="bg-black rounded-xl px-6 py-3 !border !border-white/10 text-center w-full md:w-auto">
@@ -415,8 +415,8 @@ function MarksPloReportPage() {
                     percentage < 30
                       ? "text-rose-400"
                       : percentage < 60
-                      ? "text-amber-400"
-                      : "text-emerald-400"
+                        ? "text-amber-400"
+                        : "text-emerald-400"
                   }">${performanceStatus}</span>
                 </div>
               </div>
@@ -428,8 +428,8 @@ function MarksPloReportPage() {
                   percentage < 30
                     ? "text-rose-400"
                     : percentage < 60
-                    ? "text-amber-400"
-                    : "text-emerald-400"
+                      ? "text-amber-400"
+                      : "text-emerald-400"
                 }">${percentage}%</span>
               </div>
               <div class="w-full h-3 bg-black rounded-full overflow-hidden">
@@ -437,8 +437,8 @@ function MarksPloReportPage() {
                   percentage < 30
                     ? "bg-rose-400"
                     : percentage < 60
-                    ? "bg-amber-400"
-                    : "bg-emerald-400"
+                      ? "bg-amber-400"
+                      : "bg-emerald-400"
                 }" style="width: ${percentage}%;"></div>
               </div>
             </div>
@@ -493,7 +493,7 @@ function MarksPloReportPage() {
         "!flex",
         "!items-center",
         "!justify-between",
-        "!mb-4"
+        "!mb-4",
       );
 
     document
@@ -509,7 +509,7 @@ function MarksPloReportPage() {
         "!h-[calc(100vh-220px)]",
         "!max-h-[800px]",
         "!overflow-y-auto",
-        "custom-scrollbar"
+        "custom-scrollbar",
       );
 
     // Make the main portlet match the theme
@@ -521,7 +521,7 @@ function MarksPloReportPage() {
         "!border-white/0",
         "!rounded-3xl",
         "!p-4",
-        "!shadow-lg"
+        "!shadow-lg",
       );
 
     // Add a print button
@@ -544,7 +544,7 @@ function MarksPloReportPage() {
     }
 
     const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page"
+      ".m-grid.m-grid--hor.m-grid--root.m-page",
     );
 
     if (targetElement) {

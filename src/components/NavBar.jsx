@@ -20,28 +20,89 @@ import {
   Lock,
 } from "lucide-react";
 
-function NavBar({currentPage = "", onAttendanceLinkFound }) {
+function NavBar({ currentPage = "", onAttendanceLinkFound }) {
   const [menuLinks, setMenuLinks] = useState([]);
 
   // Icon mapping based on link text or path
-  const iconStyle = "h-10 w-10 rounded-xl flex text-x items-center !bg-[#161616] justify-center";
+  const iconStyle =
+    "h-10 w-10 rounded-xl flex text-x items-center !bg-[#161616] justify-center";
   const iconMapping = {
-    Home: <span className={iconStyle}><Home size={18} /></span>,
-    "Course Registration": <span className={iconStyle}><BookOpen size={18} /></span>,
-    Attendance: <span className={iconStyle}><Calendar size={18} /></span>,
-    Marks: <span className={iconStyle}><Award size={18} /></span>,
-    "Marks PLO Report": <span className={iconStyle}><BarChart size={18} /></span>,
-    Transcript: <span className={iconStyle}><FileText size={18} /></span>,
-    "Fee Challan": <span className={iconStyle}><Receipt size={18} /></span>,
-    "Fee Details": <span className={iconStyle}><DollarSign size={18} /></span>,
-    "Course Feedback": <span className={iconStyle}><MessageSquare size={18} /></span>,
-    "Retake Exam Request": <span className={iconStyle}><Clock size={18} /></span>,
-    "Course Withdraw": <span className={iconStyle}><XCircle size={18} /></span>,
-    "Grade Change Request": <span className={iconStyle}><RefreshCw size={18} /></span>,
-    "Tentative Study Plan": <span className={iconStyle}><ListChecks size={18} /></span>,
-    "Grade Report": <span className={iconStyle}><GraduationCap size={18} /></span>,
+    Home: (
+      <span className={iconStyle}>
+        <Home size={18} />
+      </span>
+    ),
+    "Course Registration": (
+      <span className={iconStyle}>
+        <BookOpen size={18} />
+      </span>
+    ),
+    Attendance: (
+      <span className={iconStyle}>
+        <Calendar size={18} />
+      </span>
+    ),
+    Marks: (
+      <span className={iconStyle}>
+        <Award size={18} />
+      </span>
+    ),
+    "Marks PLO Report": (
+      <span className={iconStyle}>
+        <BarChart size={18} />
+      </span>
+    ),
+    Transcript: (
+      <span className={iconStyle}>
+        <FileText size={18} />
+      </span>
+    ),
+    "Fee Challan": (
+      <span className={iconStyle}>
+        <Receipt size={18} />
+      </span>
+    ),
+    "Fee Details": (
+      <span className={iconStyle}>
+        <DollarSign size={18} />
+      </span>
+    ),
+    "Course Feedback": (
+      <span className={iconStyle}>
+        <MessageSquare size={18} />
+      </span>
+    ),
+    "Retake Exam Request": (
+      <span className={iconStyle}>
+        <Clock size={18} />
+      </span>
+    ),
+    "Course Withdraw": (
+      <span className={iconStyle}>
+        <XCircle size={18} />
+      </span>
+    ),
+    "Grade Change Request": (
+      <span className={iconStyle}>
+        <RefreshCw size={18} />
+      </span>
+    ),
+    "Tentative Study Plan": (
+      <span className={iconStyle}>
+        <ListChecks size={18} />
+      </span>
+    ),
+    "Grade Report": (
+      <span className={iconStyle}>
+        <GraduationCap size={18} />
+      </span>
+    ),
     // Fallback icon for any unmatched menu items
-    default: <span className={iconStyle}><FileText size={18} /></span>,
+    default: (
+      <span className={iconStyle}>
+        <FileText size={18} />
+      </span>
+    ),
   };
 
   // Function to determine which icon to use
@@ -108,16 +169,13 @@ function NavBar({currentPage = "", onAttendanceLinkFound }) {
     if (links.length > 0) {
       setMenuLinks(links);
       const attendanceLink = links.find(
-        (link) => link.text.trim() === "Attendance"
+        (link) => link.text.trim() === "Attendance",
       );
-
 
       if (attendanceLink && onAttendanceLinkFound) {
         onAttendanceLinkFound(attendanceLink.href);
-       
       }
     }
-
 
     // Now it's safe to remove elements after extraction
     document.querySelectorAll("header").forEach((element) => {
@@ -138,12 +196,11 @@ function NavBar({currentPage = "", onAttendanceLinkFound }) {
 
     document
       .querySelectorAll(
-        ".m-grid__item.m-grid__item--fluid.m-grid.m-grid--ver-desktop.m-grid--desktop.m-body"
+        ".m-grid__item.m-grid__item--fluid.m-grid.m-grid--ver-desktop.m-grid--desktop.m-body",
       )
       .forEach((element) => {
         element.classList.remove("m-grid--desktop", "m-body");
       });
-
 
     document.querySelector(".m-subheader")?.remove();
     // Remove the close button
@@ -202,10 +259,11 @@ function NavBar({currentPage = "", onAttendanceLinkFound }) {
                       <a
                         href={link.href}
                         className={`flex items-center gap-3 pr-4 pl-2 py-1.5 rounded-2xl transition-all duration-300 text-sm no-underline hover:no-underline
-                                                    ${isActive
-                            ? "!bg-x !text-white"
-                            : "!text-slate-300 hover:!bg-[#161616] hover:text-white"
-                          }`}
+                                                    ${
+                                                      isActive
+                                                        ? "!bg-x !text-white"
+                                                        : "!text-slate-300 hover:!bg-[#161616] hover:text-white"
+                                                    }`}
                       >
                         <span
                           className={`rounded-2xl flex items-center justify-center`}
@@ -229,10 +287,11 @@ function NavBar({currentPage = "", onAttendanceLinkFound }) {
         <div className="mt-auto py-8 px-4">
           {/* Profile Card with Logout Button */}
           <div className="rounded-2xl overflow-visible bg-white/2 relative flex flex-col items-center w-full">
-            <div className="w-full flex flex-col items-center" style={{position:'relative'}}>
+            <div
+              className="w-full flex flex-col items-center"
+              style={{ position: "relative" }}
+            >
               <div className="flex items-center gap-3 p-3 w-full">
-                
-               
                 <a
                   href="/Login/logout"
                   className="ml-2 flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 backdrop-blur-md border border-white/5 text-white font-medium text-sm no-underline hover:bg-slate-100 transition-all duration-200"

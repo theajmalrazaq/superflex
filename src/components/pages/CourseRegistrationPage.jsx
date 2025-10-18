@@ -9,7 +9,7 @@ function CourseRegistrationPage() {
 
   useEffect(() => {
     const alertElement = document.querySelector(
-      ".m-alert.m-alert--icon.m-alert--icon-solid.m-alert--outline.alert.alert-warning.alert-dismissible.fade.show"
+      ".m-alert.m-alert--icon.m-alert--icon-solid.m-alert--outline.alert.alert-warning.alert-dismissible.fade.show",
     );
     if (alertElement) {
       alertElement.classList.add(
@@ -21,7 +21,7 @@ function CourseRegistrationPage() {
         "!rounded-3xl",
         "!flex",
         "!justify-between",
-        "!items-center"
+        "!items-center",
       );
       alertElement.style.visibility = "visible";
       alertElement.style.display = "block";
@@ -39,7 +39,7 @@ function CourseRegistrationPage() {
         "!h-12",
         "!flex",
         "!items-center",
-        "!justify-center"
+        "!justify-center",
       );
 
       // Create SVG element
@@ -57,7 +57,7 @@ function CourseRegistrationPage() {
       // Create path element
       const path = document.createElementNS(
         "http://www.w3.org/2000/svg",
-        "path"
+        "path",
       );
       path.setAttribute("d", badgeAlertPath);
 
@@ -69,7 +69,7 @@ function CourseRegistrationPage() {
 
     // Find the close button and add the close icon SVG
     const closeButton = alertElement?.querySelector(
-      'button.close[data-dismiss="alert"]'
+      'button.close[data-dismiss="alert"]',
     );
     if (closeButton) {
       // Hide the ::before pseudo-element
@@ -83,7 +83,7 @@ function CourseRegistrationPage() {
       // Create SVG element for close button
       const closeSvg = document.createElementNS(
         "http://www.w3.org/2000/svg",
-        "svg"
+        "svg",
       );
       closeSvg.setAttribute("width", "24");
       closeSvg.setAttribute("height", "24");
@@ -98,7 +98,7 @@ function CourseRegistrationPage() {
       // Create paths for X shape
       const line1 = document.createElementNS(
         "http://www.w3.org/2000/svg",
-        "line"
+        "line",
       );
       line1.setAttribute("x1", "18");
       line1.setAttribute("y1", "6");
@@ -107,7 +107,7 @@ function CourseRegistrationPage() {
 
       const line2 = document.createElementNS(
         "http://www.w3.org/2000/svg",
-        "line"
+        "line",
       );
       line2.setAttribute("x1", "6");
       line2.setAttribute("y1", "6");
@@ -123,7 +123,7 @@ function CourseRegistrationPage() {
     }
 
     const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page"
+      ".m-grid.m-grid--hor.m-grid--root.m-page",
     );
 
     if (targetElement) {

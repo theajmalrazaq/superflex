@@ -6,7 +6,7 @@ function GradeChangePage() {
 
   useEffect(() => {
     const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page"
+      ".m-grid.m-grid--hor.m-grid--root.m-page",
     );
 
     if (targetElement) {
@@ -22,10 +22,9 @@ function GradeChangePage() {
     // Keep track of style elements we add
     const addedStyles = [];
 
-
     // Hide or remove error divs that should be hidden initially
     const errorDivs = element.querySelectorAll(
-      "#DataErrorId, #CheckBoxErrorId, #GradeChangeReasonErrorId"
+      "#DataErrorId, #CheckBoxErrorId, #GradeChangeReasonErrorId",
     );
     errorDivs.forEach((div) => {
       div.style.display = "none";
@@ -42,7 +41,7 @@ function GradeChangePage() {
         "!font-bold",
         "!p-4",
         "!rounded-3xl",
-        "!mb-6"
+        "!mb-6",
       );
 
       // Apply flex styling only to visible alerts (those without display:none)
@@ -50,7 +49,7 @@ function GradeChangePage() {
         alertElement.classList.add(
           "!flex",
           "!justify-between",
-          "!items-center"
+          "!items-center",
         );
       }
 
@@ -67,14 +66,14 @@ function GradeChangePage() {
           "!h-12",
           "!flex",
           "!items-center",
-          "!justify-center"
+          "!justify-center",
         );
 
         // Replace icon with SVG
         const createSvgIcon = (path) => {
           const svg = document.createElementNS(
             "http://www.w3.org/2000/svg",
-            "svg"
+            "svg",
           );
           svg.setAttribute("width", "24");
           svg.setAttribute("height", "24");
@@ -88,7 +87,7 @@ function GradeChangePage() {
 
           const pathElement = document.createElementNS(
             "http://www.w3.org/2000/svg",
-            "path"
+            "path",
           );
           pathElement.setAttribute("d", path);
           svg.appendChild(pathElement);
@@ -161,7 +160,7 @@ function GradeChangePage() {
           "!focus:ring-2",
           "!focus:ring-x",
           "!focus:outline-none",
-          "!w-64"
+          "!w-64",
         );
 
         // Remove bootstrap classes
@@ -169,7 +168,7 @@ function GradeChangePage() {
           "m-dropdown__toggle",
           "btn",
           "btn-brand",
-          "dropdown-toggle"
+          "dropdown-toggle",
         );
       }
 
@@ -188,7 +187,7 @@ function GradeChangePage() {
         "!border-none",
         "!rounded-3xl",
         "!p-4",
-        "!shadow-lg"
+        "!shadow-lg",
       );
 
       // Remove unnecessary classes
@@ -196,7 +195,7 @@ function GradeChangePage() {
         "m-portlet--primary",
         "m-portlet--head-solid-bg",
         "m-portlet--border-bottom-info",
-        "m-portlet--head-sm"
+        "m-portlet--head-sm",
       );
     }
 
@@ -213,7 +212,7 @@ function GradeChangePage() {
         "!flex",
         "!items-center",
         "!justify-between",
-        "!mb-4"
+        "!mb-4",
       );
 
       // Find and style the heading
@@ -224,7 +223,7 @@ function GradeChangePage() {
 
       // Style the portlet head caption
       const portletHeadCaption = portletHead.querySelector(
-        ".m-portlet__head-caption"
+        ".m-portlet__head-caption",
       );
       if (portletHeadCaption) {
         portletHeadCaption.classList.add("!flex", "!gap-4", "!items-center");
@@ -287,7 +286,7 @@ function GradeChangePage() {
         "!text-white",
         "!h-[400px]",
         "!overflow-y-auto",
-        "custom-scrollbar"
+        "custom-scrollbar",
       );
 
       // Style section content
@@ -297,28 +296,24 @@ function GradeChangePage() {
       }
     }
 
-
     // Style the table
     const table = element.querySelector(".table");
     if (table) {
       // Create a container for the table with modern styling
       const tableContainer = document.createElement("div");
-      tableContainer.className =
-        "overflow-hidden mb-6";
+      tableContainer.className = "overflow-hidden mb-6";
       table.parentNode.insertBefore(tableContainer, table);
       tableContainer.appendChild(table);
 
-
-
-      table.querySelectorAll('.table td, .table th').forEach(el => {
-        el.classList.add('!border-none');
+      table.querySelectorAll(".table td, .table th").forEach((el) => {
+        el.classList.add("!border-none");
       });
       // Style the table
       table.classList.add("!w-full", "!border-collapse", "!border-0");
       table.classList.remove(
         "m-table",
         "m-table--head-bg-metal",
-        "table-responsive"
+        "table-responsive",
       );
 
       // Style the table headers
@@ -341,7 +336,7 @@ function GradeChangePage() {
             "!p-3",
             "!text-left",
             "!border-b",
-            "!border-white/10"
+            "!border-white/10",
           );
         });
       }
@@ -356,7 +351,7 @@ function GradeChangePage() {
           row.classList.add(
             "!bg-black",
             "!hover:bg-white/5",
-            "!transition-colors"
+            "!transition-colors",
           );
 
           const cells = row.querySelectorAll("td");
@@ -365,7 +360,7 @@ function GradeChangePage() {
               "!p-3",
               "!text-white/80",
               "!border-y",
-              "!border-white/10"
+              "!border-white/10",
             );
 
             // Style checkboxes
@@ -375,7 +370,7 @@ function GradeChangePage() {
                 "cursor-pointer",
                 "w-4",
                 "h-4",
-                "accent-x"
+                "accent-x",
               );
             }
           });
@@ -392,7 +387,7 @@ function GradeChangePage() {
         "!border-2",
         "!border-white/10",
         "!p-5",
-        "!shadow-none"
+        "!shadow-none",
       );
 
       // Style modal header
@@ -405,7 +400,7 @@ function GradeChangePage() {
           "!p-4",
           "!flex",
           "!items-center",
-          "!justify-between"
+          "!justify-between",
         );
 
         // Remove inline styles
@@ -447,7 +442,7 @@ function GradeChangePage() {
           "!p-6",
           "!max-h-[500px]",
           "!overflow-y-auto",
-          "custom-scrollbar"
+          "custom-scrollbar",
         );
 
         // Style the reason dropdown
@@ -466,7 +461,7 @@ function GradeChangePage() {
             "!focus:ring-x",
             "!focus:outline-none",
             "!w-full",
-            "!max-w-full"
+            "!max-w-full",
           );
 
           // Remove bootstrap classes
@@ -474,7 +469,7 @@ function GradeChangePage() {
             "m-dropdown__toggle",
             "btn",
             "btn-brand",
-            "dropdown-toggle"
+            "dropdown-toggle",
           );
 
           // Remove inline styles
@@ -490,7 +485,7 @@ function GradeChangePage() {
             "!text-white",
             "!font-medium",
             "!mb-2",
-            "!block"
+            "!block",
           );
         }
 
@@ -512,7 +507,7 @@ function GradeChangePage() {
               "!focus:border-x",
               "!focus:outline-none",
               "!resize-none",
-              "!h-24"
+              "!h-24",
             );
           }
 
@@ -522,7 +517,7 @@ function GradeChangePage() {
               "!text-white",
               "!font-medium",
               "!mb-2",
-              "!block"
+              "!block",
             );
           }
         }
@@ -542,12 +537,12 @@ function GradeChangePage() {
           "!p-4",
           "!flex",
           "!justify-end",
-          "!gap-3"
+          "!gap-3",
         );
 
         // Style primary action button (submit button)
         const submitBtn = modalFooter.querySelector(
-          'input[type="button"][value="Submit Request"]'
+          'input[type="button"][value="Submit Request"]',
         );
         if (submitBtn) {
           submitBtn.classList.add(
@@ -561,7 +556,7 @@ function GradeChangePage() {
             "!rounded-xl",
             "!transition-colors",
             "!border-0",
-            "!cursor-pointer"
+            "!cursor-pointer",
           );
 
           // Remove inline styles
@@ -583,7 +578,7 @@ function GradeChangePage() {
             "!h-10",
             "!rounded-xl",
             "!transition-colors",
-            "!border-0"
+            "!border-0",
           );
 
           // Remove inline styles
