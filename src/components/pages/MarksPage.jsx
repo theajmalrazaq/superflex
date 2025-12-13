@@ -106,9 +106,10 @@ function MarksPage() {
               const maximum = parseFloatOrZero(
                 row.querySelector(".MaxMarks")?.textContent,
               );
-              const stdDev = parseFloatOrZero(
-                row.querySelector(".StdDev")?.textContent,
-              );
+              
+              // Calculate standard deviation using normal distribution approximation
+              // std ≈ (max - min) / 4
+              const stdDev = (maximum - minimum) / 4;
 
               // Calculate global statistics using the weightage/total ratio
               if (total > 0) {
@@ -156,24 +157,21 @@ function MarksPage() {
         const obtTd = createTd(globalObtained, "GrandtotalObtMarks");
         const percentage = (globalObtained / globalWeightage) * 100;
 
-        // Apply modern color scheme with percentage indicator
+        // Apply modern color scheme without percentage indicator
         if (percentage < 50) {
           obtTd.classList.add("!text-rose-400", "!font-medium");
-          obtTd.innerHTML = `<span class="inline-flex items-center">${globalObtained.toFixed(2)} <span class="ml-1 text-xs opacity-70">(${percentage.toFixed(0)}%)</span></span>`;
         } else if (percentage < 70) {
           obtTd.classList.add("!text-amber-400", "!font-medium");
-          obtTd.innerHTML = `<span class="inline-flex items-center">${globalObtained.toFixed(2)} <span class="ml-1 text-xs opacity-70">(${percentage.toFixed(0)}%)</span></span>`;
         } else {
           obtTd.classList.add("!text-emerald-400", "!font-semibold");
-          obtTd.innerHTML = `<span class="inline-flex items-center">${globalObtained.toFixed(2)} <span class="ml-1 text-xs opacity-70">(${percentage.toFixed(0)}%)</span></span>`;
         }
         totalRow.appendChild(obtTd);
 
         // Add remaining statistics
-        totalRow.appendChild(createTd(globalAverage, "GrandtotalClassAvg"));
-        totalRow.appendChild(createTd(globalMinimum, "GrandtotalClassMin"));
-        totalRow.appendChild(createTd(globalMaximum, "GrandtotalClassMax"));
-        totalRow.appendChild(createTd(globalStdDev, "GrandtotalClassStdDev"));
+        totalRow.appendChild(createTd("~ " + globalAverage.toFixed(2), "GrandtotalClassAvg"));
+        totalRow.appendChild(createTd("~ " + globalMinimum.toFixed(2), "GrandtotalClassMin"));
+        totalRow.appendChild(createTd("~ " + globalMaximum.toFixed(2), "GrandtotalClassMax"));
+        totalRow.appendChild(createTd("~ " + globalStdDev.toFixed(2), "GrandtotalClassStdDev"));
 
         // Add the row to the table
         tableBody.appendChild(totalRow);
@@ -191,6 +189,7 @@ function MarksPage() {
             let weightedAvgSum = 0;
             let weightedMinSum = 0;
             let weightedMaxSum = 0;
+            let weightedStdDevSum = 0;
 
             calculationRows.forEach((row) => {
               const weightage = parseFloatOrZero(
@@ -214,6 +213,17 @@ function MarksPage() {
                 weightedAvgSum += average * (weightage / totalMarks);
                 weightedMinSum += minimum * (weightage / totalMarks);
                 weightedMaxSum += maximum * (weightage / totalMarks);
+                
+                // Calculate standard deviation using normal distribution approximation
+                // std ≈ (max - min) / 4
+                const stdDev = (maximum - minimum) / 4;
+                weightedStdDevSum += stdDev * (weightage / totalMarks);
+                
+                // Fill in the StdDev cell for this row if it's empty
+                const stdDevCell = row.querySelector(".StdDev");
+                if (stdDevCell) {
+                  stdDevCell.textContent = "~ " + stdDev.toFixed(2);
+                }
               }
             });
 
@@ -225,10 +235,12 @@ function MarksPage() {
               const avgCell = footerRow.querySelector(".totalColAverageMarks");
               const minCell = footerRow.querySelector(".totalColMinMarks");
               const maxCell = footerRow.querySelector(".totalColMaxMarks");
+              const stdCell = footerRow.querySelector(".totalColStdDev");
 
-              if (avgCell) avgCell.textContent = weightedAvgSum.toFixed(2);
-              if (minCell) minCell.textContent = weightedMinSum.toFixed(2);
-              if (maxCell) maxCell.textContent = weightedMaxSum.toFixed(2);
+              if (avgCell) avgCell.textContent = "~ " + weightedAvgSum.toFixed(2);
+              if (minCell) minCell.textContent = "~ " + weightedMinSum.toFixed(2);
+              if (maxCell) maxCell.textContent = "~ " + weightedMaxSum.toFixed(2);
+              if (stdCell) stdCell.textContent = "~ " + weightedStdDevSum.toFixed(2);
             } else {
               // If no tfoot exists, find the last row in tbody and update it
               const tbody = table.querySelector("tbody");
@@ -246,6 +258,9 @@ function MarksPage() {
                     const avgCell =
                       lastRow.querySelector(".totalColAverageMarks") ||
                       lastRow.querySelector("td:nth-child(5)"); // 5th cell is usually average
+                    const stdCell =
+                      lastRow.querySelector(".totalColStdDev") ||
+                      lastRow.querySelector("td:nth-child(6)"); // 6th cell is usually std dev
                     const minCell =
                       lastRow.querySelector(".totalColMinMarks") ||
                       lastRow.querySelector("td:nth-child(7)"); // 7th cell is usually min
@@ -254,11 +269,13 @@ function MarksPage() {
                       lastRow.querySelector("td:nth-child(8)"); // 8th cell is usually max
 
                     if (avgCell)
-                      avgCell.textContent = weightedAvgSum.toFixed(2);
+                      avgCell.textContent = "~ " + weightedAvgSum.toFixed(2);
+                    if (stdCell)
+                      stdCell.textContent = "~ " + weightedStdDevSum.toFixed(2);
                     if (minCell)
-                      minCell.textContent = weightedMinSum.toFixed(2);
+                      minCell.textContent = "~ " + weightedMinSum.toFixed(2);
                     if (maxCell)
-                      maxCell.textContent = weightedMaxSum.toFixed(2);
+                      maxCell.textContent = "~ " + weightedMaxSum.toFixed(2);
                   } else {
                     // Create a new row for totals if the last row isn't a total row
                     const newTotalRow = document.createElement("tr");
@@ -270,14 +287,16 @@ function MarksPage() {
                       <td class="text-center totalColweightage !py-4 !px-4 !text-white/90"></td>
                       <td class="text-center totalColObtMarks !py-4 !px-4 !text-white/90 !font-semibold"></td>
                       <td class="text-center totalColGrandTotal !py-4 !px-4 !text-white/90"></td>
-                      <td class="text-center totalColAverageMarks !py-4 !px-4 !text-white/90">${weightedAvgSum.toFixed(
+                      <td class="text-center totalColAverageMarks !py-4 !px-4 !text-white/90">~ ${weightedAvgSum.toFixed(
                         2,
                       )}</td>
-                      <td class="text-center totalColStdDev !py-4 !px-4 !text-white/90"></td>
-                      <td class="text-center totalColMinMarks !py-4 !px-4 !text-white/90">${weightedMinSum.toFixed(
+                      <td class="text-center totalColStdDev !py-4 !px-4 !text-white/90">~ ${weightedStdDevSum.toFixed(
                         2,
                       )}</td>
-                      <td class="text-center totalColMaxMarks !py-4 !px-4 !text-white/90">${weightedMaxSum.toFixed(
+                      <td class="text-center totalColMinMarks !py-4 !px-4 !text-white/90">~ ${weightedMinSum.toFixed(
+                        2,
+                      )}</td>
+                      <td class="text-center totalColMaxMarks !py-4 !px-4 !text-white/90">~ ${weightedMaxSum.toFixed(
                         2,
                       )}</td>
                     `;
@@ -813,6 +832,15 @@ function MarksPage() {
                 "!border-0",
               );
 
+              // Cells are no longer editable
+              if (
+                cell.classList.contains("weightage") ||
+                cell.classList.contains("ObtMarks") ||
+                cell.classList.contains("GrandTotal")
+              ) {
+                cell.classList.add("!text-white/80");
+              }
+
               // Style obtained marks with color indicators based on performance
               if (cell.classList.contains("ObtMarks")) {
                 const marks = cell.textContent.trim();
@@ -831,26 +859,10 @@ function MarksPage() {
 
                     if (percentage < 50) {
                       cell.classList.add("!text-rose-400");
-                      // Add percentage in small text
-                      cell.innerHTML = `<span class="flex items-center gap-1">
-                        ${marks}
-                        <span class="text-xs opacity-70">(${percentage.toFixed(0)}%)</span>
-                      </span>`;
                     } else if (percentage < 70) {
                       cell.classList.add("!text-amber-400");
-                      // Add percentage in small text
-                      cell.innerHTML = `<span class="flex items-center gap-1">
-                        ${marks}
-                        <span class="text-xs opacity-70">(${percentage.toFixed(0)}%)</span>
-                      </span>`;
                     } else {
                       cell.classList.add("!text-emerald-400", "!font-semibold");
-                      // Add percentage in small text with checkmark for high scores
-                      cell.innerHTML = `<span class="flex items-center gap-1">
-                        ${marks}
-                        <span class="text-xs opacity-70">(${percentage.toFixed(0)}%)</span>
-                        ${percentage >= 90 ? '<svg class="w-3 h-3 text-emerald-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>' : ""}
-                      </span>`;
                     }
                   }
                 }
@@ -882,6 +894,18 @@ function MarksPage() {
                 "!font-medium",
                 "!text-sm",
               );
+
+              // Footer cells styling only - no editing
+              if (
+                cell.classList.contains("totalColweightage") ||
+                cell.classList.contains("totalColObtMarks") ||
+                cell.classList.contains("totalColGrandTotal") ||
+                cell.classList.contains("GrandtotalColMarks") ||
+                cell.classList.contains("GrandtotalObtMarks") ||
+                cell.classList.contains("GrandtotalTotalMarks")
+              ) {
+                cell.classList.add("!text-white/90", "!font-medium");
+              }
             });
           });
         }

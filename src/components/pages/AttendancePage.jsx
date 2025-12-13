@@ -609,6 +609,17 @@ function AttendancePage() {
                 cell.classList.add("text-white/80", "font-medium");
               }
 
+              // Format date column to include day name
+              if (cellIndex === 1 && /^\d{1,2}-\w{3}-\d{4}$/.test(cell.textContent.trim())) {
+                const dateStr = cell.textContent.trim();
+                // Parse date in DD-MMM-YYYY format
+                const dateObj = new Date(dateStr.replace(/-/g, ' '));
+                if (!isNaN(dateObj.getTime())) {
+                  const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+                  cell.textContent = `${dayName} ${dateStr}`;
+                }
+              }
+
               // Enhanced attendance markers styling
               const attendanceLabel = cell.querySelector("label");
               if (attendanceLabel && attendanceLabel.textContent === "P") {
