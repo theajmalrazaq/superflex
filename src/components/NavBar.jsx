@@ -263,7 +263,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         {React.cloneElement(getIcon(link), { size: 20 })}
       </div>
       <div>
-        <div className={`text-sm font-semibold mb-0.5 ${isActive ? "text-white" : "text-zinc-200 group-hover:text-white"}`}>
+        <div className={`text-sm font-semibold mb-0.5 ${isActive ? "text-white " : "text-zinc-200 group-hover:text-white"}`}>
           {link.text}
         </div>
         <div className="text-[11px] text-zinc-500 font-medium group-hover:text-zinc-400">
@@ -327,7 +327,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         setOpenDropdown(isOpen ? null : category);
                       }}
                       className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-white/5
-                        ${isActive ? "!text-white" : "!text-zinc-400 hover:!text-white"}
+                        ${isActive ? "bg-[#a098ff]/10 text-[#a098ff] border  border-white/10 shadow-sm" : "!text-zinc-400 hover:!text-white"}
                       `}
                     >
                       {category}
