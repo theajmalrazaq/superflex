@@ -15,16 +15,10 @@ const ReviewCarousel = () => {
   const review = reviews[index];
   if (!review) return null;
   return (
-    <div className="flex items-center gap-3 text-white/80 bg-black/30 rounded-xl  mb-3 animate-fade-in">
-      <img
-        src={review.photo_url}
-        alt={review.name}
-        className="h-8 w-8 rounded-full object-cover border border-x"
-        loading="lazy"
-      />
+    <div className="flex flex-col items-start gap-4 text-white animate-fade-in max-w-2xl">
+      <span className="font-sans text-6xl font-bold mt-5 capitalize">{review.comment}</span>
       <div className="flex flex-col">
-        <span className="font-semibold text-sm text-x">{review.name}</span>
-        <span className="italic text-xs text-white/60">{review.comment}</span>
+        <span className="font-medium text-xl font-sans text-white/80">{review.name}</span>
       </div>
     </div>
   );

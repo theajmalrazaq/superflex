@@ -1,28 +1,30 @@
 import React, { useEffect, useState } from "react";
 import "../styles/loading.css";
 
-const LoadingOverlay = ({ show = true }) => {
+const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
   const [isVisible, setIsVisible] = useState(show);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set a timeout to hide the loading overlay after 2 seconds
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+    if (isFullScreen) {
+      // Set a timeout to hide the loading overlay after 2 seconds
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 2000);
 
-    // Listen for when the page has finished loading
-    const handleLoad = () => {
-      setLoading(false);
-    };
+      // Listen for when the page has finished loading
+      const handleLoad = () => {
+        setLoading(false);
+      };
 
-    window.addEventListener("load", handleLoad);
+      window.addEventListener("load", handleLoad);
 
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener("load", handleLoad);
-    };
-  }, []);
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener("load", handleLoad);
+      };
+    }
+  }, [isFullScreen]);
 
   useEffect(() => {
     if (!show || !loading) {
@@ -40,21 +42,25 @@ const LoadingOverlay = ({ show = true }) => {
 
   return (
     <div
-      className={`loading-overlay h-screen fixed inset-0 z-50 ${
-        !show || !loading ? "fade-out" : ""
+      className={`loading-overlay ${
+        isFullScreen ? "h-screen fixed inset-0 z-50" : "absolute inset-0 w-full h-full z-10 rounded-[inherit]"
+      } ${
+        !show || (!isFullScreen ? false : !loading) ? "fade-out" : ""
       }`}
     >
-      <div className="absolute inset-0 bg-black flex items-center justify-center">
+      <div className={`absolute inset-0 bg-black flex items-center justify-center ${!isFullScreen ? "bg-black/50 backdrop-blur-sm rounded-[inherit]" : ""}`}>
         <div
-          className="h-20 w-20 bg-[url('res/bg.png')] bg-black border-7 border-white/5 bg-cover rounded-[29px] flex items-center justify-center"
-          data-aos="zoom-in"
+          className={`bg-[url('res/bg.png')] bg-black border-7 border-white/5 bg-cover flex items-center justify-center ${
+            isFullScreen ? "h-20 w-20 rounded-[29px]" : "h-16 w-16 rounded-[20px] scale-75"
+          }`}
+          data-aos={isFullScreen ? "zoom-in" : ""}
           data-aos-duration="1000"
         >
           <svg
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
-            width="84"
-            height="84"
+            width={isFullScreen ? "84" : "64"}
+            height={isFullScreen ? "84" : "64"}
             fill="none"
           >
             <path

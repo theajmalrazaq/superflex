@@ -27,10 +27,19 @@ function LoginPageStyles() {
         ".m-grid__item.m-grid__item--order-tablet-and-mobile-2.m-login__aside",
       )
       .classList.add("!w-full", "!p-0");
-
-    document
-      .querySelector(".m-stack__item.m-stack__item--fluid")
-      .classList.add("!flex", "!justify-center", "!h-screen", "!items-center");
+    const mainContainer = document.querySelector(".m-stack__item.m-stack__item--fluid");
+    if (mainContainer) {
+        mainContainer.classList.add(
+            "!flex",
+            "!justify-center",
+            "!items-center",
+            "!h-screen",
+            "!w-full",
+            "!bg-transparent", 
+            "!relative",
+            "!z-[50]" 
+        );
+    }
 
     document.querySelectorAll(".m-login__wrapper").forEach((element) => {
       element.classList.add(
@@ -47,7 +56,7 @@ function LoginPageStyles() {
       .classList.add("!p-0");
 
     const formHelp = document.querySelector(".m-form__help");
-    formHelp.classList.add("!text-white", "!text-xs");
+    if(formHelp) formHelp.classList.add("!text-white", "!text-xs");
 
     document
       .querySelectorAll(".input-group.m-input-group.m-input-group--square")
@@ -59,6 +68,7 @@ function LoginPageStyles() {
       element.remove();
     });
 
+    // Inputs Styling
     document.querySelectorAll(".form-control.m-input").forEach((element) => {
       element.classList.add(
         "!rounded-lg",
@@ -70,68 +80,166 @@ function LoginPageStyles() {
         "!placeholder:opacity-100",
         "!h-[40px]",
         "!px-3",
-        "!w-full",
+        "!w-full"
       );
+      element.style.fontFamily = "'Google Sans Flex', sans-serif";
     });
 
     document.querySelectorAll(".m-login.m-login--1").forEach((element) => {
       element.classList.add("!bg-transparent", "!text-white");
     });
 
-    let logodiv = document.createElement("div");
-    // eslint-disable-next-line no-undef
-    logodiv.innerHTML = `<img src="${chrome.runtime.getURL(
-      "public/logo.svg",
-    )}" class="logo" alt="Logo" />`;
-    logodiv.classList.add(
-      "!pb-4",
-      "!border-b",
-      "!border-white/10",
-      "!w-[16rem]",
-    );
+    const oldLogo = document.querySelector(".m-login__logo");
+    if(oldLogo) oldLogo.remove();
 
-    document.querySelector(".m-login__logo").remove();
-
+    // Button Styling
     document.querySelectorAll(".btn-primary").forEach((button) => {
       button.classList.add(
-        "!bg-x",
-        "!border-white/10",
+        "!bg-[#a098ff]",
         "!text-white",
-        "!rounded-2xl",
+        "!font-bold",
+        "!border-none",
+        "!rounded-xl",
         "!w-full",
-        "!h-[40px]",
+        "!h-[44px]", // Slightly taller
         "!px-3",
         "!py-2",
         "!text-center",
         "!flex",
         "justify-center",
         "items-center",
-        "!shadow-none",
-        "hover:shadow-none",
+        "hover:!bg-[#8f86ff]",
+        "!transition-all",
+        "!duration-200"
       );
-      button.style.fontFamily = "'Product Sans', sans-serif";
+      button.style.fontFamily = "'Google Sans Flex', sans-serif";
     });
 
-    document.querySelector(".la-sign-in").remove();
+    const signInIcon = document.querySelector(".la-sign-in");
+    if(signInIcon) signInIcon.remove();
+
+    // Title Logic - Keeping it hidden as requested
     let logintitle = document.querySelector(".m-login__title");
+    if(logintitle) {
+        logintitle.style.display = "none";
+    }
 
-    // Replace inline styles with Tailwind classes
-    logintitle.innerHTML =
-      "<h1 class='!text-2xl !font-bold'>Welcome Back!</h1> <p class='!text-base'>Enter Your Login Details</p>";
-    logintitle.classList.add("!text-center");
-    logintitle.style.lineHeight = "0.7"; // Keep this as it's specific
-
+    // Card Styling (The "Old Card")
     let bglogin = document.querySelector(".m-login__signin");
-    bglogin.prepend(logodiv);
+    if(bglogin) {
+        // Remove old inline styles if any and apply new card classes
+        // Note: We use !important classes to override defaults
+        bglogin.classList.add(
+          "!bg-black/10", 
+          "backdrop-blur-xl",
+          "!p-10",
+          "!rounded-[24px]",
+          "!border",
+          "!border-white/10",
+          "!flex",
+          "!flex-col",
+          "!items-center",
+          "!justify-center",
+          "!min-w-[380px]"
+        );
+    }
+
+    // 4. BACKGROUND IMAGE INJECTION
+    let rightImage = document.getElementById("login-background-image");
+    if (!rightImage) {
+        rightImage = document.createElement("div");
+        rightImage.id = "login-background-image";
+        rightImage.classList.add(
+            "fixed",
+            "inset-0",
+            "w-full",
+            "h-full",
+            "z-0"
+        );
+
+        // Image
+        const img = document.createElement("img");
+        img.src = "https://theajmalrazaq.github.io/superflex/res/intro.svg";
+        img.classList.add(
+            "w-full",
+            "h-full",
+            "object-cover"
+        );
+        rightImage.appendChild(img);
+
+        // Add Black Mask 
+        const blackMask = document.createElement("div");
+        blackMask.className = "absolute inset-0 bg-black/60 z-10"; // Increased opacity for better text contrast
+        rightImage.appendChild(blackMask);
+        document.body.appendChild(rightImage);
+    }
+
+    // --- HERO SECTION INJECTION ---
+    const heroDiv = document.createElement("div");
+    heroDiv.className = "flex flex-col items-center justify-center text-center w-full mb-6";
+    
+    const bgUrl = chrome.runtime.getURL("public/bg.png");
+    const logoUrl = chrome.runtime.getURL("public/logo.svg");
+
+    heroDiv.innerHTML = `
+    <!-- Logo & Text Section -->
+    <div class="flex flex-col gap-4 justify-center items-center text-center">
+        <div class="h-24 w-24 bg-black border-[6px] border-white/5 bg-cover rounded-[2rem] flex items-center justify-center  relative overflow-hidden" style="background-image: url('${bgUrl}');">
+             <div class="absolute inset-0 bg-black/20"></div>
+             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="none" class="relative z-10">
+                <style>@keyframes splash{0%{transform:scale(.2);opacity:.8}80%{transform:scale(1.2);opacity:0}to{transform:scale(2.2);opacity:0}}</style>
+                <path fill="#a098ff" d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z" style="animation:splash 1.5s cubic-bezier(.165,.84,.44,1) infinite both;transform-origin:center center"/>
+             </svg>
+        </div>
+        
+        <img src="https://theajmalrazaq.github.io/superflex/res/logo.svg" alt="SuperFlex" class="w-84 opacity-90 filter mt-4" />
+        
+        <div class="space-y-2 mt-2">
+            <p class="!font-mono text-white text-sm tracking-wide">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</p>
+         
+        </div>
+    </div>
+    `;
+
+    // Fetch Star Count
+    fetch('https://api.github.com/repos/theajmalrazaq/superflex')
+        .then(res => res.json())
+        .then(data => {
+            const el = document.getElementById('starCount');
+            if(el && data.stargazers_count !== undefined) {
+                el.innerText = data.stargazers_count;
+            }
+        })
+        .catch(err => console.error("Failed to fetch stars", err));
+
+    if(bglogin && bglogin.parentNode) {
+        // We want to insert heroDiv BEFORE bglogin in its parent container
+        // This makes the hero section appear ABOVE the card, outside of the border/background of the card itself.
+        const wrapper = bglogin.parentNode;
+        
+        // Remove any previously injected hero sections to avoid duplicates
+        const existingHero = wrapper.querySelector('.hero-section-injected');
+        if (existingHero) {
+            existingHero.remove();
+        }
+        
+        // Also check inside bglogin just in case it was there from before
+        const internalHero = bglogin.querySelector('.hero-section-injected');
+        if (internalHero) {
+            internalHero.remove();
+        }
+
+        heroDiv.classList.add('hero-section-injected');
+        wrapper.insertBefore(heroDiv, bglogin);
+    }
 
     // Apply Tailwind classes instead of inline styles
     bglogin.classList.add(
-      "!bg-black/50",
-      "!p-8",
+      "!bg-zinc-900/40", // Updated card background
+      "!p-6",
       "!rounded-[32px]",
       "!border",
       "!border-white/10",
-      "!shadow-lg",
       "!flex",
       "!flex-col",
       "!items-center",

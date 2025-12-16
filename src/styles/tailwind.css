@@ -1,18 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap');
 @import "tailwindcss";
-@font-face {
-  font-family: "Garnett Medium";
-  src: url("https://framerusercontent.com/assets/rEHnEvAsgbukh0QUeqSHBvG6PnI.woff2");
-  font-display: block;
-}
-@font-face {
-  font-family: "Garnett Regular";
-  src: url("https://framerusercontent.com/assets/v6eZbzgEth8Leebqk8eQxltDlKQ.woff2");
-  font-display: block;
-}
 @theme{
   --color-x: #a098ff;
-   --font-garnett-regular: "Garnett Regular";
-   --font-garnett-medium:"Garnett Medium";
+   --font-garnett-regular: "Google Sans Flex", sans-serif;
+   --font-garnett-medium: "Google Sans Flex", sans-serif;
+   --font-inter: "Google Sans Flex", sans-serif;
+   --font-sans: "Google Sans Flex", sans-serif;
+   --font-serif: "Google Sans Flex", sans-serif;
+   --font-mono: "Google Sans Flex", sans-serif;
 }
 
 .scrollbar-hide {
@@ -41,11 +36,10 @@ button:focus {
 a{
   color: unset;
   text-decoration: unset !important;
+  background-color: unset !important;
 }
-a:hover{
-  background: unset;
-}
+
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6{
-  font-family: "Garnett Medium";
-  font-size: unset;
+  font-family: "Google Sans Flex", sans-serif;
+  font-weight: 700;
 }

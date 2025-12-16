@@ -50,12 +50,13 @@ if (document.querySelector(".m-grid__item.m-footer")) {
   document.querySelector(".m-grid__item.m-footer").remove(); // Remove the footer element
 }
 // Apply the Figtree font to elements
-document.body.style.fontFamily = "Garnett Regular";
+// Apply the Figtree font to elements
+document.body.style.fontFamily = "'Google Sans Flex', sans-serif";
 document.querySelectorAll("input").forEach((input) => {
-  input.style.fontFamily = "Garnett Medium";
+  input.style.fontFamily = "'Google Sans Flex', sans-serif";
 });
 document.querySelectorAll("button").forEach((button) => {
-  button.style.fontFamily = "Garnett Medium";
+  button.style.fontFamily = "'Google Sans Flex', sans-serif";
 });
 
 // Apply global Tailwind dark mode and background
