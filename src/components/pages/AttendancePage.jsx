@@ -8,8 +8,8 @@ import {
   BookOpen, 
   BarChart2, 
   AlertCircle,
-  Filter,
-  ChevronDown
+  ChevronDown,
+  Bookmark
 } from "lucide-react";
 
 // --- Components ---
@@ -49,7 +49,7 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10 shadow-2xl max-h-[60vh] overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10  max-h-[60vh] overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200">
            <div className="flex flex-col gap-3">
               {courses.map(course => (
                  <button
@@ -91,7 +91,7 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
       onClick={onToggleMark}
       className={`group cursor-pointer flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${
         isMarked 
-        ? "bg-[#a098ff]/10 border-[#a098ff]/50 shadow-[0_0_15px_rgba(160,152,255,0.15)]" 
+        ? "bg-[#a098ff]/10 border-[#a098ff]/50" 
         : "bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5"
       }`}
     >
@@ -127,7 +127,13 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
          }`}>
            {isPresent ? "Present" : "Absent"}
          </div>
-         {isMarked && <span className="text-[10px] text-[#a098ff] font-bold tracking-wider uppercase animate-pulse">Marked</span>}
+         <div className={`p-2 rounded-full transition-all duration-300 ${
+             isMarked 
+             ? "text-[#a098ff] bg-[#a098ff]/10" 
+             : "text-zinc-700 group-hover:text-zinc-500"
+         }`}>
+            <Bookmark size={18} fill={isMarked ? "currentColor" : "none"} />
+         </div>
       </div>
     </div>
   );
@@ -145,11 +151,107 @@ const SummaryStat = ({ icon: Icon, label, value, colorClass }) => (
   </div>
 );
 
+const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            setIsOpen(false);
+        }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // Reconstruct bookmarked items details
+    const bookmarkedDetails = [];
+    if (markedRecords.size > 0 && courses.length > 0) {
+        courses.forEach(course => {
+            course.records.forEach((record, idx) => {
+                 const uniqueId = `${course.id}-${idx}`;
+                 if (markedRecords.has(uniqueId)) {
+                     bookmarkedDetails.push({
+                         uniqueId,
+                         courseTitle: course.title,
+                         date: record.date,
+                         status: record.status, 
+                         courseId: course.id,
+                         idx: idx
+                     });
+                 }
+            });
+        });
+    }
+
+    return (
+        <div className="relative z-[999]" ref={dropdownRef}>
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className={`p-3 rounded-full border transition-all ${
+                    isOpen 
+                    ? "bg-[#a098ff]/20 text-[#a098ff] border-[#a098ff]/20" 
+                    : "bg-zinc-900/50 text-zinc-400 border-white/5 hover:text-white hover:bg-white/10"
+                }`}
+                title="View Bookmarks"
+            >
+                <Bookmark size={20} fill={bookmarkedDetails.length > 0 ? "currentColor" : "none"} />
+            </button>
+
+            {isOpen && (
+                <div className="absolute top-full right-0 mt-2 w-80 md:w-96 bg-[#111] backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
+                        <h3 className="font-bold text-white flex items-center gap-2">
+                             
+                            Bookmarked Items
+                        </h3>
+                    </div>
+                    
+                    <div className="max-h-[60vh] overflow-y-auto custom-scrollbar p-2 space-y-1">
+                        {bookmarkedDetails.length === 0 ? (
+                            <div className="p-8 text-center text-zinc-500 text-sm">
+                                <p>No bookmarks yet.</p>
+                                <p className="text-xs mt-1 opacity-50">Click the bookmark icon on any attendance record to save it here.</p>
+                            </div>
+                        ) : (
+                            bookmarkedDetails.map((item) => (
+                                <button
+                                    key={item.uniqueId}
+                                    onClick={() => {
+                                        onNavigate(item.courseId);
+                                        setIsOpen(false);
+                                    }}
+                                    className="w-full text-left p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all group"
+                                >
+                                    <div className="flex justify-between items-start mb-1">
+                                        <div className="font-bold text-sm text-white group-hover:text-[#a098ff] transition-colors truncate w-full pr-2">
+                                            {item.date}
+                                        </div>
+                                         <span className={`text-xs font-bold whitespace-nowrap ${
+                                            (item.status || "").includes('P') ? "text-emerald-400" : "text-rose-400"
+                                        }`}>
+                                            {(item.status || "").includes('P') ? "Present" : "Absent"}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-[10px] text-zinc-500 uppercase tracking-wider font-bold">
+                                        <span className="truncate max-w-[200px]">{item.courseTitle}</span>
+                                    </div>
+                                </button>
+                            ))
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
 function AttendancePage() {
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState([]);
   const [selectedCourseId, setSelectedCourseId] = useState(null);
-  const [alertInfo, setAlertInfo] = useState(null);
+  const [alerts, setAlerts] = useState([]);
   const [markedRecords, setMarkedRecords] = useState(() => {
       // Load from local storage on init
       if (typeof window !== "undefined") {
@@ -170,21 +272,21 @@ function AttendancePage() {
     const parseData = () => {
       try {
         const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
-        if (!root) {
-             // If root not found, maybe wait or we are already cleaned
-             return;
-        }
+        if (!root) return;
 
-        // Extract Alert if any
-        const alertEl = root.querySelector(".alert");
-        if(alertEl && alertEl.textContent.trim().length > 0) {
-           setAlertInfo({
-              type: alertEl.classList.contains("alert-danger") ? "error" : "info",
-              message: alertEl.textContent.trim()
-           });
-        }
+        // Extract Alerts
+        const parsedAlerts = [];
+        const alertNodes = root.querySelectorAll(".alert");
+        alertNodes.forEach(alertEl => {
+             const textEl = alertEl.querySelector(".m-alert__text");
+             let message = textEl ? textEl.textContent.trim() : alertEl.textContent.replace("Close", "").trim();
+             message = message.replace(/\s+/g, ' '); // Normalize whitespace
+             
+             const type = alertEl.classList.contains("alert-danger") ? "error" : "info";
+             parsedAlerts.push({ type, message });
+        });
+        setAlerts(parsedAlerts);
 
-        // Extract Form
         // Extract Form & Semesters
         const legacyForm = document.querySelector('form[action="/Student/StudentAttendance"]');
         if(legacyForm) {
@@ -280,7 +382,7 @@ function AttendancePage() {
        <div className="w-full min-h-screen p-6 md:p-8 space-y-8 animate-in fade-in duration-500">
           
           {/* Header Section */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
              <div className="space-y-2">
                <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
                   Attendance
@@ -319,28 +421,40 @@ function AttendancePage() {
                 </div>
                 
                 {/* Course Selector Dropdown */}
-                <div className="w-full md:w-auto">
-                    <CourseSelector 
-                      courses={courses}
-                      selectedId={selectedCourseId}
-                      onSelect={setSelectedCourseId}
-                    />
-                </div>
+                {courses.length > 0 && (
+                    <div className="w-full md:w-auto">
+                        <CourseSelector 
+                          courses={courses}
+                          selectedId={selectedCourseId}
+                          onSelect={setSelectedCourseId}
+                        />
+                    </div>
+                )}
+                
+                <BookmarksMenu 
+                    markedRecords={markedRecords}
+                    courses={courses}
+                    onNavigate={(courseId) => setSelectedCourseId(courseId)}
+                />
                 
                 {/* Hidden Form for Submission */}
                 <div ref={hiddenFormRef} className="hidden"></div>
              </div>
           </div>
 
-          {/* Alert Section */}
-          {alertInfo && (
-              <div className={`p-4 rounded-2xl border flex items-center gap-3 ${
-                  alertInfo.type === 'error' 
-                  ? 'bg-rose-500/10 border-rose-500/20 text-rose-200' 
-                  : 'bg-blue-500/10 border-blue-500/20 text-blue-200'
-              }`}>
-                  <AlertCircle size={20} />
-                  <span className="font-semibold text-sm">{alertInfo.message}</span>
+          {/* Top Banner Alert (Only show if we have courses, otherwise show in main area) */}
+          {courses.length > 0 && alerts.length > 0 && (
+              <div className="space-y-4">
+                  {alerts.map((alert, idx) => (
+                    <div key={idx} className={`p-4 rounded-2xl border flex items-center gap-3 ${
+                        alert.type === 'error' 
+                        ? 'bg-rose-500/10 border-rose-500/20 text-rose-200' 
+                        : 'bg-blue-500/10 border-blue-500/20 text-blue-200'
+                    }`}>
+                        <AlertCircle size={20} />
+                        <span className="font-semibold text-sm">{alert.message}</span>
+                    </div>
+                  ))}
               </div>
           )}
 
@@ -350,9 +464,6 @@ function AttendancePage() {
              </div>
           ) : courses.length > 0 ? (
              <>
-                {/* Course Pills */}
-
-
                 {/* Selected Course Detail */}
                 {selectedCourseData && (
                    <div key={selectedCourseId} className="space-y-16 animate-in slide-in-from-bottom-4 duration-500">
@@ -423,11 +534,34 @@ function AttendancePage() {
                 )}
              </>
           ) : (
-             !alertInfo && (
-                <div className="text-center py-20 text-zinc-500">
-                   No courses found.
-                </div>
-             )
+             <div className={`flex flex-col gap-4 py-12 justify-center mx-auto ${
+                 alerts.some(a => a.message.toLowerCase().includes("no record")) ? "w-full" : "max-w-2xl"
+             }`}>
+                {alerts.length > 0 ? (
+                    alerts.filter(alert => {
+                         const hasNoRecord = alerts.some(a => a.message.toLowerCase().includes("no record"));
+                         if (hasNoRecord && alert.message.includes("Attendance Update")) return false;
+                         return true;
+                    }).map((alert, idx) => (
+                        <div key={idx} className={`relative p-4 rounded-2xl border backdrop-blur-xl flex items-center gap-4 shadow-xl w-full ${
+                            alert.type === 'error' 
+                            ? 'bg-rose-500/10 border-rose-500/20 text-rose-200' 
+                            : 'bg-blue-500/10 border-blue-500/20 text-blue-200'
+                        }`}>
+                            <AlertCircle size={20} />
+                            <span className="font-semibold text-sm">{alert.message}</span>
+                        </div>
+                    ))
+                ) : (
+                    <div className="flex flex-col items-center justify-center opacity-50 py-12">
+                         <div className="p-4 rounded-full bg-zinc-900 mb-4 ring-1 ring-white/10">
+                            <BookOpen size={32} className="text-zinc-600" />
+                        </div>
+                        <div className="text-xl font-bold text-zinc-500">No attendance data found</div>
+                        <p className="text-sm text-zinc-600 mt-2">Try selecting a different semester</p>
+                    </div>
+                )}
+             </div>
           )}
        </div>
     </PageLayout>

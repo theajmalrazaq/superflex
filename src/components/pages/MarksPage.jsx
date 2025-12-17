@@ -1,9 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
+import  { useEffect, useState, useRef } from "react";
 import PageLayout from "../layouts/PageLayout";
 import { 
   ChevronDown, 
   AlertCircle,
   BookOpen,
+  Bookmark,
+  Layers
 } from "lucide-react";
 
 // --- Utility Functions ---
@@ -93,7 +95,176 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
   );
 };
 
-const AssessmentView = ({ section, onUpdate }) => {
+const SectionSelector = ({ sections, selectedId, onSelect }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const selectedSection = sections.find(s => s.id === selectedId) || sections[0];
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  if (!selectedSection) return null;
+
+  return (
+    <div className="relative w-full md:w-auto z-40" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full md:w-[280px] flex items-center justify-between px-3 py-2.5 rounded-[2rem] bg-zinc-900/50 border border-white/5 text-white hover:bg-white/5 transition-all group"
+      >
+        <div className="flex items-center gap-3 overflow-hidden">
+             <div className="p-2 rounded-xl bg-[#a098ff]/10 text-[#a098ff]">
+                <Layers size={16} />
+             </div>
+             <div className="flex flex-col items-start truncate">
+                 <span className="text-[10px] text-[#a098ff] font-bold uppercase tracking-wider leading-none mb-0.5">Selected Section</span>
+                 <span className="text-sm font-bold truncate w-full text-left leading-none">{selectedSection.title}</span>
+             </div>
+        </div>
+        <ChevronDown size={16} className={`text-zinc-500 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10 shadow-2xl max-h-[60vh] overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200 z-[60]">
+           <div className="flex flex-col gap-1">
+              {sections.map(section => (
+                 <button
+                    key={section.id}
+                    onClick={() => {
+                       onSelect(section.id);
+                       setIsOpen(false);
+                    }}
+                    className={`w-full flex bg-zinc-900 items-center justify-between p-3 rounded-xl transition-all ${
+                       selectedId === section.id 
+                       ? "bg-[#a098ff]/10 text-white border border-[#a098ff]/20" 
+                       : "text-zinc-400 hover:bg-white/5 border border-transparent hover:text-white"
+                    }`}
+                 >
+                    <span className="text-sm font-medium truncate">
+                       {section.title}
+                    </span>
+                 </button>
+              ))}
+           </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            setIsOpen(false);
+        }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // Reconstruct bookmarked items details
+    const bookmarkedDetails = [];
+    if (markedItems.size > 0 && courses.length > 0) {
+        courses.forEach(course => {
+            course.sections.forEach(section => {
+                section.rows.forEach(row => {
+                     const uniqueId = `${course.id}-${section.id}-${row.title}`;
+                     if (markedItems.has(uniqueId)) {
+                         bookmarkedDetails.push({
+                             uniqueId,
+                             courseTitle: course.title,
+                             sectionTitle: section.title,
+                             rowTitle: row.title,
+                             obtained: row.obtained,
+                             total: row.total,
+                             courseId: course.id,
+                             sectionId: section.id
+                         });
+                     }
+                });
+            });
+        });
+    }
+
+    return (
+        <div className="relative z-[999]" ref={dropdownRef}>
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className={`p-3 rounded-full border transition-all ${
+                    isOpen 
+                    ? "bg-[#a098ff]/20 text-[#a098ff] border-[#a098ff]/20" 
+                    : "bg-zinc-900/50 text-zinc-400 border-white/5 hover:text-white hover:bg-white/10"
+                }`}
+                title="View Bookmarks"
+            >
+                <Bookmark size={20} fill={bookmarkedDetails.length > 0 ? "currentColor" : "none"} />
+            </button>
+
+            {isOpen && (
+                <div className="absolute top-full right-0 mt-2 w-96 md:w-[500px] bg-[#111] backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
+                        <h3 className="font-bold text-white flex items-center gap-2">
+                        
+                            Bookmarked Items
+                        </h3>
+                        
+                    </div>
+                    
+                    <div className="max-h-[60vh] overflow-y-auto custom-scrollbar p-2 space-y-1">
+                        {bookmarkedDetails.length === 0 ? (
+                            <div className="p-8 text-center text-zinc-500 text-sm">
+                                <p>No bookmarks yet.</p>
+                                <p className="text-xs mt-1 opacity-50">Click the bookmark icon on any assessment item to save it here.</p>
+                            </div>
+                        ) : (
+                            bookmarkedDetails.map((item) => (
+                                <button
+                                    key={item.uniqueId}
+                                    onClick={() => {
+                                        onNavigate(item.courseId, item.sectionId);
+                                        setIsOpen(false);
+                                    }}
+                                    className="w-full text-left p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all group"
+                                >
+                                    <div className="flex justify-between items-start mb-1">
+                                        <div className="font-bold text-sm text-white group-hover:text-[#a098ff] transition-colors truncate w-full pr-2">
+                                            {item.rowTitle}
+                                        </div>
+                                         <span className={`text-xs font-bold whitespace-nowrap ${
+                                            (item.obtained/item.total)*100 >= 80 ? "text-emerald-400" :
+                                            (item.obtained/item.total)*100 >= 60 ? "text-amber-400" :
+                                            "text-rose-400"
+                                        }`}>
+                                            {item.obtained} / {item.total}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-[10px] text-zinc-500 uppercase tracking-wider font-bold">
+                                        <span className="truncate max-w-[120px]">{item.courseTitle}</span>
+                                        <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
+                                        <span className="truncate">{item.sectionTitle}</span>
+                                    </div>
+                                </button>
+                            ))
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+const AssessmentView = ({ section, onUpdate, markedItems, onToggleMark, courseId }) => {
   const isGrandTotal = section.title.includes("Grand Total");
   const obtained = section.obtained || 0;
   const weight = section.weight || 0;
@@ -122,7 +293,7 @@ const AssessmentView = ({ section, onUpdate }) => {
            {/* Title Section */}
            <div className="flex flex-col gap-1">
                <div className="flex items-center gap-3">
-                   <h3 className={`text-xl font-bold ${isGrandTotal ? "text-[#a098ff]" : "text-white"}`}>
+                   <h3 className={`text-xl font-bold text-white`}>
                        {section.title}
                    </h3>
                    {isGrandTotal && (
@@ -168,25 +339,47 @@ const AssessmentView = ({ section, onUpdate }) => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
-                        {section.rows.filter(r => r.title !== "Total").map((row, idx) => (
-                            <tr key={idx} className={`group hover:bg-white/5 transition-colors ${!row.included ? 'opacity-40 grayscale-[0.8]' : ''}`}>
-                                <td className="px-6 py-4 font-medium text-white/90">
-                                    <div className="flex items-center gap-2">
-                                        {row.included ? (
-                                            <div className="w-1.5 h-1.5 rounded-full bg-[#a098ff]"></div>
-                                        ) : (
-                                            <div className="w-1.5 h-1.5 rounded-full bg-zinc-600"></div>
-                                        )}
-                                        {row.title}
-                                        {!row.included && <span className="ml-2 text-[9px] font-bold bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded uppercase">Dropped</span>}
-                                    </div>
-                                </td>
+                        {section.rows.filter(r => r.title !== "Total").map((row, idx) => {
+                            const uniqueId = `${courseId}-${section.id}-${row.title}`;
+                            const isMarked = markedItems?.has(uniqueId);
+                            
+                            return (
+                                <tr key={idx} className={`group transition-all duration-300 border-b border-white/5 ${
+                                    !row.included ? 'opacity-40 grayscale-[0.8]' : ''
+                                } ${
+                                    isMarked 
+                                    ? "bg-[#a098ff]/10" 
+                                    : "hover:bg-white/5 border-white/5"
+                                }`}>
+                                    <td className="px-6 py-4 font-medium text-white/90">
+                                        <div className="flex items-center gap-3">
+                                             <button 
+                                                onClick={() => onToggleMark?.(uniqueId)}
+                                                className={`p-1.5 rounded-lg transition-all ${
+                                                    isMarked 
+                                                    ? "bg-[#a098ff]/20 text-[#a098ff]" 
+                                                    : "text-zinc-600 hover:text-zinc-400 hover:bg-white/5"
+                                                }`}
+                                             >
+                                                <Bookmark size={16} fill={isMarked ? "currentColor" : "none"} />
+                                             </button>
+                                            <div className="flex items-center gap-2">
+                                                {row.included ? (
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-[#a098ff]"></div>
+                                                ) : (
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-zinc-600"></div>
+                                                )}
+                                                {row.title}
+                                                {!row.included && <span className="ml-2 text-[9px] font-bold bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded uppercase">Dropped</span>}
+                                            </div>
+                                        </div>
+                                    </td>
                                 <td className="px-6 py-4 text-center text-zinc-400">
                                     <input
                                         type="text"
                                         value={row.weight}
                                         onChange={(e) => onUpdate(idx, 'weight', e.target.value)}
-                                        className="bg-transparent text-center w-16 focus:outline-none focus:border-b focus:border-[#a098ff] hover:bg-white/5 rounded transition-colors"
+                                        className="bg-transparent text-center w-16 focus:outline-none focus:border focus:border-[#a098ff] hover:bg-white/5 rounded transition-colors"
                                     />
                                 </td>
                                 <td className="px-6 py-4 text-center text-zinc-400">{row.total.toFixed(1)}</td>
@@ -195,7 +388,7 @@ const AssessmentView = ({ section, onUpdate }) => {
                                         type="text"
                                         value={row.obtained !== null ? row.obtained : ""}
                                         onChange={(e) => onUpdate(idx, 'obtained', e.target.value)}
-                                        className={`font-bold text-base text-center w-16 bg-transparent focus:outline-none focus:border-b focus:border-[#a098ff] hover:bg-white/5 rounded transition-colors ${
+                                        className={`font-bold text-base text-center w-16 bg-transparent focus:outline-none focus:border focus:border-[#a098ff] hover:bg-white/5 rounded transition-colors ${
                                         (row.obtained/row.total)*100 >= 80 ? "text-emerald-400" :
                                         (row.obtained/row.total)*100 >= 60 ? "text-amber-400" :
                                         "text-rose-400"
@@ -207,7 +400,8 @@ const AssessmentView = ({ section, onUpdate }) => {
                                 <td className="px-6 py-4 text-center text-zinc-500">{row.min.toFixed(1)}</td>
                                 <td className="px-6 py-4 text-center text-zinc-500">{row.max.toFixed(1)}</td>
                             </tr>
-                        ))}
+                        );
+                        })}
                     </tbody>
                     <tfoot className="bg-[#1c1c1c]/50 border-t-2 border-white/10 font-bold backdrop-blur-sm">
                             <tr>
@@ -397,6 +591,29 @@ function MarksPage() {
   const [alertInfo, setAlertInfo] = useState(null);
   const hiddenFormRef = useRef(null);
   const [activeSectionId, setActiveSectionId] = useState(null);
+
+  const [markedItems, setMarkedItems] = useState(() => {
+    if (typeof window !== "undefined") {
+        const saved = localStorage.getItem("superflex_marked_marks");
+        try {
+            return new Set(saved ? JSON.parse(saved) : []);
+        } catch {
+            return new Set();
+        }
+    }
+    return new Set();
+  });
+
+  useEffect(() => {
+    localStorage.setItem("superflex_marked_marks", JSON.stringify([...markedItems]));
+  }, [markedItems]);
+
+  const handleToggleMark = (id) => {
+     const newSet = new Set(markedItems);
+     if(newSet.has(id)) newSet.delete(id);
+     else newSet.add(id);
+     setMarkedItems(newSet);
+  };
 
   useEffect(() => {
     const parseData = () => {
@@ -687,13 +904,13 @@ function MarksPage() {
       <div className="w-full min-h-screen p-4 md:p-8 space-y-8 animate-in fade-in duration-500 pb-24">
          
          {/* Top Navigation Bar */}
-         <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6 mb-8">
+         <div className="flex flex-col xl:flex-row justify-between items-center gap-6 mb-8">
              <div className="space-y-2">
                  <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter">Marks & Grades</h1>
                  <p className="text-zinc-400 font-medium text-lg">Academic performance details</p>
              </div>
 
-             <div className="flex flex-col md:flex-row items-start md:items-end gap-4 w-full xl:w-auto">
+             <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full xl:w-auto">
                 <div className="flex gap-2 bg-zinc-900/50 p-1.5 rounded-full border border-white/5 backdrop-blur-sm self-start md:self-auto overflow-x-auto custom-scrollbar max-w-full">
                     {semesters.map((sem, idx) => (
                         <button
@@ -733,6 +950,23 @@ function MarksPage() {
                         }
                     }}
                  />
+                 
+                 {selectedCourse && (
+                    <SectionSelector 
+                        sections={selectedCourse.sections}
+                        selectedId={activeSectionId}
+                        onSelect={setActiveSectionId}
+                    />
+                 )}
+
+                 <BookmarksMenu 
+                    markedItems={markedItems}
+                    courses={courses}
+                    onNavigate={(courseId, sectionId) => {
+                        setSelectedCourseId(courseId);
+                        setActiveSectionId(sectionId);
+                    }}
+                 />
                  <div ref={hiddenFormRef} className="hidden" />
              </div>
          </div>
@@ -764,34 +998,25 @@ function MarksPage() {
                  {/* Active Section Content */}
                  <div className="flex flex-col gap-6">
                      
-                     {/* Section Selector Pills */}
-                     <div className="flex gap-2 bg-zinc-900/50 p-1.5 rounded-full border border-white/5 backdrop-blur-sm overflow-x-auto custom-scrollbar self-end w-fit">
-                        {selectedCourse.sections.map(section => (
-                            <button
-                                key={section.id}
-                                onClick={() => setActiveSectionId(section.id)}
-                                className={`px-5 py-2 border rounded-full text-sm font-bold transition-all duration-300 whitespace-nowrap ${
-                                    activeSectionId === section.id
-                                    ? "bg-[#a098ff]/10 text-[#a098ff] border-[#a098ff]/20"
-                                    : "text-zinc-500 border-transparent hover:text-white hover:bg-white/5"
-                                }`}
-                            >
-                                {section.title}
-                            </button>
-                        ))}
-                     </div>
+
 
                      {/* Active Section View */}
                      {activeSectionId && selectedCourse.sections.find(s => s.id === activeSectionId) ? (
                          <AssessmentView 
                             section={selectedCourse.sections.find(s => s.id === activeSectionId)}
                             onUpdate={(rowIndex, field, value) => handleRowUpdate(activeSectionId, rowIndex, field, value)}
+                            markedItems={markedItems}
+                            onToggleMark={handleToggleMark}
+                            courseId={selectedCourse.id}
                          />
                      ) : selectedCourse.sections.length > 0 ? (
                          // Fallback if no active section but sections exist (shouldn't happen often)
                          <AssessmentView 
                             section={selectedCourse.sections[0]}
                             onUpdate={(rowIndex, field, value) => handleRowUpdate(selectedCourse.sections[0].id, rowIndex, field, value)}
+                            markedItems={markedItems}
+                            onToggleMark={handleToggleMark}
+                            courseId={selectedCourse.id}
                          />
                      ) : (
                          <div className="text-center py-24 bg-[#161616] rounded-[30px] border border-white/5 opacity-50">
@@ -802,7 +1027,7 @@ function MarksPage() {
 
              </div>
          ) : (
-            <div className="text-center py-32 text-zinc-500 font-medium">No course data found.</div>
+            null
          )}
       </div>
     </PageLayout>
