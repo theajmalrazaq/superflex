@@ -29,7 +29,7 @@ function LoginPageStyles() {
       .classList.add("!w-full", "!p-0");
     const mainContainer = document.querySelector(
       ".m-stack__item.m-stack__item--fluid",
-    ); 
+    );
     if (mainContainer) {
       mainContainer.classList.add(
         "!flex",
@@ -65,10 +65,13 @@ function LoginPageStyles() {
         element.classList.add("!gap-1.5", "!flex-col", "!w-full");
       });
 
-    // Style labels to be white
-    document.querySelectorAll(".input-group label, .m-form__label, label, .input-group h5, h5").forEach((label) => {
-      label.classList.add("!text-white", "!font-medium");
-    });
+    document
+      .querySelectorAll(
+        ".input-group label, .m-form__label, label, .input-group h5, h5",
+      )
+      .forEach((label) => {
+        label.classList.add("!text-white", "!font-medium");
+      });
 
     document.querySelectorAll(".input-group-addon").forEach((element) => {
       element.remove();
@@ -142,7 +145,7 @@ function LoginPageStyles() {
         "!items-center",
         "!justify-center",
         "!w-[420px]",
-        "!hidden", // Initially hidden
+        "!hidden",
         "!fixed",
         "!top-1/2",
         "!left-1/2",
@@ -156,8 +159,9 @@ function LoginPageStyles() {
       bglogin.setAttribute("id", "login-popup");
     }
 
-    // Hide and style the Forgot Password section
-    const forgotPasswordSection = document.querySelector(".m-login__forget-password");
+    const forgotPasswordSection = document.querySelector(
+      ".m-login__forget-password",
+    );
     if (forgotPasswordSection) {
       forgotPasswordSection.classList.add(
         "!bg-black/10",
@@ -170,7 +174,7 @@ function LoginPageStyles() {
         "!flex-col",
         "!gap-6",
         "!w-[420px]",
-        "!hidden", // Initially hidden
+        "!hidden",
         "!fixed",
         "!top-1/2",
         "!left-1/2",
@@ -183,51 +187,64 @@ function LoginPageStyles() {
       );
       forgotPasswordSection.setAttribute("id", "forgot-password-popup");
 
-      // Style the forgot password head container
       const forgotHead = forgotPasswordSection.querySelector(".m-login__head");
       if (forgotHead) {
         forgotHead.classList.add("!flex", "!flex-col", "!gap-3", "!w-full");
       }
 
-      // Style the forgot password title
-      const forgotTitle = forgotPasswordSection.querySelector(".m-login__title");
+      const forgotTitle =
+        forgotPasswordSection.querySelector(".m-login__title");
       if (forgotTitle) {
         forgotTitle.style.display = "block";
-        forgotTitle.classList.add("!text-white", "!text-2xl", "!font-bold", "!mb-0");
+        forgotTitle.classList.add(
+          "!text-white",
+          "!text-2xl",
+          "!font-bold",
+          "!mb-0",
+        );
       }
 
-      // Style the description
       const forgotDesc = forgotPasswordSection.querySelector(".m-login__desc");
       if (forgotDesc) {
-        forgotDesc.classList.add("!text-white/70", "!text-sm", "!leading-relaxed", "!mb-0");
+        forgotDesc.classList.add(
+          "!text-white/70",
+          "!text-sm",
+          "!leading-relaxed",
+          "!mb-0",
+        );
       }
 
-      // Style the form container
       const forgotForm = forgotPasswordSection.querySelector(".m-login__form");
       if (forgotForm) {
         forgotForm.classList.add("!flex", "!flex-col", "!gap-4", "!w-full");
       }
 
-      // Style the email input container
-      const emailInputGroup = forgotPasswordSection.querySelector(".m-input-icon");
+      const emailInputGroup =
+        forgotPasswordSection.querySelector(".m-input-icon");
       if (emailInputGroup) {
         emailInputGroup.classList.add("!w-full");
       }
 
-      // Style the form actions container
-      const forgotFormAction = forgotPasswordSection.querySelector(".m-login__form-action");
+      const forgotFormAction = forgotPasswordSection.querySelector(
+        ".m-login__form-action",
+      );
       if (forgotFormAction) {
-        forgotFormAction.classList.add("!flex", "!flex-col", "!gap-3", "!w-full", "!mt-2");
+        forgotFormAction.classList.add(
+          "!flex",
+          "!flex-col",
+          "!gap-3",
+          "!w-full",
+          "!mt-2",
+        );
       }
 
-      // Append forgot password section to body
       document.body.appendChild(forgotPasswordSection);
     }
 
-    // Find or create the "Forgot Password" link
-    let forgotPasswordLink = document.querySelector('a[href*="ForgotPassword"]');
+    let forgotPasswordLink = document.querySelector(
+      'a[href*="ForgotPassword"]',
+    );
     if (!forgotPasswordLink) {
-      // Create a forgot password link if it doesn't exist
       forgotPasswordLink = document.createElement("a");
       forgotPasswordLink.href = "#";
       forgotPasswordLink.textContent = "Forgot Password?";
@@ -239,9 +256,10 @@ function LoginPageStyles() {
         "!transition-all",
         "!duration-200",
       );
-      
-      // Insert it in the login form
-      const loginFormAction = document.querySelector(".m-login__signin .m-form__actions");
+
+      const loginFormAction = document.querySelector(
+        ".m-login__signin .m-form__actions",
+      );
       if (loginFormAction) {
         loginFormAction.appendChild(forgotPasswordLink);
       }
@@ -257,18 +275,15 @@ function LoginPageStyles() {
       );
     }
 
-    // Add click handler for forgot password link
     if (forgotPasswordLink && forgotPasswordSection) {
       forgotPasswordLink.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
 
-        // Hide login popup
         if (bglogin) {
           bglogin.classList.add("!hidden", "!opacity-0");
         }
 
-        // Show forgot password popup
         forgotPasswordSection.classList.remove("!hidden");
         setTimeout(() => {
           forgotPasswordSection.classList.remove("!opacity-0");
@@ -276,21 +291,20 @@ function LoginPageStyles() {
         }, 10);
       });
 
-      // Add handler for cancel button in forgot password form
-      const cancelButton = forgotPasswordSection.querySelector("#m_login_forget_password_cancel");
+      const cancelButton = forgotPasswordSection.querySelector(
+        "#m_login_forget_password_cancel",
+      );
       if (cancelButton) {
         cancelButton.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
 
-          // Hide forgot password popup
           forgotPasswordSection.classList.remove("!opacity-100");
           forgotPasswordSection.classList.add("!opacity-0");
-          
+
           setTimeout(() => {
             forgotPasswordSection.classList.add("!hidden");
-            
-            // Show login popup again
+
             if (bglogin) {
               bglogin.classList.remove("!hidden");
               setTimeout(() => {
@@ -303,7 +317,6 @@ function LoginPageStyles() {
       }
     }
 
-    // Create the Sign In button
     const signInButton = document.createElement("button");
     signInButton.id = "show-login-btn";
     signInButton.className = `
@@ -332,11 +345,12 @@ function LoginPageStyles() {
       </svg>
     `;
 
-    // Create the Give Suggestion button
     const suggestionButton = document.createElement("a");
-    suggestionButton.href = "https://github.com/theajmalrazaq/superflex/issues/new";
+    suggestionButton.href =
+      "https://github.com/theajmalrazaq/superflex/issues/new";
     suggestionButton.target = "_blank";
-    suggestionButton.className = "group relative bg-white/10 backdrop-blur-sm px-7 py-3.5 rounded-xl font-semibold text-white hover:bg-white/20 hover:border-white/40 transition-all duration-300 flex items-center gap-3";
+    suggestionButton.className =
+      "group relative bg-white/10 backdrop-blur-sm px-7 py-3.5 rounded-xl font-semibold text-white hover:bg-white/20 hover:border-white/40 transition-all duration-300 flex items-center gap-3";
     suggestionButton.style.fontFamily = "'Google Sans Flex', sans-serif";
     suggestionButton.innerHTML = `
       <span class="font-light">Give Suggestion</span>
@@ -345,7 +359,6 @@ function LoginPageStyles() {
       </svg>
     `;
 
-    // Create backdrop overlay
     const backdrop = document.createElement("div");
     backdrop.id = "login-backdrop";
     backdrop.className = `
@@ -361,19 +374,16 @@ function LoginPageStyles() {
       !cursor-pointer
     `;
 
-    // Add click handlers
     signInButton.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      
-      // Show backdrop
+
       backdrop.classList.remove("!hidden");
       setTimeout(() => {
         backdrop.classList.remove("!opacity-0");
         backdrop.classList.add("!opacity-100");
       }, 10);
 
-      // Show login popup
       bglogin.classList.remove("!hidden");
       setTimeout(() => {
         bglogin.classList.remove("!opacity-0");
@@ -384,26 +394,27 @@ function LoginPageStyles() {
     backdrop.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      
-      // Hide login popup if visible
+
       if (bglogin && !bglogin.classList.contains("!hidden")) {
         bglogin.classList.remove("!opacity-100", "!scale-100");
         bglogin.classList.add("!opacity-0");
       }
-      
-      // Hide forgot password popup if visible
-      if (forgotPasswordSection && !forgotPasswordSection.classList.contains("!hidden")) {
+
+      if (
+        forgotPasswordSection &&
+        !forgotPasswordSection.classList.contains("!hidden")
+      ) {
         forgotPasswordSection.classList.remove("!opacity-100");
         forgotPasswordSection.classList.add("!opacity-0");
       }
-      
-      // Hide backdrop
+
       backdrop.classList.remove("!opacity-100");
       backdrop.classList.add("!opacity-0");
-      
+
       setTimeout(() => {
         if (bglogin) bglogin.classList.add("!hidden");
-        if (forgotPasswordSection) forgotPasswordSection.classList.add("!hidden");
+        if (forgotPasswordSection)
+          forgotPasswordSection.classList.add("!hidden");
         backdrop.classList.add("!hidden");
       }, 300);
     });
@@ -461,7 +472,7 @@ function LoginPageStyles() {
         
         <img src="https://theajmalrazaq.github.io/superflex/res/logo.svg" alt="SuperFlex" class="w-80 hero-logo" />
         
-        <p class="font-mono text-white">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</p>
+        <span class="font-mono letter-spacing-[2px] text-white">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span>
 
         <p class="text-white">
           By <a href="https://github.com/theajmalrazaq" target="_blank" class="text-[#a098ff]">Ajmal Razaq Bhatti</a>
@@ -475,7 +486,7 @@ function LoginPageStyles() {
     <!-- Feature Grid -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl w-full px-6 feature-grid mt-8">
         <div class="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-md border border-white/20 rounded-3xl p-5 hover:shadow-lg hover:shadow-[#a098ff]/10 transition duration-300 group">
-          <div class="flex items-center gap-3 mb-3">
+          <div class="flex flex-col items-start gap-3">
             <div class="bg-[#a098ff] p-2.5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition duration-300">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
                 <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/>
@@ -485,30 +496,30 @@ function LoginPageStyles() {
                 <line x1="8" x2="16" y1="18" y2="18"/>
               </svg>
             </div>
-            <h3 class="text-base font-semibold">Advanced GPA Tools</h3>
+            <h3 class="text-base font-semibold text-left">Advanced GPA Tools</h3>
+            <p class="text-white/80 text-sm leading-relaxed text-left">
+              Calculate semester GPA, plan target CGPA, and track your academic progress with ease.
+            </p>
           </div>
-          <p class="text-white/80 text-sm leading-relaxed">
-            Calculate semester GPA, plan target CGPA, and track your academic progress with ease.
-          </p>
         </div>
 
         <div class="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-md border border-white/20 rounded-3xl p-5 hover:shadow-lg hover:shadow-[#a098ff]/10 transition duration-300 group">
-          <div class="flex items-center gap-3 mb-3">
+          <div class="flex flex-col items-start gap-3">
             <div class="bg-[#a098ff] p-2.5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition duration-300">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
                 <path d="M3 3v18h18"/>
                 <path d="m19 9-5 5-4-4-3 3"/>
               </svg>
             </div>
-            <h3 class="text-base font-semibold">Statistical Insights</h3>
+            <h3 class="text-base font-semibold text-left">Statistical Insights</h3>
+            <p class="text-white/80 text-sm leading-relaxed text-left">
+              View grand total, sessional averages, min/max scores and complete performance analytics.
+            </p>
           </div>
-          <p class="text-white/80 text-sm leading-relaxed">
-            View grand total, sessional averages, min/max scores and complete performance analytics.
-          </p>
         </div>
 
         <div class="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-md border border-white/20 rounded-3xl p-5 hover:shadow-lg hover:shadow-[#a098ff]/10 transition duration-300 group">
-          <div class="flex items-center gap-3 mb-3">
+          <div class="flex flex-col items-start gap-3">
             <div class="bg-[#a098ff] p-2.5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition duration-300">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
                 <rect width="7" height="9" x="3" y="3" rx="1"/>
@@ -517,14 +528,124 @@ function LoginPageStyles() {
                 <rect width="7" height="5" x="3" y="16" rx="1"/>
               </svg>
             </div>
-            <h3 class="text-base font-semibold">Modern UI/UX</h3>
+            <h3 class="text-base font-semibold text-left">Modern UI/UX</h3>
+            <p class="text-white/80 text-sm leading-relaxed text-left">
+              Sleek interface with dark mode, customizable themes and intuitive navigation controls.
+            </p>
           </div>
-          <p class="text-white/80 text-sm leading-relaxed">
-            Sleek interface with dark mode, customizable themes and intuitive navigation controls.
-          </p>
         </div>
     </div>
+
+    <!-- Update Notification Section -->
+    <div id="update-notification-section" class="w-full max-w-4xl px-6 mt-5 hidden opacity-0 transition-opacity duration-300">
+      <div class="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-md border border-white/20 rounded-3xl p-5 hover:shadow-lg hover:shadow-[#a098ff]/10 transition duration-300 group">
+        <div class="flex items-center justify-between gap-6">
+          <div class="flex flex items-center gap-3 flex-1">
+            <div class="bg-[#a098ff] p-2.5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition duration-300">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                <path d="M16 16h5v5"/>
+              </svg>
+            </div>
+            <div class="flex flex-col gap-1">
+            <h3 class="text-base font-semibold text-white text-left">
+              New Update Available! 🎉
+            </h3>
+            <p class="text-white/80 text-sm leading-relaxed text-left">
+              Version <span id="latest-version"></span> is ready to download with exciting improvements.
+            </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 flex-shrink-0">
+            <a href="https://theajmalrazaq.github.io/superflex" target="_blank" class="bg-[#a098ff] hover:bg-[#8f86ff] text-white text-sm font-semibold px-5 py-2 rounded-xl transition-all duration-200 flex items-center gap-2 whitespace-nowrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Download
+            </a>
+            <button id="dismiss-update-btn" class="text-white/60 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-lg" title="Dismiss">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     `;
+    const CURRENT_VERSION = "1.0.0";
+    const checkForUpdates = async () => {
+      try {
+        const lastDismissed = localStorage.getItem(
+          "updateNotificationDismissed",
+        );
+        const today = new Date().toDateString();
+
+        if (lastDismissed === today) {
+          return;
+        }
+
+        const response = await fetch(
+          "https://api.github.com/repos/theajmalrazaq/superflex/releases/latest",
+        );
+        const data = await response.json();
+
+        if (data.tag_name) {
+          const latestVer = data.tag_name.replace(/^v/, "");
+
+          const latestParts = latestVer.split(".").map(Number);
+          const currentParts = CURRENT_VERSION.split(".").map(Number);
+          let isNewer = false;
+
+          for (
+            let i = 0;
+            i < Math.max(latestParts.length, currentParts.length);
+            i++
+          ) {
+            const latestPart = latestParts[i] || 0;
+            const currentPart = currentParts[i] || 0;
+            if (latestPart > currentPart) {
+              isNewer = true;
+              break;
+            }
+            if (latestPart < currentPart) break;
+          }
+
+          if (isNewer) {
+            const updateSection = document.getElementById(
+              "update-notification-section",
+            );
+            const versionEl = document.getElementById("latest-version");
+            const dismissBtn = document.getElementById("dismiss-update-btn");
+
+            if (updateSection && versionEl) {
+              versionEl.textContent = latestVer;
+              updateSection.classList.remove("hidden");
+              setTimeout(() => updateSection.classList.remove("opacity-0"), 10);
+            }
+
+            if (dismissBtn) {
+              dismissBtn.addEventListener("click", () => {
+                updateSection.classList.add("opacity-0");
+                setTimeout(() => {
+                  updateSection.classList.add("hidden");
+                  localStorage.setItem("updateNotificationDismissed", today);
+                }, 300);
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error checking for updates:", error);
+      }
+    };
+
+    checkForUpdates();
 
     fetch("https://api.github.com/repos/theajmalrazaq/superflex")
       .then((res) => res.json())
@@ -551,16 +672,16 @@ function LoginPageStyles() {
 
       heroDiv.classList.add("hero-section-injected");
       wrapper.insertBefore(heroDiv, bglogin);
-      
-      // Add buttons to the buttons container
-      const buttonsContainer = heroDiv.querySelector("#login-buttons-container");
+
+      const buttonsContainer = heroDiv.querySelector(
+        "#login-buttons-container",
+      );
       if (buttonsContainer) {
         buttonsContainer.appendChild(signInButton);
         buttonsContainer.appendChild(suggestionButton);
       }
     }
-    
-    // Append backdrop and form to body (form must come after backdrop in DOM)
+
     document.body.appendChild(backdrop);
     if (bglogin) {
       document.body.appendChild(bglogin);
