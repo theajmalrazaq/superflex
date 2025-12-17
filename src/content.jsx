@@ -6,7 +6,6 @@ import "./styles/tailwind.css";
 
 (() => {
   const script = document.createElement("script");
-
   script.src = chrome.runtime.getURL("umami.js");
   script.defer = true;
   script.dataset.websiteId = "17490ccf-0b15-4d8a-a908-5e774ad648de";
@@ -35,6 +34,13 @@ if (!favicon) {
 favicon.href = `${chrome.runtime.getURL("public/favicon.svg")}`;
 if (document.querySelector(".m-grid__item.m-footer")) {
   document.querySelector(".m-grid__item.m-footer").remove();
+}
+
+const unwantedCss = document.querySelector(
+  'link[href="/Assets/demo/demo3/base/style.bundle.css"]',
+);
+if (unwantedCss) {
+  unwantedCss.remove();
 }
 
 document.body.style.fontFamily = "'Google Sans Flex', sans-serif";

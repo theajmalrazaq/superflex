@@ -79,9 +79,7 @@
               }),
               n = await t.json();
             n && ((H = !!n.disabled), (R = n.cache));
-          } catch (t) {
-            console.log(t);
-          }
+          } catch (t) {}
       },
       I = () => {
         G ||

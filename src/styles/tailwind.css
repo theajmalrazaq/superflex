@@ -10,6 +10,10 @@
   --font-mono: "Google Sans Flex", sans-serif;
 }
 
+html {
+  font-size: 90%; /* Scale down to approx 14.4px base */
+}
+
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -33,18 +37,10 @@
 button:focus {
   outline: none !important;
 }
-a {
-  color: unset;
-  text-decoration: unset !important;
-  background-color: unset !important;
+.border {
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
-.h1,
-.h2,
-.h3,
-.h4,
-.h5,
-.h6,
 h1,
 h2,
 h3,

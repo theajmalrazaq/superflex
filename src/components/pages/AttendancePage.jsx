@@ -32,16 +32,13 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
     <div className="relative w-full md:w-auto z-50" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full md:w-[350px] flex items-center justify-between px-3 py-2.5 rounded-[2rem] bg-zinc-900/50 border border-white/5 text-white hover:bg-white/5 transition-all group"
+        className="w-full md:w-[350px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-zinc-900/50 border border-white/5 text-white hover:bg-white/5 transition-all group"
       >
         <div className="flex items-center gap-3 overflow-hidden">
           <div className="p-2 rounded-xl bg-[#a098ff]/10 text-[#a098ff]">
             <BookOpen size={16} />
           </div>
           <div className="flex flex-col items-start truncate">
-            <span className="text-[10px] text-[#a098ff] font-bold uppercase tracking-wider leading-none mb-0.5">
-              Selected Course
-            </span>
             <span className="text-sm font-bold truncate w-full text-left leading-none">
               {selectedCourse?.title}
             </span>

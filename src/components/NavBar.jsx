@@ -23,24 +23,8 @@ import {
   Bell,
 } from "lucide-react";
 
-import { runBackgroundSync } from "../utils/backgroundSync";
-
 function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   const [menuLinks, setMenuLinks] = useState([]);
-
-  useEffect(() => {
-    runBackgroundSync();
-
-    const interval = setInterval(
-      () => {
-        runBackgroundSync();
-      },
-      5 * 60 * 1000,
-    );
-
-    return () => clearInterval(interval);
-  }, []);
-
   const iconMapping = {
     Home: <Home />,
     "Course Registration": <BookOpen />,
@@ -292,37 +276,6 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const [notifications, setNotifications] = useState([]);
-  const [showNotifications, setShowNotifications] = useState(false);
-
-  const loadNotifications = () => {
-    try {
-      const saved = JSON.parse(
-        localStorage.getItem("superflex_notifications") || "[]",
-      );
-      setNotifications(saved);
-    } catch (e) {
-      console.error("Failed to load notifications", e);
-    }
-  };
-
-  useEffect(() => {
-    loadNotifications();
-
-    const handleUpdate = () => loadNotifications();
-    window.addEventListener("superflex-notification-update", handleUpdate);
-    return () =>
-      window.removeEventListener("superflex-notification-update", handleUpdate);
-  }, []);
-
-  const unreadCount = notifications.filter((n) => !n.read).length;
-
-  const markAllRead = () => {
-    const updated = notifications.map((n) => ({ ...n, read: true }));
-    setNotifications(updated);
-    localStorage.setItem("superflex_notifications", JSON.stringify(updated));
-  };
-
   return (
     <div className="flex items-center px-6 py-3 w-fit relative">
       {}
@@ -415,92 +368,6 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
       {}
       <div className="shrink-0 flex items-center gap-3">
-        {}
-        <div className="relative dropdown-container">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowNotifications(!showNotifications);
-              if (!showNotifications) {
-              }
-            }}
-            className="relative p-2 rounded-full hover:bg-white/5 transition-all text-zinc-400 hover:text-white"
-          >
-            <Bell size={20} />
-            {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500 border border-black animate-pulse"></span>
-            )}
-          </button>
-
-          {showNotifications && (
-            <div className="absolute right-0 top-full mt-2 z-[999] w-80 md:w-96 animate-in fade-in slide-in-from-top-2 duration-200">
-              <div className="bg-black border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-                <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
-                  <h3 className="font-bold text-white text-sm">
-                    Notifications
-                  </h3>
-                  {unreadCount > 0 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        markAllRead();
-                      }}
-                      className="text-[10px] uppercase font-bold text-[#a098ff] hover:underline"
-                    >
-                      Mark all read
-                    </button>
-                  )}
-                </div>
-                <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
-                  {notifications.length === 0 ? (
-                    <div className="p-8 text-center text-zinc-500 text-sm">
-                      No notifications
-                    </div>
-                  ) : (
-                    notifications.map((n) => (
-                      <div
-                        key={n.id}
-                        onClick={() => {
-                          const updated = notifications.map((notif) =>
-                            notif.id === n.id
-                              ? { ...notif, read: true }
-                              : notif,
-                          );
-                          setNotifications(updated);
-                          localStorage.setItem(
-                            "superflex_notifications",
-                            JSON.stringify(updated),
-                          );
-
-                          if (n.link) window.location.href = n.link;
-                        }}
-                        className={`p-4 border-b border-white/5 hover:bg-white/5 cursor-pointer transition-colors ${!n.read ? "bg-white/[0.02]" : ""}`}
-                      >
-                        <div className="flex justify-between items-start gap-2 mb-1">
-                          <p
-                            className={`text-sm font-semibold ${!n.read ? "text-white" : "text-zinc-400"}`}
-                          >
-                            {n.title}
-                          </p>
-                          {!n.read && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#a098ff] mt-1.5 shrink-0"></span>
-                          )}
-                        </div>
-                        <p className="text-xs text-zinc-500 mb-2 leading-relaxed line-clamp-2">
-                          {n.description}
-                        </p>
-                        <div className="flex items-center gap-2 text-[10px] text-zinc-600 font-bold uppercase tracking-wider">
-                          <span>{n.time}</span>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
         {}
         <div className="relative dropdown-container">
           <button
