@@ -7,12 +7,10 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
 
   useEffect(() => {
     if (isFullScreen) {
-      
       const timer = setTimeout(() => {
         setLoading(false);
       }, 2000);
 
-      
       const handleLoad = () => {
         setLoading(false);
       };
@@ -28,7 +26,6 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
 
   useEffect(() => {
     if (!show || !loading) {
-      
       const timer = setTimeout(() => {
         setIsVisible(false);
       }, 500);
@@ -43,15 +40,19 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
   return (
     <div
       className={`loading-overlay ${
-        isFullScreen ? "h-screen fixed inset-0 z-50" : "absolute inset-0 w-full h-full z-10 rounded-[inherit]"
-      } ${
-        !show || (!isFullScreen ? false : !loading) ? "fade-out" : ""
-      }`}
+        isFullScreen
+          ? "h-screen fixed inset-0 z-50"
+          : "absolute inset-0 w-full h-full z-10 rounded-[inherit]"
+      } ${!show || (!isFullScreen ? false : !loading) ? "fade-out" : ""}`}
     >
-      <div className={`absolute inset-0 bg-black flex items-center justify-center ${!isFullScreen ? "bg-black/50 backdrop-blur-sm rounded-[inherit]" : ""}`}>
+      <div
+        className={`absolute inset-0 bg-black flex items-center justify-center ${!isFullScreen ? "bg-black/50 backdrop-blur-sm rounded-[inherit]" : ""}`}
+      >
         <div
           className={`bg-[url('res/bg.png')] bg-black border-7 border-white/5 bg-cover flex items-center justify-center ${
-            isFullScreen ? "h-20 w-20 rounded-[29px]" : "h-16 w-16 rounded-[20px] scale-75"
+            isFullScreen
+              ? "h-20 w-20 rounded-[29px]"
+              : "h-16 w-16 rounded-[20px] scale-75"
           }`}
           data-aos={isFullScreen ? "zoom-in" : ""}
           data-aos-duration="1000"

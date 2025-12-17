@@ -6,9 +6,8 @@ function TranscriptPage() {
 
   useEffect(() => {
     const conelem = document.querySelector(".m-content");
-    conelem.querySelector(".row").remove(); 
+    conelem.querySelector(".row").remove();
 
-    
     const alertElement = document.querySelector(
       ".m-alert.m-alert--icon.m-alert--icon-solid.m-alert--outline.alert.alert-info",
     );
@@ -28,7 +27,6 @@ function TranscriptPage() {
       alertElement.style.display = "block";
     }
 
-    
     const iconElement = alertElement?.querySelector(".m-alert__icon");
     if (iconElement) {
       iconElement.classList.add(
@@ -44,7 +42,6 @@ function TranscriptPage() {
         "!justify-center",
       );
 
-      
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("width", "24");
       svg.setAttribute("height", "24");
@@ -56,7 +53,6 @@ function TranscriptPage() {
       svg.setAttribute("stroke-linejoin", "round");
       svg.classList.add("w-6", "h-6", "text-white");
 
-      
       const circle = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "circle",
@@ -65,7 +61,6 @@ function TranscriptPage() {
       circle.setAttribute("cy", "12");
       circle.setAttribute("r", "10");
 
-      
       const line1 = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "line",
@@ -75,7 +70,6 @@ function TranscriptPage() {
       line1.setAttribute("x2", "12");
       line1.setAttribute("y2", "12");
 
-      
       const line2 = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "line",
@@ -85,40 +79,34 @@ function TranscriptPage() {
       line2.setAttribute("x2", "12.01");
       line2.setAttribute("y2", "8");
 
-      
       svg.appendChild(circle);
       svg.appendChild(line1);
       svg.appendChild(line2);
-      iconElement.innerHTML = ""; 
+      iconElement.innerHTML = "";
       iconElement.appendChild(svg);
     }
 
-    
     const alertText = alertElement?.querySelector(".m-alert__text");
     if (alertText) {
       alertText.classList.add("!text-white/90", "!font-medium");
 
-      
       const boldText = alertText.querySelector("b");
       if (boldText) {
         boldText.classList.add("!text-x");
       }
     }
 
-    
     const closeButton = alertElement?.querySelector(
       'button.close[data-dismiss="alert"]',
     );
     if (closeButton) {
-      
       closeButton.style.cssText = "content: none !important;";
-      
+
       const style = document.createElement("style");
       style.textContent =
         'button.close[data-dismiss="alert"]::before { display: none !important; content: none !important; }';
       document.head.appendChild(style);
 
-      
       const closeSvg = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "svg",
@@ -133,7 +121,6 @@ function TranscriptPage() {
       closeSvg.setAttribute("stroke-linejoin", "round");
       closeSvg.classList.add("w-4", "h-4", "text-white");
 
-      
       const line1 = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "line",
@@ -152,15 +139,13 @@ function TranscriptPage() {
       line2.setAttribute("x2", "18");
       line2.setAttribute("y2", "18");
 
-      
       closeSvg.appendChild(line1);
       closeSvg.appendChild(line2);
-      closeButton.innerHTML = ""; 
+      closeButton.innerHTML = "";
       closeButton.appendChild(closeSvg);
       closeButton.classList.add("!focus:outline-none");
     }
 
-    
     document
       .querySelector(".m-portlet__head")
       ?.classList.add(
@@ -180,7 +165,6 @@ function TranscriptPage() {
       .querySelector(".m-portlet__head-text")
       ?.classList.add("!text-white", "!text-xl", "!font-bold");
 
-    
     const portletHeadCaption = document.querySelector(
       ".m-portlet__head-caption",
     );
@@ -189,16 +173,13 @@ function TranscriptPage() {
         ".m-portlet__head-title",
       );
 
-      
       const titleContainer = document.createElement("div");
       titleContainer.className = "flex items-center gap-4";
 
-      
       if (portletHeadTitle) {
         titleContainer.appendChild(portletHeadTitle);
       }
 
-      
       const planCGPAButton = document.createElement("button");
       planCGPAButton.className =
         "px-4 py-2 bg-x text-white text-sm rounded-lg flex items-center gap-2 hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md";
@@ -210,15 +191,12 @@ function TranscriptPage() {
         Plan CGPA
       `;
 
-      
       titleContainer.appendChild(planCGPAButton);
 
-      
       portletHeadCaption.innerHTML = "";
       portletHeadCaption.appendChild(titleContainer);
     }
 
-    
     document
       .querySelector(
         ".m-portlet.m-portlet--brand.m-portlet--head-solid-bg.m-portlet--border-bottom-brand.m-portlet--head-sm",
@@ -240,14 +218,9 @@ function TranscriptPage() {
         "custom-scrollbar",
       );
 
-    
     const styleTranscriptTables = () => {
-      
-
-      
       const sectionContent = document.querySelector(".m-section__content");
       if (sectionContent) {
-        
         document.querySelectorAll(".transcript-link").forEach((link) => {
           link.classList.add(
             "text-blue-500",
@@ -258,13 +231,11 @@ function TranscriptPage() {
           );
         });
 
-        
         document.querySelectorAll("table").forEach((table) => {
-          if (table.closest(".modal-body")) return; 
+          if (table.closest(".modal-body")) return;
 
           table.classList.add("w-full", "border-collapse", "border-0");
 
-          
           const thead = table.querySelector("thead");
           if (thead) {
             thead.classList.add(
@@ -288,7 +259,6 @@ function TranscriptPage() {
             });
           }
 
-          
           const tbody = table.querySelector("tbody");
           if (tbody) {
             tbody.classList.add("border-t", "border-white/10");
@@ -302,7 +272,6 @@ function TranscriptPage() {
                 "hover:bg-white/5",
               );
 
-              
               const cells = row.querySelectorAll("td");
               cells.forEach((cell) => {
                 cell.classList.add(
@@ -312,7 +281,6 @@ function TranscriptPage() {
                   "border-white/10",
                 );
 
-                
                 if (cell.textContent.includes("A")) {
                   cell.classList.add("text-green-400", "font-medium");
                 } else if (
@@ -332,14 +300,11 @@ function TranscriptPage() {
           }
         });
 
-        
         const mainRow = sectionContent.querySelector(".row");
         if (mainRow) {
-          
           const semesterCols = mainRow.querySelectorAll(".col-md-6");
 
           semesterCols.forEach((semesterCol) => {
-            
             const semesterContainer = document.createElement("div");
             semesterContainer.className = "semester-container";
             semesterContainer.classList.add(
@@ -351,15 +316,12 @@ function TranscriptPage() {
               "!border-none",
             );
 
-            
             semesterCol.parentNode.insertBefore(semesterContainer, semesterCol);
             semesterContainer.appendChild(semesterCol);
 
-            
             semesterCol.classList.remove("col-md-6");
             semesterCol.style.width = "100%";
 
-            
             const headerRow = semesterCol.querySelector(".row");
             if (headerRow) {
               headerRow.className = "semester-header cursor-pointer";
@@ -374,7 +336,7 @@ function TranscriptPage() {
                   "!mb-0",
                 );
               });
-              
+
               const collapseIcon = document.createElement("div");
               collapseIcon.className =
                 "h-8 w-8 rounded-lg !bg-x !flex !items-center !justify-center mr-2 shadow-inner";
@@ -388,13 +350,11 @@ function TranscriptPage() {
                 </svg>
               `;
 
-              
               const semesterTitle = headerRow.querySelector("h5");
               if (semesterTitle) {
                 const titleWrapper = document.createElement("div");
                 titleWrapper.className = "!flex !items-center";
 
-                
                 semesterTitle.parentNode.insertBefore(
                   titleWrapper,
                   semesterTitle,
@@ -404,24 +364,19 @@ function TranscriptPage() {
               }
             }
 
-            
             const table = semesterCol.querySelector("table");
             if (table) {
-              
               const tableContainer = document.createElement("div");
               tableContainer.className =
                 "rounded-xl overflow-hidden !border !border-white/10 custom-scrollbar accordion-content";
               tableContainer.dataset.expanded = "false";
 
-              
               table.parentNode.insertBefore(tableContainer, table);
               tableContainer.appendChild(table);
 
-              
               table.classList.add("transcript-table");
               table.classList.remove("table-bordered");
 
-              
               const tableStyles = document.createElement("style");
               tableStyles.textContent = `
                 .transcript-table {
@@ -494,12 +449,10 @@ function TranscriptPage() {
               `;
               document.head.appendChild(tableStyles);
 
-              
               table.classList.add("!w-full", "!border-collapse", "!border-0");
             }
           });
 
-          
           semesterCols.forEach((semesterCol) => {
             const headerRow = semesterCol.querySelector(".semester-header");
             headerRow.classList.add(
@@ -522,7 +475,6 @@ function TranscriptPage() {
               semesterCol.querySelector(".accordion-content");
 
             if (headerRow && tableContainer) {
-              
               tableContainer.style.maxHeight = "0px";
               tableContainer.style.opacity = "0";
               tableContainer.style.overflow = "hidden";
@@ -537,12 +489,10 @@ function TranscriptPage() {
                 chevronUp.classList.remove("hidden");
               }
 
-              
               headerRow.addEventListener("click", function () {
                 const isExpanded = tableContainer.dataset.expanded === "true";
 
                 if (isExpanded) {
-                  
                   tableContainer.style.maxHeight = "0px";
                   tableContainer.style.opacity = "0";
                   tableContainer.dataset.expanded = "false";
@@ -552,10 +502,9 @@ function TranscriptPage() {
                     chevronUp.classList.remove("hidden");
                   }
                 } else {
-                  
                   tableContainer.style.maxHeight = `${
                     tableContainer.scrollHeight + 30
-                  }px`; 
+                  }px`;
                   tableContainer.style.opacity = "1";
                   tableContainer.dataset.expanded = "true";
 
@@ -570,25 +519,20 @@ function TranscriptPage() {
         }
       }
 
-      
       const addGradeCalculator = () => {
-        
         const semesterContainers = document.querySelectorAll(
           ".semester-container",
         );
         if (semesterContainers.length === 0) return;
 
-        
         const lastSemesterContainer =
           semesterContainers[semesterContainers.length - 1];
 
-        
         const spans =
           lastSemesterContainer.querySelectorAll(".pull-right span");
-        const cgpaElem = spans[2]; 
-        const sgpaElem = spans[3]; 
+        const cgpaElem = spans[2];
+        const sgpaElem = spans[3];
 
-        
         let prevCGPA = 0;
         let crEarned = 0;
 
@@ -598,20 +542,17 @@ function TranscriptPage() {
           const secondLastSpans =
             secondLastSemContainer.querySelectorAll(".pull-right span");
 
-          
           if (secondLastSpans.length > 1) {
             const crEarnedText = secondLastSpans[1].innerText.split(":")[1];
             crEarned = parseInt(crEarnedText) || 0;
           }
 
-          
           if (secondLastSpans.length > 2) {
             const cgpaText = secondLastSpans[2].innerText.split(":")[1];
             prevCGPA = parseFloat(cgpaText) || 0;
           }
         }
 
-        
         const getSelectHTML = (currGrade) => {
           return `<select class="grade-select bg-zinc-900 !border !border-white/20 rounded p-1 text-white w-full">
             <option value="-1">-</option>
@@ -643,7 +584,6 @@ function TranscriptPage() {
           </select>`;
         };
 
-        
         const getSUCreditHours = () => {
           return Array.from(document.querySelectorAll("td"))
             .filter((td) => td.innerText === "S" || td.innerText === "U")
@@ -656,15 +596,11 @@ function TranscriptPage() {
             }, 0);
         };
 
-        
         const addCGPAPlannerCalculator = () => {
-          
           const portletPlanCGPAButton = document.getElementById(
             "portletPlanCGPAButton",
           );
 
-          
-          
           const headerRow =
             lastSemesterContainer.querySelector(".semester-header");
           if (headerRow) {
@@ -676,21 +612,17 @@ function TranscriptPage() {
             }
           }
 
-          
           const extractCGPAData = () => {
-            
             const spans =
               lastSemesterContainer.querySelectorAll(".pull-right span");
             let currentCGPA = 0;
             let currentCreditHours = 0;
 
-            
             if (spans.length > 2) {
               const cgpaText = spans[2].innerText.split(":")[1];
               currentCGPA = parseFloat(cgpaText) || 0;
             }
 
-            
             if (spans.length > 1) {
               const crEarnedText = spans[1].innerText.split(":")[1];
               currentCreditHours = parseInt(crEarnedText) || 0;
@@ -702,30 +634,24 @@ function TranscriptPage() {
             };
           };
 
-          
           const createPlannerModal = () => {
-            
             const existingModal = document.getElementById("cgpaPlannerModal");
             if (existingModal) {
               existingModal.remove();
             }
 
-            
             const modalOverlay = document.createElement("div");
             modalOverlay.id = "cgpaPlannerModal";
             modalOverlay.className =
               "fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn";
             modalOverlay.style.backdropFilter = "blur(5px)";
 
-            
             const { currentCGPA, currentCreditHours } = extractCGPAData();
 
-            
             const modalContent = document.createElement("div");
             modalContent.className =
               "bg-zinc-900 !rounded-2xl !border !border-white/10 !shadow-xl !w-full !max-w-md !mx-4 !animate-scaleIn";
 
-            
             modalContent.innerHTML = `
               <div class="border-b border-white/10 p-4 flex items-center justify-between">
                 <h3 class="text-white font-bold text-xl flex items-center">
@@ -782,11 +708,9 @@ function TranscriptPage() {
               </div>
             `;
 
-            
             modalOverlay.appendChild(modalContent);
             document.body.appendChild(modalOverlay);
 
-            
             const styleElement = document.createElement("style");
             styleElement.textContent = `
               .animate-fadeIn {
@@ -820,8 +744,6 @@ function TranscriptPage() {
             `;
             document.head.appendChild(styleElement);
 
-            
-            
             const closeModal = () => {
               modalContent.classList.add("animate-scaleOut");
               modalOverlay.classList.add("animate-fadeOut");
@@ -839,7 +761,6 @@ function TranscriptPage() {
               }
             });
 
-            
             document
               .getElementById("cgpaPlannerForm")
               .addEventListener("submit", (e) => {
@@ -860,7 +781,6 @@ function TranscriptPage() {
 
                 const resultElement = document.getElementById("plannerResult");
 
-                
                 if (
                   isNaN(currentCH) ||
                   isNaN(currentCGPA) ||
@@ -885,13 +805,11 @@ function TranscriptPage() {
                   return;
                 }
 
-                
                 const requiredGPA =
                   (targetCGPA * (currentCH + nextCH) -
                     currentCGPA * currentCH) /
                   nextCH;
 
-                
                 if (requiredGPA > 4.0) {
                   resultElement.innerHTML = `
                   <div class="flex items-start">
@@ -929,7 +847,6 @@ function TranscriptPage() {
                   </div>
                 `;
                 } else {
-                  
                   let difficultyColor = "text-green-400";
                   let difficultyText = "Easily achievable";
 
@@ -966,39 +883,32 @@ function TranscriptPage() {
               });
           };
 
-          
           if (portletPlanCGPAButton) {
             portletPlanCGPAButton.addEventListener("click", createPlannerModal);
           }
         };
 
-        
         setTimeout(addCGPAPlannerCalculator, 600);
 
-        
         const rows = lastSemesterContainer.querySelectorAll("tbody > tr");
         rows.forEach((row) => {
           const gradeCells = row.querySelectorAll("td.text-center");
           if (gradeCells.length >= 2) {
-            const gradeCell = gradeCells[1]; 
+            const gradeCell = gradeCells[1];
             const currentGrade = gradeCell.innerText.trim();
 
-            
             if (currentGrade === "I" || currentGrade === "-") {
               gradeCell.innerHTML = getSelectHTML(currentGrade);
             }
           }
         });
 
-        
         const handleSelectChange = () => {
           const rows = lastSemesterContainer.querySelectorAll("tbody > tr");
           let totalCreditHours = 0;
           let totalGradePoints = 0;
 
-          
           rows.forEach((row) => {
-            
             const gradeCells = row.querySelectorAll("td.text-center");
             if (gradeCells.length < 2) return;
 
@@ -1014,32 +924,26 @@ function TranscriptPage() {
             let gradePoints = 0;
             let isGraded = false;
 
-            
             const selectElement = gradeCell.querySelector(
               "select.grade-select",
             );
 
             if (selectElement) {
-              
               if (selectElement.value !== "-1") {
                 gradePoints = parseFloat(selectElement.value);
                 isGraded = true;
 
-                
                 pointsCell.innerText = gradePoints;
                 pointsCell.style.fontWeight = "bold";
                 pointsCell.classList.add("text-x");
               }
             } else {
-              
               const gradeText = gradeCell.textContent.trim();
 
-              
               if (["S", "U", "W", "I", "-"].includes(gradeText)) {
                 return;
               }
 
-              
               if (gradeText === "A+" || gradeText === "A") {
                 gradePoints = 4.0;
                 isGraded = true;
@@ -1075,7 +979,6 @@ function TranscriptPage() {
                 isGraded = true;
               }
 
-              
               if (!isGraded) {
                 const badgeElement = gradeCell.querySelector(".grade-badge");
                 if (badgeElement) {
@@ -1118,14 +1021,12 @@ function TranscriptPage() {
               }
             }
 
-            
             if (isGraded) {
               totalCreditHours += creditHours;
               totalGradePoints += creditHours * gradePoints;
             }
           });
 
-          
           if (totalCreditHours === 0) {
             cgpaElem.innerHTML = `CGPA: ${prevCGPA.toFixed(2)}`;
             sgpaElem.innerHTML = `SGPA: 0`;
@@ -1140,7 +1041,6 @@ function TranscriptPage() {
               calculatedSGPA * totalCreditHours) /
             (actualCreditHoursEarned + totalCreditHours);
 
-          
           cgpaElem.innerHTML = `CGPA: <span class="text-x font-bold">${calculatedCGPA.toFixed(
             2,
           )}</span>`;
@@ -1148,36 +1048,29 @@ function TranscriptPage() {
             2,
           )}</span>`;
 
-          
           cgpaElem.classList.add("font-bold");
           sgpaElem.classList.add("font-bold");
         };
 
-        
         lastSemesterContainer
           .querySelectorAll("select.grade-select")
           .forEach((select) => {
             select.addEventListener("change", handleSelectChange);
           });
 
-        
         setTimeout(handleSelectChange, 100);
       };
 
-      
       setTimeout(addGradeCalculator, 500);
 
-      
       document.querySelectorAll("table").forEach((table) => {
-        if (table.closest(".modal-body")) return; 
+        if (table.closest(".modal-body")) return;
 
-        
         if (!table.classList.contains("transcript-table")) {
           table.classList.add("transcript-table");
           table.classList.remove("table-bordered");
         }
 
-        
         const thead = table.querySelector("thead");
         if (thead) {
           const headers = thead.querySelectorAll("th");
@@ -1194,7 +1087,6 @@ function TranscriptPage() {
           });
         }
 
-        
         const tbody = table.querySelector("tbody");
         if (tbody) {
           const rows = tbody.querySelectorAll("tr");
@@ -1205,7 +1097,6 @@ function TranscriptPage() {
               "!transition-colors",
             );
 
-            
             const cells = row.querySelectorAll("td");
             cells.forEach((cell) => {
               cell.classList.add(
@@ -1215,7 +1106,6 @@ function TranscriptPage() {
                 "!border-white/10",
               );
 
-              
               if (cell.textContent.includes("A")) {
                 cell.classList.add("transcript-good-grade");
               } else if (
@@ -1231,14 +1121,11 @@ function TranscriptPage() {
                 cell.classList.add("transcript-poor-grade");
               }
 
-              
               if (cell.textContent.trim().match(/^[A-F][+-]?$/)) {
                 const grade = cell.textContent.trim();
 
-                
                 const badgeElement = document.createElement("span");
 
-                
                 if (grade.startsWith("A")) {
                   badgeElement.className = "grade-badge grade-a";
                 } else if (grade.startsWith("B") || grade === "C+") {
@@ -1255,19 +1142,16 @@ function TranscriptPage() {
 
                 badgeElement.textContent = grade;
 
-                
                 cell.textContent = "";
                 cell.appendChild(badgeElement);
               }
 
-              
               const numericMatch = cell.textContent.trim().match(/^[\d.]+$/);
               if (numericMatch) {
                 const numValue = parseFloat(cell.textContent.trim());
                 const originalText = cell.textContent;
 
                 if (!isNaN(numValue)) {
-                  
                   if (numValue >= 3.5) {
                     cell.innerHTML = `<span class="font-semibold text-green-400">${originalText}</span>`;
                   } else if (numValue >= 2.5) {
@@ -1282,19 +1166,16 @@ function TranscriptPage() {
         }
       });
 
-      
       const headerRows = document.querySelectorAll(".semester-header");
       headerRows.forEach((headerRow) => {
         const chevronDown = headerRow.querySelector(".chevron-down");
         const chevronUp = headerRow.querySelector(".chevron-up");
 
-        
         const tableContainer = headerRow
           .closest(".semester-container")
           ?.querySelector(".rounded-xl");
 
         if (tableContainer && chevronDown && chevronUp) {
-          
           tableContainer.style.maxHeight = "0px";
           tableContainer.style.transition =
             "max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
@@ -1303,29 +1184,24 @@ function TranscriptPage() {
           chevronDown.classList.add("hidden");
           chevronUp.classList.remove("hidden");
 
-          
           headerRow.addEventListener("click", () => {
             if (tableContainer.style.maxHeight === "0px") {
-              
               tableContainer.style.maxHeight = `${
                 tableContainer.scrollHeight + 50
-              }px`; 
+              }px`;
               tableContainer.style.opacity = "1";
               setTimeout(() => {
                 tableContainer.style.overflow = "visible";
-              }, 400); 
+              }, 400);
 
-              
               chevronDown.classList.remove("hidden");
               chevronDown.style.transform = "rotate(0deg)";
               chevronUp.classList.add("hidden");
             } else {
-              
               tableContainer.style.maxHeight = "0px";
               tableContainer.style.opacity = "0";
               tableContainer.style.overflow = "hidden";
 
-              
               chevronDown.classList.add("hidden");
               chevronUp.classList.remove("hidden");
               chevronUp.style.transform = "rotate(0deg)";
@@ -1335,7 +1211,6 @@ function TranscriptPage() {
       });
     };
 
-    
     setTimeout(styleTranscriptTables, 300);
 
     const targetElement = document.querySelector(

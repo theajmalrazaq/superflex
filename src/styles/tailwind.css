@@ -1,18 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap");
 @import "tailwindcss";
-@theme{
+@theme {
   --color-x: #a098ff;
-   --font-garnett-regular: "Google Sans Flex", sans-serif;
-   --font-garnett-medium: "Google Sans Flex", sans-serif;
-   --font-inter: "Google Sans Flex", sans-serif;
-   --font-sans: "Google Sans Flex", sans-serif;
-   --font-serif: "Google Sans Flex", sans-serif;
-   --font-mono: "Google Sans Flex", sans-serif;
+  --font-garnett-regular: "Google Sans Flex", sans-serif;
+  --font-garnett-medium: "Google Sans Flex", sans-serif;
+  --font-inter: "Google Sans Flex", sans-serif;
+  --font-sans: "Google Sans Flex", sans-serif;
+  --font-serif: "Google Sans Flex", sans-serif;
+  --font-mono: "Google Sans Flex", sans-serif;
 }
 
 .scrollbar-hide {
-  -ms-overflow-style: none; 
-  scrollbar-width: none; 
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
@@ -33,13 +33,24 @@
 button:focus {
   outline: none !important;
 }
-a{
+a {
   color: unset;
   text-decoration: unset !important;
   background-color: unset !important;
 }
 
-.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6{
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: "Google Sans Flex", sans-serif;
   font-weight: 700;
 }

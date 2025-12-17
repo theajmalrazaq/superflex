@@ -1,5 +1,3 @@
- 
- 
 import React, { useEffect, useState, useMemo } from "react";
 import PageLayout from "../layouts/PageLayout";
 import LoadingOverlay from "../LoadingOverlay";
@@ -40,65 +38,99 @@ ChartJS.register(
   Tooltip,
   Legend,
   ArcElement,
-  Filler
+  Filler,
 );
 
 const CategoryAccordion = ({ category, isOpen, onToggle }) => {
   return (
     <div className=" rounded-xl overflow-hidden bg-zinc-900/50 backdrop-blur-sm mb-4">
-      <button 
+      <button
         onClick={onToggle}
         className="w-full flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 transition-colors"
       >
         <div className="flex items-center gap-3">
-            <span className={`p-1.5 rounded-lg ${isOpen ? 'bg-[#a098ff]/20 text-[#a098ff]' : 'bg-zinc-800 text-zinc-500'}`}>
-                {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </span>
-            <span className="font-semibold text-white text-sm">{category.name}</span>
-            <span className="text-xs text-zinc-500 bg-zinc-900 px-2 py-0.5 rounded ">
-                {category.assessments.length}
-            </span>
+          <span
+            className={`p-1.5 rounded-lg ${isOpen ? "bg-[#a098ff]/20 text-[#a098ff]" : "bg-zinc-800 text-zinc-500"}`}
+          >
+            {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </span>
+          <span className="font-semibold text-white text-sm">
+            {category.name}
+          </span>
+          <span className="text-xs text-zinc-500 bg-zinc-900 px-2 py-0.5 rounded ">
+            {category.assessments.length}
+          </span>
         </div>
         <div className="text-xs text-zinc-400 font-medium">
-            <span className="text-white">{category.assessments.reduce((acc, curr) => acc + curr.obtained, 0).toFixed(1)}</span>
-            <span className="text-zinc-600"> / {category.assessments.reduce((acc, curr) => acc + curr.total, 0).toFixed(1)}</span>
+          <span className="text-white">
+            {category.assessments
+              .reduce((acc, curr) => acc + curr.obtained, 0)
+              .toFixed(1)}
+          </span>
+          <span className="text-zinc-600">
+            {" "}
+            /{" "}
+            {category.assessments
+              .reduce((acc, curr) => acc + curr.total, 0)
+              .toFixed(1)}
+          </span>
         </div>
       </button>
-      
+
       {isOpen && (
         <div className="border-t border-white/5">
-            <table className="w-full text-left border-collapse">
-                <thead>
-                    <tr className="bg-white/[0.02]">
-                        <th className="p-3 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider border-b border-white/5 w-16">No.</th>
-                        <th className="p-3 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-right">Marks</th>
-                        <th className="p-3 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-right w-24">Status</th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                    {category.assessments.map((asm, idx) => (
-                        <tr key={idx} className="hover:bg-white/[0.02] transition-colors group">
-                            <td className="p-3 text-sm text-zinc-300 font-medium">{asm.name}</td>
-                            <td className="p-3 text-right">
-                                <div className="flex flex-col items-end">
-                                    <span className="text-sm text-white font-bold">
-                                        {asm.obtained} <span className="text-zinc-600 font-normal text-xs">/ {asm.total}</span>
-                                    </span>
-                                </div>
-                            </td>
-                            <td className="p-3 text-right">
-                                <span className={`text-[10px] font-bold px-2 py-1 rounded-full border ${
-                                    asm.percentage >= 80 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 
-                                    asm.percentage >= 60 ? 'bg-[#a098ff]/10 text-[#a098ff] border-[#a098ff]/20' : 
-                                    asm.percentage >= 40 ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
-                                }`}>
-                                    {asm.percentage.toFixed(0)}%
-                                </span>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-white/[0.02]">
+                <th className="p-3 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider border-b border-white/5 w-16">
+                  No.
+                </th>
+                <th className="p-3 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-right">
+                  Marks
+                </th>
+                <th className="p-3 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-right w-24">
+                  Status
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {category.assessments.map((asm, idx) => (
+                <tr
+                  key={idx}
+                  className="hover:bg-white/[0.02] transition-colors group"
+                >
+                  <td className="p-3 text-sm text-zinc-300 font-medium">
+                    {asm.name}
+                  </td>
+                  <td className="p-3 text-right">
+                    <div className="flex flex-col items-end">
+                      <span className="text-sm text-white font-bold">
+                        {asm.obtained}{" "}
+                        <span className="text-zinc-600 font-normal text-xs">
+                          / {asm.total}
+                        </span>
+                      </span>
+                    </div>
+                  </td>
+                  <td className="p-3 text-right">
+                    <span
+                      className={`text-[10px] font-bold px-2 py-1 rounded-full border ${
+                        asm.percentage >= 80
+                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                          : asm.percentage >= 60
+                            ? "bg-[#a098ff]/10 text-[#a098ff] border-[#a098ff]/20"
+                            : asm.percentage >= 40
+                              ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                              : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                      }`}
+                    >
+                      {asm.percentage.toFixed(0)}%
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>
@@ -106,54 +138,49 @@ const CategoryAccordion = ({ category, isOpen, onToggle }) => {
 };
 
 function HomePage() {
-  
   const [universityInfo, setUniversityInfo] = useState(null);
   const [personalInfo, setPersonalInfo] = useState(null);
   const [profileSections, setProfileSections] = useState([]);
   const [activeMainTab, setActiveMainTab] = useState("stats");
 
-  
-  
   const [attendanceData, setAttendanceData] = useState(null);
-  const [marksHistory, setMarksHistory] = useState([]); 
-  const [currentAggregate, setCurrentAggregate] = useState({ obtained: 0, total: 0, percentage: 0 });
+  const [marksHistory, setMarksHistory] = useState([]);
+  const [currentAggregate, setCurrentAggregate] = useState({
+    obtained: 0,
+    total: 0,
+    percentage: 0,
+  });
   const [coursesData, setCoursesData] = useState([]);
   const [activeCourse, setActiveCourse] = useState(null);
-  const [openCategoryIdx, setOpenCategoryIdx] = useState(null); 
+  const [openCategoryIdx, setOpenCategoryIdx] = useState(null);
 
-  
   const [links, setLinks] = useState({});
   const [chartPattern, setChartPattern] = useState(null);
 
-  
   useEffect(() => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
     canvas.width = 10;
     canvas.height = 10;
-    
-    
-    ctx.fillStyle = 'rgba(255,255,255,0.02)'; 
-    ctx.fillRect(0,0,10,10);
-    
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)'; 
+
+    ctx.fillStyle = "rgba(255,255,255,0.02)";
+    ctx.fillRect(0, 0, 10, 10);
+
+    ctx.strokeStyle = "rgba(255,255,255,0.15)";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, 10);
     ctx.lineTo(10, 0);
     ctx.stroke();
-    
-    setChartPattern(ctx.createPattern(canvas, 'repeat'));
+
+    setChartPattern(ctx.createPattern(canvas, "repeat"));
   }, []);
 
-  
   useEffect(() => {
     setOpenCategoryIdx(null);
   }, [activeCourse]);
 
-  
   useEffect(() => {
-    
     const scrollbarStyle = `
       .custom-scrollbar::-webkit-scrollbar { width: 6px; }
       .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -164,69 +191,77 @@ function HomePage() {
     styleElement.textContent = scrollbarStyle;
     document.head.appendChild(styleElement);
 
-    
     const savedHistory = localStorage.getItem("superflex_marks_history");
-    if(savedHistory) {
+    if (savedHistory) {
       try {
         setMarksHistory(JSON.parse(savedHistory));
-      } catch(e) { console.error("History parse fail", e); }
+      } catch (e) {
+        console.error("History parse fail", e);
+      }
     }
 
-    
-    const targetElement = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
+    const targetElement = document.querySelector(
+      ".m-grid.m-grid--hor.m-grid--root.m-page",
+    );
     if (targetElement) {
-      
-      targetElement.querySelectorAll("script").forEach((script) => script.remove());
+      targetElement
+        .querySelectorAll("script")
+        .forEach((script) => script.remove());
       targetElement.querySelector("#NotificationDetail")?.remove();
       document.querySelector(".m-scroll-top")?.remove();
 
-      
       let uniInfo = {};
       let personalData = {};
       const allSections = [];
 
       const rows = targetElement.querySelectorAll(".row");
       rows.forEach((row) => {
-        const portletTitle = row.querySelector(".m-portlet__head-text")?.textContent.trim();
-        
-        if (portletTitle) {
-           const sectionData = {};
-           row.querySelectorAll(".col-md-4 p").forEach((p) => {
-              const label = p.querySelector(".m--font-boldest")?.textContent.trim().replace(":", "");
-              const value = p.querySelector("span:not(.m--font-boldest)")?.textContent.trim();
-              if (label && value) sectionData[label] = value;
-           });
+        const portletTitle = row
+          .querySelector(".m-portlet__head-text")
+          ?.textContent.trim();
 
-           if(Object.keys(sectionData).length > 0) {
-              allSections.push({ title: portletTitle, data: sectionData });
-              
-              
-              if (portletTitle === "University Information") uniInfo = sectionData;
-              if (portletTitle === "Personal Information") personalData = sectionData;
-           }
+        if (portletTitle) {
+          const sectionData = {};
+          row.querySelectorAll(".col-md-4 p").forEach((p) => {
+            const label = p
+              .querySelector(".m--font-boldest")
+              ?.textContent.trim()
+              .replace(":", "");
+            const value = p
+              .querySelector("span:not(.m--font-boldest)")
+              ?.textContent.trim();
+            if (label && value) sectionData[label] = value;
+          });
+
+          if (Object.keys(sectionData).length > 0) {
+            allSections.push({ title: portletTitle, data: sectionData });
+
+            if (portletTitle === "University Information")
+              uniInfo = sectionData;
+            if (portletTitle === "Personal Information")
+              personalData = sectionData;
+          }
         }
       });
 
       setProfileSections(allSections);
       setUniversityInfo(uniInfo);
       setPersonalInfo(personalData);
-      
-      
+
       targetElement.remove();
     }
-    
+
     return () => {
       document.head.removeChild(styleElement);
     };
   }, []);
 
-  
   const handleLinksFound = (foundLinks) => {
-    
     const linkMap = {};
-    foundLinks.forEach(l => {
-        if(l.text.includes("Attendance")) linkMap.attendance = l.href;
-        if(l.text.includes("Marks") && !l.text.includes("PLO")) linkMap.marks = l.href;
+    foundLinks.forEach((l) => {
+      if (l.text.includes("Attendance")) linkMap.attendance = l.href;
+      if (l.text.includes("Marks") && !l.text.includes("PLO"))
+        linkMap.marks = l.href;
     });
     setLinks(linkMap);
   };
@@ -242,33 +277,43 @@ function HomePage() {
       const html = await res.text();
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, "text/html");
-      
+
       const summaryData = [];
-      const tables = doc.querySelectorAll(".table.table-bordered.table-responsive");
-      
+      const tables = doc.querySelectorAll(
+        ".table.table-bordered.table-responsive",
+      );
+
       tables.forEach((table) => {
-          const tabPane = table.closest(".tab-pane");
-          let title = tabPane?.querySelector("h5")?.textContent.trim() || "Course";
-          const titleParts = title.split("-");
-          if(titleParts.length > 1) {
-              const rawTitle = titleParts.slice(1).join("-").trim();
-              title = rawTitle.replace(/\(.*\)/, "").trim();
-          }
-          const rows = table.querySelectorAll("tbody tr");
-          let present = 0, absent = 0;
-          rows.forEach(r => {
-             const marker = r.querySelector("td:nth-child(4)")?.textContent.trim();
-             if(marker?.includes("P")) present++;
-             if(marker?.includes("A")) absent++;
-          });
-          
-          let percentage = 0;
-          const progress = tabPane?.querySelector(".progress-bar");
-          if(progress) {
-             percentage = parseFloat(progress.getAttribute("aria-valuenow") || 0);
-          }
-          
-          summaryData.push({ title, present, absent, total: rows.length, percentage });
+        const tabPane = table.closest(".tab-pane");
+        let title =
+          tabPane?.querySelector("h5")?.textContent.trim() || "Course";
+        const titleParts = title.split("-");
+        if (titleParts.length > 1) {
+          const rawTitle = titleParts.slice(1).join("-").trim();
+          title = rawTitle.replace(/\(.*\)/, "").trim();
+        }
+        const rows = table.querySelectorAll("tbody tr");
+        let present = 0,
+          absent = 0;
+        rows.forEach((r) => {
+          const marker = r.querySelector("td:nth-child(4)")?.textContent.trim();
+          if (marker?.includes("P")) present++;
+          if (marker?.includes("A")) absent++;
+        });
+
+        let percentage = 0;
+        const progress = tabPane?.querySelector(".progress-bar");
+        if (progress) {
+          percentage = parseFloat(progress.getAttribute("aria-valuenow") || 0);
+        }
+
+        summaryData.push({
+          title,
+          present,
+          absent,
+          total: rows.length,
+          percentage,
+        });
       });
       setAttendanceData(summaryData);
     } catch (e) {
@@ -288,508 +333,594 @@ function HomePage() {
       const parsedCourses = [];
 
       const tabPanes = doc.querySelectorAll(".tab-pane");
-      
-      tabPanes.forEach(pane => {
-         const courseId = pane.id; 
-         let courseTitle = pane.querySelector("h5")?.textContent.trim() || courseId;
-         const titleParts = courseTitle.split("-");
-         if(titleParts.length > 1) {
-             const rawTitle = titleParts.slice(1).join("-").trim();
-             courseTitle = rawTitle.replace(/\(.*\)/, "").trim();
-         }
 
-         let courseTotalObtained = 0;
-         let courseTotalWeight = 0;
-         const categories = [];
+      tabPanes.forEach((pane) => {
+        const courseId = pane.id;
+        let courseTitle =
+          pane.querySelector("h5")?.textContent.trim() || courseId;
+        const titleParts = courseTitle.split("-");
+        if (titleParts.length > 1) {
+          const rawTitle = titleParts.slice(1).join("-").trim();
+          courseTitle = rawTitle.replace(/\(.*\)/, "").trim();
+        }
 
-         
-         const cards = pane.querySelectorAll(".card");
-         cards.forEach(card => {
-             const header = card.querySelector(".card-header button")?.textContent.trim();
-             if(!header || header.includes("Grand Total")) return;
+        let courseTotalObtained = 0;
+        let courseTotalWeight = 0;
+        const categories = [];
 
-             const categoryAssessments = [];
-             const rows = card.querySelectorAll("tbody tr");
-             rows.forEach(tr => {
-                 if(tr.classList.contains("totalColumn_1471")) return;
+        const cards = pane.querySelectorAll(".card");
+        cards.forEach((card) => {
+          const header = card
+            .querySelector(".card-header button")
+            ?.textContent.trim();
+          if (!header || header.includes("Grand Total")) return;
 
-                 const tds = tr.querySelectorAll("td");
-                 if(tds.length < 4) return;
+          const categoryAssessments = [];
+          const rows = card.querySelectorAll("tbody tr");
+          rows.forEach((tr) => {
+            if (tr.classList.contains("totalColumn_1471")) return;
 
-                 const name = tds[0]?.textContent.trim();
-                 const obtainedStr = tds[2]?.textContent.trim();
-                 const totalStr = tds[3]?.textContent.trim();
-                 
-                 
-                 if(name === "Total" || name === "Grand Total") return;
+            const tds = tr.querySelectorAll("td");
+            if (tds.length < 4) return;
 
-                 if(obtainedStr && obtainedStr !== "-" && obtainedStr !== "") {
-                     const obtained = parseFloat(obtainedStr);
-                     const total = parseFloat(totalStr);
-                     
-                     if(!isNaN(obtained)) {
-                         categoryAssessments.push({
-                             name: name,
-                             obtained,
-                             total: isNaN(total) ? 0 : total,
-                             percentage: (total > 0 && !isNaN(total)) ? (obtained/total)*100 : 0
-                         });
-                     }
-                 }
-             });
+            const name = tds[0]?.textContent.trim();
+            const obtainedStr = tds[2]?.textContent.trim();
+            const totalStr = tds[3]?.textContent.trim();
 
-             if(categoryAssessments.length > 0) {
-                 categories.push({
-                     name: header,
-                     assessments: categoryAssessments
-                 });
-             }
-         });
+            if (name === "Total" || name === "Grand Total") return;
 
-         
-         const calcRows = pane.querySelectorAll(".sum_table .calculationrow");
-         calcRows.forEach(row => {
-            const weightText = row.querySelector(".weightage")?.textContent;
-            const obtMarksText = row.querySelector(".ObtMarks")?.textContent;
-            const w = parseFloat(weightText || "0");
-            const o = parseFloat(obtMarksText || "0");
-            if(!isNaN(w) && !isNaN(o)) {
-                courseTotalObtained += o;
-                courseTotalWeight += w;
+            if (obtainedStr && obtainedStr !== "-" && obtainedStr !== "") {
+              const obtained = parseFloat(obtainedStr);
+              const total = parseFloat(totalStr);
+
+              if (!isNaN(obtained)) {
+                categoryAssessments.push({
+                  name: name,
+                  obtained,
+                  total: isNaN(total) ? 0 : total,
+                  percentage:
+                    total > 0 && !isNaN(total) ? (obtained / total) * 100 : 0,
+                });
+              }
             }
-         });
-         
-         semesterTotalObtained += courseTotalObtained;
-         semesterTotalWeight += courseTotalWeight;
+          });
 
-         parsedCourses.push({
-             id: courseId,
-             title: courseTitle,
-             categories: categories,
-             obtained: courseTotalObtained,
-             total: courseTotalWeight,
-             percentage: courseTotalWeight > 0 ? (courseTotalObtained / courseTotalWeight) * 100 : 0
-         });
+          if (categoryAssessments.length > 0) {
+            categories.push({
+              name: header,
+              assessments: categoryAssessments,
+            });
+          }
+        });
+
+        const calcRows = pane.querySelectorAll(".sum_table .calculationrow");
+        calcRows.forEach((row) => {
+          const weightText = row.querySelector(".weightage")?.textContent;
+          const obtMarksText = row.querySelector(".ObtMarks")?.textContent;
+          const w = parseFloat(weightText || "0");
+          const o = parseFloat(obtMarksText || "0");
+          if (!isNaN(w) && !isNaN(o)) {
+            courseTotalObtained += o;
+            courseTotalWeight += w;
+          }
+        });
+
+        semesterTotalObtained += courseTotalObtained;
+        semesterTotalWeight += courseTotalWeight;
+
+        parsedCourses.push({
+          id: courseId,
+          title: courseTitle,
+          categories: categories,
+          obtained: courseTotalObtained,
+          total: courseTotalWeight,
+          percentage:
+            courseTotalWeight > 0
+              ? (courseTotalObtained / courseTotalWeight) * 100
+              : 0,
+        });
       });
 
       setCoursesData(parsedCourses);
-      if(parsedCourses.length > 0) {
-          setActiveCourse(parsedCourses[0].id);
+      if (parsedCourses.length > 0) {
+        setActiveCourse(parsedCourses[0].id);
       }
 
-      const currentPerc = semesterTotalWeight > 0 ? (semesterTotalObtained / semesterTotalWeight) * 100 : 0;
-      setCurrentAggregate({ obtained: semesterTotalObtained, total: semesterTotalWeight, percentage: currentPerc });
-
-      
-      const currentSession = universityInfo?.Session || "Current"; 
-      const newHistoryItem = { semester: currentSession, percentage: currentPerc, timestamp: new Date().toISOString() };
-      setMarksHistory(prev => {
-         const existingIndex = prev.findIndex(item => item.semester === currentSession);
-         let updated;
-         if(existingIndex >= 0) {
-            updated = [...prev];
-            updated[existingIndex] = newHistoryItem;
-         } else {
-            updated = [...prev, newHistoryItem];
-         }
-         localStorage.setItem("superflex_marks_history", JSON.stringify(updated));
-         return updated;
+      const currentPerc =
+        semesterTotalWeight > 0
+          ? (semesterTotalObtained / semesterTotalWeight) * 100
+          : 0;
+      setCurrentAggregate({
+        obtained: semesterTotalObtained,
+        total: semesterTotalWeight,
+        percentage: currentPerc,
       });
 
+      const currentSession = universityInfo?.Session || "Current";
+      const newHistoryItem = {
+        semester: currentSession,
+        percentage: currentPerc,
+        timestamp: new Date().toISOString(),
+      };
+      setMarksHistory((prev) => {
+        const existingIndex = prev.findIndex(
+          (item) => item.semester === currentSession,
+        );
+        let updated;
+        if (existingIndex >= 0) {
+          updated = [...prev];
+          updated[existingIndex] = newHistoryItem;
+        } else {
+          updated = [...prev, newHistoryItem];
+        }
+        localStorage.setItem(
+          "superflex_marks_history",
+          JSON.stringify(updated),
+        );
+        return updated;
+      });
     } catch (e) {
-       console.error("Marks fetch error", e);
+      console.error("Marks fetch error", e);
     }
   };
 
-  
-
-
   const performanceChartData = useMemo(() => {
-    if(!marksHistory || marksHistory.length === 0) return null;
+    if (!marksHistory || marksHistory.length === 0) return null;
     return {
-      labels: marksHistory.map(s => s.semester),
+      labels: marksHistory.map((s) => s.semester),
       datasets: [
         {
-          label: 'Aggregate %',
-          data: marksHistory.map(s => s.percentage),
-          borderColor: '#a098ff',
-          backgroundColor: 'rgba(160, 152, 255, 0.1)',
+          label: "Aggregate %",
+          data: marksHistory.map((s) => s.percentage),
+          borderColor: "#a098ff",
+          backgroundColor: "rgba(160, 152, 255, 0.1)",
           tension: 0.4,
           fill: true,
-          pointBackgroundColor: '#a098ff',
-          pointBorderColor: '#000',
-        }
-      ]
+          pointBackgroundColor: "#a098ff",
+          pointBorderColor: "#000",
+        },
+      ],
     };
   }, [marksHistory]);
 
   const activeCourseData = useMemo(() => {
-      return coursesData.find(c => c.id === activeCourse);
+    return coursesData.find((c) => c.id === activeCourse);
   }, [coursesData, activeCourse]);
 
   const mostAbsentSubject = useMemo(() => {
     if (!attendanceData || attendanceData.length === 0) return null;
-    return attendanceData.reduce((prev, current) => (prev.absent > current.absent) ? prev : current);
+    return attendanceData.reduce((prev, current) =>
+      prev.absent > current.absent ? prev : current,
+    );
   }, [attendanceData]);
 
-  
   return (
-    <PageLayout currentPage={window.location.pathname} onLinksFound={handleLinksFound}>
+    <PageLayout
+      currentPage={window.location.pathname}
+      onLinksFound={handleLinksFound}
+    >
       <div className="w-full px-6 py-8 space-y-8 animate-in fade-in duration-500">
-        
-        { }
-        { }
+        {}
+        {}
         <div className="relative rounded-[2rem] bg-black p-6 overflow-hidden group">
-           { }
-           <div className="absolute top-0 right-0 w-96 h-96 bg-[#a098ff]/5 blur-[80px] rounded-full pointer-events-none -mr-20 -mt-20 opacity-40"></div>
-           
-           <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
-               { }
-               <div className="flex items-center gap-5 w-full md:w-auto">
-               <div className="flex flex-col gap-5">
-                   { }
-                   <div className="relative shrink-0">
-                        <img 
-                            src="/Login/GetImage" 
-                            alt="Profile"
-                            className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover bg-zinc-800"
-                            onError={(e) => {
-                                e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><rect fill="%2318181b" width="128" height="128"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2352525b" font-weight="bold" font-size="40">Use</text></svg>';
-                            }}
-                        />
-                   </div>
+          {}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#a098ff]/5 blur-[80px] rounded-full pointer-events-none -mr-20 -mt-20 opacity-40"></div>
 
-                   <div className="flex flex-col text-left space-y-0.5">
-                      <h1 className="text-2xl md:text-4xl font-black text-white tracking-tight leading-none">
-                        Hey Pookie, <span className="text-[#a098ff]">{personalInfo?.Name || "Student"}</span>
-                      </h1>
-                      <p className="text-zinc-500 text-sm font-medium">
-                          Nice to see you!
-                      </p>
-                   </div>
-                   </div>
-               </div>
+          <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
+            {}
+            <div className="flex items-center gap-5 w-full md:w-auto">
+              <div className="flex flex-col gap-5">
+                {}
+                <div className="relative shrink-0">
+                  <img
+                    src="/Login/GetImage"
+                    alt="Profile"
+                    className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover bg-zinc-800"
+                    onError={(e) => {
+                      e.target.src =
+                        'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><rect fill="%2318181b" width="128" height="128"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2352525b" font-weight="bold" font-size="40">Use</text></svg>';
+                    }}
+                  />
+                </div>
 
+                <div className="flex flex-col text-left space-y-0.5">
+                  <h1 className="text-2xl md:text-4xl font-black text-white tracking-tight leading-none">
+                    Hey Pookie,{" "}
+                    <span className="text-[#a098ff]">
+                      {personalInfo?.Name || "Student"}
+                    </span>
+                  </h1>
+                  <p className="text-zinc-500 text-sm font-medium">
+                    Nice to see you!
+                  </p>
+                </div>
+              </div>
+            </div>
 
-               { }
-               <div className="flex backdrop-blur-md p-1 rounded-full shrink-0 w-full md:w-auto justify-center gap-5 md:justify-end">
-                   <button 
-                      onClick={() => setActiveMainTab("stats")}
-                      className={`px-5 py-2 border border-white/5  rounded-full text-xs font-bold flex items-center gap-2 transition-all duration-300 ${
-                         activeMainTab === "stats" 
-                         ? "bg-[#a098ff]/10 text-[#a098ff]"  
-                         : "text-zinc-500 hover:text-white hover:bg-white/5"
-                      }`}
-                   >
-                      <Activity size={16} className={activeMainTab === "stats" ? "animate-pulse" : ""}/>
-                      Stats
-                   </button>
-                   <button 
-                      onClick={() => setActiveMainTab("info")}
-                      className={`px-5 py-2 border border-white/5  rounded-full text-xs font-bold flex items-center gap-2 transition-all duration-300 ${
-                         activeMainTab === "info" 
-                         ? "bg-[#a098ff]/10 text-[#a098ff]"  
-                         : "text-zinc-500 hover:text-white hover:bg-white/5"
-                      }`}
-                   >
-                      <User size={16} />
-                      Info
-                   </button>
-               </div>
-           </div>
+            {}
+            <div className="flex backdrop-blur-md p-1 rounded-full shrink-0 w-full md:w-auto justify-center gap-5 md:justify-end">
+              <button
+                onClick={() => setActiveMainTab("stats")}
+                className={`px-5 py-2 border border-white/5  rounded-full text-xs font-bold flex items-center gap-2 transition-all duration-300 ${
+                  activeMainTab === "stats"
+                    ? "bg-[#a098ff]/10 text-[#a098ff]"
+                    : "text-zinc-500 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <Activity
+                  size={16}
+                  className={activeMainTab === "stats" ? "animate-pulse" : ""}
+                />
+                Stats
+              </button>
+              <button
+                onClick={() => setActiveMainTab("info")}
+                className={`px-5 py-2 border border-white/5  rounded-full text-xs font-bold flex items-center gap-2 transition-all duration-300 ${
+                  activeMainTab === "info"
+                    ? "bg-[#a098ff]/10 text-[#a098ff]"
+                    : "text-zinc-500 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <User size={16} />
+                Info
+              </button>
+            </div>
+          </div>
         </div>
 
-        { }
+        {}
         {activeMainTab === "stats" && (
-           <div className="space-y-8 animate-in fade-in duration-300">
-              { }
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                 { }
-                 <div className="p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
-                    <div className="flex justify-between items-start mb-6">
-                       <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
-                          <GraduationCap size={24} />
-                       </div>
+          <div className="space-y-8 animate-in fade-in duration-300">
+            {}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {}
+              <div className="p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
+                    <GraduationCap size={24} />
+                  </div>
+                </div>
+                <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">
+                  Degree Program
+                </p>
+                <h3 className="text-xl font-bold text-white truncate">
+                  {universityInfo?.Degree || "..."}
+                </h3>
+              </div>
+
+              {}
+              <div className="p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70  transition-all duration-300 hover:-translate-y-1 group">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
+                    <Users size={24} />
+                  </div>
+                </div>
+                <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">
+                  Section
+                </p>
+                <h3 className="text-xl font-bold text-white">
+                  {universityInfo?.Section || "..."}
+                </h3>
+              </div>
+
+              {}
+              <div className="p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
+                    <Award size={24} />
+                  </div>
+                </div>
+                <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">
+                  Total Registered Courses
+                </p>
+                <h3 className="text-xl font-bold text-white">
+                  {coursesData?.length || 0}
+                </h3>
+              </div>
+
+              <div className="p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
+                    <Activity size={24} />
+                  </div>
+                </div>
+                <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">
+                  Subject with Most Absents
+                </p>
+                <h3
+                  className="text-xl font-bold text-white truncate"
+                  title={mostAbsentSubject?.title}
+                >
+                  {mostAbsentSubject ? (
+                    <span className="flex items-center gap-2">
+                      <span className="truncate max-w-[120px]">
+                        {mostAbsentSubject.title}
+                      </span>
+                      <span className="text-sm text-zinc-500 font-medium bg-zinc-900  px-1.5 py-0.5 rounded">
+                        {mostAbsentSubject.absent}
+                      </span>
+                    </span>
+                  ) : (
+                    "..."
+                  )}
+                </h3>
+              </div>
+            </div>
+
+            {}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              {}
+              {coursesData.length > 0 ? (
+                <div className="bg-zinc-900/50 backdrop-blur-xl rounded-3xl p-6  overflow-hidden flex flex-col gap-6 h-full">
+                  <div className="flex flex-col justify-between items-start gap-4">
+                    <div className="flex w-full justify-between items-start">
+                      <div>
+                        <h3 className="text-lg font-bold text-white">
+                          Course Performance
+                        </h3>
+                        <p className="text-zinc-500 text-sm">
+                          Detailed marks for each subject
+                        </p>
+                      </div>
+                      {links.marks && (
+                        <a
+                          href={links.marks}
+                          className="bg-white/5 hover:bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-lg  transition-colors flex items-center gap-1.5"
+                        >
+                          View Details
+                          <ArrowRight size={12} />
+                        </a>
+                      )}
                     </div>
-                    <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">Degree Program</p>
-                    <h3 className="text-xl font-bold text-white truncate">{universityInfo?.Degree || "..."}</h3>
-                 </div>
-                 
-                 { }
-                 <div className="p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70  transition-all duration-300 hover:-translate-y-1 group">
-                    <div className="flex justify-between items-start mb-6">
-                       <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
-                          <Users size={24} />
-                       </div>
+
+                    {}
+                    <div className="w-full overflow-x-auto custom-scrollbar pb-2">
+                      <div className="flex gap-2">
+                        {coursesData.map((course) => (
+                          <button
+                            key={course.id}
+                            onClick={() => setActiveCourse(course.id)}
+                            className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${
+                              activeCourse === course.id
+                                ? "bg-[#a098ff] text-white border-[#a098ff]"
+                                : "bg-zinc-900/50 text-zinc-400 border-white/5 hover:text-white hover:bg-zinc-800 hover:border-white/20"
+                            }`}
+                          >
+                            {course.id}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                    <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">Section</p>
-                    <h3 className="text-xl font-bold text-white">{universityInfo?.Section || "..."}</h3>
-                 </div>
-      
-                 { }
-                 <div className="p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
-                    <div className="flex justify-between items-start mb-6">
-                       <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
-                          <Award size={24} />
-                       </div>
+                  </div>
+
+                  {}
+                  {activeCourseData && (
+                    <div
+                      key={activeCourse}
+                      className="animate-in fade-in zoom-in-95 duration-300"
+                    >
+                      <div className="flex flex-col gap-2 mb-4">
+                        <h2 className="text-xl font-bold text-white leading-tight">
+                          {activeCourseData.title}
+                        </h2>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded-md bg-zinc-900  text-zinc-400 text-xs font-medium">
+                            {activeCourseData.id}
+                          </span>
+                          <span className="text-xs text-zinc-500">
+                            {activeCourseData.categories.reduce(
+                              (acc, cat) => acc + cat.assessments.length,
+                              0,
+                            )}{" "}
+                            Assessments
+                          </span>
+                        </div>
+                      </div>
+
+                      {}
+                      <div className="space-y-3">
+                        {activeCourseData.categories.map((category, idx) => (
+                          <CategoryAccordion
+                            key={idx}
+                            category={category}
+                            isOpen={openCategoryIdx === idx}
+                            onToggle={() =>
+                              setOpenCategoryIdx(
+                                openCategoryIdx === idx ? null : idx,
+                              )
+                            }
+                          />
+                        ))}
+                        {activeCourseData.categories.length === 0 && (
+                          <div className="p-8 text-center text-zinc-500 text-sm  rounded-xl bg-black">
+                            No assessments uploaded yet.
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">Total Registered Courses</p>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-black rounded-3xl  p-6 flex items-center justify-center text-zinc-500 min-h-[300px]">
+                  No marks data available
+                </div>
+              )}
+              {}
+              <div className="p-8 rounded-[1.5rem] bg-zinc-900/50 backdrop-blur-xl   h-full flex flex-col">
+                <div className="flex justify-between items-start mb-8">
+                  <div>
                     <h3 className="text-xl font-bold text-white">
-                       {coursesData?.length || 0}
+                      Attendance Overview
                     </h3>
-                 </div>
-      
-                 <div className="p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
-                    <div className="flex justify-between items-start mb-6">
-                       <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
-                          <Activity size={24} />
-                       </div>
+                    <p className="text-zinc-500 text-sm">
+                      Present vs Absent (Count)
+                    </p>
+                  </div>
+                  {links.attendance && (
+                    <a
+                      href={links.attendance}
+                      className="bg-white/5 hover:bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-lg  transition-colors flex items-center gap-1.5"
+                    >
+                      View Details
+                      <ArrowRight size={12} />
+                    </a>
+                  )}
+                </div>
+                <div className="flex-1 w-full overflow-hidden relative min-h-[400px]">
+                  {attendanceData && chartPattern ? (
+                    <div
+                      style={{
+                        height: `${Math.max(400, attendanceData.length * 60)}px`,
+                        width: "100%",
+                      }}
+                    >
+                      <Bar
+                        data={{
+                          labels: attendanceData.map((d) => {
+                            const t = d.title;
+                            const trunc =
+                              t.length > 15 ? t.substring(0, 15) + "..." : t;
+                            return `${trunc} (P:${d.present} A:${d.absent})`;
+                          }),
+                          datasets: [
+                            {
+                              label: "Attended",
+                              data: attendanceData.map((d) => d.percentage),
+                              backgroundColor: attendanceData.map((d) => {
+                                if (d.percentage >= 75) return "#a098ff";
+                                if (d.percentage >= 60) return "#f59e0b";
+                                return "#f43f5e";
+                              }),
+                              barPercentage: 0.6,
+                              categoryPercentage: 0.8,
+                              borderRadius: { topLeft: 100, bottomLeft: 100 },
+                              borderSkipped: false,
+                            },
+                            {
+                              label: "Remaining",
+                              data: attendanceData.map(
+                                (d) => 100 - d.percentage,
+                              ),
+                              backgroundColor: chartPattern,
+                              barPercentage: 0.6,
+                              categoryPercentage: 0.8,
+                              borderRadius: { topRight: 100, bottomRight: 100 },
+                              borderSkipped: false,
+                            },
+                          ],
+                        }}
+                        options={{
+                          indexAxis: "y",
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                              callbacks: {
+                                label: (context) => {
+                                  const idx = context.dataIndex;
+                                  const item = attendanceData[idx];
+                                  if (context.datasetIndex === 0) {
+                                    return `Present: ${item.present} (${item.percentage.toFixed(1)}%)`;
+                                  }
+                                  return `Absent: ${item.absent}`;
+                                },
+                              },
+                            },
+                          },
+                          scales: {
+                            x: {
+                              stacked: true,
+                              display: false,
+                              max: 100,
+                              grid: { display: false },
+                            },
+                            y: {
+                              stacked: true,
+                              grid: { display: false },
+                              ticks: {
+                                color: "#a1a1aa",
+                                font: {
+                                  size: 11,
+                                  family: "'Google Sans Flex', sans-serif",
+                                },
+                                autoSkip: false,
+                              },
+                              border: { display: false },
+                            },
+                          },
+                        }}
+                      />
                     </div>
-                    <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">Subject with Most Absents</p>
-                    <h3 className="text-xl font-bold text-white truncate" title={mostAbsentSubject?.title}>
-                        {mostAbsentSubject ? (
-                            <span className="flex items-center gap-2">
-                                <span className="truncate max-w-[120px]">{mostAbsentSubject.title}</span>
-                                <span className="text-sm text-zinc-500 font-medium bg-zinc-900  px-1.5 py-0.5 rounded">
-                                    {mostAbsentSubject.absent}
-                                </span>
-                            </span>
-                        ) : "..."}
-                    </h3>
-                 </div>
+                  ) : (
+                    <LoadingOverlay show={true} isFullScreen={false} />
+                  )}
+                </div>
               </div>
-      
-              { }
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                   
-                   { }
-                   {coursesData.length > 0 ? (
-                     <div className="bg-zinc-900/50 backdrop-blur-xl rounded-3xl p-6  overflow-hidden flex flex-col gap-6 h-full">
-                        <div className="flex flex-col justify-between items-start gap-4">
-                           <div className="flex w-full justify-between items-start">
-                              <div>
-                                 <h3 className="text-lg font-bold text-white">Course Performance</h3>
-                                 <p className="text-zinc-500 text-sm">Detailed marks for each subject</p>
-                              </div>
-                              {links.marks && (
-                                <a 
-                                  href={links.marks} 
-                                  className="bg-white/5 hover:bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-lg  transition-colors flex items-center gap-1.5"
-                                >
-                                   View Details
-                                   <ArrowRight size={12} />
-                                </a>
-                              )}
-                           </div>
-                           
-                           { }
-                           <div className="w-full overflow-x-auto custom-scrollbar pb-2">
-                               <div className="flex gap-2">
-                                   {coursesData.map(course => (
-                                       <button
-                                           key={course.id}
-                                           onClick={() => setActiveCourse(course.id)}
-                                           className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${
-                                               activeCourse === course.id 
-                                               ? "bg-[#a098ff] text-white border-[#a098ff]" 
-                                               : "bg-zinc-900/50 text-zinc-400 border-white/5 hover:text-white hover:bg-zinc-800 hover:border-white/20"
-                                           }`}
-                                       >
-                                           {course.id}
-                                       </button>
-                                   ))}
-                               </div>
-                           </div>
-                        </div>
-                        
-                        { }
-                        {activeCourseData && (
-                            <div key={activeCourse} className="animate-in fade-in zoom-in-95 duration-300">
-                               <div className="flex flex-col gap-2 mb-4">
-                                    <h2 className="text-xl font-bold text-white leading-tight">{activeCourseData.title}</h2>
-                                    <div className="flex items-center gap-2">
-                                        <span className="px-2 py-0.5 rounded-md bg-zinc-900  text-zinc-400 text-xs font-medium">{activeCourseData.id}</span>
-                                        <span className="text-xs text-zinc-500">
-                                            {activeCourseData.categories.reduce((acc, cat) => acc + cat.assessments.length, 0)} Assessments
-                                        </span>
-                                    </div>
-                               </div>
-           
-                               { }
-                               <div className="space-y-3">
-                                   {activeCourseData.categories.map((category, idx) => (
-                                       <CategoryAccordion 
-                                           key={idx} 
-                                           category={category} 
-                                           isOpen={openCategoryIdx === idx}
-                                           onToggle={() => setOpenCategoryIdx(openCategoryIdx === idx ? null : idx)}
-                                       />
-                                   ))}
-                                   {activeCourseData.categories.length === 0 && (
-                                        <div className="p-8 text-center text-zinc-500 text-sm  rounded-xl bg-black">
-                                            No assessments uploaded yet.
-                                        </div>
-                                   )}
-                               </div>
-                            </div>
-                        )}
-                     </div>
-                   ) : (
-                      <div className="bg-black rounded-3xl  p-6 flex items-center justify-center text-zinc-500 min-h-[300px]">
-                          No marks data available
-                      </div>
-                   )}
-                        { }
-                   <div className="p-8 rounded-[1.5rem] bg-zinc-900/50 backdrop-blur-xl   h-full flex flex-col">
-                     <div className="flex justify-between items-start mb-8">
-                        <div>
-                           <h3 className="text-xl font-bold text-white">Attendance Overview</h3>
-                           <p className="text-zinc-500 text-sm">Present vs Absent (Count)</p>
-                        </div>
-                        {links.attendance && (
-                            <a 
-                              href={links.attendance} 
-                              className="bg-white/5 hover:bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-lg  transition-colors flex items-center gap-1.5"
-                            >
-                               View Details
-                               <ArrowRight size={12} />
-                            </a>
-                        )}
-                      </div>
-                  <div className="flex-1 w-full overflow-hidden relative min-h-[400px]">
-                     {attendanceData && chartPattern ? (
-                        <div style={{ height: `${Math.max(400, attendanceData.length * 60)}px`, width: '100%' }}>
-                            <Bar
-                                data={{
-                                    labels: attendanceData.map(d => {
-                                        
-                                        const t = d.title;
-                                        const trunc = t.length > 15 ? t.substring(0, 15) + '...' : t;
-                                        return `${trunc} (P:${d.present} A:${d.absent})`;
-                                    }),
-                                    datasets: [
-                                        {
-                                            label: 'Attended',
-                                            data: attendanceData.map(d => d.percentage),
-                                            backgroundColor: attendanceData.map(d => {
-                                                if(d.percentage >= 75) return '#a098ff';
-                                                if(d.percentage >= 60) return '#f59e0b';
-                                                return '#f43f5e';
-                                            }),
-                                            barPercentage: 0.6,
-                                            categoryPercentage: 0.8,
-                                            borderRadius: { topLeft: 100, bottomLeft: 100 },
-                                            borderSkipped: false
-                                        },
-                                        {
-                                            label: 'Remaining',
-                                            data: attendanceData.map(d => 100 - d.percentage),
-                                            backgroundColor: chartPattern,
-                                            barPercentage: 0.6,
-                                            categoryPercentage: 0.8,
-                                            borderRadius: { topRight: 100, bottomRight: 100 },
-                                            borderSkipped: false
-                                        }
-                                    ]
-                                }}
-                                options={{
-                                    indexAxis: 'y',
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: { display: false },
-                                        tooltip: { 
-                                            callbacks: {
-                                                label: (context) => {
-                                                    const idx = context.dataIndex;
-                                                    const item = attendanceData[idx];
-                                                    if(context.datasetIndex === 0) {
-                                                        return `Present: ${item.present} (${item.percentage.toFixed(1)}%)`;
-                                                    }
-                                                    return `Absent: ${item.absent}`;
-                                                }
-                                            }
-                                        }
-                                    },
-                                    scales: {
-                                        x: {
-                                            stacked: true,
-                                            display: false,
-                                            max: 100,
-                                            grid: { display: false }
-                                        },
-                                        y: {
-                                            stacked: true,
-                                            grid: { display: false },
-                                            ticks: {
-                                                color: '#a1a1aa', 
-                                                font: { size: 11, family: "'Google Sans Flex', sans-serif" },
-                                                autoSkip: false
-                                            },
-                                            border: { display: false }
-                                        }
-                                    }
-                                }}
-                            />
-                        </div>
-                     ) : (
-                        <LoadingOverlay show={true} isFullScreen={false} />
-                     )}
-                  </div>
-                  </div>
-      
-              </div>
-           </div>
+            </div>
+          </div>
         )}
 
-        { }
+        {}
         {activeMainTab === "info" && (
-           <div className="animate-in fade-in duration-300">
-              <ProfileInfoTabs profileSections={profileSections} />
-           </div>
+          <div className="animate-in fade-in duration-300">
+            <ProfileInfoTabs profileSections={profileSections} />
+          </div>
         )}
-
       </div>
     </PageLayout>
   );
 }
 
-
 const ProfileInfoTabs = ({ profileSections }) => {
-   if (!profileSections || profileSections.length === 0) return null;
+  if (!profileSections || profileSections.length === 0) return null;
 
-   return (
-      <div className="space-y-8 animate-in fade-in duration-500">
-         {profileSections.map((section, idx) => (
-             <div key={idx} className="bg-zinc-900/60 backdrop-blur-xl rounded-[2rem]  p-8 overflow-hidden">
-               { }
-               <div className="flex items-center gap-4 mb-8">
-                   <div className="p-3 bg-[#a098ff]/10 rounded-2xl text-[#a098ff]">
-                       {section.title.toLowerCase().includes("personal") ? <User size={24} /> : 
-                        section.title.toLowerCase().includes("university") ? <Building size={24} /> : 
-                        (section.title.toLowerCase().includes("guardian") || section.title.toLowerCase().includes("family")) ? <Users size={24} /> :
-                        <Activity size={24} />}
-                   </div>
-                   <h3 className="text-2xl font-bold text-white tracking-tight">{section.title}</h3>
-               </div>
-               
-               { }
-               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {Object.entries(section.data).map(([key, val], i) => (
-                      <div key={i} className="flex flex-col p-4 rounded-2xl bg-black/20 hover:bg-white/5 transition-colors group">
-                         <span className="text-zinc-500 text-[10px] uppercase tracking-wider font-bold mb-1.5 group-hover:text-zinc-400">
-                            {key}
-                         </span>
-                         <span className="text-zinc-100 text-sm font-medium break-words leading-relaxed">
-                            {val}
-                         </span>
-                      </div>
-                  ))}
-               </div>
+  return (
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {profileSections.map((section, idx) => (
+        <div
+          key={idx}
+          className="bg-zinc-900/60 backdrop-blur-xl rounded-[2rem]  p-8 overflow-hidden"
+        >
+          {}
+          <div className="flex items-center gap-4 mb-8">
+            <div className="p-3 bg-[#a098ff]/10 rounded-2xl text-[#a098ff]">
+              {section.title.toLowerCase().includes("personal") ? (
+                <User size={24} />
+              ) : section.title.toLowerCase().includes("university") ? (
+                <Building size={24} />
+              ) : section.title.toLowerCase().includes("guardian") ||
+                section.title.toLowerCase().includes("family") ? (
+                <Users size={24} />
+              ) : (
+                <Activity size={24} />
+              )}
             </div>
-         ))}
-      </div>
-   );
+            <h3 className="text-2xl font-bold text-white tracking-tight">
+              {section.title}
+            </h3>
+          </div>
+
+          {}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Object.entries(section.data).map(([key, val], i) => (
+              <div
+                key={i}
+                className="flex flex-col p-4 rounded-2xl bg-black/20 hover:bg-white/5 transition-colors group"
+              >
+                <span className="text-zinc-500 text-[10px] uppercase tracking-wider font-bold mb-1.5 group-hover:text-zinc-400">
+                  {key}
+                </span>
+                <span className="text-zinc-100 text-sm font-medium break-words leading-relaxed">
+                  {val}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 };
 
 export default HomePage;

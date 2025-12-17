@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "clean" : "node scripts/clean.js"
+    "clean": "node scripts/clean.js && npx prettier --write ."
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.13",

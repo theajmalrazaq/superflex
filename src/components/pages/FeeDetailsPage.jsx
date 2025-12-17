@@ -9,17 +9,14 @@ function FeeDetailsPage() {
   const loadContent = async () => {
     setLoadingError(false);
 
-    
     let targetElement = document.querySelector(
       ".m-grid.m-grid--hor.m-grid--root.m-page",
     );
 
-    
     if (!targetElement) {
-      
       const waitForElement = new Promise((resolve) => {
         let attempts = 0;
-        const maxAttempts = 30; 
+        const maxAttempts = 30;
 
         const checkInterval = setInterval(() => {
           targetElement = document.querySelector(
@@ -31,7 +28,7 @@ function FeeDetailsPage() {
             clearInterval(checkInterval);
             resolve(targetElement);
           }
-        }, 1000); 
+        }, 1000);
       });
 
       targetElement = await waitForElement;
@@ -45,7 +42,6 @@ function FeeDetailsPage() {
     }
 
     if (targetElement) {
-      
       setElemContent(targetElement.innerHTML);
       targetElement.remove();
     } else {
@@ -61,10 +57,8 @@ function FeeDetailsPage() {
     initializeContent();
   }, []);
 
-  
   useEffect(() => {
     if (elemContent && !contentLoaded.current) {
-      
       const checkForCompleteRender = () => {
         const contentContainer = document.querySelector(
           ".m-grid.m-grid--hor.m-grid--root.m-page",
@@ -72,7 +66,6 @@ function FeeDetailsPage() {
 
         if (!contentContainer) return false;
 
-        
         const tables = contentContainer.querySelectorAll("table");
         const hasPopulatedTables = Array.from(tables).some(
           (table) => table.querySelectorAll("tbody tr").length > 0,
@@ -81,26 +74,22 @@ function FeeDetailsPage() {
         return hasPopulatedTables;
       };
 
-      
       const initialStylingTimeout = setTimeout(() => {
-        
         if (checkForCompleteRender()) {
           applyCustomStyling();
           contentLoaded.current = true;
         } else {
-          
           const stylingInterval = setInterval(() => {
             if (checkForCompleteRender()) {
               clearInterval(stylingInterval);
               applyCustomStyling();
               contentLoaded.current = true;
             }
-          }, 500); 
+          }, 500);
 
-          
           setTimeout(() => {
             clearInterval(stylingInterval);
-            
+
             if (!contentLoaded.current) {
               applyCustomStyling();
               contentLoaded.current = true;
@@ -114,7 +103,6 @@ function FeeDetailsPage() {
   }, [elemContent]);
 
   const applyCustomStyling = () => {
-    
     const element = document.querySelector(
       ".m-grid.m-grid--hor.m-grid--root.m-page",
     );
@@ -124,7 +112,6 @@ function FeeDetailsPage() {
       col.classList.add("!w-full", "!max-w-full");
     });
 
-    
     const portlet = element.querySelector(".m-portlet");
     if (portlet) {
       portlet.classList.add(
@@ -136,7 +123,6 @@ function FeeDetailsPage() {
       );
     }
 
-    
     const portletHead = element.querySelector(".m-portlet__head");
     if (portletHead) {
       portletHead.classList.add(
@@ -152,7 +138,6 @@ function FeeDetailsPage() {
         "!mb-4",
       );
 
-      
       const headingText = portletHead.querySelector(".m-portlet__head-text");
       if (headingText) {
         headingText.classList.add("!text-white", "!text-xl", "!font-bold");
@@ -160,7 +145,6 @@ function FeeDetailsPage() {
       }
     }
 
-    
     const portletBody = element.querySelector(".m-portlet__body");
     if (portletBody) {
       portletBody.classList.add(
@@ -178,7 +162,6 @@ function FeeDetailsPage() {
       );
     }
 
-    
     const styleElement = document.createElement("style");
     styleElement.textContent = `
             .custom-scrollbar::-webkit-scrollbar {
@@ -199,7 +182,6 @@ function FeeDetailsPage() {
         `;
     document.head.appendChild(styleElement);
 
-    
     const semesterHeaders = element.querySelectorAll(
       "[id^='rowStdDetailHeader_']",
     );
@@ -218,13 +200,11 @@ function FeeDetailsPage() {
         );
       }
 
-      
       const colDiv = header.querySelector(".col-lg-3");
       if (colDiv) {
         colDiv.classList.add("!flex", "!items-center");
       }
 
-      
       const expandBtn = header.querySelector("[id^='BtnhideshowInternal']");
       if (expandBtn) {
         expandBtn.classList.remove(
@@ -251,7 +231,6 @@ function FeeDetailsPage() {
           "!p-0",
         );
 
-        
         expandBtn.addEventListener("click", function () {
           const icon = this.querySelector("i");
           const targetId = this.getAttribute("onclick").match(
@@ -269,7 +248,6 @@ function FeeDetailsPage() {
         });
       }
 
-      
       const semesterLabel = header.querySelector("label");
       if (semesterLabel) {
         semesterLabel.classList.add(
@@ -280,20 +258,16 @@ function FeeDetailsPage() {
         );
       }
 
-      
       const amountCells = header.querySelectorAll("p.text-center");
       amountCells.forEach((cell, index) => {
         cell.classList.add("!text-white/80", "!font-medium");
 
-        
         const amount = parseFloat(cell.textContent.replace(/[(),%]/g, ""));
         if (!isNaN(amount)) {
-          
           if (index === 4) {
             cell.classList.add("!text-emerald-400", "!font-bold");
           }
 
-          
           if (index === 5) {
             if (amount < 0) {
               cell.classList.add("!text-rose-400");
@@ -302,7 +276,6 @@ function FeeDetailsPage() {
             }
           }
 
-          
           if (index === 0 && amount < 0) {
             cell.classList.add("!text-rose-400");
           }
@@ -310,7 +283,6 @@ function FeeDetailsPage() {
       });
     });
 
-    
     const sampleStdFeeDetail = document.getElementById("sample_StdFeeDetail");
     if (sampleStdFeeDetail) {
       sampleStdFeeDetail.classList.add("!p-6");
@@ -321,19 +293,15 @@ function FeeDetailsPage() {
       sumhead.classList.add("!p-2", "!bg-white/10", "!mb-2");
     }
 
-    
     const semesterDetails = element.querySelectorAll("[id^='rowStdDetail_']");
     semesterDetails.forEach((detail) => {
       detail.classList.add("!mt-2", "!mb-6", "!rounded-xl", "!overflow-hidden");
 
-      
       const feeDetailsRow = detail.querySelector(".row");
       if (feeDetailsRow) {
-        
         feeDetailsRow.classList.add("!flex", "!flex-col", "!w-full", "!gap-6");
         feeDetailsRow.classList.remove("row");
 
-        
         const feeInSemesterCol = feeDetailsRow.querySelector(".col-lg-5");
         const registrationLogCol = feeDetailsRow.querySelector(".col-lg-7");
 
@@ -341,7 +309,6 @@ function FeeDetailsPage() {
           feeInSemesterCol.classList.remove("col-lg-5");
           feeInSemesterCol.classList.add("!w-full");
 
-          
           const feeInSemesterHeader = feeInSemesterCol.querySelector("h4");
           if (feeInSemesterHeader) {
             feeInSemesterHeader.classList.add(
@@ -352,7 +319,6 @@ function FeeDetailsPage() {
             );
           }
 
-          
           const feeBreakdownContainer = feeInSemesterCol.querySelector(
             ".border.border-secondary",
           );
@@ -370,7 +336,6 @@ function FeeDetailsPage() {
             );
           }
 
-          
           const feeItems = feeInSemesterCol.querySelectorAll(".row");
           feeItems.forEach((row) => {
             row.classList.add(
@@ -380,13 +345,11 @@ function FeeDetailsPage() {
               "!mb-3",
             );
 
-            
             const labels = row.querySelectorAll("label");
             labels.forEach((label) => {
               label.removeAttribute("style");
               label.classList.add("!text-white/80", "!font-medium");
 
-              
               const boldText = label.querySelector("b");
               if (boldText && boldText.textContent.match(/[A-G]\)/)) {
                 boldText.classList.add("!text-x", "!font-bold", "!mr-1");
@@ -394,7 +357,6 @@ function FeeDetailsPage() {
             });
           });
 
-          
           const feeLists = feeInSemesterCol.querySelectorAll("ul");
           feeLists.forEach((list) => {
             list.classList.add("!pl-6", "!mt-1", "!mb-3", "!text-white/70");
@@ -403,7 +365,6 @@ function FeeDetailsPage() {
             listItems.forEach((item) => {
               item.classList.add("!mb-1");
 
-              
               const boldAmount = item.querySelector("b");
               if (boldAmount) {
                 boldAmount.classList.add("!text-white", "!font-medium");
@@ -416,7 +377,6 @@ function FeeDetailsPage() {
           registrationLogCol.classList.remove("col-lg-7");
           registrationLogCol.classList.add("!w-full");
 
-          
           const regLogHeader = registrationLogCol.querySelector("h4");
           if (regLogHeader) {
             regLogHeader.classList.add(
@@ -427,13 +387,11 @@ function FeeDetailsPage() {
             );
           }
 
-          
           const hrElements = registrationLogCol.querySelectorAll("hr");
           hrElements.forEach((hr) => {
             hr.classList.add("!border-white/10", "!mb-4");
           });
 
-          
           const gpaRows = registrationLogCol.querySelectorAll(
             ".row:not(:last-child)",
           );
@@ -456,7 +414,6 @@ function FeeDetailsPage() {
             });
           });
 
-          
           const installmentHeader = registrationLogCol.querySelector(
             "#lbIsntallmentHead_0",
           );
@@ -472,13 +429,11 @@ function FeeDetailsPage() {
         }
       }
 
-      
       const sectionHeadings = detail.querySelectorAll("h4");
       sectionHeadings.forEach((heading) => {
         heading.classList.add("!text-white", "!font-bold", "!text-lg", "!mb-2");
       });
 
-      
       const borderContainers = detail.querySelectorAll(
         ".border.border-secondary",
       );
@@ -494,11 +449,9 @@ function FeeDetailsPage() {
         );
       });
 
-      
       detail.querySelectorAll("label").forEach((label) => {
         label.classList.add("!text-white/80");
 
-        
         if (label.textContent.includes(")")) {
           const boldText = label.querySelector("b");
           if (boldText) {
@@ -507,7 +460,6 @@ function FeeDetailsPage() {
         }
       });
 
-      
       const tables = detail.querySelectorAll("table");
       tables.forEach((table) => {
         table.classList.add(
@@ -520,14 +472,12 @@ function FeeDetailsPage() {
           "!mb-4",
         );
 
-        
         table.classList.remove(
           "table-responsive",
           "m-table--border-info",
           "m-table--head-bg-info",
         );
 
-        
         const thead = table.querySelector("thead");
         if (thead) {
           thead.classList.add("!bg-zinc-900");
@@ -551,7 +501,6 @@ function FeeDetailsPage() {
           });
         }
 
-        
         const tbody = table.querySelector("tbody");
         if (tbody) {
           tbody.classList.add("!divide-y", "!divide-white/10");
@@ -578,21 +527,17 @@ function FeeDetailsPage() {
       });
     });
 
-    
     const collectionTable = element.querySelector("#sample_CollectionDetail");
     if (collectionTable) {
-      
       const tableContainer = document.createElement("div");
       tableContainer.className =
         "rounded-xl overflow-hidden !border !border-white/10 mb-6";
       collectionTable.parentNode.insertBefore(tableContainer, collectionTable);
       tableContainer.appendChild(collectionTable);
 
-      
       collectionTable.classList.add("!w-full", "!border-collapse", "!border-0");
       collectionTable.classList.remove("table-bordered", "table-responsive");
 
-      
       const thead = collectionTable.querySelector("thead");
       if (thead) {
         thead.classList.add("!bg-zinc-900", "!sticky", "!top-0", "!z-10");
@@ -611,7 +556,6 @@ function FeeDetailsPage() {
         });
       }
 
-      
       const tbody = collectionTable.querySelector("tbody");
       if (tbody) {
         tbody.classList.add("!divide-y", "!divide-white/10");
@@ -633,23 +577,19 @@ function FeeDetailsPage() {
               "!border-white/10",
             );
 
-            
             if (index === 5) {
               cell.classList.add("!font-medium", "!text-emerald-400");
             }
 
-            
             if (index === 9) {
               const status = cell.textContent.trim();
               cell.innerHTML = `<span class="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-md font-medium">${status}</span>`;
             }
 
-            
             if (index === 6 || index === 7) {
               cell.classList.add("!text-blue-400");
             }
 
-            
             if (index === 10) {
               const link = cell.querySelector("a");
               if (link) {
@@ -668,12 +608,10 @@ function FeeDetailsPage() {
       }
     }
 
-    
     const summaryContainer = document.createElement("div");
     summaryContainer.className =
       "bg-zinc-900 rounded-2xl p-6 mb-6 !border !border-white/10";
 
-    
     let totalPaid = 0;
     const paymentAmounts = element.querySelectorAll(
       "#sample_CollectionDetail tbody tr td:nth-child(6)",
@@ -685,7 +623,6 @@ function FeeDetailsPage() {
       }
     });
 
-    
     const latestPaymentRow = element.querySelector(
       "#sample_CollectionDetail tbody tr",
     );
@@ -734,14 +671,12 @@ function FeeDetailsPage() {
             ${latestPaymentInfo}
         `;
 
-    
     if (portletBody && portletBody.firstChild) {
       portletBody.insertBefore(summaryContainer, portletBody.firstChild);
     }
   };
 
   const handleRetry = () => {
-    
     loadContent();
   };
 
@@ -754,7 +689,7 @@ function FeeDetailsPage() {
         />
       ) : (
         <div className="bg-black rounded-3xl border border-white/10 p-6 shadow-lg text-white">
-          { }
+          {}
           <div className="bg-zinc-900 rounded-2xl p-6 mb-6 !border !border-white/10">
             <div className="flex flex-col md:flex-row justify-between items-start gap-4">
               <div className="flex items-start gap-4">
@@ -825,7 +760,7 @@ function FeeDetailsPage() {
             )}
           </div>
 
-          { }
+          {}
           <div className="mb-3 !p-6" id="sample_StdFeeDetail"></div>
           <div className="table-scrollable">
             <div className="rounded-xl overflow-hidden !border !border-white/10 mb-6">

@@ -10,7 +10,6 @@ function CourseWithdrawPage() {
     );
 
     if (targetElement) {
-      
       applyCustomStyling(targetElement);
 
       setElemContent(targetElement.innerHTML);
@@ -19,16 +18,13 @@ function CourseWithdrawPage() {
   }, []);
 
   const applyCustomStyling = (element) => {
-    
     const addedStyles = [];
 
-    
     const errorDiv = element.querySelector("#DataErrormsgdiv");
     if (errorDiv) {
-      errorDiv.remove(); 
+      errorDiv.remove();
     }
 
-    
     const styleElement = document.createElement("style");
     styleElement.textContent = `
             .custom-scrollbar::-webkit-scrollbar {
@@ -75,12 +71,11 @@ function CourseWithdrawPage() {
                 background-color: rgba(0, 0, 0, 0.4);
             }
         `;
-    
+
     styleElement.setAttribute("data-custom-style", "true");
     document.head.appendChild(styleElement);
     addedStyles.push(styleElement);
 
-    
     const alertElements = element.querySelectorAll(".m-alert");
     alertElements.forEach((alertElement) => {
       alertElement.classList.add(
@@ -96,7 +91,6 @@ function CourseWithdrawPage() {
         "!mb-6",
       );
 
-      
       const iconElement = alertElement.querySelector(".m-alert__icon");
       if (iconElement) {
         iconElement.classList.add(
@@ -112,7 +106,6 @@ function CourseWithdrawPage() {
           "!justify-center",
         );
 
-        
         const createSvgIcon = (path) => {
           const svg = document.createElementNS(
             "http://www.w3.org/2000/svg",
@@ -138,7 +131,6 @@ function CourseWithdrawPage() {
           return svg;
         };
 
-        
         let iconPath = "";
         if (alertElement.classList.contains("alert-danger")) {
           iconPath =
@@ -153,7 +145,6 @@ function CourseWithdrawPage() {
         iconElement.appendChild(createSvgIcon(iconPath));
       }
 
-      
       const closeButton = alertElement.querySelector("button.close");
       if (closeButton) {
         closeButton.style.cssText = "content: none !important;";
@@ -174,7 +165,6 @@ function CourseWithdrawPage() {
         closeButton.classList.add("!focus:outline-none");
       }
 
-      
       if (alertElement.classList.contains("alert-info")) {
         const linkElement = alertElement.querySelector("a");
         if (linkElement) {
@@ -189,7 +179,6 @@ function CourseWithdrawPage() {
       }
     });
 
-    
     const semesterForm = element.querySelector("#Formwithdraw");
     if (semesterForm) {
       semesterForm.classList.add("!ml-4");
@@ -211,7 +200,6 @@ function CourseWithdrawPage() {
           "!w-64",
         );
 
-        
         semesterSelect.classList.remove(
           "m-dropdown__toggle",
           "btn",
@@ -220,14 +208,12 @@ function CourseWithdrawPage() {
         );
       }
 
-      
       const brTag = semesterForm.querySelector("br");
       if (brTag) {
         brTag.remove();
       }
     }
 
-    
     const portlet = element.querySelector(".m-portlet");
     if (portlet) {
       portlet.classList.add(
@@ -238,7 +224,6 @@ function CourseWithdrawPage() {
         "!shadow-lg",
       );
 
-      
       portlet.classList.remove(
         "m-portlet--primary",
         "m-portlet--head-solid-bg",
@@ -247,7 +232,6 @@ function CourseWithdrawPage() {
       );
     }
 
-    
     const portletHead = element.querySelector(".m-portlet__head");
     if (portletHead) {
       portletHead.classList.add(
@@ -263,28 +247,21 @@ function CourseWithdrawPage() {
         "!mb-4",
       );
 
-      
       const headingText = portletHead.querySelector(".m-portlet__head-text");
       if (headingText) {
         headingText.classList.add("!text-white", "!text-xl", "!font-bold");
       }
 
-      
       const headCaption = portletHead.querySelector(".m-portlet__head-caption");
       if (headCaption) {
         headCaption.classList.add("!flex", "!justify-center", "!items-center");
       }
 
-      
       const semesterForm = element.querySelector("#Formwithdraw");
       if (semesterForm) {
-        
-
-        
         const formContainer = document.createElement("div");
         formContainer.appendChild(semesterForm);
 
-        
         if (headingText && headingText.parentElement) {
           headingText.parentElement.after(formContainer);
         } else {
@@ -292,21 +269,16 @@ function CourseWithdrawPage() {
         }
       }
 
-      
       const buttonContainer = document.createElement("div");
       buttonContainer.className = "portlet-head-buttons flex gap-2";
 
-      
       const lastRow = element.querySelector("tbody tr:last-child");
       if (lastRow) {
         const buttonCell = lastRow.querySelector("td:last-child");
         if (buttonCell) {
-          
           const buttons = buttonCell.querySelectorAll(".btn");
 
-          
           if (buttons.length >= 1) {
-            
             const initiateButton = document.createElement("a");
             initiateButton.href = "#";
             initiateButton.className =
@@ -314,7 +286,6 @@ function CourseWithdrawPage() {
             initiateButton.setAttribute("data-toggle", "modal");
             initiateButton.setAttribute("data-target", "#RemarksDetail");
 
-            
             initiateButton.innerHTML = `
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -329,7 +300,6 @@ function CourseWithdrawPage() {
           }
 
           if (buttons.length >= 2) {
-            
             const downloadButton = document.createElement("a");
             downloadButton.href = "#";
             downloadButton.className =
@@ -339,7 +309,6 @@ function CourseWithdrawPage() {
               "ftn_PrintCourseWithdrawForm();",
             );
 
-            
             downloadButton.innerHTML = `
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -351,16 +320,13 @@ function CourseWithdrawPage() {
             buttonContainer.appendChild(downloadButton);
           }
 
-          
           portletHead.appendChild(buttonContainer);
 
-          
           buttonCell.style.display = "none";
         }
       }
     }
 
-    
     const portletBody = element.querySelector(".m-portlet__body");
     if (portletBody) {
       portletBody.classList.add(
@@ -376,26 +342,23 @@ function CourseWithdrawPage() {
         "custom-scrollbar",
       );
 
-      
       const sectionContent = portletBody.querySelector(".m-section__content");
       if (sectionContent) {
         sectionContent.style.marginBottom = "0";
       }
     }
 
-    
     const table = element.querySelector(".table");
     if (table) {
       table.querySelectorAll(".table td, .table th").forEach((el) => {
         el.classList.add("!border-none");
       });
-      
+
       const tableContainer = document.createElement("div");
       tableContainer.className = "overflow-hidden mb-6";
       table.parentNode.insertBefore(tableContainer, table);
       tableContainer.appendChild(table);
 
-      
       table.classList.add("!w-full", "!border-collapse", "!border-0");
       table.classList.remove(
         "m-table",
@@ -403,12 +366,10 @@ function CourseWithdrawPage() {
         "table-responsive",
       );
 
-      
       const thead = table.querySelector("thead");
       if (thead) {
         thead.classList.add("!bg-zinc-900", "!sticky", "!top-0", "!z-10");
 
-        
         const checkboxHeader = thead.querySelector("#Checkallhide_Show");
         if (checkboxHeader) {
           checkboxHeader.innerHTML = "Select";
@@ -428,7 +389,6 @@ function CourseWithdrawPage() {
         });
       }
 
-      
       const tbody = table.querySelector("tbody");
       if (tbody) {
         tbody.classList.add("!divide-y", "!divide-white/10");
@@ -450,7 +410,6 @@ function CourseWithdrawPage() {
               "!border-white/10",
             );
 
-            
             const checkbox = cell.querySelector('input[type="checkbox"]');
             if (checkbox) {
               checkbox.classList.add(
@@ -463,7 +422,6 @@ function CourseWithdrawPage() {
           });
         });
 
-        
         const lastRow = tbody.querySelector("tr:last-child");
         if (lastRow) {
           const buttonCell = lastRow.querySelector("td:last-child");
@@ -490,14 +448,11 @@ function CourseWithdrawPage() {
                 "!mr-2",
               );
 
-              
               button.style.marginTop = "0";
 
-              
               button.classList.remove("btn-primary", "btn-sm");
             });
 
-            
             const initiateButton = buttonCell.querySelector(".btn:first-child");
             if (initiateButton) {
               initiateButton.innerHTML = `
@@ -512,7 +467,6 @@ function CourseWithdrawPage() {
               `;
             }
 
-            
             const downloadButton = buttonCell.querySelector(".btn:last-child");
             if (downloadButton) {
               downloadButton.innerHTML = `
@@ -529,7 +483,6 @@ function CourseWithdrawPage() {
       }
     }
 
-    
     const modals = element.querySelectorAll(".modal-content");
     modals.forEach((modal) => {
       modal.classList.add(
@@ -541,7 +494,6 @@ function CourseWithdrawPage() {
         "!shadow-none",
       );
 
-      
       const modalHeader = modal.querySelector(".modal-header");
       if (modalHeader) {
         modalHeader.classList.add(
@@ -554,7 +506,6 @@ function CourseWithdrawPage() {
           "!justify-between",
         );
 
-        
         if (modalHeader.hasAttribute("style")) {
           modalHeader.removeAttribute("style");
         }
@@ -565,7 +516,6 @@ function CourseWithdrawPage() {
           modalTitle.textContent = "Course Withdraw Details";
         }
 
-        
         const closeBtn = modalHeader.querySelector(".close");
         if (closeBtn) {
           closeBtn.innerHTML = `
@@ -575,7 +525,6 @@ function CourseWithdrawPage() {
                         </svg>
                     `;
 
-          
           if (closeBtn.hasAttribute("style")) {
             closeBtn.removeAttribute("style");
           }
@@ -584,7 +533,6 @@ function CourseWithdrawPage() {
         }
       }
 
-      
       const modalBody = modal.querySelector(".modal-body");
       if (modalBody) {
         modalBody.classList.add(
@@ -596,14 +544,12 @@ function CourseWithdrawPage() {
           "custom-scrollbar",
         );
 
-        
         const fileInputContainers = modalBody.querySelectorAll(".form-group");
         fileInputContainers.forEach((container) => {
           const label = container.querySelector("label");
           const fileInput = container.querySelector('input[type="file"]');
 
           if (label && fileInput) {
-            
             label.classList.add(
               "!text-white",
               "!font-medium",
@@ -612,10 +558,8 @@ function CourseWithdrawPage() {
             );
             label.style.fontWeight = "normal";
 
-            
             const labelText = label.textContent.split(":")[0];
 
-            
             const uploadContainer = document.createElement("div");
             uploadContainer.className = "file-upload-container relative";
 
@@ -634,23 +578,19 @@ function CourseWithdrawPage() {
                             <p class="text-xs text-white/40">Image must be less than 650 KB</p>
                         `;
 
-            
             const newFileInput = fileInput.cloneNode(true);
             newFileInput.className = "file-upload-input";
             if (newFileInput.hasAttribute("style")) {
               newFileInput.removeAttribute("style");
             }
 
-            
             uploadContainer.appendChild(uploadBox);
             uploadContainer.appendChild(newFileInput);
 
-            
             fileInput.parentNode.replaceChild(uploadContainer, fileInput);
           }
         });
 
-        
         const textareaGroup = modalBody.querySelector(".form-group:last-child");
         if (textareaGroup) {
           const textarea = textareaGroup.querySelector("textarea");
@@ -684,12 +624,10 @@ function CourseWithdrawPage() {
           }
         }
 
-        
         const brTags = modalBody.querySelectorAll("br");
         brTags.forEach((br) => br.remove());
       }
 
-      
       const modalFooter = modal.querySelector(".modal-footer");
       if (modalFooter) {
         modalFooter.classList.add(
@@ -702,7 +640,6 @@ function CourseWithdrawPage() {
           "!gap-3",
         );
 
-        
         const submitBtn = modalFooter.querySelector('input[type="button"]');
         if (submitBtn) {
           submitBtn.classList.add(
@@ -719,13 +656,11 @@ function CourseWithdrawPage() {
             "!cursor-pointer",
           );
 
-          
           if (submitBtn.hasAttribute("style")) {
             submitBtn.removeAttribute("style");
           }
         }
 
-        
         const closeBtn = modalFooter.querySelector(".btn-default");
         if (closeBtn) {
           closeBtn.classList.add(
@@ -741,7 +676,6 @@ function CourseWithdrawPage() {
             "!border-0",
           );
 
-          
           if (closeBtn.hasAttribute("style")) {
             closeBtn.removeAttribute("style");
           }

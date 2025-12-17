@@ -30,7 +30,6 @@ function PathRouter() {
     };
   }, []);
 
-  
   const renderComponent = () => {
     if (currentPath === "/" || currentPath.startsWith("/?dump=")) {
       return <HomePage />;
@@ -88,7 +87,6 @@ function PathRouter() {
       return <ChangePasswordPage />;
     }
 
-    
     return <NotFoundPage />;
   };
 

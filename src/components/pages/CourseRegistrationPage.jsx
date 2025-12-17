@@ -42,7 +42,6 @@ function CourseRegistrationPage() {
         "!justify-center",
       );
 
-      
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("width", "24");
       svg.setAttribute("height", "24");
@@ -54,33 +53,28 @@ function CourseRegistrationPage() {
       svg.setAttribute("stroke-linejoin", "round");
       svg.classList.add("w-6", "h-6", "text-white");
 
-      
       const path = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "path",
       );
       path.setAttribute("d", badgeAlertPath);
 
-      
       svg.appendChild(path);
-      iconElement.innerHTML = ""; 
+      iconElement.innerHTML = "";
       iconElement.appendChild(svg);
     }
 
-    
     const closeButton = alertElement?.querySelector(
       'button.close[data-dismiss="alert"]',
     );
     if (closeButton) {
-      
       closeButton.style.cssText = "content: none !important;";
-      
+
       const style = document.createElement("style");
       style.textContent =
         'button.close[data-dismiss="alert"]::before { display: none !important; content: none !important; }';
       document.head.appendChild(style);
 
-      
       const closeSvg = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "svg",
@@ -95,7 +89,6 @@ function CourseRegistrationPage() {
       closeSvg.setAttribute("stroke-linejoin", "round");
       closeSvg.classList.add("w-4", "h-4", "text-white");
 
-      
       const line1 = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "line",
@@ -114,10 +107,9 @@ function CourseRegistrationPage() {
       line2.setAttribute("x2", "18");
       line2.setAttribute("y2", "18");
 
-      
       closeSvg.appendChild(line1);
       closeSvg.appendChild(line2);
-      closeButton.innerHTML = ""; 
+      closeButton.innerHTML = "";
       closeButton.appendChild(closeSvg);
       closeButton.classList.add("!focus:outline-none");
     }

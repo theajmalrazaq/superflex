@@ -11,20 +11,15 @@
     <img src="https://img.shields.io/github/stars/theajmalrazaq/superflex?style=for-the-badge&color=f92b04" alt="GitHub stars">
   </a>
 
-  
   <a href="https://github.com/theajmalrazaq/superflex/issues">
     <img src="https://img.shields.io/github/issues-raw/theajmalrazaq/superflex?style=for-the-badge&color=f92b04" alt="GitHub issues">
   </a>
 
-  
   <a href="https://github.com/theajmalrazaq/superflex/blob/master/LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-f92b04?style=for-the-badge" alt="License">
   </a>
 </p>
 
-
-
-  
   <p>
     <a href="https://theajmalrazaq.github.io/superflex">Website</a> •
     <a href="#features">Features</a> •
@@ -36,28 +31,30 @@
 
 ## Overview
 
-SuperFlex is the ultimate glow-up for that crusty university Flex portal at NUCES that was giving major 2005 vibes. It's literally a browser extension that said "challenge accepted" and transformed the ancient interface into this sleek, dark-mode masterpiece. It's not just a pretty face though - we've added so many features that your productivity is about to be *chef's kiss* 🔥
+SuperFlex is the ultimate glow-up for that crusty university Flex portal at NUCES that was giving major 2005 vibes. It's literally a browser extension that said "challenge accepted" and transformed the ancient interface into this sleek, dark-mode masterpiece. It's not just a pretty face though - we've added so many features that your productivity is about to be _chef's kiss_ 🔥
 
 This bad boy works by sneaking React components into the boring old LMS pages, basically performing plastic surgery on the UI. No cap, it's the ultimate uni life hack that the administration wasn't ready for. Flex portal? More like FLEX on your classmates with this aesthetic upgrade! 😎
 
 ## Features
 
 ### 🎨 Modern UI/UX
+
 - **Dark Mode**: Easy on the eyes with a sleek dark theme
 - **Custom Typography**: Improved readability with Product Sans font
 - **Animated Components**: Smooth transitions and loading states
 
 ### 📊 Enhanced Dashboards
+
 - **Attendance Visualization**: Visual progress bars for attendance tracking
 - **Grade Summaries**: At-a-glance view of course performance
 - **CGPA Calculator**: Plan future semesters and calculate required grades
 - **PLO Attainment Tracking**: Monitor program learning outcomes
 
 ### 🛠️ Improved Functionality
+
 - **Smart Tables**: Sortable, filterable academic data
 - **Collapsible Sections**: Better organize content with expandable accordions
 - **Custom Navigation**: Streamlined access to important features
-
 
 ## Supported Pages
 
@@ -73,8 +70,8 @@ SuperFlex enhances the following university LMS pages:
 - **Fee Details Page**: Clearer financial information display
 - **Retake Exam Page**: Simplified exam registration process
 
-
 ### Installation
+
 1. Download the latest release from the [GitHub Releases page](https://github.com/theajmalrazaq/superflex/releases)
 2. Unzip the downloaded file
 3. Open Chrome and go to `chrome://extensions/`
@@ -92,18 +89,22 @@ SuperFlex is built with modern web technologies:
 - **CRXJS**: Chrome extension development tools
 
 ### Prerequisites
+
 - Node.js (v16+)
 - npm or yarn
 - Chrome browser
 
 ### Setup Development Environment
+
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/theajmalrazaq/superflex.git
 cd superflex
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 # or
@@ -111,6 +112,7 @@ yarn
 ```
 
 3. Start the development server:
+
 ```bash
 npm run dev
 # or
@@ -126,6 +128,7 @@ yarn dev
 5. The extension will automatically reload when you make changes
 
 ### Project Structure
+
 ```
 superflex/
 ├── public/             # Static assets

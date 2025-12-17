@@ -27,18 +27,20 @@ function LoginPageStyles() {
         ".m-grid__item.m-grid__item--order-tablet-and-mobile-2.m-login__aside",
       )
       .classList.add("!w-full", "!p-0");
-    const mainContainer = document.querySelector(".m-stack__item.m-stack__item--fluid");
+    const mainContainer = document.querySelector(
+      ".m-stack__item.m-stack__item--fluid",
+    );
     if (mainContainer) {
-        mainContainer.classList.add(
-            "!flex",
-            "!justify-center",
-            "!items-center",
-            "!h-screen",
-            "!w-full",
-            "!bg-transparent", 
-            "!relative",
-            "!z-[50]" 
-        );
+      mainContainer.classList.add(
+        "!flex",
+        "!justify-center",
+        "!items-center",
+        "!h-screen",
+        "!w-full",
+        "!bg-transparent",
+        "!relative",
+        "!z-[50]",
+      );
     }
 
     document.querySelectorAll(".m-login__wrapper").forEach((element) => {
@@ -56,7 +58,7 @@ function LoginPageStyles() {
       .classList.add("!p-0");
 
     const formHelp = document.querySelector(".m-form__help");
-    if(formHelp) formHelp.classList.add("!text-white", "!text-xs");
+    if (formHelp) formHelp.classList.add("!text-white", "!text-xs");
 
     document
       .querySelectorAll(".input-group.m-input-group.m-input-group--square")
@@ -68,7 +70,6 @@ function LoginPageStyles() {
       element.remove();
     });
 
-    
     document.querySelectorAll(".form-control.m-input").forEach((element) => {
       element.classList.add(
         "!rounded-lg",
@@ -80,7 +81,7 @@ function LoginPageStyles() {
         "!placeholder:opacity-100",
         "!h-[40px]",
         "!px-3",
-        "!w-full"
+        "!w-full",
       );
       element.style.fontFamily = "'Google Sans Flex', sans-serif";
     });
@@ -90,9 +91,8 @@ function LoginPageStyles() {
     });
 
     const oldLogo = document.querySelector(".m-login__logo");
-    if(oldLogo) oldLogo.remove();
+    if (oldLogo) oldLogo.remove();
 
-    
     document.querySelectorAll(".btn-primary").forEach((button) => {
       button.classList.add(
         "!bg-[#a098ff]",
@@ -101,7 +101,7 @@ function LoginPageStyles() {
         "!border-none",
         "!rounded-xl",
         "!w-full",
-        "!h-[44px]", 
+        "!h-[44px]",
         "!px-3",
         "!py-2",
         "!text-center",
@@ -110,74 +110,57 @@ function LoginPageStyles() {
         "items-center",
         "hover:!bg-[#8f86ff]",
         "!transition-all",
-        "!duration-200"
+        "!duration-200",
       );
       button.style.fontFamily = "'Google Sans Flex', sans-serif";
     });
 
     const signInIcon = document.querySelector(".la-sign-in");
-    if(signInIcon) signInIcon.remove();
+    if (signInIcon) signInIcon.remove();
 
-    
     let logintitle = document.querySelector(".m-login__title");
-    if(logintitle) {
-        logintitle.style.display = "none";
+    if (logintitle) {
+      logintitle.style.display = "none";
     }
 
-    
     let bglogin = document.querySelector(".m-login__signin");
-    if(bglogin) {
-        
-        
-        bglogin.classList.add(
-          "!bg-black/10", 
-          "backdrop-blur-xl",
-          "!p-10",
-          "!rounded-[24px]",
-          "!border",
-          "!border-white/10",
-          "!flex",
-          "!flex-col",
-          "!items-center",
-          "!justify-center",
-          "!min-w-[380px]"
-        );
+    if (bglogin) {
+      bglogin.classList.add(
+        "!bg-black/10",
+        "backdrop-blur-xl",
+        "!p-10",
+        "!rounded-[24px]",
+        "!border",
+        "!border-white/10",
+        "!flex",
+        "!flex-col",
+        "!items-center",
+        "!justify-center",
+        "!min-w-[380px]",
+      );
     }
 
-    
     let rightImage = document.getElementById("login-background-image");
     if (!rightImage) {
-        rightImage = document.createElement("div");
-        rightImage.id = "login-background-image";
-        rightImage.classList.add(
-            "fixed",
-            "inset-0",
-            "w-full",
-            "h-full",
-            "z-0"
-        );
+      rightImage = document.createElement("div");
+      rightImage.id = "login-background-image";
+      rightImage.classList.add("fixed", "inset-0", "w-full", "h-full", "z-0");
 
-        
-        const img = document.createElement("img");
-        img.src = "https://theajmalrazaq.github.io/superflex/res/intro.svg";
-        img.classList.add(
-            "w-full",
-            "h-full",
-            "object-cover"
-        );
-        rightImage.appendChild(img);
+      const img = document.createElement("img");
+      img.src = "https://theajmalrazaq.github.io/superflex/res/intro.svg";
+      img.classList.add("w-full", "h-full", "object-cover");
+      rightImage.appendChild(img);
 
-        
-        const blackMask = document.createElement("div");
-        blackMask.className = "absolute inset-0 bg-black/60 z-10"; 
-        rightImage.appendChild(blackMask);
-        document.body.appendChild(rightImage);
+      const blackMask = document.createElement("div");
+      blackMask.className = "absolute inset-0 bg-black/60 z-10";
+      rightImage.appendChild(blackMask);
+      document.body.appendChild(rightImage);
     }
 
-    
     const heroDiv = document.createElement("div");
-    heroDiv.className = "flex flex-col items-center justify-center text-center w-full mb-6";
-    
+    heroDiv.className =
+      "flex flex-col items-center justify-center text-center w-full mb-6";
+
     const bgUrl = chrome.runtime.getURL("public/bg.png");
     const logoUrl = chrome.runtime.getURL("public/logo.svg");
 
@@ -201,41 +184,35 @@ function LoginPageStyles() {
     </div>
     `;
 
-    
-    fetch('https://api.github.com/repos/theajmalrazaq/superflex')
-        .then(res => res.json())
-        .then(data => {
-            const el = document.getElementById('starCount');
-            if(el && data.stargazers_count !== undefined) {
-                el.innerText = data.stargazers_count;
-            }
-        })
-        .catch(err => console.error("Failed to fetch stars", err));
-
-    if(bglogin && bglogin.parentNode) {
-        
-        
-        const wrapper = bglogin.parentNode;
-        
-        
-        const existingHero = wrapper.querySelector('.hero-section-injected');
-        if (existingHero) {
-            existingHero.remove();
+    fetch("https://api.github.com/repos/theajmalrazaq/superflex")
+      .then((res) => res.json())
+      .then((data) => {
+        const el = document.getElementById("starCount");
+        if (el && data.stargazers_count !== undefined) {
+          el.innerText = data.stargazers_count;
         }
-        
-        
-        const internalHero = bglogin.querySelector('.hero-section-injected');
-        if (internalHero) {
-            internalHero.remove();
-        }
+      })
+      .catch((err) => console.error("Failed to fetch stars", err));
 
-        heroDiv.classList.add('hero-section-injected');
-        wrapper.insertBefore(heroDiv, bglogin);
+    if (bglogin && bglogin.parentNode) {
+      const wrapper = bglogin.parentNode;
+
+      const existingHero = wrapper.querySelector(".hero-section-injected");
+      if (existingHero) {
+        existingHero.remove();
+      }
+
+      const internalHero = bglogin.querySelector(".hero-section-injected");
+      if (internalHero) {
+        internalHero.remove();
+      }
+
+      heroDiv.classList.add("hero-section-injected");
+      wrapper.insertBefore(heroDiv, bglogin);
     }
 
-    
     bglogin.classList.add(
-      "!bg-zinc-900/40", 
+      "!bg-zinc-900/40",
       "!p-6",
       "!rounded-[32px]",
       "!border",
@@ -246,7 +223,6 @@ function LoginPageStyles() {
       "!justify-center",
     );
 
-    
     const passwordInputs = document.querySelectorAll(
       '.m-input-icon--right input[type="password"]',
     );

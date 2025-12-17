@@ -10,7 +10,6 @@ function RetakeExamPage() {
     );
 
     if (targetElement) {
-      
       applyCustomStyling(targetElement);
 
       setElemContent(targetElement.innerHTML);
@@ -19,16 +18,13 @@ function RetakeExamPage() {
   }, []);
 
   const applyCustomStyling = (element) => {
-    
     const addedStyles = [];
 
-    
     const errorDiv = element.querySelector("#DataErrormsgdiv");
     if (errorDiv) {
       errorDiv.remove();
     }
 
-    
     const styleElement = document.createElement("style");
     styleElement.textContent = `
             .custom-scrollbar::-webkit-scrollbar {
@@ -59,12 +55,11 @@ function RetakeExamPage() {
                 backdrop-filter: blur(20px);
             }            
         `;
-    
+
     styleElement.setAttribute("data-custom-style", "true");
     document.head.appendChild(styleElement);
     addedStyles.push(styleElement);
 
-    
     const alertElements = element.querySelectorAll(".m-alert");
     alertElements.forEach((alertElement) => {
       alertElement.classList.add(
@@ -80,7 +75,6 @@ function RetakeExamPage() {
         "!mb-6",
       );
 
-      
       const iconElement = alertElement.querySelector(".m-alert__icon");
       if (iconElement) {
         iconElement.classList.add(
@@ -96,7 +90,6 @@ function RetakeExamPage() {
           "!justify-center",
         );
 
-        
         const createSvgIcon = (path) => {
           const svg = document.createElementNS(
             "http://www.w3.org/2000/svg",
@@ -122,7 +115,6 @@ function RetakeExamPage() {
           return svg;
         };
 
-        
         let iconPath = "";
         if (alertElement.classList.contains("alert-danger")) {
           iconPath =
@@ -135,28 +127,25 @@ function RetakeExamPage() {
         iconElement.appendChild(createSvgIcon(iconPath));
       }
 
-      
       const closeButton = alertElement.querySelector("button.close");
       if (closeButton) {
-        
         closeButton.style.cssText = "content: none !important;";
 
         const style = document.createElement("style");
         style.textContent =
           'button.close[data-dismiss="alert"]::before, button.close[data-dismiss="modal"]::before { display: none !important; content: none !important; }';
-        
+
         style.setAttribute("data-custom-style", "true");
         document.head.appendChild(style);
         addedStyles.push(style);
 
-        
         const listItemStyle = document.createElement("style");
         listItemStyle.textContent = `
           li[style*="font-size: large"] {
             font-size: medium !important;
           }
         `;
-        
+
         listItemStyle.setAttribute("data-custom-style", "true");
         document.head.appendChild(listItemStyle);
         addedStyles.push(listItemStyle);
@@ -171,7 +160,6 @@ function RetakeExamPage() {
       }
     });
 
-    
     const portlet = element.querySelector(".m-portlet");
     if (portlet) {
       portlet.classList.add(
@@ -183,7 +171,6 @@ function RetakeExamPage() {
       );
     }
 
-    
     const portletHead = element.querySelector(".m-portlet__head");
     if (portletHead) {
       portletHead.classList.add(
@@ -199,23 +186,20 @@ function RetakeExamPage() {
         "!mb-4",
       );
 
-      
       const headingText = portletHead.querySelector(".m-portlet__head-text");
       if (headingText) {
         headingText.classList.add("!text-white", "!text-xl", "!font-bold");
         headingText.innerHTML = "Retake Exam Requests";
       }
 
-      
       const semesterForm = element.querySelector(
         'form[action="/Student/RetakeRequest"]',
       );
       if (semesterForm) {
-        
         const formClone = semesterForm.cloneNode(true);
-        
+
         semesterForm.remove();
-        
+
         portletHead.appendChild(formClone);
         formClone.classList.add(
           "!flex",
@@ -225,7 +209,6 @@ function RetakeExamPage() {
           "flex-1",
         );
 
-        
         const formSelects = formClone.querySelectorAll("select");
         formSelects.forEach((select) => {
           select.classList.add(
@@ -242,7 +225,6 @@ function RetakeExamPage() {
             "!focus:outline-none",
           );
 
-          
           select.classList.remove(
             "m-dropdown__toggle",
             "btn",
@@ -251,23 +233,20 @@ function RetakeExamPage() {
           );
         });
 
-        
         const rowDiv = formClone.querySelector(".row");
         if (rowDiv) {
           const colDiv = rowDiv.querySelector(".col-md-12");
           if (colDiv) {
-            
             const children = [...colDiv.childNodes];
-            
+
             children.forEach((child) => formClone.appendChild(child));
-            
+
             rowDiv.remove();
           }
         }
       }
     }
 
-    
     const portletBody = element.querySelector(".m-portlet__body");
     if (portletBody) {
       portletBody.classList.add(
@@ -284,7 +263,6 @@ function RetakeExamPage() {
       );
     }
 
-    
     const retakeReasonSection = element.querySelector(".m-section");
     if (retakeReasonSection) {
       retakeReasonSection.classList.add(
@@ -325,7 +303,6 @@ function RetakeExamPage() {
           "!max-w-md",
         );
 
-        
         retakeReasonSelect.classList.remove(
           "m-dropdown__toggle",
           "btn",
@@ -335,27 +312,21 @@ function RetakeExamPage() {
         retakeReasonSelect.style.textAlign = "left";
       }
 
-      
       const retakeRequestBtn = element.querySelector(
         "#btnModalExamRetakRequest",
       );
       const downloadBtn = element.querySelector("#btnDownloadExamRetakForm");
 
-      
       const selectWithButtonsContainer = document.createElement("div");
       selectWithButtonsContainer.className = "flex items-center gap-3";
 
-      
       const selectParent = retakeReasonSelect?.parentElement;
 
       if (selectParent && retakeRequestBtn && downloadBtn) {
-        
         const selectClone = retakeReasonSelect.cloneNode(true);
 
-        
         selectWithButtonsContainer.appendChild(selectClone);
 
-        
         retakeRequestBtn.innerHTML = `
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -392,11 +363,9 @@ function RetakeExamPage() {
         );
         downloadBtn.title = "Download Exam Retake Form";
 
-        
         selectWithButtonsContainer.appendChild(retakeRequestBtn);
         selectWithButtonsContainer.appendChild(downloadBtn);
 
-        
         selectParent.replaceChild(
           selectWithButtonsContainer,
           retakeReasonSelect,
@@ -404,23 +373,20 @@ function RetakeExamPage() {
       }
     }
 
-    
     const table = element.querySelector(".table");
     if (table) {
       table.querySelectorAll(".table td, .table th").forEach((el) => {
         el.classList.add("!border-none");
       });
-      
+
       const tableContainer = document.createElement("div");
       tableContainer.className = "overflow-hidden mb-6";
       table.parentNode.insertBefore(tableContainer, table);
       tableContainer.appendChild(table);
 
-      
       table.classList.add("!w-full", "!border-collapse", "!border-0");
       table.classList.remove("table-bordered", "table-responsive");
 
-      
       const thead = table.querySelector("thead");
       if (thead) {
         thead.classList.add("!bg-zinc-900", "!sticky", "!top-0", "!z-10");
@@ -439,7 +405,6 @@ function RetakeExamPage() {
         });
       }
 
-      
       const tbody = table.querySelector("tbody");
       if (tbody) {
         tbody.classList.add("!divide-y", "!divide-white/10");
@@ -461,10 +426,8 @@ function RetakeExamPage() {
               "!border-white/10",
             );
 
-            
             const checkbox = cell.querySelector('input[type="checkbox"]');
             if (checkbox) {
-              
               checkbox.classList.add("cursor-pointer");
             }
           });
@@ -485,7 +448,6 @@ function RetakeExamPage() {
     });
     document.querySelector("#DataErrormsgdiv_RetakeModalReason").remove();
 
-    
     const buttons = element.querySelectorAll(".btn");
     buttons.forEach((button) => {
       if (
@@ -510,12 +472,10 @@ function RetakeExamPage() {
           "!mt-0",
         );
 
-        
         button.classList.remove("btn-primary", "btn-sm", "glow-button");
       }
     });
 
-    
     const modals = element.querySelectorAll(".modal-content");
     modals.forEach((modal) => {
       modal.classList.add(
@@ -527,7 +487,6 @@ function RetakeExamPage() {
         "!shadow-none",
       );
 
-      
       const modalHeader = modal.querySelector(".modal-header");
       if (modalHeader) {
         modalHeader.classList.add(
@@ -541,7 +500,6 @@ function RetakeExamPage() {
           "!gap-4",
         );
 
-        
         if (modalHeader.hasAttribute("style")) {
           modalHeader.removeAttribute("style");
         }
@@ -551,10 +509,8 @@ function RetakeExamPage() {
           modalTitle.classList.add("!text-white", "!font-bold", "!text-xl");
         }
 
-        
         const existingCloseBtn = modalHeader.querySelector(".close");
         if (existingCloseBtn) {
-          
           const newCloseBtn = document.createElement("button");
           newCloseBtn.type = "button";
           newCloseBtn.className =
@@ -562,7 +518,6 @@ function RetakeExamPage() {
           newCloseBtn.setAttribute("data-dismiss", "modal");
           newCloseBtn.setAttribute("aria-label", "Close");
 
-          
           newCloseBtn.innerHTML = `
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
@@ -572,26 +527,21 @@ function RetakeExamPage() {
             </svg>
           `;
 
-          
           if (existingCloseBtn.onclick) {
             newCloseBtn.onclick = existingCloseBtn.onclick;
           }
 
-          
           existingCloseBtn.parentNode.replaceChild(
             newCloseBtn,
             existingCloseBtn,
           );
 
-          
           modalHeader.style.position = "relative";
           modalHeader.style.paddingRight = "48px";
         }
 
-        
         const headerAlert = modalHeader.querySelector(".m-alert");
         if (headerAlert) {
-          
           const feeNotice = document.createElement("div");
           feeNotice.className = "text-amber-400 text-sm mt-2 flex items-center";
           feeNotice.innerHTML = `
@@ -603,7 +553,6 @@ function RetakeExamPage() {
                         Fee will be charged upon submit request: Rs. 2000 per paper
                     `;
 
-          
           headerAlert.parentNode.replaceChild(feeNotice, headerAlert);
         }
 
@@ -618,7 +567,6 @@ function RetakeExamPage() {
         }
       }
 
-      
       const modalBody = modal.querySelector(".modal-body");
       if (modalBody) {
         modalBody.classList.add(
@@ -630,7 +578,6 @@ function RetakeExamPage() {
           "custom-scrollbar",
         );
 
-        
         const modalCheckboxes = modalBody.querySelectorAll(
           'input[type="checkbox"]',
         );
@@ -638,7 +585,6 @@ function RetakeExamPage() {
           checkbox.remove();
         });
 
-        
         const errorDiv = modalBody.querySelector(
           "#DataErrormsgdiv_RetakeModalReason",
         );
@@ -646,19 +592,16 @@ function RetakeExamPage() {
           errorDiv.style.display = "none";
         }
 
-        
         const formRows = modalBody.querySelectorAll(".row");
         formRows.forEach((row) => {
           row.classList.add("mb-4");
 
-          
           const formColumns = row.querySelectorAll(".col-md-11, .col-sm-11");
           formColumns.forEach((col) => {
             col.className = "w-full";
           });
         });
 
-        
         const fileInputs = modalBody.querySelectorAll('input[type="file"]');
         fileInputs.forEach((input) => {
           const label = input.previousElementSibling;
@@ -669,13 +612,12 @@ function RetakeExamPage() {
               "!mb-2",
               "!block",
             );
-            
+
             if (label.hasAttribute("style")) {
               label.removeAttribute("style");
             }
           }
 
-          
           const container = document.createElement("div");
           container.className =
             "mt-1 flex justify-center px-6 pt-5 pb-6 !border !border-white/10 !rounded-xl bg-black/50 hover:bg-black/70 transition-colors cursor-pointer";
@@ -697,27 +639,22 @@ function RetakeExamPage() {
           wrapper.appendChild(uploadIcon);
           wrapper.appendChild(text);
 
-          
           const newInput = input.cloneNode(true);
           newInput.className =
             "absolute inset-0 w-full h-full opacity-0 cursor-pointer";
 
-          
           if (newInput.hasAttribute("style")) {
             newInput.removeAttribute("style");
           }
 
-          
           const inputContainer = document.createElement("div");
           inputContainer.className = "relative";
 
-          
           wrapper.appendChild(inputContainer);
           inputContainer.appendChild(newInput);
 
           container.appendChild(wrapper);
 
-          
           const parentContainer = input.closest(".mt-1") || input.parentNode;
           if (parentContainer) {
             parentContainer.parentNode.replaceChild(container, parentContainer);
@@ -727,7 +664,6 @@ function RetakeExamPage() {
           }
         });
 
-        
         const textareas = modalBody.querySelectorAll("textarea");
         textareas.forEach((textarea) => {
           textarea.classList.add(
@@ -754,19 +690,17 @@ function RetakeExamPage() {
               "!mb-2",
               "!block",
             );
-            
+
             if (label.hasAttribute("style")) {
               label.removeAttribute("style");
             }
           }
         });
 
-        
         const brTags = modalBody.querySelectorAll("br");
         brTags.forEach((br) => br.remove());
       }
 
-      
       const modalFooter = modal.querySelector(".modal-footer");
       if (modalFooter) {
         modalFooter.classList.add(
@@ -779,7 +713,6 @@ function RetakeExamPage() {
           "!gap-3",
         );
 
-        
         const primaryBtn = modalFooter.querySelector(
           'input[type="button"], .btn-primary',
         );
@@ -798,17 +731,14 @@ function RetakeExamPage() {
             "!cursor-pointer",
           );
 
-          
           if (primaryBtn.hasAttribute("style")) {
             primaryBtn.removeAttribute("style");
           }
         }
 
-        
         const existingFooterCloseBtn =
           modalFooter.querySelector(".btn-default");
         if (existingFooterCloseBtn) {
-          
           const newFooterCloseBtn = document.createElement("button");
           newFooterCloseBtn.type = "button";
           newFooterCloseBtn.className =
@@ -817,12 +747,10 @@ function RetakeExamPage() {
           newFooterCloseBtn.textContent =
             existingFooterCloseBtn.textContent || "Cancel";
 
-          
           if (existingFooterCloseBtn.onclick) {
             newFooterCloseBtn.onclick = existingFooterCloseBtn.onclick;
           }
 
-          
           existingFooterCloseBtn.parentNode.replaceChild(
             newFooterCloseBtn,
             existingFooterCloseBtn,
@@ -831,29 +759,23 @@ function RetakeExamPage() {
       }
     });
 
-    
     const setupModalListeners = () => {
-      
       const modalElements = document.querySelectorAll(".modal");
 
       modalElements.forEach((modal) => {
-        
         const remarksDetailElement = modal.querySelector(
           "#ExamRetakeRemarksDetail",
         );
         if (remarksDetailElement) {
-          
           remarksDetailElement.style.height = "100%";
           remarksDetailElement.style.backdropFilter = "blur(10px)";
 
-          
           modal.addEventListener("shown.bs.modal", () => {
             remarksDetailElement.style.display = "flex";
             remarksDetailElement.style.justifyContent = "center";
             remarksDetailElement.style.alignItems = "center";
           });
 
-          
           modal.addEventListener("hidden.bs.modal", () => {
             remarksDetailElement.style.display = "none";
           });
@@ -861,7 +783,6 @@ function RetakeExamPage() {
       });
     };
 
-    
     setTimeout(setupModalListeners, 500);
   };
 

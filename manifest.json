@@ -19,7 +19,7 @@
   "host_permissions": ["https://flexstudent.nu.edu.pk/*"],
   "web_accessible_resources": [
     {
-      "resources": ["public/*","umami.js"],
+      "resources": ["public/*", "umami.js"],
       "matches": ["<all_urls>"]
     }
   ]

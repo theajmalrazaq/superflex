@@ -10,7 +10,6 @@ function GradeChangePage() {
     );
 
     if (targetElement) {
-      
       applyCustomStyling(targetElement);
 
       setElemContent(targetElement.innerHTML);
@@ -19,10 +18,8 @@ function GradeChangePage() {
   }, []);
 
   const applyCustomStyling = (element) => {
-    
     const addedStyles = [];
 
-    
     const errorDivs = element.querySelectorAll(
       "#DataErrorId, #CheckBoxErrorId, #GradeChangeReasonErrorId",
     );
@@ -30,10 +27,8 @@ function GradeChangePage() {
       div.style.display = "none";
     });
 
-    
     const alertElements = element.querySelectorAll(".m-alert");
     alertElements.forEach((alertElement) => {
-      
       alertElement.classList.add(
         "!bg-black",
         "!text-white",
@@ -44,7 +39,6 @@ function GradeChangePage() {
         "!mb-6",
       );
 
-      
       if (alertElement.style.display !== "none") {
         alertElement.classList.add(
           "!flex",
@@ -53,7 +47,6 @@ function GradeChangePage() {
         );
       }
 
-      
       const iconElement = alertElement.querySelector(".m-alert__icon");
       if (iconElement) {
         iconElement.classList.add(
@@ -69,7 +62,6 @@ function GradeChangePage() {
           "!justify-center",
         );
 
-        
         const createSvgIcon = (path) => {
           const svg = document.createElementNS(
             "http://www.w3.org/2000/svg",
@@ -95,7 +87,6 @@ function GradeChangePage() {
           return svg;
         };
 
-        
         let iconPath = "";
         if (alertElement.classList.contains("alert-danger")) {
           iconPath =
@@ -110,7 +101,6 @@ function GradeChangePage() {
         iconElement.appendChild(createSvgIcon(iconPath));
       }
 
-      
       const closeButton = alertElement.querySelector("button.close");
       if (closeButton) {
         closeButton.style.cssText = "content: none !important;";
@@ -131,7 +121,6 @@ function GradeChangePage() {
         closeButton.classList.add("!focus:outline-none");
       }
 
-      
       if (alertElement.classList.contains("alert-info")) {
         const alertText = alertElement.querySelector(".m-alert__text");
         if (alertText) {
@@ -141,7 +130,6 @@ function GradeChangePage() {
       }
     });
 
-    
     const semesterForm = element.querySelector("#FormGradeChange");
     if (semesterForm) {
       semesterForm.classList.add("!ml-4");
@@ -163,7 +151,6 @@ function GradeChangePage() {
           "!w-64",
         );
 
-        
         semesterSelect.classList.remove(
           "m-dropdown__toggle",
           "btn",
@@ -172,14 +159,12 @@ function GradeChangePage() {
         );
       }
 
-      
       const brTag = semesterForm.querySelector("br");
       if (brTag) {
         brTag.remove();
       }
     }
 
-    
     const portlet = element.querySelector(".m-portlet");
     if (portlet) {
       portlet.classList.add(
@@ -190,7 +175,6 @@ function GradeChangePage() {
         "!shadow-lg",
       );
 
-      
       portlet.classList.remove(
         "m-portlet--primary",
         "m-portlet--head-solid-bg",
@@ -199,7 +183,6 @@ function GradeChangePage() {
       );
     }
 
-    
     const portletHead = element.querySelector(".m-portlet__head");
     if (portletHead) {
       portletHead.classList.add(
@@ -215,13 +198,11 @@ function GradeChangePage() {
         "!mb-4",
       );
 
-      
       const headingText = portletHead.querySelector(".m-portlet__head-text");
       if (headingText) {
         headingText.classList.add("!text-white", "!text-xl", "!font-bold");
       }
 
-      
       const portletHeadCaption = portletHead.querySelector(
         ".m-portlet__head-caption",
       );
@@ -229,11 +210,9 @@ function GradeChangePage() {
         portletHeadCaption.classList.add("!flex", "!gap-4", "!items-center");
       }
 
-      
       const buttonContainer = document.createElement("div");
       buttonContainer.className = "portlet-head-buttons flex gap-2";
 
-      
       const requestButton = document.createElement("button");
       requestButton.id = "btnModalGradeChange";
       requestButton.type = "button";
@@ -252,19 +231,15 @@ function GradeChangePage() {
                 </svg>
                 Request Grade Change
             `;
-      requestButton.style.display = "none"; 
+      requestButton.style.display = "none";
       buttonContainer.appendChild(requestButton);
 
-      
       portletHead.appendChild(buttonContainer);
 
-      
       if (semesterForm) {
-        
         const formContainer = document.createElement("div");
         formContainer.appendChild(semesterForm);
 
-        
         if (headingText && headingText.parentElement) {
           headingText.parentElement.after(formContainer);
         } else {
@@ -273,7 +248,6 @@ function GradeChangePage() {
       }
     }
 
-    
     const portletBody = element.querySelector(".m-portlet__body");
     if (portletBody) {
       portletBody.classList.add(
@@ -289,17 +263,14 @@ function GradeChangePage() {
         "custom-scrollbar",
       );
 
-      
       const sectionContent = portletBody.querySelector(".m-section__content");
       if (sectionContent) {
         sectionContent.style.marginBottom = "0";
       }
     }
 
-    
     const table = element.querySelector(".table");
     if (table) {
-      
       const tableContainer = document.createElement("div");
       tableContainer.className = "overflow-hidden mb-6";
       table.parentNode.insertBefore(tableContainer, table);
@@ -308,7 +279,7 @@ function GradeChangePage() {
       table.querySelectorAll(".table td, .table th").forEach((el) => {
         el.classList.add("!border-none");
       });
-      
+
       table.classList.add("!w-full", "!border-collapse", "!border-0");
       table.classList.remove(
         "m-table",
@@ -316,12 +287,10 @@ function GradeChangePage() {
         "table-responsive",
       );
 
-      
       const thead = table.querySelector("thead");
       if (thead) {
         thead.classList.add("!bg-zinc-900", "!sticky", "!top-0", "!z-10");
 
-        
         const checkboxHeader = thead.querySelector("#Checkallhide_Show");
         if (checkboxHeader) {
           checkboxHeader.innerHTML = "Select";
@@ -341,7 +310,6 @@ function GradeChangePage() {
         });
       }
 
-      
       const tbody = table.querySelector("tbody");
       if (tbody) {
         tbody.classList.add("!divide-y", "!divide-white/10");
@@ -363,7 +331,6 @@ function GradeChangePage() {
               "!border-white/10",
             );
 
-            
             const checkbox = cell.querySelector('input[type="checkbox"]');
             if (checkbox) {
               checkbox.classList.add(
@@ -378,7 +345,6 @@ function GradeChangePage() {
       }
     }
 
-    
     const modals = element.querySelectorAll(".modal-content");
     modals.forEach((modal) => {
       modal.classList.add(
@@ -390,7 +356,6 @@ function GradeChangePage() {
         "!shadow-none",
       );
 
-      
       const modalHeader = modal.querySelector(".modal-header");
       if (modalHeader) {
         modalHeader.classList.add(
@@ -403,7 +368,6 @@ function GradeChangePage() {
           "!justify-between",
         );
 
-        
         if (modalHeader.hasAttribute("style")) {
           modalHeader.removeAttribute("style");
         }
@@ -414,7 +378,6 @@ function GradeChangePage() {
           modalTitle.textContent = "Grade Change Request";
         }
 
-        
         const closeBtn = modalHeader.querySelector(".close");
         if (closeBtn) {
           closeBtn.innerHTML = `
@@ -424,7 +387,6 @@ function GradeChangePage() {
                         </svg>
                     `;
 
-          
           if (closeBtn.hasAttribute("style")) {
             closeBtn.removeAttribute("style");
           }
@@ -433,7 +395,6 @@ function GradeChangePage() {
         }
       }
 
-      
       const modalBody = modal.querySelector(".modal-body");
       if (modalBody) {
         modalBody.classList.add(
@@ -445,7 +406,6 @@ function GradeChangePage() {
           "custom-scrollbar",
         );
 
-        
         const reasonSelect = modalBody.querySelector("#GradeChangeReason");
         if (reasonSelect) {
           reasonSelect.classList.add(
@@ -464,7 +424,6 @@ function GradeChangePage() {
             "!max-w-full",
           );
 
-          
           reasonSelect.classList.remove(
             "m-dropdown__toggle",
             "btn",
@@ -472,13 +431,11 @@ function GradeChangePage() {
             "dropdown-toggle",
           );
 
-          
           if (reasonSelect.hasAttribute("style")) {
             reasonSelect.removeAttribute("style");
           }
         }
 
-        
         const reasonLabel = modalBody.querySelector(".row:first-child label");
         if (reasonLabel) {
           reasonLabel.classList.add(
@@ -489,7 +446,6 @@ function GradeChangePage() {
           );
         }
 
-        
         const textareaGroup = modalBody.querySelector("#remrksdiv");
         if (textareaGroup) {
           const textarea = textareaGroup.querySelector("textarea");
@@ -522,12 +478,10 @@ function GradeChangePage() {
           }
         }
 
-        
         const brTags = modalBody.querySelectorAll("br");
         brTags.forEach((br) => br.remove());
       }
 
-      
       const modalFooter = modal.querySelector(".modal-footer");
       if (modalFooter) {
         modalFooter.classList.add(
@@ -540,7 +494,6 @@ function GradeChangePage() {
           "!gap-3",
         );
 
-        
         const submitBtn = modalFooter.querySelector(
           'input[type="button"][value="Submit Request"]',
         );
@@ -559,13 +512,11 @@ function GradeChangePage() {
             "!cursor-pointer",
           );
 
-          
           if (submitBtn.hasAttribute("style")) {
             submitBtn.removeAttribute("style");
           }
         }
 
-        
         const closeBtn = modalFooter.querySelector(".btn-default");
         if (closeBtn) {
           closeBtn.classList.add(
@@ -581,15 +532,12 @@ function GradeChangePage() {
             "!border-0",
           );
 
-          
           if (closeBtn.hasAttribute("style")) {
             closeBtn.removeAttribute("style");
           }
         }
       }
     });
-
-    
   };
 
   return (

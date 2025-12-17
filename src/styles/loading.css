@@ -1,7 +1,7 @@
-body { 
-visibility: hidden !important;
-overflow: hidden;
-background: black;
+body {
+  visibility: hidden !important;
+  overflow: hidden;
+  background: black;
 }
 .loading-overlay {
   position: fixed;
@@ -22,7 +22,7 @@ background: black;
 .loading-overlay.fade-out {
   opacity: 0;
 }
-.border{
+.border {
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 .spinner {

@@ -10,7 +10,6 @@ function ChangePasswordPage() {
     );
 
     if (targetElement) {
-      
       applyCustomStyling(targetElement);
 
       setElemContent(targetElement.innerHTML);
@@ -29,7 +28,6 @@ function ChangePasswordPage() {
         "!shadow-lg",
       );
 
-      
       portlet.classList.remove(
         "m-portlet--primary",
         "m-portlet--head-solid-bg",
@@ -38,7 +36,6 @@ function ChangePasswordPage() {
       );
     }
 
-    
     const portletHead = element.querySelector(".m-portlet__head");
     if (portletHead) {
       portletHead.classList.add(
@@ -54,14 +51,12 @@ function ChangePasswordPage() {
         "!mb-4",
       );
 
-      
       const headingText = portletHead.querySelector(".m-portlet__head-text");
       if (headingText) {
         headingText.classList.add("!text-white", "!text-xl", "!font-bold");
       }
     }
 
-    
     const portletBody = element.querySelector(".m-portlet__body");
     if (portletBody) {
       portletBody.classList.add(
@@ -75,10 +70,8 @@ function ChangePasswordPage() {
       );
     }
 
-    
     const form = element.querySelector("#ChangePassword");
     if (form) {
-      
       const inputsContainer = document.createElement("div");
       inputsContainer.classList.add(
         "flex",
@@ -88,23 +81,19 @@ function ChangePasswordPage() {
         "mb-6",
       );
 
-      
       const formRows = form.querySelectorAll(".form-group.m-form__group.row");
       const extractedInputs = [];
 
       formRows.forEach((row) => {
         const inputContainer = row.querySelector(".m-input-icon");
         if (inputContainer) {
-          
           const iconSpans = inputContainer.querySelectorAll(
             ".m-input-icon__icon",
           );
           iconSpans.forEach((span) => span.remove());
 
-          
           const input = inputContainer.querySelector("input");
           if (input) {
-            
             const clonedInput = input.cloneNode(true);
 
             clonedInput.classList.add(
@@ -120,19 +109,15 @@ function ChangePasswordPage() {
               "!w-full",
             );
 
-            
             clonedInput.classList.remove("m-input--pill", "m-input--air");
 
-            
             if (clonedInput.hasAttribute("style")) {
               clonedInput.removeAttribute("style");
             }
 
-            
             const inputWrapper = document.createElement("div");
             inputWrapper.classList.add("relative", "w-full");
 
-            
             const lockIcon = document.createElementNS(
               "http://www.w3.org/2000/svg",
               "svg",
@@ -181,14 +166,11 @@ function ChangePasswordPage() {
             lockLine.setAttribute("d", "M8 11V7a4 4 0 018 0v4");
             lockIcon.appendChild(lockLine);
 
-            
             clonedInput.classList.add("!pl-10");
 
-            
             inputWrapper.appendChild(lockIcon);
             inputWrapper.appendChild(clonedInput);
 
-            
             const errorMsg = row.querySelector(".matcherror");
             if (errorMsg) {
               const errorMsgClone = errorMsg.cloneNode(true);
@@ -200,39 +182,31 @@ function ChangePasswordPage() {
           }
         }
 
-        
         row.dataset.toRemove = "true";
       });
 
-      
       extractedInputs.forEach((inputElem) => {
         inputsContainer.appendChild(inputElem);
       });
 
-      
       form
         .querySelectorAll('[data-to-remove="true"]')
         .forEach((row) => row.remove());
 
-      
       if (form.firstChild) {
         form.insertBefore(inputsContainer, form.firstChild);
       } else {
         form.appendChild(inputsContainer);
       }
 
-      
       const buttonRow = form.querySelector(".row:not(.form-group)");
       if (buttonRow) {
         buttonRow.classList.add("!mt-8");
 
-        
         const submitButton = buttonRow.querySelector("button#submit");
         if (submitButton) {
-          
           submitButton.innerHTML = "";
 
-          
           const saveIcon = document.createElementNS(
             "http://www.w3.org/2000/svg",
             "svg",
@@ -271,16 +245,13 @@ function ChangePasswordPage() {
           saveLine2.setAttribute("points", "7 3 7 8 15 8");
           saveIcon.appendChild(saveLine2);
 
-          
           const buttonContent = document.createElement("span");
           buttonContent.className = "flex items-center";
           buttonContent.appendChild(saveIcon);
           buttonContent.appendChild(document.createTextNode("Update Password"));
 
-          
           submitButton.appendChild(buttonContent);
 
-          
           submitButton.classList.add(
             "!bg-x",
             "hover:!bg-x/80",
@@ -294,7 +265,6 @@ function ChangePasswordPage() {
             "!shadow-lg",
           );
 
-          
           submitButton.classList.remove(
             "btn-brand",
             "m-btn",
@@ -305,7 +275,6 @@ function ChangePasswordPage() {
         }
       }
 
-      
       const feedbackElements = form.querySelectorAll(".matcherror");
       feedbackElements.forEach((element) => {
         element.classList.add("!text-red-400", "!mt-1", "!text-sm");

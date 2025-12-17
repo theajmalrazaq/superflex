@@ -10,7 +10,6 @@ function FeeChallanPage() {
     );
 
     if (targetElement) {
-      
       applyCustomStyling(targetElement);
 
       setElemContent(targetElement.innerHTML);
@@ -19,7 +18,6 @@ function FeeChallanPage() {
   }, []);
 
   const applyCustomStyling = (element) => {
-    
     const portlet = element.querySelector(".m-portlet");
     if (portlet) {
       portlet.classList.add(
@@ -31,7 +29,6 @@ function FeeChallanPage() {
       );
     }
 
-    
     const portletHead = element.querySelector(".m-portlet__head");
     if (portletHead) {
       portletHead.classList.add(
@@ -47,7 +44,6 @@ function FeeChallanPage() {
         "!mb-4",
       );
 
-      
       const headingText = portletHead.querySelector(".m-portlet__head-text");
       if (headingText) {
         headingText.classList.add("!text-white", "!text-xl", "!font-bold");
@@ -55,13 +51,11 @@ function FeeChallanPage() {
       }
     }
 
-    
     const tableContainer = element.querySelector(".m-section__content");
     if (tableContainer) {
       tableContainer.classList.add("!p-0");
     }
 
-    
     const tables = element.querySelectorAll("table");
     tables.forEach((table) => {
       table.classList.add(
@@ -72,10 +66,8 @@ function FeeChallanPage() {
       );
     });
 
-    
     const challanTable = element.querySelector("table table");
     if (challanTable) {
-      
       const tableStyle = document.createElement("style");
       tableStyle.innerHTML = `
                 .challan-table {
@@ -116,7 +108,6 @@ function FeeChallanPage() {
         el.style.cssText = "padding: inherit !important";
       });
 
-      
       const headers = challanTable.querySelectorAll("th");
       headers.forEach((header) => {
         header.classList.add(
@@ -128,7 +119,6 @@ function FeeChallanPage() {
         );
       });
 
-      
       const headerRows = challanTable.querySelectorAll("thead tr");
       headerRows.forEach((row) => {
         const headerCells = row.querySelectorAll("th");
@@ -138,7 +128,6 @@ function FeeChallanPage() {
         }
       });
 
-      
       const printButtons = challanTable.querySelectorAll(".btn-primary");
       printButtons.forEach((button) => {
         button.classList.remove("btn-primary");
@@ -154,16 +143,12 @@ function FeeChallanPage() {
         );
       });
 
-      
       challanTable.querySelectorAll("td", "th").forEach((element) => {
         element.classList.add("!border-none");
       });
 
       const rows = challanTable.querySelectorAll("tbody tr");
       rows.forEach((row) => {
-        
-        
-
         row.classList.add(
           "!bg-black",
           "!hover:bg-white/5",
@@ -180,7 +165,6 @@ function FeeChallanPage() {
             "!border-white/0",
           );
 
-          
           if (
             cell.textContent.trim().match(/^\$|PKR|Rs\.|\d+\.\d{2}|\d+,\d+/)
           ) {
@@ -188,7 +172,6 @@ function FeeChallanPage() {
           }
         });
 
-        
         const statusCell = row.querySelector("td:nth-child(5)");
         if (statusCell && statusCell.textContent.trim() === "Paid") {
           statusCell.innerHTML = `
@@ -204,7 +187,6 @@ function FeeChallanPage() {
                     `;
         }
 
-        
         const dateCells = [
           row.querySelector("td:nth-child(3)"),
           row.querySelector("td:nth-child(4)"),
@@ -216,7 +198,6 @@ function FeeChallanPage() {
         });
       });
 
-      
       const infoPanel = element.querySelector(
         "td[style*='border-right:solid 1px']",
       );
@@ -230,13 +211,11 @@ function FeeChallanPage() {
         );
         infoPanel.removeAttribute("style");
 
-        
         const infoHeadings = infoPanel.querySelectorAll("strong");
         infoHeadings.forEach((heading) => {
           heading.classList.add("!text-x", "!font-medium");
         });
 
-        
         const links = infoPanel.querySelectorAll("a");
         links.forEach((link) => {
           link.classList.add(
@@ -246,24 +225,20 @@ function FeeChallanPage() {
           );
         });
 
-        
         const paragraphs = infoPanel.querySelectorAll("p");
         paragraphs.forEach((p) => {
           p.classList.add("!text-white/70");
         });
       }
 
-      
       const portletBody = element.querySelector(".m-portlet__body");
       if (portletBody) {
-        
         const paymentInstructionsCell = element.querySelector(
           "td[style*='border-right:solid 1px']",
         );
         if (paymentInstructionsCell) {
           paymentInstructionsCell.remove();
         } else {
-          
           const allTds = element.querySelectorAll("td");
           for (const td of allTds) {
             if (
@@ -277,7 +252,6 @@ function FeeChallanPage() {
           }
         }
 
-        
         portletBody.classList.add(
           "!bg-black",
           "!rounded-b-3xl",

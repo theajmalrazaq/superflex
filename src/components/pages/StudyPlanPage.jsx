@@ -11,7 +11,6 @@ function StudyPlanPage() {
     );
 
     if (targetElement) {
-      
       applyCustomStyling(targetElement);
 
       setElemContent(targetElement.innerHTML);
@@ -20,7 +19,6 @@ function StudyPlanPage() {
   }, []);
 
   useEffect(() => {
-    
     if (elemContent && contentRef.current) {
       setupAccordions();
     }
@@ -33,7 +31,6 @@ function StudyPlanPage() {
       contentRef.current.querySelectorAll(".semester-header");
 
     accordionHeaders.forEach((header) => {
-      
       header.classList.add(
         "cursor-pointer",
         "bg-black/50",
@@ -52,7 +49,6 @@ function StudyPlanPage() {
       );
 
       header.addEventListener("click", function () {
-        
         const parentCol = this.closest(".semester-container")?.querySelector(
           ".accordion-content",
         );
@@ -60,7 +56,6 @@ function StudyPlanPage() {
 
         const isExpanded = parentCol.classList.contains("expanded");
 
-        
         const allAccordions =
           contentRef.current.querySelectorAll(".accordion-content");
         allAccordions.forEach((acc) => {
@@ -68,7 +63,6 @@ function StudyPlanPage() {
           acc.style.opacity = "0";
           acc.classList.remove("expanded");
 
-          
           const accHeader = acc
             .closest(".semester-container")
             ?.querySelector(".semester-header");
@@ -81,13 +75,11 @@ function StudyPlanPage() {
           }
         });
 
-        
         if (!isExpanded) {
           parentCol.style.maxHeight = "2000px";
           parentCol.style.opacity = "1";
           parentCol.classList.add("expanded");
 
-          
           const chevronDown = this.querySelector(".chevron-down");
           const chevronUp = this.querySelector(".chevron-up");
 
@@ -99,7 +91,6 @@ function StudyPlanPage() {
   };
 
   const applyCustomStyling = (element) => {
-    
     const styleElement = document.createElement("style");
     styleElement.textContent = `
       .custom-scrollbar::-webkit-scrollbar {
@@ -183,7 +174,6 @@ function StudyPlanPage() {
     `;
     document.head.appendChild(styleElement);
 
-    
     const portlet = element.querySelector(".m-portlet");
     if (portlet) {
       portlet.classList.add(
@@ -194,7 +184,6 @@ function StudyPlanPage() {
         "!shadow-lg",
       );
 
-      
       portlet.classList.remove(
         "m-portlet--brand",
         "m-portlet--head-solid-bg",
@@ -203,7 +192,6 @@ function StudyPlanPage() {
       );
     }
 
-    
     const portletHead = element.querySelector(".m-portlet__head");
     if (portletHead) {
       portletHead.classList.add(
@@ -219,14 +207,12 @@ function StudyPlanPage() {
         "!mb-4",
       );
 
-      
       const headingText = portletHead.querySelector(".m-portlet__head-text");
       if (headingText) {
         headingText.classList.add("!text-white", "!text-xl", "!font-bold");
       }
     }
 
-    
     const portletBody = element.querySelector(".m-portlet__body");
     if (portletBody) {
       portletBody.classList.add(
@@ -244,14 +230,11 @@ function StudyPlanPage() {
       );
     }
 
-    
     const sectionContent = element.querySelector(".m-section__content");
     if (sectionContent) {
-      
       const semesterCols = sectionContent.querySelectorAll(".col-md-6");
 
       semesterCols.forEach((semesterCol) => {
-        
         const semesterContainer = document.createElement("div");
         semesterContainer.className = "semester-container";
         semesterContainer.classList.add(
@@ -262,27 +245,21 @@ function StudyPlanPage() {
           "!border-none",
         );
 
-        
         semesterCol.parentNode.insertBefore(semesterContainer, semesterCol);
         semesterContainer.appendChild(semesterCol);
 
-        
         semesterCol.classList.remove("col-md-6");
         semesterCol.style.width = "100%";
 
-        
         const semesterHeader = semesterCol.querySelector("h4");
         if (semesterHeader) {
-          
           const headerRow = document.createElement("div");
           headerRow.className = "semester-header cursor-pointer";
           headerRow.innerHTML = semesterHeader.outerHTML;
 
-          
           semesterHeader.parentNode.insertBefore(headerRow, semesterHeader);
           semesterHeader.remove();
 
-          
           const collapseIcon = document.createElement("div");
           collapseIcon.className =
             "h-8 w-8 rounded-lg !bg-x !flex !items-center !justify-center mr-2 shadow-inner";
@@ -296,18 +273,15 @@ function StudyPlanPage() {
             </svg>
           `;
 
-          
           const h4Element = headerRow.querySelector("h4");
           if (h4Element) {
             const titleWrapper = document.createElement("div");
             titleWrapper.className = "!flex !items-center";
 
-            
             h4Element.parentNode.insertBefore(titleWrapper, h4Element);
             titleWrapper.appendChild(collapseIcon);
             titleWrapper.appendChild(h4Element);
 
-            
             h4Element.classList.add(
               "!text-white",
               "!font-bold",
@@ -315,7 +289,6 @@ function StudyPlanPage() {
               "!mb-0",
             );
 
-            
             const smallText = h4Element.querySelector("small");
             if (smallText) {
               smallText.classList.add("!text-white/60", "!ml-2");
@@ -323,20 +296,16 @@ function StudyPlanPage() {
           }
         }
 
-        
         const table = semesterCol.querySelector("table");
         if (table) {
-          
           const tableContainer = document.createElement("div");
           tableContainer.className =
             "rounded-xl overflow-hidden !border !border-white/10 accordion-content";
           tableContainer.dataset.expanded = "false";
 
-          
           table.parentNode.insertBefore(tableContainer, table);
           tableContainer.appendChild(table);
 
-          
           table.classList.add("studyplan-table");
           table.classList.remove(
             "table",
@@ -348,7 +317,6 @@ function StudyPlanPage() {
             "span12",
           );
 
-          
           const thead = table.querySelector("thead");
           if (thead) {
             thead.classList.add(
@@ -372,7 +340,6 @@ function StudyPlanPage() {
             });
           }
 
-          
           const tbody = table.querySelector("tbody");
           if (tbody) {
             tbody.classList.add("!divide-y", "!divide-white/10");
@@ -385,7 +352,6 @@ function StudyPlanPage() {
                 "!transition-colors",
               );
 
-              
               const cells = row.querySelectorAll("td");
               cells.forEach((cell, index) => {
                 cell.classList.add(
@@ -395,17 +361,13 @@ function StudyPlanPage() {
                   "!border-white/10",
                 );
 
-                
                 if (cell.classList.contains("text-center")) {
                   cell.classList.add("!font-semibold", "!text-white");
                 }
 
-                
                 if (index === 3) {
-                  
                   const courseType = cell.textContent.trim();
 
-                  
                   const badgeElement = document.createElement("span");
 
                   if (courseType === "Core") {
@@ -416,7 +378,6 @@ function StudyPlanPage() {
 
                   badgeElement.textContent = courseType;
 
-                  
                   cell.textContent = "";
                   cell.appendChild(badgeElement);
                 }
@@ -426,13 +387,11 @@ function StudyPlanPage() {
         }
       });
 
-      
       semesterCols.forEach((semesterCol) => {
         const headerRow = semesterCol.querySelector(".semester-header");
         const tableContainer = semesterCol.querySelector(".accordion-content");
 
         if (headerRow && tableContainer) {
-          
           tableContainer.style.maxHeight = "0";
           tableContainer.style.opacity = "0";
           tableContainer.style.overflow = "hidden";
@@ -445,12 +404,9 @@ function StudyPlanPage() {
             chevronUp.classList.remove("hidden");
           }
 
-          
           headerRow.addEventListener("click", function () {
-            
             const isExpanded = tableContainer.classList.contains("expanded");
 
-            
             const allAccordions =
               element.querySelectorAll(".accordion-content");
             allAccordions.forEach((acc) => {
@@ -459,7 +415,6 @@ function StudyPlanPage() {
                 acc.style.opacity = "0";
                 acc.classList.remove("expanded");
 
-                
                 const otherHeader = acc
                   .closest(".col-md-6")
                   .querySelector(".semester-header");
@@ -476,8 +431,6 @@ function StudyPlanPage() {
             });
 
             if (isExpanded) {
-              
-              
               tableContainer.style.maxHeight = "0";
               tableContainer.style.opacity = "0";
               tableContainer.classList.remove("expanded");
@@ -487,19 +440,13 @@ function StudyPlanPage() {
                 chevronUp.classList.remove("hidden");
               }
             } else {
-              
-              
               const scrollHeight = tableContainer.scrollHeight;
-              
 
-              
               tableContainer.style.maxHeight = "2000px";
               tableContainer.style.opacity = "1";
               tableContainer.classList.add("expanded");
 
-              
               setTimeout(() => {
-                
                 if (tableContainer.classList.contains("expanded")) {
                   tableContainer.style.maxHeight = `${scrollHeight + 50}px`;
                 }
@@ -513,9 +460,6 @@ function StudyPlanPage() {
           });
         }
       });
-
-      
-      
     }
   };
 
