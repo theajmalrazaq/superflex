@@ -12,7 +12,7 @@ import {
   Bookmark
 } from "lucide-react";
 
-// --- Components ---
+
 
 const CourseSelector = ({ courses, selectedId, onSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -165,7 +165,7 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Reconstruct bookmarked items details
+    
     const bookmarkedDetails = [];
     if (markedRecords.size > 0 && courses.length > 0) {
         courses.forEach(course => {
@@ -253,7 +253,7 @@ function AttendancePage() {
   const [selectedCourseId, setSelectedCourseId] = useState(null);
   const [alerts, setAlerts] = useState([]);
   const [markedRecords, setMarkedRecords] = useState(() => {
-      // Load from local storage on init
+      
       if (typeof window !== "undefined") {
           const saved = localStorage.getItem("superflex_marked_attendance");
           return new Set(saved ? JSON.parse(saved) : []);
@@ -268,26 +268,26 @@ function AttendancePage() {
   const hiddenFormRef = useRef(null);
 
   useEffect(() => {
-    // 1. Parsing Logic
+    
     const parseData = () => {
       try {
         const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
         if (!root) return;
 
-        // Extract Alerts
+        
         const parsedAlerts = [];
         const alertNodes = root.querySelectorAll(".alert");
         alertNodes.forEach(alertEl => {
              const textEl = alertEl.querySelector(".m-alert__text");
              let message = textEl ? textEl.textContent.trim() : alertEl.textContent.replace("Close", "").trim();
-             message = message.replace(/\s+/g, ' '); // Normalize whitespace
+             message = message.replace(/\s+/g, ' '); 
              
              const type = alertEl.classList.contains("alert-danger") ? "error" : "info";
              parsedAlerts.push({ type, message });
         });
         setAlerts(parsedAlerts);
 
-        // Extract Form & Semesters
+        
         const legacyForm = document.querySelector('form[action="/Student/StudentAttendance"]');
         if(legacyForm) {
            const select = legacyForm.querySelector("select");
@@ -299,7 +299,7 @@ function AttendancePage() {
                }));
                setSemesters(opts);
                
-               // Clone form for hidden submission
+               
                if(hiddenFormRef.current) {
                    hiddenFormRef.current.innerHTML = "";
                    const formClone = legacyForm.cloneNode(true);
@@ -308,13 +308,13 @@ function AttendancePage() {
            }
         }
 
-        // Extract Courses
+        
         const parsedCourses = [];
         const tabPanes = root.querySelectorAll(".tab-pane");
         
         tabPanes.forEach((pane) => {
             let title = pane.querySelector("h5")?.textContent.trim() || pane.id;
-             // Clean title (remove semester info often found in parens)
+             
             title = title.replace(/\(.*\)/, "").trim();
 
             const prog = pane.querySelector(".progress-bar");
@@ -327,10 +327,10 @@ function AttendancePage() {
                const cols = row.querySelectorAll("td");
                if(cols.length >= 4) {
                   const dateStr = cols[1]?.textContent.trim();
-                  // Parse date for Day info
+                  
                   let day = "";
                   try {
-                      // Attempt to parse '16-Dec-2024' format
+                      
                       const parts = dateStr.split('-');
                       if(parts.length === 3) {
                           const d = new Date(`${parts[1]} ${parts[0]}, ${parts[2]}`);
@@ -361,66 +361,9 @@ function AttendancePage() {
         setCourses(parsedCourses);
         if(parsedCourses.length > 0) setSelectedCourseId(parsedCourses[0].id);
 
-        // Notification & Snapshot Logic
-        const checkNotifications = () => {
-             const oldSnapshot = localStorage.getItem("superflex_attendance_snapshot");
-             let notifications = [];
-             try {
-                notifications = JSON.parse(localStorage.getItem("superflex_notifications") || "[]");
-             } catch(e) { notifications = []; }
 
-             if (oldSnapshot) {
-                 const oldCourses = JSON.parse(oldSnapshot);
-                 const oldMap = new Map();
-                 
-                 oldCourses.forEach(c => {
-                    c.records.forEach(r => {
-                         const key = `${c.id}|${r.date}|${r.time}`;
-                         oldMap.set(key, r);
-                    });
-                 });
-                 
-                 parsedCourses.forEach(c => {
-                    c.records.forEach(r => {
-                         const key = `${c.id}|${r.date}|${r.time}`;
-                         const oldRow = oldMap.get(key);
-                         
-                         if (!oldRow) {
-                             notifications.unshift({
-                                 id: Date.now() + Math.random(),
-                                 title: "New Attendance",
-                                 description: `${c.title}: ${r.status} on ${r.date}`,
-                                 time: new Date().toLocaleString(),
-                                 read: false,
-                                 type: "attendance",
-                                 link: "/Student/StudentAttendance"
-                             });
-                         } else if (oldRow.status !== r.status) {
-                              notifications.unshift({
-                                 id: Date.now() + Math.random(),
-                                 title: "Attendance Updated",
-                                 description: `${c.title}: ${r.date} changed from ${oldRow.status} to ${r.status}`,
-                                 time: new Date().toLocaleString(),
-                                 read: false,
-                                 type: "attendance",
-                                 link: "/Student/StudentAttendance"
-                             });
-                         }
-                    });
-                 });
-             }
-             
-             // Keep only last 50 notifications
-             if(notifications.length > 50) notifications = notifications.slice(0, 50);
 
-             localStorage.setItem("superflex_notifications", JSON.stringify(notifications));
-             localStorage.setItem("superflex_attendance_snapshot", JSON.stringify(parsedCourses));
-             window.dispatchEvent(new Event("superflex-notification-update"));
-        };
         
-        checkNotifications();
-
-        // Cleanup Legacy
         root.style.display = "none";
         setLoading(false);
 
@@ -440,7 +383,7 @@ function AttendancePage() {
     <PageLayout currentPage={window.location.pathname}>
        <div className="w-full min-h-screen p-6 md:p-8 space-y-8 animate-in fade-in duration-500">
           
-          {/* Header Section */}
+          { }
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
              <div className="space-y-2">
                <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
@@ -452,7 +395,7 @@ function AttendancePage() {
              </div>
              
              <div className="flex flex-col md:flex-row items-end gap-4">
-                 {/* Semester Selector Pills */}
+                 { }
                  <div className="flex gap-2 bg-zinc-900/50 p-1.5 rounded-full border border-white/5 backdrop-blur-sm self-start md:self-auto overflow-x-auto custom-scrollbar max-w-full">
                     {semesters.map((sem, idx) => (
                         <button
@@ -462,7 +405,7 @@ function AttendancePage() {
                                     const select = hiddenFormRef.current.querySelector("select");
                                     if(select) {
                                         select.value = sem.value;
-                                        // Submit the form
+                                        
                                         const form = hiddenFormRef.current.querySelector("form");
                                         if(form) form.submit();
                                     }
@@ -479,7 +422,7 @@ function AttendancePage() {
                     ))}
                 </div>
                 
-                {/* Course Selector Dropdown */}
+                { }
                 {courses.length > 0 && (
                     <div className="w-full md:w-auto">
                         <CourseSelector 
@@ -496,12 +439,12 @@ function AttendancePage() {
                     onNavigate={(courseId) => setSelectedCourseId(courseId)}
                 />
                 
-                {/* Hidden Form for Submission */}
+                { }
                 <div ref={hiddenFormRef} className="hidden"></div>
              </div>
           </div>
 
-          {/* Top Banner Alert (Only show if we have courses, otherwise show in main area) */}
+          { }
           {courses.length > 0 && alerts.length > 0 && (
               <div className="space-y-4">
                   {alerts.map((alert, idx) => (
@@ -523,11 +466,11 @@ function AttendancePage() {
              </div>
           ) : courses.length > 0 ? (
              <>
-                {/* Selected Course Detail */}
+                { }
                 {selectedCourseData && (
                    <div key={selectedCourseId} className="space-y-16 animate-in slide-in-from-bottom-4 duration-500">
                       
-                      {/* Stats Overview */}
+                      { }
                       <div className="flex flex-wrap gap-4">
                          <SummaryStat 
                             icon={BarChart2}
@@ -555,7 +498,7 @@ function AttendancePage() {
                           />
                       </div>
 
-                      {/* Records List */}
+                      { }
                       <div className="bg-zinc-900/30 rounded-[2rem] p-6 backdrop-blur-xl">
                          <div className="flex items-center justify-between mb-6">
                             <h3 className="text-xl font-bold text-white">History Log</h3>
@@ -565,7 +508,7 @@ function AttendancePage() {
                          </div>
                                                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                              {selectedCourseData.records.map((record, idx) => {
-                                const recordId = `${selectedCourseId}-${idx}`; // Unique ID for each record
+                                const recordId = `${selectedCourseId}-${idx}`; 
                                 return (
                                    <AttendanceCard 
                                       key={idx} 

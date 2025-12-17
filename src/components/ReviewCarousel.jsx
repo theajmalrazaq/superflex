@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-// Static import of reviews.json
+
 import reviews from "../../public/reviews.json";
 
 const ReviewCarousel = () => {

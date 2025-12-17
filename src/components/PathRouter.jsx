@@ -30,7 +30,7 @@ function PathRouter() {
     };
   }, []);
 
-  // Function to render the appropriate component based on the path
+  
   const renderComponent = () => {
     if (currentPath === "/" || currentPath.startsWith("/?dump=")) {
       return <HomePage />;
@@ -88,7 +88,7 @@ function PathRouter() {
       return <ChangePasswordPage />;
     }
 
-    // Return 404 page for unknown routes instead of defaulting to HomePage
+    
     return <NotFoundPage />;
   };
 

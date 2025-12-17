@@ -10,7 +10,7 @@ function GradeChangePage() {
     );
 
     if (targetElement) {
-      // Apply styling and DOM modifications before removing the element
+      
       applyCustomStyling(targetElement);
 
       setElemContent(targetElement.innerHTML);
@@ -19,10 +19,10 @@ function GradeChangePage() {
   }, []);
 
   const applyCustomStyling = (element) => {
-    // Keep track of style elements we add
+    
     const addedStyles = [];
 
-    // Hide or remove error divs that should be hidden initially
+    
     const errorDivs = element.querySelectorAll(
       "#DataErrorId, #CheckBoxErrorId, #GradeChangeReasonErrorId",
     );
@@ -30,10 +30,10 @@ function GradeChangePage() {
       div.style.display = "none";
     });
 
-    // Style alert messages
+    
     const alertElements = element.querySelectorAll(".m-alert");
     alertElements.forEach((alertElement) => {
-      // Basic styling for all alerts
+      
       alertElement.classList.add(
         "!bg-black",
         "!text-white",
@@ -44,7 +44,7 @@ function GradeChangePage() {
         "!mb-6",
       );
 
-      // Apply flex styling only to visible alerts (those without display:none)
+      
       if (alertElement.style.display !== "none") {
         alertElement.classList.add(
           "!flex",
@@ -53,7 +53,7 @@ function GradeChangePage() {
         );
       }
 
-      // Style alert icon
+      
       const iconElement = alertElement.querySelector(".m-alert__icon");
       if (iconElement) {
         iconElement.classList.add(
@@ -69,7 +69,7 @@ function GradeChangePage() {
           "!justify-center",
         );
 
-        // Replace icon with SVG
+        
         const createSvgIcon = (path) => {
           const svg = document.createElementNS(
             "http://www.w3.org/2000/svg",
@@ -95,7 +95,7 @@ function GradeChangePage() {
           return svg;
         };
 
-        // Different icon paths based on alert type
+        
         let iconPath = "";
         if (alertElement.classList.contains("alert-danger")) {
           iconPath =
@@ -110,7 +110,7 @@ function GradeChangePage() {
         iconElement.appendChild(createSvgIcon(iconPath));
       }
 
-      // Style close button
+      
       const closeButton = alertElement.querySelector("button.close");
       if (closeButton) {
         closeButton.style.cssText = "content: none !important;";
@@ -131,7 +131,7 @@ function GradeChangePage() {
         closeButton.classList.add("!focus:outline-none");
       }
 
-      // Special styling for info alert with link
+      
       if (alertElement.classList.contains("alert-info")) {
         const alertText = alertElement.querySelector(".m-alert__text");
         if (alertText) {
@@ -141,7 +141,7 @@ function GradeChangePage() {
       }
     });
 
-    // Style semester selection form
+    
     const semesterForm = element.querySelector("#FormGradeChange");
     if (semesterForm) {
       semesterForm.classList.add("!ml-4");
@@ -163,7 +163,7 @@ function GradeChangePage() {
           "!w-64",
         );
 
-        // Remove bootstrap classes
+        
         semesterSelect.classList.remove(
           "m-dropdown__toggle",
           "btn",
@@ -172,14 +172,14 @@ function GradeChangePage() {
         );
       }
 
-      // Remove the <br> tag
+      
       const brTag = semesterForm.querySelector("br");
       if (brTag) {
         brTag.remove();
       }
     }
 
-    // Style the portlet container
+    
     const portlet = element.querySelector(".m-portlet");
     if (portlet) {
       portlet.classList.add(
@@ -190,7 +190,7 @@ function GradeChangePage() {
         "!shadow-lg",
       );
 
-      // Remove unnecessary classes
+      
       portlet.classList.remove(
         "m-portlet--primary",
         "m-portlet--head-solid-bg",
@@ -199,7 +199,7 @@ function GradeChangePage() {
       );
     }
 
-    // Style the portlet head
+    
     const portletHead = element.querySelector(".m-portlet__head");
     if (portletHead) {
       portletHead.classList.add(
@@ -215,13 +215,13 @@ function GradeChangePage() {
         "!mb-4",
       );
 
-      // Find and style the heading
+      
       const headingText = portletHead.querySelector(".m-portlet__head-text");
       if (headingText) {
         headingText.classList.add("!text-white", "!text-xl", "!font-bold");
       }
 
-      // Style the portlet head caption
+      
       const portletHeadCaption = portletHead.querySelector(
         ".m-portlet__head-caption",
       );
@@ -229,11 +229,11 @@ function GradeChangePage() {
         portletHeadCaption.classList.add("!flex", "!gap-4", "!items-center");
       }
 
-      // Create a container for the buttons in the header
+      
       const buttonContainer = document.createElement("div");
       buttonContainer.className = "portlet-head-buttons flex gap-2";
 
-      // Add a request button to the header
+      
       const requestButton = document.createElement("button");
       requestButton.id = "btnModalGradeChange";
       requestButton.type = "button";
@@ -252,19 +252,19 @@ function GradeChangePage() {
                 </svg>
                 Request Grade Change
             `;
-      requestButton.style.display = "none"; // Initially hidden, will be shown via JS when checkboxes are checked
+      requestButton.style.display = "none"; 
       buttonContainer.appendChild(requestButton);
 
-      // Add buttons to portlet head
+      
       portletHead.appendChild(buttonContainer);
 
-      // Move the semester selection form to portlet head if it exists
+      
       if (semesterForm) {
-        // Create container for form to help with positioning in header
+        
         const formContainer = document.createElement("div");
         formContainer.appendChild(semesterForm);
 
-        // Insert the form after the heading
+        
         if (headingText && headingText.parentElement) {
           headingText.parentElement.after(formContainer);
         } else {
@@ -273,7 +273,7 @@ function GradeChangePage() {
       }
     }
 
-    // Style the portlet body
+    
     const portletBody = element.querySelector(".m-portlet__body");
     if (portletBody) {
       portletBody.classList.add(
@@ -289,17 +289,17 @@ function GradeChangePage() {
         "custom-scrollbar",
       );
 
-      // Style section content
+      
       const sectionContent = portletBody.querySelector(".m-section__content");
       if (sectionContent) {
         sectionContent.style.marginBottom = "0";
       }
     }
 
-    // Style the table
+    
     const table = element.querySelector(".table");
     if (table) {
-      // Create a container for the table with modern styling
+      
       const tableContainer = document.createElement("div");
       tableContainer.className = "overflow-hidden mb-6";
       table.parentNode.insertBefore(tableContainer, table);
@@ -308,7 +308,7 @@ function GradeChangePage() {
       table.querySelectorAll(".table td, .table th").forEach((el) => {
         el.classList.add("!border-none");
       });
-      // Style the table
+      
       table.classList.add("!w-full", "!border-collapse", "!border-0");
       table.classList.remove(
         "m-table",
@@ -316,12 +316,12 @@ function GradeChangePage() {
         "table-responsive",
       );
 
-      // Style the table headers
+      
       const thead = table.querySelector("thead");
       if (thead) {
         thead.classList.add("!bg-zinc-900", "!sticky", "!top-0", "!z-10");
 
-        // Remove the checkbox column header
+        
         const checkboxHeader = thead.querySelector("#Checkallhide_Show");
         if (checkboxHeader) {
           checkboxHeader.innerHTML = "Select";
@@ -341,7 +341,7 @@ function GradeChangePage() {
         });
       }
 
-      // Style the table body
+      
       const tbody = table.querySelector("tbody");
       if (tbody) {
         tbody.classList.add("!divide-y", "!divide-white/10");
@@ -363,7 +363,7 @@ function GradeChangePage() {
               "!border-white/10",
             );
 
-            // Style checkboxes
+            
             const checkbox = cell.querySelector('input[type="checkbox"]');
             if (checkbox) {
               checkbox.classList.add(
@@ -378,7 +378,7 @@ function GradeChangePage() {
       }
     }
 
-    // Style the modals
+    
     const modals = element.querySelectorAll(".modal-content");
     modals.forEach((modal) => {
       modal.classList.add(
@@ -390,7 +390,7 @@ function GradeChangePage() {
         "!shadow-none",
       );
 
-      // Style modal header
+      
       const modalHeader = modal.querySelector(".modal-header");
       if (modalHeader) {
         modalHeader.classList.add(
@@ -403,7 +403,7 @@ function GradeChangePage() {
           "!justify-between",
         );
 
-        // Remove inline styles
+        
         if (modalHeader.hasAttribute("style")) {
           modalHeader.removeAttribute("style");
         }
@@ -414,7 +414,7 @@ function GradeChangePage() {
           modalTitle.textContent = "Grade Change Request";
         }
 
-        // Style close button
+        
         const closeBtn = modalHeader.querySelector(".close");
         if (closeBtn) {
           closeBtn.innerHTML = `
@@ -424,7 +424,7 @@ function GradeChangePage() {
                         </svg>
                     `;
 
-          // Remove inline styles
+          
           if (closeBtn.hasAttribute("style")) {
             closeBtn.removeAttribute("style");
           }
@@ -433,7 +433,7 @@ function GradeChangePage() {
         }
       }
 
-      // Style modal body
+      
       const modalBody = modal.querySelector(".modal-body");
       if (modalBody) {
         modalBody.classList.add(
@@ -445,7 +445,7 @@ function GradeChangePage() {
           "custom-scrollbar",
         );
 
-        // Style the reason dropdown
+        
         const reasonSelect = modalBody.querySelector("#GradeChangeReason");
         if (reasonSelect) {
           reasonSelect.classList.add(
@@ -464,7 +464,7 @@ function GradeChangePage() {
             "!max-w-full",
           );
 
-          // Remove bootstrap classes
+          
           reasonSelect.classList.remove(
             "m-dropdown__toggle",
             "btn",
@@ -472,13 +472,13 @@ function GradeChangePage() {
             "dropdown-toggle",
           );
 
-          // Remove inline styles
+          
           if (reasonSelect.hasAttribute("style")) {
             reasonSelect.removeAttribute("style");
           }
         }
 
-        // Style the reason label
+        
         const reasonLabel = modalBody.querySelector(".row:first-child label");
         if (reasonLabel) {
           reasonLabel.classList.add(
@@ -489,7 +489,7 @@ function GradeChangePage() {
           );
         }
 
-        // Style textarea
+        
         const textareaGroup = modalBody.querySelector("#remrksdiv");
         if (textareaGroup) {
           const textarea = textareaGroup.querySelector("textarea");
@@ -522,12 +522,12 @@ function GradeChangePage() {
           }
         }
 
-        // Remove unnecessary <br> tags
+        
         const brTags = modalBody.querySelectorAll("br");
         brTags.forEach((br) => br.remove());
       }
 
-      // Style modal footer
+      
       const modalFooter = modal.querySelector(".modal-footer");
       if (modalFooter) {
         modalFooter.classList.add(
@@ -540,7 +540,7 @@ function GradeChangePage() {
           "!gap-3",
         );
 
-        // Style primary action button (submit button)
+        
         const submitBtn = modalFooter.querySelector(
           'input[type="button"][value="Submit Request"]',
         );
@@ -559,13 +559,13 @@ function GradeChangePage() {
             "!cursor-pointer",
           );
 
-          // Remove inline styles
+          
           if (submitBtn.hasAttribute("style")) {
             submitBtn.removeAttribute("style");
           }
         }
 
-        // Style close/cancel button
+        
         const closeBtn = modalFooter.querySelector(".btn-default");
         if (closeBtn) {
           closeBtn.classList.add(
@@ -581,7 +581,7 @@ function GradeChangePage() {
             "!border-0",
           );
 
-          // Remove inline styles
+          
           if (closeBtn.hasAttribute("style")) {
             closeBtn.removeAttribute("style");
           }
@@ -589,7 +589,7 @@ function GradeChangePage() {
       }
     });
 
-    // Summary section removed
+    
   };
 
   return (

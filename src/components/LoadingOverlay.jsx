@@ -7,12 +7,12 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
 
   useEffect(() => {
     if (isFullScreen) {
-      // Set a timeout to hide the loading overlay after 2 seconds
+      
       const timer = setTimeout(() => {
         setLoading(false);
       }, 2000);
 
-      // Listen for when the page has finished loading
+      
       const handleLoad = () => {
         setLoading(false);
       };
@@ -28,7 +28,7 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
 
   useEffect(() => {
     if (!show || !loading) {
-      // Add a small delay before hiding to allow animation to complete
+      
       const timer = setTimeout(() => {
         setIsVisible(false);
       }, 500);

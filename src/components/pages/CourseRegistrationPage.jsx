@@ -42,7 +42,7 @@ function CourseRegistrationPage() {
         "!justify-center",
       );
 
-      // Create SVG element
+      
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("width", "24");
       svg.setAttribute("height", "24");
@@ -54,33 +54,33 @@ function CourseRegistrationPage() {
       svg.setAttribute("stroke-linejoin", "round");
       svg.classList.add("w-6", "h-6", "text-white");
 
-      // Create path element
+      
       const path = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "path",
       );
       path.setAttribute("d", badgeAlertPath);
 
-      // Append path to SVG and SVG to icon element
+      
       svg.appendChild(path);
-      iconElement.innerHTML = ""; // Clear existing content
+      iconElement.innerHTML = ""; 
       iconElement.appendChild(svg);
     }
 
-    // Find the close button and add the close icon SVG
+    
     const closeButton = alertElement?.querySelector(
       'button.close[data-dismiss="alert"]',
     );
     if (closeButton) {
-      // Hide the ::before pseudo-element
+      
       closeButton.style.cssText = "content: none !important;";
-      // Add a style tag to ensure ::before is hidden
+      
       const style = document.createElement("style");
       style.textContent =
         'button.close[data-dismiss="alert"]::before { display: none !important; content: none !important; }';
       document.head.appendChild(style);
 
-      // Create SVG element for close button
+      
       const closeSvg = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "svg",
@@ -95,7 +95,7 @@ function CourseRegistrationPage() {
       closeSvg.setAttribute("stroke-linejoin", "round");
       closeSvg.classList.add("w-4", "h-4", "text-white");
 
-      // Create paths for X shape
+      
       const line1 = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "line",
@@ -114,10 +114,10 @@ function CourseRegistrationPage() {
       line2.setAttribute("x2", "18");
       line2.setAttribute("y2", "18");
 
-      // Append paths to SVG and SVG to close button
+      
       closeSvg.appendChild(line1);
       closeSvg.appendChild(line2);
-      closeButton.innerHTML = ""; // Clear any existing content
+      closeButton.innerHTML = ""; 
       closeButton.appendChild(closeSvg);
       closeButton.classList.add("!focus:outline-none");
     }

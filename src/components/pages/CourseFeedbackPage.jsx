@@ -10,7 +10,7 @@ function CourseFeedbackPage() {
     );
 
     if (targetElement) {
-      // Apply styling and DOM modifications before removing the element
+      
       applyCustomStyling(targetElement);
 
       setElemContent(targetElement.innerHTML);
@@ -19,10 +19,10 @@ function CourseFeedbackPage() {
   }, []);
 
   const applyCustomStyling = (element) => {
-    // Keep track of style elements we add
+    
     const addedStyles = [];
 
-    // Add custom scrollbar styling
+    
     const styleElement = document.createElement("style");
     styleElement.textContent = `
             .custom-scrollbar::-webkit-scrollbar {
@@ -41,12 +41,12 @@ function CourseFeedbackPage() {
                 background: rgba(255, 255, 255, 0.3);
             }
         `;
-    // Mark as our custom style
+    
     styleElement.setAttribute("data-custom-style", "true");
     document.head.appendChild(styleElement);
     addedStyles.push(styleElement);
 
-    // Style alert messages
+    
     const alertElements = element.querySelectorAll(".m-alert");
     alertElements.forEach((alertElement) => {
       alertElement.classList.add(
@@ -62,7 +62,7 @@ function CourseFeedbackPage() {
         "!m-6",
       );
 
-      // Style alert icon
+      
       const iconElement = alertElement.querySelector(".m-alert__icon");
       if (iconElement) {
         iconElement.classList.add(
@@ -78,7 +78,7 @@ function CourseFeedbackPage() {
           "!justify-center",
         );
 
-        // Replace icon with SVG
+        
         const createSvgIcon = (path) => {
           const svg = document.createElementNS(
             "http://www.w3.org/2000/svg",
@@ -104,13 +104,13 @@ function CourseFeedbackPage() {
           return svg;
         };
 
-        // Icon path for warning alert
+        
         const iconPath = "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z";
         iconElement.innerHTML = "";
         iconElement.appendChild(createSvgIcon(iconPath));
       }
 
-      // Style close button
+      
       const closeButton = alertElement.querySelector("button.close");
       if (closeButton) {
         closeButton.style.cssText = "content: none !important;";
@@ -131,12 +131,12 @@ function CourseFeedbackPage() {
         closeButton.classList.add("!focus:outline-none");
       }
 
-      // Style alert text
+      
       const alertText = alertElement.querySelector(".m-alert__text");
       if (alertText) {
         alertText.classList.add("!text-white/90", "!ml-4");
 
-        // Style the strong element
+        
         const strongElement = alertText.querySelector("strong");
         if (strongElement) {
           strongElement.classList.add("!text-x");
@@ -144,7 +144,7 @@ function CourseFeedbackPage() {
       }
     });
 
-    // Style the portlet container
+    
     const portlet = element.querySelector(".m-portlet");
     if (portlet) {
       portlet.classList.add(
@@ -155,7 +155,7 @@ function CourseFeedbackPage() {
         "!shadow-lg",
       );
 
-      // Remove unnecessary classes
+      
       portlet.classList.remove(
         "m-portlet--primary",
         "m-portlet--head-solid-bg",
@@ -164,7 +164,7 @@ function CourseFeedbackPage() {
       );
     }
 
-    // Style the portlet head
+    
     const portletHead = element.querySelector(".m-portlet__head");
     if (portletHead) {
       portletHead.classList.add(
@@ -180,20 +180,20 @@ function CourseFeedbackPage() {
         "!mb-4",
       );
 
-      // Find and style the heading
+      
       const headingText = portletHead.querySelector(".m-portlet__head-text");
       if (headingText) {
         headingText.classList.add("!text-white", "!text-xl", "!font-bold");
       }
 
-      // Style the portlet head caption
+      
       const headCaption = portletHead.querySelector(".m-portlet__head-caption");
       if (headCaption) {
         headCaption.classList.add("!flex", "!justify-center", "!items-center");
       }
     }
 
-    // Style the portlet body
+    
     const portletBody = element.querySelector(".m-portlet__body");
     if (portletBody) {
       portletBody.classList.add(
@@ -210,26 +210,26 @@ function CourseFeedbackPage() {
         "custom-scrollbar",
       );
 
-      // Style section content
+      
       const sectionContent = portletBody.querySelector(".m-section__content");
       if (sectionContent) {
         sectionContent.style.marginBottom = "0";
       }
     }
 
-    // Style the table
+    
     const table = element.querySelector(".table");
     if (table) {
       table.querySelectorAll(".table td, .table th").forEach((el) => {
         el.classList.add("!border-none");
       });
-      // Create a container for the table with modern styling
+      
       const tableContainer = document.createElement("div");
       tableContainer.className = "overflow-hidden mb-6";
       table.parentNode.insertBefore(tableContainer, table);
       tableContainer.appendChild(table);
 
-      // Style the table
+      
       table.classList.add("!w-full", "!border-collapse", "!border-0");
       table.classList.remove(
         "m-table",
@@ -237,7 +237,7 @@ function CourseFeedbackPage() {
         "table-responsive",
       );
 
-      // Style the table headers
+      
       const thead = table.querySelector("thead");
       if (thead) {
         thead.classList.add("!bg-zinc-900", "!sticky", "!top-0", "!z-10");
@@ -256,7 +256,7 @@ function CourseFeedbackPage() {
         });
       }
 
-      // Style the table body
+      
       const tbody = table.querySelector("tbody");
       if (tbody) {
         tbody.classList.add("!divide-y", "!divide-white/10");
@@ -278,19 +278,19 @@ function CourseFeedbackPage() {
               "!border-white/10",
             );
 
-            // Style success text
+            
             if (cell.classList.contains("text-success")) {
               cell.classList.remove("text-success");
               cell.classList.add("!text-emerald-400");
             }
 
-            // Ensure last column is visible even if empty
+            
             if (index === cells.length - 1) {
               cell.classList.add("!min-w-[80px]");
 
-              // If empty, add a placeholder or visual indicator
+              
               if (!cell.textContent.trim()) {
-                // Add a subtle dash to indicate empty cell
+                
                 const dash = document.createElement("span");
                 dash.textContent = "-";
                 dash.classList.add("text-white/30");
@@ -301,10 +301,10 @@ function CourseFeedbackPage() {
         });
       }
 
-      // Fix header columns to match data columns
+      
       const headers = table.querySelectorAll("thead th");
       if (headers.length > 0) {
-        // Ensure the last header column is properly styled
+        
         const lastHeader = headers[headers.length - 1];
         lastHeader.classList.add("!min-w-[80px]");
       }

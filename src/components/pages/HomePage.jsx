@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-undef */
+ 
+ 
 import React, { useEffect, useState, useMemo } from "react";
 import PageLayout from "../layouts/PageLayout";
 import LoadingOverlay from "../LoadingOverlay";
@@ -106,37 +106,37 @@ const CategoryAccordion = ({ category, isOpen, onToggle }) => {
 };
 
 function HomePage() {
-  // --- State ---
+  
   const [universityInfo, setUniversityInfo] = useState(null);
   const [personalInfo, setPersonalInfo] = useState(null);
   const [profileSections, setProfileSections] = useState([]);
   const [activeMainTab, setActiveMainTab] = useState("stats");
 
-  // Fetched Data
-  // Fetched Data
+  
+  
   const [attendanceData, setAttendanceData] = useState(null);
   const [marksHistory, setMarksHistory] = useState([]); 
   const [currentAggregate, setCurrentAggregate] = useState({ obtained: 0, total: 0, percentage: 0 });
   const [coursesData, setCoursesData] = useState([]);
   const [activeCourse, setActiveCourse] = useState(null);
-  const [openCategoryIdx, setOpenCategoryIdx] = useState(null); // Default closed
+  const [openCategoryIdx, setOpenCategoryIdx] = useState(null); 
 
-  // Links
+  
   const [links, setLinks] = useState({});
   const [chartPattern, setChartPattern] = useState(null);
 
-  // Create chart pattern
+  
   useEffect(() => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     canvas.width = 10;
     canvas.height = 10;
     
-    // Draw diagonal stripes
-    ctx.fillStyle = 'rgba(255,255,255,0.02)'; // Base transparent fill
+    
+    ctx.fillStyle = 'rgba(255,255,255,0.02)'; 
     ctx.fillRect(0,0,10,10);
     
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)'; // Stripe color
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)'; 
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, 10);
@@ -146,14 +146,14 @@ function HomePage() {
     setChartPattern(ctx.createPattern(canvas, 'repeat'));
   }, []);
 
-  // Reset open category when course changes
+  
   useEffect(() => {
     setOpenCategoryIdx(null);
   }, [activeCourse]);
 
-  // --- Initial DOM Parsing (Uni/Personal Info) ---
+  
   useEffect(() => {
-    // Add custom scrollbar style
+    
     const scrollbarStyle = `
       .custom-scrollbar::-webkit-scrollbar { width: 6px; }
       .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -164,7 +164,7 @@ function HomePage() {
     styleElement.textContent = scrollbarStyle;
     document.head.appendChild(styleElement);
 
-    // Load History from LocalStorage
+    
     const savedHistory = localStorage.getItem("superflex_marks_history");
     if(savedHistory) {
       try {
@@ -172,15 +172,15 @@ function HomePage() {
       } catch(e) { console.error("History parse fail", e); }
     }
 
-    // Parse initial DOM
+    
     const targetElement = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
     if (targetElement) {
-      // Clean up scripts
+      
       targetElement.querySelectorAll("script").forEach((script) => script.remove());
       targetElement.querySelector("#NotificationDetail")?.remove();
       document.querySelector(".m-scroll-top")?.remove();
 
-      // University Info
+      
       let uniInfo = {};
       let personalData = {};
       const allSections = [];
@@ -200,7 +200,7 @@ function HomePage() {
            if(Object.keys(sectionData).length > 0) {
               allSections.push({ title: portletTitle, data: sectionData });
               
-              // Maintain backward compatibility for Top Cards
+              
               if (portletTitle === "University Information") uniInfo = sectionData;
               if (portletTitle === "Personal Information") personalData = sectionData;
            }
@@ -211,7 +211,7 @@ function HomePage() {
       setUniversityInfo(uniInfo);
       setPersonalInfo(personalData);
       
-      // Remove original content after parsing
+      
       targetElement.remove();
     }
     
@@ -220,9 +220,9 @@ function HomePage() {
     };
   }, []);
 
-  // --- Fetching Logic ---
+  
   const handleLinksFound = (foundLinks) => {
-    // Map links for easy access
+    
     const linkMap = {};
     foundLinks.forEach(l => {
         if(l.text.includes("Attendance")) linkMap.attendance = l.href;
@@ -302,7 +302,7 @@ function HomePage() {
          let courseTotalWeight = 0;
          const categories = [];
 
-         // Extract Assessments by Category
+         
          const cards = pane.querySelectorAll(".card");
          cards.forEach(card => {
              const header = card.querySelector(".card-header button")?.textContent.trim();
@@ -320,7 +320,7 @@ function HomePage() {
                  const obtainedStr = tds[2]?.textContent.trim();
                  const totalStr = tds[3]?.textContent.trim();
                  
-                 // specific check to skip Total/Grand Total rows to avoid NaN issues
+                 
                  if(name === "Total" || name === "Grand Total") return;
 
                  if(obtainedStr && obtainedStr !== "-" && obtainedStr !== "") {
@@ -346,7 +346,7 @@ function HomePage() {
              }
          });
 
-         // Calculate Total for Aggregate from Summary Table
+         
          const calcRows = pane.querySelectorAll(".sum_table .calculationrow");
          calcRows.forEach(row => {
             const weightText = row.querySelector(".weightage")?.textContent;
@@ -380,8 +380,8 @@ function HomePage() {
       const currentPerc = semesterTotalWeight > 0 ? (semesterTotalObtained / semesterTotalWeight) * 100 : 0;
       setCurrentAggregate({ obtained: semesterTotalObtained, total: semesterTotalWeight, percentage: currentPerc });
 
-      // Update History
-      const currentSession = universityInfo?.Session || "Current"; // e.g. "Fall 2024"
+      
+      const currentSession = universityInfo?.Session || "Current"; 
       const newHistoryItem = { semester: currentSession, percentage: currentPerc, timestamp: new Date().toISOString() };
       setMarksHistory(prev => {
          const existingIndex = prev.findIndex(item => item.semester === currentSession);
@@ -401,7 +401,7 @@ function HomePage() {
     }
   };
 
-  // --- Charts Configuration ---
+  
 
 
   const performanceChartData = useMemo(() => {
@@ -432,22 +432,22 @@ function HomePage() {
     return attendanceData.reduce((prev, current) => (prev.absent > current.absent) ? prev : current);
   }, [attendanceData]);
 
-  // --- Render ---
+  
   return (
     <PageLayout currentPage={window.location.pathname} onLinksFound={handleLinksFound}>
       <div className="w-full px-6 py-8 space-y-8 animate-in fade-in duration-500">
         
-        {/* Hero Section */}
-        {/* Hero Section */}
+        { }
+        { }
         <div className="relative rounded-[2rem] bg-black p-6 overflow-hidden group">
-           {/* Background Glows */}
+           { }
            <div className="absolute top-0 right-0 w-96 h-96 bg-[#a098ff]/5 blur-[80px] rounded-full pointer-events-none -mr-20 -mt-20 opacity-40"></div>
            
            <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
-               {/* Left: Profile & Text */}
+               { }
                <div className="flex items-center gap-5 w-full md:w-auto">
                <div className="flex flex-col gap-5">
-                   {/* Profile Image */}
+                   { }
                    <div className="relative shrink-0">
                         <img 
                             src="/Login/GetImage" 
@@ -471,7 +471,7 @@ function HomePage() {
                </div>
 
 
-               {/* Right: Stats Toggle */}
+               { }
                <div className="flex backdrop-blur-md p-1 rounded-full shrink-0 w-full md:w-auto justify-center gap-5 md:justify-end">
                    <button 
                       onClick={() => setActiveMainTab("stats")}
@@ -499,12 +499,12 @@ function HomePage() {
            </div>
         </div>
 
-        {/* STATS VIEW */}
+        { }
         {activeMainTab === "stats" && (
            <div className="space-y-8 animate-in fade-in duration-300">
-              {/* Info Grid */}
+              { }
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                 {/* Card 1: Degree */}
+                 { }
                  <div className="p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
                     <div className="flex justify-between items-start mb-6">
                        <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
@@ -515,7 +515,7 @@ function HomePage() {
                     <h3 className="text-xl font-bold text-white truncate">{universityInfo?.Degree || "..."}</h3>
                  </div>
                  
-                 {/* Card 2: Section */}
+                 { }
                  <div className="p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70  transition-all duration-300 hover:-translate-y-1 group">
                     <div className="flex justify-between items-start mb-6">
                        <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
@@ -526,7 +526,7 @@ function HomePage() {
                     <h3 className="text-xl font-bold text-white">{universityInfo?.Section || "..."}</h3>
                  </div>
       
-                 {/* Card 3: Total Registered Courses */}
+                 { }
                  <div className="p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
                     <div className="flex justify-between items-start mb-6">
                        <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
@@ -559,10 +559,10 @@ function HomePage() {
                  </div>
               </div>
       
-              {/* Combined Dashboard Row: Marks & Attendance */}
+              { }
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                    
-                   {/* LEFT: Course Marks Tabs Section */}
+                   { }
                    {coursesData.length > 0 ? (
                      <div className="bg-zinc-900/50 backdrop-blur-xl rounded-3xl p-6  overflow-hidden flex flex-col gap-6 h-full">
                         <div className="flex flex-col justify-between items-start gap-4">
@@ -582,7 +582,7 @@ function HomePage() {
                               )}
                            </div>
                            
-                           {/* Course Tabs - Compact Scrollable */}
+                           { }
                            <div className="w-full overflow-x-auto custom-scrollbar pb-2">
                                <div className="flex gap-2">
                                    {coursesData.map(course => (
@@ -602,7 +602,7 @@ function HomePage() {
                            </div>
                         </div>
                         
-                        {/* Selected Course Content */}
+                        { }
                         {activeCourseData && (
                             <div key={activeCourse} className="animate-in fade-in zoom-in-95 duration-300">
                                <div className="flex flex-col gap-2 mb-4">
@@ -615,7 +615,7 @@ function HomePage() {
                                     </div>
                                </div>
            
-                               {/* Accordions */}
+                               { }
                                <div className="space-y-3">
                                    {activeCourseData.categories.map((category, idx) => (
                                        <CategoryAccordion 
@@ -639,7 +639,7 @@ function HomePage() {
                           No marks data available
                       </div>
                    )}
-                        {/* RIGHT: Attendance Chart */}
+                        { }
                    <div className="p-8 rounded-[1.5rem] bg-zinc-900/50 backdrop-blur-xl   h-full flex flex-col">
                      <div className="flex justify-between items-start mb-8">
                         <div>
@@ -662,7 +662,7 @@ function HomePage() {
                             <Bar
                                 data={{
                                     labels: attendanceData.map(d => {
-                                        // Truncate label if too long
+                                        
                                         const t = d.title;
                                         const trunc = t.length > 15 ? t.substring(0, 15) + '...' : t;
                                         return `${trunc} (P:${d.present} A:${d.absent})`;
@@ -722,7 +722,7 @@ function HomePage() {
                                             stacked: true,
                                             grid: { display: false },
                                             ticks: {
-                                                color: '#a1a1aa', // zinc-400
+                                                color: '#a1a1aa', 
                                                 font: { size: 11, family: "'Google Sans Flex', sans-serif" },
                                                 autoSkip: false
                                             },
@@ -742,7 +742,7 @@ function HomePage() {
            </div>
         )}
 
-        {/* INFO VIEW */}
+        { }
         {activeMainTab === "info" && (
            <div className="animate-in fade-in duration-300">
               <ProfileInfoTabs profileSections={profileSections} />
@@ -754,7 +754,7 @@ function HomePage() {
   );
 }
 
-// --- Subcomponent for Info Tables ---
+
 const ProfileInfoTabs = ({ profileSections }) => {
    if (!profileSections || profileSections.length === 0) return null;
 
@@ -762,7 +762,7 @@ const ProfileInfoTabs = ({ profileSections }) => {
       <div className="space-y-8 animate-in fade-in duration-500">
          {profileSections.map((section, idx) => (
              <div key={idx} className="bg-zinc-900/60 backdrop-blur-xl rounded-[2rem]  p-8 overflow-hidden">
-               {/* Header */}
+               { }
                <div className="flex items-center gap-4 mb-8">
                    <div className="p-3 bg-[#a098ff]/10 rounded-2xl text-[#a098ff]">
                        {section.title.toLowerCase().includes("personal") ? <User size={24} /> : 
@@ -773,7 +773,7 @@ const ProfileInfoTabs = ({ profileSections }) => {
                    <h3 className="text-2xl font-bold text-white tracking-tight">{section.title}</h3>
                </div>
                
-               {/* Grid Layout for Fields */}
+               { }
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {Object.entries(section.data).map(([key, val], i) => (
                       <div key={i} className="flex flex-col p-4 rounded-2xl bg-black/20 hover:bg-white/5 transition-colors group">

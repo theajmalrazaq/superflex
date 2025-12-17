@@ -10,7 +10,7 @@ function CourseWithdrawPage() {
     );
 
     if (targetElement) {
-      // Apply styling and DOM modifications before removing the element
+      
       applyCustomStyling(targetElement);
 
       setElemContent(targetElement.innerHTML);
@@ -19,16 +19,16 @@ function CourseWithdrawPage() {
   }, []);
 
   const applyCustomStyling = (element) => {
-    // Keep track of style elements we add
+    
     const addedStyles = [];
 
-    // Remove DataErrormsgdiv element if it exists
+    
     const errorDiv = element.querySelector("#DataErrormsgdiv");
     if (errorDiv) {
-      errorDiv.remove(); // Remove the element completely instead of just hiding it
+      errorDiv.remove(); 
     }
 
-    // Add custom scrollbar styling
+    
     const styleElement = document.createElement("style");
     styleElement.textContent = `
             .custom-scrollbar::-webkit-scrollbar {
@@ -75,12 +75,12 @@ function CourseWithdrawPage() {
                 background-color: rgba(0, 0, 0, 0.4);
             }
         `;
-    // Mark as our custom style
+    
     styleElement.setAttribute("data-custom-style", "true");
     document.head.appendChild(styleElement);
     addedStyles.push(styleElement);
 
-    // Style alert messages
+    
     const alertElements = element.querySelectorAll(".m-alert");
     alertElements.forEach((alertElement) => {
       alertElement.classList.add(
@@ -96,7 +96,7 @@ function CourseWithdrawPage() {
         "!mb-6",
       );
 
-      // Style alert icon
+      
       const iconElement = alertElement.querySelector(".m-alert__icon");
       if (iconElement) {
         iconElement.classList.add(
@@ -112,7 +112,7 @@ function CourseWithdrawPage() {
           "!justify-center",
         );
 
-        // Replace icon with SVG
+        
         const createSvgIcon = (path) => {
           const svg = document.createElementNS(
             "http://www.w3.org/2000/svg",
@@ -138,7 +138,7 @@ function CourseWithdrawPage() {
           return svg;
         };
 
-        // Different icon paths based on alert type
+        
         let iconPath = "";
         if (alertElement.classList.contains("alert-danger")) {
           iconPath =
@@ -153,7 +153,7 @@ function CourseWithdrawPage() {
         iconElement.appendChild(createSvgIcon(iconPath));
       }
 
-      // Style close button
+      
       const closeButton = alertElement.querySelector("button.close");
       if (closeButton) {
         closeButton.style.cssText = "content: none !important;";
@@ -174,7 +174,7 @@ function CourseWithdrawPage() {
         closeButton.classList.add("!focus:outline-none");
       }
 
-      // Special styling for info alert with link
+      
       if (alertElement.classList.contains("alert-info")) {
         const linkElement = alertElement.querySelector("a");
         if (linkElement) {
@@ -189,7 +189,7 @@ function CourseWithdrawPage() {
       }
     });
 
-    // Style semester selection form
+    
     const semesterForm = element.querySelector("#Formwithdraw");
     if (semesterForm) {
       semesterForm.classList.add("!ml-4");
@@ -211,7 +211,7 @@ function CourseWithdrawPage() {
           "!w-64",
         );
 
-        // Remove bootstrap classes
+        
         semesterSelect.classList.remove(
           "m-dropdown__toggle",
           "btn",
@@ -220,14 +220,14 @@ function CourseWithdrawPage() {
         );
       }
 
-      // Remove the <br> tag
+      
       const brTag = semesterForm.querySelector("br");
       if (brTag) {
         brTag.remove();
       }
     }
 
-    // Style the portlet container
+    
     const portlet = element.querySelector(".m-portlet");
     if (portlet) {
       portlet.classList.add(
@@ -238,7 +238,7 @@ function CourseWithdrawPage() {
         "!shadow-lg",
       );
 
-      // Remove unnecessary classes
+      
       portlet.classList.remove(
         "m-portlet--primary",
         "m-portlet--head-solid-bg",
@@ -247,7 +247,7 @@ function CourseWithdrawPage() {
       );
     }
 
-    // Style the portlet head
+    
     const portletHead = element.querySelector(".m-portlet__head");
     if (portletHead) {
       portletHead.classList.add(
@@ -263,28 +263,28 @@ function CourseWithdrawPage() {
         "!mb-4",
       );
 
-      // Find and style the heading
+      
       const headingText = portletHead.querySelector(".m-portlet__head-text");
       if (headingText) {
         headingText.classList.add("!text-white", "!text-xl", "!font-bold");
       }
 
-      // Style the portlet head caption
+      
       const headCaption = portletHead.querySelector(".m-portlet__head-caption");
       if (headCaption) {
         headCaption.classList.add("!flex", "!justify-center", "!items-center");
       }
 
-      // Find and move the semester selection form to the portlet head
+      
       const semesterForm = element.querySelector("#Formwithdraw");
       if (semesterForm) {
-        // Apply any styling before moving
+        
 
-        // Create container for form to help with positioning in header
+        
         const formContainer = document.createElement("div");
         formContainer.appendChild(semesterForm);
 
-        // Insert the form after the heading
+        
         if (headingText && headingText.parentElement) {
           headingText.parentElement.after(formContainer);
         } else {
@@ -292,21 +292,21 @@ function CourseWithdrawPage() {
         }
       }
 
-      // Create a container for the buttons in the header
+      
       const buttonContainer = document.createElement("div");
       buttonContainer.className = "portlet-head-buttons flex gap-2";
 
-      // Find the buttons in the table cell
+      
       const lastRow = element.querySelector("tbody tr:last-child");
       if (lastRow) {
         const buttonCell = lastRow.querySelector("td:last-child");
         if (buttonCell) {
-          // Get the buttons
+          
           const buttons = buttonCell.querySelectorAll(".btn");
 
-          // Create icon-only buttons for the header
+          
           if (buttons.length >= 1) {
-            // First button - Initiate Withdraw Request
+            
             const initiateButton = document.createElement("a");
             initiateButton.href = "#";
             initiateButton.className =
@@ -314,7 +314,7 @@ function CourseWithdrawPage() {
             initiateButton.setAttribute("data-toggle", "modal");
             initiateButton.setAttribute("data-target", "#RemarksDetail");
 
-            // Only add the icon SVG, no text
+            
             initiateButton.innerHTML = `
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -329,7 +329,7 @@ function CourseWithdrawPage() {
           }
 
           if (buttons.length >= 2) {
-            // Second button - Download CourseWithdraw Form
+            
             const downloadButton = document.createElement("a");
             downloadButton.href = "#";
             downloadButton.className =
@@ -339,7 +339,7 @@ function CourseWithdrawPage() {
               "ftn_PrintCourseWithdrawForm();",
             );
 
-            // Only add the icon SVG, no text
+            
             downloadButton.innerHTML = `
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
                   stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -351,16 +351,16 @@ function CourseWithdrawPage() {
             buttonContainer.appendChild(downloadButton);
           }
 
-          // Add buttons to portlet head
+          
           portletHead.appendChild(buttonContainer);
 
-          // Remove or hide the original buttons cell
+          
           buttonCell.style.display = "none";
         }
       }
     }
 
-    // Style the portlet body
+    
     const portletBody = element.querySelector(".m-portlet__body");
     if (portletBody) {
       portletBody.classList.add(
@@ -376,26 +376,26 @@ function CourseWithdrawPage() {
         "custom-scrollbar",
       );
 
-      // Style section content
+      
       const sectionContent = portletBody.querySelector(".m-section__content");
       if (sectionContent) {
         sectionContent.style.marginBottom = "0";
       }
     }
 
-    // Style the table
+    
     const table = element.querySelector(".table");
     if (table) {
       table.querySelectorAll(".table td, .table th").forEach((el) => {
         el.classList.add("!border-none");
       });
-      // Create a container for the table with modern styling
+      
       const tableContainer = document.createElement("div");
       tableContainer.className = "overflow-hidden mb-6";
       table.parentNode.insertBefore(tableContainer, table);
       tableContainer.appendChild(table);
 
-      // Style the table
+      
       table.classList.add("!w-full", "!border-collapse", "!border-0");
       table.classList.remove(
         "m-table",
@@ -403,12 +403,12 @@ function CourseWithdrawPage() {
         "table-responsive",
       );
 
-      // Style the table headers
+      
       const thead = table.querySelector("thead");
       if (thead) {
         thead.classList.add("!bg-zinc-900", "!sticky", "!top-0", "!z-10");
 
-        // Remove the checkbox column header
+        
         const checkboxHeader = thead.querySelector("#Checkallhide_Show");
         if (checkboxHeader) {
           checkboxHeader.innerHTML = "Select";
@@ -428,7 +428,7 @@ function CourseWithdrawPage() {
         });
       }
 
-      // Style the table body
+      
       const tbody = table.querySelector("tbody");
       if (tbody) {
         tbody.classList.add("!divide-y", "!divide-white/10");
@@ -450,7 +450,7 @@ function CourseWithdrawPage() {
               "!border-white/10",
             );
 
-            // Style checkboxes
+            
             const checkbox = cell.querySelector('input[type="checkbox"]');
             if (checkbox) {
               checkbox.classList.add(
@@ -463,7 +463,7 @@ function CourseWithdrawPage() {
           });
         });
 
-        // Style the buttons in the last row
+        
         const lastRow = tbody.querySelector("tr:last-child");
         if (lastRow) {
           const buttonCell = lastRow.querySelector("td:last-child");
@@ -490,14 +490,14 @@ function CourseWithdrawPage() {
                 "!mr-2",
               );
 
-              // Remove unnecessary styles
+              
               button.style.marginTop = "0";
 
-              // Remove bootstrap classes
+              
               button.classList.remove("btn-primary", "btn-sm");
             });
 
-            // First button - add icon
+            
             const initiateButton = buttonCell.querySelector(".btn:first-child");
             if (initiateButton) {
               initiateButton.innerHTML = `
@@ -512,7 +512,7 @@ function CourseWithdrawPage() {
               `;
             }
 
-            // Second button - add icon
+            
             const downloadButton = buttonCell.querySelector(".btn:last-child");
             if (downloadButton) {
               downloadButton.innerHTML = `
@@ -529,7 +529,7 @@ function CourseWithdrawPage() {
       }
     }
 
-    // Style the modals
+    
     const modals = element.querySelectorAll(".modal-content");
     modals.forEach((modal) => {
       modal.classList.add(
@@ -541,7 +541,7 @@ function CourseWithdrawPage() {
         "!shadow-none",
       );
 
-      // Style modal header
+      
       const modalHeader = modal.querySelector(".modal-header");
       if (modalHeader) {
         modalHeader.classList.add(
@@ -554,7 +554,7 @@ function CourseWithdrawPage() {
           "!justify-between",
         );
 
-        // Remove inline styles
+        
         if (modalHeader.hasAttribute("style")) {
           modalHeader.removeAttribute("style");
         }
@@ -565,7 +565,7 @@ function CourseWithdrawPage() {
           modalTitle.textContent = "Course Withdraw Details";
         }
 
-        // Style close button
+        
         const closeBtn = modalHeader.querySelector(".close");
         if (closeBtn) {
           closeBtn.innerHTML = `
@@ -575,7 +575,7 @@ function CourseWithdrawPage() {
                         </svg>
                     `;
 
-          // Remove inline styles
+          
           if (closeBtn.hasAttribute("style")) {
             closeBtn.removeAttribute("style");
           }
@@ -584,7 +584,7 @@ function CourseWithdrawPage() {
         }
       }
 
-      // Style modal body
+      
       const modalBody = modal.querySelector(".modal-body");
       if (modalBody) {
         modalBody.classList.add(
@@ -596,14 +596,14 @@ function CourseWithdrawPage() {
           "custom-scrollbar",
         );
 
-        // Enhance file upload fields
+        
         const fileInputContainers = modalBody.querySelectorAll(".form-group");
         fileInputContainers.forEach((container) => {
           const label = container.querySelector("label");
           const fileInput = container.querySelector('input[type="file"]');
 
           if (label && fileInput) {
-            // Style label
+            
             label.classList.add(
               "!text-white",
               "!font-medium",
@@ -612,10 +612,10 @@ function CourseWithdrawPage() {
             );
             label.style.fontWeight = "normal";
 
-            // Get the label text (without the colon and parentheses part)
+            
             const labelText = label.textContent.split(":")[0];
 
-            // Create a modern file upload component
+            
             const uploadContainer = document.createElement("div");
             uploadContainer.className = "file-upload-container relative";
 
@@ -634,23 +634,23 @@ function CourseWithdrawPage() {
                             <p class="text-xs text-white/40">Image must be less than 650 KB</p>
                         `;
 
-            // Clone the file input and remove any inline styles
+            
             const newFileInput = fileInput.cloneNode(true);
             newFileInput.className = "file-upload-input";
             if (newFileInput.hasAttribute("style")) {
               newFileInput.removeAttribute("style");
             }
 
-            // Add the new elements to the container
+            
             uploadContainer.appendChild(uploadBox);
             uploadContainer.appendChild(newFileInput);
 
-            // Replace the old file input with our new container
+            
             fileInput.parentNode.replaceChild(uploadContainer, fileInput);
           }
         });
 
-        // Style textarea
+        
         const textareaGroup = modalBody.querySelector(".form-group:last-child");
         if (textareaGroup) {
           const textarea = textareaGroup.querySelector("textarea");
@@ -684,12 +684,12 @@ function CourseWithdrawPage() {
           }
         }
 
-        // Remove unnecessary <br> tags
+        
         const brTags = modalBody.querySelectorAll("br");
         brTags.forEach((br) => br.remove());
       }
 
-      // Style modal footer
+      
       const modalFooter = modal.querySelector(".modal-footer");
       if (modalFooter) {
         modalFooter.classList.add(
@@ -702,7 +702,7 @@ function CourseWithdrawPage() {
           "!gap-3",
         );
 
-        // Style primary action button (submit button)
+        
         const submitBtn = modalFooter.querySelector('input[type="button"]');
         if (submitBtn) {
           submitBtn.classList.add(
@@ -719,13 +719,13 @@ function CourseWithdrawPage() {
             "!cursor-pointer",
           );
 
-          // Remove inline styles
+          
           if (submitBtn.hasAttribute("style")) {
             submitBtn.removeAttribute("style");
           }
         }
 
-        // Style close/cancel button
+        
         const closeBtn = modalFooter.querySelector(".btn-default");
         if (closeBtn) {
           closeBtn.classList.add(
@@ -741,7 +741,7 @@ function CourseWithdrawPage() {
             "!border-0",
           );
 
-          // Remove inline styles
+          
           if (closeBtn.hasAttribute("style")) {
             closeBtn.removeAttribute("style");
           }

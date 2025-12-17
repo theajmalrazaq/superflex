@@ -10,7 +10,7 @@ function FeeChallanPage() {
     );
 
     if (targetElement) {
-      // Apply styling and DOM modifications before removing the element
+      
       applyCustomStyling(targetElement);
 
       setElemContent(targetElement.innerHTML);
@@ -19,7 +19,7 @@ function FeeChallanPage() {
   }, []);
 
   const applyCustomStyling = (element) => {
-    // Style the portlet container
+    
     const portlet = element.querySelector(".m-portlet");
     if (portlet) {
       portlet.classList.add(
@@ -31,7 +31,7 @@ function FeeChallanPage() {
       );
     }
 
-    // Style the portlet head
+    
     const portletHead = element.querySelector(".m-portlet__head");
     if (portletHead) {
       portletHead.classList.add(
@@ -47,7 +47,7 @@ function FeeChallanPage() {
         "!mb-4",
       );
 
-      // Find and style the heading
+      
       const headingText = portletHead.querySelector(".m-portlet__head-text");
       if (headingText) {
         headingText.classList.add("!text-white", "!text-xl", "!font-bold");
@@ -55,13 +55,13 @@ function FeeChallanPage() {
       }
     }
 
-    // Style the table container
+    
     const tableContainer = element.querySelector(".m-section__content");
     if (tableContainer) {
       tableContainer.classList.add("!p-0");
     }
 
-    // Style the tables and make them responsive
+    
     const tables = element.querySelectorAll("table");
     tables.forEach((table) => {
       table.classList.add(
@@ -72,10 +72,10 @@ function FeeChallanPage() {
       );
     });
 
-    // Style the main challan table
+    
     const challanTable = element.querySelector("table table");
     if (challanTable) {
-      // Create a style element for custom scrolling
+      
       const tableStyle = document.createElement("style");
       tableStyle.innerHTML = `
                 .challan-table {
@@ -116,7 +116,7 @@ function FeeChallanPage() {
         el.style.cssText = "padding: inherit !important";
       });
 
-      // Style table headers
+      
       const headers = challanTable.querySelectorAll("th");
       headers.forEach((header) => {
         header.classList.add(
@@ -128,7 +128,7 @@ function FeeChallanPage() {
         );
       });
 
-      // Remove the last th element from each tr in thead (only action column)
+      
       const headerRows = challanTable.querySelectorAll("thead tr");
       headerRows.forEach((row) => {
         const headerCells = row.querySelectorAll("th");
@@ -138,7 +138,7 @@ function FeeChallanPage() {
         }
       });
 
-      // Style the print button
+      
       const printButtons = challanTable.querySelectorAll(".btn-primary");
       printButtons.forEach((button) => {
         button.classList.remove("btn-primary");
@@ -154,15 +154,15 @@ function FeeChallanPage() {
         );
       });
 
-      // Remove border-top from all table cells and headers
+      
       challanTable.querySelectorAll("td", "th").forEach((element) => {
         element.classList.add("!border-none");
       });
 
       const rows = challanTable.querySelectorAll("tbody tr");
       rows.forEach((row) => {
-        // DO NOT remove the second cell as it might contain amount information
-        // Instead, identify which cell contains the amount and style it appropriately
+        
+        
 
         row.classList.add(
           "!bg-black",
@@ -180,7 +180,7 @@ function FeeChallanPage() {
             "!border-white/0",
           );
 
-          // Check if cell contains amount information (typically contains currency symbol or numbers)
+          
           if (
             cell.textContent.trim().match(/^\$|PKR|Rs\.|\d+\.\d{2}|\d+,\d+/)
           ) {
@@ -188,7 +188,7 @@ function FeeChallanPage() {
           }
         });
 
-        // Status is typically in the 5th column
+        
         const statusCell = row.querySelector("td:nth-child(5)");
         if (statusCell && statusCell.textContent.trim() === "Paid") {
           statusCell.innerHTML = `
@@ -204,7 +204,7 @@ function FeeChallanPage() {
                     `;
         }
 
-        // Style date cells - these are typically the 3rd and 4th columns
+        
         const dateCells = [
           row.querySelector("td:nth-child(3)"),
           row.querySelector("td:nth-child(4)"),
@@ -216,7 +216,7 @@ function FeeChallanPage() {
         });
       });
 
-      // Style the payment instructions panel
+      
       const infoPanel = element.querySelector(
         "td[style*='border-right:solid 1px']",
       );
@@ -230,13 +230,13 @@ function FeeChallanPage() {
         );
         infoPanel.removeAttribute("style");
 
-        // Style the headings in info panel
+        
         const infoHeadings = infoPanel.querySelectorAll("strong");
         infoHeadings.forEach((heading) => {
           heading.classList.add("!text-x", "!font-medium");
         });
 
-        // Style the links in info panel
+        
         const links = infoPanel.querySelectorAll("a");
         links.forEach((link) => {
           link.classList.add(
@@ -246,24 +246,24 @@ function FeeChallanPage() {
           );
         });
 
-        // Style paragraphs in info panel
+        
         const paragraphs = infoPanel.querySelectorAll("p");
         paragraphs.forEach((p) => {
           p.classList.add("!text-white/70");
         });
       }
 
-      // Insert the summary card at the top of the portlet body
+      
       const portletBody = element.querySelector(".m-portlet__body");
       if (portletBody) {
-        // Target the payment instructions cell using its specific attributes
+        
         const paymentInstructionsCell = element.querySelector(
           "td[style*='border-right:solid 1px']",
         );
         if (paymentInstructionsCell) {
           paymentInstructionsCell.remove();
         } else {
-          // Fallback approach - find by content
+          
           const allTds = element.querySelectorAll("td");
           for (const td of allTds) {
             if (
@@ -277,7 +277,7 @@ function FeeChallanPage() {
           }
         }
 
-        // Add additional styling to portlet body
+        
         portletBody.classList.add(
           "!bg-black",
           "!rounded-b-3xl",

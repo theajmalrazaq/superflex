@@ -10,7 +10,7 @@ function RetakeExamPage() {
     );
 
     if (targetElement) {
-      // Apply styling and DOM modifications before removing the element
+      
       applyCustomStyling(targetElement);
 
       setElemContent(targetElement.innerHTML);
@@ -19,16 +19,16 @@ function RetakeExamPage() {
   }, []);
 
   const applyCustomStyling = (element) => {
-    // Keep track of style elements we add
+    
     const addedStyles = [];
 
-    // Remove DataErrormsgdiv element if it exists
+    
     const errorDiv = element.querySelector("#DataErrormsgdiv");
     if (errorDiv) {
       errorDiv.remove();
     }
 
-    // Add custom scrollbar styling
+    
     const styleElement = document.createElement("style");
     styleElement.textContent = `
             .custom-scrollbar::-webkit-scrollbar {
@@ -59,12 +59,12 @@ function RetakeExamPage() {
                 backdrop-filter: blur(20px);
             }            
         `;
-    // Mark as our custom style
+    
     styleElement.setAttribute("data-custom-style", "true");
     document.head.appendChild(styleElement);
     addedStyles.push(styleElement);
 
-    // Style alert messages
+    
     const alertElements = element.querySelectorAll(".m-alert");
     alertElements.forEach((alertElement) => {
       alertElement.classList.add(
@@ -80,7 +80,7 @@ function RetakeExamPage() {
         "!mb-6",
       );
 
-      // Style alert icon
+      
       const iconElement = alertElement.querySelector(".m-alert__icon");
       if (iconElement) {
         iconElement.classList.add(
@@ -96,7 +96,7 @@ function RetakeExamPage() {
           "!justify-center",
         );
 
-        // Replace icon with SVG
+        
         const createSvgIcon = (path) => {
           const svg = document.createElementNS(
             "http://www.w3.org/2000/svg",
@@ -122,7 +122,7 @@ function RetakeExamPage() {
           return svg;
         };
 
-        // Different icon paths based on alert type
+        
         let iconPath = "";
         if (alertElement.classList.contains("alert-danger")) {
           iconPath =
@@ -135,28 +135,28 @@ function RetakeExamPage() {
         iconElement.appendChild(createSvgIcon(iconPath));
       }
 
-      // Style close button
+      
       const closeButton = alertElement.querySelector("button.close");
       if (closeButton) {
-        // Hide the ::before pseudo-element
+        
         closeButton.style.cssText = "content: none !important;";
 
         const style = document.createElement("style");
         style.textContent =
           'button.close[data-dismiss="alert"]::before, button.close[data-dismiss="modal"]::before { display: none !important; content: none !important; }';
-        // Mark as our custom style
+        
         style.setAttribute("data-custom-style", "true");
         document.head.appendChild(style);
         addedStyles.push(style);
 
-        // Add style rule for list items with large font size
+        
         const listItemStyle = document.createElement("style");
         listItemStyle.textContent = `
           li[style*="font-size: large"] {
             font-size: medium !important;
           }
         `;
-        // Mark as our custom style
+        
         listItemStyle.setAttribute("data-custom-style", "true");
         document.head.appendChild(listItemStyle);
         addedStyles.push(listItemStyle);
@@ -171,7 +171,7 @@ function RetakeExamPage() {
       }
     });
 
-    // Style the portlet container
+    
     const portlet = element.querySelector(".m-portlet");
     if (portlet) {
       portlet.classList.add(
@@ -183,7 +183,7 @@ function RetakeExamPage() {
       );
     }
 
-    // Style the portlet head
+    
     const portletHead = element.querySelector(".m-portlet__head");
     if (portletHead) {
       portletHead.classList.add(
@@ -199,23 +199,23 @@ function RetakeExamPage() {
         "!mb-4",
       );
 
-      // Find and style the heading
+      
       const headingText = portletHead.querySelector(".m-portlet__head-text");
       if (headingText) {
         headingText.classList.add("!text-white", "!text-xl", "!font-bold");
         headingText.innerHTML = "Retake Exam Requests";
       }
 
-      // Move the semester selection form to portlet head
+      
       const semesterForm = element.querySelector(
         'form[action="/Student/RetakeRequest"]',
       );
       if (semesterForm) {
-        // Clone the form before removing it from its original location
+        
         const formClone = semesterForm.cloneNode(true);
-        // Remove the original form
+        
         semesterForm.remove();
-        // Add the form to the portlet head
+        
         portletHead.appendChild(formClone);
         formClone.classList.add(
           "!flex",
@@ -225,7 +225,7 @@ function RetakeExamPage() {
           "flex-1",
         );
 
-        // Style the form content
+        
         const formSelects = formClone.querySelectorAll("select");
         formSelects.forEach((select) => {
           select.classList.add(
@@ -242,7 +242,7 @@ function RetakeExamPage() {
             "!focus:outline-none",
           );
 
-          // Remove bootstrap classes
+          
           select.classList.remove(
             "m-dropdown__toggle",
             "btn",
@@ -251,23 +251,23 @@ function RetakeExamPage() {
           );
         });
 
-        // Remove the row and col divs that are no longer needed
+        
         const rowDiv = formClone.querySelector(".row");
         if (rowDiv) {
           const colDiv = rowDiv.querySelector(".col-md-12");
           if (colDiv) {
-            // Get all children of colDiv
+            
             const children = [...colDiv.childNodes];
-            // Append children directly to form
+            
             children.forEach((child) => formClone.appendChild(child));
-            // Remove the row and col divs
+            
             rowDiv.remove();
           }
         }
       }
     }
 
-    // Style the portlet body
+    
     const portletBody = element.querySelector(".m-portlet__body");
     if (portletBody) {
       portletBody.classList.add(
@@ -284,7 +284,7 @@ function RetakeExamPage() {
       );
     }
 
-    // Style the section containing the retake reason dropdown
+    
     const retakeReasonSection = element.querySelector(".m-section");
     if (retakeReasonSection) {
       retakeReasonSection.classList.add(
@@ -325,7 +325,7 @@ function RetakeExamPage() {
           "!max-w-md",
         );
 
-        // Remove bootstrap classes
+        
         retakeReasonSelect.classList.remove(
           "m-dropdown__toggle",
           "btn",
@@ -335,27 +335,27 @@ function RetakeExamPage() {
         retakeReasonSelect.style.textAlign = "left";
       }
 
-      // Find the buttons to move
+      
       const retakeRequestBtn = element.querySelector(
         "#btnModalExamRetakRequest",
       );
       const downloadBtn = element.querySelector("#btnDownloadExamRetakForm");
 
-      // Create a flex container for the select and buttons
+      
       const selectWithButtonsContainer = document.createElement("div");
       selectWithButtonsContainer.className = "flex items-center gap-3";
 
-      // Find the parent of the select to replace it with our container
+      
       const selectParent = retakeReasonSelect?.parentElement;
 
       if (selectParent && retakeRequestBtn && downloadBtn) {
-        // Clone the select to avoid removing it from DOM before we're ready
+        
         const selectClone = retakeReasonSelect.cloneNode(true);
 
-        // Add the select to our container
+        
         selectWithButtonsContainer.appendChild(selectClone);
 
-        // Style buttons as icon-only
+        
         retakeRequestBtn.innerHTML = `
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -392,11 +392,11 @@ function RetakeExamPage() {
         );
         downloadBtn.title = "Download Exam Retake Form";
 
-        // Add buttons to the container
+        
         selectWithButtonsContainer.appendChild(retakeRequestBtn);
         selectWithButtonsContainer.appendChild(downloadBtn);
 
-        // Replace the select element with our container
+        
         selectParent.replaceChild(
           selectWithButtonsContainer,
           retakeReasonSelect,
@@ -404,23 +404,23 @@ function RetakeExamPage() {
       }
     }
 
-    // Style the table
+    
     const table = element.querySelector(".table");
     if (table) {
       table.querySelectorAll(".table td, .table th").forEach((el) => {
         el.classList.add("!border-none");
       });
-      // Create a container for the table with modern styling
+      
       const tableContainer = document.createElement("div");
       tableContainer.className = "overflow-hidden mb-6";
       table.parentNode.insertBefore(tableContainer, table);
       tableContainer.appendChild(table);
 
-      // Style the table
+      
       table.classList.add("!w-full", "!border-collapse", "!border-0");
       table.classList.remove("table-bordered", "table-responsive");
 
-      // Style the table headers
+      
       const thead = table.querySelector("thead");
       if (thead) {
         thead.classList.add("!bg-zinc-900", "!sticky", "!top-0", "!z-10");
@@ -439,7 +439,7 @@ function RetakeExamPage() {
         });
       }
 
-      // Style the table body
+      
       const tbody = table.querySelector("tbody");
       if (tbody) {
         tbody.classList.add("!divide-y", "!divide-white/10");
@@ -461,10 +461,10 @@ function RetakeExamPage() {
               "!border-white/10",
             );
 
-            // Style checkboxes
+            
             const checkbox = cell.querySelector('input[type="checkbox"]');
             if (checkbox) {
-              // Leave the original checkbox as is, without any custom styling or event handlers
+              
               checkbox.classList.add("cursor-pointer");
             }
           });
@@ -485,7 +485,7 @@ function RetakeExamPage() {
     });
     document.querySelector("#DataErrormsgdiv_RetakeModalReason").remove();
 
-    // Style the buttons
+    
     const buttons = element.querySelectorAll(".btn");
     buttons.forEach((button) => {
       if (
@@ -510,12 +510,12 @@ function RetakeExamPage() {
           "!mt-0",
         );
 
-        // Remove default styling
+        
         button.classList.remove("btn-primary", "btn-sm", "glow-button");
       }
     });
 
-    // Style the modals
+    
     const modals = element.querySelectorAll(".modal-content");
     modals.forEach((modal) => {
       modal.classList.add(
@@ -527,7 +527,7 @@ function RetakeExamPage() {
         "!shadow-none",
       );
 
-      // Style modal header
+      
       const modalHeader = modal.querySelector(".modal-header");
       if (modalHeader) {
         modalHeader.classList.add(
@@ -541,7 +541,7 @@ function RetakeExamPage() {
           "!gap-4",
         );
 
-        // Remove inline styles
+        
         if (modalHeader.hasAttribute("style")) {
           modalHeader.removeAttribute("style");
         }
@@ -551,10 +551,10 @@ function RetakeExamPage() {
           modalTitle.classList.add("!text-white", "!font-bold", "!text-xl");
         }
 
-        // Remove the existing close button and create a new one
+        
         const existingCloseBtn = modalHeader.querySelector(".close");
         if (existingCloseBtn) {
-          // Create new close button with better styling
+          
           const newCloseBtn = document.createElement("button");
           newCloseBtn.type = "button";
           newCloseBtn.className =
@@ -562,7 +562,7 @@ function RetakeExamPage() {
           newCloseBtn.setAttribute("data-dismiss", "modal");
           newCloseBtn.setAttribute("aria-label", "Close");
 
-          // Add 'X' icon SVG
+          
           newCloseBtn.innerHTML = `
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
@@ -572,26 +572,26 @@ function RetakeExamPage() {
             </svg>
           `;
 
-          // Copy event listeners from the original button
+          
           if (existingCloseBtn.onclick) {
             newCloseBtn.onclick = existingCloseBtn.onclick;
           }
 
-          // Replace the old button with the new one
+          
           existingCloseBtn.parentNode.replaceChild(
             newCloseBtn,
             existingCloseBtn,
           );
 
-          // Adjust modal header to accommodate absolute positioned button
+          
           modalHeader.style.position = "relative";
           modalHeader.style.paddingRight = "48px";
         }
 
-        // Remove the alert from the modal header (note about fee)
+        
         const headerAlert = modalHeader.querySelector(".m-alert");
         if (headerAlert) {
-          // Create a cleaner fee notice instead of the alert
+          
           const feeNotice = document.createElement("div");
           feeNotice.className = "text-amber-400 text-sm mt-2 flex items-center";
           feeNotice.innerHTML = `
@@ -603,7 +603,7 @@ function RetakeExamPage() {
                         Fee will be charged upon submit request: Rs. 2000 per paper
                     `;
 
-          // Replace the alert with the fee notice
+          
           headerAlert.parentNode.replaceChild(feeNotice, headerAlert);
         }
 
@@ -618,7 +618,7 @@ function RetakeExamPage() {
         }
       }
 
-      // Style modal body
+      
       const modalBody = modal.querySelector(".modal-body");
       if (modalBody) {
         modalBody.classList.add(
@@ -630,7 +630,7 @@ function RetakeExamPage() {
           "custom-scrollbar",
         );
 
-        // Remove all checkboxes from the modal
+        
         const modalCheckboxes = modalBody.querySelectorAll(
           'input[type="checkbox"]',
         );
@@ -638,7 +638,7 @@ function RetakeExamPage() {
           checkbox.remove();
         });
 
-        // Hide or remove the error alert div in the modal
+        
         const errorDiv = modalBody.querySelector(
           "#DataErrormsgdiv_RetakeModalReason",
         );
@@ -646,19 +646,19 @@ function RetakeExamPage() {
           errorDiv.style.display = "none";
         }
 
-        // Improve form layout with better spacing
+        
         const formRows = modalBody.querySelectorAll(".row");
         formRows.forEach((row) => {
           row.classList.add("mb-4");
 
-          // Remove the column classes and replace with better styling
+          
           const formColumns = row.querySelectorAll(".col-md-11, .col-sm-11");
           formColumns.forEach((col) => {
             col.className = "w-full";
           });
         });
 
-        // Style form elements inside modal
+        
         const fileInputs = modalBody.querySelectorAll('input[type="file"]');
         fileInputs.forEach((input) => {
           const label = input.previousElementSibling;
@@ -669,13 +669,13 @@ function RetakeExamPage() {
               "!mb-2",
               "!block",
             );
-            // Remove inline styles if present
+            
             if (label.hasAttribute("style")) {
               label.removeAttribute("style");
             }
           }
 
-          // Enhance file uploader appearance
+          
           const container = document.createElement("div");
           container.className =
             "mt-1 flex justify-center px-6 pt-5 pb-6 !border !border-white/10 !rounded-xl bg-black/50 hover:bg-black/70 transition-colors cursor-pointer";
@@ -697,27 +697,27 @@ function RetakeExamPage() {
           wrapper.appendChild(uploadIcon);
           wrapper.appendChild(text);
 
-          // Clone the original input and give it a new styling
+          
           const newInput = input.cloneNode(true);
           newInput.className =
             "absolute inset-0 w-full h-full opacity-0 cursor-pointer";
 
-          // Remove any inline styles
+          
           if (newInput.hasAttribute("style")) {
             newInput.removeAttribute("style");
           }
 
-          // Create a container with relative positioning for the input
+          
           const inputContainer = document.createElement("div");
           inputContainer.className = "relative";
 
-          // Add wrapper and input to container
+          
           wrapper.appendChild(inputContainer);
           inputContainer.appendChild(newInput);
 
           container.appendChild(wrapper);
 
-          // Replace original input's parent with our new container
+          
           const parentContainer = input.closest(".mt-1") || input.parentNode;
           if (parentContainer) {
             parentContainer.parentNode.replaceChild(container, parentContainer);
@@ -727,7 +727,7 @@ function RetakeExamPage() {
           }
         });
 
-        // Style textareas
+        
         const textareas = modalBody.querySelectorAll("textarea");
         textareas.forEach((textarea) => {
           textarea.classList.add(
@@ -754,19 +754,19 @@ function RetakeExamPage() {
               "!mb-2",
               "!block",
             );
-            // Remove inline styles if present
+            
             if (label.hasAttribute("style")) {
               label.removeAttribute("style");
             }
           }
         });
 
-        // Remove unnecessary <br> tags
+        
         const brTags = modalBody.querySelectorAll("br");
         brTags.forEach((br) => br.remove());
       }
 
-      // Style modal footer
+      
       const modalFooter = modal.querySelector(".modal-footer");
       if (modalFooter) {
         modalFooter.classList.add(
@@ -779,7 +779,7 @@ function RetakeExamPage() {
           "!gap-3",
         );
 
-        // Style primary action button
+        
         const primaryBtn = modalFooter.querySelector(
           'input[type="button"], .btn-primary',
         );
@@ -798,17 +798,17 @@ function RetakeExamPage() {
             "!cursor-pointer",
           );
 
-          // Remove inline styles if present
+          
           if (primaryBtn.hasAttribute("style")) {
             primaryBtn.removeAttribute("style");
           }
         }
 
-        // Replace the footer close/cancel button
+        
         const existingFooterCloseBtn =
           modalFooter.querySelector(".btn-default");
         if (existingFooterCloseBtn) {
-          // Create a new button that looks better
+          
           const newFooterCloseBtn = document.createElement("button");
           newFooterCloseBtn.type = "button";
           newFooterCloseBtn.className =
@@ -817,12 +817,12 @@ function RetakeExamPage() {
           newFooterCloseBtn.textContent =
             existingFooterCloseBtn.textContent || "Cancel";
 
-          // Copy event listeners if any
+          
           if (existingFooterCloseBtn.onclick) {
             newFooterCloseBtn.onclick = existingFooterCloseBtn.onclick;
           }
 
-          // Replace the old button with the new one
+          
           existingFooterCloseBtn.parentNode.replaceChild(
             newFooterCloseBtn,
             existingFooterCloseBtn,
@@ -831,29 +831,29 @@ function RetakeExamPage() {
       }
     });
 
-    // Add event listeners for modal events
+    
     const setupModalListeners = () => {
-      // Get all modal elements
+      
       const modalElements = document.querySelectorAll(".modal");
 
       modalElements.forEach((modal) => {
-        // Check for the ExamRetakeRemarksDetail element inside this modal
+        
         const remarksDetailElement = modal.querySelector(
           "#ExamRetakeRemarksDetail",
         );
         if (remarksDetailElement) {
-          // Add styles directly to the element for positioning
+          
           remarksDetailElement.style.height = "100%";
           remarksDetailElement.style.backdropFilter = "blur(10px)";
 
-          // Listen for modal shown event
+          
           modal.addEventListener("shown.bs.modal", () => {
             remarksDetailElement.style.display = "flex";
             remarksDetailElement.style.justifyContent = "center";
             remarksDetailElement.style.alignItems = "center";
           });
 
-          // Listen for modal hidden event
+          
           modal.addEventListener("hidden.bs.modal", () => {
             remarksDetailElement.style.display = "none";
           });
@@ -861,7 +861,7 @@ function RetakeExamPage() {
       });
     };
 
-    // Call the setup function after a short delay to ensure the DOM is ready
+    
     setTimeout(setupModalListeners, 500);
   };
 

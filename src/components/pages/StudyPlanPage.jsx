@@ -11,7 +11,7 @@ function StudyPlanPage() {
     );
 
     if (targetElement) {
-      // Apply styling and DOM modifications before removing the element
+      
       applyCustomStyling(targetElement);
 
       setElemContent(targetElement.innerHTML);
@@ -20,7 +20,7 @@ function StudyPlanPage() {
   }, []);
 
   useEffect(() => {
-    // After content is rendered, apply accordion functionality
+    
     if (elemContent && contentRef.current) {
       setupAccordions();
     }
@@ -33,7 +33,7 @@ function StudyPlanPage() {
       contentRef.current.querySelectorAll(".semester-header");
 
     accordionHeaders.forEach((header) => {
-      // Add the new styling classes to each header
+      
       header.classList.add(
         "cursor-pointer",
         "bg-black/50",
@@ -52,7 +52,7 @@ function StudyPlanPage() {
       );
 
       header.addEventListener("click", function () {
-        // Find the closest parent col and then find the accordion content within it
+        
         const parentCol = this.closest(".semester-container")?.querySelector(
           ".accordion-content",
         );
@@ -60,7 +60,7 @@ function StudyPlanPage() {
 
         const isExpanded = parentCol.classList.contains("expanded");
 
-        // Close all accordions first
+        
         const allAccordions =
           contentRef.current.querySelectorAll(".accordion-content");
         allAccordions.forEach((acc) => {
@@ -68,7 +68,7 @@ function StudyPlanPage() {
           acc.style.opacity = "0";
           acc.classList.remove("expanded");
 
-          // Update chevron icons
+          
           const accHeader = acc
             .closest(".semester-container")
             ?.querySelector(".semester-header");
@@ -81,13 +81,13 @@ function StudyPlanPage() {
           }
         });
 
-        // Toggle current accordion
+        
         if (!isExpanded) {
           parentCol.style.maxHeight = "2000px";
           parentCol.style.opacity = "1";
           parentCol.classList.add("expanded");
 
-          // Update chevron icons for this header
+          
           const chevronDown = this.querySelector(".chevron-down");
           const chevronUp = this.querySelector(".chevron-up");
 
@@ -99,7 +99,7 @@ function StudyPlanPage() {
   };
 
   const applyCustomStyling = (element) => {
-    // Add custom scrollbar styling
+    
     const styleElement = document.createElement("style");
     styleElement.textContent = `
       .custom-scrollbar::-webkit-scrollbar {
@@ -183,7 +183,7 @@ function StudyPlanPage() {
     `;
     document.head.appendChild(styleElement);
 
-    // Style the portlet container
+    
     const portlet = element.querySelector(".m-portlet");
     if (portlet) {
       portlet.classList.add(
@@ -194,7 +194,7 @@ function StudyPlanPage() {
         "!shadow-lg",
       );
 
-      // Remove unnecessary classes
+      
       portlet.classList.remove(
         "m-portlet--brand",
         "m-portlet--head-solid-bg",
@@ -203,7 +203,7 @@ function StudyPlanPage() {
       );
     }
 
-    // Style the portlet head
+    
     const portletHead = element.querySelector(".m-portlet__head");
     if (portletHead) {
       portletHead.classList.add(
@@ -219,14 +219,14 @@ function StudyPlanPage() {
         "!mb-4",
       );
 
-      // Style the heading
+      
       const headingText = portletHead.querySelector(".m-portlet__head-text");
       if (headingText) {
         headingText.classList.add("!text-white", "!text-xl", "!font-bold");
       }
     }
 
-    // Style the portlet body
+    
     const portletBody = element.querySelector(".m-portlet__body");
     if (portletBody) {
       portletBody.classList.add(
@@ -244,14 +244,14 @@ function StudyPlanPage() {
       );
     }
 
-    // Restructure and style the semester sections
+    
     const sectionContent = element.querySelector(".m-section__content");
     if (sectionContent) {
-      // Get all semester columns
+      
       const semesterCols = sectionContent.querySelectorAll(".col-md-6");
 
       semesterCols.forEach((semesterCol) => {
-        // Create a container for each semester
+        
         const semesterContainer = document.createElement("div");
         semesterContainer.className = "semester-container";
         semesterContainer.classList.add(
@@ -262,27 +262,27 @@ function StudyPlanPage() {
           "!border-none",
         );
 
-        // Move the semester content into the container
+        
         semesterCol.parentNode.insertBefore(semesterContainer, semesterCol);
         semesterContainer.appendChild(semesterCol);
 
-        // Remove the column class and set full width
+        
         semesterCol.classList.remove("col-md-6");
         semesterCol.style.width = "100%";
 
-        // Style the semester header
+        
         const semesterHeader = semesterCol.querySelector("h4");
         if (semesterHeader) {
-          // Create a header row for accordion functionality
+          
           const headerRow = document.createElement("div");
           headerRow.className = "semester-header cursor-pointer";
           headerRow.innerHTML = semesterHeader.outerHTML;
 
-          // Replace the original h4 with our new header row
+          
           semesterHeader.parentNode.insertBefore(headerRow, semesterHeader);
           semesterHeader.remove();
 
-          // Add collapse/expand icon
+          
           const collapseIcon = document.createElement("div");
           collapseIcon.className =
             "h-8 w-8 rounded-lg !bg-x !flex !items-center !justify-center mr-2 shadow-inner";
@@ -296,18 +296,18 @@ function StudyPlanPage() {
             </svg>
           `;
 
-          // Style the semester title with flex container
+          
           const h4Element = headerRow.querySelector("h4");
           if (h4Element) {
             const titleWrapper = document.createElement("div");
             titleWrapper.className = "!flex !items-center";
 
-            // Wrap the title in the container with the icon
+            
             h4Element.parentNode.insertBefore(titleWrapper, h4Element);
             titleWrapper.appendChild(collapseIcon);
             titleWrapper.appendChild(h4Element);
 
-            // Style the header text
+            
             h4Element.classList.add(
               "!text-white",
               "!font-bold",
@@ -315,7 +315,7 @@ function StudyPlanPage() {
               "!mb-0",
             );
 
-            // Style the small text
+            
             const smallText = h4Element.querySelector("small");
             if (smallText) {
               smallText.classList.add("!text-white/60", "!ml-2");
@@ -323,20 +323,20 @@ function StudyPlanPage() {
           }
         }
 
-        // Style the table
+        
         const table = semesterCol.querySelector("table");
         if (table) {
-          // Create a container with modern styling
+          
           const tableContainer = document.createElement("div");
           tableContainer.className =
             "rounded-xl overflow-hidden !border !border-white/10 accordion-content";
           tableContainer.dataset.expanded = "false";
 
-          // Insert container before table
+          
           table.parentNode.insertBefore(tableContainer, table);
           tableContainer.appendChild(table);
 
-          // Style the table
+          
           table.classList.add("studyplan-table");
           table.classList.remove(
             "table",
@@ -348,7 +348,7 @@ function StudyPlanPage() {
             "span12",
           );
 
-          // Style the table head
+          
           const thead = table.querySelector("thead");
           if (thead) {
             thead.classList.add(
@@ -372,7 +372,7 @@ function StudyPlanPage() {
             });
           }
 
-          // Style the table body
+          
           const tbody = table.querySelector("tbody");
           if (tbody) {
             tbody.classList.add("!divide-y", "!divide-white/10");
@@ -385,7 +385,7 @@ function StudyPlanPage() {
                 "!transition-colors",
               );
 
-              // Style cells
+              
               const cells = row.querySelectorAll("td");
               cells.forEach((cell, index) => {
                 cell.classList.add(
@@ -395,17 +395,17 @@ function StudyPlanPage() {
                   "!border-white/10",
                 );
 
-                // Apply special styling to credit hours (centered column)
+                
                 if (cell.classList.contains("text-center")) {
                   cell.classList.add("!font-semibold", "!text-white");
                 }
 
-                // Style course type with badges
+                
                 if (index === 3) {
-                  // Type column
+                  
                   const courseType = cell.textContent.trim();
 
-                  // Create badge element
+                  
                   const badgeElement = document.createElement("span");
 
                   if (courseType === "Core") {
@@ -416,7 +416,7 @@ function StudyPlanPage() {
 
                   badgeElement.textContent = courseType;
 
-                  // Replace text with badge
+                  
                   cell.textContent = "";
                   cell.appendChild(badgeElement);
                 }
@@ -426,13 +426,13 @@ function StudyPlanPage() {
         }
       });
 
-      // Fix accordion functionality after all elements have been created
+      
       semesterCols.forEach((semesterCol) => {
         const headerRow = semesterCol.querySelector(".semester-header");
         const tableContainer = semesterCol.querySelector(".accordion-content");
 
         if (headerRow && tableContainer) {
-          // Set initial collapsed state
+          
           tableContainer.style.maxHeight = "0";
           tableContainer.style.opacity = "0";
           tableContainer.style.overflow = "hidden";
@@ -445,12 +445,12 @@ function StudyPlanPage() {
             chevronUp.classList.remove("hidden");
           }
 
-          // Add click event listener to toggle visibility
+          
           headerRow.addEventListener("click", function () {
-            console.log("Header clicked");
+            
             const isExpanded = tableContainer.classList.contains("expanded");
 
-            // Toggle all other accordions closed
+            
             const allAccordions =
               element.querySelectorAll(".accordion-content");
             allAccordions.forEach((acc) => {
@@ -459,7 +459,7 @@ function StudyPlanPage() {
                 acc.style.opacity = "0";
                 acc.classList.remove("expanded");
 
-                // Update chevrons for other accordions
+                
                 const otherHeader = acc
                   .closest(".col-md-6")
                   .querySelector(".semester-header");
@@ -476,8 +476,8 @@ function StudyPlanPage() {
             });
 
             if (isExpanded) {
-              // Collapse
-              console.log("Collapsing accordion");
+              
+              
               tableContainer.style.maxHeight = "0";
               tableContainer.style.opacity = "0";
               tableContainer.classList.remove("expanded");
@@ -487,19 +487,19 @@ function StudyPlanPage() {
                 chevronUp.classList.remove("hidden");
               }
             } else {
-              // Expand
-              console.log("Expanding accordion");
+              
+              
               const scrollHeight = tableContainer.scrollHeight;
-              console.log("Scroll height:", scrollHeight);
+              
 
-              // First set a large value to ensure it expands
+              
               tableContainer.style.maxHeight = "2000px";
               tableContainer.style.opacity = "1";
               tableContainer.classList.add("expanded");
 
-              // Then after a short delay, set the actual height
+              
               setTimeout(() => {
-                // Only adjust if still expanded to avoid race conditions
+                
                 if (tableContainer.classList.contains("expanded")) {
                   tableContainer.style.maxHeight = `${scrollHeight + 50}px`;
                 }
@@ -514,8 +514,8 @@ function StudyPlanPage() {
         }
       });
 
-      // Remove auto-clicking of first semester
-      // We're leaving this comment to show the removal of the auto-click code
+      
+      
     }
   };
 

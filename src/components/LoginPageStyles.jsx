@@ -68,7 +68,7 @@ function LoginPageStyles() {
       element.remove();
     });
 
-    // Inputs Styling
+    
     document.querySelectorAll(".form-control.m-input").forEach((element) => {
       element.classList.add(
         "!rounded-lg",
@@ -92,7 +92,7 @@ function LoginPageStyles() {
     const oldLogo = document.querySelector(".m-login__logo");
     if(oldLogo) oldLogo.remove();
 
-    // Button Styling
+    
     document.querySelectorAll(".btn-primary").forEach((button) => {
       button.classList.add(
         "!bg-[#a098ff]",
@@ -101,7 +101,7 @@ function LoginPageStyles() {
         "!border-none",
         "!rounded-xl",
         "!w-full",
-        "!h-[44px]", // Slightly taller
+        "!h-[44px]", 
         "!px-3",
         "!py-2",
         "!text-center",
@@ -118,17 +118,17 @@ function LoginPageStyles() {
     const signInIcon = document.querySelector(".la-sign-in");
     if(signInIcon) signInIcon.remove();
 
-    // Title Logic - Keeping it hidden as requested
+    
     let logintitle = document.querySelector(".m-login__title");
     if(logintitle) {
         logintitle.style.display = "none";
     }
 
-    // Card Styling (The "Old Card")
+    
     let bglogin = document.querySelector(".m-login__signin");
     if(bglogin) {
-        // Remove old inline styles if any and apply new card classes
-        // Note: We use !important classes to override defaults
+        
+        
         bglogin.classList.add(
           "!bg-black/10", 
           "backdrop-blur-xl",
@@ -144,7 +144,7 @@ function LoginPageStyles() {
         );
     }
 
-    // 4. BACKGROUND IMAGE INJECTION
+    
     let rightImage = document.getElementById("login-background-image");
     if (!rightImage) {
         rightImage = document.createElement("div");
@@ -157,7 +157,7 @@ function LoginPageStyles() {
             "z-0"
         );
 
-        // Image
+        
         const img = document.createElement("img");
         img.src = "https://theajmalrazaq.github.io/superflex/res/intro.svg";
         img.classList.add(
@@ -167,14 +167,14 @@ function LoginPageStyles() {
         );
         rightImage.appendChild(img);
 
-        // Add Black Mask 
+        
         const blackMask = document.createElement("div");
-        blackMask.className = "absolute inset-0 bg-black/60 z-10"; // Increased opacity for better text contrast
+        blackMask.className = "absolute inset-0 bg-black/60 z-10"; 
         rightImage.appendChild(blackMask);
         document.body.appendChild(rightImage);
     }
 
-    // --- HERO SECTION INJECTION ---
+    
     const heroDiv = document.createElement("div");
     heroDiv.className = "flex flex-col items-center justify-center text-center w-full mb-6";
     
@@ -201,7 +201,7 @@ function LoginPageStyles() {
     </div>
     `;
 
-    // Fetch Star Count
+    
     fetch('https://api.github.com/repos/theajmalrazaq/superflex')
         .then(res => res.json())
         .then(data => {
@@ -213,17 +213,17 @@ function LoginPageStyles() {
         .catch(err => console.error("Failed to fetch stars", err));
 
     if(bglogin && bglogin.parentNode) {
-        // We want to insert heroDiv BEFORE bglogin in its parent container
-        // This makes the hero section appear ABOVE the card, outside of the border/background of the card itself.
+        
+        
         const wrapper = bglogin.parentNode;
         
-        // Remove any previously injected hero sections to avoid duplicates
+        
         const existingHero = wrapper.querySelector('.hero-section-injected');
         if (existingHero) {
             existingHero.remove();
         }
         
-        // Also check inside bglogin just in case it was there from before
+        
         const internalHero = bglogin.querySelector('.hero-section-injected');
         if (internalHero) {
             internalHero.remove();
@@ -233,9 +233,9 @@ function LoginPageStyles() {
         wrapper.insertBefore(heroDiv, bglogin);
     }
 
-    // Apply Tailwind classes instead of inline styles
+    
     bglogin.classList.add(
-      "!bg-zinc-900/40", // Updated card background
+      "!bg-zinc-900/40", 
       "!p-6",
       "!rounded-[32px]",
       "!border",
@@ -246,7 +246,7 @@ function LoginPageStyles() {
       "!justify-center",
     );
 
-    // Update password toggle functionality
+    
     const passwordInputs = document.querySelectorAll(
       '.m-input-icon--right input[type="password"]',
     );

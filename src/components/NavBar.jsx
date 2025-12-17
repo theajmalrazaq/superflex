@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+ 
 import React, { useEffect, useState } from "react";
 import {
   Home,
@@ -24,10 +24,24 @@ import {
   Bell
 } from "lucide-react";
 
+import { runBackgroundSync } from "../utils/backgroundSync";
+
 function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   const [menuLinks, setMenuLinks] = useState([]);
 
-  // No wrapper span in iconKey mapping
+  useEffect(() => {
+      
+      runBackgroundSync();
+      
+      
+      const interval = setInterval(() => {
+          runBackgroundSync();
+      }, 5 * 60 * 1000);
+      
+      return () => clearInterval(interval);
+  }, []);
+
+  
   const iconMapping = {
     Home: <Home />,
     "Course Registration": <BookOpen />,
@@ -43,17 +57,17 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     "Grade Change Request": <RefreshCw />,
     "Tentative Study Plan": <ListChecks />,
     "Grade Report": <GraduationCap />,
-    // Fallback icon for any unmatched menu items
+    
     default: <FileText />,
   };
 
-  // Function to determine which icon to use
+  
   const getIcon = (link) => {
     const linkText = link.text.trim();
     return iconMapping[linkText] || iconMapping["default"];
   };
 
-  // Add custom scrollbar styles
+  
   useEffect(() => {
     const scrollbarStyle = `
       .custom-scrollbar::-webkit-scrollbar {
@@ -80,13 +94,13 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   }, []);
 
   useEffect(() => {
-    // Important: Extract menu links BEFORE removing any elements
+    
     const extractMenuLinks = () => {
       const links = [];
       const menuElements = document.querySelectorAll(".m-menu__link");
 
       if (menuElements.length === 0) {
-        // If no menu links found, check in the specific container
+        
         const leftMenu = document.querySelector(".m-aside-left-menu");
         if (leftMenu) {
           leftMenu.querySelectorAll("a").forEach((element) => {
@@ -108,7 +122,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           });
         }
       } else {
-        // Process the menu links that were found
+        
         menuElements.forEach((element) => {
           try {
             if (element.href) {
@@ -127,11 +141,11 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           }
         });
       }
-      // Filter out "Grade Report" links
+      
       return links.filter((link) => link.text.trim() !== "Grade Report");
     };
 
-    // Extract links first
+    
     const links = extractMenuLinks();
 
     if (links.length > 0) {
@@ -149,7 +163,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       }
     }
 
-    // Now it's safe to remove elements after extraction
+    
     document.querySelectorAll("header").forEach((element) => {
       element.remove();
     });
@@ -175,20 +189,20 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       });
 
     document.querySelector(".m-subheader")?.remove();
-    // Remove the close button
+    
     document.querySelector("#m_aside_left_close_btn")?.remove();
   }, [onAttendanceLinkFound]);
 
-  // For debugging
+  
   useEffect(() => {
     if (menuLinks.length === 0) {
-      console.log("Menu links array is empty");
+      
     } else {
-      console.log(`Found ${menuLinks.length} menu links`);
+      
     }
   }, [menuLinks]);
 
-  // Group links into categories
+  
   const [groupedLinks, setGroupedLinks] = useState({});
 
   useEffect(() => {
@@ -231,7 +245,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     setGroupedLinks(newGroupedLinks);
   }, [menuLinks]);
 
-  // Helper to check if any link in a category is active
+  
   const isCategoryActive = (categoryLinks) => {
     return categoryLinks.some(link => 
       link.path && currentPage && currentPage.includes(link.path)
@@ -274,10 +288,10 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     </a>
   );
 
-  // State for managing which dropdown is open
+  
   const [openDropdown, setOpenDropdown] = useState(null);
 
-  // Close dropdown when clicking outside
+  
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (!e.target.closest('.dropdown-container')) {
@@ -288,7 +302,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  // Notifications Logic
+  
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -319,7 +333,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
   return (
     <div className="flex items-center px-6 py-3 w-fit relative">
-      {/* Logo Section */}
+      { }
       <div className="flex items-center shrink-0">
         <img
           src={chrome.runtime.getURL("public/logo.svg")}
@@ -328,20 +342,20 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         />
       </div>
 
-      {/* Navigation Groups */}
+      { }
       <div className="flex justify-center !px-8">
         <nav>
           {menuLinks.length === 0 ? (
             <div className="text-white/50 text-sm">Loading...</div>
           ) : (
             <div className="flex items-center gap-1">
-              {/* Root Items (Home) */}
+              { }
               {groupedLinks.root?.map((link, index) => {
                  const isActive = currentPage === "/" || currentPage.startsWith("/?dump=");
                  return <NavItem key={index} link={link} isActive={isActive} />;
               })}
 
-              {/* Categories with Dropdowns */}
+              { }
               {["Academics", "Finance", "Services", "More"].map((category) => {
                 const links = groupedLinks[category];
                 if (!links || links.length === 0) return null;
@@ -376,7 +390,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         <path d="m6 9 6 6 6-6"/>
                       </svg>
                     </button>
-                    {/* Dropdown Menu */}
+                    { }
                     {isOpen && (
                       <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-[999] w-max animate-in fade-in slide-in-from-top-2 duration-200">
                         <div className="bg-black border border-white/10 rounded-2xl p-2 shadow-2xl min-w-[520px]">
@@ -397,18 +411,18 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         </nav>
       </div>
 
-      {/* Profile Dropdown & CTA Logout Button */}
+      { }
       <div className="shrink-0 flex items-center gap-3">
         
-        {/* Notification Bell */}
+        { }
         <div className="relative dropdown-container">
             <button
                 onClick={(e) => {
                     e.stopPropagation();
                     setShowNotifications(!showNotifications);
                     if(!showNotifications) {
-                        // Mark as read when opening? Maybe wait for user action?
-                        // For now we just open.
+                        
+                        
                     }
                 }}
                 className="relative p-2 rounded-full hover:bg-white/5 transition-all text-zinc-400 hover:text-white"
@@ -446,7 +460,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                                     <div 
                                         key={n.id}
                                         onClick={() => {
-                                            // Mark as read and update storage
+                                            
                                             const updated = notifications.map(notif => 
                                                 notif.id === n.id ? {...notif, read: true} : notif
                                             );
@@ -478,7 +492,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
             )}
         </div>
 
-        {/* Profile Dropdown */}
+        { }
         <div className="relative dropdown-container">
           <button
             onClick={(e) => {
@@ -511,14 +525,14 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
             </svg>
           </button>
 
-          {/* Profile Dropdown Menu */}
+          { }
           {openDropdown === 'profile' && (
             <div className="absolute right-0 top-full mt-2 z-[999] w-56 animate-in fade-in slide-in-from-top-2 duration-200">
               <div className="bg-black border border-white/10 rounded-2xl p-2 shadow-2xl">
                 <button
                   onClick={() => {
                     setOpenDropdown(null);
-                    // TODO: Implement password change logic
+                    
                   }}
                   className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all text-left text-zinc-300 hover:text-white"
                 >

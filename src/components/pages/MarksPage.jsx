@@ -8,17 +8,17 @@ import {
   Layers
 } from "lucide-react";
 
-// --- Utility Functions ---
+
 
 const parseFloatOrZero = (value) => {
   if (!value || value === "-" || value.trim() === "") return 0;
-  // Remove non-numeric chars except dot and minus
+  
   const cleaned = value.toString().replace(/[^0-9.-]/g, '');
   const parsed = parseFloat(cleaned);
   return isNaN(parsed) ? 0 : parsed;
 };
 
-// --- Components ---
+
 
 const CourseSelector = ({ courses, selectedId, onSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -173,7 +173,7 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Reconstruct bookmarked items details
+    
     const bookmarkedDetails = [];
     if (markedItems.size > 0 && courses.length > 0) {
         courses.forEach(course => {
@@ -289,7 +289,7 @@ const AssessmentView = ({ section, onUpdate, markedItems, onToggleMark, courseId
     }`}>
       <div className="w-full">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 border-b border-white/5">
-           {/* Title Section */}
+           { }
            <div className="flex flex-col gap-1">
                <div className="flex items-center gap-3">
                    <h3 className={`text-xl font-bold text-white`}>
@@ -306,7 +306,7 @@ const AssessmentView = ({ section, onUpdate, markedItems, onToggleMark, courseId
                </p>
            </div>
            
-           {/* Mini Stats (Right Side) */}
+           { }
            <div className="flex items-center gap-4">
                <div className="flex flex-col items-end px-5 py-2.5 rounded-xl bg-black/20 border border-white/5 min-w-[120px]">
                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Weight</span>
@@ -321,7 +321,7 @@ const AssessmentView = ({ section, onUpdate, markedItems, onToggleMark, courseId
            </div>
         </div>
 
-        {/* Table Content */}
+        { }
         <div className="p-6">
             <div className="w-full overflow-x-auto rounded-xl border border-white/5 custom-scrollbar bg-black/20">
                 <table className="w-full text-sm text-left border-collapse">
@@ -428,7 +428,7 @@ const recalculateCourse = (course) => {
     let globalWeightage = 0;
     let globalObtained = 0;
     
-    // For Stats (Avg, StdDev, Min, Max)
+    
     let globalAverage = 0;
     let globalMinimum = 0;
     let globalMaximum = 0;
@@ -439,17 +439,17 @@ const recalculateCourse = (course) => {
     const newSections = sectionsExceptTotal.map(section => {
         let rows = [...section.rows];
         
-        // Dynamic calc of Section Weight (Sum of all rows)
-        // We use parseFloat to handle string inputs safely
+        
+        
         const secWeight = rows.reduce((sum, r) => {
             const val = parseFloat(r.weight);
             return sum + (isNaN(val) ? 0 : val);
         }, 0);
 
-        // Enrich rows with weighted score for calculation
-        // weightedScore = (Obtained / Total) * Weight
+        
+        
         rows = rows.map(r => {
-            // Safe parse values
+            
             const rawObt = parseFloat(r.obtained);
             const obt = isNaN(rawObt) ? 0 : rawObt;
             
@@ -463,34 +463,34 @@ const recalculateCourse = (course) => {
             return { ...r, _weightedScore: weightedScore };
         });
         
-        // Sort for Best Off Logic based on Weighted Score performance
+        
         const sorted = rows.map((r, i) => ({...r, originalIdx: i}));
         sorted.sort((a,b) => b._weightedScore - a._weightedScore);
         
         let currentAccWeight = 0;
         const includedIndices = new Set();
         
-        // "Best Off" inclusion logic
-        // Since secWeight is now SUM of all rows, this loop will essentially include ALL rows
-        // unless there is some float precision delta, but effectively it includes all.
-        // This matches user expectation that "Total Weight" updates to sum of rows.
+        
+        
+        
+        
         for(let item of sorted) {
              const rawW = parseFloat(item.weight);
              const w = isNaN(rawW) ? 0 : rawW;
              
-             if(currentAccWeight < secWeight - 0.001) { // epsilon for float safety
+             if(currentAccWeight < secWeight - 0.001) { 
                  currentAccWeight += w;
                  includedIndices.add(item.originalIdx);
              }
         }
         
-        // Clean up temporary prop and set included
+        
         rows = rows.map((r, i) => {
             const { _weightedScore, ...rest } = r;
             return { ...rest, included: includedIndices.has(i) };
         });
 
-        // Calculate Section Obtained (Sum of included weighted scores)
+        
         let calculatedSecObtained = 0;
         
         rows.forEach(r => {
@@ -510,13 +510,13 @@ const recalculateCourse = (course) => {
             }
         });
         
-        // Update Globals
+        
         if (secWeight > 0) {
             globalWeightage += secWeight; 
             globalObtained += calculatedSecObtained;
         }
 
-        // Weighted Stats
+        
          let secWeightedAvg = 0, secWeightedMin = 0, secWeightedMax = 0, secWeightedStd = 0;
          
          rows.forEach(r => {
@@ -554,7 +554,7 @@ const recalculateCourse = (course) => {
         };
     });
     
-    // Reconstruct Grand Total Section
+    
     const grandTotalSection = {
         id: `${course.id}-Grand_Total_Marks`,
         title: "Grand Total Marks",
@@ -620,7 +620,7 @@ function MarksPage() {
             const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
             if (!root) return;
 
-             // Extract Alert
+             
             const alertEl = root.querySelector(".alert");
             if(alertEl?.textContent.trim()) {
                 setAlertInfo({
@@ -629,7 +629,7 @@ function MarksPage() {
                 });
             }
 
-            // Extract Semester Form
+            
             const legacyForm = document.querySelector('form[action="/Student/StudentMarks"]');
             if(legacyForm) {
                 const select = legacyForm.querySelector("select");
@@ -647,7 +647,7 @@ function MarksPage() {
                 }
             }
 
-            // Extract Courses (Tabs)
+            
             const parsedCourses = [];
             const tabPanes = root.querySelectorAll(".tab-pane");
 
@@ -657,7 +657,7 @@ function MarksPage() {
 
                 const sections = [];
                 
-                // Variables for Grand Total Calculation (mimicking snippet logic)
+                
                 let globalWeightage = 0;
                 let globalObtained = 0;
                 let globalAverage = 0;
@@ -665,25 +665,25 @@ function MarksPage() {
                 let globalMaximum = 0;
                 let globalStdDev = 0;
 
-                // Find assessment sections divs (exclude Grand_Total_Marks for extraction loop)
+                
                 const allCourseDivs = Array.from(pane.querySelectorAll(`div[id^="${pane.id}"]`));
                 
                 allCourseDivs.forEach(secDiv => {
                     const secId = secDiv.id;
                     const isGrandTotal = secId.endsWith("Grand_Total_Marks");
                     
-                    if (isGrandTotal) return; // Skip reading Grand Total, we will calculate it.
+                    if (isGrandTotal) return; 
 
                     const secTitleBtn = secDiv.previousElementSibling?.querySelector(".btn-link") || secDiv.querySelector(".card-header button");
                     let secTitle = secTitleBtn?.textContent.trim();
                     if(!secTitle) secTitle = secId.replace(pane.id + "-", "").replace(/_/g, " ");
 
-                    // Parse Rows
+                    
                     const rowsData = [];
                     const calcRows = secDiv.querySelectorAll(".calculationrow");
                     
                     calcRows.forEach(row => {
-                         // Prefer classes as per snippet
+                         
                          const weight = parseFloatOrZero(row.querySelector(".weightage")?.textContent);
                          const grandTotal = parseFloatOrZero(row.querySelector(".GrandTotal")?.textContent);
                          const obtMarks = parseFloatOrZero(row.querySelector(".ObtMarks")?.textContent);
@@ -692,7 +692,7 @@ function MarksPage() {
                          const max = parseFloatOrZero(row.querySelector(".MaxMarks")?.textContent);
                          let stdDev = parseFloatOrZero(row.querySelector(".StdDev")?.textContent);
 
-                         // Fallback StdDev formula from snippet: (max - min) / 4
+                         
                          if (stdDev === 0 && (max > 0 || min > 0)) {
                              stdDev = (max - min) / 4;
                          }
@@ -710,16 +710,16 @@ function MarksPage() {
                          });
                     });
 
-                    // Parse Total Row for the section
+                    
                     let secWeight = 0, secObtained = 0;
                     
-                    // Snippet uses [class*='totalColumn_']
+                    
                     const totalRows = secDiv.querySelectorAll("[class*='totalColumn_']");
                     let footerRow = null;
                     if (totalRows.length > 0) {
                         footerRow = totalRows[totalRows.length - 1];
                     } else {
-                        // Fallback to tfoot
+                        
                         footerRow = secDiv.querySelector("tfoot tr");
                     }
 
@@ -727,17 +727,17 @@ function MarksPage() {
                         secWeight = parseFloatOrZero(footerRow.querySelector(".totalColweightage")?.textContent);
                         secObtained = parseFloatOrZero(footerRow.querySelector(".totalColObtMarks")?.textContent);
                     } else {
-                        // Calculation fallback
+                        
                         secWeight = rowsData.reduce((acc, r) => acc + r.weight, 0);
                         secObtained = rowsData.reduce((acc, r) => acc + r.obtained, 0);
                     }
 
-                    // Best Off Logic (Snippet Style)
+                    
                     const includeInStats = secWeight > 0;
 
                     if (includeInStats) {
                         let currentAccWeight = 0;
-                        // Sort by obtained marks descending (Snippet logic)
+                        
                         const sorted = [...rowsData].map((r, i) => ({...r, originalIdx: i}));
                         sorted.sort((a,b) => b.obtained - a.obtained);
                         
@@ -753,22 +753,22 @@ function MarksPage() {
                              r.included = includedIndices.has(i);
                         });
 
-                        // Add to Global Totals (Snippet Logic)
-                        // Note: Snippet sums weighted contributions from rows
+                        
+                        
                         globalWeightage += secWeight;
                         globalObtained += secObtained;
                     }
 
-                    // Weighted stats contribution
-                    // Loop rows again to calc weighted stats for the section
+                    
+                    
                     let secWeightedAvg = 0, secWeightedMin = 0, secWeightedMax = 0, secWeightedStd = 0;
                     
                     rowsData.forEach(r => {
-                        // Only add to global if included in stats
+                        
                         if (r.included && r.total > 0 && includeInStats) {
-                            // Contribution ratio: (rowWeight / rowTotal) * ... wait.
-                            // Snippet: globalAverage += average * (weightage / total);
-                            // This assumes correct weighting distribution.
+                            
+                            
+                            
                             const ratio = r.weight / r.total;
                             secWeightedAvg += r.avg * ratio;
                             secWeightedMin += r.min * ratio;
@@ -782,7 +782,7 @@ function MarksPage() {
                         }
                     });
                     
-                    // Push Section
+                    
                     sections.push({
                         id: secId,
                         title: secTitle,
@@ -798,25 +798,25 @@ function MarksPage() {
                     });
                 });
 
-                // Construct Grand Total Stats
+                
                 const courseGrandTotalStats = {
                     weight: globalWeightage,
                     obtained: globalObtained,
                     percentage: globalWeightage > 0 ? (globalObtained / globalWeightage) * 100 : 0
                 };
 
-                // Add a "Grand Total" section card for UI consistency
-                /* 
-                   Snippet says: "Find or create the grand total table body... Create grand total row... append... calculateMarks..."
-                   We will synthesize this section so it appears in the list as per new UI.
-                */
+                
+                
+
+
+
                 sections.push({
                     id: `${pane.id}-Grand_Total_Marks`,
                     title: "Grand Total Marks",
                     weight: globalWeightage,
                     obtained: globalObtained,
-                    rows: [], // No detail rows for Grand Total usually, or we could add summary?
-                    // The new UI expects rows. Let's create a summary row.
+                    rows: [], 
+                    
                     stats: {
                         weightedAvg: globalAverage,
                         weightedStdDev: globalStdDev,
@@ -837,75 +837,13 @@ function MarksPage() {
             if(parsedCourses.length > 0) {
                 const firstId = parsedCourses[0].id;
                 setSelectedCourseId(firstId);
-                // Set first section as active
+                
                 if(parsedCourses[0].sections.length > 0) {
                     setActiveSectionId(parsedCourses[0].sections[0].id);
                 }
             }
 
-            // Notification & Snapshot Logic
-            const checkNotifications = () => {
-                 const oldSnapshot = localStorage.getItem("superflex_marks_snapshot");
-                 let notifications = [];
-                 try {
-                    notifications = JSON.parse(localStorage.getItem("superflex_notifications") || "[]");
-                 } catch(e) { notifications = []; }
 
-                 if (oldSnapshot) {
-                     const oldCourses = JSON.parse(oldSnapshot);
-                     const oldMap = new Map();
-                     
-                     oldCourses.forEach(c => {
-                         c.sections.forEach(s => {
-                             s.rows.forEach(r => {
-                                 const key = `${c.id}|${s.id}|${r.title}`;
-                                 oldMap.set(key, r);
-                             });
-                         });
-                     });
-
-                     parsedCourses.forEach(c => {
-                         c.sections.forEach(s => {
-                             s.rows.forEach(r => {
-                                 const key = `${c.id}|${s.id}|${r.title}`;
-                                 const oldRow = oldMap.get(key);
-                                 
-                                 // Ignore Grand Total rows? Probably better to track granular changes
-                                 if (!oldRow) {
-                                     notifications.unshift({
-                                         id: Date.now() + Math.random(),
-                                         title: "New Assessment",
-                                         description: `${c.title}: ${r.title} added.`,
-                                         time: new Date().toLocaleString(),
-                                         read: false,
-                                         type: "marks",
-                                         link: "/Student/StudentMarks"
-                                     });
-                                 } else if (oldRow.obtained !== r.obtained || oldRow.total !== r.total) {
-                                      notifications.unshift({
-                                         id: Date.now() + Math.random(),
-                                         title: "Marks Updated",
-                                         description: `${c.title}: ${r.title} updated (${oldRow.obtained.toFixed(1)}/${oldRow.total.toFixed(1)} -> ${r.obtained.toFixed(1)}/${r.total.toFixed(1)})`,
-                                         time: new Date().toLocaleString(),
-                                         read: false,
-                                         type: "marks",
-                                         link: "/Student/StudentMarks"
-                                     });
-                                 }
-                             });
-                         });
-                     });
-                 }
-                 
-                 // Keep only last 50 notifications
-                 if(notifications.length > 50) notifications = notifications.slice(0, 50);
-
-                 localStorage.setItem("superflex_notifications", JSON.stringify(notifications));
-                 localStorage.setItem("superflex_marks_snapshot", JSON.stringify(parsedCourses));
-                 window.dispatchEvent(new Event("superflex-notification-update"));
-            };
-            
-            checkNotifications();
 
             root.style.display = "none";
             setLoading(false);
@@ -922,10 +860,10 @@ function MarksPage() {
   const handleRowUpdate = (sectionId, rowIndex, field, value) => {
     if (!selectedCourseId) return;
 
-    // Allow raw string to be set for editing (enables typing '5.')
-    // Calculation logic uses parseFloat, so this is safe for state.
     
-    // We update the courses state
+    
+    
+    
     setCourses(prevCourses => {
         const courseIdx = prevCourses.findIndex(c => c.id === selectedCourseId);
         if (courseIdx === -1) return prevCourses;
@@ -942,7 +880,7 @@ function MarksPage() {
             [field]: value 
         };
         
-        // Construct temporary course with updated section (pre-calc)
+        
         const updatedSections = [...course.sections];
         updatedSections[sectionIdx] = {
             ...section,
@@ -951,7 +889,7 @@ function MarksPage() {
         
         const tempCourse = { ...course, sections: updatedSections };
         
-        // Recalculate
+        
         const recalculatedCourse = recalculateCourse(tempCourse);
         
         const newCourses = [...prevCourses];
@@ -966,7 +904,7 @@ function MarksPage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-4 md:p-8 space-y-8 animate-in fade-in duration-500 pb-24">
          
-         {/* Top Navigation Bar */}
+         { }
          <div className="flex flex-col xl:flex-row justify-between items-center gap-6 mb-8">
              <div className="space-y-2">
                  <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter">Marks & Grades</h1>
@@ -983,7 +921,7 @@ function MarksPage() {
                                     const select = hiddenFormRef.current.querySelector("select");
                                     if(select) {
                                         select.value = sem.value;
-                                        // Submit the form
+                                        
                                         const form = hiddenFormRef.current.querySelector("form");
                                         if(form) form.submit();
                                     }
@@ -1005,9 +943,9 @@ function MarksPage() {
                     selectedId={selectedCourseId}
                     onSelect={(id) => {
                         setSelectedCourseId(id);
-                        // Auto expand sections for newly selected course
+                        
                         const crs = courses.find(c => c.id === id);
-                        // Set active section to first section of new course
+                        
                         if(crs && crs.sections.length > 0) {
                             setActiveSectionId(crs.sections[0].id);
                         }
@@ -1034,7 +972,7 @@ function MarksPage() {
              </div>
          </div>
 
-         {/* Alert Banner */}
+         { }
          {alertInfo && (
             <div className={`p-4 rounded-3xl border flex items-center gap-4 ${
                 alertInfo.type === 'error' 
@@ -1058,12 +996,12 @@ function MarksPage() {
                  
 
 
-                 {/* Active Section Content */}
+                 { }
                  <div className="flex flex-col gap-6">
                      
 
 
-                     {/* Active Section View */}
+                     { }
                      {activeSectionId && selectedCourse.sections.find(s => s.id === activeSectionId) ? (
                          <AssessmentView 
                             section={selectedCourse.sections.find(s => s.id === activeSectionId)}
@@ -1073,7 +1011,7 @@ function MarksPage() {
                             courseId={selectedCourse.id}
                          />
                      ) : selectedCourse.sections.length > 0 ? (
-                         // Fallback if no active section but sections exist (shouldn't happen often)
+                         
                          <AssessmentView 
                             section={selectedCourse.sections[0]}
                             onUpdate={(rowIndex, field, value) => handleRowUpdate(selectedCourse.sections[0].id, rowIndex, field, value)}
