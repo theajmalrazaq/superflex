@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageLayout from "../layouts/PageLayout";
-import LoadingOverlay from "../LoadingOverlay";
+import LoadingOverlay, { LoadingSpinner } from "../LoadingOverlay";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -157,6 +157,9 @@ function HomePage() {
   const [links, setLinks] = useState({});
   const [chartPattern, setChartPattern] = useState(null);
 
+  const [loadingMarks, setLoadingMarks] = useState(false);
+  const [loadingAttendance, setLoadingAttendance] = useState(false);
+
   useEffect(() => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -267,8 +270,16 @@ function HomePage() {
   };
 
   useEffect(() => {
-    if (links.attendance) fetchAttendance(links.attendance);
-    if (links.marks) fetchMarks(links.marks);
+    if (links.attendance) {
+      setLoadingAttendance(true);
+      fetchAttendance(links.attendance).finally(() =>
+        setLoadingAttendance(false),
+      );
+    }
+    if (links.marks) {
+      setLoadingMarks(true);
+      fetchMarks(links.marks).finally(() => setLoadingMarks(false));
+    }
   }, [links]);
 
   const fetchAttendance = async (url) => {
@@ -574,7 +585,7 @@ function HomePage() {
             {}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {}
-              <div className="p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
+              <div className="p-6 rounded-[2rem] border bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
                 <div className="flex justify-between items-start mb-6">
                   <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
                     <GraduationCap size={24} />
@@ -589,7 +600,7 @@ function HomePage() {
               </div>
 
               {}
-              <div className="p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70  transition-all duration-300 hover:-translate-y-1 group">
+              <div className="p-6 rounded-[2rem] border  bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70  transition-all duration-300 hover:-translate-y-1 group">
                 <div className="flex justify-between items-start mb-6">
                   <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
                     <Users size={24} />
@@ -604,7 +615,7 @@ function HomePage() {
               </div>
 
               {}
-              <div className="p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
+              <div className="p-6 rounded-[2rem] border  bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
                 <div className="flex justify-between items-start mb-6">
                   <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
                     <Award size={24} />
@@ -618,7 +629,7 @@ function HomePage() {
                 </h3>
               </div>
 
-              <div className="p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
+              <div className="p-6 rounded-[2rem] border  bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
                 <div className="flex justify-between items-start mb-6">
                   <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
                     <Activity size={24} />
@@ -631,7 +642,11 @@ function HomePage() {
                   className="text-xl font-bold text-white truncate"
                   title={mostAbsentSubject?.title}
                 >
-                  {mostAbsentSubject ? (
+                  {loadingAttendance ? (
+                    <div className="scale-50 origin-left -ml-4 -mt-4">
+                      <LoadingSpinner />
+                    </div>
+                  ) : mostAbsentSubject ? (
                     <span className="flex items-center gap-2">
                       <span className="truncate max-w-[120px]">
                         {mostAbsentSubject.title}
@@ -650,8 +665,12 @@ function HomePage() {
             {}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               {}
-              {coursesData.length > 0 ? (
-                <div className="bg-zinc-900/50 backdrop-blur-xl rounded-3xl p-6  overflow-hidden flex flex-col gap-6 h-full">
+              {loadingMarks ? (
+                <div className="bg-black rounded-3xl p-6 min-h-[300px] flex items-center justify-center">
+                  <LoadingSpinner />
+                </div>
+              ) : coursesData.length > 0 ? (
+                <div className="bg-zinc-900/50 border backdrop-blur-xl rounded-3xl p-6  overflow-hidden flex flex-col gap-6 h-full">
                   <div className="flex flex-col justify-between items-start gap-4">
                     <div className="flex w-full justify-between items-start">
                       <div>
@@ -746,7 +765,7 @@ function HomePage() {
                 </div>
               )}
               {}
-              <div className="p-8 rounded-[1.5rem] bg-zinc-900/50 backdrop-blur-xl   h-full flex flex-col">
+              <div className="p-8 rounded-[1.5rem] border bg-zinc-900/50 backdrop-blur-xl border h-full flex flex-col">
                 <div className="flex justify-between items-start mb-8">
                   <div>
                     <h3 className="text-xl font-bold text-white">
@@ -852,9 +871,9 @@ function HomePage() {
                         }}
                       />
                     </div>
-                  ) : (
-                    <LoadingOverlay show={true} isFullScreen={false} />
-                  )}
+                  ) : loadingAttendance ? (
+                    <LoadingSpinner />
+                  ) : null}
                 </div>
               </div>
             </div>
@@ -880,7 +899,7 @@ const ProfileInfoTabs = ({ profileSections }) => {
       {profileSections.map((section, idx) => (
         <div
           key={idx}
-          className="bg-zinc-900/60 backdrop-blur-xl rounded-[2rem]  p-8 overflow-hidden"
+          className="bg-zinc-900/60 border backdrop-blur-xl rounded-[2rem]  p-8 overflow-hidden"
         >
           {}
           <div className="flex items-center gap-4 mb-8">

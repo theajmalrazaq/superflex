@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import LoadingOverlay, { LoadingSpinner } from "../LoadingOverlay";
 import PageLayout from "../layouts/PageLayout";
 import {
   ChevronDown,
@@ -1092,12 +1093,7 @@ function MarksPage() {
         )}
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center h-64 gap-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#a098ff]"></div>
-            <span className="text-zinc-500 text-sm font-bold animate-pulse">
-              Loading Marks Data...
-            </span>
-          </div>
+          <LoadingSpinner />
         ) : selectedCourse ? (
           <div className="space-y-8 animate-in slide-in-from-bottom-8 duration-700">
             {}

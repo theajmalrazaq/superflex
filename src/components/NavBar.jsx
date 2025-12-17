@@ -15,12 +15,7 @@ import {
   ListChecks,
   GraduationCap,
   LogOut,
-  User,
   Lock,
-  Building,
-  MapPin,
-  Users,
-  Bell,
 } from "lucide-react";
 
 function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {

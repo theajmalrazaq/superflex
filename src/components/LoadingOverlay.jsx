@@ -6,6 +6,18 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const handleCustomLoading = (e) => {
+      if (typeof e.detail === "boolean") {
+        setLoading(e.detail);
+        if (e.detail) setIsVisible(true);
+      } else if (e.detail?.isLoading !== undefined) {
+        setLoading(e.detail.isLoading);
+        if (e.detail.isLoading) setIsVisible(true);
+      }
+    };
+
+    window.addEventListener("superflex-update-loading", handleCustomLoading);
+
     if (isFullScreen) {
       const timer = setTimeout(() => {
         setLoading(false);
@@ -20,8 +32,19 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
       return () => {
         clearTimeout(timer);
         window.removeEventListener("load", handleLoad);
+        window.removeEventListener(
+          "superflex-update-loading",
+          handleCustomLoading,
+        );
       };
     }
+
+    return () => {
+      window.removeEventListener(
+        "superflex-update-loading",
+        handleCustomLoading,
+      );
+    };
   }, [isFullScreen]);
 
   useEffect(() => {
@@ -39,38 +62,54 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
 
   return (
     <div
-      className={`loading-overlay ${
-        isFullScreen
-          ? "h-screen fixed inset-0 z-50"
-          : "absolute inset-0 w-full h-full z-10 rounded-[inherit]"
-      } ${!show || (!isFullScreen ? false : !loading) ? "fade-out" : ""}`}
+      className={`loading-overlay fixed inset-0 z-[9999] h-screen w-screen bg-black flex items-center justify-center ${
+        !show || !loading ? "fade-out" : ""
+      }`}
     >
       <div
-        className={`absolute inset-0 bg-black flex items-center justify-center ${!isFullScreen ? "bg-black/50 backdrop-blur-sm rounded-[inherit]" : ""}`}
+        className="bg-[url('res/bg.png')] bg-black border-[1px] border-white/10 bg-cover flex items-center justify-center h-24 w-24 rounded-[32px] shadow-2xl relative overflow-hidden"
+        data-aos="zoom-in"
+        data-aos-duration="1000"
       >
-        <div
-          className={`bg-[url('res/bg.png')] bg-black border-7 border-white/5 bg-cover flex items-center justify-center ${
-            isFullScreen
-              ? "h-20 w-20 rounded-[29px]"
-              : "h-16 w-16 rounded-[20px] scale-75"
-          }`}
-          data-aos={isFullScreen ? "zoom-in" : ""}
-          data-aos-duration="1000"
+        <div className="absolute inset-0 bg-[#a098ff]/10 blur-xl"></div>
+        <svg
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+          width="64"
+          height="64"
+          fill="none"
+          className="relative z-10"
         >
-          <svg
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-            width={isFullScreen ? "84" : "64"}
-            height={isFullScreen ? "84" : "64"}
-            fill="none"
-          >
-            <path
-              className="animate-splash"
-              fill="#a098ff"
-              d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
-            />
-          </svg>
-        </div>
+          <path
+            className="animate-splash"
+            fill="#a098ff"
+            d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
+          />
+        </svg>
+      </div>
+    </div>
+  );
+};
+
+export const LoadingSpinner = () => {
+  return (
+    <div className="flex items-center justify-center w-full h-full min-h-[200px]">
+      <div className="bg-black/50 border border-white/5 flex items-center justify-center h-16 w-16 rounded-[20px] relative overflow-hidden">
+        <div className="absolute inset-0 bg-[#a098ff]/5 blur-md"></div>
+        <svg
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+          width="42"
+          height="42"
+          fill="none"
+          className="relative z-10"
+        >
+          <path
+            className="animate-splash"
+            fill="#a098ff"
+            d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
+          />
+        </svg>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import LoadingOverlay, { LoadingSpinner } from "../LoadingOverlay";
 import PageLayout from "../layouts/PageLayout";
 import {
   CheckCircle2,
@@ -162,7 +163,7 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
 };
 
 const SummaryStat = ({ icon: Icon, label, value, colorClass }) => (
-  <div className="flex-1 min-w-[140px] p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-xl hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
+  <div className="flex-1 min-w-[140px] p-6 rounded-[2rem] border bg-zinc-900/50 backdrop-blur-xl hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
     <div className="flex justify-between items-start mb-6">
       <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
         <Icon size={24} />
@@ -293,6 +294,13 @@ function AttendancePage() {
     }
     return new Set();
   });
+
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent("superflex-update-loading", { detail: true }),
+    );
+  }, []);
+
   useEffect(() => {
     localStorage.setItem(
       "superflex_marked_attendance",
@@ -403,9 +411,15 @@ function AttendancePage() {
         if (parsedCourses.length > 0) setSelectedCourseId(parsedCourses[0].id);
 
         root.style.display = "none";
+        window.dispatchEvent(
+          new CustomEvent("superflex-update-loading", { detail: false }),
+        );
         setLoading(false);
       } catch (e) {
         console.error("Attendance Parsing Error", e);
+        window.dispatchEvent(
+          new CustomEvent("superflex-update-loading", { detail: false }),
+        );
         setLoading(false);
       }
     };
@@ -501,9 +515,7 @@ function AttendancePage() {
         )}
 
         {loading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-          </div>
+          <LoadingSpinner />
         ) : courses.length > 0 ? (
           <>
             {}
