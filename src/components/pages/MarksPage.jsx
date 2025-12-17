@@ -215,7 +215,6 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
                 <div className="absolute top-full right-0 mt-2 w-96 md:w-[500px] bg-[#111] backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                     <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
                         <h3 className="font-bold text-white flex items-center gap-2">
-                        
                             Bookmarked Items
                         </h3>
                         
@@ -843,6 +842,70 @@ function MarksPage() {
                     setActiveSectionId(parsedCourses[0].sections[0].id);
                 }
             }
+
+            // Notification & Snapshot Logic
+            const checkNotifications = () => {
+                 const oldSnapshot = localStorage.getItem("superflex_marks_snapshot");
+                 let notifications = [];
+                 try {
+                    notifications = JSON.parse(localStorage.getItem("superflex_notifications") || "[]");
+                 } catch(e) { notifications = []; }
+
+                 if (oldSnapshot) {
+                     const oldCourses = JSON.parse(oldSnapshot);
+                     const oldMap = new Map();
+                     
+                     oldCourses.forEach(c => {
+                         c.sections.forEach(s => {
+                             s.rows.forEach(r => {
+                                 const key = `${c.id}|${s.id}|${r.title}`;
+                                 oldMap.set(key, r);
+                             });
+                         });
+                     });
+
+                     parsedCourses.forEach(c => {
+                         c.sections.forEach(s => {
+                             s.rows.forEach(r => {
+                                 const key = `${c.id}|${s.id}|${r.title}`;
+                                 const oldRow = oldMap.get(key);
+                                 
+                                 // Ignore Grand Total rows? Probably better to track granular changes
+                                 if (!oldRow) {
+                                     notifications.unshift({
+                                         id: Date.now() + Math.random(),
+                                         title: "New Assessment",
+                                         description: `${c.title}: ${r.title} added.`,
+                                         time: new Date().toLocaleString(),
+                                         read: false,
+                                         type: "marks",
+                                         link: "/Student/StudentMarks"
+                                     });
+                                 } else if (oldRow.obtained !== r.obtained || oldRow.total !== r.total) {
+                                      notifications.unshift({
+                                         id: Date.now() + Math.random(),
+                                         title: "Marks Updated",
+                                         description: `${c.title}: ${r.title} updated (${oldRow.obtained.toFixed(1)}/${oldRow.total.toFixed(1)} -> ${r.obtained.toFixed(1)}/${r.total.toFixed(1)})`,
+                                         time: new Date().toLocaleString(),
+                                         read: false,
+                                         type: "marks",
+                                         link: "/Student/StudentMarks"
+                                     });
+                                 }
+                             });
+                         });
+                     });
+                 }
+                 
+                 // Keep only last 50 notifications
+                 if(notifications.length > 50) notifications = notifications.slice(0, 50);
+
+                 localStorage.setItem("superflex_notifications", JSON.stringify(notifications));
+                 localStorage.setItem("superflex_marks_snapshot", JSON.stringify(parsedCourses));
+                 window.dispatchEvent(new Event("superflex-notification-update"));
+            };
+            
+            checkNotifications();
 
             root.style.display = "none";
             setLoading(false);

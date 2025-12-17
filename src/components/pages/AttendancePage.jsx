@@ -361,6 +361,65 @@ function AttendancePage() {
         setCourses(parsedCourses);
         if(parsedCourses.length > 0) setSelectedCourseId(parsedCourses[0].id);
 
+        // Notification & Snapshot Logic
+        const checkNotifications = () => {
+             const oldSnapshot = localStorage.getItem("superflex_attendance_snapshot");
+             let notifications = [];
+             try {
+                notifications = JSON.parse(localStorage.getItem("superflex_notifications") || "[]");
+             } catch(e) { notifications = []; }
+
+             if (oldSnapshot) {
+                 const oldCourses = JSON.parse(oldSnapshot);
+                 const oldMap = new Map();
+                 
+                 oldCourses.forEach(c => {
+                    c.records.forEach(r => {
+                         const key = `${c.id}|${r.date}|${r.time}`;
+                         oldMap.set(key, r);
+                    });
+                 });
+                 
+                 parsedCourses.forEach(c => {
+                    c.records.forEach(r => {
+                         const key = `${c.id}|${r.date}|${r.time}`;
+                         const oldRow = oldMap.get(key);
+                         
+                         if (!oldRow) {
+                             notifications.unshift({
+                                 id: Date.now() + Math.random(),
+                                 title: "New Attendance",
+                                 description: `${c.title}: ${r.status} on ${r.date}`,
+                                 time: new Date().toLocaleString(),
+                                 read: false,
+                                 type: "attendance",
+                                 link: "/Student/StudentAttendance"
+                             });
+                         } else if (oldRow.status !== r.status) {
+                              notifications.unshift({
+                                 id: Date.now() + Math.random(),
+                                 title: "Attendance Updated",
+                                 description: `${c.title}: ${r.date} changed from ${oldRow.status} to ${r.status}`,
+                                 time: new Date().toLocaleString(),
+                                 read: false,
+                                 type: "attendance",
+                                 link: "/Student/StudentAttendance"
+                             });
+                         }
+                    });
+                 });
+             }
+             
+             // Keep only last 50 notifications
+             if(notifications.length > 50) notifications = notifications.slice(0, 50);
+
+             localStorage.setItem("superflex_notifications", JSON.stringify(notifications));
+             localStorage.setItem("superflex_attendance_snapshot", JSON.stringify(parsedCourses));
+             window.dispatchEvent(new Event("superflex-notification-update"));
+        };
+        
+        checkNotifications();
+
         // Cleanup Legacy
         root.style.display = "none";
         setLoading(false);
