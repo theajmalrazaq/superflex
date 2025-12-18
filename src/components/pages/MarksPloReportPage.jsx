@@ -1,520 +1,343 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import PageLayout from "../layouts/PageLayout";
+import { LoadingSpinner } from "../LoadingOverlay";
+import { 
+  BarChart3, 
+  TrendingUp, 
+  Target,
+  FileBarChart,
+  Layout,
+  Info
+} from "lucide-react";
 
 function MarksPloReportPage() {
-  const [elemContent, setElemContent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [semesters, setSemesters] = useState([]);
+  const [reportHtml, setReportHtml] = useState(null);
+  const [summaryData, setSummaryData] = useState(null);
+  
+  const hiddenContentRef = useRef(null);
 
   useEffect(() => {
-    document
-      .querySelectorAll("[style*='border']")
-      .forEach((el) => (el.style.border = "none"));
+    window.dispatchEvent(
+      new CustomEvent("superflex-update-loading", { detail: true }),
+    );
 
-    const parseFloatOrZero = (value) => {
-      if (!value || value === "-" || value.trim() === "") return 0;
-      const parsedValue = parseFloat(value);
-      return isNaN(parsedValue) ? 0 : parsedValue;
+    const parseData = () => {
+      try {
+        let root = document.querySelector(".m-wrapper");
+        
+        // Fallback for strict mode / re-renders
+        if (!root || root.children.length === 0) {
+            if (hiddenContentRef.current && hiddenContentRef.current.children.length > 0) {
+                root = hiddenContentRef.current;
+            } else {
+                setLoading(false);
+                window.dispatchEvent(
+                    new CustomEvent("superflex-update-loading", { detail: false }),
+                );
+                return;
+            }
+        }
+
+        // 1. Parse Semesters
+        const legacyForm = root.querySelector("form") || root.querySelector(".row"); // Sometimes form IS the row
+        if (legacyForm) {
+            const select = legacyForm.querySelector("select#SemId");
+            if (select) {
+                const opts = Array.from(select.options).map((o) => ({
+                    label: o.text.trim(),
+                    value: o.value,
+                    selected: o.selected,
+                }));
+                setSemesters(opts);
+            }
+        }
+
+        // 2. Parse Report Table
+        const table = root.querySelector("table.sum_table");
+        if (table) {
+            // Process Summary Data from Table Footer
+            const lastRow = table.querySelector("tr:last-child");
+            if (lastRow) {
+                // Assuming last valid cell is percentage
+                // Logic based on previous code: obtainPercentage = tr:last-child td.text-center.bold
+                const boldCells = lastRow.querySelectorAll("td.bold.text-center");
+                const percentageCell = boldCells.length > 0 ? boldCells[boldCells.length - 1] : null;
+
+                if (percentageCell) {
+                    const percentage = parseFloat(percentageCell.textContent.trim()) || 0;
+                    
+                    // Parse PLO Breakdown
+                    // PLO cells are between some indices in the last row.
+                    // Previous code: slice(2, -1) from "td.text-center"
+                    const allCenterCells = Array.from(lastRow.querySelectorAll("td.text-center"));
+                    // Heuristic: PLO values are usually numeric cells before the final total?
+                    // Let's deduce from headers if possible, or stick to the heuristic
+                    // The previous code used slice(2, -1). Let's try to map all numeric values found that are NOT the total
+                    
+                    const ploValues = [];
+                    // Using the previous code's logic as it was specific to this page's structure
+                    const validPloCells = allCenterCells.slice(2, -1);
+                    validPloCells.forEach((cell, idx) => {
+                        const txt = cell.textContent.trim();
+                        if (txt !== '-' && txt !== '') {
+                            ploValues.push({
+                                id: idx + 1,
+                                value: parseFloat(txt) || 0
+                            });
+                        }
+                    });
+
+                    setSummaryData({
+                        percentage,
+                        ploBreakdown: ploValues
+                    });
+                }
+            }
+
+            // Style and Save Table HTML
+            // We clone it to modify it safeley
+            const clonedTable = table.cloneNode(true);
+            
+            // Apply Tailwind Classes
+            clonedTable.classList.add("w-full", "border-collapse");
+            clonedTable.classList.remove("table-bordered", "table-striped", "table-responsive", "m-table", "sum_table");
+            
+            // Header
+            const thead = clonedTable.querySelector("thead");
+            if (thead) {
+                thead.classList.add("bg-zinc-900/50", "text-xs", "uppercase", "tracking-wider", "font-bold", "text-zinc-400");
+                const ths = thead.querySelectorAll("th");
+                ths.forEach(th => {
+                   th.classList.add("p-3", "border", "border-white/5", "text-center"); 
+                   th.removeAttribute("style"); // remove inline borders
+                });
+            }
+
+            // Body
+            const tbody = clonedTable.querySelector("tbody");
+            if (tbody) {
+                const trs = tbody.querySelectorAll("tr");
+                trs.forEach(tr => {
+                    tr.classList.add("border-b", "border-white/5", "hover:bg-white/5", "transition-colors");
+                    tr.removeAttribute("style"); // remove legacy bg colors
+
+                    const tds = tr.querySelectorAll("td");
+                    tds.forEach(td => {
+                        td.classList.add("p-3", "text-sm", "border-x", "border-white/5", "text-zinc-300");
+                        
+                        // Colorize scores
+                        const txt = td.textContent.trim();
+                        if (/^\d+(\.\d+)?$/.test(txt)) { // Is number
+                            const val = parseFloat(txt);
+                            if (val < 30) td.classList.add("text-rose-400", "font-bold");
+                            else if (val < 60) td.classList.add("text-amber-400", "font-bold");
+                            else if (val >= 60) td.classList.add("text-emerald-400", "font-bold");
+                        }
+                        
+                        // Handle 'bold' class from legacy
+                        if (td.classList.contains("bold")) td.classList.add("font-bold", "text-white");
+                    });
+                });
+                
+                // Highlight last row (Totals)
+                const lastTr = tbody.querySelector("tr:last-child");
+                if (lastTr) {
+                    lastTr.classList.add("bg-white/5", "!font-bold");
+                    const tds = lastTr.querySelectorAll("td");
+                    tds.forEach(td => td.classList.add("!text-white")); // Ensure visible
+                }
+            }
+
+            setReportHtml(clonedTable.outerHTML);
+        } else {
+            console.log("No table found");
+        }
+
+        // 3. Move Content for Legacy Form Functionality
+        if (hiddenContentRef.current && root !== hiddenContentRef.current) {
+            hiddenContentRef.current.innerHTML = "";
+            while (root.firstChild) {
+                hiddenContentRef.current.appendChild(root.firstChild);
+            }
+        }
+
+        setLoading(false);
+        window.dispatchEvent(
+          new CustomEvent("superflex-update-loading", { detail: false }),
+        );
+      } catch (e) {
+        console.error("Marks PLO Parsing Error", e);
+        setLoading(false);
+        window.dispatchEvent(
+          new CustomEvent("superflex-update-loading", { detail: false }),
+        );
+      }
     };
 
-    const portletHead = document.querySelector(".m-portlet__head");
-
-    const semesterForm = document.querySelector(
-      ".row:has(.col-md-12.text-center select#SemId)",
-    );
-    if (semesterForm) {
-      semesterForm.classList.add("!flex", "!items-center", "!gap-4", "!mb-4");
-      semesterForm.classList.remove("row");
-
-      const formContentDiv = semesterForm.querySelector(".col-md-12");
-      if (formContentDiv) {
-        formContentDiv.classList.add("!flex", "!items-center", "!gap-2");
-        formContentDiv.classList.remove("col-md-12", "text-center");
-
-        const label = formContentDiv.querySelector("label");
-        if (label) {
-          label.classList.add("!text-white", "!font-medium", "!m-0");
-
-          label.innerHTML = "<strong>Semester:</strong>";
-        }
-
-        formContentDiv.innerHTML = formContentDiv.innerHTML.replace(
-          /&nbsp;/g,
-          "",
-        );
-
-        const selectElement = formContentDiv.querySelector("select");
-        if (selectElement) {
-          selectElement.classList.add(
-            "!bg-black",
-            "!text-white",
-            "!border",
-            "!border-white/10",
-            "!rounded-xl",
-            "!px-4",
-            "!py-2",
-            "!cursor-pointer",
-            "!focus:ring-2",
-            "!focus:ring-x",
-            "!focus:outline-none",
-          );
-
-          selectElement.classList.remove(
-            "m-dropdown__toggle",
-            "btn",
-            "btn-brand",
-            "dropdown-toggle",
-          );
-
-          selectElement.style.paddingRight = "1rem";
-          selectElement.style.appearance = "auto";
-        }
-      }
-
-      if (portletHead) {
-        const formClone = semesterForm.cloneNode(true);
-        semesterForm.remove();
-        portletHead.appendChild(formClone);
-        formClone.classList.add("ml-4", "flex-1");
-      }
-    }
-
-    const ploTables = document.querySelectorAll(".sum_table");
-
-    if (ploTables.length === 0) {
-      const noReportMessage = document.createElement("div");
-      noReportMessage.className =
-        "rounded-xl p-8 bg-black !border !border-white/10 text-center mb-6";
-      noReportMessage.innerHTML = `
-          <svg class="w-16 h-16 mx-auto text-white/30 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <h3 class="text-xl font-bold text-white mb-2">No PLO Report Available</h3>
-          <p class="text-white/70">There is no PLO attainment data available for the selected semester.</p>
-          <p class="text-white/50 text-sm mt-2">Please select a different semester from the dropdown above.</p>
-        `;
-
-      const mContent = document.querySelector(".m-content");
-      const portletBody = document.querySelector(".m-portlet__body");
-
-      if (mContent && !portletBody) {
-        const form = mContent.querySelector("form");
-        if (form) {
-          form.insertAdjacentElement("afterend", noReportMessage);
-        } else {
-          mContent.appendChild(noReportMessage);
-        }
-      } else if (portletBody) {
-        portletBody.insertBefore(noReportMessage, portletBody.firstChild);
-      }
-    }
-
-    ploTables.forEach((table) => {
-      const tableContainer = document.createElement("div");
-      tableContainer.className =
-        "rounded-xl overflow-hidden !border !border-white/10 mb-6 max-w-full overflow-x-auto custom-scrollbar";
-
-      table.parentNode.insertBefore(tableContainer, table);
-      tableContainer.appendChild(table);
-
-      table.classList.add(
-        "!w-full",
-        "!border-collapse",
-        "!border-0",
-        "!bg-black",
-      );
-
-      table.classList.remove(
-        "table-bordered",
-        "table-striped",
-        "table-responsive",
-        "m-table",
-        "m-table--head-bg-info",
-        "table",
-      );
-
-      const thead = table.querySelector("thead");
-      if (thead) {
-        thead.classList.add(
-          "!bg-zinc-900",
-          "!sticky",
-          "!top-0",
-          "!z-10",
-          "!border-none",
-        );
-
-        let headerrow = thead.querySelectorAll("tr");
-
-        headerrow.forEach((row) => {
-          const headerCells = row.querySelectorAll("th");
-          headerCells.forEach((header) => {
-            header.classList.add(
-              "!bg-transparent",
-              "!text-gray-400",
-              "!font-medium",
-              "!p-3",
-              "!text-center",
-              "!border-none",
-            );
-            header.style.cssText = "border: none !important;";
-          });
-        });
-
-        const mainHeader = thead.querySelector("th[colspan='18']");
-        if (mainHeader) {
-          mainHeader.classList.add(
-            "!text-white",
-            "!font-bold",
-            "!text-lg",
-            "!py-4",
-            "!bg-zinc-800",
-          );
-        }
-
-        const domainHeader = thead.querySelector("th[colspan='3']");
-        const ploHeader = thead.querySelector("th[colspan='12']");
-
-        if (domainHeader) {
-          domainHeader.classList.add(
-            "!bg-zinc-800/50",
-            "!text-white",
-            "!font-medium",
-          );
-        }
-
-        if (ploHeader) {
-          ploHeader.classList.add(
-            "!bg-zinc-800/50",
-            "!text-white",
-            "!font-medium",
-          );
-        }
-
-        const ploNumberHeaders = thead.querySelectorAll(
-          "th[style*='white-space: nowrap']",
-        );
-        ploNumberHeaders.forEach((header) => {
-          header.classList.add("!whitespace-nowrap", "!px-4", "!py-2");
-          header.removeAttribute("style");
-        });
-      }
-
-      const tbody = table.querySelector("tbody");
-      if (tbody) {
-        tbody.classList.add("!divide-y", "!divide-white/10");
-
-        const courseRows = tbody.querySelectorAll("tr td[rowspan]");
-        courseRows.forEach((cell) => {
-          cell.classList.add(
-            "!font-medium",
-            "!text-white",
-            "!pl-4",
-            "!bg-zinc-900/30",
-          );
-          cell.removeAttribute("style");
-        });
-
-        const cloRows = tbody.querySelectorAll("tr");
-        cloRows.forEach((row) => {
-          row.classList.add(
-            "!bg-black",
-            "!hover:bg-white/5",
-            "!transition-colors",
-          );
-
-          const cells = row.querySelectorAll("td");
-          cells.forEach((cell) => {
-            cell.classList.add(
-              "!p-3",
-              "!text-white/80",
-              "!border-y",
-              "!border-white/10",
-            );
-
-            if (
-              cell.classList.contains("bold") &&
-              cell.textContent.includes("CLO")
-            ) {
-              cell.classList.add("!text-white", "!font-medium", "!bg-x/10");
-            }
-
-            if (
-              cell.classList.contains("text-center") &&
-              !cell.classList.contains("bold")
-            ) {
-              const value = parseFloatOrZero(cell.textContent);
-              if (value > 0) {
-                if (value < 30) {
-                  cell.classList.add("!text-rose-400");
-                } else if (value < 60) {
-                  cell.classList.add("!text-amber-400");
-                } else {
-                  cell.classList.add("!text-emerald-400");
-                }
-                cell.classList.add("!font-medium");
-              }
-            }
-          });
-        });
-
-        const totalRows = tbody.querySelectorAll(
-          "tr[style*='background: #36a3f7']",
-        );
-        totalRows.forEach((row) => {
-          row.classList.add("!bg-x/80", "!text-white", "!font-medium");
-          row.removeAttribute("style");
-
-          const totalCells = row.querySelectorAll("td");
-          totalCells.forEach((cell) => {
-            cell.classList.add("!py-3", "!font-medium");
-
-            if (cell.classList.contains("text-right")) {
-              cell.classList.add("!text-right", "!pr-6");
-            }
-
-            if (
-              cell.textContent.trim() !== "-" &&
-              cell.classList.contains("text-center")
-            ) {
-              const value = parseFloatOrZero(cell.textContent);
-              if (value > 0) {
-                if (value < 30) {
-                  cell.classList.add("!text-rose-200");
-                } else if (value < 60) {
-                  cell.classList.add("!text-amber-200");
-                } else {
-                  cell.classList.add("!text-emerald-200");
-                }
-              }
-            }
-          });
-        });
-      }
-    });
-
-    const gridHtmlp = document.getElementById("GridHtmlp");
-    if (gridHtmlp && gridHtmlp.querySelector(".sum_table")) {
-      const table = gridHtmlp.querySelector(".sum_table");
-      const obtainPercentage = table
-        .querySelector("tr:last-child td.text-center.bold")
-        ?.textContent.trim();
-
-      const totalRow = table.querySelector("tr:last-child");
-      const ploCells = totalRow
-        ? Array.from(totalRow.querySelectorAll("td.text-center")).slice(2, -1)
-        : [];
-      const ploValues = ploCells.map((cell) => {
-        const text = cell.textContent.trim();
-        return text === "-" ? 0 : parseFloatOrZero(text);
-      });
-
-      if (obtainPercentage && obtainPercentage !== "-") {
-        const percentage = parseFloatOrZero(obtainPercentage);
-
-        const performanceStatus =
-          percentage < 30 ? "Poor" : percentage < 60 ? "Average" : "Excellent";
-
-        const summaryCard = document.createElement("div");
-        summaryCard.className =
-          "bg-zinc-900 rounded-2xl p-6 mb-6 !border !border-white/10";
-
-        let ploBreakdown = "";
-        if (ploValues.length > 0) {
-          ploBreakdown = `
-              <div class="mt-5 !border-t !border-white/10 pt-4">
-                <h4 class="text-sm font-medium text-white/70 mb-3">PLO Breakdown</h4>
-                <div class="grid grid-cols-4 gap-3 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12">
-                  ${ploValues
-                    .map(
-                      (value, index) => `
-                    <div class="bg-black rounded-lg p-2 !border !border-white/5 text-center">
-                      <div class="text-xs text-white/60 mb-1">PLO ${
-                        index + 1
-                      }</div>
-                      <div class="text-sm font-bold ${
-                        value < 30
-                          ? "text-rose-400"
-                          : value < 60
-                            ? "text-amber-400"
-                            : "text-emerald-400"
-                      }">${value}%</div>
-                    </div>
-                  `,
-                    )
-                    .join("")}
-                </div>
-              </div>
-            `;
-        }
-
-        summaryCard.innerHTML = `
-            <div class="flex flex-col md:flex-row justify-between items-start gap-4">
-              <div class="flex items-start gap-4">
-                <div class="h-12 w-12 rounded-xl bg-x flex items-center justify-center">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                  </svg>
-                </div>
-                <div>
-                  <h3 class="text-xl font-bold text-white">PLO Attainment Summary</h3>
-                  <p class="text-sm text-white/70 mt-1">Based on current semester assessment</p>
-                </div>
-              </div>
-              <div class="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-                <div class="bg-black rounded-xl px-6 py-3 !border !border-white/10 text-center w-full md:w-auto">
-                  <span class="block text-xs text-white/70 mb-1">Overall Attainment</span>
-                  <span class="text-2xl font-bold ${
-                    percentage < 30
-                      ? "text-rose-400"
-                      : percentage < 60
-                        ? "text-amber-400"
-                        : "text-emerald-400"
-                  }">${percentage}%</span>
-                </div>
-                <div class="bg-black rounded-xl px-6 py-3 !border !border-white/10 text-center w-full md:w-auto">
-                  <span class="block text-xs text-white/70 mb-1">Status</span>
-                  <span class="text-sm font-bold ${
-                    percentage < 30
-                      ? "text-rose-400"
-                      : percentage < 60
-                        ? "text-amber-400"
-                        : "text-emerald-400"
-                  }">${performanceStatus}</span>
-                </div>
-              </div>
-            </div>
-            <div class="w-full mt-4">
-              <div class="flex justify-between items-center mb-2">
-                <span class="text-sm text-white/70">Progress</span>
-                <span class="text-sm font-bold ${
-                  percentage < 30
-                    ? "text-rose-400"
-                    : percentage < 60
-                      ? "text-amber-400"
-                      : "text-emerald-400"
-                }">${percentage}%</span>
-              </div>
-              <div class="w-full h-3 bg-black rounded-full overflow-hidden">
-                <div class="h-full rounded-full ${
-                  percentage < 30
-                    ? "bg-rose-400"
-                    : percentage < 60
-                      ? "bg-amber-400"
-                      : "bg-emerald-400"
-                }" style="width: ${percentage}%;"></div>
-              </div>
-            </div>
-            ${ploBreakdown}
-          `;
-
-        gridHtmlp.insertBefore(summaryCard, gridHtmlp.firstChild);
-      }
-    }
-
-    document
-      .querySelectorAll(".bg-zinc-900, .bg-black, .bg-x, .bg-zinc-800")
-      .forEach((el) => {
-        el.classList.add("print:!bg-white");
-      });
-
-    document
-      .querySelectorAll(".text-white, .text-gray-400, .text-white\\/80")
-      .forEach((el) => {
-        el.classList.add("print:!text-black");
-      });
-
-    document.querySelectorAll(".border-white\\/10").forEach((el) => {
-      el.classList.add("print:!border-gray-200");
-    });
-
-    document
-      .querySelectorAll(".rounded-xl, .rounded-2xl, .rounded-lg")
-      .forEach((el) => {
-        el.classList.add("print:!rounded-none");
-      });
-
-    document
-      .querySelectorAll(".m-subheader, header, .m-footer")
-      .forEach((el) => {
-        el.classList.add("print:!hidden");
-      });
-
-    document
-      .querySelector(".m-portlet__head")
-      ?.classList.add(
-        "!bg-black",
-        "!border",
-        "!border-white/10",
-        "!rounded-t-3xl",
-        "!h-fit",
-        "!p-4",
-        "!flex",
-        "!items-center",
-        "!justify-between",
-        "!mb-4",
-      );
-
-    document
-      .querySelector(".m-portlet__body")
-      ?.classList.add(
-        "!bg-black",
-        "!rounded-b-3xl",
-        "!p-8",
-        "!border",
-        "!border-white/10",
-        "!shadow-lg",
-        "!text-white",
-        "!h-[calc(100vh-220px)]",
-        "!max-h-[800px]",
-        "!overflow-y-auto",
-        "custom-scrollbar",
-      );
-
-    document
-      .querySelector(".m-portlet")
-      ?.classList.add(
-        "!bg-black",
-        "!border",
-        "!border-white/0",
-        "!rounded-3xl",
-        "!p-4",
-        "!shadow-lg",
-      );
-
-    if (portletHead) {
-      const printBtn = document.createElement("button");
-      printBtn.className =
-        "bg-x hover:bg-x/80 text-white font-medium py-2 px-4 rounded-xl transition-colors flex items-center gap-2";
-      printBtn.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 6 2 18 2 18 9"></polyline>
-            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-            <rect x="6" y="14" width="12" height="8"></rect>
-          </svg>
-          Print Report
-        `;
-      printBtn.addEventListener("click", () => {
-        window.print();
-      });
-      portletHead.appendChild(printBtn);
-    }
-
-    const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
-
-    if (targetElement) {
-      setElemContent(targetElement.innerHTML);
-      targetElement.remove();
-    }
+    parseData();
   }, []);
+
+  const handleSemesterChange = (val) => {
+    if (hiddenContentRef.current) {
+        const select = hiddenContentRef.current.querySelector("select#SemId");
+        if (select) {
+            select.value = val;
+            select.dispatchEvent(new Event('change'));
+            // If there's a form, submit it
+            const form = select.closest("form");
+            if (form) form.submit();
+        }
+    }
+  };
+
+  // Helper for status visual
+  const getStatus = (pct) => {
+      if (pct < 30) return { label: "Poor", color: "text-rose-400", bg: "bg-rose-500/20" };
+      if (pct < 60) return { label: "Average", color: "text-amber-400", bg: "bg-amber-500/20" };
+      return { label: "Excellent", color: "text-emerald-400", bg: "bg-emerald-500/20" };
+  };
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      {elemContent && (
-        <div
-          className="m-grid m-grid--hor m-grid--root m-page"
-          dangerouslySetInnerHTML={{ __html: elemContent }}
-        />
-      )}
+      <div className="w-full min-h-screen p-6 md:p-8 space-y-8 print:p-0 print:bg-white">
+        
+        {/* Header - No Print */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 print:hidden">
+          <div className="space-y-2">
+            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
+              PLO Report
+            </h1>
+            <p className="text-zinc-400 font-medium">
+              Program Learning Outcomes attainment analysis
+            </p>
+          </div>
+
+          <div className="flex gap-4">
+             {semesters.length > 0 && (
+                 <div className="flex gap-2 bg-zinc-900/50 p-1.5 rounded-full border border-white/5 backdrop-blur-sm overflow-x-auto custom-scrollbar">
+                    {semesters.map((sem, idx) => (
+                        <button
+                        key={idx}
+                        onClick={() => handleSemesterChange(sem.value)}
+                        className={`px-5 py-2 border rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
+                            sem.selected
+                            ? "bg-[#a098ff]/10 text-[#a098ff] border-[#a098ff]/20"
+                            : "text-zinc-500 border-transparent hover:text-white hover:bg-white/5"
+                        }`}
+                        >
+                        {sem.label}
+                        </button>
+                    ))}
+                </div>
+             )}
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <LoadingSpinner />
+          </div>
+        ) : (
+          <div className="space-y-8">
+            
+            {/* Dashboard Summary */}
+            {summaryData && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 print:gap-4">
+                    {/* Overall Score */}
+                    <div className="bg-zinc-900/50 border border-white/5 rounded-3xl p-6 relative overflow-hidden group print:border-gray-200 print:bg-white">
+                        <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                             <Target size={80} className="text-white print:text-black" />
+                        </div>
+                        <div className="relative z-10">
+                            <h3 className="text-zinc-400 font-medium text-sm flex items-center gap-2 print:text-black">
+                                <BarChart3 size={16} /> Overall Attainment
+                            </h3>
+                            <div className={`mt-4 text-5xl font-black tracking-tighter ${getStatus(summaryData.percentage).color} print:text-black`}>
+                                {summaryData.percentage}%
+                            </div>
+                            <div className="mt-2 text-sm text-zinc-500 print:text-gray-600">Based on CLO mapping</div>
+                        </div>
+                    </div>
+
+                     {/* Status */}
+                     <div className="bg-zinc-900/50 border border-white/5 rounded-3xl p-6 relative overflow-hidden group print:border-gray-200 print:bg-white">
+                        <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
+                             <TrendingUp size={80} className="text-white print:text-black" />
+                        </div>
+                        <div className="relative z-10">
+                            <h3 className="text-zinc-400 font-medium text-sm flex items-center gap-2 print:text-black">
+                                <Layout size={16} /> Performance Status
+                            </h3>
+                            <div className="mt-4 flex items-center gap-3">
+                                <span className={`px-4 py-2 rounded-xl text-lg font-bold border ${getStatus(summaryData.percentage).bg} ${getStatus(summaryData.percentage).color} border-transparent print:border-gray-200 print:text-black print:bg-transparent`}>
+                                    {getStatus(summaryData.percentage).label}
+                                </span>
+                            </div>
+                             <div className="mt-4 w-full bg-zinc-800 rounded-full h-2 overflow-hidden print:bg-gray-200">
+                                <div 
+                                    className={`h-full ${getStatus(summaryData.percentage).bg.replace('/20', '')}`} 
+                                    style={{ width: `${summaryData.percentage}%` }}
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* PLO Breakdown */}
+                    <div className="bg-zinc-900/50 border border-white/5 rounded-3xl p-6 md:col-span-1 print:border-gray-200 print:bg-white">
+                         <h3 className="text-zinc-400 font-medium text-sm flex items-center gap-2 mb-4 print:text-black">
+                            <FileBarChart size={16} /> PLO Breakdown
+                        </h3>
+                        <div className="grid grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                             {summaryData.ploBreakdown.map((plo, i) => (
+                                 <div key={i} className="flex flex-col items-center bg-black/20 rounded-lg p-2 border border-white/5 hover:border-white/10 transition-colors print:border-gray-200 print:bg-transparent">
+                                     <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider print:text-black">PLO {plo.id}</span>
+                                     <span className={`text-sm font-bold ${getStatus(plo.value).color} print:text-black`}>
+                                         {plo.value}%
+                                     </span>
+                                 </div>
+                             ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Printable section removed */}
+
+            {/* Detailed Report Table */}
+            {reportHtml ? (
+                <div className="bg-zinc-900/50 border border-white/5 rounded-3xl overflow-hidden">
+                    <div className="p-6 border-b border-white/5 flex items-center gap-3 bg-white/5">
+                        <div className="p-2 bg-[#a098ff]/10 rounded-lg text-[#a098ff]">
+                            <Layout size={20} />
+                        </div>
+                        <h3 className="font-bold text-lg text-white">Detailed Result</h3>
+                    </div>
+                    {/* Render extracted HTML */}
+                    <div className="overflow-x-auto custom-scrollbar p-0">
+                         <div 
+                            className="legacy-table-wrapper w-full [&_table]:w-full [&_table]:border-collapse [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap"
+                            dangerouslySetInnerHTML={{ __html: reportHtml }} 
+                         />
+                    </div>
+                </div>
+            ) : (
+                <div className="flex flex-col items-center justify-center py-20 text-center opacity-50 border border-white/5 rounded-3xl bg-zinc-900/20">
+                    <Info size={48} className="mb-4 text-zinc-500" />
+                    <p className="text-xl font-bold text-white">No PLO Report Available</p>
+                    <p className="text-zinc-400 mt-2">There is no PLO attainment data available for the selected semester.</p>
+                    <p className="text-zinc-500 text-sm mt-1">Please select a different semester.</p>
+                </div>
+            )}
+
+          </div>
+        )}
+
+        {/* Hidden Legacy Container */}
+        <div ref={hiddenContentRef} className="hidden" />
+
+      </div>
     </PageLayout>
   );
 }

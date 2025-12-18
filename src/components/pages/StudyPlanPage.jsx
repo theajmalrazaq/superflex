@@ -1,477 +1,298 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import PageLayout from "../layouts/PageLayout";
+import { LoadingSpinner } from "../LoadingOverlay";
+import {
+  GraduationCap,
+  BookOpen,
+  Layers,
+  CheckCircle2,
+  ChevronRight,
+  TrendingUp,
+} from "lucide-react";
+
+const StatCard = ({ icon: Icon, label, value, subValue }) => (
+  <div
+    className="p-6 rounded-[2rem] border border-white/5 bg-zinc-900/50 backdrop-blur-xl hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group flex flex-col gap-4 h-full"
+  >
+    <div className="flex justify-between items-start mb-6">
+      <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
+        <Icon size={24} />
+      </div>
+    </div>
+    <div className="space-y-1">
+      <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">
+        {label}
+      </p>
+      <div className="flex items-baseline gap-2">
+        <h3 className="text-xl font-bold text-white tracking-tight uppercase">
+          {value}
+        </h3>
+        {subValue && (
+          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest ml-1">{subValue}</span>
+        )}
+      </div>
+    </div>
+  </div>
+);
 
 function StudyPlanPage() {
-  const [elemContent, setElemContent] = useState(null);
-  const contentRef = useRef(null);
+  const [loading, setLoading] = useState(true);
+  const [semesters, setSemesters] = useState([]);
+  const [activeSemIdx, setActiveSemIdx] = useState(0);
 
   useEffect(() => {
-    const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
+    // Notify loading start
+    window.dispatchEvent(
+      new CustomEvent("superflex-update-loading", { detail: true }),
     );
 
-    if (targetElement) {
-      applyCustomStyling(targetElement);
-
-      setElemContent(targetElement.innerHTML);
-      targetElement.remove();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (elemContent && contentRef.current) {
-      setupAccordions();
-    }
-  }, [elemContent]);
-
-  const setupAccordions = () => {
-    if (!contentRef.current) return;
-
-    const accordionHeaders =
-      contentRef.current.querySelectorAll(".semester-header");
-
-    accordionHeaders.forEach((header) => {
-      header.classList.add(
-        "cursor-pointer",
-        "bg-black/50",
-        "!rounded-xl",
-        "!p-6",
-        "!mb-2",
-        "!flex",
-        "!items-center",
-        "!justify-between",
-        "!border",
-        "!border-white/10",
-        "!text-white",
-        "!font-bold",
-        "!text-lg",
-        "!bg-white/10",
-      );
-
-      header.addEventListener("click", function () {
-        const parentCol = this.closest(".semester-container")?.querySelector(
-          ".accordion-content",
+    const parseData = () => {
+      try {
+        const root = document.querySelector(
+          ".m-grid.m-grid--hor.m-grid--root.m-page",
         );
-        if (!parentCol) return;
+        if (!root) {
+          setLoading(false);
+          window.dispatchEvent(
+            new CustomEvent("superflex-update-loading", { detail: false }),
+          );
+          return;
+        }
 
-        const isExpanded = parentCol.classList.contains("expanded");
+        const parsedSemesters = [];
+        const semesterCols = root.querySelectorAll(".col-md-6");
 
-        const allAccordions =
-          contentRef.current.querySelectorAll(".accordion-content");
-        allAccordions.forEach((acc) => {
-          acc.style.maxHeight = "0";
-          acc.style.opacity = "0";
-          acc.classList.remove("expanded");
+        semesterCols.forEach((col) => {
+          const h4 = col.querySelector("h4");
+          if (!h4) return;
 
-          const accHeader = acc
-            .closest(".semester-container")
-            ?.querySelector(".semester-header");
-          if (accHeader) {
-            const chevronDown = accHeader.querySelector(".chevron-down");
-            const chevronUp = accHeader.querySelector(".chevron-up");
+          const title = h4.textContent.replace(h4.querySelector("small")?.textContent || "", "").trim();
+          const crHrsText = h4.querySelector("small")?.textContent || "";
+          const crHrs = parseInt(crHrsText.match(/\d+/)?.[0] || "0");
 
-            if (chevronDown) chevronDown.classList.add("hidden");
-            if (chevronUp) chevronUp.classList.remove("hidden");
+          const courses = [];
+          const table = col.querySelector("table");
+          if (table) {
+            table.querySelectorAll("tbody tr").forEach((tr) => {
+              const cells = tr.querySelectorAll("td");
+              if (cells.length >= 4) {
+                courses.push({
+                  code: cells[0].textContent.trim(),
+                  title: cells[1].textContent.trim(),
+                  crHrs: parseInt(cells[2].textContent.trim()),
+                  type: cells[3].textContent.trim(),
+                });
+              }
+            });
           }
+
+          parsedSemesters.push({ title, crHrs, courses });
         });
 
-        if (!isExpanded) {
-          parentCol.style.maxHeight = "2000px";
-          parentCol.style.opacity = "1";
-          parentCol.classList.add("expanded");
+        setSemesters(parsedSemesters);
+        
+        // Hide original content
+        root.style.display = "none";
+        
+        setLoading(false);
+        window.dispatchEvent(
+          new CustomEvent("superflex-update-loading", { detail: false }),
+        );
+      } catch (e) {
+        console.error("Study Plan Parsing Error", e);
+        setLoading(false);
+        window.dispatchEvent(
+          new CustomEvent("superflex-update-loading", { detail: false }),
+        );
+      }
+    };
 
-          const chevronDown = this.querySelector(".chevron-down");
-          const chevronUp = this.querySelector(".chevron-up");
+    parseData();
+  }, []);
 
-          if (chevronDown) chevronDown.classList.remove("hidden");
-          if (chevronUp) chevronUp.classList.add("hidden");
+  const stats = useMemo(() => {
+    let totalCredits = 0;
+    let totalCourses = 0;
+    let coreCourses = 0;
+    let electives = 0;
+
+    semesters.forEach(sem => {
+      sem.courses.forEach(course => {
+        const isNC = course.type.toLowerCase().includes("non credit") || 
+                     course.code.toLowerCase().includes("nc");
+        
+        if (!isNC) {
+          totalCredits += course.crHrs;
+          totalCourses++;
+          if (course.type === "Core") coreCourses++;
+          else if (course.type.toLowerCase().includes("elective")) electives++;
         }
       });
     });
-  };
 
-  const applyCustomStyling = (element) => {
-    const styleElement = document.createElement("style");
-    styleElement.textContent = `
-      .custom-scrollbar::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-      .custom-scrollbar::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 10px;
-      }
-      .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
-      }
-      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.3);
-      }
-      
-      .accordion-content {
-        transition: max-height 0.5s ease, opacity 0.3s ease;
-        overflow: hidden;
-      }
-      
-      .accordion-content.expanded {
-        max-height: 2000px !important; /* Use a large value as fallback */
-        opacity: 1 !important;
-      }
-      
-      .grade-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 9999px;
-        padding: 2px 10px;
-        font-weight: 600;
-        min-width: 36px;
-        text-align: center;
-      }
-      
-      .semester-container {
-        margin-bottom: 1.5rem;
-      }
-      
-     
-      
-      .studyplan-table {
-        border-spacing: 0;
-        width: 100%;
-      }
-      
-      .studyplan-table th {
-        background-color: rgba(30, 30, 30, 0.8) !important;
-        backdrop-filter: blur(4px);
-        font-weight: 500 !important;
-        padding: 12px !important;
-        letter-spacing: 0.5px;
-      }
-      
-      .studyplan-table td {
-        padding: 12px !important;
-        font-size: 0.95rem;
-      }
-      
-      .type-badge {
-        display: inline-flex;
-        padding: 0.25rem 0.75rem;
-        border-radius: 9999px;
-        font-size: 0.875rem;
-        font-weight: 500;
-      }
-      
-      .type-core {
-        background-color: rgba(52, 211, 153, 0.2);
-        color: rgb(52, 211, 153);
-      }
-      
-      .type-elective {
-        background-color: rgba(251, 191, 36, 0.2);
-        color: rgb(251, 191, 36);
-      }
-    `;
-    document.head.appendChild(styleElement);
+    return { totalCredits, totalCourses, coreCourses, electives };
+  }, [semesters]);
 
-    const portlet = element.querySelector(".m-portlet");
-    if (portlet) {
-      portlet.classList.add(
-        "!bg-black",
-        "!border-none",
-        "!rounded-3xl",
-        "!p-4",
-        "!shadow-lg",
-      );
+  const activeSemData = semesters[activeSemIdx];
 
-      portlet.classList.remove(
-        "m-portlet--brand",
-        "m-portlet--head-solid-bg",
-        "m-portlet--border-bottom-brand",
-        "m-portlet--head-sm",
-      );
-    }
-
-    const portletHead = element.querySelector(".m-portlet__head");
-    if (portletHead) {
-      portletHead.classList.add(
-        "!bg-black",
-        "!border",
-        "!border-white/10",
-        "!rounded-t-3xl",
-        "!h-fit",
-        "!p-4",
-        "!flex",
-        "!items-center",
-        "!justify-between",
-        "!mb-4",
-      );
-
-      const headingText = portletHead.querySelector(".m-portlet__head-text");
-      if (headingText) {
-        headingText.classList.add("!text-white", "!text-xl", "!font-bold");
-      }
-    }
-
-    const portletBody = element.querySelector(".m-portlet__body");
-    if (portletBody) {
-      portletBody.classList.add(
-        "!bg-black",
-        "!rounded-b-3xl",
-        "!p-6",
-        "!border",
-        "!border-white/10",
-        "!shadow-lg",
-        "!text-white",
-        "!h-[calc(100vh-220px)]",
-        "!max-h-[800px]",
-        "!overflow-y-auto",
-        "custom-scrollbar",
-      );
-    }
-
-    const sectionContent = element.querySelector(".m-section__content");
-    if (sectionContent) {
-      const semesterCols = sectionContent.querySelectorAll(".col-md-6");
-
-      semesterCols.forEach((semesterCol) => {
-        const semesterContainer = document.createElement("div");
-        semesterContainer.className = "semester-container";
-        semesterContainer.classList.add(
-          "!rounded-xl",
-          "w-full",
-          "bg-black",
-          "!p-4",
-          "!border-none",
-        );
-
-        semesterCol.parentNode.insertBefore(semesterContainer, semesterCol);
-        semesterContainer.appendChild(semesterCol);
-
-        semesterCol.classList.remove("col-md-6");
-        semesterCol.style.width = "100%";
-
-        const semesterHeader = semesterCol.querySelector("h4");
-        if (semesterHeader) {
-          const headerRow = document.createElement("div");
-          headerRow.className = "semester-header cursor-pointer";
-          headerRow.innerHTML = semesterHeader.outerHTML;
-
-          semesterHeader.parentNode.insertBefore(headerRow, semesterHeader);
-          semesterHeader.remove();
-
-          const collapseIcon = document.createElement("div");
-          collapseIcon.className =
-            "h-8 w-8 rounded-lg !bg-x !flex !items-center !justify-center mr-2 shadow-inner";
-          collapseIcon.innerHTML = `
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-up !text-white transition-transform duration-300">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down !text-white hidden transition-transform duration-300">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-          `;
-
-          const h4Element = headerRow.querySelector("h4");
-          if (h4Element) {
-            const titleWrapper = document.createElement("div");
-            titleWrapper.className = "!flex !items-center";
-
-            h4Element.parentNode.insertBefore(titleWrapper, h4Element);
-            titleWrapper.appendChild(collapseIcon);
-            titleWrapper.appendChild(h4Element);
-
-            h4Element.classList.add(
-              "!text-white",
-              "!font-bold",
-              "!text-lg",
-              "!mb-0",
-            );
-
-            const smallText = h4Element.querySelector("small");
-            if (smallText) {
-              smallText.classList.add("!text-white/60", "!ml-2");
-            }
-          }
-        }
-
-        const table = semesterCol.querySelector("table");
-        if (table) {
-          const tableContainer = document.createElement("div");
-          tableContainer.className =
-            "rounded-xl overflow-hidden !border !border-white/10 accordion-content";
-          tableContainer.dataset.expanded = "false";
-
-          table.parentNode.insertBefore(tableContainer, table);
-          tableContainer.appendChild(table);
-
-          table.classList.add("studyplan-table");
-          table.classList.remove(
-            "table",
-            "m-table",
-            "m-table--head-bg-info",
-            "table-bordered",
-            "table-striped",
-            "table-responsive",
-            "span12",
-          );
-
-          const thead = table.querySelector("thead");
-          if (thead) {
-            thead.classList.add(
-              "bg-zinc-900",
-              "!rounded-t-lg",
-              "top-0",
-              "z-10",
-            );
-
-            const headers = thead.querySelectorAll("th");
-            headers.forEach((header) => {
-              header.classList.add(
-                "!bg-transparent",
-                "!text-slate-400",
-                "!font-medium",
-                "!p-3",
-                "!text-left",
-                "!border-b",
-                "!border-white/10",
-              );
-            });
-          }
-
-          const tbody = table.querySelector("tbody");
-          if (tbody) {
-            tbody.classList.add("!divide-y", "!divide-white/10");
-
-            const rows = tbody.querySelectorAll("tr");
-            rows.forEach((row) => {
-              row.classList.add(
-                "!bg-black",
-                "!hover:bg-white/5",
-                "!transition-colors",
-              );
-
-              const cells = row.querySelectorAll("td");
-              cells.forEach((cell, index) => {
-                cell.classList.add(
-                  "!p-3",
-                  "!text-white/80",
-                  "!border-y",
-                  "!border-white/10",
-                );
-
-                if (cell.classList.contains("text-center")) {
-                  cell.classList.add("!font-semibold", "!text-white");
-                }
-
-                if (index === 3) {
-                  const courseType = cell.textContent.trim();
-
-                  const badgeElement = document.createElement("span");
-
-                  if (courseType === "Core") {
-                    badgeElement.className = "type-badge type-core";
-                  } else if (courseType === "Elective") {
-                    badgeElement.className = "type-badge type-elective";
-                  }
-
-                  badgeElement.textContent = courseType;
-
-                  cell.textContent = "";
-                  cell.appendChild(badgeElement);
-                }
-              });
-            });
-          }
-        }
-      });
-
-      semesterCols.forEach((semesterCol) => {
-        const headerRow = semesterCol.querySelector(".semester-header");
-        const tableContainer = semesterCol.querySelector(".accordion-content");
-
-        if (headerRow && tableContainer) {
-          tableContainer.style.maxHeight = "0";
-          tableContainer.style.opacity = "0";
-          tableContainer.style.overflow = "hidden";
-
-          const chevronDown = headerRow.querySelector(".chevron-down");
-          const chevronUp = headerRow.querySelector(".chevron-up");
-
-          if (chevronDown && chevronUp) {
-            chevronDown.classList.add("hidden");
-            chevronUp.classList.remove("hidden");
-          }
-
-          headerRow.addEventListener("click", function () {
-            const isExpanded = tableContainer.classList.contains("expanded");
-
-            const allAccordions =
-              element.querySelectorAll(".accordion-content");
-            allAccordions.forEach((acc) => {
-              if (acc !== tableContainer) {
-                acc.style.maxHeight = "0";
-                acc.style.opacity = "0";
-                acc.classList.remove("expanded");
-
-                const otherHeader = acc
-                  .closest(".col-md-6")
-                  .querySelector(".semester-header");
-                if (otherHeader) {
-                  const otherChevronDown =
-                    otherHeader.querySelector(".chevron-down");
-                  const otherChevronUp =
-                    otherHeader.querySelector(".chevron-up");
-                  if (otherChevronDown)
-                    otherChevronDown.classList.add("hidden");
-                  if (otherChevronUp) otherChevronUp.classList.remove("hidden");
-                }
-              }
-            });
-
-            if (isExpanded) {
-              tableContainer.style.maxHeight = "0";
-              tableContainer.style.opacity = "0";
-              tableContainer.classList.remove("expanded");
-
-              if (chevronDown && chevronUp) {
-                chevronDown.classList.add("hidden");
-                chevronUp.classList.remove("hidden");
-              }
-            } else {
-              const scrollHeight = tableContainer.scrollHeight;
-
-              tableContainer.style.maxHeight = "2000px";
-              tableContainer.style.opacity = "1";
-              tableContainer.classList.add("expanded");
-
-              setTimeout(() => {
-                if (tableContainer.classList.contains("expanded")) {
-                  tableContainer.style.maxHeight = `${scrollHeight + 50}px`;
-                }
-              }, 50);
-
-              if (chevronDown && chevronUp) {
-                chevronDown.classList.remove("hidden");
-                chevronUp.classList.add("hidden");
-              }
-            }
-          });
-        }
-      });
-    }
-  };
+  if (loading) {
+    return (
+      <PageLayout currentPage={window.location.pathname}>
+        <div className="flex justify-center py-20">
+          <LoadingSpinner />
+        </div>
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      {elemContent && (
-        <div
-          ref={contentRef}
-          className="m-grid m-grid--hor m-grid--root m-page"
-          dangerouslySetInnerHTML={{ __html: elemContent }}
-        />
-      )}
+      <div className="w-full min-h-screen p-6 md:p-10 space-y-10 relative z-10">
+        {/* Glow Effects */}
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+        <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
+
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="space-y-2">
+            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
+              Study <span className="text-[#a098ff]">Plan</span>
+            </h1>
+            <p className="text-zinc-400 font-medium font-sans">
+              Degree requirements and course roadmaps
+            </p>
+          </div>
+          <div className="flex items-center gap-4 bg-zinc-900/50 px-6 py-3 rounded-2xl border border-white/5 backdrop-blur-xl">
+            <div className="text-right">
+              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Graduation Path</p>
+              <h4 className="text-lg font-bold text-white">4 Year Degree</h4>
+            </div>
+            <div className="w-px h-8 bg-white/10 mx-2"></div>
+            <GraduationCap className="text-[#a098ff]" size={24} />
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatCard 
+            icon={BookOpen} 
+            label="Total Credits" 
+            value={stats.totalCredits} 
+            subValue="to Graduate"
+          />
+          <StatCard 
+            icon={Layers} 
+            label="Core Courses" 
+            value={stats.coreCourses} 
+            subValue="Required"
+          />
+          <StatCard 
+            icon={TrendingUp} 
+            label="Electives" 
+            value={stats.electives} 
+            subValue="Available"
+          />
+          <StatCard 
+            icon={CheckCircle2} 
+            label="Semesters" 
+            value={semesters.length} 
+            subValue="Planned"
+          />
+        </div>
+
+        {/* Content Section */}
+        <div className="space-y-8">
+          {/* Semester Selector */}
+          <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+              <div className="flex gap-2 bg-black/40 p-1.5 rounded-full border border-white/5 backdrop-blur-sm overflow-x-auto custom-scrollbar no-scrollbar min-w-fit">
+                {semesters.map((sem, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveSemIdx(idx)}
+                    className={`px-6 py-2.5 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
+                      activeSemIdx === idx
+                        ? "bg-[#a098ff] text-white shadow-lg shadow-[#a098ff]/20"
+                        : "text-zinc-500 hover:text-white"
+                    }`}
+                  >
+                    {sem.title}
+                  </button>
+                ))}
+              </div>
+              
+              {activeSemData && (
+                <div className="flex items-center gap-6 pr-4">
+                  <div className="text-right">
+                    <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">Semester Load</p>
+                    <span className="text-xl font-bold text-[#a098ff] font-sans">
+                      {activeSemData.crHrs} <span className="text-xs text-zinc-500 uppercase ml-1">Credits</span>
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Active Semester Courses */}
+          {activeSemData && (
+            <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden">
+               <div className="flex items-center gap-3 mb-10 border-b border-white/5 pb-8">
+                  <div className="p-3 bg-zinc-800 rounded-xl text-zinc-400">
+                    <BookOpen size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white tracking-tight">{activeSemData.title} Timeline</h3>
+                    <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Curriculum Roadmap</p>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto custom-scrollbar">
+                  <table className="w-full text-left order-collapse border-spacing-0">
+                    <thead>
+                      <tr className="border-b border-white/5">
+                        <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Code</th>
+                        <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Course Title</th>
+                        <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider text-center">Cr.H</th>
+                        <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider text-right">Category</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {activeSemData.courses.map((course, cIdx) => (
+                        <tr key={cIdx} className="group hover:bg-white/[0.02] transition-colors">
+                          <td className="px-6 py-5">
+                            <span className="px-2.5 py-1 rounded-lg bg-zinc-800 text-zinc-400 text-[10px] font-bold tracking-tight border border-white/5">
+                              {course.code}
+                            </span>
+                          </td>
+                          <td className="px-6 py-5">
+                            <span className="text-white font-medium group-hover:text-[#a098ff] transition-colors">
+                              {course.title}
+                            </span>
+                          </td>
+                          <td className="px-6 py-5 text-center">
+                            <span className="text-zinc-400 font-bold font-sans">
+                              {course.crHrs}
+                            </span>
+                          </td>
+                          <td className="px-6 py-5 text-right">
+                            <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                              course.type === "Core" 
+                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
+                              : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                            }`}>
+                              {course.type}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+            </div>
+          )}
+        </div>
+      </div>
     </PageLayout>
   );
 }

@@ -510,7 +510,7 @@ function HomePage() {
       currentPage={window.location.pathname}
       onLinksFound={handleLinksFound}
     >
-      <div className="w-full px-6 py-8 space-y-8 animate-in fade-in duration-500">
+      <div className="w-full px-6 py-8 space-y-8">
         {}
         {}
         <div className="relative rounded-[2rem] bg-black p-6 overflow-hidden group">
@@ -560,7 +560,7 @@ function HomePage() {
               >
                 <Activity
                   size={16}
-                  className={activeMainTab === "stats" ? "animate-pulse" : ""}
+                  className={""}
                 />
                 Stats
               </button>
@@ -581,7 +581,7 @@ function HomePage() {
 
         {}
         {activeMainTab === "stats" && (
-          <div className="space-y-8 animate-in fade-in duration-300">
+          <div className="space-y-8">
             {}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {}
@@ -670,17 +670,16 @@ function HomePage() {
                   <LoadingSpinner />
                 </div>
               ) : coursesData.length > 0 ? (
-                <div className="bg-zinc-900/50 border backdrop-blur-xl rounded-3xl p-6  overflow-hidden flex flex-col gap-6 h-full">
-                  <div className="flex flex-col justify-between items-start gap-4">
-                    <div className="flex w-full justify-between items-start">
-                      <div>
-                        <h3 className="text-lg font-bold text-white">
-                          Course Performance
-                        </h3>
-                        <p className="text-zinc-500 text-sm">
-                          Detailed marks for each subject
-                        </p>
-                      </div>
+                <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden flex flex-col gap-8 h-full">
+                  <div className="flex flex-col md:flex-row justify-between items-start gap-6">
+                    <div className="space-y-1">
+                      <h3 className="text-xl font-bold text-white tracking-tight">
+                        Course Performance
+                      </h3>
+                      <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+                        Detailed marks and assessments
+                      </p>
+                    </div>
                       {links.marks && (
                         <a
                           href={links.marks}
@@ -693,16 +692,16 @@ function HomePage() {
                     </div>
 
                     {}
-                    <div className="w-full overflow-x-auto custom-scrollbar pb-2">
-                      <div className="flex gap-2">
+                    <div className="w-full overflow-x-auto custom-scrollbar no-scrollbar">
+                      <div className="flex gap-2 bg-black/40 p-1.5 rounded-full border border-white/5 backdrop-blur-sm w-fit">
                         {coursesData.map((course) => (
                           <button
                             key={course.id}
                             onClick={() => setActiveCourse(course.id)}
-                            className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap transition-all border ${
+                            className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
                               activeCourse === course.id
-                                ? "bg-[#a098ff] text-white border-[#a098ff]"
-                                : "bg-zinc-900/50 text-zinc-400 border-white/5 hover:text-white hover:bg-zinc-800 hover:border-white/20"
+                                ? "bg-[#a098ff] text-white shadow-lg shadow-[#a098ff]/20"
+                                : "text-zinc-500 hover:text-white"
                             }`}
                           >
                             {course.id}
@@ -710,13 +709,12 @@ function HomePage() {
                         ))}
                       </div>
                     </div>
-                  </div>
 
                   {}
                   {activeCourseData && (
                     <div
                       key={activeCourse}
-                      className="animate-in fade-in zoom-in-95 duration-300"
+                      className=""
                     >
                       <div className="flex flex-col gap-2 mb-4">
                         <h2 className="text-xl font-bold text-white leading-tight">
@@ -765,14 +763,14 @@ function HomePage() {
                 </div>
               )}
               {}
-              <div className="p-8 rounded-[1.5rem] border bg-zinc-900/50 backdrop-blur-xl border h-full flex flex-col">
+              <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 h-full flex flex-col">
                 <div className="flex justify-between items-start mb-8">
-                  <div>
-                    <h3 className="text-xl font-bold text-white">
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-bold text-white tracking-tight">
                       Attendance Overview
                     </h3>
-                    <p className="text-zinc-500 text-sm">
-                      Present vs Absent (Count)
+                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+                      Presence and Absence Analytics
                     </p>
                   </div>
                   {links.attendance && (
@@ -882,7 +880,7 @@ function HomePage() {
 
         {}
         {activeMainTab === "info" && (
-          <div className="animate-in fade-in duration-300">
+          <div className="">
             <ProfileInfoTabs profileSections={profileSections} />
           </div>
         )}
@@ -895,7 +893,7 @@ const ProfileInfoTabs = ({ profileSections }) => {
   if (!profileSections || profileSections.length === 0) return null;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8">
       {profileSections.map((section, idx) => (
         <div
           key={idx}

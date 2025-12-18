@@ -431,7 +431,7 @@ function AttendancePage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-6 md:p-8 space-y-8 animate-in fade-in duration-500">
+      <div className="w-full min-h-screen p-6 md:p-8 space-y-8">
         {}
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="space-y-2">
@@ -462,10 +462,10 @@ function AttendancePage() {
                       }
                     }
                   }}
-                  className={`px-5 py-2 border rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
+                  className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
                     sem.selected
-                      ? "bg-[#a098ff]/10 text-[#a098ff] border-[#a098ff]/20"
-                      : "text-zinc-500 border-transparent hover:text-white hover:bg-white/5"
+                      ? "bg-[#a098ff] text-white shadow-lg shadow-[#a098ff]/20"
+                      : "text-zinc-500 hover:text-white"
                   }`}
                 >
                   {sem.label}
@@ -522,7 +522,7 @@ function AttendancePage() {
             {selectedCourseData && (
               <div
                 key={selectedCourseId}
-                className="space-y-16 animate-in slide-in-from-bottom-4 duration-500"
+                className="space-y-16"
               >
                 {}
                 <div className="flex flex-wrap gap-4">

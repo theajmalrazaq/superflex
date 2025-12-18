@@ -20,7 +20,7 @@ function PageLayout({
         </div>
       </div>
 
-      <div className="w-full flex-1 p-6 pt-4 overflow-x-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="w-full flex-1 p-6 pt-4 overflow-x-hidden">
         {children}
       </div>
     </div>

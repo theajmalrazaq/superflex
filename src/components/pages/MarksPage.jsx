@@ -999,7 +999,7 @@ function MarksPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-4 md:p-8 space-y-8 animate-in fade-in duration-500 pb-24">
+      <div className="w-full min-h-screen p-4 md:p-8 space-y-8 pb-24">
         {}
         <div className="flex flex-col xl:flex-row justify-between items-center gap-6 mb-8">
           <div className="space-y-2">
@@ -1095,7 +1095,7 @@ function MarksPage() {
         {loading ? (
           <LoadingSpinner />
         ) : selectedCourse ? (
-          <div className="space-y-8 animate-in slide-in-from-bottom-8 duration-700">
+          <div className="space-y-8">
             {}
             <div className="flex flex-col gap-6">
               {}

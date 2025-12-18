@@ -1,1236 +1,758 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import PageLayout from "../layouts/PageLayout";
+import LoadingOverlay, { LoadingSpinner } from "../LoadingOverlay";
+import {
+  TrendingUp,
+  Award,
+  BookOpen,
+  Calendar,
+  ChevronRight,
+  Calculator,
+  Target,
+  Plus,
+  Minus,
+  Info,
+  ArrowRight,
+  Save,
+  RefreshCw,
+  Zap,
+} from "lucide-react";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
+
+const GRADE_POINTS = {
+  "A+": 4.0,
+  "A": 4.0,
+  "A-": 3.67,
+  "B+": 3.33,
+  "B": 3.0,
+  "B-": 2.67,
+  "C+": 2.33,
+  "C": 2.0,
+  "C-": 1.67,
+  "D+": 1.33,
+  "D": 1.0,
+  "F": 0.0,
+};
+
+const StatCard = ({ icon: Icon, label, value, subValue, delay = "0" }) => (
+  <div 
+    className="flex-1 min-w-[200px] p-6 rounded-[2rem] border bg-zinc-900/50 backdrop-blur-xl hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group"
+    style={{ animationDelay: `${delay}ms` }}
+  >
+    <div className="flex justify-between items-start mb-6">
+      <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
+        <Icon size={24} />
+      </div>
+    </div>
+    <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">
+      {label}
+    </p>
+    <div className="flex items-baseline gap-2">
+      <h3 className="text-3xl font-bold font-sans text-white tracking-tighter">{value}</h3>
+      {subValue && <span className="text-xs font-medium text-zinc-500">{subValue}</span>}
+    </div>
+  </div>
+);
+
+
+const CGPAPlannerModal = ({ isOpen, onClose, currentCGPA, currentCreditHours }) => {
+  const [targetCGPA, setTargetCGPA] = useState("");
+  const [nextCH, setNextCH] = useState("");
+  const [result, setResult] = useState(null);
+
+  const calculate = (e) => {
+    e.preventDefault();
+    const target = parseFloat(targetCGPA);
+    const nextHours = parseFloat(nextCH);
+    
+    if (isNaN(target) || isNaN(nextHours) || nextHours <= 0) return;
+
+    const requiredGPA = (target * (currentCreditHours + nextHours) - currentCGPA * currentCreditHours) / nextHours;
+    setResult(requiredGPA);
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300" onClick={onClose}>
+      <div 
+        className="bg-black/20 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 w-full max-w-[420px] animate-in zoom-in-95 fade-in duration-300 relative overflow-hidden shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#a098ff]/5 blur-[80px] rounded-full -mr-32 -mt-32 pointer-events-none"></div>
+        
+        <div className="relative">
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className="p-4 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] mb-4">
+              <Target size={32} />
+            </div>
+            <h2 className="text-2xl font-bold text-white tracking-tight">CGPA Planner</h2>
+            <p className="text-zinc-400 font-medium text-sm mt-1">Calculate your future strategy</p>
+          </div>
+
+          <form onSubmit={calculate} className="space-y-6">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-white/50 uppercase tracking-widest ml-1">Target CGPA</label>
+                <input 
+                  type="number" 
+                  step="0.01"
+                  min="0"
+                  max="4"
+                  value={targetCGPA}
+                  onChange={e => setTargetCGPA(e.target.value)}
+                  placeholder="e.g. 3.70"
+                  className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-[#a098ff]/50 focus:ring-4 focus:ring-[#a098ff]/5 transition-all font-medium placeholder:text-white/20"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-white/50 uppercase tracking-widest ml-1">Next Cr.Hrs</label>
+                <input 
+                  type="number" 
+                  value={nextCH}
+                  onChange={e => setNextCH(e.target.value)}
+                  placeholder="e.g. 18"
+                  className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-[#a098ff]/50 focus:ring-4 focus:ring-[#a098ff]/5 transition-all font-medium placeholder:text-white/20"
+                />
+              </div>
+            </div>
+
+            <button 
+              type="submit"
+              className="w-full h-[48px] bg-[#a098ff] hover:bg-[#8f86ff] text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-[#a098ff]/20 active:scale-[0.98]"
+            >
+              Generate Strategy
+            </button>
+          </form>
+
+          {result !== null && (
+            <div className="mt-8 p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Required GPA Strategy</p>
+              {result > 4.0 ? (
+                <div className="text-rose-400">
+                  <p className="text-3xl font-bold tracking-tight mb-2">{result.toFixed(2)}</p>
+                  <div className="flex items-center gap-2 text-xs font-medium bg-rose-500/10 p-2 rounded-lg">
+                    <Info size={14} />
+                    Target unreachable in one semester.
+                  </div>
+                </div>
+              ) : result < 0 ? (
+                <div className="text-emerald-400">
+                  <p className="text-3xl font-bold tracking-tight mb-2">0.00</p>
+                  <div className="flex items-center gap-2 text-xs font-medium bg-emerald-500/10 p-2 rounded-lg">
+                    <Zap size={14} />
+                    Target already achieved!
+                  </div>
+                </div>
+              ) : (
+                <div className="text-[#a098ff]">
+                  <p className="text-4xl font-bold tracking-tight mb-3">{result.toFixed(2)}</p>
+                  <p className="text-xs text-zinc-400 font-medium leading-relaxed">
+                    Maintain an average of <span className="text-white">{result.toFixed(2)}</span> in your next <span className="text-white">{nextCH}</span> credit hours.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 function TranscriptPage() {
-  const [elemContent, setElemContent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [semesters, setSemesters] = useState([]);
+  const [activeSemIdx, setActiveSemIdx] = useState(0);
+  const [isPlannerOpen, setIsPlannerOpen] = useState(false);
+  const [whatIfMode, setWhatIfMode] = useState(false);
+  const [overriddenGrades, setOverriddenGrades] = useState({});
 
   useEffect(() => {
-    const conelem = document.querySelector(".m-content");
-    conelem.querySelector(".row").remove();
-
-    const alertElement = document.querySelector(
-      ".m-alert.m-alert--icon.m-alert--icon-solid.m-alert--outline.alert.alert-info",
-    );
-    if (alertElement) {
-      alertElement.classList.add(
-        "!bg-black",
-        "!text-white",
-        "!border-white/10",
-        "!font-bold",
-        "!p-4",
-        "!rounded-3xl",
-        "!flex",
-        "!justify-between",
-        "!items-center",
-      );
-      alertElement.style.visibility = "visible";
-      alertElement.style.display = "block";
-    }
-
-    const iconElement = alertElement?.querySelector(".m-alert__icon");
-    if (iconElement) {
-      iconElement.classList.add(
-        "!text-white",
-        "!text-2xl",
-        "!bg-x",
-        "!rounded-full",
-        "!p-2",
-        "!w-12",
-        "!h-12",
-        "!flex",
-        "!items-center",
-        "!justify-center",
-      );
-
-      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg.setAttribute("width", "24");
-      svg.setAttribute("height", "24");
-      svg.setAttribute("viewBox", "0 0 24 24");
-      svg.setAttribute("fill", "none");
-      svg.setAttribute("stroke", "currentColor");
-      svg.setAttribute("stroke-width", "2");
-      svg.setAttribute("stroke-linecap", "round");
-      svg.setAttribute("stroke-linejoin", "round");
-      svg.classList.add("w-6", "h-6", "text-white");
-
-      const circle = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "circle",
-      );
-      circle.setAttribute("cx", "12");
-      circle.setAttribute("cy", "12");
-      circle.setAttribute("r", "10");
-
-      const line1 = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "line",
-      );
-      line1.setAttribute("x1", "12");
-      line1.setAttribute("y1", "16");
-      line1.setAttribute("x2", "12");
-      line1.setAttribute("y2", "12");
-
-      const line2 = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "line",
-      );
-      line2.setAttribute("x1", "12");
-      line2.setAttribute("y1", "8");
-      line2.setAttribute("x2", "12.01");
-      line2.setAttribute("y2", "8");
-
-      svg.appendChild(circle);
-      svg.appendChild(line1);
-      svg.appendChild(line2);
-      iconElement.innerHTML = "";
-      iconElement.appendChild(svg);
-    }
-
-    const alertText = alertElement?.querySelector(".m-alert__text");
-    if (alertText) {
-      alertText.classList.add("!text-white/90", "!font-medium");
-
-      const boldText = alertText.querySelector("b");
-      if (boldText) {
-        boldText.classList.add("!text-x");
-      }
-    }
-
-    const closeButton = alertElement?.querySelector(
-      'button.close[data-dismiss="alert"]',
-    );
-    if (closeButton) {
-      closeButton.style.cssText = "content: none !important;";
-
-      const style = document.createElement("style");
-      style.textContent =
-        'button.close[data-dismiss="alert"]::before { display: none !important; content: none !important; }';
-      document.head.appendChild(style);
-
-      const closeSvg = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "svg",
-      );
-      closeSvg.setAttribute("width", "24");
-      closeSvg.setAttribute("height", "24");
-      closeSvg.setAttribute("viewBox", "0 0 24 24");
-      closeSvg.setAttribute("fill", "none");
-      closeSvg.setAttribute("stroke", "currentColor");
-      closeSvg.setAttribute("stroke-width", "2");
-      closeSvg.setAttribute("stroke-linecap", "round");
-      closeSvg.setAttribute("stroke-linejoin", "round");
-      closeSvg.classList.add("w-4", "h-4", "text-white");
-
-      const line1 = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "line",
-      );
-      line1.setAttribute("x1", "18");
-      line1.setAttribute("y1", "6");
-      line1.setAttribute("x2", "6");
-      line1.setAttribute("y2", "18");
-
-      const line2 = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "line",
-      );
-      line2.setAttribute("x1", "6");
-      line2.setAttribute("y1", "6");
-      line2.setAttribute("x2", "18");
-      line2.setAttribute("y2", "18");
-
-      closeSvg.appendChild(line1);
-      closeSvg.appendChild(line2);
-      closeButton.innerHTML = "";
-      closeButton.appendChild(closeSvg);
-      closeButton.classList.add("!focus:outline-none");
-    }
-
-    document
-      .querySelector(".m-portlet__head")
-      ?.classList.add(
-        "!bg-black",
-        "!border",
-        "!border-white/10",
-        "!rounded-t-3xl",
-        "!h-fit",
-        "!p-4",
-        "!flex",
-        "!items-center",
-        "!justify-between",
-        "!mb-4",
-      );
-
-    document
-      .querySelector(".m-portlet__head-text")
-      ?.classList.add("!text-white", "!text-xl", "!font-bold");
-
-    const portletHeadCaption = document.querySelector(
-      ".m-portlet__head-caption",
-    );
-    if (portletHeadCaption) {
-      const portletHeadTitle = portletHeadCaption.querySelector(
-        ".m-portlet__head-title",
-      );
-
-      const titleContainer = document.createElement("div");
-      titleContainer.className = "flex items-center gap-4";
-
-      if (portletHeadTitle) {
-        titleContainer.appendChild(portletHeadTitle);
-      }
-
-      const planCGPAButton = document.createElement("button");
-      planCGPAButton.className =
-        "px-4 py-2 bg-x text-white text-sm rounded-lg flex items-center gap-2 hover:from-purple-700 hover:to-indigo-700 transition-all shadow-md";
-      planCGPAButton.id = "portletPlanCGPAButton";
-      planCGPAButton.innerHTML = `
-        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        Plan CGPA
-      `;
-
-      titleContainer.appendChild(planCGPAButton);
-
-      portletHeadCaption.innerHTML = "";
-      portletHeadCaption.appendChild(titleContainer);
-    }
-
-    document
-      .querySelector(
-        ".m-portlet.m-portlet--brand.m-portlet--head-solid-bg.m-portlet--border-bottom-brand.m-portlet--head-sm",
-      )
-      ?.classList.add("!bg-black", "!border-none");
-
-    document
-      .querySelector(".m-portlet__body")
-      ?.classList.add(
-        "!bg-black",
-        "!rounded-b-3xl",
-        "!p-6",
-        "!border",
-        "!border-white/10",
-        "!shadow-lg",
-        "!text-white",
-        "!h-[450px]",
-        "!overflow-y-auto",
-        "custom-scrollbar",
-      );
-
-    const styleTranscriptTables = () => {
-      const sectionContent = document.querySelector(".m-section__content");
-      if (sectionContent) {
-        document.querySelectorAll(".transcript-link").forEach((link) => {
-          link.classList.add(
-            "text-blue-500",
-            "underline",
-            "transition-colors",
-            "duration-200",
-            "hover:text-x",
-          );
-        });
-
-        document.querySelectorAll("table").forEach((table) => {
-          if (table.closest(".modal-body")) return;
-
-          table.classList.add("w-full", "border-collapse", "border-0");
-
-          const thead = table.querySelector("thead");
-          if (thead) {
-            thead.classList.add(
-              "bg-zinc-900",
-              "!rounded-t-lg",
-              "top-0",
-              "z-10",
-            );
-
-            const headers = thead.querySelectorAll("th");
-            headers.forEach((header) => {
-              header.classList.add(
-                "bg-transparent",
-                "text-slate-400",
-                "font-medium",
-                "p-3",
-                "text-left",
-                "border-b",
-                "border-white/10",
-              );
-            });
-          }
-
-          const tbody = table.querySelector("tbody");
-          if (tbody) {
-            tbody.classList.add("border-t", "border-white/10");
-
-            const rows = tbody.querySelectorAll("tr");
-            rows.forEach((row) => {
-              row.classList.add(
-                "bg-black",
-                "transition-colors",
-                "duration-200",
-                "hover:bg-white/5",
-              );
-
-              const cells = row.querySelectorAll("td");
-              cells.forEach((cell) => {
-                cell.classList.add(
-                  "p-3",
-                  "text-white/80",
-                  "border-b",
-                  "border-white/10",
-                );
-
-                if (cell.textContent.includes("A")) {
-                  cell.classList.add("text-green-400", "font-medium");
-                } else if (
-                  cell.textContent.includes("B") ||
-                  cell.textContent.includes("C+")
-                ) {
-                  cell.classList.add("text-amber-400", "font-medium");
-                } else if (
-                  cell.textContent.includes("C") ||
-                  cell.textContent.includes("D") ||
-                  cell.textContent.includes("F")
-                ) {
-                  cell.classList.add("text-red-400", "font-medium");
-                }
-              });
-            });
-          }
-        });
-
-        const mainRow = sectionContent.querySelector(".row");
-        if (mainRow) {
-          const semesterCols = mainRow.querySelectorAll(".col-md-6");
-
-          semesterCols.forEach((semesterCol) => {
-            const semesterContainer = document.createElement("div");
-            semesterContainer.className = "semester-container";
-            semesterContainer.classList.add(
-              "!mb-4",
-              "!rounded-xl",
-              "w-full",
-              "bg-black",
-              "!p-4",
-              "!border-none",
-            );
-
-            semesterCol.parentNode.insertBefore(semesterContainer, semesterCol);
-            semesterContainer.appendChild(semesterCol);
-
-            semesterCol.classList.remove("col-md-6");
-            semesterCol.style.width = "100%";
-
-            const headerRow = semesterCol.querySelector(".row");
-            if (headerRow) {
-              headerRow.className = "semester-header cursor-pointer";
-              headerRow
-                .querySelector(".pull-right")
-                .classList.add("!text-white/80", "text-base", "!p-4");
-              headerRow.querySelectorAll("h5").forEach((h5) => {
-                h5.classList.add(
-                  "!text-white",
-                  "!font-bold",
-                  "!text-lg",
-                  "!mb-0",
-                );
-              });
-
-              const collapseIcon = document.createElement("div");
-              collapseIcon.className =
-                "h-8 w-8 rounded-lg !bg-x !flex !items-center !justify-center mr-2 shadow-inner";
-              collapseIcon.innerHTML = `
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-up !text-white transition-transform duration-300">
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-down !text-white hidden transition-transform duration-300">
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-              `;
-
-              const semesterTitle = headerRow.querySelector("h5");
-              if (semesterTitle) {
-                const titleWrapper = document.createElement("div");
-                titleWrapper.className = "!flex !items-center";
-
-                semesterTitle.parentNode.insertBefore(
-                  titleWrapper,
-                  semesterTitle,
-                );
-                titleWrapper.appendChild(collapseIcon);
-                titleWrapper.appendChild(semesterTitle);
-              }
-            }
-
-            const table = semesterCol.querySelector("table");
-            if (table) {
-              const tableContainer = document.createElement("div");
-              tableContainer.className =
-                "rounded-xl overflow-hidden !border !border-white/10 custom-scrollbar accordion-content";
-              tableContainer.dataset.expanded = "false";
-
-              table.parentNode.insertBefore(tableContainer, table);
-              tableContainer.appendChild(table);
-
-              table.classList.add("transcript-table");
-              table.classList.remove("table-bordered");
-
-              const tableStyles = document.createElement("style");
-              tableStyles.textContent = `
-                .transcript-table {
-                  border-spacing: 0;
-                  width: 100%;
-                  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-                }
-                .transcript-table thead th {
-                  background-color: rgba(30, 30, 30, 0.8) !important;
-                  backdrop-filter: blur(4px);
-                  font-weight: 500 !important;
-                  padding: 12px !important;
-                  letter-spacing: 0.5px;
-                }
-                .transcript-table tbody tr {
-                  transition: all 0.2s ease;
-                }
-               
-                .transcript-table td {
-                  padding: 12px !important;
-                  font-size: 0.95rem;
-                }
-                .grade-badge {
-                  display: inline-flex;
-                  align-items: center;
-                  justify-content: center;
-                  border-radius: 9999px;
-                  padding: 2px 10px;
-                  font-weight: 600;
-                  min-width: 36px;
-                  text-align: center;
-                }
-                .grade-a {
-                  background-color: rgba(52, 211, 153, 0.2);
-                  color: rgb(52, 211, 153);
-                  border: 1px solid rgba(52, 211, 153, 0.3);
-                }
-                .grade-b {
-                  background-color: rgba(251, 191, 36, 0.2);
-                  color: rgb(251, 191, 36);
-                  border: 1px solid rgba(251, 191, 36, 0.3);
-                }
-                .grade-c {
-                  background-color: rgba(239, 68, 68, 0.2);
-                  color: rgb(239, 68, 68);
-                  border: 1px solid rgba(239, 68, 68, 0.3);
-                }
-                .grade-none {
-                  background-color: rgba(156, 163, 175, 0.2);
-                  color: rgb(156, 163, 175);
-                  border: 1px solid rgba(156, 163, 175, 0.3);
-                }
-                .accordion-content {
-                  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                }
-                .custom-scrollbar::-webkit-scrollbar {
-                  width: 6px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                  background: rgba(255, 255, 255, 0.05);
-                  border-radius: 10px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                  background: rgba(255, 255, 255, 0.2);
-                  border-radius: 10px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                  background: rgba(255, 255, 255, 0.3);
-                }
-              `;
-              document.head.appendChild(tableStyles);
-
-              table.classList.add("!w-full", "!border-collapse", "!border-0");
-            }
-          });
-
-          semesterCols.forEach((semesterCol) => {
-            const headerRow = semesterCol.querySelector(".semester-header");
-            headerRow.classList.add(
-              "cursor-pointer",
-              "bg-black/50",
-              "!rounded-xl",
-              "!p-3",
-              "!mb-2",
-              "!flex",
-              "!items-center",
-              "!justify-between",
-              "!border",
-              "!border-white/10",
-              "!text-white",
-              "!font-bold",
-              "!text-lg",
-              "!bg-white/10",
-            );
-            const tableContainer =
-              semesterCol.querySelector(".accordion-content");
-
-            if (headerRow && tableContainer) {
-              tableContainer.style.maxHeight = "0px";
-              tableContainer.style.opacity = "0";
-              tableContainer.style.overflow = "hidden";
-              tableContainer.style.transition =
-                "max-height 0.3s ease, opacity 0.3s ease";
-
-              const chevronDown = headerRow.querySelector(".chevron-down");
-              const chevronUp = headerRow.querySelector(".chevron-up");
-
-              if (chevronDown && chevronUp) {
-                chevronDown.classList.add("hidden");
-                chevronUp.classList.remove("hidden");
-              }
-
-              headerRow.addEventListener("click", function () {
-                const isExpanded = tableContainer.dataset.expanded === "true";
-
-                if (isExpanded) {
-                  tableContainer.style.maxHeight = "0px";
-                  tableContainer.style.opacity = "0";
-                  tableContainer.dataset.expanded = "false";
-
-                  if (chevronDown && chevronUp) {
-                    chevronDown.classList.add("hidden");
-                    chevronUp.classList.remove("hidden");
-                  }
-                } else {
-                  tableContainer.style.maxHeight = `${
-                    tableContainer.scrollHeight + 30
-                  }px`;
-                  tableContainer.style.opacity = "1";
-                  tableContainer.dataset.expanded = "true";
-
-                  if (chevronDown && chevronUp) {
-                    chevronDown.classList.remove("hidden");
-                    chevronUp.classList.add("hidden");
-                  }
-                }
-              });
-            }
-          });
-        }
-      }
-
-      const addGradeCalculator = () => {
-        const semesterContainers = document.querySelectorAll(
-          ".semester-container",
-        );
-        if (semesterContainers.length === 0) return;
-
-        const lastSemesterContainer =
-          semesterContainers[semesterContainers.length - 1];
-
-        const spans =
-          lastSemesterContainer.querySelectorAll(".pull-right span");
-        const cgpaElem = spans[2];
-        const sgpaElem = spans[3];
-
-        let prevCGPA = 0;
-        let crEarned = 0;
-
-        if (semesterContainers.length > 1) {
-          const secondLastSemContainer =
-            semesterContainers[semesterContainers.length - 2];
-          const secondLastSpans =
-            secondLastSemContainer.querySelectorAll(".pull-right span");
-
-          if (secondLastSpans.length > 1) {
-            const crEarnedText = secondLastSpans[1].innerText.split(":")[1];
-            crEarned = parseInt(crEarnedText) || 0;
-          }
-
-          if (secondLastSpans.length > 2) {
-            const cgpaText = secondLastSpans[2].innerText.split(":")[1];
-            prevCGPA = parseFloat(cgpaText) || 0;
-          }
+    const parse = () => {
+      try {
+        const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
+        if (!root) {
+          setTimeout(parse, 500);
+          return;
         }
 
-        const getSelectHTML = (currGrade) => {
-          return `<select class="grade-select bg-zinc-900 !border !border-white/20 rounded p-1 text-white w-full">
-            <option value="-1">-</option>
-            <option value="4" ${
-              currGrade === "A+" || currGrade === "A" ? "selected" : ""
-            }>A/A+</option>
-            <option value="3.67" ${
-              currGrade === "A-" ? "selected" : ""
-            }>A-</option>
-            <option value="3.33" ${
-              currGrade === "B+" ? "selected" : ""
-            }>B+</option>
-            <option value="3" ${currGrade === "B" ? "selected" : ""}>B</option>
-            <option value="2.67" ${
-              currGrade === "B-" ? "selected" : ""
-            }>B-</option>
-            <option value="2.33" ${
-              currGrade === "C+" ? "selected" : ""
-            }>C+</option>
-            <option value="2" ${currGrade === "C" ? "selected" : ""}>C</option>
-            <option value="1.67" ${
-              currGrade === "C-" ? "selected" : ""
-            }>C-</option>
-            <option value="1.33" ${
-              currGrade === "D+" ? "selected" : ""
-            }>D+</option>
-            <option value="1" ${currGrade === "D" ? "selected" : ""}>D</option>
-            <option value="0" ${currGrade === "F" ? "selected" : ""}>F</option>
-          </select>`;
-        };
+        const semesterData = [];
+        const semesterCols = root.querySelectorAll(".m-section__content .row .col-md-6");
 
-        const getSUCreditHours = () => {
-          return Array.from(document.querySelectorAll("td"))
-            .filter((td) => td.innerText === "S" || td.innerText === "U")
-            .reduce((total, curr) => {
-              const creditHoursCell = curr.previousElementSibling;
-              const creditHours = creditHoursCell
-                ? parseInt(creditHoursCell.innerText) || 0
-                : 0;
-              return total + creditHours;
-            }, 0);
-        };
-
-        const addCGPAPlannerCalculator = () => {
-          const portletPlanCGPAButton = document.getElementById(
-            "portletPlanCGPAButton",
-          );
-
-          const headerRow =
-            lastSemesterContainer.querySelector(".semester-header");
-          if (headerRow) {
-            const existingPlannerButton = headerRow.querySelector(
-              ".cgpa-planner-button",
-            );
-            if (existingPlannerButton) {
-              existingPlannerButton.remove();
-            }
-          }
-
-          const extractCGPAData = () => {
-            const spans =
-              lastSemesterContainer.querySelectorAll(".pull-right span");
-            let currentCGPA = 0;
-            let currentCreditHours = 0;
-
-            if (spans.length > 2) {
-              const cgpaText = spans[2].innerText.split(":")[1];
-              currentCGPA = parseFloat(cgpaText) || 0;
-            }
-
-            if (spans.length > 1) {
-              const crEarnedText = spans[1].innerText.split(":")[1];
-              currentCreditHours = parseInt(crEarnedText) || 0;
-            }
-
-            return {
-              currentCGPA,
-              currentCreditHours,
-            };
+        semesterCols.forEach((col) => {
+          const title = col.querySelector("h5")?.textContent.trim() || "Untitled Semester";
+          
+          const summarySpans = col.querySelectorAll(".pull-right span");
+          const summaryArr = Array.from(summarySpans).map(s => s.textContent.split(":")[1]?.trim() || "0");
+          
+          const summary = {
+            crRegistered: parseInt(summaryArr[0]),
+            crEarned: parseInt(summaryArr[1]),
+            cgpa: parseFloat(summaryArr[2]),
+            sgpa: parseFloat(summaryArr[3]),
           };
 
-          const createPlannerModal = () => {
-            const existingModal = document.getElementById("cgpaPlannerModal");
-            if (existingModal) {
-              existingModal.remove();
-            }
-
-            const modalOverlay = document.createElement("div");
-            modalOverlay.id = "cgpaPlannerModal";
-            modalOverlay.className =
-              "fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn";
-            modalOverlay.style.backdropFilter = "blur(5px)";
-
-            const { currentCGPA, currentCreditHours } = extractCGPAData();
-
-            const modalContent = document.createElement("div");
-            modalContent.className =
-              "bg-zinc-900 !rounded-2xl !border !border-white/10 !shadow-xl !w-full !max-w-md !mx-4 !animate-scaleIn";
-
-            modalContent.innerHTML = `
-              <div class="border-b border-white/10 p-4 flex items-center justify-between">
-                <h3 class="text-white font-bold text-xl flex items-center">
-                  <svg class="w-5 h-5 mr-2 text-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  CGPA Planning Calculator
-                </h3>
-                <button class="text-gray-400 hover:text-white transition-colors focus:outline-none" id="closeModal">
-                  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
-              </div>
-              
-              <div class="p-6">
-                <div class="text-white/80 text-sm mb-4">
-                  This calculator will help you determine the GPA you need next semester to reach your target CGPA.
-                </div>
-                
-                <form id="cgpaPlannerForm" class="space-y-4">
-                  <div class="mb-3">
-                    <label class="block text-gray-400 text-sm mb-1">Current Credit Hours</label>
-                    <input type="number" id="currentCreditHours" value="${currentCreditHours}" class="w-full bg-black !border !border-white/20 !rounded-lg p-2 text-white" placeholder="e.g., 60">
-                  </div>
-                  
-                  <div class="mb-3">
-                    <label class="block text-gray-400 text-sm mb-1">Current CGPA</label>
-                    <input type="number" id="currentCGPA" value="${currentCGPA.toFixed(
-                      2,
-                    )}" class="w-full bg-black !border !border-white/20 !rounded-lg p-2 text-white" step="0.01" placeholder="e.g., 3.50">
-                  </div>
-                  
-                  <div class="mb-3">
-                    <label class="block text-gray-400 text-sm mb-1">Target CGPA</label>
-                    <input type="number" id="targetCGPA" class="w-full bg-black !border !border-white/20 !rounded-lg p-2 text-white" step="0.01" placeholder="e.g., 3.70">
-                  </div>
-                  
-                  <div class="mb-3">
-                    <label class="block text-gray-400 text-sm mb-1">Next Semester Credit Hours</label>
-                    <input type="number" id="nextCreditHours" class="w-full bg-black !border !border-white/20 !rounded-lg p-2 text-white" placeholder="e.g., 15">
-                  </div>
-                  
-                  <button type="submit" class="w-full py-3 bg-x text-white rounded-lg font-medium flex items-center justify-center transition-colors">
-                    <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                    </svg>
-                    Calculate Required GPA
-                  </button>
-                </form>
-                
-                <div id="plannerResult" class="mt-4 p-4 rounded bg-black/50 hidden"></div>
-              </div>
-            `;
-
-            modalOverlay.appendChild(modalContent);
-            document.body.appendChild(modalOverlay);
-
-            const styleElement = document.createElement("style");
-            styleElement.textContent = `
-              .animate-fadeIn {
-                animation: fadeIn 0.3s ease-out forwards;
-              }
-              .animate-scaleIn {
-                animation: scaleIn 0.3s ease-out forwards;
-              }
-              @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-              }
-              @keyframes scaleIn {
-                from { transform: scale(0.95); opacity: 0; }
-                to { transform: scale(1); opacity: 1; }
-              }
-              .animate-fadeOut {
-                animation: fadeOut 0.2s ease-in forwards;
-              }
-              .animate-scaleOut {
-                animation: scaleOut 0.2s ease-in forwards;
-              }
-              @keyframes fadeOut {
-                from { opacity: 1; }
-                to { opacity: 0; }
-              }
-              @keyframes scaleOut {
-                from { transform: scale(1); opacity: 1; }
-                to { transform: scale(0.95); opacity: 0; }
-              }
-            `;
-            document.head.appendChild(styleElement);
-
-            const closeModal = () => {
-              modalContent.classList.add("animate-scaleOut");
-              modalOverlay.classList.add("animate-fadeOut");
-              setTimeout(() => {
-                modalOverlay.remove();
-              }, 200);
-            };
-
-            document
-              .getElementById("closeModal")
-              .addEventListener("click", closeModal);
-            modalOverlay.addEventListener("click", (e) => {
-              if (e.target === modalOverlay) {
-                closeModal();
-              }
-            });
-
-            document
-              .getElementById("cgpaPlannerForm")
-              .addEventListener("submit", (e) => {
-                e.preventDefault();
-
-                const currentCH = parseFloat(
-                  document.getElementById("currentCreditHours").value,
-                );
-                const currentCGPA = parseFloat(
-                  document.getElementById("currentCGPA").value,
-                );
-                const targetCGPA = parseFloat(
-                  document.getElementById("targetCGPA").value,
-                );
-                const nextCH = parseFloat(
-                  document.getElementById("nextCreditHours").value,
-                );
-
-                const resultElement = document.getElementById("plannerResult");
-
-                if (
-                  isNaN(currentCH) ||
-                  isNaN(currentCGPA) ||
-                  isNaN(targetCGPA) ||
-                  isNaN(nextCH) ||
-                  currentCH <= 0 ||
-                  nextCH <= 0 ||
-                  currentCGPA < 0 ||
-                  currentCGPA > 4 ||
-                  targetCGPA < 0 ||
-                  targetCGPA > 4
-                ) {
-                  resultElement.innerHTML = `
-                  <div class="text-red-400 font-medium">Please enter valid values:</div>
-                  <ul class="list-disc list-inside text-gray-300 text-sm mt-2">
-                    <li>Credit hours must be positive numbers</li>
-                    <li>CGPA values must be between 0 and 4</li>
-                    <li>All fields are required</li>
-                  </ul>
-                `;
-                  resultElement.classList.remove("hidden");
-                  return;
-                }
-
-                const requiredGPA =
-                  (targetCGPA * (currentCH + nextCH) -
-                    currentCGPA * currentCH) /
-                  nextCH;
-
-                if (requiredGPA > 4.0) {
-                  resultElement.innerHTML = `
-                  <div class="flex items-start">
-                    <svg class="w-5 h-5 text-amber-400 mr-2 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                    </svg>
-                    <div>
-                      <div class="text-amber-400 font-bold text-lg">Target CGPA not achievable in one semester</div>
-                      <div class="text-gray-300 mt-1">You would need a GPA of ${requiredGPA.toFixed(
-                        2,
-                      )} next semester, which exceeds the maximum of 4.0.</div>
-                      <div class="text-gray-300 mt-2">Consider:</div>
-                      <ul class="list-disc list-inside text-gray-300 text-sm mt-1">
-                        <li>Setting a lower target CGPA</li>
-                        <li>Spreading improvement over multiple semesters</li>
-                        <li>Taking more credit hours if possible</li>
-                      </ul>
-                    </div>
-                  </div>
-                `;
-                } else if (requiredGPA < 0) {
-                  resultElement.innerHTML = `
-                  <div class="flex items-start">
-                    <svg class="w-5 h-5 text-green-400 mr-2 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <div>
-                      <div class="text-green-400 font-bold text-lg">Target already achieved!</div>
-                      <div class="text-gray-300 mt-1">Your current CGPA is already higher than your target.</div>
-                      <div class="text-gray-300 mt-2">You need any GPA greater than ${Math.max(
-                        0,
-                        requiredGPA,
-                      ).toFixed(2)} to maintain your target.</div>
-                    </div>
-                  </div>
-                `;
-                } else {
-                  let difficultyColor = "text-green-400";
-                  let difficultyText = "Easily achievable";
-
-                  if (requiredGPA > 3.7) {
-                    difficultyColor = "text-red-400";
-                    difficultyText = "Challenging";
-                  } else if (requiredGPA > 3.0) {
-                    difficultyColor = "text-amber-400";
-                    difficultyText = "Moderate";
-                  }
-
-                  resultElement.innerHTML = `
-                  <div class="flex items-start">
-                    <svg class="w-5 h-5 text-x mr-2 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <div>
-                      <div class="text-white font-bold text-lg">Required GPA: <span class="${difficultyColor}">${requiredGPA.toFixed(
-                        2,
-                      )}</span></div>
-                      <div class="text-gray-300 mt-1">Difficulty: <span class="${difficultyColor} font-medium">${difficultyText}</span></div>
-                      <div class="text-gray-300 mt-2">To achieve a CGPA of ${targetCGPA.toFixed(
-                        2,
-                      )} from your current ${currentCGPA.toFixed(2)},</div> 
-                      <div class="text-gray-300">you need a GPA of at least ${requiredGPA.toFixed(
-                        2,
-                      )} in your next ${nextCH} credit hours.</div>
-                    </div>
-                  </div>
-                `;
-                }
-
-                resultElement.classList.remove("hidden");
-              });
-          };
-
-          if (portletPlanCGPAButton) {
-            portletPlanCGPAButton.addEventListener("click", createPlannerModal);
-          }
-        };
-
-        setTimeout(addCGPAPlannerCalculator, 600);
-
-        const rows = lastSemesterContainer.querySelectorAll("tbody > tr");
-        rows.forEach((row) => {
-          const gradeCells = row.querySelectorAll("td.text-center");
-          if (gradeCells.length >= 2) {
-            const gradeCell = gradeCells[1];
-            const currentGrade = gradeCell.innerText.trim();
-
-            if (currentGrade === "I" || currentGrade === "-") {
-              gradeCell.innerHTML = getSelectHTML(currentGrade);
-            }
-          }
-        });
-
-        const handleSelectChange = () => {
-          const rows = lastSemesterContainer.querySelectorAll("tbody > tr");
-          let totalCreditHours = 0;
-          let totalGradePoints = 0;
-
+          const courses = [];
+          const rows = col.querySelectorAll("tbody tr");
           rows.forEach((row) => {
-            const gradeCells = row.querySelectorAll("td.text-center");
-            if (gradeCells.length < 2) return;
-
-            const gradeCell = gradeCells[1];
-            const creditCell = row.querySelector("td:nth-child(4)");
-            const pointsCell = row.querySelector("td:nth-child(6)");
-
-            if (!creditCell || !pointsCell) return;
-
-            const creditHours = parseInt(creditCell.innerText) || 0;
-            if (creditHours === 0) return;
-
-            let gradePoints = 0;
-            let isGraded = false;
-
-            const selectElement = gradeCell.querySelector(
-              "select.grade-select",
-            );
-
-            if (selectElement) {
-              if (selectElement.value !== "-1") {
-                gradePoints = parseFloat(selectElement.value);
-                isGraded = true;
-
-                pointsCell.innerText = gradePoints;
-                pointsCell.style.fontWeight = "bold";
-                pointsCell.classList.add("text-x");
-              }
-            } else {
-              const gradeText = gradeCell.textContent.trim();
-
-              if (["S", "U", "W", "I", "-"].includes(gradeText)) {
-                return;
-              }
-
-              if (gradeText === "A+" || gradeText === "A") {
-                gradePoints = 4.0;
-                isGraded = true;
-              } else if (gradeText === "A-") {
-                gradePoints = 3.67;
-                isGraded = true;
-              } else if (gradeText === "B+") {
-                gradePoints = 3.33;
-                isGraded = true;
-              } else if (gradeText === "B") {
-                gradePoints = 3.0;
-                isGraded = true;
-              } else if (gradeText === "B-") {
-                gradePoints = 2.67;
-                isGraded = true;
-              } else if (gradeText === "C+") {
-                gradePoints = 2.33;
-                isGraded = true;
-              } else if (gradeText === "C") {
-                gradePoints = 2.0;
-                isGraded = true;
-              } else if (gradeText === "C-") {
-                gradePoints = 1.67;
-                isGraded = true;
-              } else if (gradeText === "D+") {
-                gradePoints = 1.33;
-                isGraded = true;
-              } else if (gradeText === "D") {
-                gradePoints = 1.0;
-                isGraded = true;
-              } else if (gradeText === "F") {
-                gradePoints = 0.0;
-                isGraded = true;
-              }
-
-              if (!isGraded) {
-                const badgeElement = gradeCell.querySelector(".grade-badge");
-                if (badgeElement) {
-                  const badgeText = badgeElement.textContent.trim();
-                  if (badgeText === "A+" || badgeText === "A") {
-                    gradePoints = 4.0;
-                    isGraded = true;
-                  } else if (badgeText === "A-") {
-                    gradePoints = 3.67;
-                    isGraded = true;
-                  } else if (badgeText === "B+") {
-                    gradePoints = 3.33;
-                    isGraded = true;
-                  } else if (badgeText === "B") {
-                    gradePoints = 3.0;
-                    isGraded = true;
-                  } else if (badgeText === "B-") {
-                    gradePoints = 2.67;
-                    isGraded = true;
-                  } else if (badgeText === "C+") {
-                    gradePoints = 2.33;
-                    isGraded = true;
-                  } else if (badgeText === "C") {
-                    gradePoints = 2.0;
-                    isGraded = true;
-                  } else if (badgeText === "C-") {
-                    gradePoints = 1.67;
-                    isGraded = true;
-                  } else if (badgeText === "D+") {
-                    gradePoints = 1.33;
-                    isGraded = true;
-                  } else if (badgeText === "D") {
-                    gradePoints = 1.0;
-                    isGraded = true;
-                  } else if (badgeText === "F") {
-                    gradePoints = 0.0;
-                    isGraded = true;
-                  }
-                }
-              }
-            }
-
-            if (isGraded) {
-              totalCreditHours += creditHours;
-              totalGradePoints += creditHours * gradePoints;
-            }
-          });
-
-          if (totalCreditHours === 0) {
-            cgpaElem.innerHTML = `CGPA: ${prevCGPA.toFixed(2)}`;
-            sgpaElem.innerHTML = `SGPA: 0`;
-            return;
-          }
-
-          const calculatedSGPA = totalGradePoints / totalCreditHours;
-          const suCreditHours = getSUCreditHours();
-          const actualCreditHoursEarned = crEarned - suCreditHours;
-          const calculatedCGPA =
-            (prevCGPA * actualCreditHoursEarned +
-              calculatedSGPA * totalCreditHours) /
-            (actualCreditHoursEarned + totalCreditHours);
-
-          cgpaElem.innerHTML = `CGPA: <span class="text-x font-bold">${calculatedCGPA.toFixed(
-            2,
-          )}</span>`;
-          sgpaElem.innerHTML = `SGPA: <span class="text-x font-bold">${calculatedSGPA.toFixed(
-            2,
-          )}</span>`;
-
-          cgpaElem.classList.add("font-bold");
-          sgpaElem.classList.add("font-bold");
-        };
-
-        lastSemesterContainer
-          .querySelectorAll("select.grade-select")
-          .forEach((select) => {
-            select.addEventListener("change", handleSelectChange);
-          });
-
-        setTimeout(handleSelectChange, 100);
-      };
-
-      setTimeout(addGradeCalculator, 500);
-
-      document.querySelectorAll("table").forEach((table) => {
-        if (table.closest(".modal-body")) return;
-
-        if (!table.classList.contains("transcript-table")) {
-          table.classList.add("transcript-table");
-          table.classList.remove("table-bordered");
-        }
-
-        const thead = table.querySelector("thead");
-        if (thead) {
-          const headers = thead.querySelectorAll("th");
-          headers.forEach((header) => {
-            header.classList.add(
-              "bg-transparent",
-              "!text-gray-400",
-              "!font-medium",
-              "!p-3",
-              "!text-left",
-              "!border-b",
-              "!border-white/10",
-            );
-          });
-        }
-
-        const tbody = table.querySelector("tbody");
-        if (tbody) {
-          const rows = tbody.querySelectorAll("tr");
-          rows.forEach((row) => {
-            row.classList.add(
-              "!bg-black",
-              "!hover:bg-white/5",
-              "!transition-colors",
-            );
-
             const cells = row.querySelectorAll("td");
-            cells.forEach((cell) => {
-              cell.classList.add(
-                "!p-3",
-                "!text-white/80",
-                "!border-y",
-                "!border-white/10",
-              );
-
-              if (cell.textContent.includes("A")) {
-                cell.classList.add("transcript-good-grade");
-              } else if (
-                cell.textContent.includes("B") ||
-                cell.textContent.includes("C+")
-              ) {
-                cell.classList.add("transcript-average-grade");
-              } else if (
-                cell.textContent.includes("C") ||
-                cell.textContent.includes("D") ||
-                cell.textContent.includes("F")
-              ) {
-                cell.classList.add("transcript-poor-grade");
-              }
-
-              if (cell.textContent.trim().match(/^[A-F][+-]?$/)) {
-                const grade = cell.textContent.trim();
-
-                const badgeElement = document.createElement("span");
-
-                if (grade.startsWith("A")) {
-                  badgeElement.className = "grade-badge grade-a";
-                } else if (grade.startsWith("B") || grade === "C+") {
-                  badgeElement.className = "grade-badge grade-b";
-                } else if (
-                  grade.startsWith("C") ||
-                  grade.startsWith("D") ||
-                  grade.startsWith("F")
-                ) {
-                  badgeElement.className = "grade-badge grade-c";
-                } else {
-                  badgeElement.className = "grade-badge grade-none";
-                }
-
-                badgeElement.textContent = grade;
-
-                cell.textContent = "";
-                cell.appendChild(badgeElement);
-              }
-
-              const numericMatch = cell.textContent.trim().match(/^[\d.]+$/);
-              if (numericMatch) {
-                const numValue = parseFloat(cell.textContent.trim());
-                const originalText = cell.textContent;
-
-                if (!isNaN(numValue)) {
-                  if (numValue >= 3.5) {
-                    cell.innerHTML = `<span class="font-semibold text-green-400">${originalText}</span>`;
-                  } else if (numValue >= 2.5) {
-                    cell.innerHTML = `<span class="font-semibold text-amber-400">${originalText}</span>`;
-                  } else if (numValue > 0) {
-                    cell.innerHTML = `<span class="font-semibold text-red-400">${originalText}</span>`;
-                  }
-                }
-              }
-            });
-          });
-        }
-      });
-
-      const headerRows = document.querySelectorAll(".semester-header");
-      headerRows.forEach((headerRow) => {
-        const chevronDown = headerRow.querySelector(".chevron-down");
-        const chevronUp = headerRow.querySelector(".chevron-up");
-
-        const tableContainer = headerRow
-          .closest(".semester-container")
-          ?.querySelector(".rounded-xl");
-
-        if (tableContainer && chevronDown && chevronUp) {
-          tableContainer.style.maxHeight = "0px";
-          tableContainer.style.transition =
-            "max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-          tableContainer.style.overflow = "hidden";
-          tableContainer.style.opacity = "0";
-          chevronDown.classList.add("hidden");
-          chevronUp.classList.remove("hidden");
-
-          headerRow.addEventListener("click", () => {
-            if (tableContainer.style.maxHeight === "0px") {
-              tableContainer.style.maxHeight = `${
-                tableContainer.scrollHeight + 50
-              }px`;
-              tableContainer.style.opacity = "1";
-              setTimeout(() => {
-                tableContainer.style.overflow = "visible";
-              }, 400);
-
-              chevronDown.classList.remove("hidden");
-              chevronDown.style.transform = "rotate(0deg)";
-              chevronUp.classList.add("hidden");
-            } else {
-              tableContainer.style.maxHeight = "0px";
-              tableContainer.style.opacity = "0";
-              tableContainer.style.overflow = "hidden";
-
-              chevronDown.classList.add("hidden");
-              chevronUp.classList.remove("hidden");
-              chevronUp.style.transform = "rotate(0deg)";
+            if (cells.length >= 6) {
+              const ch = parseFloat(cells[3].textContent.trim()) || 0;
+              const pts = parseFloat(cells[5].textContent.trim()) || 0;
+              courses.push({
+                code: cells[0].textContent.trim(),
+                description: cells[1].textContent.trim(),
+                type: cells[2].textContent.trim(),
+                crHrs: ch,
+                grade: cells[4].textContent.trim(),
+                points: pts,
+              });
             }
           });
+
+
+          semesterData.push({
+            title,
+            summary,
+            courses,
+          });
+        });
+
+        if (semesterData.length > 0) {
+          setSemesters(semesterData);
+          setActiveSemIdx(semesterData.length - 1);
         }
-      });
+        
+        root.style.display = "none";
+        setLoading(false);
+      } catch (e) {
+        console.error("Transcript Parsing Error", e);
+        setLoading(false);
+      }
     };
 
-    setTimeout(styleTranscriptTables, 300);
-
-    const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
-
-    if (targetElement) {
-      setElemContent(targetElement.innerHTML);
-      targetElement.remove();
-    }
+    setTimeout(parse, 300);
   }, []);
+
+  const activeSemData = semesters[activeSemIdx];
+
+  const { calculatedStats, originalCGPA } = useMemo(() => {
+    if (semesters.length === 0) return { calculatedStats: null, originalCGPA: 0 };
+
+    let cumulativeGradePoints = 0;
+    let cumulativeCreditsForGPA = 0;
+    let totalCreditsAttempted = 0;
+    
+    // Map to track unique courses earned (passed)
+    const passedUniqueCredits = new Map(); // courseCode -> max_crHrs
+    const courseStatsMap = new Map(); // courseCode -> { gp, crHrs }
+    
+    let lastNonEmptyCGPA = 0;
+
+    const semesterStats = semesters.map((sem, sIdx) => {
+      let semGradePoints = 0;
+      let semCreditsForGPA = 0;
+      let semCreditsAttempted = 0;
+      let semCreditsEarned = 0;
+      let hasOverriddenGrade = false;
+
+      // Temporary collectors for this semester to decide if we include them in global totals
+      const tempPassedCredits = new Map();
+
+      sem.courses.forEach(course => {
+        const key = `${sem.title}-${course.code}`;
+        if (overriddenGrades[key]) hasOverriddenGrade = true;
+
+        const grade = overriddenGrades[key] || course.grade;
+        const gp = GRADE_POINTS[grade];
+        const isGraded = gp !== undefined;
+        
+        const isNonCredit = course.type.toLowerCase().includes('non credit') || 
+                           grade === 'S' || 
+                           grade === 'U';
+
+        if (isNonCredit) return;
+
+        semCreditsAttempted += course.crHrs;
+
+        if (isGraded) {
+          semGradePoints += gp * course.crHrs;
+          semCreditsForGPA += course.crHrs;
+          
+          // Handle repeats for CGPA calculation
+          if (courseStatsMap.has(course.code)) {
+            const prev = courseStatsMap.get(course.code);
+            cumulativeGradePoints -= prev.gp * prev.crHrs;
+            cumulativeCreditsForGPA -= prev.crHrs;
+          }
+          
+          cumulativeGradePoints += gp * course.crHrs;
+          cumulativeCreditsForGPA += course.crHrs;
+          courseStatsMap.set(course.code, { gp, crHrs: course.crHrs });
+
+          if (grade !== 'F') {
+            semCreditsEarned += course.crHrs;
+            tempPassedCredits.set(course.code, course.crHrs);
+          }
+        }
+      });
+
+      const sgpa = semCreditsForGPA > 0 ? semGradePoints / semCreditsForGPA : 0;
+      const isEmptySemester = semCreditsForGPA === 0 && !hasOverriddenGrade;
+
+      if (!isEmptySemester) {
+        totalCreditsAttempted += semCreditsAttempted;
+        tempPassedCredits.forEach((ch, code) => {
+          passedUniqueCredits.set(code, Math.max(passedUniqueCredits.get(code) || 0, ch));
+        });
+      }
+
+      const cgpa = cumulativeCreditsForGPA > 0 ? cumulativeGradePoints / cumulativeCreditsForGPA : 0;
+
+      if (!isEmptySemester || sIdx === 0) {
+        lastNonEmptyCGPA = cgpa;
+      }
+      
+      return {
+        title: sem.title,
+        sgpa: sgpa,
+        cgpa: cgpa,
+        attempted: semCreditsAttempted,
+        earned: semCreditsEarned,
+        isEmptySemester
+      };
+    });
+
+    const totalCreditsEarned = Array.from(passedUniqueCredits.values()).reduce((sum, ch) => sum + ch, 0);
+
+    return {
+      calculatedStats: {
+        history: semesterStats.filter((s, idx) => !s.isEmptySemester),
+        currentCGPA: lastNonEmptyCGPA,
+        totalCreditsEarned: totalCreditsEarned,
+        totalCreditsAttempted: totalCreditsAttempted,
+        totalCreditsForGPA: cumulativeCreditsForGPA,
+        actualSemestersCount: semesterStats.filter(s => !s.isEmptySemester).length,
+        actualCoursesCount: Array.from(courseStatsMap.keys()).length
+      },
+      originalCGPA: semesters[semesters.length - 1].summary.cgpa
+    };
+  }, [semesters, overriddenGrades]);
+
+
+
+
+  const chartData = useMemo(() => {
+    if (!calculatedStats) return null;
+    return {
+      labels: calculatedStats.history.map(h => h.title.split(' ')[0]),
+      datasets: [
+        {
+          label: "SGPA",
+          data: calculatedStats.history.map(h => h.sgpa),
+          borderColor: "#a098ff",
+          backgroundColor: (context) => {
+            const ctx = context.chart.ctx;
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, "rgba(160, 152, 255, 0.15)");
+            gradient.addColorStop(1, "rgba(160, 152, 255, 0)");
+            return gradient;
+          },
+          tension: 0.45,
+          fill: true,
+          pointBackgroundColor: "#a098ff",
+          pointBorderWidth: 4,
+          pointBorderColor: "#111",
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          borderWidth: 3,
+        },
+        {
+          label: "CGPA",
+          data: calculatedStats.history.map(h => h.cgpa),
+          borderColor: "#10b981",
+          tension: 0.45,
+          fill: false,
+          pointBackgroundColor: "#10b981",
+          pointBorderWidth: 4,
+          pointBorderColor: "#111",
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          borderWidth: 3,
+          borderDash: [5, 5],
+        }
+
+      ],
+    };
+  }, [calculatedStats]);
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: "#18181b",
+        titleFont: { size: 13, weight: 'bold' },
+        bodyFont: { size: 12 },
+        padding: 16,
+        borderRadius: 16,
+        borderColor: "rgba(255,255,255,0.1)",
+        borderWidth: 1,
+        displayColors: false,
+        callbacks: {
+          label: (context) => `${context.dataset.label}: ${context.parsed.y.toFixed(2)}`
+        }
+      }
+    },
+    scales: {
+      y: {
+        min: 0,
+        max: 4,
+        ticks: { color: "#3f3f46", stepSize: 1, font: { weight: 'bold' } },
+        grid: { color: "rgba(255,255,255,0.03)" }
+      },
+      x: {
+        ticks: { color: "#3f3f46", font: { weight: 'bold' } },
+        grid: { display: false }
+      }
+    }
+  };
+
+  const handleGradeChange = (semTitle, courseCode, newGrade) => {
+    setOverriddenGrades(prev => ({
+      ...prev,
+      [`${semTitle}-${courseCode}`]: newGrade
+    }));
+  };
+
+  if (loading) return <LoadingOverlay />;
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      {elemContent && (
-        <div
-          className="m-grid m-grid--hor m-grid--root m-page"
-          dangerouslySetInnerHTML={{ __html: elemContent }}
-        />
-      )}
+      {}
+      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
+
+      <div className="w-full p-6 md:p-10 space-y-10 relative z-10">
+        {}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="space-y-2">
+            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
+              Transcript Report
+            </h1>
+            <p className="text-zinc-400 font-medium">
+              Academic performance and degree analytics
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-4 w-full md:w-auto justify-end">
+            <button 
+              onClick={() => setIsPlannerOpen(true)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/5 bg-zinc-900/50 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-300 group"
+            >
+              <Target size={16} className="group-hover:scale-110 transition-transform" />
+              Strategic Planner
+            </button>
+            <button 
+              onClick={() => whatIfMode ? (setOverriddenGrades({}), setWhatIfMode(false)) : setWhatIfMode(true)}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full border transition-all duration-300 text-xs font-bold ${
+                whatIfMode 
+                ? "bg-[#a098ff]/10 text-[#a098ff] border-[#a098ff]/20" 
+                : "bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
+              }`}
+            >
+              <Calculator size={16} />
+              {whatIfMode ? "Abort Simulation" : "Simulation Lab"}
+            </button>
+          </div>
+        </div>
+
+
+        {}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          <StatCard 
+            icon={TrendingUp} 
+            label="Cumulative GPA" 
+            value={calculatedStats?.currentCGPA.toFixed(2) || "0.00"} 
+            subValue={whatIfMode ? `(Was ${originalCGPA.toFixed(2)})` : "Current"}
+            delay="0"
+          />
+          <StatCard 
+            icon={Award} 
+            label="Credits Cleared" 
+            value={calculatedStats?.totalCreditsEarned || "0"} 
+            subValue={`of ${calculatedStats?.totalCreditsAttempted || 0} attempted`}
+            delay="100"
+          />
+          <StatCard 
+            icon={Calendar} 
+            label="Semesters" 
+            value={calculatedStats?.actualSemestersCount || 0} 
+            subValue="Completed"
+            delay="200"
+          />
+          <StatCard 
+            icon={BookOpen} 
+            label="Degree Progress" 
+            value={calculatedStats?.actualCoursesCount || 0} 
+            subValue="Graded Courses"
+            delay="300"
+          />
+        </div>
+
+
+        {}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
+          {}
+          <div className="xl:col-span-2 space-y-8">
+            <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 flex flex-col gap-8 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-[#a098ff]/5 blur-[100px] rounded-full -mr-48 -mt-48 pointer-events-none"></div>
+
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                <div className="flex gap-2 bg-black/40 p-1.5 rounded-full border border-white/5 backdrop-blur-sm overflow-x-auto custom-scrollbar no-scrollbar">
+                  {semesters.map((sem, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveSemIdx(idx)}
+                      className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 min-w-fit ${
+                        activeSemIdx === idx
+                          ? "bg-[#a098ff] text-white shadow-lg shadow-[#a098ff]/20"
+                          : "text-zinc-500 hover:text-white"
+                      }`}
+                    >
+                      {sem.title}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+
+              {activeSemData && (
+                <div className="space-y-10 relative z-10">
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-10">
+                    <div className="space-y-1">
+                      <h2 className="text-3xl font-black text-white tracking-tighter">{activeSemData.title}</h2>
+                      <p className="text-xs text-zinc-500 font-black uppercase tracking-widest">Semester Detail Report</p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-12 lg:gap-x-16 gap-y-6">
+                      <div className="text-right flex flex-col items-end min-w-[70px]">
+                        <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">Attemp.</span>
+                        <span className="text-3xl font-bold font-sans text-white tracking-tighter">
+                          {activeSemData.courses.reduce((acc, c) => {
+                            const grade = overriddenGrades[`${activeSemData.title}-${c.code}`] || c.grade;
+                            const isNonCredit = c.type.toLowerCase().includes('non credit') || grade === 'S' || grade === 'U';
+                            return isNonCredit ? acc : acc + c.crHrs;
+                          }, 0)}
+                        </span>
+                      </div>
+                      <div className="text-right flex flex-col items-end min-w-[70px]">
+                        <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">Earned</span>
+                        <span className="text-3xl font-bold font-sans text-emerald-400 tracking-tighter">
+                          {activeSemIdx === semesters.length - 1 && !overriddenGrades[Object.keys(overriddenGrades).find(k => k.startsWith(activeSemData.title))] ? "0" : (calculatedStats?.history.find(h => h.title === activeSemData.title)?.earned || 0)}
+                        </span>
+                      </div>
+                      <div className="text-right flex flex-col items-end min-w-[70px]">
+                        <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">SGPA</span>
+                        <span className="text-3xl font-bold font-sans text-[#a098ff] tracking-tighter">
+                          {activeSemIdx === semesters.length - 1 && !overriddenGrades[Object.keys(overriddenGrades).find(k => k.startsWith(activeSemData.title))] ? "0.00" : (calculatedStats?.history.find(h => h.title === activeSemData.title)?.sgpa.toFixed(2) || "0.00")}
+                        </span>
+                      </div>
+                      <div className="text-right flex flex-col items-end min-w-[70px]">
+                        <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">CGPA</span>
+                        <span className="text-3xl font-bold font-sans text-white tracking-tighter">
+                          {activeSemIdx === semesters.length - 1 && !overriddenGrades[Object.keys(overriddenGrades).find(k => k.startsWith(activeSemData.title))] 
+                            ? calculatedStats?.currentCGPA.toFixed(2) 
+                            : (calculatedStats?.history.find(h => h.title === activeSemData.title)?.cgpa.toFixed(2) || "0.00")}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="overflow-x-auto custom-scrollbar -mx-2">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-white/[0.02]">
+                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5">Code</th>
+                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5">Course Name</th>
+                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-center">Cr.H</th>
+                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-center">Grade</th>
+                          <th className="px-8 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-right">Points</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {activeSemData.courses.map((course, idx) => {
+                          const currentGrade = overriddenGrades[`${activeSemData.title}-${course.code}`] || course.grade;
+                          const isSimulated = !!overriddenGrades[`${activeSemData.title}-${course.code}`];
+                          
+                          return (
+                            <tr key={idx} className={`group transition-all duration-300 border-b border-white/5 last:border-0 hover:bg-white/[0.03]`}>
+                              <td className="px-6 py-4">
+                                <span className="text-xs font-bold text-white px-2.5 py-1 bg-white/5 rounded-lg group-hover:bg-[#a098ff]/20 group-hover:text-[#a098ff] transition-all">
+                                  {course.code}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="space-y-0.5">
+                                  <p className="text-sm font-bold text-white leading-tight">{course.description}</p>
+                                  <p className="text-[10px] font-medium text-zinc-600 uppercase tracking-wide">{course.type}</p>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                <span className="text-sm font-medium text-zinc-400 group-hover:text-white transition-colors">{course.crHrs}</span>
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                {whatIfMode ? (
+                                  <select 
+                                    value={currentGrade}
+                                    onChange={(e) => handleGradeChange(activeSemData.title, course.code, e.target.value)}
+                                    className={`text-xs font-bold px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/10 text-center cursor-pointer hover:border-[#a098ff]/50 transition-all outline-none appearance-none ${
+                                      currentGrade.startsWith('A') ? 'text-emerald-400' : 
+                                      currentGrade.startsWith('B') ? 'text-blue-400' :
+                                      currentGrade.startsWith('C') ? 'text-amber-400' :
+                                      currentGrade === 'F' ? 'text-rose-400' : 'text-zinc-500'
+                                    }`}
+                                  >
+                                    {Object.keys(GRADE_POINTS).concat(['I', 'S', 'U', 'W']).map(g => (
+                                      <option key={g} value={g}>{g}</option>
+                                    ))}
+                                  </select>
+                                ) : (
+                                  <div className="flex justify-center">
+                                    <span className={`text-[10px] font-bold px-3 py-1 rounded-full border ${
+                                      currentGrade.startsWith('A') 
+                                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                                        : currentGrade.startsWith('B')
+                                          ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                                          : currentGrade.startsWith('C')
+                                            ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                            : currentGrade === 'F'
+                                              ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                                              : 'bg-zinc-800 text-zinc-500 border-transparent'
+                                    }`}>
+                                      {currentGrade}
+                                    </span>
+                                  </div>
+                                )}
+                              </td>
+                              <td className="px-8 py-4 text-right">
+                                <span className={`text-sm font-bold font-sans ${isSimulated ? 'text-[#a098ff]' : 'text-zinc-300'}`}>
+                                  {((GRADE_POINTS[currentGrade] || 0) * course.crHrs).toFixed(1)}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                </div>
+              )}
+            </div>
+          </div>
+
+          {}
+          <div className="space-y-10">
+            {}
+            <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 relative overflow-hidden group">
+              <div className="flex items-center justify-between mb-8">
+                <div className="space-y-1">
+                  <h3 className="text-xl font-bold text-white tracking-tight">Performance Flow</h3>
+                  <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Historical GPA Trend</p>
+                </div>
+                <div className="p-3 bg-[#a098ff]/10 rounded-2xl text-[#a098ff]">
+                  <TrendingUp size={18} />
+                </div>
+              </div>
+              <div className="h-[280px] w-full transition-all duration-700">
+                {chartData && <Line data={chartData} options={chartOptions} />}
+              </div>
+            </div>
+
+
+            {}
+            <div className="bg-[#111] border border-[#a098ff]/20 rounded-[2.5rem] p-7 relative overflow-hidden ">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#a098ff]/5 blur-[80px] rounded-full -mr-32 -mt-32"></div>
+              
+              <div className="relative z-10 flex flex-col h-full">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 bg-[#a098ff]/10 rounded-xl text-[#a098ff]">
+                    <Zap size={20} />
+                  </div>
+                  <h3 className="text-lg font-bold text-white tracking-tight">Simulation Desk</h3>
+                </div>
+
+                <div className="space-y-4 flex-1">
+                  <div className="p-5 rounded-[1.5rem] bg-zinc-900/40 border border-white/5  transition-colors">
+                    <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">Projected CGPA</p>
+                    <div className="flex items-end justify-between">
+                      <span className="text-4xl font-bold font-sans text-white tracking-tighter">
+                        {calculatedStats?.currentCGPA.toFixed(2)}
+                      </span>
+                      {whatIfMode && (
+                        <div className={`flex items-center gap-1 text-xs font-medium font-sans ${calculatedStats.currentCGPA >= originalCGPA ? 'text-emerald-400' : 'text-rose-400'}`}>
+                          {calculatedStats.currentCGPA >= originalCGPA ? '+' : ''}{(calculatedStats.currentCGPA - originalCGPA).toFixed(3)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="p-5 rounded-[1.5rem] bg-zinc-900/40 border border-white/5  transition-colors">
+                    <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">Simulation Impact</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xl font-medium font-sans text-zinc-400">
+                        {Object.keys(overriddenGrades).length} <span className="text-[10px] uppercase ml-1 opacity-60">Changes</span>
+                      </span>
+                      {whatIfMode && (
+                        <button 
+                          onClick={() => setOverriddenGrades({})}
+                          className="p-1.5 text-zinc-600 hover:text-white transition-colors"
+                        >
+                          <RefreshCw size={12} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                 
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <CGPAPlannerModal 
+        isOpen={isPlannerOpen} 
+        onClose={() => setIsPlannerOpen(false)} 
+        currentCGPA={calculatedStats?.currentCGPA || 0}
+        currentCreditHours={calculatedStats?.totalCreditsForGPA || 0}
+      />
     </PageLayout>
   );
 }
