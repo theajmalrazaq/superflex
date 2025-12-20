@@ -7,14 +7,20 @@ import {
   Target,
   FileBarChart,
   Layout,
-  Info
+  Info,
+  AlertTriangle,
 } from "lucide-react";
+import NotificationBanner from "../NotificationBanner";
+import PageHeader from "../PageHeader";
+import StatsCard from "../StatsCard";
+import SuperTabs from "../SuperTabs";
 
 function MarksPloReportPage() {
   const [loading, setLoading] = useState(true);
   const [semesters, setSemesters] = useState([]);
   const [reportHtml, setReportHtml] = useState(null);
   const [summaryData, setSummaryData] = useState(null);
+  const [alerts, setAlerts] = useState([]);
   
   const hiddenContentRef = useRef(null);
 
@@ -39,6 +45,30 @@ function MarksPloReportPage() {
                 return;
             }
         }
+
+        // 0. Parse Alerts
+        const alertList = [];
+        root.querySelectorAll(".m-alert, .alert").forEach(alert => {
+          if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
+
+          const textContainer = alert.querySelector(".m-alert__text") || alert;
+          const clone = textContainer.cloneNode(true);
+          // Remove standard UI elements that shouldn't be in the message
+          clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
+          
+          let message = clone.textContent
+            .replace(/Alert!/gi, "")
+            .replace(/Close/gi, "")
+            .replace(/&nbsp;/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+          if (message && message.length > 3) {
+              const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
+              alertList.push({ type, message });
+          }
+        });
+        setAlerts(alertList);
 
         // 1. Parse Semesters
         const legacyForm = root.querySelector("form") || root.querySelector(".row"); // Sometimes form IS the row
@@ -203,37 +233,19 @@ function MarksPloReportPage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-6 md:p-8 space-y-8 print:p-0 print:bg-white">
         
-        {/* Header - No Print */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 print:hidden">
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-              PLO Report
-            </h1>
-            <p className="text-zinc-400 font-medium">
-              Program Learning Outcomes attainment analysis
-            </p>
-          </div>
-
-          <div className="flex gap-4">
-             {semesters.length > 0 && (
-                 <div className="flex gap-2 bg-zinc-900/50 p-1.5 rounded-full border border-white/5 backdrop-blur-sm overflow-x-auto custom-scrollbar">
-                    {semesters.map((sem, idx) => (
-                        <button
-                        key={idx}
-                        onClick={() => handleSemesterChange(sem.value)}
-                        className={`px-5 py-2 border rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
-                            sem.selected
-                            ? "bg-[#a098ff]/10 text-[#a098ff] border-[#a098ff]/20"
-                            : "text-zinc-500 border-transparent hover:text-white hover:bg-white/5"
-                        }`}
-                        >
-                        {sem.label}
-                        </button>
-                    ))}
-                </div>
-             )}
-          </div>
-        </div>
+        <PageHeader
+          className="print:hidden"
+          title="PLO Report"
+          subtitle="Program Learning Outcomes attainment analysis"
+        >
+          {semesters.length > 0 && (
+            <SuperTabs
+              tabs={semesters}
+              activeTab={semesters.find((s) => s.selected)?.value}
+              onTabChange={handleSemesterChange}
+            />
+          )}
+        </PageHeader>
 
         {loading ? (
           <div className="flex justify-center py-20">
@@ -241,63 +253,48 @@ function MarksPloReportPage() {
           </div>
         ) : (
           <div className="space-y-8">
+            {/* Notifications */}
+            <NotificationBanner alerts={alerts} />
             
             {/* Dashboard Summary */}
             {summaryData && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 print:gap-4">
-                    {/* Overall Score */}
-                    <div className="bg-zinc-900/50 border border-white/5 rounded-3xl p-6 relative overflow-hidden group print:border-gray-200 print:bg-white">
-                        <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                             <Target size={80} className="text-white print:text-black" />
-                        </div>
-                        <div className="relative z-10">
-                            <h3 className="text-zinc-400 font-medium text-sm flex items-center gap-2 print:text-black">
-                                <BarChart3 size={16} /> Overall Attainment
-                            </h3>
-                            <div className={`mt-4 text-5xl font-black tracking-tighter ${getStatus(summaryData.percentage).color} print:text-black`}>
-                                {summaryData.percentage}%
-                            </div>
-                            <div className="mt-2 text-sm text-zinc-500 print:text-gray-600">Based on CLO mapping</div>
-                        </div>
-                    </div>
-
-                     {/* Status */}
-                     <div className="bg-zinc-900/50 border border-white/5 rounded-3xl p-6 relative overflow-hidden group print:border-gray-200 print:bg-white">
-                        <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
-                             <TrendingUp size={80} className="text-white print:text-black" />
-                        </div>
-                        <div className="relative z-10">
-                            <h3 className="text-zinc-400 font-medium text-sm flex items-center gap-2 print:text-black">
-                                <Layout size={16} /> Performance Status
-                            </h3>
-                            <div className="mt-4 flex items-center gap-3">
-                                <span className={`px-4 py-2 rounded-xl text-lg font-bold border ${getStatus(summaryData.percentage).bg} ${getStatus(summaryData.percentage).color} border-transparent print:border-gray-200 print:text-black print:bg-transparent`}>
-                                    {getStatus(summaryData.percentage).label}
-                                </span>
-                            </div>
-                             <div className="mt-4 w-full bg-zinc-800 rounded-full h-2 overflow-hidden print:bg-gray-200">
-                                <div 
-                                    className={`h-full ${getStatus(summaryData.percentage).bg.replace('/20', '')}`} 
-                                    style={{ width: `${summaryData.percentage}%` }}
-                                ></div>
-                            </div>
-                        </div>
-                    </div>
+                    <StatsCard 
+                        icon={Target}
+                        label="Overall Attainment"
+                        value={`${summaryData.percentage}%`}
+                        subValue="Based on CLO mapping"
+                        delay={100}
+                        className={`print:border-gray-200 print:bg-white ${getStatus(summaryData.percentage).color}`}
+                    />
+                    <StatsCard 
+                        icon={TrendingUp}
+                        label="Performance Status"
+                        value={getStatus(summaryData.percentage).label}
+                        subValue="Performance Level"
+                        delay={200}
+                        className={`print:border-gray-200 print:bg-white ${getStatus(summaryData.percentage).color}`}
+                    />
 
                     {/* PLO Breakdown */}
-                    <div className="bg-zinc-900/50 border border-white/5 rounded-3xl p-6 md:col-span-1 print:border-gray-200 print:bg-white">
-                         <h3 className="text-zinc-400 font-medium text-sm flex items-center gap-2 mb-4 print:text-black">
-                            <FileBarChart size={16} /> PLO Breakdown
-                        </h3>
-                        <div className="grid grid-cols-4 md:grid-cols-4 lg:grid-cols-5 gap-2">
-                             {summaryData.ploBreakdown.map((plo, i) => (
-                                 <div key={i} className="flex flex-col items-center bg-black/20 rounded-lg p-2 border border-white/5 hover:border-white/10 transition-colors print:border-gray-200 print:bg-transparent">
-                                     <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider print:text-black">PLO {plo.id}</span>
-                                     <span className={`text-sm font-bold ${getStatus(plo.value).color} print:text-black`}>
-                                         {plo.value}%
-                                     </span>
-                                 </div>
-                             ))}
+                    <div className="flex-1 min-w-[140px] p-6 rounded-[2rem] border bg-zinc-900/50 backdrop-blur-xl hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group print:border-gray-200 print:bg-white">
+                        <div className="flex justify-between items-start mb-6">
+                            <div className="p-3.5 rounded-2xl bg-[#a098ff]/10 text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
+                                <FileBarChart size={24} />
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                            <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1 print:text-black">PLO Breakdown</p>
+                            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
+                                 {summaryData.ploBreakdown.map((plo, i) => (
+                                     <div key={i} className="flex flex-col items-center bg-black/20 rounded-lg p-2 border border-white/5 hover:border-white/10 transition-colors print:border-gray-200 print:bg-transparent">
+                                         <span className="text-[9px] text-zinc-500 uppercase font-black tracking-widest print:text-black leading-none mb-1">PLO{plo.id}</span>
+                                         <span className={`text-[11px] font-black text-[#a098ff] print:text-black`}>
+                                             {plo.value}%
+                                         </span>
+                                     </div>
+                                 ))}
+                            </div>
                         </div>
                     </div>
                 </div>

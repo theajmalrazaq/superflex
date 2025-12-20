@@ -1,697 +1,691 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import PageLayout from "../layouts/PageLayout";
+import LoadingOverlay, { LoadingSpinner } from "../LoadingOverlay";
+import {
+  FileText,
+  AlertCircle,
+  Clock,
+  CheckCircle2,
+  Trash2,
+  Printer,
+  ChevronRight,
+  Info,
+  Layers,
+  Calendar,
+  Zap,
+  Upload,
+  Send,
+  X,
+  CreditCard,
+  AlertTriangle,
+  BookOpen,
+  Layout,
+  ShieldCheck,
+  Download
+} from "lucide-react";
+import NotificationBanner from "../NotificationBanner";
+import PageHeader from "../PageHeader";
+import StatsCard from "../StatsCard";
+import SuperTabs from "../SuperTabs";
+
+/**
+ * Premium Modal Component for Withdrawal Intake
+ */
+const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
+  const [remarks, setRemarks] = useState("");
+  const [files, setFiles] = useState({ withdrawForm: null, cnicFront: null, cnicBack: null });
+  const MAX_SIZE = 0.63 * 1024 * 1024; // 0.63 MB (Legacy constraint)
+
+  if (!isOpen) return null;
+
+  const handleFileChange = (key, file) => {
+    if (file && file.size > MAX_SIZE) {
+        alert(`${key === 'withdrawForm' ? 'Withdraw Form' : key === 'cnicFront' ? 'CNIC Front' : 'CNIC Back'} image must be less than 0.63 MB (650 KB).`);
+        return;
+    }
+    setFiles(prev => ({ ...prev, [key]: file }));
+  };
+
+  const isFormValid = remarks.trim() && files.withdrawForm && files.cnicFront && files.cnicBack;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div 
+        className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-lg bg-zinc-900 border border-white/10 rounded-[2rem] p-6 animate-in zoom-in-95 duration-300 space-y-6 max-h-[90vh] overflow-y-auto custom-scrollbar no-scrollbar">
+        <div className="flex justify-between items-start">
+          <div className="space-y-0.5">
+            <h2 className="text-xl font-black text-white tracking-tight">Withdrawal Intake</h2>
+            <p className="text-[#a098ff] text-[9px] font-black uppercase tracking-widest">Complete Documentation Required</p>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-zinc-400 hover:text-white transition-all"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="p-3 rounded-xl bg-[#a098ff]/5 border border-[#a098ff]/10 flex items-center gap-3">
+            <div className="p-1.5 bg-[#a098ff]/20 rounded-lg text-[#a098ff]">
+                <Info size={14} />
+            </div>
+            <p className="text-[10px] font-bold text-[#a098ff]/90 leading-tight">
+                Important: Uploaded images must be under 650KB each.
+            </p>
+        </div>
+
+        <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4">
+                {[
+                    { key: 'withdrawForm', label: 'Withdraw Form', icon: FileText },
+                    { key: 'cnicFront', label: 'CNIC Front', icon: CreditCard },
+                    { key: 'cnicBack', label: 'CNIC Back', icon: CreditCard }
+                ].map((input) => (
+                    <div key={input.key} className="space-y-2">
+                        <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest px-1">{input.label}</label>
+                        <div 
+                            className="group relative border-2 border-dashed border-white/5 hover:border-[#a098ff]/30 rounded-2xl p-4 transition-all cursor-pointer bg-white/[0.02] hover:bg-white/[0.04] overflow-hidden"
+                            onClick={() => document.getElementById(`file-${input.key}`).click()}
+                        >
+                            <input 
+                                id={`file-${input.key}`}
+                                type="file" 
+                                accept="image/*"
+                                className="hidden" 
+                                onChange={(e) => handleFileChange(input.key, e.target.files[0])}
+                            />
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-white/5 rounded-xl text-zinc-400 group-hover:text-[#a098ff] group-hover:bg-[#a098ff]/10 transition-all">
+                                    <input.icon size={18} />
+                                </div>
+                                <div className="space-y-0.5 flex-1 min-w-0">
+                                    <p className="text-xs font-bold text-white truncate px-1">
+                                        {files[input.key] ? files[input.key].name : `Select ${input.label}`}
+                                    </p>
+                                    <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest px-1">
+                                        {files[input.key] ? `${(files[input.key].size / 1024).toFixed(0)} KB` : "Image Store (Max 650KB)"}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="space-y-2">
+                <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest px-1">Reason for Withdrawal</label>
+                <textarea 
+                    value={remarks}
+                    onChange={(e) => setRemarks(e.target.value)}
+                    placeholder="Provide a detailed reason..."
+                    className="w-full bg-white/[0.02] border border-white/5 text-white p-4 rounded-2xl text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#a098ff]/30 transition-all min-h-[100px] resize-none"
+                />
+            </div>
+        </div>
+
+        <button 
+           onClick={() => onSubmit({ remarks, files })}
+           disabled={!isFormValid}
+           className="w-full bg-[#a098ff] hover:bg-[#8f86ff] disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-950 px-6 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+        >
+            <Send size={16} />
+            Confirm & Submit Request
+        </button>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Rules & Instructions Modal
+ */
+const InstructionsModal = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div 
+        className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-lg bg-zinc-900 border border-white/10 rounded-[2rem] animate-in zoom-in-95 duration-300 overflow-hidden flex flex-col max-h-[85vh]">
+        <div className="p-5 border-b border-white/5 flex justify-between items-center bg-zinc-900/50 backdrop-blur-xl shrink-0">
+          <div className="space-y-0.5">
+            <h2 className="text-lg font-black text-white tracking-tight">Rules & Procedures</h2>
+            <p className="text-[#a098ff] text-[9px] font-black uppercase tracking-[0.2em]">Withdrawal Framework</p>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-zinc-400 hover:text-white transition-all"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="p-5 overflow-y-auto custom-scrollbar flex-1 space-y-6 text-left no-scrollbar">
+            <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                    <div className="w-1 h-4 bg-[#a098ff] rounded-full"></div>
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Mandatory Documents</h3>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                    {[
+                        { title: "Withdraw Form", desc: "Signed by you and parents" },
+                        { title: "CNIC Front", desc: "Clear scan of Parent/Guardian" },
+                        { title: "CNIC Back", desc: "Clear scan of Parent/Guardian" },
+                        { title: "Valid Images", desc: "Format: JPG, PNG, WEBP" }
+                    ].map((item, i) => (
+                        <div key={i} className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
+                            <h4 className="text-[10px] font-black text-white uppercase">{item.title}</h4>
+                            <p className="text-[9px] text-zinc-500 leading-tight font-medium">{item.desc}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                    <div className="w-1 h-4 bg-[#a098ff] rounded-full"></div>
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Submission Protocol</h3>
+                </div>
+                <div className="space-y-2">
+                    {[
+                        "Ensure the withdrawal window is active for the course.",
+                        "All files must be strictly under 650KB (0.63 MB).",
+                        "A 'W' grade will be permanent on the transcript.",
+                        "Withdrawal does not refund any tuition fees."
+                    ].map((step, i) => (
+                        <div key={i} className="flex gap-3 p-2 rounded-lg hover:bg-white/[0.02] transition-colors group">
+                            <div className="w-5 h-5 rounded-full bg-[#a098ff]/10 border border-[#a098ff]/20 flex items-center justify-center text-[#a098ff] text-[9px] font-black shrink-0">
+                                {i + 1}
+                            </div>
+                            <p className="text-[11px] text-zinc-400 font-medium leading-relaxed">{step}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+
+        <div className="p-5 border-t border-white/5 bg-zinc-900/50 shrink-0">
+            <button 
+                onClick={onClose}
+                className="w-full bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all"
+            >
+                Understood, Close
+            </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+/**
+ * Premium Course Card Component
+ */
+const WithdrawalCourseCard = ({ course, isSelected, onToggle, index }) => {
+  return (
+    <div
+      onClick={() => course.canSelect && onToggle(course.id)}
+      className={`group flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${
+        course.canSelect ? "cursor-pointer" : "cursor-not-allowed opacity-60"
+      } ${
+        isSelected
+          ? "bg-[#a098ff]/10 border-[#a098ff]/50"
+          : "bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5"
+      }`}
+    >
+      <div className="flex items-center gap-4">
+        <span
+          className={`font-bold text-sm min-w-[1.5rem] ${isSelected ? "text-[#a098ff]" : "text-zinc-600"}`}
+        >
+          {index}.
+        </span>
+        
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-300 ${
+          isSelected 
+            ? "bg-[#a098ff]/20 border-[#a098ff]/30 text-[#a098ff] scale-105" 
+            : "bg-zinc-800/50 border-white/5 text-zinc-500"
+        }`}>
+          <BookOpen size={20} />
+        </div>
+
+        <div className="flex flex-col gap-1 min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-black text-[#a098ff] uppercase tracking-tighter opacity-80 shrink-0">
+              {course.code}
+            </span>
+            <span className="text-white font-medium text-sm leading-tight truncate">
+              {course.name}
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-3 text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
+            <span className="flex items-center gap-1.5">
+               {course.credits} Credits
+            </span>
+            <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
+            <span className="flex items-center gap-1.5 capitalize">
+               {course.type}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4">
+        {course.status && (
+            <div className={`px-3 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest ${
+                course.status.toLowerCase().includes('withdraw')
+                ? "bg-rose-500/10 border-rose-500/20 text-rose-400"
+                : course.status.toLowerCase().includes('not applied')
+                ? "bg-white/5 border-white/5 text-zinc-500"
+                : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+            }`}>
+                {course.status}
+            </div>
+        )}
+        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+            isSelected 
+            ? "bg-[#a098ff] border-[#a098ff] text-zinc-950 scale-110" 
+            : "border-zinc-700 bg-transparent"
+        }`}>
+            {isSelected && <CheckCircle2 size={14} strokeWidth={3} />}
+            {!isSelected && !course.canSelect && <X size={10} className="text-zinc-800" />}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 function CourseWithdrawPage() {
-  const [elemContent, setElemContent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [semesters, setSemesters] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const hiddenContentRef = useRef(null);
 
   useEffect(() => {
-    const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
-    if (targetElement) {
-      applyCustomStyling(targetElement);
+    const parseWithdrawData = () => {
+      try {
+        const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
+        if (!root) {
+          setTimeout(parseWithdrawData, 500);
+          return;
+        }
 
-      setElemContent(targetElement.innerHTML);
-      targetElement.remove();
-    }
+        // 1. Parse Semesters
+        const select = root.querySelector("select#SemId");
+        if (select) {
+          const opts = Array.from(select.options).map(o => ({
+            label: o.text.trim(),
+            value: o.value,
+            selected: o.selected
+          }));
+          setSemesters(opts);
+        }
+
+        // 2. Parse Alerts
+        const alertList = [];
+        root.querySelectorAll(".m-alert, .alert").forEach(alert => {
+           if (alert.style.display === "none") return;
+           
+           const textEl = alert.querySelector(".m-alert__text") || alert;
+           const clone = textEl.cloneNode(true);
+           // Remove standard UI elements that shouldn't be in the message
+           clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
+           
+           let message = clone.textContent
+             .replace(/Alert!/gi, "")
+             .replace(/Close/gi, "")
+             .replace(/&nbsp;/g, " ")
+             .replace(/\s+/g, " ")
+             .trim();
+           
+           if (message && message.length > 3) {
+             const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
+             alertList.push({ type, message });
+           }
+        });
+        setAlerts(alertList);
+
+        // 3. Parse Courses Table
+        const courseData = [];
+        const table = root.querySelector(".table");
+        if (table) {
+          const rows = table.querySelectorAll("tbody tr");
+          rows.forEach((row, idx) => {
+             const cells = Array.from(row.querySelectorAll("td"));
+             if (cells.length < 4) return;
+
+             const checkbox = row.querySelector('input[name="OfferIdCheckBox"]');
+             let code, name, credits, status, offerId;
+             
+             if (checkbox) {
+                 offerId = checkbox.id.split('_')[1];
+                 code = cells[2]?.textContent.trim();
+                 name = cells[3]?.textContent.trim();
+                 credits = cells[4]?.textContent.trim();
+                 status = cells[5]?.textContent.trim();
+             } else {
+                 code = cells[1]?.textContent.trim();
+                 name = cells[2]?.textContent.trim();
+                 credits = cells[3]?.textContent.trim();
+                 status = cells[4]?.textContent.trim();
+             }
+
+             if (code) {
+                courseData.push({
+                    id: idx,
+                    offerId: offerId,
+                    isSelected: false,
+                    canSelect: !!checkbox,
+                    code,
+                    name,
+                    credits,
+                    type: "Course",
+                    status: status || "Not Applied",
+                    rawCheckbox: checkbox
+                 });
+             }
+          });
+        }
+        setCourses(courseData);
+
+        if (hiddenContentRef.current) {
+          hiddenContentRef.current.innerHTML = "";
+          hiddenContentRef.current.appendChild(root.cloneNode(true));
+        }
+        
+        root.style.opacity = "0";
+        root.style.pointerEvents = "none";
+        root.style.position = "absolute";
+        root.style.zIndex = "-1";
+
+        setLoading(false);
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
+      } catch (err) {
+        console.error("Course Withdraw Parser Error", err);
+        setLoading(false);
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
+      }
+    };
+
+    parseWithdrawData();
   }, []);
 
-  const applyCustomStyling = (element) => {
-    const addedStyles = [];
-
-    const errorDiv = element.querySelector("#DataErrormsgdiv");
-    if (errorDiv) {
-      errorDiv.remove();
+  const handleSemesterChange = (val) => {
+    const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
+    const select = root?.querySelector("select#SemId");
+    if (select) {
+      select.value = val;
+      select.dispatchEvent(new Event('change'));
+      const form = select.closest("form");
+      if (form) form.submit();
     }
-
-    const styleElement = document.createElement("style");
-    styleElement.textContent = `
-            .custom-scrollbar::-webkit-scrollbar {
-                width: 8px;
-                height: 8px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-track {
-                background: rgba(255, 255, 255, 0.05);
-                border-radius: 10px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 10px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                background: rgba(255, 255, 255, 0.3);
-            }
-            
-            .file-upload-container {
-                margin-top: 1rem;
-                display: flex;
-                flex-direction: column;
-            }
-            
-            .file-upload-input {
-                opacity: 0;
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                cursor: pointer;
-            }
-            
-            .file-upload-box {
-                border: 2px dashed rgba(255, 255, 255, 0.2);
-                border-radius: 1rem;
-                padding: 2rem;
-                text-align: center;
-                transition: all 0.3s;
-                background-color: rgba(0, 0, 0, 0.2);
-            }
-            
-            .file-upload-box:hover {
-                border-color: rgba(255, 255, 255, 0.5);
-                background-color: rgba(0, 0, 0, 0.4);
-            }
-        `;
-
-    styleElement.setAttribute("data-custom-style", "true");
-    document.head.appendChild(styleElement);
-    addedStyles.push(styleElement);
-
-    const alertElements = element.querySelectorAll(".m-alert");
-    alertElements.forEach((alertElement) => {
-      alertElement.classList.add(
-        "!bg-black",
-        "!text-white",
-        "!border-white/10",
-        "!font-bold",
-        "!p-4",
-        "!rounded-3xl",
-        "!flex",
-        "!justify-between",
-        "!items-center",
-        "!mb-6",
-      );
-
-      const iconElement = alertElement.querySelector(".m-alert__icon");
-      if (iconElement) {
-        iconElement.classList.add(
-          "!text-white",
-          "!text-2xl",
-          "!bg-x",
-          "!rounded-full",
-          "!p-2",
-          "!w-12",
-          "!h-12",
-          "!flex",
-          "!items-center",
-          "!justify-center",
-        );
-
-        const createSvgIcon = (path) => {
-          const svg = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "svg",
-          );
-          svg.setAttribute("width", "24");
-          svg.setAttribute("height", "24");
-          svg.setAttribute("viewBox", "0 0 24 24");
-          svg.setAttribute("fill", "none");
-          svg.setAttribute("stroke", "currentColor");
-          svg.setAttribute("stroke-width", "2");
-          svg.setAttribute("stroke-linecap", "round");
-          svg.setAttribute("stroke-linejoin", "round");
-          svg.classList.add("w-6", "h-6", "text-white");
-
-          const pathElement = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "path",
-          );
-          pathElement.setAttribute("d", path);
-          svg.appendChild(pathElement);
-
-          return svg;
-        };
-
-        let iconPath = "";
-        if (alertElement.classList.contains("alert-danger")) {
-          iconPath =
-            "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z";
-        } else if (alertElement.classList.contains("alert-info")) {
-          iconPath = "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z";
-        } else {
-          iconPath = "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z";
-        }
-
-        iconElement.innerHTML = "";
-        iconElement.appendChild(createSvgIcon(iconPath));
-      }
-
-      const closeButton = alertElement.querySelector("button.close");
-      if (closeButton) {
-        closeButton.style.cssText = "content: none !important;";
-
-        const style = document.createElement("style");
-        style.textContent =
-          'button.close[data-dismiss="alert"]::before, button.close[data-dismiss="modal"]::before { display: none !important; content: none !important; }';
-        style.setAttribute("data-custom-style", "true");
-        document.head.appendChild(style);
-        addedStyles.push(style);
-
-        closeButton.innerHTML = `
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/70">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                `;
-        closeButton.classList.add("!focus:outline-none");
-      }
-
-      if (alertElement.classList.contains("alert-info")) {
-        const linkElement = alertElement.querySelector("a");
-        if (linkElement) {
-          linkElement.classList.add(
-            "!text-x",
-            "!font-bold",
-            "!underline",
-            "hover:!text-white",
-            "!transition-colors",
-          );
-        }
-      }
-    });
-
-    const semesterForm = element.querySelector("#Formwithdraw");
-    if (semesterForm) {
-      semesterForm.classList.add("!ml-4");
-
-      const semesterSelect = semesterForm.querySelector("#SemId");
-      if (semesterSelect) {
-        semesterSelect.classList.add(
-          "!bg-black",
-          "!text-white",
-          "!border",
-          "!border-white/10",
-          "!rounded-xl",
-          "!px-4",
-          "!py-2",
-          "!cursor-pointer",
-          "!focus:ring-2",
-          "!focus:ring-x",
-          "!focus:outline-none",
-          "!w-64",
-        );
-
-        semesterSelect.classList.remove(
-          "m-dropdown__toggle",
-          "btn",
-          "btn-brand",
-          "dropdown-toggle",
-        );
-      }
-
-      const brTag = semesterForm.querySelector("br");
-      if (brTag) {
-        brTag.remove();
-      }
-    }
-
-    const portlet = element.querySelector(".m-portlet");
-    if (portlet) {
-      portlet.classList.add(
-        "!bg-black",
-        "!border-none",
-        "!rounded-3xl",
-        "!p-4",
-        "!shadow-lg",
-      );
-
-      portlet.classList.remove(
-        "m-portlet--primary",
-        "m-portlet--head-solid-bg",
-        "m-portlet--border-bottom-info",
-        "m-portlet--head-sm",
-      );
-    }
-
-    const portletHead = element.querySelector(".m-portlet__head");
-    if (portletHead) {
-      portletHead.classList.add(
-        "!bg-black",
-        "!border",
-        "!border-white/10",
-        "!rounded-t-3xl",
-        "!h-fit",
-        "!p-4",
-        "!flex",
-        "!items-center",
-        "!justify-between",
-        "!mb-4",
-      );
-
-      const headingText = portletHead.querySelector(".m-portlet__head-text");
-      if (headingText) {
-        headingText.classList.add("!text-white", "!text-xl", "!font-bold");
-      }
-
-      const headCaption = portletHead.querySelector(".m-portlet__head-caption");
-      if (headCaption) {
-        headCaption.classList.add("!flex", "!justify-center", "!items-center");
-      }
-
-      const semesterForm = element.querySelector("#Formwithdraw");
-      if (semesterForm) {
-        const formContainer = document.createElement("div");
-        formContainer.appendChild(semesterForm);
-
-        if (headingText && headingText.parentElement) {
-          headingText.parentElement.after(formContainer);
-        } else {
-          portletHead.appendChild(formContainer);
-        }
-      }
-
-      const buttonContainer = document.createElement("div");
-      buttonContainer.className = "portlet-head-buttons flex gap-2";
-
-      const lastRow = element.querySelector("tbody tr:last-child");
-      if (lastRow) {
-        const buttonCell = lastRow.querySelector("td:last-child");
-        if (buttonCell) {
-          const buttons = buttonCell.querySelectorAll(".btn");
-
-          if (buttons.length >= 1) {
-            const initiateButton = document.createElement("a");
-            initiateButton.href = "#";
-            initiateButton.className =
-              "btn btn-primary btn-sm !bg-x hover:!bg-x/80 !text-white !text-sm !w-10 !h-10 !p-0 !flex !justify-center !items-center !rounded-xl !border-0";
-            initiateButton.setAttribute("data-toggle", "modal");
-            initiateButton.setAttribute("data-target", "#RemarksDetail");
-
-            initiateButton.innerHTML = `
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                  <polyline points="10 9 9 9 8 9"></polyline>
-              </svg>
-            `;
-            buttonContainer.appendChild(initiateButton);
-          }
-
-          if (buttons.length >= 2) {
-            const downloadButton = document.createElement("a");
-            downloadButton.href = "#";
-            downloadButton.className =
-              "btn btn-primary btn-sm !bg-x hover:!bg-x/80 !text-white !text-sm !w-10 !h-10 !p-0 !flex !justify-center !items-center !rounded-xl !border-0";
-            downloadButton.setAttribute(
-              "onclick",
-              "ftn_PrintCourseWithdrawForm();",
-            );
-
-            downloadButton.innerHTML = `
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 17V3"></path>
-                  <path d="m6 11 6 6 6-6"></path>
-                  <path d="M19 21H5"></path>
-              </svg>
-            `;
-            buttonContainer.appendChild(downloadButton);
-          }
-
-          portletHead.appendChild(buttonContainer);
-
-          buttonCell.style.display = "none";
-        }
-      }
-    }
-
-    const portletBody = element.querySelector(".m-portlet__body");
-    if (portletBody) {
-      portletBody.classList.add(
-        "!bg-black",
-        "!rounded-b-3xl",
-        "!p-0",
-        "!border",
-        "!border-white/10",
-        "!shadow-lg",
-        "!text-white",
-        "!h-[400px]",
-        "!overflow-y-auto",
-        "custom-scrollbar",
-      );
-
-      const sectionContent = portletBody.querySelector(".m-section__content");
-      if (sectionContent) {
-        sectionContent.style.marginBottom = "0";
-      }
-    }
-
-    const table = element.querySelector(".table");
-    if (table) {
-      table.querySelectorAll(".table td, .table th").forEach((el) => {
-        el.classList.add("!border-none");
-      });
-
-      const tableContainer = document.createElement("div");
-      tableContainer.className = "overflow-hidden mb-6";
-      table.parentNode.insertBefore(tableContainer, table);
-      tableContainer.appendChild(table);
-
-      table.classList.add("!w-full", "!border-collapse", "!border-0");
-      table.classList.remove(
-        "m-table",
-        "m-table--head-bg-metal",
-        "table-responsive",
-      );
-
-      const thead = table.querySelector("thead");
-      if (thead) {
-        thead.classList.add("!bg-zinc-900", "!sticky", "!top-0", "!z-10");
-
-        const checkboxHeader = thead.querySelector("#Checkallhide_Show");
-        if (checkboxHeader) {
-          checkboxHeader.innerHTML = "Select";
-        }
-
-        const headers = thead.querySelectorAll("th");
-        headers.forEach((header) => {
-          header.classList.add(
-            "!bg-transparent",
-            "!text-gray-400",
-            "!font-medium",
-            "!p-3",
-            "!text-left",
-            "!border-b",
-            "!border-white/10",
-          );
-        });
-      }
-
-      const tbody = table.querySelector("tbody");
-      if (tbody) {
-        tbody.classList.add("!divide-y", "!divide-white/10");
-
-        const rows = tbody.querySelectorAll("tr");
-        rows.forEach((row) => {
-          row.classList.add(
-            "!bg-black",
-            "!hover:bg-white/5",
-            "!transition-colors",
-          );
-
-          const cells = row.querySelectorAll("td");
-          cells.forEach((cell) => {
-            cell.classList.add(
-              "!p-3",
-              "!text-white/80",
-              "!border-y",
-              "!border-white/10",
-            );
-
-            const checkbox = cell.querySelector('input[type="checkbox"]');
-            if (checkbox) {
-              checkbox.classList.add(
-                "cursor-pointer",
-                "w-4",
-                "h-4",
-                "accent-x",
-              );
-            }
-          });
-        });
-
-        const lastRow = tbody.querySelector("tr:last-child");
-        if (lastRow) {
-          const buttonCell = lastRow.querySelector("td:last-child");
-          if (buttonCell) {
-            const buttons = buttonCell.querySelectorAll(".btn");
-            buttons.forEach((button) => {
-              button.classList.add(
-                "!bg-x",
-                "hover:!bg-x/80",
-                "!text-white",
-                "!font-medium",
-                "!py-2",
-                "!px-4",
-                "!h-10",
-                "!w-fit",
-                "!rounded-xl",
-                "!transition-colors",
-                "!flex",
-                "!items-center",
-                "!inline-flex",
-                "!gap-2",
-                "!border-0",
-                "!mt-0",
-                "!mr-2",
-              );
-
-              button.style.marginTop = "0";
-
-              button.classList.remove("btn-primary", "btn-sm");
-            });
-
-            const initiateButton = buttonCell.querySelector(".btn:first-child");
-            if (initiateButton) {
-              initiateButton.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                    <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
-              `;
-            }
-
-            const downloadButton = buttonCell.querySelector(".btn:last-child");
-            if (downloadButton) {
-              downloadButton.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 17V3"></path>
-                    <path d="m6 11 6 6 6-6"></path>
-                    <path d="M19 21H5"></path>
-                </svg>
-              `;
-            }
-          }
-        }
-      }
-    }
-
-    const modals = element.querySelectorAll(".modal-content");
-    modals.forEach((modal) => {
-      modal.classList.add(
-        "!bg-black",
-        "!rounded-2xl",
-        "!border-2",
-        "!border-white/10",
-        "!p-5",
-        "!shadow-none",
-      );
-
-      const modalHeader = modal.querySelector(".modal-header");
-      if (modalHeader) {
-        modalHeader.classList.add(
-          "!bg-black",
-          "!border-b",
-          "!border-white/10",
-          "!p-4",
-          "!flex",
-          "!items-center",
-          "!justify-between",
-        );
-
-        if (modalHeader.hasAttribute("style")) {
-          modalHeader.removeAttribute("style");
-        }
-
-        const modalTitle = modalHeader.querySelector(".modal-title");
-        if (modalTitle) {
-          modalTitle.classList.add("!text-white", "!font-bold", "!text-xl");
-          modalTitle.textContent = "Course Withdraw Details";
-        }
-
-        const closeBtn = modalHeader.querySelector(".close");
-        if (closeBtn) {
-          closeBtn.innerHTML = `
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/70">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    `;
-
-          if (closeBtn.hasAttribute("style")) {
-            closeBtn.removeAttribute("style");
-          }
-
-          closeBtn.classList.add("!focus:outline-none");
-        }
-      }
-
-      const modalBody = modal.querySelector(".modal-body");
-      if (modalBody) {
-        modalBody.classList.add(
-          "!bg-black",
-          "!text-white",
-          "!p-6",
-          "!max-h-[500px]",
-          "!overflow-y-auto",
-          "custom-scrollbar",
-        );
-
-        const fileInputContainers = modalBody.querySelectorAll(".form-group");
-        fileInputContainers.forEach((container) => {
-          const label = container.querySelector("label");
-          const fileInput = container.querySelector('input[type="file"]');
-
-          if (label && fileInput) {
-            label.classList.add(
-              "!text-white",
-              "!font-medium",
-              "!mb-2",
-              "!block",
-            );
-            label.style.fontWeight = "normal";
-
-            const labelText = label.textContent.split(":")[0];
-
-            const uploadContainer = document.createElement("div");
-            uploadContainer.className = "file-upload-container relative";
-
-            const uploadBox = document.createElement("div");
-            uploadBox.className = "file-upload-box";
-
-            uploadBox.innerHTML = `
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" 
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
-                                 stroke-linejoin="round" class="mx-auto mb-4 text-white/30">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                <polyline points="17 8 12 3 7 8"></polyline>
-                                <line x1="12" y1="3" x2="12" y2="15"></line>
-                            </svg>
-                            <p class="text-sm text-white/60 mb-1">Click to upload ${labelText}</p>
-                            <p class="text-xs text-white/40">Image must be less than 650 KB</p>
-                        `;
-
-            const newFileInput = fileInput.cloneNode(true);
-            newFileInput.className = "file-upload-input";
-            if (newFileInput.hasAttribute("style")) {
-              newFileInput.removeAttribute("style");
-            }
-
-            uploadContainer.appendChild(uploadBox);
-            uploadContainer.appendChild(newFileInput);
-
-            fileInput.parentNode.replaceChild(uploadContainer, fileInput);
-          }
-        });
-
-        const textareaGroup = modalBody.querySelector(".form-group:last-child");
-        if (textareaGroup) {
-          const textarea = textareaGroup.querySelector("textarea");
-          if (textarea) {
-            textarea.classList.add(
-              "!w-full",
-              "!bg-black",
-              "!border",
-              "!border-white/20",
-              "!rounded-lg",
-              "!p-3",
-              "!text-white",
-              "!mt-2",
-              "!transition-colors",
-              "!focus:border-x",
-              "!focus:outline-none",
-              "!resize-none",
-              "!h-24",
-            );
-          }
-
-          const label = textareaGroup.querySelector("label");
-          if (label) {
-            label.classList.add(
-              "!text-white",
-              "!font-medium",
-              "!mb-2",
-              "!block",
-            );
-            label.style.fontWeight = "normal";
-          }
-        }
-
-        const brTags = modalBody.querySelectorAll("br");
-        brTags.forEach((br) => br.remove());
-      }
-
-      const modalFooter = modal.querySelector(".modal-footer");
-      if (modalFooter) {
-        modalFooter.classList.add(
-          "!bg-black",
-          "!border-t",
-          "!border-white/10",
-          "!p-4",
-          "!flex",
-          "!justify-end",
-          "!gap-3",
-        );
-
-        const submitBtn = modalFooter.querySelector('input[type="button"]');
-        if (submitBtn) {
-          submitBtn.classList.add(
-            "!bg-x",
-            "hover:!bg-x/80",
-            "!text-white",
-            "!font-medium",
-            "!h-10",
-            "!py-2",
-            "!px-6",
-            "!rounded-xl",
-            "!transition-colors",
-            "!border-0",
-            "!cursor-pointer",
-          );
-
-          if (submitBtn.hasAttribute("style")) {
-            submitBtn.removeAttribute("style");
-          }
-        }
-
-        const closeBtn = modalFooter.querySelector(".btn-default");
-        if (closeBtn) {
-          closeBtn.classList.add(
-            "!bg-white/10",
-            "hover:!bg-white/20",
-            "!text-white",
-            "!font-medium",
-            "!py-2",
-            "!px-6",
-            "!h-10",
-            "!rounded-xl",
-            "!transition-colors",
-            "!border-0",
-          );
-
-          if (closeBtn.hasAttribute("style")) {
-            closeBtn.removeAttribute("style");
-          }
-        }
-      }
-    });
   };
+
+  const toggleCourseSelection = (id) => {
+    setCourses(prev => prev.map(c => {
+       if (c.id === id) {
+          return { ...c, isSelected: !c.isSelected };
+       }
+       return c;
+    }));
+  };
+
+  const handleWithdrawAction = () => {
+    const selected = courses.filter(c => c.isSelected);
+    if (selected.length === 0) {
+       alert("Please select at least one course to withdraw.");
+       return;
+    }
+    setIsModalOpen(true);
+  };
+
+  const submitWithdrawal = async ({ remarks, files }) => {
+    const selected = courses.filter(c => c.isSelected);
+    if (selected.length === 0) return;
+
+    setIsSubmitting(true);
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
+
+    try {
+        const formData = new FormData();
+        selected.forEach(course => {
+            formData.append("offerId", course.offerId);
+        });
+        
+        formData.append("Remarks", remarks);
+        formData.append("WFImage", files.withdrawForm);
+        formData.append("CNICFimage", files.cnicFront);
+        formData.append("CNICBimage", files.cnicBack);
+        
+        const currentSem = semesters.find(s => s.selected)?.value || "";
+        formData.append("Sem_ID", currentSem);
+
+        const response = await fetch("../Student/InitiateCourseWithdrawRequest", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+        
+        if (data.msg === "done") {
+            alert("Withdrawal request submitted successfully!");
+            window.location.reload();
+        } else {
+            alert("Error: " + (data.msg || "Submission failed. Please check file sizes."));
+        }
+    } catch (err) {
+        console.error("Submission error", err);
+        alert("Failed to submit request. Please try again.");
+    } finally {
+        setIsSubmitting(false);
+        setIsModalOpen(false);
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
+    }
+  };
+
+  const handlePrintForm = () => {
+     const selected = courses.filter(c => c.isSelected);
+     if (selected.length === 0) {
+        alert("Please select at least one course to generate the form.");
+        return;
+     }
+
+     const offerIdsStr = selected.map(c => c.offerId).join("_");
+     const url = `../Student/PrintStdCourseWithdrawForm?OfferIds=${offerIdsStr}`;
+     window.open(url, '_blank');
+  };
+
+  if (loading) return (
+    <PageLayout currentPage={window.location.pathname}>
+      <div className="w-full min-h-screen p-6 md:p-8 space-y-8">
+        <div className="flex justify-center py-20">
+          <LoadingSpinner />
+        </div>
+      </div>
+    </PageLayout>
+  );
+
+  const isWithdrawActive = courses.some(c => c.canSelect);
+  const selectedCount = courses.filter(c => c.isSelected).length;
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      {elemContent && (
-        <div
-          className="m-grid m-grid--hor m-grid--root m-page"
-          dangerouslySetInnerHTML={{ __html: elemContent }}
+      <div className="w-full min-h-screen p-6 md:p-8 space-y-8 relative z-10">
+        
+        <RemarksModal 
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSubmit={submitWithdrawal}
         />
-      )}
+
+        <InstructionsModal 
+            isOpen={isInstructionsOpen}
+            onClose={() => setIsInstructionsOpen(false)}
+        />
+        
+        {/* Glow Effects */}
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+
+        <PageHeader
+          title="Course Withdraw"
+          subtitle="Academic withdrawal management and status tracking"
+        >
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            {/* Semester Pill Selector */}
+            <SuperTabs
+              tabs={semesters}
+              activeTab={semesters.find((s) => s.selected)?.value}
+              onTabChange={handleSemesterChange}
+            />
+          </div>
+        </PageHeader>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard
+            icon={Layout}
+            label="Total Courses" 
+            value={courses.length} 
+            delay={100}
+          />
+          <StatsCard 
+            icon={Trash2}
+            label="Selected" 
+            value={selectedCount} 
+            delay={200}
+            className={selectedCount > 0 ? "!bg-rose-500/10 !border-rose-500/20" : ""}
+          />
+          <StatsCard 
+            icon={ShieldCheck}
+            label="Withdrawal Status" 
+            value={isWithdrawActive ? "WINDOW OPEN" : "LOCKED"} 
+            delay={300}
+            className={isWithdrawActive ? "!bg-emerald-500/10 !border-emerald-500/20" : "!bg-rose-500/10 !border-rose-500/20"}
+          />
+          <StatsCard 
+            icon={Clock}
+            label="Pending Requests" 
+            value={courses.filter(c => c.status.toLowerCase().includes('pending')).length} 
+            delay={400}
+            className={courses.filter(c => c.status.toLowerCase().includes('pending')).length > 0 ? "!bg-amber-500/10 !border-amber-500/20" : ""}
+          />
+        </div>
+
+        {/* Notifications */}
+        <NotificationBanner 
+            alerts={alerts} 
+            onActionClick={() => setIsInstructionsOpen(true)} 
+        />
+
+        {/* Primary Content Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <div className="xl:col-span-2 space-y-6">
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between px-2">
+                        <h3 className="text-xl font-bold text-white tracking-tight">
+                            Available Courses
+                        </h3>
+                        <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest bg-white/5 px-3 py-1 rounded-lg">
+                            {courses.length} Records
+                        </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 gap-3">
+                        {courses.map((course, idx) => (
+                        <WithdrawalCourseCard 
+                            key={course.id} 
+                            course={course}
+                            index={idx + 1}
+                            isSelected={course.isSelected}
+                            onToggle={toggleCourseSelection}
+                        />
+                        ))}
+                    </div>
+
+                    {courses.length === 0 && (
+                        <div className="text-center py-20 bg-zinc-900/30 rounded-[2rem] border border-dashed border-white/5">
+                            <div className="flex flex-col items-center gap-4 opacity-50">
+                                <Layers size={48} className="text-zinc-600" />
+                                <p className="text-zinc-500 font-medium uppercase tracking-widest text-xs">No courses found for this semester</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Sidebar Controls */}
+            <div className="space-y-6">
+                <div className="bg-zinc-900/50 border border-white/5 backdrop-blur-xl rounded-[2.5rem] p-8 space-y-8 sticky top-8">
+                    <div className="space-y-6">
+                        <div className="p-5 rounded-2xl bg-[#a098ff]/5 border border-[#a098ff]/10 space-y-4">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-[#a098ff]/10 rounded-lg text-[#a098ff]">
+                                    <ShieldCheck size={18} />
+                                </div>
+                                <h4 className="text-sm font-bold text-white tracking-tight">Action Summary</h4>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex justify-between text-xs font-medium">
+                                    <span className="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Selected</span>
+                                    <span className="text-white font-black">{selectedCount}</span>
+                                </div>
+                                <div className="flex justify-between text-xs font-medium">
+                                    <span className="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">Processing</span>
+                                    <span className="text-white font-black">Immediate</span>
+                                </div>
+                                <div className="pt-3 border-t border-white/10 flex justify-between items-center">
+                                    <span className="text-zinc-400 text-[10px] font-black uppercase tracking-widest">Permanent Impact</span>
+                                    <span className="text-[#a098ff] font-black text-xs uppercase tracking-widest">Yes</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <button 
+                                onClick={handlePrintForm}
+                                disabled={selectedCount === 0}
+                                className="group flex items-center justify-center gap-3 w-full bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none text-white px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
+                            >
+                                <Printer size={16} className="group-hover:scale-110 transition-transform" />
+                                Download Form
+                            </button>
+                            <button 
+                                onClick={handleWithdrawAction}
+                                disabled={selectedCount === 0 || isSubmitting}
+                                className="group flex items-center justify-center gap-3 w-full bg-rose-500 hover:bg-rose-600 disabled:bg-zinc-800 disabled:text-zinc-600 text-white px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95"
+                            >
+                                <Trash2 size={16} className="group-hover:rotate-12 transition-transform" />
+                                {isSubmitting ? "Processing..." : "Initiate Withdraw"}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-white/5 space-y-4">
+                        <div className="flex items-center gap-3 px-1 text-[#a098ff]">
+                            <Zap size={14} />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Quick Tool</span>
+                        </div>
+                        <p className="text-[10px] text-zinc-500 font-medium leading-relaxed px-1">
+                            Use <a href="https://imageresizer.com/" target="_blank" rel="noreferrer" className="text-white hover:underline">Image Resizer</a> to meet the strict 650KB limit for all uploads.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+
+      <div ref={hiddenContentRef} className="hidden" />
     </PageLayout>
   );
 }

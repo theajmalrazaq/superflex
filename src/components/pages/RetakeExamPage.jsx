@@ -1,799 +1,791 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import PageLayout from "../layouts/PageLayout";
+import { LoadingSpinner } from "../LoadingOverlay";
+import {
+  CheckCircle2,
+  AlertCircle,
+  BookOpen,
+  Clock,
+  Layout,
+  FileText,
+  Download,
+  AlertTriangle,
+  ChevronDown,
+  ChevronRight,
+  ShieldCheck,
+  Upload,
+  X,
+  Info,
+} from "lucide-react";
+import NotificationBanner from "../NotificationBanner";
+import PageHeader from "../PageHeader";
+import StatsCard from "../StatsCard";
+import SuperTabs from "../SuperTabs";
 
-function RetakeExamPage() {
-  const [elemContent, setElemContent] = useState(null);
+/**
+ * Premium Modal Component for Retake Request Details
+ */
+const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
+  const [file, setFile] = useState(null);
+  const [remarks, setRemarks] = useState("");
+  const fileInputRef = useRef(null);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div 
+        className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-lg bg-zinc-900 border border-white/10 rounded-[2rem] p-6 animate-in zoom-in-95 duration-300 space-y-6">
+        <div className="flex justify-between items-start">
+          <div className="space-y-0.5">
+            <h2 className="text-xl font-black text-white tracking-tight">Request Details</h2>
+            <p className="text-[#a098ff] text-[9px] font-black uppercase tracking-widest">Retake Exam Submission</p>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-zinc-400 hover:text-white transition-all"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-3">
+            <div className="p-1.5 bg-amber-500/20 rounded-lg text-amber-500">
+                <AlertTriangle size={14} />
+            </div>
+            <p className="text-[10px] font-bold text-amber-500/90 leading-tight">
+                Important: Fee of Rs. {fee} will be charged upon submission.
+            </p>
+        </div>
+
+        <div className="space-y-4">
+            <div className="space-y-2">
+                <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest px-1">Evidence Documentation</label>
+                <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="group relative border-2 border-dashed border-white/5 hover:border-[#a098ff]/30 rounded-2xl p-4 transition-all cursor-pointer bg-white/[0.02] hover:bg-white/[0.04]"
+                >
+                    <input 
+                        type="file" 
+                        ref={fileInputRef}
+                        accept="application/pdf"
+                        onChange={(e) => setFile(e.target.files[0])}
+                        className="hidden" 
+                    />
+                    <div className="flex flex-col items-center gap-2 text-center">
+                        <div className="p-3 bg-[#a098ff]/10 rounded-xl text-[#a098ff] group-hover:scale-110 transition-transform">
+                            <Upload size={18} />
+                        </div>
+                        <div className="space-y-0.5">
+                            <p className="text-xs font-bold text-white truncate max-w-[200px]">
+                                {file ? file.name : "Upload Form (PDF)"}
+                            </p>
+                            <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">
+                                {file ? `${(file.size / 1024 / 1024).toFixed(2)} MB` : "Max 3MB"}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="space-y-2">
+                <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest px-1">Applicant Remarks</label>
+                <textarea 
+                    value={remarks}
+                    onChange={(e) => setRemarks(e.target.value)}
+                    placeholder="Provide details..."
+                    className="w-full bg-white/[0.02] border border-white/5 text-white p-4 rounded-2xl text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#a098ff]/30 transition-all min-h-[80px] resize-none"
+                />
+            </div>
+        </div>
+
+        <button 
+           onClick={() => onSubmit(file, remarks)}
+           disabled={!file || !remarks}
+           className="w-full bg-[#a098ff] hover:bg-[#b0a8ff] disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-950 px-6 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all active:scale-[0.98]"
+        >
+            Confirm & Submit Request
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const InstructionsModal = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div 
+        className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-lg bg-zinc-900 border border-white/10 rounded-[2rem] animate-in zoom-in-95 duration-300 overflow-hidden flex flex-col max-h-[85vh]">
+        <div className="p-5 border-b border-white/5 flex justify-between items-center bg-zinc-900/50 backdrop-blur-xl shrink-0">
+          <div className="space-y-0.5">
+            <h2 className="text-lg font-black text-white tracking-tight">Rules & Procedures</h2>
+            <p className="text-[#a098ff] text-[9px] font-black uppercase tracking-[0.2em]">Exam Framework</p>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-zinc-400 hover:text-white transition-all"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="p-5 overflow-y-auto custom-scrollbar flex-1 space-y-6 text-left">
+            <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                    <div className="w-1 h-4 bg-[#a098ff] rounded-full"></div>
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Eligible Situations</h3>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                    {[
+                        { title: "Hospitalization", desc: "Severe illness with records" },
+                        { title: "Bereavement", desc: "First relative death docs" },
+                        { title: "Marriage", desc: "Self/Siblings with receipts" },
+                        { title: "Special Cases", desc: "Director's advance approval" }
+                    ].map((item, i) => (
+                        <div key={i} className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
+                            <h4 className="text-[10px] font-black text-white uppercase">{item.title}</h4>
+                            <p className="text-[9px] text-zinc-500 leading-tight font-medium">{item.desc}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                    <div className="w-1 h-4 bg-[#a098ff] rounded-full"></div>
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider">Submission Protocol</h3>
+                </div>
+                <div className="space-y-2">
+                    {[
+                        "Submit within specified dates only.",
+                        "Combine Form + Evidence into SINGLE PDF (< 3MB).",
+                        "Rs. 2,000 per paper processing fee.",
+                        "Select all papers in one application."
+                    ].map((step, i) => (
+                        <div key={i} className="flex gap-3 p-2 rounded-lg hover:bg-white/[0.02] transition-colors group">
+                            <div className="w-5 h-5 rounded-full bg-[#a098ff]/10 border border-[#a098ff]/20 flex items-center justify-center text-[#a098ff] text-[9px] font-black shrink-0">
+                                {i + 1}
+                            </div>
+                            <p className="text-[11px] text-zinc-400 font-medium leading-relaxed">{step}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+
+        <div className="p-5 border-t border-white/5 bg-zinc-900/50 shrink-0">
+            <button 
+                onClick={onClose}
+                className="w-full bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all"
+            >
+                Understood, Close
+            </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+const RetakeCourseCard = ({ course, isSelected, onToggle, index }) => {
+  return (
+    <div
+      onClick={onToggle}
+      className={`group cursor-pointer flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${
+        isSelected
+          ? "bg-[#a098ff]/10 border-[#a098ff]/50"
+          : "bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5"
+      }`}
+    >
+      <div className="flex items-center gap-4">
+        <span
+          className={`font-bold text-sm min-w-[1.5rem] ${isSelected ? "text-[#a098ff]" : "text-zinc-600"}`}
+        >
+          {index}.
+        </span>
+        
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-300 ${
+          isSelected 
+            ? "bg-[#a098ff]/20 border-[#a098ff]/30 text-[#a098ff] scale-105" 
+            : "bg-zinc-800/50 border-white/5 text-zinc-500"
+        }`}>
+          <BookOpen size={20} />
+        </div>
+
+        <div className="flex flex-col gap-1 min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-black text-[#a098ff] uppercase tracking-tighter opacity-80 shrink-0">
+              {course.code}
+            </span>
+            <span className="text-white font-medium text-sm leading-tight truncate">
+              {course.courseName}
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-3 text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
+            <span className="flex items-center gap-1.5">
+               {course.credits} Credits
+            </span>
+            <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
+            <span className="flex items-center gap-1.5">
+               Section {course.section}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4">
+        {course.status && (
+            <div className="px-3 py-1 rounded-lg bg-white/5 border border-white/5 text-[10px] font-black text-zinc-400 uppercase tracking-widest">
+                {course.status}
+            </div>
+        )}
+        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+            isSelected 
+            ? "bg-[#a098ff] border-[#a098ff] text-zinc-950 scale-110" 
+            : "border-zinc-700 bg-transparent"
+        }`}>
+            {isSelected && <CheckCircle2 size={14} strokeWidth={3} />}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ExamTypeSelector = ({ types, selectedValue, onSelect }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const selectedType = types.find((t) => t.value === selectedValue) || types[0];
 
   useEffect(() => {
-    const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
-
-    if (targetElement) {
-      applyCustomStyling(targetElement);
-
-      setElemContent(targetElement.innerHTML);
-      targetElement.remove();
-    }
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const applyCustomStyling = (element) => {
-    const addedStyles = [];
+  return (
+    <div className="relative w-full md:w-auto z-50" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full md:w-[280px] flex items-center justify-between px-4 py-2.5 rounded-full bg-zinc-900/50 border border-white/5 text-white hover:bg-white/5 transition-all group backdrop-blur-sm"
+      >
+        <div className="flex items-center gap-3 overflow-hidden">
+          <div className="p-2 rounded-xl bg-[#a098ff]/10 text-[#a098ff]">
+            <Layout size={16} />
+          </div>
+          <span className="text-sm font-bold truncate">
+            {selectedType?.label || "Select Exam Type"}
+          </span>
+        </div>
+        <ChevronDown
+          size={16}
+          className={`text-zinc-500 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
 
-    const errorDiv = element.querySelector("#DataErrormsgdiv");
-    if (errorDiv) {
-      errorDiv.remove();
-    }
+      {isOpen && (
+        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-[2rem] bg-black/50 backdrop-blur-2xl border border-white/10 max-h-[60vh] overflow-y-auto no-scrollbar animate-in fade-in zoom-in-95 duration-200">
+          <div className="flex flex-col gap-2">
+            {types.map((type, idx) => (
+              <button
+                key={idx}
+                onClick={() => {
+                  onSelect(type.value);
+                  setIsOpen(false);
+                }}
+                className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${
+                  selectedValue === type.value
+                    ? "bg-[#a098ff]/10 border border-[#a098ff]/20 text-white"
+                    : "hover:bg-white/5 border border-transparent text-zinc-400"
+                }`}
+              >
+                <span className="text-xs font-bold uppercase tracking-widest">{type.label}</span>
+                {selectedValue === type.value && <div className="w-1.5 h-1.5 rounded-full bg-[#a098ff]"></div>}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
-    const styleElement = document.createElement("style");
-    styleElement.textContent = `
-            .custom-scrollbar::-webkit-scrollbar {
-                width: 8px;
-                height: 8px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-track {
-                background: rgba(255, 255, 255, 0.05);
-                border-radius: 10px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 10px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                background: rgba(255, 255, 255, 0.3);
-            }
-            
-            .grade-badge {
-                display: inline-block;
-                padding: 2px 8px;
-                border-radius: 4px;
-                font-weight: 600;
-            }
-            
-            #ExamRetakeRemarksDetail {
-                 height: 100%;
-                backdrop-filter: blur(20px);
-            }            
-        `;
+function RetakeExamPage() {
+  const [loading, setLoading] = useState(true);
+  const [semesters, setSemesters] = useState([]);
+  const [examTypes, setExamTypes] = useState([]);
+  const [reasons, setReasons] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+  const [selectedCourses, setSelectedCourses] = useState(new Set());
+  const [selectedReason, setSelectedReason] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
+  const [stats, setStats] = useState({ total: 0, sessional1: 0, sessional2: 0, final: 0 });
 
-    styleElement.setAttribute("data-custom-style", "true");
-    document.head.appendChild(styleElement);
-    addedStyles.push(styleElement);
+  const hiddenFormRef = useRef(null);
 
-    const alertElements = element.querySelectorAll(".m-alert");
-    alertElements.forEach((alertElement) => {
-      alertElement.classList.add(
-        "!bg-black",
-        "!text-white",
-        "!border-white/10",
-        "!font-bold",
-        "!p-4",
-        "!rounded-3xl",
-        "!flex",
-        "!justify-between",
-        "!items-center",
-        "!mb-6",
-      );
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
-      const iconElement = alertElement.querySelector(".m-alert__icon");
-      if (iconElement) {
-        iconElement.classList.add(
-          "!text-white",
-          "!text-2xl",
-          "!bg-x",
-          "!rounded-full",
-          "!p-2",
-          "!w-12",
-          "!h-12",
-          "!flex",
-          "!items-center",
-          "!justify-center",
-        );
+    const parseRetakeData = () => {
+      const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
+      if (!root) {
+        setTimeout(parseRetakeData, 500);
+        return;
+      }
 
-        const createSvgIcon = (path) => {
-          const svg = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "svg",
-          );
-          svg.setAttribute("width", "24");
-          svg.setAttribute("height", "24");
-          svg.setAttribute("viewBox", "0 0 24 24");
-          svg.setAttribute("fill", "none");
-          svg.setAttribute("stroke", "currentColor");
-          svg.setAttribute("stroke-width", "2");
-          svg.setAttribute("stroke-linecap", "round");
-          svg.setAttribute("stroke-linejoin", "round");
-          svg.classList.add("w-6", "h-6", "text-white");
+      try {
+        // Parse Alerts
+        const alertList = [];
+        root.querySelectorAll(".m-alert, .alert").forEach(alert => {
+          if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
 
-          const pathElement = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "path",
-          );
-          pathElement.setAttribute("d", path);
-          svg.appendChild(pathElement);
+          const textContainer = alert.querySelector(".m-alert__text") || alert;
+          const clone = textContainer.cloneNode(true);
+          // Remove standard UI elements that shouldn't be in the message
+          clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
+          
+          let message = clone.textContent
+            .replace(/Alert!/gi, "")
+            .replace(/Close/gi, "")
+            .replace(/&nbsp;/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
 
-          return svg;
-        };
+          if (message && message.length > 3) {
+              const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
+              alertList.push({ type, message });
+          }
+        });
+        setAlerts(alertList);
 
-        let iconPath = "";
-        if (alertElement.classList.contains("alert-danger")) {
-          iconPath =
-            "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z";
-        } else {
-          iconPath = "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z";
+        // Parse Semesters
+        const semSelect = root.querySelector("#SemId");
+        if (semSelect) {
+          const sems = Array.from(semSelect.options).map(opt => ({
+            value: opt.value,
+            label: opt.textContent.trim(),
+            selected: opt.selected
+          }));
+          setSemesters(sems);
         }
 
-        iconElement.innerHTML = "";
-        iconElement.appendChild(createSvgIcon(iconPath));
-      }
-
-      const closeButton = alertElement.querySelector("button.close");
-      if (closeButton) {
-        closeButton.style.cssText = "content: none !important;";
-
-        const style = document.createElement("style");
-        style.textContent =
-          'button.close[data-dismiss="alert"]::before, button.close[data-dismiss="modal"]::before { display: none !important; content: none !important; }';
-
-        style.setAttribute("data-custom-style", "true");
-        document.head.appendChild(style);
-        addedStyles.push(style);
-
-        const listItemStyle = document.createElement("style");
-        listItemStyle.textContent = `
-          li[style*="font-size: large"] {
-            font-size: medium !important;
-          }
-        `;
-
-        listItemStyle.setAttribute("data-custom-style", "true");
-        document.head.appendChild(listItemStyle);
-        addedStyles.push(listItemStyle);
-
-        closeButton.innerHTML = `
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/70">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                `;
-        closeButton.classList.add("!focus:outline-none");
-      }
-    });
-
-    const portlet = element.querySelector(".m-portlet");
-    if (portlet) {
-      portlet.classList.add(
-        "!bg-black",
-        "!border-none",
-        "!rounded-3xl",
-        "!p-4",
-        "!shadow-lg",
-      );
-    }
-
-    const portletHead = element.querySelector(".m-portlet__head");
-    if (portletHead) {
-      portletHead.classList.add(
-        "!bg-black",
-        "!border",
-        "!border-white/10",
-        "!rounded-t-3xl",
-        "!h-fit",
-        "!p-4",
-        "!flex",
-        "!items-center",
-        "!justify-between",
-        "!mb-4",
-      );
-
-      const headingText = portletHead.querySelector(".m-portlet__head-text");
-      if (headingText) {
-        headingText.classList.add("!text-white", "!text-xl", "!font-bold");
-        headingText.innerHTML = "Retake Exam Requests";
-      }
-
-      const semesterForm = element.querySelector(
-        'form[action="/Student/RetakeRequest"]',
-      );
-      if (semesterForm) {
-        const formClone = semesterForm.cloneNode(true);
-
-        semesterForm.remove();
-
-        portletHead.appendChild(formClone);
-        formClone.classList.add(
-          "!flex",
-          "!items-center",
-          "!gap-4",
-          "ml-4",
-          "flex-1",
-        );
-
-        const formSelects = formClone.querySelectorAll("select");
-        formSelects.forEach((select) => {
-          select.classList.add(
-            "!bg-black",
-            "!text-white",
-            "!border",
-            "!border-white/10",
-            "!rounded-xl",
-            "!px-4",
-            "!py-2",
-            "!cursor-pointer",
-            "!focus:ring-2",
-            "!focus:ring-x",
-            "!focus:outline-none",
-          );
-
-          select.classList.remove(
-            "m-dropdown__toggle",
-            "btn",
-            "btn-brand",
-            "dropdown-toggle",
-          );
-        });
-
-        const rowDiv = formClone.querySelector(".row");
-        if (rowDiv) {
-          const colDiv = rowDiv.querySelector(".col-md-12");
-          if (colDiv) {
-            const children = [...colDiv.childNodes];
-
-            children.forEach((child) => formClone.appendChild(child));
-
-            rowDiv.remove();
-          }
+        // Parse Exam Types
+        const evalSelect = root.querySelector("#EvalTypeId");
+        if (evalSelect) {
+          const evals = Array.from(evalSelect.options).map(opt => ({
+            value: opt.value,
+            label: opt.textContent.trim(),
+            selected: opt.selected
+          }));
+          setExamTypes(evals);
         }
-      }
-    }
 
-    const portletBody = element.querySelector(".m-portlet__body");
-    if (portletBody) {
-      portletBody.classList.add(
-        "!bg-black",
-        "!rounded-b-3xl",
-        "!p-0",
-        "!border",
-        "!border-white/10",
-        "!shadow-lg",
-        "!text-white",
-        "!h-[330px]",
-        "!overflow-y-auto",
-        "custom-scrollbar",
-      );
-    }
+        // Parse Reasons
+        const reasonSelect = root.querySelector("#DrpDwnRetakeReason");
+        if (reasonSelect) {
+          const res = Array.from(reasonSelect.options).map(opt => ({
+            value: opt.value,
+            label: opt.textContent.trim(),
+            selected: opt.selected
+          }));
+          setReasons(res);
+          const selected = res.find(r => r.selected);
+          if (selected) setSelectedReason(selected.value);
+        }
 
-    const retakeReasonSection = element.querySelector(".m-section");
-    if (retakeReasonSection) {
-      retakeReasonSection.classList.add(
-        "!rounded-xl",
-        "!p-0",
-        "!border-none",
-        "!mb-6",
-      );
+        // Parse Courses Table
+        const courseList = [];
+        const table = root.querySelector(".table");
+        if (table) {
+          const rows = table.querySelectorAll("tbody tr");
+          rows.forEach((row, idx) => {
+            const cells = row.querySelectorAll("td");
+            if (cells.length >= 6) {
+              const checkbox = cells[5]?.querySelector('input[type="checkbox"]');
+              const isDisabled = checkbox?.disabled;
+              const isChecked = checkbox?.checked;
 
-      const retakeReasonLabel = retakeReasonSection.querySelector("label");
-      if (retakeReasonLabel) {
-        retakeReasonLabel.classList.add(
-          "!text-white",
-          "!font-medium",
-          "!mb-2",
-          "!block",
-        );
-        retakeReasonLabel.style.textDecoration = "none";
-      }
-
-      const retakeReasonSelect = retakeReasonSection.querySelector(
-        "#DrpDwnRetakeReason",
-      );
-      if (retakeReasonSelect) {
-        retakeReasonSelect.classList.add(
-          "!bg-black",
-          "!text-white",
-          "!border",
-          "!border-white/10",
-          "!rounded-xl",
-          "!px-4",
-          "!py-2",
-          "!cursor-pointer",
-          "!focus:ring-2",
-          "!focus:ring-x",
-          "!focus:outline-none",
-          "!w-full",
-          "!max-w-md",
-        );
-
-        retakeReasonSelect.classList.remove(
-          "m-dropdown__toggle",
-          "btn",
-          "btn-brand",
-          "dropdown-toggle",
-        );
-        retakeReasonSelect.style.textAlign = "left";
-      }
-
-      const retakeRequestBtn = element.querySelector(
-        "#btnModalExamRetakRequest",
-      );
-      const downloadBtn = element.querySelector("#btnDownloadExamRetakForm");
-
-      const selectWithButtonsContainer = document.createElement("div");
-      selectWithButtonsContainer.className = "flex items-center gap-3";
-
-      const selectParent = retakeReasonSelect?.parentElement;
-
-      if (selectParent && retakeRequestBtn && downloadBtn) {
-        const selectClone = retakeReasonSelect.cloneNode(true);
-
-        selectWithButtonsContainer.appendChild(selectClone);
-
-        retakeRequestBtn.innerHTML = `
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                `;
-        retakeRequestBtn.classList.add(
-          "!w-10",
-          "!h-10",
-          "!p-0",
-          "!flex",
-          "!items-center",
-          "!justify-center",
-        );
-        retakeRequestBtn.title = "Initiate Exam Retake Request";
-
-        downloadBtn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
-                        <path d="M12 17V3"></path>
-                        <path d="m6 11 6 6 6-6"></path>
-                        <path d="M19 21H5"></path>
-                    </svg>
-                `;
-        downloadBtn.classList.add(
-          "!w-10",
-          "!h-10",
-          "!p-0",
-          "!flex",
-          "!items-center",
-          "!justify-center",
-        );
-        downloadBtn.title = "Download Exam Retake Form";
-
-        selectWithButtonsContainer.appendChild(retakeRequestBtn);
-        selectWithButtonsContainer.appendChild(downloadBtn);
-
-        selectParent.replaceChild(
-          selectWithButtonsContainer,
-          retakeReasonSelect,
-        );
-      }
-    }
-
-    const table = element.querySelector(".table");
-    if (table) {
-      table.querySelectorAll(".table td, .table th").forEach((el) => {
-        el.classList.add("!border-none");
-      });
-
-      const tableContainer = document.createElement("div");
-      tableContainer.className = "overflow-hidden mb-6";
-      table.parentNode.insertBefore(tableContainer, table);
-      tableContainer.appendChild(table);
-
-      table.classList.add("!w-full", "!border-collapse", "!border-0");
-      table.classList.remove("table-bordered", "table-responsive");
-
-      const thead = table.querySelector("thead");
-      if (thead) {
-        thead.classList.add("!bg-zinc-900", "!sticky", "!top-0", "!z-10");
-
-        const headers = thead.querySelectorAll("th");
-        headers.forEach((header) => {
-          header.classList.add(
-            "!bg-transparent",
-            "!text-gray-400",
-            "!font-medium",
-            "!p-3",
-            "!text-left",
-            "!border-b",
-            "!border-white/10",
-          );
-        });
-      }
-
-      const tbody = table.querySelector("tbody");
-      if (tbody) {
-        tbody.classList.add("!divide-y", "!divide-white/10");
-
-        const rows = tbody.querySelectorAll("tr");
-        rows.forEach((row) => {
-          row.classList.add(
-            "!bg-black",
-            "!hover:bg-white/5",
-            "!transition-colors",
-          );
-
-          const cells = row.querySelectorAll("td");
-          cells.forEach((cell) => {
-            cell.classList.add(
-              "!p-3",
-              "!text-white/80",
-              "!border-y",
-              "!border-white/10",
-            );
-
-            const checkbox = cell.querySelector('input[type="checkbox"]');
-            if (checkbox) {
-              checkbox.classList.add("cursor-pointer");
+              courseList.push({
+                id: idx,
+                serial: cells[0]?.textContent.trim(),
+                code: cells[1]?.textContent.trim(),
+                courseName: cells[2]?.textContent.trim(),
+                credits: cells[3]?.textContent.trim(),
+                section: cells[4]?.textContent.trim(),
+                status: cells[6]?.textContent.trim(),
+                offerId: checkbox?.id.split('_')[1],
+                checkboxId: checkbox?.id,
+                isDisabled,
+                isChecked
+              });
             }
           });
-        });
+        }
+        setCourses(courseList);
+
+        // Hide original
+        root.style.opacity = "0";
+        root.style.pointerEvents = "none";
+        root.style.position = "absolute";
+        root.style.zIndex = "-1";
+
+        setLoading(false);
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
+      } catch (err) {
+        console.error("Retake Parser Error:", err);
+        setLoading(false);
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
-    }
-
-    document.querySelector("#btnModalRetakeExamDetail").classList.add("!mt-2");
-    document.querySelectorAll(".modal-dialog").forEach((modal) => {
-      modal.classList.add(
-        "!border",
-        "!border-white/10",
-        "!rounded-2xl",
-        "!shadow-lg",
-        "!bg-black",
-        "!p-4",
-      );
-    });
-    document.querySelector("#DataErrormsgdiv_RetakeModalReason").remove();
-
-    const buttons = element.querySelectorAll(".btn");
-    buttons.forEach((button) => {
-      if (
-        !button.closest(".modal-footer") &&
-        !button.classList.contains("close")
-      ) {
-        button.classList.add(
-          "!bg-x",
-          "hover:!bg-x/80",
-          "!text-white",
-          "!font-medium",
-          "!py-2",
-          "!px-4",
-          "h-12",
-          "w-fit",
-          "!rounded-xl",
-          "!transition-colors",
-          "!flex",
-          "!items-center",
-          "!gap-2",
-          "!border-0",
-          "!mt-0",
-        );
-
-        button.classList.remove("btn-primary", "btn-sm", "glow-button");
-      }
-    });
-
-    const modals = element.querySelectorAll(".modal-content");
-    modals.forEach((modal) => {
-      modal.classList.add(
-        "!bg-black",
-        "!rounded-2xl",
-        "!border-2",
-        "!border-white/10",
-        "!p-5",
-        "!shadow-none",
-      );
-
-      const modalHeader = modal.querySelector(".modal-header");
-      if (modalHeader) {
-        modalHeader.classList.add(
-          "!bg-black",
-          "!border-b",
-          "!border-white/10",
-          "!p-4",
-          "!flex",
-          "!flex-col",
-          "justify-between",
-          "!gap-4",
-        );
-
-        if (modalHeader.hasAttribute("style")) {
-          modalHeader.removeAttribute("style");
-        }
-
-        const modalTitle = modalHeader.querySelector(".modal-title");
-        if (modalTitle) {
-          modalTitle.classList.add("!text-white", "!font-bold", "!text-xl");
-        }
-
-        const existingCloseBtn = modalHeader.querySelector(".close");
-        if (existingCloseBtn) {
-          const newCloseBtn = document.createElement("button");
-          newCloseBtn.type = "button";
-          newCloseBtn.className =
-            "modal-close-btn absolute top-4 right-4 p-2 rounded-full hover:bg-white/10 transition-colors focus:outline-none";
-          newCloseBtn.setAttribute("data-dismiss", "modal");
-          newCloseBtn.setAttribute("aria-label", "Close");
-
-          newCloseBtn.innerHTML = `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
-                 class="text-white/70 hover:text-white transition-colors">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          `;
-
-          if (existingCloseBtn.onclick) {
-            newCloseBtn.onclick = existingCloseBtn.onclick;
-          }
-
-          existingCloseBtn.parentNode.replaceChild(
-            newCloseBtn,
-            existingCloseBtn,
-          );
-
-          modalHeader.style.position = "relative";
-          modalHeader.style.paddingRight = "48px";
-        }
-
-        const headerAlert = modalHeader.querySelector(".m-alert");
-        if (headerAlert) {
-          const feeNotice = document.createElement("div");
-          feeNotice.className = "text-amber-400 text-sm mt-2 flex items-center";
-          feeNotice.innerHTML = `
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="12" y1="8" x2="12" y2="12"></line>
-                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                        </svg>
-                        Fee will be charged upon submit request: Rs. 2000 per paper
-                    `;
-
-          headerAlert.parentNode.replaceChild(feeNotice, headerAlert);
-        }
-
-        const closeBtn = modalHeader.querySelector(".close");
-        if (closeBtn) {
-          closeBtn.innerHTML = `
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/70">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    `;
-        }
-      }
-
-      const modalBody = modal.querySelector(".modal-body");
-      if (modalBody) {
-        modalBody.classList.add(
-          "!bg-black",
-          "!text-white",
-          "!p-6",
-          "h-[500px]",
-          "!overflow-y-auto",
-          "custom-scrollbar",
-        );
-
-        const modalCheckboxes = modalBody.querySelectorAll(
-          'input[type="checkbox"]',
-        );
-        modalCheckboxes.forEach((checkbox) => {
-          checkbox.remove();
-        });
-
-        const errorDiv = modalBody.querySelector(
-          "#DataErrormsgdiv_RetakeModalReason",
-        );
-        if (errorDiv) {
-          errorDiv.style.display = "none";
-        }
-
-        const formRows = modalBody.querySelectorAll(".row");
-        formRows.forEach((row) => {
-          row.classList.add("mb-4");
-
-          const formColumns = row.querySelectorAll(".col-md-11, .col-sm-11");
-          formColumns.forEach((col) => {
-            col.className = "w-full";
-          });
-        });
-
-        const fileInputs = modalBody.querySelectorAll('input[type="file"]');
-        fileInputs.forEach((input) => {
-          const label = input.previousElementSibling;
-          if (label && label.tagName === "LABEL") {
-            label.classList.add(
-              "!text-white",
-              "!font-medium",
-              "!mb-2",
-              "!block",
-            );
-
-            if (label.hasAttribute("style")) {
-              label.removeAttribute("style");
-            }
-          }
-
-          const container = document.createElement("div");
-          container.className =
-            "mt-1 flex justify-center px-6 pt-5 pb-6 !border !border-white/10 !rounded-xl bg-black/50 hover:bg-black/70 transition-colors cursor-pointer";
-
-          const wrapper = document.createElement("div");
-          wrapper.className = "space-y-1 text-center";
-
-          const uploadIcon = document.createElement("div");
-          uploadIcon.innerHTML = `
-                       <svg xmlns="http://www.w3.org/2000/svg" width="24" class="mx-auto h-12 w-12 text-x/30" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload-icon lucide-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
-                    `;
-
-          const text = document.createElement("div");
-          text.className = "flex justify-center text-sm text-white/60";
-          text.innerHTML = `
-                        <p class="pl-1">Click to upload a PDF file (max 3MB)</p>
-                    `;
-
-          wrapper.appendChild(uploadIcon);
-          wrapper.appendChild(text);
-
-          const newInput = input.cloneNode(true);
-          newInput.className =
-            "absolute inset-0 w-full h-full opacity-0 cursor-pointer";
-
-          if (newInput.hasAttribute("style")) {
-            newInput.removeAttribute("style");
-          }
-
-          const inputContainer = document.createElement("div");
-          inputContainer.className = "relative";
-
-          wrapper.appendChild(inputContainer);
-          inputContainer.appendChild(newInput);
-
-          container.appendChild(wrapper);
-
-          const parentContainer = input.closest(".mt-1") || input.parentNode;
-          if (parentContainer) {
-            parentContainer.parentNode.replaceChild(container, parentContainer);
-          } else {
-            input.parentNode.insertBefore(container, input);
-            input.remove();
-          }
-        });
-
-        const textareas = modalBody.querySelectorAll("textarea");
-        textareas.forEach((textarea) => {
-          textarea.classList.add(
-            "!w-full",
-            "!bg-black",
-            "!border",
-            "!border-white/20",
-            "!rounded-lg",
-            "!p-3",
-            "!text-white",
-            "!mt-2",
-            "!transition-colors",
-            "!focus:border-x",
-            "!focus:outline-none",
-            "!resize-none",
-            "!h-24",
-          );
-
-          const label = textarea.previousElementSibling;
-          if (label && label.tagName === "LABEL") {
-            label.classList.add(
-              "!text-white",
-              "!font-medium",
-              "!mb-2",
-              "!block",
-            );
-
-            if (label.hasAttribute("style")) {
-              label.removeAttribute("style");
-            }
-          }
-        });
-
-        const brTags = modalBody.querySelectorAll("br");
-        brTags.forEach((br) => br.remove());
-      }
-
-      const modalFooter = modal.querySelector(".modal-footer");
-      if (modalFooter) {
-        modalFooter.classList.add(
-          "!bg-black",
-          "!border-t",
-          "!border-white/10",
-          "!p-4",
-          "!flex",
-          "!justify-end",
-          "!gap-3",
-        );
-
-        const primaryBtn = modalFooter.querySelector(
-          'input[type="button"], .btn-primary',
-        );
-        if (primaryBtn) {
-          primaryBtn.classList.add(
-            "!bg-x",
-            "hover:!bg-x/80",
-            "!text-white",
-            "!font-medium",
-            "!h-12",
-            "!py-3",
-            "!px-8",
-            "!rounded-xl",
-            "!transition-colors",
-            "!border-0",
-            "!cursor-pointer",
-          );
-
-          if (primaryBtn.hasAttribute("style")) {
-            primaryBtn.removeAttribute("style");
-          }
-        }
-
-        const existingFooterCloseBtn =
-          modalFooter.querySelector(".btn-default");
-        if (existingFooterCloseBtn) {
-          const newFooterCloseBtn = document.createElement("button");
-          newFooterCloseBtn.type = "button";
-          newFooterCloseBtn.className =
-            "modal-footer-close-btn !bg-white/10 hover:!bg-white/20 !text-white !font-medium !py-3 !px-8 !rounded-xl !transition-colors !border-0";
-          newFooterCloseBtn.setAttribute("data-dismiss", "modal");
-          newFooterCloseBtn.textContent =
-            existingFooterCloseBtn.textContent || "Cancel";
-
-          if (existingFooterCloseBtn.onclick) {
-            newFooterCloseBtn.onclick = existingFooterCloseBtn.onclick;
-          }
-
-          existingFooterCloseBtn.parentNode.replaceChild(
-            newFooterCloseBtn,
-            existingFooterCloseBtn,
-          );
-        }
-      }
-    });
-
-    const setupModalListeners = () => {
-      const modalElements = document.querySelectorAll(".modal");
-
-      modalElements.forEach((modal) => {
-        const remarksDetailElement = modal.querySelector(
-          "#ExamRetakeRemarksDetail",
-        );
-        if (remarksDetailElement) {
-          remarksDetailElement.style.height = "100%";
-          remarksDetailElement.style.backdropFilter = "blur(10px)";
-
-          modal.addEventListener("shown.bs.modal", () => {
-            remarksDetailElement.style.display = "flex";
-            remarksDetailElement.style.justifyContent = "center";
-            remarksDetailElement.style.alignItems = "center";
-          });
-
-          modal.addEventListener("hidden.bs.modal", () => {
-            remarksDetailElement.style.display = "none";
-          });
-        }
-      });
     };
 
-    setTimeout(setupModalListeners, 500);
+    parseRetakeData();
+  }, []);
+
+  const handleSemesterChange = (val) => {
+    const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
+    const select = root?.querySelector("#SemId");
+    if (select) {
+      select.value = val;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      const form = select.closest('form');
+      if (form) form.submit();
+    }
   };
+
+  const handleExamTypeChange = (val) => {
+    const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
+    const select = root?.querySelector("#EvalTypeId");
+    if (select) {
+      select.value = val;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      const form = select.closest('form');
+      if (form) form.submit();
+    }
+  };
+
+  const handleReasonChange = (val) => {
+    setSelectedReason(val);
+    const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
+    const select = root?.querySelector("#DrpDwnRetakeReason");
+    if (select) {
+      select.value = val;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  };
+
+  const toggleCourse = (id) => {
+    const course = courses.find(c => c.id === id);
+    if (course && !course.isDisabled) {
+      const newSelected = new Set(selectedCourses);
+      const isChecking = !newSelected.has(id);
+      
+      if (isChecking) newSelected.add(id);
+      else newSelected.delete(id);
+      
+      setSelectedCourses(newSelected);
+
+      // Sync with legacy checkbox using direct click to trigger jQuery handlers
+      const legacyCheckbox = document.getElementById(course.checkboxId);
+      if (legacyCheckbox) {
+        // Only click if state doesn't match to avoid infinite loops or de-selection
+        if (legacyCheckbox.checked !== isChecking) {
+          legacyCheckbox.click();
+        }
+      }
+    }
+  };
+
+  const handleInitiateRequest = () => {
+    if (selectedCourses.size === 0) {
+        alert("Please select at least one course.");
+        return;
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleModalSubmit = (file, remarks) => {
+    // 1. Sync file to legacy input
+    const legacyFileInput = document.getElementById("RetakeMidFile");
+    if (legacyFileInput) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        legacyFileInput.files = dataTransfer.files;
+        legacyFileInput.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    // 2. Sync remarks to legacy textarea
+    const legacyRemarks = document.getElementById("StdRmktxtarea");
+    if (legacyRemarks) {
+        legacyRemarks.value = remarks;
+        legacyRemarks.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    // 3. Call legacy submission function
+    if (typeof window.fn_SubmitStdRemarks === 'function') {
+        window.fn_SubmitStdRemarks();
+    } else {
+        // Fallback: try to find the button in the hidden legacy modal and click it
+        const legacyBtn = document.querySelector('#remrksbtn input[type="button"]');
+        if (legacyBtn) legacyBtn.click();
+    }
+    
+    setIsModalOpen(false);
+  };
+
+  const handleDownloadForm = () => {
+    if (selectedCourses.size === 0) {
+        alert("Please select at least one course.");
+        return;
+    }
+    // Final Sync: Ensure all selections and the reason are forced into the legacy DOM
+    courses.forEach(c => {
+        const checkbox = document.getElementById(c.checkboxId);
+        if (checkbox) {
+            checkbox.checked = selectedCourses.has(c.id);
+            // Trigger change event for legacy scripts
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    });
+
+    // Ensure Reason is also synced
+    const legacyReasonSelect = document.getElementById("DrpDwnRetakeReason");
+    if (legacyReasonSelect) {
+        legacyReasonSelect.value = selectedReason;
+        legacyReasonSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    // Trigger Download
+    if (typeof window.ftn_PrintExamRetakeRequestForm === 'function') {
+        window.ftn_PrintExamRetakeRequestForm();
+    } else {
+        const legacyBtn = document.getElementById("btnDownloadExamRetakForm");
+        if (legacyBtn) legacyBtn.click();
+    }
+  };
+
+  if (loading) return (
+    <PageLayout currentPage={window.location.pathname}>
+      <div className="w-full min-h-screen p-6 md:p-8 space-y-8">
+        <div className="flex justify-center py-20">
+          <LoadingSpinner />
+        </div>
+      </div>
+    </PageLayout>
+  );
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      {elemContent && (
-        <div
-          className="m-grid m-grid--hor m-grid--root m-page"
-          dangerouslySetInnerHTML={{ __html: elemContent }}
+      <div className="w-full min-h-screen p-6 md:p-8 space-y-8 relative z-10">
+        
+        <RetakeModal 
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSubmit={handleModalSubmit}
+            selectedReason={selectedReason}
+            fee={selectedCourses.size * 2000}
         />
-      )}
+
+        <InstructionsModal 
+            isOpen={isInstructionsOpen}
+            onClose={() => setIsInstructionsOpen(false)}
+        />
+        
+        {/* Glow Effects */}
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+
+        <PageHeader
+          title="Retake Exam"
+          subtitle="Manage your examination retake applications"
+        >
+          <div className="flex flex-col md:flex-row items-center gap-4">
+             {/* Semester Pill Selector - Strict Attendance Style */}
+             <SuperTabs
+                tabs={semesters}
+                activeTab={semesters.find((s) => s.selected)?.value}
+                onTabChange={handleSemesterChange}
+             />
+
+             {/* Exam Type Selector - Custom Dropdown Style */}
+             <ExamTypeSelector 
+                types={examTypes}
+                selectedValue={examTypes.find(e => e.selected)?.value || ""}
+                onSelect={handleExamTypeChange}
+             />
+          </div>
+        </PageHeader>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard 
+            icon={Layout}
+            label="Total Courses" 
+            value={courses.length} 
+            delay={100}
+          />
+          <StatsCard 
+            icon={CheckCircle2}
+            label="Selected" 
+            value={selectedCourses.size} 
+            delay={200}
+            className={selectedCourses.size > 0 ? "!bg-[#a098ff]/10 !border-[#a098ff]/20" : ""}
+          />
+          <StatsCard 
+            icon={ShieldCheck}
+            label="Processed" 
+            value={courses.filter(c => c.status && c.status.trim().length > 0).length} 
+            delay={300}
+          />
+          <StatsCard 
+            icon={AlertCircle}
+            label="Total Fee" 
+            value={`Rs. ${selectedCourses.size * 2000}`} 
+            delay={400}
+            className={selectedCourses.size > 0 ? "!bg-amber-500/10 !border-amber-500/20" : ""}
+          />
+        </div>
+
+        {/* Notifications */}
+        <NotificationBanner 
+            alerts={alerts} 
+            onActionClick={() => setIsInstructionsOpen(true)} 
+        />
+
+        {/* Primary Content Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <div className="xl:col-span-2 space-y-6">
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between px-2">
+                        <h3 className="text-xl font-bold text-white">
+                            Eligible Courses
+                        </h3>
+                        <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest bg-white/5 px-3 py-1 rounded-lg">
+                            {courses.length} Total
+                        </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 gap-4">
+                        {courses.map((course, idx) => (
+                        <RetakeCourseCard 
+                            key={course.id} 
+                            course={course}
+                            index={idx + 1}
+                            isSelected={selectedCourses.has(course.id)}
+                            onToggle={() => toggleCourse(course.id)}
+                        />
+                        ))}
+                    </div>
+
+                    {courses.length === 0 && (
+                        <div className="text-center py-20 bg-zinc-900/30 rounded-[2rem] border border-dashed border-white/5">
+                            <div className="flex flex-col items-center gap-4 opacity-50">
+                                <FileText size={48} className="text-zinc-600" />
+                                <p className="text-zinc-500 font-medium uppercase tracking-widest text-xs">No courses eligible for retake</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Sidebar Controls */}
+            <div className="space-y-6">
+                <div className="bg-zinc-900/50 border border-white/5 backdrop-blur-xl rounded-[2.5rem] p-8 space-y-8 sticky top-8">
+                    <div className="space-y-6">
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Retake Situation</label>
+                            <div className="relative group">
+                                <select 
+                                    value={selectedReason}
+                                    onChange={(e) => handleReasonChange(e.target.value)}
+                                    className="w-full appearance-none bg-zinc-800/50 border border-white/5 text-white px-5 py-4 rounded-2xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#a098ff]/50 transition-all cursor-pointer pr-12"
+                                >
+                                    {reasons.map((reason, idx) => (
+                                        <option key={idx} value={reason.value}>{reason.label}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown size={16} className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none group-hover:text-white transition-colors" />
+                            </div>
+                        </div>
+
+                        <div className="p-5 rounded-2xl bg-[#a098ff]/5 border border-[#a098ff]/10 space-y-4">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-[#a098ff]/10 rounded-lg text-[#a098ff]">
+                                    <ShieldCheck size={18} />
+                                </div>
+                                <h4 className="text-sm font-bold text-white">Order Summary</h4>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex justify-between text-xs font-medium">
+                                    <span className="text-zinc-500">Selected Papers</span>
+                                    <span className="text-white">{selectedCourses.size}</span>
+                                </div>
+                                <div className="flex justify-between text-xs font-medium">
+                                    <span className="text-zinc-500">Processing Fee</span>
+                                    <span className="text-white">Rs. 2,000 / paper</span>
+                                </div>
+                                <div className="pt-3 border-t border-white/10 flex justify-between items-center">
+                                    <span className="text-xs font-bold text-zinc-400">Total Charged</span>
+                                    <span className="text-lg font-black text-white">Rs. {selectedCourses.size * 2000}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                        <button 
+                            disabled={selectedCourses.size === 0}
+                            onClick={handleInitiateRequest}
+                            className={`w-full group flex items-center justify-between px-6 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all duration-300 ${
+                                selectedCourses.size > 0 
+                                ? "bg-[#a098ff] text-zinc-950 hover:bg-[#b0a8ff]" 
+                                : "bg-zinc-800 text-zinc-600 cursor-not-allowed"
+                            }`}
+                        >
+                            Initiate Request
+                            <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                        </button>
+
+                        <button 
+                            disabled={selectedCourses.size === 0}
+                            onClick={handleDownloadForm}
+                            className={`w-full group flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all duration-300 border ${
+                                selectedCourses.size > 0 
+                                ? "border-[#a098ff]/30 text-[#a098ff] hover:bg-[#a098ff]/5" 
+                                : "border-white/5 text-zinc-600 cursor-not-allowed"
+                            }`}
+                        >
+                            <Download size={16} />
+                            Download Form
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </PageLayout>
   );
 }

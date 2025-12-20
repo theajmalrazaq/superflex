@@ -1,297 +1,296 @@
 import React, { useEffect, useState } from "react";
 import PageLayout from "../layouts/PageLayout";
+import { LoadingSpinner } from "../LoadingOverlay";
+import {
+  MessageSquare,
+  CheckCircle2,
+  AlertCircle,
+  BookOpen,
+  Clock,
+  Layout,
+  AlertTriangle,
+} from "lucide-react";
+import NotificationBanner from "../NotificationBanner";
+import PageHeader from "../PageHeader";
+import StatsCard from "../StatsCard";
+
+
+const FeedbackCard = ({ course, onAction, index }) => {
+  const isPending = course.hasAction;
+  return (
+    <div
+      className="group cursor-default flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5"
+    >
+      <div className="flex items-center gap-4">
+        <span className="font-bold text-sm min-w-[1.5rem] text-zinc-600">
+          {index}.
+        </span>
+        
+        {/* Visual Icon Box - Matching Attendance Style */}
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-300 ${
+          isPending 
+            ? "bg-amber-500/10 border-amber-500/20 text-amber-500 group-hover:scale-110" 
+            : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 group-hover:scale-110"
+        }`}>
+          {isPending ? <Clock size={20} /> : <CheckCircle2 size={20} />}
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-black text-[#a098ff] uppercase tracking-tighter opacity-80">
+              {course.code}
+            </span>
+            <span className="text-white font-medium text-sm leading-tight">
+              {course.courseName}
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-3 text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
+            <span className="flex items-center gap-1.5">
+               <BookOpen size={11} className="text-zinc-600" />
+               {course.credits} Credits
+            </span>
+            <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
+            <span className="flex items-center gap-1.5 uppercase">
+               Faculty Survey
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col items-end gap-2">
+        <div
+          className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all duration-300 ${
+            isPending
+              ? "bg-amber-500/5 text-amber-500 border-amber-500/10 group-hover:border-amber-500/30"
+              : "bg-emerald-500/5 text-emerald-400 border-emerald-500/10 group-hover:border-emerald-500/30"
+          }`}
+        >
+          {course.status}
+        </div>
+        {isPending && (
+          <button
+            onClick={() => onAction(course)}
+            className="text-[#a098ff] text-[9px] font-black uppercase tracking-[0.2em] hover:text-white transition-colors"
+          >
+            Review Now
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
 
 function CourseFeedbackPage() {
-  const [elemContent, setElemContent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+  const [stats, setStats] = useState({ total: 0, pending: 0, submitted: 0 });
 
   useEffect(() => {
-    const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
-    if (targetElement) {
-      applyCustomStyling(targetElement);
-
-      setElemContent(targetElement.innerHTML);
-      targetElement.remove();
-    }
-  }, []);
-
-  const applyCustomStyling = (element) => {
-    const addedStyles = [];
-
-    const styleElement = document.createElement("style");
-    styleElement.textContent = `
-            .custom-scrollbar::-webkit-scrollbar {
-                width: 8px;
-                height: 8px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-track {
-                background: rgba(255, 255, 255, 0.05);
-                border-radius: 10px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 10px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                background: rgba(255, 255, 255, 0.3);
-            }
-        `;
-
-    styleElement.setAttribute("data-custom-style", "true");
-    document.head.appendChild(styleElement);
-    addedStyles.push(styleElement);
-
-    const alertElements = element.querySelectorAll(".m-alert");
-    alertElements.forEach((alertElement) => {
-      alertElement.classList.add(
-        "!bg-black",
-        "!text-white",
-        "!border-white/10",
-        "!font-bold",
-        "!p-4",
-        "!rounded-3xl",
-        "!flex",
-        "!justify-between",
-        "!items-center",
-        "!m-6",
-      );
-
-      const iconElement = alertElement.querySelector(".m-alert__icon");
-      if (iconElement) {
-        iconElement.classList.add(
-          "!text-white",
-          "!text-2xl",
-          "!bg-x",
-          "!rounded-full",
-          "!p-2",
-          "!w-12",
-          "!h-12",
-          "!flex",
-          "!items-center",
-          "!justify-center",
-        );
-
-        const createSvgIcon = (path) => {
-          const svg = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "svg",
-          );
-          svg.setAttribute("width", "24");
-          svg.setAttribute("height", "24");
-          svg.setAttribute("viewBox", "0 0 24 24");
-          svg.setAttribute("fill", "none");
-          svg.setAttribute("stroke", "currentColor");
-          svg.setAttribute("stroke-width", "2");
-          svg.setAttribute("stroke-linecap", "round");
-          svg.setAttribute("stroke-linejoin", "round");
-          svg.classList.add("w-6", "h-6", "text-white");
-
-          const pathElement = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "path",
-          );
-          pathElement.setAttribute("d", path);
-          svg.appendChild(pathElement);
-
-          return svg;
-        };
-
-        const iconPath = "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z";
-        iconElement.innerHTML = "";
-        iconElement.appendChild(createSvgIcon(iconPath));
+    const parseFeedbackData = () => {
+      const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
+      if (!root) {
+        setTimeout(parseFeedbackData, 500);
+        return;
       }
 
-      const closeButton = alertElement.querySelector("button.close");
-      if (closeButton) {
-        closeButton.style.cssText = "content: none !important;";
+      try {
+        // Parse Alerts
+        const alertList = [];
+        root.querySelectorAll(".m-alert, .alert").forEach(alert => {
+          if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
 
-        const style = document.createElement("style");
-        style.textContent =
-          'button.close[data-dismiss="alert"]::before, button.close[data-dismiss="modal"]::before { display: none !important; content: none !important; }';
-        style.setAttribute("data-custom-style", "true");
-        document.head.appendChild(style);
-        addedStyles.push(style);
+          const textContainer = alert.querySelector(".m-alert__text") || alert;
+          const clone = textContainer.cloneNode(true);
+          // Remove standard UI elements that shouldn't be in the message
+          clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
+          
+          let message = clone.textContent
+            .replace(/Alert!/gi, "")
+            .replace(/Close/gi, "")
+            .replace(/&nbsp;/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
 
-        closeButton.innerHTML = `
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/70">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                `;
-        closeButton.classList.add("!focus:outline-none");
-      }
-
-      const alertText = alertElement.querySelector(".m-alert__text");
-      if (alertText) {
-        alertText.classList.add("!text-white/90", "!ml-4");
-
-        const strongElement = alertText.querySelector("strong");
-        if (strongElement) {
-          strongElement.classList.add("!text-x");
-        }
-      }
-    });
-
-    const portlet = element.querySelector(".m-portlet");
-    if (portlet) {
-      portlet.classList.add(
-        "!bg-black",
-        "!border-none",
-        "!rounded-3xl",
-        "!p-4",
-        "!shadow-lg",
-      );
-
-      portlet.classList.remove(
-        "m-portlet--primary",
-        "m-portlet--head-solid-bg",
-        "m-portlet--border-bottom-info",
-        "m-portlet--head-sm",
-      );
-    }
-
-    const portletHead = element.querySelector(".m-portlet__head");
-    if (portletHead) {
-      portletHead.classList.add(
-        "!bg-black",
-        "!border",
-        "!border-white/10",
-        "!rounded-t-3xl",
-        "!h-fit",
-        "!p-4",
-        "!flex",
-        "!items-center",
-        "!justify-between",
-        "!mb-4",
-      );
-
-      const headingText = portletHead.querySelector(".m-portlet__head-text");
-      if (headingText) {
-        headingText.classList.add("!text-white", "!text-xl", "!font-bold");
-      }
-
-      const headCaption = portletHead.querySelector(".m-portlet__head-caption");
-      if (headCaption) {
-        headCaption.classList.add("!flex", "!justify-center", "!items-center");
-      }
-    }
-
-    const portletBody = element.querySelector(".m-portlet__body");
-    if (portletBody) {
-      portletBody.classList.add(
-        "!bg-black",
-        "!rounded-b-3xl",
-        "!p-0",
-        "!border",
-        "!border-white/10",
-        "!shadow-lg",
-        "!text-white",
-        "!h-[calc(100vh-220px)]",
-        "!max-h-[800px]",
-        "!overflow-y-auto",
-        "custom-scrollbar",
-      );
-
-      const sectionContent = portletBody.querySelector(".m-section__content");
-      if (sectionContent) {
-        sectionContent.style.marginBottom = "0";
-      }
-    }
-
-    const table = element.querySelector(".table");
-    if (table) {
-      table.querySelectorAll(".table td, .table th").forEach((el) => {
-        el.classList.add("!border-none");
-      });
-
-      const tableContainer = document.createElement("div");
-      tableContainer.className = "overflow-hidden mb-6";
-      table.parentNode.insertBefore(tableContainer, table);
-      tableContainer.appendChild(table);
-
-      table.classList.add("!w-full", "!border-collapse", "!border-0");
-      table.classList.remove(
-        "m-table",
-        "m-table--head-bg-metal",
-        "table-responsive",
-      );
-
-      const thead = table.querySelector("thead");
-      if (thead) {
-        thead.classList.add("!bg-zinc-900", "!sticky", "!top-0", "!z-10");
-
-        const headers = thead.querySelectorAll("th");
-        headers.forEach((header) => {
-          header.classList.add(
-            "!bg-transparent",
-            "!text-gray-400",
-            "!font-medium",
-            "!p-3",
-            "!text-left",
-            "!border-b",
-            "!border-white/10",
-          );
+          if (message && message.length > 3) {
+              const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
+              alertList.push({ type, message });
+          }
         });
-      }
+        setAlerts(alertList);
 
-      const tbody = table.querySelector("tbody");
-      if (tbody) {
-        tbody.classList.add("!divide-y", "!divide-white/10");
+        // Parse Courses Table
+        const courseList = [];
+        const table = root.querySelector(".table");
+        if (table) {
+          const rows = table.querySelectorAll("tbody tr");
+          rows.forEach((row, idx) => {
+            const cells = row.querySelectorAll("td");
+            // Match legacy 6-column structure: S.No, Code, Name, Credits, Status, Feedback
+            if (cells.length >= 5) {
+              const actionBtn = cells[5]?.querySelector("a, button") || cells[4]?.querySelector("a, button");
+              const actionOnClick = actionBtn?.getAttribute("onclick");
+              const actionHref = actionBtn?.getAttribute("href");
 
-        const rows = tbody.querySelectorAll("tr");
-        rows.forEach((row) => {
-          row.classList.add(
-            "!bg-black",
-            "!hover:bg-white/5",
-            "!transition-colors",
-          );
-
-          const cells = row.querySelectorAll("td");
-          cells.forEach((cell, index) => {
-            cell.classList.add(
-              "!p-3",
-              "!text-white/80",
-              "!border-y",
-              "!border-white/10",
-            );
-
-            if (cell.classList.contains("text-success")) {
-              cell.classList.remove("text-success");
-              cell.classList.add("!text-emerald-400");
-            }
-
-            if (index === cells.length - 1) {
-              cell.classList.add("!min-w-[80px]");
-
-              if (!cell.textContent.trim()) {
-                const dash = document.createElement("span");
-                dash.textContent = "-";
-                dash.classList.add("text-white/30");
-                cell.appendChild(dash);
-              }
+              courseList.push({
+                id: idx,
+                serial: cells[0]?.textContent.trim(),
+                code: cells[1]?.textContent.trim(),
+                courseName: cells[2]?.textContent.trim(),
+                credits: cells[3]?.textContent.trim(),
+                status: cells[4]?.textContent.trim() || cells[3]?.textContent.trim(), // Fallback if structure varies
+                teacherName: "", // Screenshot doesn't show teacher
+                hasAction: !!(actionOnClick || (actionHref && actionHref !== "#")),
+                actionOnClick,
+                actionHref
+              });
             }
           });
-        });
-      }
+        }
 
-      const headers = table.querySelectorAll("thead th");
-      if (headers.length > 0) {
-        const lastHeader = headers[headers.length - 1];
-        lastHeader.classList.add("!min-w-[80px]");
+        setCourses(courseList);
+
+        // Calculate Stats
+        const pending = courseList.filter(c => c.hasAction).length;
+        setStats({
+          total: courseList.length,
+          pending: pending,
+          submitted: courseList.length - pending
+        });
+
+        // Hide original
+        root.style.opacity = "0";
+        root.style.pointerEvents = "none";
+        root.style.position = "absolute";
+        root.style.zIndex = "-1";
+
+        setLoading(false);
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
+      } catch (err) {
+        console.error("Feedback Parser Error:", err);
+        setLoading(false);
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
+    };
+
+    parseFeedbackData();
+  }, []);
+
+  const handleFeedbackAction = (course) => {
+    if (course.actionOnClick) {
+      // Execute legacy onclick script
+      try {
+        const script = course.actionOnClick.replace('return false;', '');
+        new Function(script)();
+      } catch (e) {
+        console.error("Action execution failed", e);
+      }
+    } else if (course.actionHref) {
+      window.location.href = course.actionHref;
     }
   };
 
+  if (loading) return (
+    <PageLayout currentPage={window.location.pathname}>
+      <div className="w-full min-h-screen p-6 md:p-8 space-y-8">
+        <div className="flex justify-center py-20">
+          <LoadingSpinner />
+        </div>
+      </div>
+    </PageLayout>
+  );
+
   return (
     <PageLayout currentPage={window.location.pathname}>
-      {elemContent && (
-        <div
-          className="m-grid m-grid--hor m-grid--root m-page"
-          dangerouslySetInnerHTML={{ __html: elemContent }}
+      <div className="w-full min-h-screen p-6 md:p-8 space-y-8">
+        
+        {/* Glow Effects */}
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+        <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
+
+        <PageHeader
+          title="Course Review"
+          subtitle="Faculty evaluation and academic survey management"
         />
-      )}
+
+        {/* Stats Grid */}
+        <div className="flex flex-wrap gap-4">
+          <StatsCard 
+            icon={Layout}
+            label="Total Assigned" 
+            value={stats.total} 
+            delay={100}
+          />
+          <StatsCard 
+            icon={Clock}
+            label="Pending" 
+            value={stats.pending} 
+            delay={200}
+            className={stats.pending > 0 ? "!bg-amber-500/10 !border-amber-500/20" : ""}
+          />
+          <StatsCard 
+            icon={CheckCircle2}
+            label="Completed" 
+            value={stats.submitted} 
+            delay={300}
+            className={stats.pending === 0 && stats.total > 0 ? "!bg-emerald-500/10 !border-emerald-500/20" : ""}
+          />
+          <StatsCard 
+            icon={MessageSquare}
+            label="Overall Status" 
+            value={stats.pending === 0 ? "DONE" : "IN PROGRESS"} 
+            delay={400}
+          />
+        </div>
+
+        {/* Notifications */}
+        <NotificationBanner alerts={alerts} />
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between px-2">
+            <h3 className="text-xl font-bold text-white">
+              Evaluation Log
+            </h3>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {courses.map((course, idx) => (
+              <FeedbackCard 
+                key={course.id} 
+                course={course}
+                index={idx + 1}
+                onAction={handleFeedbackAction}
+              />
+            ))}
+          </div>
+
+          {courses.length === 0 && (
+            <div className="text-center py-20 bg-zinc-900/30 rounded-[2rem] border border-dashed border-white/5">
+              <p className="text-zinc-500 font-medium">No pending evaluations found.</p>
+            </div>
+          )}
+        </div>
+      </div>
+      
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          height: 6px;
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+      `}</style>
     </PageLayout>
   );
 }

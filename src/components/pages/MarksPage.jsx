@@ -7,7 +7,15 @@ import {
   BookOpen,
   Bookmark,
   Layers,
+  AlertTriangle,
+  Award,
+  Activity,
+  BarChart2,
 } from "lucide-react";
+import NotificationBanner from "../NotificationBanner";
+import PageHeader from "../PageHeader";
+import StatsCard from "../StatsCard";
+import SuperTabs from "../SuperTabs";
 
 const parseFloatOrZero = (value) => {
   if (!value || value === "-" || value.trim() === "") return 0;
@@ -58,7 +66,7 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10 shadow-2xl max-h-[60vh] overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200 z-[60]">
+        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10  max-h-[60vh] overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200 z-[60]">
           <div className="flex flex-col gap-3">
             {courses.map((course) => (
               <button
@@ -144,8 +152,8 @@ const SectionSelector = ({ sections, selectedId, onSelect }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10 shadow-2xl max-h-[60vh] overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200 z-[60]">
-          <div className="flex flex-col gap-1">
+        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10  max-h-[60vh] overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200 z-[60]">
+          <div className="flex flex-col gap-2">
             {sections.map((section) => (
               <button
                 key={section.id}
@@ -226,7 +234,7 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-96 md:w-[500px] bg-[#111] backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-full right-0 mt-2 w-96 md:w-[500px] bg-[#111] backdrop-blur-xl border border-white/10 rounded-2xl  overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
             <h3 className="font-bold text-white flex items-center gap-2">
               Bookmarked Items
@@ -322,7 +330,7 @@ const AssessmentView = ({
     <div
       className={`group rounded-[2rem] border transition-all duration-300 overflow-hidden ${
         isGrandTotal
-          ? "bg-[#111] border-[#a098ff]/30 shadow-lg shadow-[#a098ff]/5"
+          ? "bg-[#111] border-[#a098ff]/30 "
           : "bg-[#161616] border-white/5"
       }`}
     >
@@ -346,29 +354,25 @@ const AssessmentView = ({
           </div>
 
           {}
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col items-end px-5 py-2.5 rounded-xl bg-black/20 border border-white/5 min-w-[120px]">
-              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
-                Weight
-              </span>
-              <span className="text-lg font-bold text-white">
-                {weight.toFixed(2)}
-              </span>
-            </div>
-            <div
-              className={`flex flex-col items-end px-5 py-2.5 rounded-xl border min-w-[120px] ${statusBg} ${borderColor}`}
-            >
-              <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
-                Obtained
-              </span>
-              <span className={`text-2xl font-bold ${statusColor}`}>
-                {obtained.toFixed(2)}
-              </span>
-            </div>
-          </div>
         </div>
 
-        {}
+        {/* Assessment Stats */}
+        <div className="flex flex-wrap items-center gap-4 p-6 border-b border-white/5">
+          <StatsCard
+            icon={Layers}
+            label="Weight"
+            value={weight.toFixed(2)}
+            delay={100}
+            className="!p-4 !rounded-2xl !min-w-[150px] !gap-2"
+          />
+          <StatsCard
+            icon={Award}
+            label="Obtained"
+            value={obtained.toFixed(2)}
+            delay={200}
+            className={`!p-4 !rounded-2xl !min-w-[150px] !gap-2 ${statusBg} ${borderColor}`}
+          />
+        </div>
         <div className="p-6">
           <div className="w-full overflow-x-auto rounded-xl border border-white/5 custom-scrollbar bg-black/20">
             <table className="w-full text-sm text-left border-collapse">
@@ -678,7 +682,7 @@ function MarksPage() {
   const [courses, setCourses] = useState([]);
   const [selectedCourseId, setSelectedCourseId] = useState(null);
   const [semesters, setSemesters] = useState([]);
-  const [alertInfo, setAlertInfo] = useState(null);
+  const [alerts, setAlerts] = useState([]);
   const hiddenFormRef = useRef(null);
   const [activeSectionId, setActiveSectionId] = useState(null);
 
@@ -716,13 +720,29 @@ function MarksPage() {
         );
         if (!root) return;
 
-        const alertEl = root.querySelector(".alert");
-        if (alertEl?.textContent.trim()) {
-          setAlertInfo({
-            type: alertEl.classList.contains("alert-danger") ? "error" : "info",
-            message: alertEl.textContent.trim(),
-          });
-        }
+        // Parse Alerts
+        const alertList = [];
+        root.querySelectorAll(".m-alert, .alert").forEach(alert => {
+          if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
+
+          const textContainer = alert.querySelector(".m-alert__text") || alert;
+          const clone = textContainer.cloneNode(true);
+          // Remove standard UI elements that shouldn't be in the message
+          clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
+          
+          let message = clone.textContent
+            .replace(/Alert!/gi, "")
+            .replace(/Close/gi, "")
+            .replace(/&nbsp;/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+          if (message && message.length > 3) {
+              const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
+              alertList.push({ type, message });
+          }
+        });
+        setAlerts(alertList);
 
         const legacyForm = document.querySelector(
           'form[action="/Student/StudentMarks"]',
@@ -1001,44 +1021,25 @@ function MarksPage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-4 md:p-8 space-y-8 pb-24">
         {}
-        <div className="flex flex-col xl:flex-row justify-between items-center gap-6 mb-8">
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter">
-              Marks & Grades
-            </h1>
-            <p className="text-zinc-400 font-medium text-lg">
-              Academic performance details
-            </p>
-          </div>
-
+        <PageHeader
+          title="Marks & Grades"
+          subtitle="Academic performance details"
+        >
           <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full xl:w-auto">
-            <div className="flex gap-2 bg-zinc-900/50 p-1.5 rounded-full border border-white/5 backdrop-blur-sm self-start md:self-auto overflow-x-auto custom-scrollbar max-w-full">
-              {semesters.map((sem, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    if (hiddenFormRef.current) {
-                      const select =
-                        hiddenFormRef.current.querySelector("select");
-                      if (select) {
-                        select.value = sem.value;
-
-                        const form =
-                          hiddenFormRef.current.querySelector("form");
-                        if (form) form.submit();
-                      }
-                    }
-                  }}
-                  className={`px-5 py-2 border rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
-                    sem.selected
-                      ? "bg-[#a098ff]/10 text-[#a098ff] border-[#a098ff]/20"
-                      : "text-zinc-500 border-transparent hover:text-white hover:bg-white/5"
-                  }`}
-                >
-                  {sem.label}
-                </button>
-              ))}
-            </div>
+            <SuperTabs
+              tabs={semesters}
+              activeTab={semesters.find((s) => s.selected)?.value}
+              onTabChange={(value) => {
+                if (hiddenFormRef.current) {
+                  const select = hiddenFormRef.current.querySelector("select");
+                  if (select) {
+                    select.value = value;
+                    const form = hiddenFormRef.current.querySelector("form");
+                    if (form) form.submit();
+                  }
+                }
+              }}
+            />
 
             <CourseSelector
               courses={courses}
@@ -1072,25 +1073,11 @@ function MarksPage() {
             />
             <div ref={hiddenFormRef} className="hidden" />
           </div>
-        </div>
+        </PageHeader>
 
         {}
-        {alertInfo && (
-          <div
-            className={`p-4 rounded-3xl border flex items-center gap-4 ${
-              alertInfo.type === "error"
-                ? "bg-rose-500/10 border-rose-500/20 text-rose-200"
-                : "bg-blue-500/10 border-blue-500/20 text-blue-200"
-            }`}
-          >
-            <div
-              className={`p-2 rounded-full ${alertInfo.type === "error" ? "bg-rose-500/20" : "bg-blue-500/20"}`}
-            >
-              <AlertCircle size={20} />
-            </div>
-            <span className="font-semibold text-sm">{alertInfo.message}</span>
-          </div>
-        )}
+        {/* Notifications */}
+        <NotificationBanner alerts={alerts} />
 
         {loading ? (
           <LoadingSpinner />

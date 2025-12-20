@@ -11,7 +11,12 @@ import {
   AlertCircle,
   ChevronDown,
   Bookmark,
+  AlertTriangle,
 } from "lucide-react";
+import NotificationBanner from "../NotificationBanner";
+import PageHeader from "../PageHeader";
+import StatsCard from "../StatsCard";
+import SuperTabs from "../SuperTabs";
 
 const CourseSelector = ({ courses, selectedId, onSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -162,19 +167,7 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
   );
 };
 
-const SummaryStat = ({ icon: Icon, label, value, colorClass }) => (
-  <div className="flex-1 min-w-[140px] p-6 rounded-[2rem] border bg-zinc-900/50 backdrop-blur-xl hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
-    <div className="flex justify-between items-start mb-6">
-      <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
-        <Icon size={24} />
-      </div>
-    </div>
-    <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">
-      {label}
-    </p>
-    <h3 className="text-xl font-bold text-white truncate">{value}</h3>
-  </div>
-);
+
 
 const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -227,7 +220,7 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-80 md:w-96 bg-[#111] backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-full right-0 mt-2 w-80 md:w-96 bg-[#111] backdrop-blur-xl border border-white/10 rounded-2xl  overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
             <h3 className="font-bold text-white flex items-center gap-2">
               Bookmarked Items
@@ -433,86 +426,40 @@ function AttendancePage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-6 md:p-8 space-y-8">
         {}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-              Attendance
-            </h1>
-            <p className="text-zinc-400 font-medium">
-              Track your presence and schedule
-            </p>
-          </div>
+        <PageHeader 
+          title="Attendance" 
+          subtitle="Track your presence and schedule"
+        >
 
-          <div className="flex flex-col md:flex-row items-end gap-4">
-            {}
-            <div className="flex gap-2 bg-zinc-900/50 p-1.5 rounded-full border border-white/5 backdrop-blur-sm self-start md:self-auto overflow-x-auto custom-scrollbar max-w-full">
-              {semesters.map((sem, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    if (hiddenFormRef.current) {
-                      const select =
-                        hiddenFormRef.current.querySelector("select");
-                      if (select) {
-                        select.value = sem.value;
-
-                        const form =
-                          hiddenFormRef.current.querySelector("form");
-                        if (form) form.submit();
-                      }
-                    }
-                  }}
-                  className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
-                    sem.selected
-                      ? "bg-[#a098ff] text-white shadow-lg shadow-[#a098ff]/20"
-                      : "text-zinc-500 hover:text-white"
-                  }`}
-                >
-                  {sem.label}
-                </button>
-              ))}
-            </div>
-
-            {}
-            {courses.length > 0 && (
-              <div className="w-full md:w-auto">
-                <CourseSelector
-                  courses={courses}
-                  selectedId={selectedCourseId}
-                  onSelect={setSelectedCourseId}
-                />
-              </div>
-            )}
-
-            <BookmarksMenu
-              markedRecords={markedRecords}
-              courses={courses}
-              onNavigate={(courseId) => setSelectedCourseId(courseId)}
+          <div className="flex flex-col lg:flex-row items-center gap-4">
+            <SuperTabs
+              tabs={semesters}
+              activeTab={semesters.find((s) => s.selected)?.value}
+              onTabChange={(value) => {
+                if (hiddenFormRef.current) {
+                  const select = hiddenFormRef.current.querySelector("select");
+                  if (select) {
+                    select.value = value;
+                    const form = hiddenFormRef.current.querySelector("form");
+                    if (form) form.submit();
+                  }
+                }
+              }}
             />
-
-            {}
-            <div ref={hiddenFormRef} className="hidden"></div>
+            <div className="flex items-center gap-4">
+              {courses.length > 0 && <CourseSelector courses={courses} selectedId={selectedCourseId} onSelect={setSelectedCourseId} />}
+              <BookmarksMenu
+                markedRecords={markedRecords}
+                courses={courses}
+                onNavigate={(courseId) => setSelectedCourseId(courseId)}
+              />
+              <div ref={hiddenFormRef} className="hidden"></div>
+            </div>
           </div>
-        </div>
+        </PageHeader>
 
         {}
-        {courses.length > 0 && alerts.length > 0 && (
-          <div className="space-y-4">
-            {alerts.map((alert, idx) => (
-              <div
-                key={idx}
-                className={`p-4 rounded-2xl border flex items-center gap-3 ${
-                  alert.type === "error"
-                    ? "bg-rose-500/10 border-rose-500/20 text-rose-200"
-                    : "bg-blue-500/10 border-blue-500/20 text-blue-200"
-                }`}
-              >
-                <AlertCircle size={20} />
-                <span className="font-semibold text-sm">{alert.message}</span>
-              </div>
-            ))}
-          </div>
-        )}
+        <NotificationBanner alerts={alerts} />
 
         {loading ? (
           <LoadingSpinner />
@@ -526,29 +473,29 @@ function AttendancePage() {
               >
                 {}
                 <div className="flex flex-wrap gap-4">
-                  <SummaryStat
+                  <StatsCard
                     icon={BarChart2}
-                    label="Attendance Percentage"
+                    label="Percentage"
                     value={`${selectedCourseData.percentage}%`}
-                    colorClass="bg-[#a098ff] text-[#a098ff]"
+                    delay={100}
                   />
-                  <SummaryStat
+                  <StatsCard
                     icon={CheckCircle2}
                     label="Present"
                     value={selectedCourseData.present}
-                    colorClass="bg-[#a098ff] text-[#a098ff]"
+                    delay={200}
                   />
-                  <SummaryStat
+                  <StatsCard
                     icon={XCircle}
                     label="Absent"
                     value={selectedCourseData.absent}
-                    colorClass="bg-[#a098ff] text-[#a098ff]"
+                    delay={300}
                   />
-                  <SummaryStat
+                  <StatsCard
                     icon={Calendar}
-                    label="Classes"
+                    label="Total Classes"
                     value={selectedCourseData.records.length}
-                    colorClass="bg-[#a098ff] text-[#a098ff]"
+                    delay={400}
                   />
                 </div>
 
@@ -600,8 +547,7 @@ function AttendancePage() {
             }`}
           >
             {alerts.length > 0 ? (
-              alerts
-                .filter((alert) => {
+              <NotificationBanner alerts={alerts.filter((alert) => {
                   const hasNoRecord = alerts.some((a) =>
                     a.message.toLowerCase().includes("no record"),
                   );
@@ -611,22 +557,8 @@ function AttendancePage() {
                   )
                     return false;
                   return true;
-                })
-                .map((alert, idx) => (
-                  <div
-                    key={idx}
-                    className={`relative p-4 rounded-2xl border backdrop-blur-xl flex items-center gap-4 shadow-xl w-full ${
-                      alert.type === "error"
-                        ? "bg-rose-500/10 border-rose-500/20 text-rose-200"
-                        : "bg-blue-500/10 border-blue-500/20 text-blue-200"
-                    }`}
-                  >
-                    <AlertCircle size={20} />
-                    <span className="font-semibold text-sm">
-                      {alert.message}
-                    </span>
-                  </div>
-                ))
+                })} 
+              />
             ) : (
               <div className="flex flex-col items-center justify-center opacity-50 py-12">
                 <div className="p-4 rounded-full bg-zinc-900 mb-4 ring-1 ring-white/10">

@@ -26,7 +26,10 @@ import {
   ChevronDown,
   ChevronUp,
   ArrowRight,
+  AlertTriangle,
 } from "lucide-react";
+import NotificationBanner from "../NotificationBanner";
+import StatsCard from "../StatsCard";
 
 ChartJS.register(
   CategoryScale,
@@ -142,6 +145,7 @@ function HomePage() {
   const [personalInfo, setPersonalInfo] = useState(null);
   const [profileSections, setProfileSections] = useState([]);
   const [activeMainTab, setActiveMainTab] = useState("stats");
+  const [alerts, setAlerts] = useState([]);
 
   const [attendanceData, setAttendanceData] = useState(null);
   const [marksHistory, setMarksHistory] = useState([]);
@@ -212,6 +216,32 @@ function HomePage() {
         .forEach((script) => script.remove());
       targetElement.querySelector("#NotificationDetail")?.remove();
       document.querySelector(".m-scroll-top")?.remove();
+
+      document.querySelector(".m-scroll-top")?.remove();
+
+      // Parse Alerts
+      const alertList = [];
+      targetElement.querySelectorAll(".m-alert, .alert").forEach(alert => {
+        if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
+
+        const textContainer = alert.querySelector(".m-alert__text") || alert;
+        const clone = textContainer.cloneNode(true);
+        // Remove standard UI elements that shouldn't be in the message
+        clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
+        
+        let message = clone.textContent
+          .replace(/Alert!/gi, "")
+          .replace(/Close/gi, "")
+          .replace(/&nbsp;/g, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+
+        if (message && message.length > 3) {
+            const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
+            alertList.push({ type, message });
+        }
+      });
+      setAlerts(alertList);
 
       let uniInfo = {};
       let personalData = {};
@@ -579,87 +609,38 @@ function HomePage() {
           </div>
         </div>
 
+        <NotificationBanner alerts={alerts} />
+
         {}
         {activeMainTab === "stats" && (
           <div className="space-y-8">
             {}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {}
-              <div className="p-6 rounded-[2rem] border bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
-                <div className="flex justify-between items-start mb-6">
-                  <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
-                    <GraduationCap size={24} />
-                  </div>
-                </div>
-                <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">
-                  Degree Program
-                </p>
-                <h3 className="text-xl font-bold text-white truncate">
-                  {universityInfo?.Degree || "..."}
-                </h3>
-              </div>
-
-              {}
-              <div className="p-6 rounded-[2rem] border  bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70  transition-all duration-300 hover:-translate-y-1 group">
-                <div className="flex justify-between items-start mb-6">
-                  <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
-                    <Users size={24} />
-                  </div>
-                </div>
-                <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">
-                  Section
-                </p>
-                <h3 className="text-xl font-bold text-white">
-                  {universityInfo?.Section || "..."}
-                </h3>
-              </div>
-
-              {}
-              <div className="p-6 rounded-[2rem] border  bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
-                <div className="flex justify-between items-start mb-6">
-                  <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
-                    <Award size={24} />
-                  </div>
-                </div>
-                <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">
-                  Total Registered Courses
-                </p>
-                <h3 className="text-xl font-bold text-white">
-                  {coursesData?.length || 0}
-                </h3>
-              </div>
-
-              <div className="p-6 rounded-[2rem] border  bg-zinc-900/50 backdrop-blur-xl  hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group">
-                <div className="flex justify-between items-start mb-6">
-                  <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
-                    <Activity size={24} />
-                  </div>
-                </div>
-                <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">
-                  Subject with Most Absents
-                </p>
-                <h3
-                  className="text-xl font-bold text-white truncate"
-                  title={mostAbsentSubject?.title}
-                >
-                  {loadingAttendance ? (
-                    <div className="scale-50 origin-left -ml-4 -mt-4">
-                      <LoadingSpinner />
-                    </div>
-                  ) : mostAbsentSubject ? (
-                    <span className="flex items-center gap-2">
-                      <span className="truncate max-w-[120px]">
-                        {mostAbsentSubject.title}
-                      </span>
-                      <span className="text-sm text-zinc-500 font-medium bg-zinc-900  px-1.5 py-0.5 rounded">
-                        {mostAbsentSubject.absent}
-                      </span>
-                    </span>
-                  ) : (
-                    "..."
-                  )}
-                </h3>
-              </div>
+              <StatsCard 
+                icon={GraduationCap} 
+                label="Degree Program" 
+                value={universityInfo?.Degree || "..."} 
+                delay={0}
+              />
+              <StatsCard 
+                icon={Users} 
+                label="Section" 
+                value={universityInfo?.Section || "..."} 
+                delay={100}
+              />
+              <StatsCard 
+                icon={Award} 
+                label="Registered Courses" 
+                value={coursesData?.length || 0} 
+                delay={200}
+              />
+              <StatsCard 
+                icon={Activity} 
+                label="Critical Attendance" 
+                value={loadingAttendance ? "..." : mostAbsentSubject ? mostAbsentSubject.title : "None"} 
+                subValue={mostAbsentSubject ? `${mostAbsentSubject.absent} Absents` : ""}
+                delay={300}
+              />
             </div>
 
             {}
@@ -700,7 +681,7 @@ function HomePage() {
                             onClick={() => setActiveCourse(course.id)}
                             className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
                               activeCourse === course.id
-                                ? "bg-[#a098ff] text-white shadow-lg shadow-[#a098ff]/20"
+                                ? "bg-[#a098ff] text-white"
                                 : "text-zinc-500 hover:text-white"
                             }`}
                           >

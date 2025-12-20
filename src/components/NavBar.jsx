@@ -221,7 +221,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   const NavItem = ({ link, isActive }) => (
     <button
       onClick={() => (window.location.href = link.href)}
-      className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 text-[13px] font-medium whitespace-nowrap cursor-pointer ${isActive ? "bg-[#a098ff]/10 text-[#a098ff] border  border-white/10 shadow-sm" : "text-zinc-400 border-transparent hover:text-white hover:bg-white/5"}`}
+      className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 text-[13px] font-medium whitespace-nowrap cursor-pointer ${isActive ? "bg-[#a098ff]/10 text-[#a098ff] border  border-white/10" : "text-zinc-400 border-transparent hover:text-white hover:bg-white/5"}`}
     >
       <span className={isActive ? "text-inherit" : "text-current"}>
         {React.cloneElement(getIcon(link), { size: 16 })}
@@ -312,7 +312,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         setOpenDropdown(isOpen ? null : category);
                       }}
                       className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-white/5
-                        ${isActive ? "bg-[#a098ff]/10 text-[#a098ff] border  border-white/10 shadow-sm" : "!text-zinc-400 hover:!text-white"}
+                        ${isActive ? "bg-[#a098ff]/10 text-[#a098ff] border  border-white/10" : "!text-zinc-400 hover:!text-white"}
                       `}
                     >
                       {category}
@@ -334,7 +334,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                     {}
                     {isOpen && (
                       <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-[999] w-max animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="bg-black border border-white/10 rounded-2xl p-2 shadow-2xl min-w-[520px]">
+                        <div className="bg-black border border-white/10 rounded-2xl p-2  min-w-[520px]">
                           <div className="grid grid-cols-2 gap-2 max-h-[70vh] overflow-y-auto custom-scrollbar p-1">
                             {links.map((link, idx) => {
                               const isLinkActive =
@@ -400,7 +400,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           {}
           {openDropdown === "profile" && (
             <div className="absolute right-0 top-full mt-2 z-[999] w-56 animate-in fade-in slide-in-from-top-2 duration-200">
-              <div className="bg-black border border-white/10 rounded-2xl p-2 shadow-2xl">
+              <div className="bg-black border border-white/10 rounded-2xl p-2 ">
                 <button
                   onClick={() => {
                     setOpenDropdown(null);

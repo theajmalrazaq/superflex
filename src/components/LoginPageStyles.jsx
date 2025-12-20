@@ -79,16 +79,21 @@ function LoginPageStyles() {
 
     document.querySelectorAll(".form-control.m-input").forEach((element) => {
       element.classList.add(
-        "!rounded-lg",
-        "!bg-transparent",
+        "!rounded-2xl",
+        "!bg-white/5",
         "!border",
-        "!border-white/10",
+        "!border-white/5",
         "!text-white",
-        "!placeholder:text-white/50",
-        "!placeholder:opacity-100",
-        "!h-[40px]",
-        "!px-3",
+        "!placeholder:text-white/40",
+        "!placeholder:font-medium",
+        "!placeholder:text-xs",
+        "!h-[48px]",
+        "!px-5",
         "!w-full",
+        "focus:!border-[#a098ff]/30",
+        "focus:!bg-white/[0.08]",
+        "!transition-all",
+        "!duration-300"
       );
       element.style.fontFamily = "'Google Sans Flex', sans-serif";
     });
@@ -103,22 +108,26 @@ function LoginPageStyles() {
     document.querySelectorAll(".btn-primary").forEach((button) => {
       button.classList.add(
         "!bg-[#a098ff]",
-        "!text-white",
-        "!font-bold",
+        "!text-zinc-950",
+        "!font-black",
+        "!uppercase",
+        "!tracking-widest",
+        "!text-[10px]",
         "!border-none",
-        "!rounded-xl",
+        "!rounded-2xl",
         "!w-full",
-        "!mb-5",
-        "!h-[44px]",
-        "!px-3",
-        "!py-2",
+        "!mb-6",
+        "!h-[50px]",
+        "!px-6",
+        "!py-3",
         "!text-center",
         "!flex",
         "justify-center",
         "items-center",
         "hover:!bg-[#8f86ff]",
+        "hover:!scale-[1.02]",
         "!transition-all",
-        "!duration-200",
+        "!duration-300",
       );
       button.style.fontFamily = "'Google Sans Flex', sans-serif";
     });
@@ -134,17 +143,17 @@ function LoginPageStyles() {
     let bglogin = document.querySelector(".m-login__signin");
     if (bglogin) {
       bglogin.classList.add(
-        "!bg-black/10",
-        "backdrop-blur-xl",
+        "!bg-zinc-900/90",
+        "backdrop-blur-2xl",
         "!p-10",
-        "!rounded-[24px]",
+        "!rounded-[2.5rem]",
         "!border",
         "!border-white/10",
         "!flex",
         "!flex-col",
         "!items-center",
         "!justify-center",
-        "!w-[420px]",
+        "!w-[440px]",
         "!hidden",
         "!fixed",
         "!top-1/2",
@@ -153,10 +162,23 @@ function LoginPageStyles() {
         "!-translate-y-1/2",
         "!z-[999]",
         "!opacity-0",
+        "!scale-95",
         "!transition-all",
-        "!duration-300",
+        "!duration-500",
+        "!ease-out"
       );
       bglogin.setAttribute("id", "login-popup");
+      
+      // Add a header to the login popup if it doesn't exist
+      if (!bglogin.querySelector(".login-header")) {
+        const header = document.createElement("div");
+        header.className = "login-header w-full text-left mb-8 space-y-1";
+        header.innerHTML = `
+          <h2 class="text-2xl font-black text-white tracking-tight">Welcome Back</h2>
+          <p class="text-[#a098ff] text-[10px] font-black uppercase tracking-widest">Access your portal with style</p>
+        `;
+        bglogin.insertBefore(header, bglogin.firstChild);
+      }
     }
 
     const forgotPasswordSection = document.querySelector(
@@ -164,16 +186,16 @@ function LoginPageStyles() {
     );
     if (forgotPasswordSection) {
       forgotPasswordSection.classList.add(
-        "!bg-black/10",
-        "backdrop-blur-xl",
-        "!p-8",
-        "!rounded-[24px]",
+        "!bg-zinc-900/95",
+        "backdrop-blur-2xl",
+        "!p-10",
+        "!rounded-[2.5rem]",
         "!border",
         "!border-white/10",
         "!flex",
         "!flex-col",
-        "!gap-6",
-        "!w-[420px]",
+        "!gap-8",
+        "!w-[440px]",
         "!hidden",
         "!fixed",
         "!top-1/2",
@@ -182,8 +204,10 @@ function LoginPageStyles() {
         "!-translate-y-1/2",
         "!z-[999]",
         "!opacity-0",
+        "!scale-95",
         "!transition-all",
-        "!duration-300",
+        "!duration-500",
+        "!ease-out"
       );
       forgotPasswordSection.setAttribute("id", "forgot-password-popup");
 
@@ -337,8 +361,8 @@ function LoginPageStyles() {
     `;
     signInButton.style.fontFamily = "'Google Sans Flex', sans-serif";
     signInButton.innerHTML = `
-      <span class="font-light">Sign In</span>
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+      <span class="font-black uppercase tracking-widest text-[11px]">Initiate Access</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
         <polyline points="10 17 15 12 10 7"/>
         <line x1="15" y1="12" x2="3" y2="12"/>
@@ -423,15 +447,27 @@ function LoginPageStyles() {
     if (!rightImage) {
       rightImage = document.createElement("div");
       rightImage.id = "login-background-image";
-      rightImage.classList.add("fixed", "inset-0", "w-full", "h-full", "z-0");
+      rightImage.classList.add("fixed", "inset-0", "w-full", "h-full", "z-0", "overflow-hidden");
+
+      // Atmospheric Glows - Matching Internal Pages
+      const glow1 = document.createElement("div");
+      glow1.className = "fixed top-0 right-0 w-[800px] h-[800px] bg-[#a098ff]/10 blur-[150px] rounded-full -mr-96 -mt-96 pointer-events-none z-10 animate-pulse";
+      glow1.style.animationDuration = "10s";
+      
+      const glow2 = document.createElement("div");
+      glow2.className = "fixed bottom-0 left-0 w-[600px] h-[600px] bg-emerald-500/5 blur-[150px] rounded-full -ml-96 -mb-96 pointer-events-none z-10 animate-pulse";
+      glow2.style.animationDuration = "15s";
 
       const img = document.createElement("img");
       img.src = "https://theajmalrazaq.github.io/superflex/res/intro.svg";
-      img.classList.add("w-full", "h-full", "object-cover");
-      rightImage.appendChild(img);
-
+      img.classList.add("w-full", "h-full", "object-cover", "opacity-20", "mix-blend-luminosity");
+      
       const blackMask = document.createElement("div");
-      blackMask.className = "absolute inset-0 bg-black/60 z-10";
+      blackMask.className = "absolute inset-0 bg-gradient-to-b from-black/40 via-black/80 to-black z-10";
+      
+      rightImage.appendChild(glow1);
+      rightImage.appendChild(glow2);
+      rightImage.appendChild(img);
       rightImage.appendChild(blackMask);
       document.body.appendChild(rightImage);
     }
@@ -462,20 +498,28 @@ function LoginPageStyles() {
     </a>
 
     <!-- Logo & Text Section -->
-    <div class="flex flex-col gap-4 justify-center items-center text-center">
-        <div class="h-20 w-20 bg-black border-7 border-white/5 bg-cover rounded-[29px] flex items-center justify-center" style="background-image: url('${bgUrl}');">
-             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="84" height="84" fill="none">
-                <style>@keyframes splash{0%{transform:scale(.2);opacity:.8}80%{transform:scale(1.2);opacity:0}to{transform:scale(2.2);opacity:0}}</style>
-                <path fill="#a098ff" d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z" style="animation:splash 1.5s cubic-bezier(.165,.84,.44,1) infinite both;transform-origin:center center"/>
-             </svg>
+    <div class="flex flex-col gap-6 justify-center items-center text-center relative z-10">
+        <div class="group relative">
+          <div class="absolute -inset-4 bg-[#a098ff]/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition duration-700"></div>
+          <div class="h-24 w-24 bg-black border-8 border-white/5 bg-cover rounded-[32px] flex items-center justify-center relative z-10 " style="background-image: url('${bgUrl}');">
+               <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="96" height="96" fill="none">
+                  <style>@keyframes splash{0%{transform:scale(.2);opacity:.8}80%{transform:scale(1.2);opacity:0}to{transform:scale(2.2);opacity:0}}</style>
+                  <path fill="#a098ff" d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z" style="animation:splash 1.5s cubic-bezier(.165,.84,.44,1) infinite both;transform-origin:center center"/>
+               </svg>
+          </div>
         </div>
         
-        <img src="https://theajmalrazaq.github.io/superflex/res/logo.svg" alt="SuperFlex" class="w-80 hero-logo" />
+        <div class="space-y-2">
+          <img src="https://theajmalrazaq.github.io/superflex/res/logo.svg" alt="SuperFlex" class="w-96 hero-logo filter" />
+          <div class="flex items-center justify-center gap-3">
+            <span class="w-12 h-px bg-gradient-to-r from-transparent to-white/20"></span>
+            <span class="font-black text-[10px] uppercase tracking-[0.4em] text-[#a098ff]/80">Next Gen Academic Portal</span>
+            <span class="w-12 h-px bg-gradient-to-l from-transparent to-white/20"></span>
+          </div>
+        </div>
         
-        <span class="font-mono letter-spacing-[2px] text-white">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span>
-
-        <p class="text-white">
-          By <a href="https://github.com/theajmalrazaq" target="_blank" class="text-[#a098ff]">Ajmal Razaq Bhatti</a>
+        <p class="text-zinc-400 text-sm font-medium">
+          Crafted with obsession by <a href="https://github.com/theajmalrazaq" target="_blank" class="text-white hover:text-[#a098ff] transition-colors decoration-[#a098ff]/30 underline-offset-4 underline">Ajmal Razaq Bhatti</a>
         </p>
     </div>
 
@@ -484,11 +528,11 @@ function LoginPageStyles() {
     </div>
 
     <!-- Feature Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl w-full px-6 feature-grid mt-8">
-        <div class="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-md border border-white/20 rounded-3xl p-5 hover:shadow-lg hover:shadow-[#a098ff]/10 transition duration-300 group">
-          <div class="flex flex-col items-start gap-3">
-            <div class="bg-[#a098ff] p-2.5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition duration-300">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full px-6 feature-grid mt-12 mb-12 relative z-10">
+        <div class="bg-zinc-900/40 backdrop-blur-2xl border border-white/5 rounded-[2rem] p-8 hover:bg-zinc-900/60 hover:border-[#a098ff]/20 transition-all duration-500 group cursor-default">
+          <div className="flex flex-col items-start gap-4">
+            <div class="w-12 h-12 bg-[#a098ff]/10 rounded-2xl flex items-center justify-center text-[#a098ff] group-hover:scale-110 transition duration-500 border border-[#a098ff]/20">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/>
                 <line x1="8" x2="16" y1="6" y2="6"/>
                 <line x1="8" x2="16" y1="10" y2="10"/>
@@ -496,49 +540,55 @@ function LoginPageStyles() {
                 <line x1="8" x2="16" y1="18" y2="18"/>
               </svg>
             </div>
-            <h3 class="text-base font-semibold text-left">Advanced GPA Tools</h3>
-            <p class="text-white/80 text-sm leading-relaxed text-left">
-              Calculate semester GPA, plan target CGPA, and track your academic progress with ease.
-            </p>
+            <div class="space-y-2">
+              <h3 class="text-lg font-black text-white tracking-tight uppercase tracking-tighter">Advanced GPA Tools</h3>
+              <p class="text-zinc-500 text-sm leading-relaxed font-medium">
+                Calculate semester GPA, plan target CGPA, and track your academic progress with a precision-engineered calculator.
+              </p>
+            </div>
           </div>
         </div>
 
-        <div class="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-md border border-white/20 rounded-3xl p-5 hover:shadow-lg hover:shadow-[#a098ff]/10 transition duration-300 group">
-          <div class="flex flex-col items-start gap-3">
-            <div class="bg-[#a098ff] p-2.5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition duration-300">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+        <div class="bg-zinc-900/40 backdrop-blur-2xl border border-white/5 rounded-[2rem] p-8 hover:bg-zinc-900/60 hover:border-[#a098ff]/20 transition-all duration-500 group cursor-default">
+          <div className="flex flex-col items-start gap-4">
+            <div class="w-12 h-12 bg-[#a098ff]/10 rounded-2xl flex items-center justify-center text-[#a098ff] group-hover:scale-110 transition duration-500 border border-[#a098ff]/20">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 3v18h18"/>
                 <path d="m19 9-5 5-4-4-3 3"/>
               </svg>
             </div>
-            <h3 class="text-base font-semibold text-left">Statistical Insights</h3>
-            <p class="text-white/80 text-sm leading-relaxed text-left">
-              View grand total, sessional averages, min/max scores and complete performance analytics.
-            </p>
+            <div class="space-y-2">
+              <h3 class="text-lg font-black text-white tracking-tight uppercase tracking-tighter">Statistical Insights</h3>
+              <p class="text-zinc-500 text-sm leading-relaxed font-medium">
+                Deep dive into your performance with grand totals, sessional averages, and comparative analytics.
+              </p>
+            </div>
           </div>
         </div>
 
-        <div class="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-md border border-white/20 rounded-3xl p-5 hover:shadow-lg hover:shadow-[#a098ff]/10 transition duration-300 group">
-          <div class="flex flex-col items-start gap-3">
-            <div class="bg-[#a098ff] p-2.5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition duration-300">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
+        <div class="bg-zinc-900/40 backdrop-blur-2xl border border-white/5 rounded-[2rem] p-8 hover:bg-zinc-900/60 hover:border-[#a098ff]/20 transition-all duration-500 group cursor-default">
+          <div className="flex flex-col items-start gap-4">
+            <div class="w-12 h-12 bg-[#a098ff]/10 rounded-2xl flex items-center justify-center text-[#a098ff] group-hover:scale-110 transition duration-500 border border-[#a098ff]/20">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect width="7" height="9" x="3" y="3" rx="1"/>
                 <rect width="7" height="5" x="14" y="3" rx="1"/>
                 <rect width="7" height="9" x="14" y="12" rx="1"/>
                 <rect width="7" height="5" x="3" y="16" rx="1"/>
               </svg>
             </div>
-            <h3 class="text-base font-semibold text-left">Modern UI/UX</h3>
-            <p class="text-white/80 text-sm leading-relaxed text-left">
-              Sleek interface with dark mode, customizable themes and intuitive navigation controls.
-            </p>
+            <div class="space-y-2">
+              <h3 class="text-lg font-black text-white tracking-tight uppercase tracking-tighter">Modern Experience</h3>
+              <p class="text-zinc-500 text-sm leading-relaxed font-medium">
+                Experience the portal like never before with glassmorphism, fluid animations, and a dark aesthetic.
+              </p>
+            </div>
           </div>
         </div>
     </div>
 
     <!-- Update Notification Section -->
     <div id="update-notification-section" class="w-full max-w-4xl px-6 mt-5 hidden opacity-0 transition-opacity duration-300">
-      <div class="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-md border border-white/20 rounded-3xl p-5 hover:shadow-lg hover:shadow-[#a098ff]/10 transition duration-300 group">
+      <div class="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-md border border-white/20 rounded-3xl p-5  transition duration-300 group">
         <div class="flex items-center justify-between gap-6">
           <div class="flex flex items-center gap-3 flex-1">
             <div class="bg-[#a098ff] p-2.5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition duration-300">
@@ -578,7 +628,7 @@ function LoginPageStyles() {
       </div>
     </div>
     `;
-    const CURRENT_VERSION = "1.0.0";
+    const CURRENT_VERSION = "0.0.9";
     const checkForUpdates = async () => {
       try {
         const lastDismissed = localStorage.getItem(

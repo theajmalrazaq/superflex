@@ -16,7 +16,12 @@ import {
   Save,
   RefreshCw,
   Zap,
+  AlertTriangle,
 } from "lucide-react";
+import NotificationBanner from "../NotificationBanner";
+import PageHeader from "../PageHeader";
+import StatsCard from "../StatsCard";
+import SuperTabs from "../SuperTabs";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -56,25 +61,7 @@ const GRADE_POINTS = {
   "F": 0.0,
 };
 
-const StatCard = ({ icon: Icon, label, value, subValue, delay = "0" }) => (
-  <div 
-    className="flex-1 min-w-[200px] p-6 rounded-[2rem] border bg-zinc-900/50 backdrop-blur-xl hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group"
-    style={{ animationDelay: `${delay}ms` }}
-  >
-    <div className="flex justify-between items-start mb-6">
-      <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
-        <Icon size={24} />
-      </div>
-    </div>
-    <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">
-      {label}
-    </p>
-    <div className="flex items-baseline gap-2">
-      <h3 className="text-3xl font-bold font-sans text-white tracking-tighter">{value}</h3>
-      {subValue && <span className="text-xs font-medium text-zinc-500">{subValue}</span>}
-    </div>
-  </div>
-);
+
 
 
 const CGPAPlannerModal = ({ isOpen, onClose, currentCGPA, currentCreditHours }) => {
@@ -98,7 +85,7 @@ const CGPAPlannerModal = ({ isOpen, onClose, currentCGPA, currentCreditHours }) 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300" onClick={onClose}>
       <div 
-        className="bg-black/20 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 w-full max-w-[420px] animate-in zoom-in-95 fade-in duration-300 relative overflow-hidden shadow-2xl"
+        className="bg-black/20 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 w-full max-w-[420px] animate-in zoom-in-95 fade-in duration-300 relative overflow-hidden "
         onClick={e => e.stopPropagation()}
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#a098ff]/5 blur-[80px] rounded-full -mr-32 -mt-32 pointer-events-none"></div>
@@ -141,7 +128,7 @@ const CGPAPlannerModal = ({ isOpen, onClose, currentCGPA, currentCreditHours }) 
 
             <button 
               type="submit"
-              className="w-full h-[48px] bg-[#a098ff] hover:bg-[#8f86ff] text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-[#a098ff]/20 active:scale-[0.98]"
+              className="w-full h-[48px] bg-[#a098ff] hover:bg-[#8f86ff] text-white rounded-xl font-bold text-sm transition-all active:scale-[0.98]"
             >
               Generate Strategy
             </button>
@@ -188,6 +175,7 @@ function TranscriptPage() {
   const [semesters, setSemesters] = useState([]);
   const [activeSemIdx, setActiveSemIdx] = useState(0);
   const [isPlannerOpen, setIsPlannerOpen] = useState(false);
+  const [alerts, setAlerts] = useState([]);
   const [whatIfMode, setWhatIfMode] = useState(false);
   const [overriddenGrades, setOverriddenGrades] = useState({});
 
@@ -199,6 +187,30 @@ function TranscriptPage() {
           setTimeout(parse, 500);
           return;
         }
+
+        // 0. Parse Alerts
+        const alertList = [];
+        root.querySelectorAll(".m-alert, .alert").forEach(alert => {
+          if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
+
+          const textContainer = alert.querySelector(".m-alert__text") || alert;
+          const clone = textContainer.cloneNode(true);
+          // Remove standard UI elements that shouldn't be in the message
+          clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
+          
+          let message = clone.textContent
+            .replace(/Alert!/gi, "")
+            .replace(/Close/gi, "")
+            .replace(/&nbsp;/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+          if (message && message.length > 3) {
+              const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
+              alertList.push({ type, message });
+          }
+        });
+        setAlerts(alertList);
 
         const semesterData = [];
         const semesterCols = root.querySelectorAll(".m-section__content .row .col-md-6");
@@ -460,68 +472,62 @@ function TranscriptPage() {
 
       <div className="w-full p-6 md:p-10 space-y-10 relative z-10">
         {}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-              Transcript Report
-            </h1>
-            <p className="text-zinc-400 font-medium">
-              Academic performance and degree analytics
-            </p>
-          </div>
+        <PageHeader 
+          title="Transcript Report" 
+          subtitle="Academic performance and degree analytics"
+        >
+          <button 
+            onClick={() => setIsPlannerOpen(true)}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/5 bg-zinc-900/50 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-300 group"
+          >
+            <Target size={16} className="group-hover:scale-110 transition-transform" />
+            Strategic Planner
+          </button>
+          <button 
+            onClick={() => whatIfMode ? (setOverriddenGrades({}), setWhatIfMode(false)) : setWhatIfMode(true)}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-full border transition-all duration-300 text-xs font-bold ${
+              whatIfMode 
+              ? "bg-[#a098ff]/10 text-[#a098ff] border-[#a098ff]/20" 
+              : "bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
+            }`}
+          >
+            <Calculator size={16} />
+            {whatIfMode ? "Abort Simulation" : "Simulation Lab"}
+          </button>
+        </PageHeader>
 
-          <div className="flex flex-wrap items-center gap-4 w-full md:w-auto justify-end">
-            <button 
-              onClick={() => setIsPlannerOpen(true)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/5 bg-zinc-900/50 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-300 group"
-            >
-              <Target size={16} className="group-hover:scale-110 transition-transform" />
-              Strategic Planner
-            </button>
-            <button 
-              onClick={() => whatIfMode ? (setOverriddenGrades({}), setWhatIfMode(false)) : setWhatIfMode(true)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-full border transition-all duration-300 text-xs font-bold ${
-                whatIfMode 
-                ? "bg-[#a098ff]/10 text-[#a098ff] border-[#a098ff]/20" 
-                : "bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
-              }`}
-            >
-              <Calculator size={16} />
-              {whatIfMode ? "Abort Simulation" : "Simulation Lab"}
-            </button>
-          </div>
-        </div>
+        <NotificationBanner alerts={alerts} />
 
 
         {}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          <StatCard 
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatsCard 
             icon={TrendingUp} 
             label="Cumulative GPA" 
             value={calculatedStats?.currentCGPA.toFixed(2) || "0.00"} 
             subValue={whatIfMode ? `(Was ${originalCGPA.toFixed(2)})` : "Current"}
-            delay="0"
+            delay={0}
           />
-          <StatCard 
+          <StatsCard 
             icon={Award} 
             label="Credits Cleared" 
             value={calculatedStats?.totalCreditsEarned || "0"} 
             subValue={`of ${calculatedStats?.totalCreditsAttempted || 0} attempted`}
-            delay="100"
+            delay={100}
           />
-          <StatCard 
+          <StatsCard 
             icon={Calendar} 
             label="Semesters" 
             value={calculatedStats?.actualSemestersCount || 0} 
             subValue="Completed"
-            delay="200"
+            delay={200}
           />
-          <StatCard 
+          <StatsCard 
             icon={BookOpen} 
             label="Degree Progress" 
             value={calculatedStats?.actualCoursesCount || 0} 
             subValue="Graded Courses"
-            delay="300"
+            delay={300}
           />
         </div>
 
@@ -534,21 +540,11 @@ function TranscriptPage() {
               <div className="absolute top-0 right-0 w-96 h-96 bg-[#a098ff]/5 blur-[100px] rounded-full -mr-48 -mt-48 pointer-events-none"></div>
 
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-                <div className="flex gap-2 bg-black/40 p-1.5 rounded-full border border-white/5 backdrop-blur-sm overflow-x-auto custom-scrollbar no-scrollbar">
-                  {semesters.map((sem, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveSemIdx(idx)}
-                      className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 min-w-fit ${
-                        activeSemIdx === idx
-                          ? "bg-[#a098ff] text-white shadow-lg shadow-[#a098ff]/20"
-                          : "text-zinc-500 hover:text-white"
-                      }`}
-                    >
-                      {sem.title}
-                    </button>
-                  ))}
-                </div>
+                <SuperTabs
+                  tabs={semesters.map((s, idx) => ({ value: idx, label: s.title }))}
+                  activeTab={activeSemIdx}
+                  onTabChange={setActiveSemIdx}
+                />
               </div>
 
 

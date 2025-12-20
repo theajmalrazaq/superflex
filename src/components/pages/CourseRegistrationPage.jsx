@@ -8,7 +8,11 @@ import {
   CheckCircle2,
   Info,
   Layers,
+  AlertTriangle,
 } from "lucide-react";
+import NotificationBanner from "../NotificationBanner";
+import PageHeader from "../PageHeader";
+import StatsCard from "../StatsCard";
 
 function CourseRegistrationPage() {
   const [loading, setLoading] = useState(true);
@@ -35,24 +39,28 @@ function CourseRegistrationPage() {
         }
 
         // Parse Alerts
-        const parsedAlerts = [];
-        const alertElements = root.querySelectorAll(".m-alert");
-        alertElements.forEach((alertEl) => {
-          const textEl = alertEl.querySelector(".m-alert__text");
-          let message = textEl
-            ? textEl.textContent.trim()
-            : alertEl.textContent.replace(/Close/g, "").trim();
-          message = message.replace(/\s+/g, " ");
+        const alertList = [];
+        root.querySelectorAll(".m-alert, .alert").forEach(alert => {
+          if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
 
-          const type = alertEl.classList.contains("alert-danger")
-            ? "error"
-            : "info";
+          const textContainer = alert.querySelector(".m-alert__text") || alert;
+          const clone = textContainer.cloneNode(true);
+          // Remove standard UI elements that shouldn't be in the message
+          clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
           
-          if (message) {
-            parsedAlerts.push({ type, message });
+          let message = clone.textContent
+            .replace(/Alert!/gi, "")
+            .replace(/Close/gi, "")
+            .replace(/&nbsp;/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+          if (message && message.length > 3) {
+              const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
+              alertList.push({ type, message });
           }
         });
-        setAlerts(parsedAlerts);
+        setAlerts(alertList);
         const parsedTables = [];
         const rawTables = root.querySelectorAll("table");
         
@@ -102,17 +110,10 @@ function CourseRegistrationPage() {
   return (
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-6 md:p-8 space-y-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-              Course Registration
-            </h1>
-            <p className="text-zinc-400 font-medium">
-              Manage your semester course enrollments
-            </p>
-          </div>
-        </div>
+        <PageHeader
+          title="Course Registration"
+          subtitle="Manage your semester course enrollments"
+        />
 
         {loading ? (
           <div className="flex justify-center py-20">
@@ -120,28 +121,8 @@ function CourseRegistrationPage() {
           </div>
         ) : (
           <div className="space-y-8">
-            {/* Alerts Section */}
-            {alerts.length > 0 && (
-              <div className="space-y-4">
-                {alerts.map((alert, idx) => (
-                  <div
-                    key={idx}
-                    className={`p-5 rounded-2xl border  backdrop-blur-xl flex items-center gap-4 shadow-lg ${
-                      alert.type === "error"
-                        ? "bg-rose-500/10 border-rose-500/20 text-rose-200"
-                        : "bg-blue-500/10 border-blue-500/20 text-blue-200"
-                    }`}
-                  >
-                    <div className={`p-2 rounded-full ${
-                        alert.type === "error" ? "bg-rose-500/20" : "bg-blue-500/20"
-                    }`}>
-                        {alert.type === "error" ? <AlertCircle size={20} /> : <Info size={20} />}
-                    </div>
-                    <span className="font-medium text-sm leading-relaxed mt-1">{alert.message}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* Notifications */}
+            <NotificationBanner alerts={alerts} />
 
             {/* Tables Section */}
             {tables.length > 0 ? (

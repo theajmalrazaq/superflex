@@ -1,553 +1,440 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import PageLayout from "../layouts/PageLayout";
+import NotificationBanner from "../NotificationBanner";
+import PageHeader from "../PageHeader";
+import StatsCard from "../StatsCard";
+import { LoadingSpinner } from "../LoadingOverlay";
+import SuperTabs from "../SuperTabs";
+import { 
+  ClipboardEdit, 
+  History, 
+  CheckCircle2, 
+  Clock, 
+  AlertTriangle,
+  Search,
+  BookOpen,
+  Calendar,
+  Layout
+} from "lucide-react";
 
 function GradeChangePage() {
-  const [elemContent, setElemContent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [alerts, setAlerts] = useState([]);
+  const [semesters, setSemesters] = useState([]);
+  const [requests, setRequests] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [stats, setStats] = useState({ total: 0, pending: 0, processed: 0 });
+  
+  const hiddenContentRef = useRef(null);
 
   useEffect(() => {
-    const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
+    // Aggressively hide any legacy containers that might interfere
+    const hiderStyle = document.createElement("style");
+    hiderStyle.id = "superflex-grade-change-hide";
+    hiderStyle.innerHTML = `
+      .m-grid.m-grid--hor.m-grid--root.m-page:not(#legacy-root-hidden),
+      .m-content:not(#legacy-root-hidden .m-content),
+      #FormGradeChange:not(#legacy-root-hidden #FormGradeChange) {
+        display: none !important;
+      }
+      #legacy-root-hidden {
+        position: absolute !important;
+        top: -9999px !important;
+        left: -9999px !important;
+        width: 1px !important;
+        height: 1px !important;
+        overflow: hidden !important;
+        visibility: hidden !important;
+      }
+      /* Ensure modals and their backdrops stay functional */
+      .modal, .modal-backdrop {
+        visibility: visible !important;
+      }
+      #RemarksDetail .modal-content {
+        background: #09090b !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        border-radius: 2rem !important;
+        color: white !important;
+       ;
+      }
+      #RemarksDetail .modal-header { border-bottom: 1px solid rgba(255,255,255,0.1) !important; padding: 1.5rem !important; }
+      #RemarksDetail .modal-footer { border-top: 1px solid rgba(255,255,255,0.1) !important; padding: 1.5rem !important; }
+      #RemarksDetail .modal-title { font-weight: 900 !important; color: white !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; font-size: 1.125rem !important; }
+      #RemarksDetail label { color: #71717a !important; font-size: 10px !important; font-weight: 900 !important; text-transform: uppercase !important; letter-spacing: 0.1em !important; margin-bottom: 0.5rem !important; }
+      #RemarksDetail input, #RemarksDetail select, #RemarksDetail textarea {
+        background: rgba(255,255,255,0.03) !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        color: white !important;
+        border-radius: 1rem !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 13px !important;
+        transition: all 0.2s !important;
+      }
+      #RemarksDetail input:focus, #RemarksDetail select:focus, #RemarksDetail textarea:focus {
+        border-color: rgba(160, 152, 255, 0.5) !important;
+        background: rgba(255,255,255,0.05) !important;
+        outline: none !important;
+      }
+    `;
+    document.head.appendChild(hiderStyle);
+
+    window.dispatchEvent(
+      new CustomEvent("superflex-update-loading", { detail: true }),
     );
 
-    if (targetElement) {
-      applyCustomStyling(targetElement);
+    const parseData = () => {
+      try {
+        const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page:not(#legacy-root-hidden)");
+        if (!root) {
+          if (document.getElementById("legacy-root-hidden")) {
+              // already parsed
+          } else {
+             setTimeout(parseData, 500);
+          }
+          return;
+        }
 
-      setElemContent(targetElement.innerHTML);
-      targetElement.remove();
-    }
+        // 1. Parse Alerts
+        const alertList = [];
+        root.querySelectorAll(".m-alert, .alert").forEach(alert => {
+          if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
+
+          const textContainer = alert.querySelector(".m-alert__text") || alert;
+          const clone = textContainer.cloneNode(true);
+          clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
+          
+          let message = clone.textContent
+            .replace(/Alert!/gi, "")
+            .replace(/Note!/gi, "")
+            .replace(/Close/gi, "")
+            .replace(/&nbsp;/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+          if (message && message.length > 3) {
+              const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
+              alertList.push({ type, message });
+          }
+        });
+        setAlerts(alertList);
+
+        // 2. Parse Semesters
+        const semesterSelect = root.querySelector("select#SemId");
+        if (semesterSelect) {
+            const opts = Array.from(semesterSelect.options).map(o => ({
+                label: o.text.trim(),
+                value: o.value,
+                selected: o.selected
+            }));
+            setSemesters(opts);
+        }
+
+        // 3. Parse Requests Table
+        const requestList = [];
+        const table = root.querySelector("table.table");
+        if (table) {
+            const rows = table.querySelectorAll("tbody tr");
+            rows.forEach((row, idx) => {
+                const cells = row.querySelectorAll("td");
+                // Legacy Structure: S.No, Code, Name, Section, Credits, Grade, Checkbox, Status
+                if (cells.length >= 7) {
+                    requestList.push({
+                        id: idx,
+                        code: cells[1]?.textContent.trim(),
+                        course: cells[2]?.textContent.trim(),
+                        section: cells[3]?.textContent.trim(),
+                        credits: cells[4]?.textContent.trim(),
+                        grade: cells[5]?.textContent.trim(),
+                        status: cells[7]?.textContent.trim() || cells[6]?.textContent.trim() || "N/A",
+                        checkboxId: cells[6]?.querySelector('input[type="checkbox"]')?.id,
+                        fullRowHtml: row.innerHTML
+                    });
+                }
+            });
+        }
+        setRequests(requestList);
+
+        // 4. Calculate Stats
+        const pendingValue = requestList.filter(r => r.status.toLowerCase().includes('pending')).length;
+        const processedValue = requestList.filter(r => 
+            r.status.toLowerCase().includes('approved') || 
+            r.status.toLowerCase().includes('rejected') || 
+            r.status.toLowerCase().includes('processed')
+        ).length;
+        
+        setStats({
+            total: requestList.length,
+            pending: pendingValue,
+            processed: processedValue
+        });
+
+        // 5. MOVE original DOM instead of cloning to preserve event listeners
+        if (hiddenContentRef.current) {
+            hiddenContentRef.current.innerHTML = "";
+            root.id = "legacy-root-hidden";
+            hiddenContentRef.current.appendChild(root);
+        }
+
+        setLoading(false);
+        window.dispatchEvent(
+          new CustomEvent("superflex-update-loading", { detail: false }),
+        );
+      } catch (err) {
+        console.error("Grade Change Parser Error:", err);
+        setLoading(false);
+        window.dispatchEvent(
+          new CustomEvent("superflex-update-loading", { detail: false }),
+        );
+      }
+    };
+
+    parseData();
+
+    return () => {
+        const hider = document.getElementById("superflex-grade-change-hide");
+        if (hider) hider.remove();
+    };
   }, []);
 
-  const applyCustomStyling = (element) => {
-    const addedStyles = [];
-
-    const errorDivs = element.querySelectorAll(
-      "#DataErrorId, #CheckBoxErrorId, #GradeChangeReasonErrorId",
-    );
-    errorDivs.forEach((div) => {
-      div.style.display = "none";
-    });
-
-    const alertElements = element.querySelectorAll(".m-alert");
-    alertElements.forEach((alertElement) => {
-      alertElement.classList.add(
-        "!bg-black",
-        "!text-white",
-        "!border-white/10",
-        "!font-bold",
-        "!p-4",
-        "!rounded-3xl",
-        "!mb-6",
-      );
-
-      if (alertElement.style.display !== "none") {
-        alertElement.classList.add(
-          "!flex",
-          "!justify-between",
-          "!items-center",
-        );
+  const handleSemesterChange = (val) => {
+      const legacySelect = document.querySelector("#legacy-root-hidden select#SemId");
+      if (legacySelect) {
+          legacySelect.value = val;
+          legacySelect.dispatchEvent(new Event('change', { bubbles: true }));
+          const form = legacySelect.closest("form");
+          if (form) form.submit();
       }
-
-      const iconElement = alertElement.querySelector(".m-alert__icon");
-      if (iconElement) {
-        iconElement.classList.add(
-          "!text-white",
-          "!text-2xl",
-          "!bg-x",
-          "!rounded-full",
-          "!p-2",
-          "!w-12",
-          "!h-12",
-          "!flex",
-          "!items-center",
-          "!justify-center",
-        );
-
-        const createSvgIcon = (path) => {
-          const svg = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "svg",
-          );
-          svg.setAttribute("width", "24");
-          svg.setAttribute("height", "24");
-          svg.setAttribute("viewBox", "0 0 24 24");
-          svg.setAttribute("fill", "none");
-          svg.setAttribute("stroke", "currentColor");
-          svg.setAttribute("stroke-width", "2");
-          svg.setAttribute("stroke-linecap", "round");
-          svg.setAttribute("stroke-linejoin", "round");
-          svg.classList.add("w-6", "h-6", "text-white");
-
-          const pathElement = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "path",
-          );
-          pathElement.setAttribute("d", path);
-          svg.appendChild(pathElement);
-
-          return svg;
-        };
-
-        let iconPath = "";
-        if (alertElement.classList.contains("alert-danger")) {
-          iconPath =
-            "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z";
-        } else if (alertElement.classList.contains("alert-info")) {
-          iconPath = "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z";
-        } else {
-          iconPath = "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z";
-        }
-
-        iconElement.innerHTML = "";
-        iconElement.appendChild(createSvgIcon(iconPath));
-      }
-
-      const closeButton = alertElement.querySelector("button.close");
-      if (closeButton) {
-        closeButton.style.cssText = "content: none !important;";
-
-        const style = document.createElement("style");
-        style.textContent =
-          'button.close[data-dismiss="alert"]::before, button.close[data-dismiss="modal"]::before { display: none !important; content: none !important; }';
-        style.setAttribute("data-custom-style", "true");
-        document.head.appendChild(style);
-        addedStyles.push(style);
-
-        closeButton.innerHTML = `
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/70">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                `;
-        closeButton.classList.add("!focus:outline-none");
-      }
-
-      if (alertElement.classList.contains("alert-info")) {
-        const alertText = alertElement.querySelector(".m-alert__text");
-        if (alertText) {
-          alertText.classList.add("!font-medium", "!text-white/90");
-          alertText.style.fontWeight = "normal";
-        }
-      }
-    });
-
-    const semesterForm = element.querySelector("#FormGradeChange");
-    if (semesterForm) {
-      semesterForm.classList.add("!ml-4");
-
-      const semesterSelect = semesterForm.querySelector("#SemId");
-      if (semesterSelect) {
-        semesterSelect.classList.add(
-          "!bg-black",
-          "!text-white",
-          "!border",
-          "!border-white/10",
-          "!rounded-xl",
-          "!px-4",
-          "!py-2",
-          "!cursor-pointer",
-          "!focus:ring-2",
-          "!focus:ring-x",
-          "!focus:outline-none",
-          "!w-64",
-        );
-
-        semesterSelect.classList.remove(
-          "m-dropdown__toggle",
-          "btn",
-          "btn-brand",
-          "dropdown-toggle",
-        );
-      }
-
-      const brTag = semesterForm.querySelector("br");
-      if (brTag) {
-        brTag.remove();
-      }
-    }
-
-    const portlet = element.querySelector(".m-portlet");
-    if (portlet) {
-      portlet.classList.add(
-        "!bg-black",
-        "!border-none",
-        "!rounded-3xl",
-        "!p-4",
-        "!shadow-lg",
-      );
-
-      portlet.classList.remove(
-        "m-portlet--primary",
-        "m-portlet--head-solid-bg",
-        "m-portlet--border-bottom-info",
-        "m-portlet--head-sm",
-      );
-    }
-
-    const portletHead = element.querySelector(".m-portlet__head");
-    if (portletHead) {
-      portletHead.classList.add(
-        "!bg-black",
-        "!border",
-        "!border-white/10",
-        "!rounded-t-3xl",
-        "!h-fit",
-        "!p-4",
-        "!flex",
-        "!items-center",
-        "!justify-between",
-        "!mb-4",
-      );
-
-      const headingText = portletHead.querySelector(".m-portlet__head-text");
-      if (headingText) {
-        headingText.classList.add("!text-white", "!text-xl", "!font-bold");
-      }
-
-      const portletHeadCaption = portletHead.querySelector(
-        ".m-portlet__head-caption",
-      );
-      if (portletHeadCaption) {
-        portletHeadCaption.classList.add("!flex", "!gap-4", "!items-center");
-      }
-
-      const buttonContainer = document.createElement("div");
-      buttonContainer.className = "portlet-head-buttons flex gap-2";
-
-      const requestButton = document.createElement("button");
-      requestButton.id = "btnModalGradeChange";
-      requestButton.type = "button";
-      requestButton.className =
-        "!bg-x hover:!bg-x/80 !text-white !font-medium !py-2 !px-4 !h-10 !rounded-xl !transition-colors !flex !items-center !inline-flex !gap-2 !border-0 !mt-0";
-      requestButton.setAttribute("data-toggle", "modal");
-      requestButton.setAttribute("data-target", "#RemarksDetail");
-      requestButton.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                    <polyline points="10 9 9 9 8 9"></polyline>
-                </svg>
-                Request Grade Change
-            `;
-      requestButton.style.display = "none";
-      buttonContainer.appendChild(requestButton);
-
-      portletHead.appendChild(buttonContainer);
-
-      if (semesterForm) {
-        const formContainer = document.createElement("div");
-        formContainer.appendChild(semesterForm);
-
-        if (headingText && headingText.parentElement) {
-          headingText.parentElement.after(formContainer);
-        } else {
-          portletHead.appendChild(formContainer);
-        }
-      }
-    }
-
-    const portletBody = element.querySelector(".m-portlet__body");
-    if (portletBody) {
-      portletBody.classList.add(
-        "!bg-black",
-        "!rounded-b-3xl",
-        "!border",
-        "!p-0",
-        "!border-white/10",
-        "!shadow-lg",
-        "!text-white",
-        "!h-[400px]",
-        "!overflow-y-auto",
-        "custom-scrollbar",
-      );
-
-      const sectionContent = portletBody.querySelector(".m-section__content");
-      if (sectionContent) {
-        sectionContent.style.marginBottom = "0";
-      }
-    }
-
-    const table = element.querySelector(".table");
-    if (table) {
-      const tableContainer = document.createElement("div");
-      tableContainer.className = "overflow-hidden mb-6";
-      table.parentNode.insertBefore(tableContainer, table);
-      tableContainer.appendChild(table);
-
-      table.querySelectorAll(".table td, .table th").forEach((el) => {
-        el.classList.add("!border-none");
-      });
-
-      table.classList.add("!w-full", "!border-collapse", "!border-0");
-      table.classList.remove(
-        "m-table",
-        "m-table--head-bg-metal",
-        "table-responsive",
-      );
-
-      const thead = table.querySelector("thead");
-      if (thead) {
-        thead.classList.add("!bg-zinc-900", "!sticky", "!top-0", "!z-10");
-
-        const checkboxHeader = thead.querySelector("#Checkallhide_Show");
-        if (checkboxHeader) {
-          checkboxHeader.innerHTML = "Select";
-        }
-
-        const headers = thead.querySelectorAll("th");
-        headers.forEach((header) => {
-          header.classList.add(
-            "!bg-transparent",
-            "!text-gray-400",
-            "!font-medium",
-            "!p-3",
-            "!text-left",
-            "!border-b",
-            "!border-white/10",
-          );
-        });
-      }
-
-      const tbody = table.querySelector("tbody");
-      if (tbody) {
-        tbody.classList.add("!divide-y", "!divide-white/10");
-
-        const rows = tbody.querySelectorAll("tr");
-        rows.forEach((row) => {
-          row.classList.add(
-            "!bg-black",
-            "!hover:bg-white/5",
-            "!transition-colors",
-          );
-
-          const cells = row.querySelectorAll("td");
-          cells.forEach((cell) => {
-            cell.classList.add(
-              "!p-3",
-              "!text-white/80",
-              "!border-y",
-              "!border-white/10",
-            );
-
-            const checkbox = cell.querySelector('input[type="checkbox"]');
-            if (checkbox) {
-              checkbox.classList.add(
-                "cursor-pointer",
-                "w-4",
-                "h-4",
-                "accent-x",
-              );
-            }
-          });
-        });
-      }
-    }
-
-    const modals = element.querySelectorAll(".modal-content");
-    modals.forEach((modal) => {
-      modal.classList.add(
-        "!bg-black",
-        "!rounded-2xl",
-        "!border-2",
-        "!border-white/10",
-        "!p-5",
-        "!shadow-none",
-      );
-
-      const modalHeader = modal.querySelector(".modal-header");
-      if (modalHeader) {
-        modalHeader.classList.add(
-          "!bg-black",
-          "!border-b",
-          "!border-white/10",
-          "!p-4",
-          "!flex",
-          "!items-center",
-          "!justify-between",
-        );
-
-        if (modalHeader.hasAttribute("style")) {
-          modalHeader.removeAttribute("style");
-        }
-
-        const modalTitle = modalHeader.querySelector(".modal-title");
-        if (modalTitle) {
-          modalTitle.classList.add("!text-white", "!font-bold", "!text-xl");
-          modalTitle.textContent = "Grade Change Request";
-        }
-
-        const closeBtn = modalHeader.querySelector(".close");
-        if (closeBtn) {
-          closeBtn.innerHTML = `
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white/70">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    `;
-
-          if (closeBtn.hasAttribute("style")) {
-            closeBtn.removeAttribute("style");
-          }
-
-          closeBtn.classList.add("!focus:outline-none");
-        }
-      }
-
-      const modalBody = modal.querySelector(".modal-body");
-      if (modalBody) {
-        modalBody.classList.add(
-          "!bg-black",
-          "!text-white",
-          "!p-6",
-          "!max-h-[500px]",
-          "!overflow-y-auto",
-          "custom-scrollbar",
-        );
-
-        const reasonSelect = modalBody.querySelector("#GradeChangeReason");
-        if (reasonSelect) {
-          reasonSelect.classList.add(
-            "!bg-black",
-            "!text-white",
-            "!border",
-            "!border-white/10",
-            "!rounded-xl",
-            "!px-4",
-            "!py-2",
-            "!cursor-pointer",
-            "!focus:ring-2",
-            "!focus:ring-x",
-            "!focus:outline-none",
-            "!w-full",
-            "!max-w-full",
-          );
-
-          reasonSelect.classList.remove(
-            "m-dropdown__toggle",
-            "btn",
-            "btn-brand",
-            "dropdown-toggle",
-          );
-
-          if (reasonSelect.hasAttribute("style")) {
-            reasonSelect.removeAttribute("style");
-          }
-        }
-
-        const reasonLabel = modalBody.querySelector(".row:first-child label");
-        if (reasonLabel) {
-          reasonLabel.classList.add(
-            "!text-white",
-            "!font-medium",
-            "!mb-2",
-            "!block",
-          );
-        }
-
-        const textareaGroup = modalBody.querySelector("#remrksdiv");
-        if (textareaGroup) {
-          const textarea = textareaGroup.querySelector("textarea");
-          if (textarea) {
-            textarea.classList.add(
-              "!w-full",
-              "!bg-black",
-              "!border",
-              "!border-white/20",
-              "!rounded-lg",
-              "!p-3",
-              "!text-white",
-              "!mt-2",
-              "!transition-colors",
-              "!focus:border-x",
-              "!focus:outline-none",
-              "!resize-none",
-              "!h-24",
-            );
-          }
-
-          const label = textareaGroup.querySelector("label");
-          if (label) {
-            label.classList.add(
-              "!text-white",
-              "!font-medium",
-              "!mb-2",
-              "!block",
-            );
-          }
-        }
-
-        const brTags = modalBody.querySelectorAll("br");
-        brTags.forEach((br) => br.remove());
-      }
-
-      const modalFooter = modal.querySelector(".modal-footer");
-      if (modalFooter) {
-        modalFooter.classList.add(
-          "!bg-black",
-          "!border-t",
-          "!border-white/10",
-          "!p-4",
-          "!flex",
-          "!justify-end",
-          "!gap-3",
-        );
-
-        const submitBtn = modalFooter.querySelector(
-          'input[type="button"][value="Submit Request"]',
-        );
-        if (submitBtn) {
-          submitBtn.classList.add(
-            "!bg-x",
-            "hover:!bg-x/80",
-            "!text-white",
-            "!font-medium",
-            "!h-10",
-            "!py-2",
-            "!px-6",
-            "!rounded-xl",
-            "!transition-colors",
-            "!border-0",
-            "!cursor-pointer",
-          );
-
-          if (submitBtn.hasAttribute("style")) {
-            submitBtn.removeAttribute("style");
-          }
-        }
-
-        const closeBtn = modalFooter.querySelector(".btn-default");
-        if (closeBtn) {
-          closeBtn.classList.add(
-            "!bg-white/10",
-            "hover:!bg-white/20",
-            "!text-white",
-            "!font-medium",
-            "!py-2",
-            "!px-6",
-            "!h-10",
-            "!rounded-xl",
-            "!transition-colors",
-            "!border-0",
-          );
-
-          if (closeBtn.hasAttribute("style")) {
-            closeBtn.removeAttribute("style");
-          }
-        }
-      }
-    });
   };
+
+  const handleCheckboxToggle = (checkboxId) => {
+      const legacyCb = document.querySelector(`#legacy-root-hidden #${checkboxId}`);
+      if (legacyCb && !legacyCb.disabled) {
+          legacyCb.checked = !legacyCb.checked;
+          legacyCb.dispatchEvent(new Event('change', { bubbles: true }));
+          
+          if (legacyCb.checked) {
+              setSelectedIds(prev => [...prev, checkboxId]);
+          } else {
+              setSelectedIds(prev => prev.filter(id => id !== checkboxId));
+          }
+      }
+  };
+
+  const handleSelectAll = (checked) => {
+      const legacyCheckboxes = document.querySelectorAll('#legacy-root-hidden input[name="OfferIdCheckBox"]:not(:disabled)');
+      const ids = [];
+      legacyCheckboxes.forEach(cb => {
+          cb.checked = checked;
+          cb.dispatchEvent(new Event('change', { bubbles: true }));
+          if (checked) ids.push(cb.id);
+      });
+      setSelectedIds(checked ? ids : []);
+      
+      const legacySelectAll = document.querySelector('#legacy-root-hidden #checkall');
+      if (legacySelectAll) {
+          legacySelectAll.checked = checked;
+          legacySelectAll.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+  };
+
+  const handleOpenRequestModal = () => {
+      const legacyBtn = document.querySelector("#legacy-root-hidden #btnModalGradeChange") || 
+                        document.querySelector("#legacy-root-hidden [data-target='#RemarksDetail']");
+      
+      if (selectedIds.length === 0) {
+          alert("Kindly select at least one course to proceed.");
+          return;
+      }
+
+      if (legacyBtn) {
+          legacyBtn.click();
+      } else if (window.$) {
+          // If the button is injected later or hidden, try direct modal show
+          window.$("#RemarksDetail").modal('show');
+      }
+  };
+
+  const hasAvailableRequests = requests.some(r => r.checkboxId);
+
+  if (loading) return (
+    <PageLayout currentPage={window.location.pathname}>
+      <div className="w-full min-h-screen p-6 md:p-8 space-y-8">
+        <div className="flex justify-center py-20">
+          <LoadingSpinner />
+        </div>
+      </div>
+    </PageLayout>
+  );
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      {elemContent && (
-        <div
-          className="m-grid m-grid--hor m-grid--root m-page"
-          dangerouslySetInnerHTML={{ __html: elemContent }}
-        />
-      )}
+      <div className="w-full min-h-screen p-6 md:p-8 space-y-8 relative z-10">
+        
+        {/* Glow Effects */}
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+        <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
+
+        <PageHeader 
+          title="Grade Change"
+          subtitle="Apply for rectification of marks or missing assessment data"
+        >
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            {semesters.length > 0 && (
+                <SuperTabs
+                    tabs={semesters}
+                    activeTab={semesters.find((s) => s.selected)?.value}
+                    onTabChange={handleSemesterChange}
+                />
+            )}
+            
+            {hasAvailableRequests && (
+                <button 
+                    onClick={handleOpenRequestModal}
+                    className={`flex items-center gap-2 px-6 py-3 rounded-full font-black uppercase text-[10px] tracking-widest transition-all  ${
+                        selectedIds.length > 0 
+                        ? "bg-[#a098ff] hover:bg-[#a098ff]/90 text-zinc-950 animate-pulse" 
+                        : "bg-zinc-800 text-zinc-500 border border-white/5 opacity-50 cursor-not-allowed"
+                    }`}
+                >
+                    <ClipboardEdit size={14} />
+                    {selectedIds.length > 0 ? `Submit ${selectedIds.length} Request${selectedIds.length > 1 ? 's' : ''}` : 'New Application'}
+                </button>
+            )}
+          </div>
+        </PageHeader>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard 
+            icon={History}
+            label="Applications" 
+            value={stats.total} 
+            delay={100}
+          />
+          <StatsCard 
+            icon={Clock}
+            label="In Review" 
+            value={stats.pending} 
+            delay={200}
+            className={stats.pending > 0 ? "!bg-amber-500/10 !border-amber-500/20" : ""}
+          />
+          <StatsCard 
+            icon={CheckCircle2}
+            label="Processed" 
+            value={stats.processed} 
+            delay={300}
+            className={stats.processed > 0 ? "!bg-emerald-500/10 !border-emerald-500/20" : ""}
+          />
+          <StatsCard 
+            icon={AlertTriangle}
+            label="Status" 
+            value="ACTIVE" 
+            delay={400}
+          />
+        </div>
+
+        <NotificationBanner alerts={alerts} />
+
+        <div className="grid grid-cols-1 gap-8">
+            <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden">
+                <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/5">
+                    <div className="flex items-center gap-3">
+                        <div className="p-3 bg-[#a098ff]/10 rounded-xl text-[#a098ff]">
+                            <Layout size={20} />
+                        </div>
+                        <h3 className="text-xl font-bold text-white tracking-tight">Application Log</h3>
+                    </div>
+                </div>
+
+                <div className="overflow-x-auto custom-scrollbar">
+                    <table className="w-full min-w-[800px]">
+                        <thead>
+                            <tr className="border-b border-white/5">
+                                <th className="py-4 px-4 text-center">
+                                    {hasAvailableRequests && (
+                                        <input 
+                                            type="checkbox" 
+                                            onChange={(e) => handleSelectAll(e.target.checked)}
+                                            className="w-4 h-4 rounded border-white/10 bg-white/5 checked:bg-[#a098ff] transition-all cursor-pointer"
+                                        />
+                                    )}
+                                </th>
+                                <th className="text-left py-4 px-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Index</th>
+                                <th className="text-left py-4 px-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Course Detail</th>
+                                <th className="text-center py-4 px-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Code</th>
+                                <th className="text-center py-4 px-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Grade</th>
+                                <th className="text-center py-4 px-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Section</th>
+                                <th className="text-right py-4 px-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Process Status</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/[0.03]">
+                            {requests.map((req, idx) => (
+                                <tr key={idx} className={`group hover:bg-white/[0.02] transition-colors ${selectedIds.includes(req.checkboxId) ? 'bg-[#a098ff]/5' : ''}`}>
+                                    <td className="py-4 px-4 text-center">
+                                        {req.checkboxId && (
+                                            <input 
+                                                type="checkbox" 
+                                                checked={selectedIds.includes(req.checkboxId)}
+                                                onChange={() => handleCheckboxToggle(req.checkboxId)}
+                                                className="w-4 h-4 rounded border-white/10 bg-white/5 checked:bg-[#a098ff] transition-all cursor-pointer"
+                                            />
+                                        )}
+                                    </td>
+                                    <td className="py-4 px-4 text-xs font-bold text-zinc-500">{idx + 1}</td>
+                                    <td className="py-4 px-4">
+                                        <div className="flex flex-col">
+                                            <span className="text-white font-bold text-sm tracking-tight">{req.course}</span>
+                                            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{req.credits} Credits</span>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-4 text-center">
+                                        <span className="px-2.5 py-1 rounded-md bg-zinc-800/50 text-zinc-400 font-bold text-[10px] uppercase tracking-wider">
+                                            {req.code}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-4 text-center">
+                                        <span className="px-3 py-1.5 rounded-lg bg-[#a098ff]/10 text-[#a098ff] font-black text-xs">
+                                            {req.grade}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-4 text-center text-xs text-zinc-400 font-bold tracking-widest">{req.section}</td>
+                                    <td className="py-4 px-4 text-right">
+                                        <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
+                                            req.status.toLowerCase().includes('pending') 
+                                            ? "bg-amber-500/5 text-amber-500 border-amber-500/10"
+                                            : req.status.toLowerCase().includes('rejected')
+                                            ? "bg-rose-500/5 text-rose-400 border-rose-500/10"
+                                            : "bg-emerald-500/5 text-emerald-400 border-emerald-500/10"
+                                        }`}>
+                                            {req.status}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
+                            {requests.length === 0 && (
+                                <tr>
+                                    <td colSpan="7" className="py-20 text-center">
+                                        <div className="flex flex-col items-center gap-4">
+                                            <div className="p-6 bg-zinc-800/50 rounded-full text-zinc-600 border border-white/5">
+                                                <Search size={40} />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-zinc-500 font-black uppercase tracking-widest text-xs">No records available</p>
+                                                <p className="text-zinc-600 text-[10px] font-medium">There are currently no subjects available for grade change in this semester.</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {/* Hidden Legacy Container */}
+        <div ref={hiddenContentRef} />
+      </div>
     </PageLayout>
   );
 }

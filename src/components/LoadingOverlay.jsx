@@ -51,7 +51,7 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
     if (!show || !loading) {
       const timer = setTimeout(() => {
         setIsVisible(false);
-      }, 500);
+      }, 800);
       return () => clearTimeout(timer);
     } else {
       setIsVisible(true);
@@ -62,14 +62,12 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
 
   return (
     <div
-      className={`loading-overlay fixed inset-0 z-[9999] h-screen w-screen bg-black flex items-center justify-center ${
+      className={`loading-overlay fixed inset-0 z-[10000] h-screen w-screen flex items-center justify-center ${
         !show || !loading ? "fade-out" : ""
       }`}
     >
       <div
-        className="bg-[url('res/bg.png')] bg-black border-[1px] border-white/10 bg-cover flex items-center justify-center h-24 w-24 rounded-[32px] shadow-2xl relative overflow-hidden"
-        data-aos="zoom-in"
-        data-aos-duration="1000"
+        className="bg-[url('res/bg.png')] bg-black border-[1px] border-white/10 bg-cover flex items-center justify-center h-24 w-24 rounded-[32px]  relative overflow-hidden"
       >
         <div className="absolute inset-0 bg-[#a098ff]/10 blur-xl"></div>
         <svg

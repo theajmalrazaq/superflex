@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
 import PageLayout from "../layouts/PageLayout";
+import NotificationBanner from "../NotificationBanner";
+import PageHeader from "../PageHeader";
 
 function ChangePasswordPage() {
   const [elemContent, setElemContent] = useState(null);
+  const [alerts, setAlerts] = useState([]);
 
   useEffect(() => {
     const targetElement = document.querySelector(
@@ -10,6 +12,30 @@ function ChangePasswordPage() {
     );
 
     if (targetElement) {
+      // Parse Alerts
+      const alertList = [];
+      targetElement.querySelectorAll(".m-alert, .alert").forEach(alert => {
+        if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
+
+        const textContainer = alert.querySelector(".m-alert__text") || alert;
+        const clone = textContainer.cloneNode(true);
+        // Remove standard UI elements that shouldn't be in the message
+        clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
+        
+        let message = clone.textContent
+          .replace(/Alert!/gi, "")
+          .replace(/Close/gi, "")
+          .replace(/&nbsp;/g, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+
+        if (message && message.length > 3) {
+            const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
+            alertList.push({ type, message });
+        }
+      });
+      setAlerts(alertList);
+
       applyCustomStyling(targetElement);
 
       setElemContent(targetElement.innerHTML);
@@ -25,7 +51,7 @@ function ChangePasswordPage() {
         "!border-none",
         "!rounded-3xl",
         "!p-4",
-        "!shadow-lg",
+        "",
       );
 
       portlet.classList.remove(
@@ -65,7 +91,7 @@ function ChangePasswordPage() {
         "!p-6",
         "!border",
         "!border-white/10",
-        "!shadow-lg",
+        "",
         "!text-white",
       );
     }
@@ -262,7 +288,7 @@ function ChangePasswordPage() {
             "!rounded-xl",
             "!transition-colors",
             "!border-0",
-            "!shadow-lg",
+            "",
           );
 
           submitButton.classList.remove(
@@ -284,12 +310,19 @@ function ChangePasswordPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      {elemContent && (
-        <div
-          className="m-grid m-grid--hor m-grid--root m-page"
-          dangerouslySetInnerHTML={{ __html: elemContent }}
+      <div className="p-8 space-y-8">
+        <PageHeader 
+          title="Security" 
+          subtitle="Manage your account password and security settings"
         />
-      )}
+        <NotificationBanner alerts={alerts} />
+        {elemContent && (
+          <div
+            className="m-grid m-grid--hor m-grid--root m-page"
+            dangerouslySetInnerHTML={{ __html: elemContent }}
+          />
+        )}
+      </div>
     </PageLayout>
   );
 }

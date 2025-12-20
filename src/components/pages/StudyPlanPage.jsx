@@ -8,36 +8,18 @@ import {
   CheckCircle2,
   ChevronRight,
   TrendingUp,
+  AlertTriangle,
 } from "lucide-react";
+import NotificationBanner from "../NotificationBanner";
+import PageHeader from "../PageHeader";
+import StatsCard from "../StatsCard";
+import SuperTabs from "../SuperTabs";
 
-const StatCard = ({ icon: Icon, label, value, subValue }) => (
-  <div
-    className="p-6 rounded-[2rem] border border-white/5 bg-zinc-900/50 backdrop-blur-xl hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group flex flex-col gap-4 h-full"
-  >
-    <div className="flex justify-between items-start mb-6">
-      <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
-        <Icon size={24} />
-      </div>
-    </div>
-    <div className="space-y-1">
-      <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1">
-        {label}
-      </p>
-      <div className="flex items-baseline gap-2">
-        <h3 className="text-xl font-bold text-white tracking-tight uppercase">
-          {value}
-        </h3>
-        {subValue && (
-          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest ml-1">{subValue}</span>
-        )}
-      </div>
-    </div>
-  </div>
-);
 
 function StudyPlanPage() {
   const [loading, setLoading] = useState(true);
   const [semesters, setSemesters] = useState([]);
+  const [alerts, setAlerts] = useState([]);
   const [activeSemIdx, setActiveSemIdx] = useState(0);
 
   useEffect(() => {
@@ -58,6 +40,30 @@ function StudyPlanPage() {
           );
           return;
         }
+        
+        // Parse Alerts
+        const alertList = [];
+        root.querySelectorAll(".m-alert, .alert").forEach(alert => {
+          if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
+
+          const textContainer = alert.querySelector(".m-alert__text") || alert;
+          const clone = textContainer.cloneNode(true);
+          // Remove standard UI elements that shouldn't be in the message
+          clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
+          
+          let message = clone.textContent
+            .replace(/Alert!/gi, "")
+            .replace(/Close/gi, "")
+            .replace(/&nbsp;/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+          if (message && message.length > 3) {
+              const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
+              alertList.push({ type, message });
+          }
+        });
+        setAlerts(alertList);
 
         const parsedSemesters = [];
         const semesterCols = root.querySelectorAll(".col-md-6");
@@ -152,16 +158,10 @@ function StudyPlanPage() {
         <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-              Study <span className="text-[#a098ff]">Plan</span>
-            </h1>
-            <p className="text-zinc-400 font-medium font-sans">
-              Degree requirements and course roadmaps
-            </p>
-          </div>
+        <PageHeader
+          title="Study Plan"
+          subtitle="Degree requirements and course roadmaps"
+        >
           <div className="flex items-center gap-4 bg-zinc-900/50 px-6 py-3 rounded-2xl border border-white/5 backdrop-blur-xl">
             <div className="text-right">
               <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Graduation Path</p>
@@ -170,33 +170,39 @@ function StudyPlanPage() {
             <div className="w-px h-8 bg-white/10 mx-2"></div>
             <GraduationCap className="text-[#a098ff]" size={24} />
           </div>
-        </div>
+        </PageHeader>
+
+        <NotificationBanner alerts={alerts} />
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard 
+          <StatsCard 
             icon={BookOpen} 
             label="Total Credits" 
             value={stats.totalCredits} 
             subValue="to Graduate"
+            delay={100}
           />
-          <StatCard 
+          <StatsCard 
             icon={Layers} 
             label="Core Courses" 
             value={stats.coreCourses} 
             subValue="Required"
+            delay={200}
           />
-          <StatCard 
+          <StatsCard 
             icon={TrendingUp} 
             label="Electives" 
             value={stats.electives} 
             subValue="Available"
+            delay={300}
           />
-          <StatCard 
+          <StatsCard 
             icon={CheckCircle2} 
             label="Semesters" 
             value={semesters.length} 
             subValue="Planned"
+            delay={400}
           />
         </div>
 
@@ -205,21 +211,11 @@ function StudyPlanPage() {
           {/* Semester Selector */}
           <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-              <div className="flex gap-2 bg-black/40 p-1.5 rounded-full border border-white/5 backdrop-blur-sm overflow-x-auto custom-scrollbar no-scrollbar min-w-fit">
-                {semesters.map((sem, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setActiveSemIdx(idx)}
-                    className={`px-6 py-2.5 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
-                      activeSemIdx === idx
-                        ? "bg-[#a098ff] text-white shadow-lg shadow-[#a098ff]/20"
-                        : "text-zinc-500 hover:text-white"
-                    }`}
-                  >
-                    {sem.title}
-                  </button>
-                ))}
-              </div>
+              <SuperTabs
+                tabs={semesters.map((s, idx) => ({ value: idx, label: s.title }))}
+                activeTab={activeSemIdx}
+                onTabChange={setActiveSemIdx}
+              />
               
               {activeSemData && (
                 <div className="flex items-center gap-6 pr-4">

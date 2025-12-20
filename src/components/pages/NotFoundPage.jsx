@@ -11,7 +11,7 @@ function NotFoundPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-180px)]">
-      <div className="bg-black rounded-3xl !border !border-white/10 p-16 shadow-lg flex flex-col items-center">
+      <div className="bg-black rounded-3xl !border !border-white/10 p-16  flex flex-col items-center">
         <div className="h-24 w-24 rounded-full bg-white/5 flex items-center justify-center mb-8">
           <svg
             viewBox="0 0 24 24"

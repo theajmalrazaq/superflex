@@ -1,858 +1,437 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import PageLayout from "../layouts/PageLayout";
-
-function FeeDetailsPage() {
-  const [elemContent, setElemContent] = useState(null);
-  const contentLoaded = useRef(false);
-  const [loadingError, setLoadingError] = useState(false);
-
-  const loadContent = async () => {
-    setLoadingError(false);
-
-    let targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
-
-    if (!targetElement) {
-      const waitForElement = new Promise((resolve) => {
-        let attempts = 0;
-        const maxAttempts = 30;
-
-        const checkInterval = setInterval(() => {
-          targetElement = document.querySelector(
-            ".m-grid.m-grid--hor.m-grid--root.m-page",
-          );
-          attempts++;
-
-          if (targetElement || attempts >= maxAttempts) {
-            clearInterval(checkInterval);
-            resolve(targetElement);
-          }
-        }, 1000);
-      });
-
-      targetElement = await waitForElement;
-    }
-
-    const customCssLink = document.querySelector(
-      'link[href="/Assets/CustomCss.css"]',
-    );
-    if (customCssLink) {
-      customCssLink.remove();
-    }
-
-    if (targetElement) {
-      setElemContent(targetElement.innerHTML);
-      targetElement.remove();
-    } else {
-      setLoadingError(true);
-    }
-  };
-
-  useEffect(() => {
-    const initializeContent = async () => {
-      await loadContent();
-    };
-
-    initializeContent();
-  }, []);
-
-  useEffect(() => {
-    if (elemContent && !contentLoaded.current) {
-      const checkForCompleteRender = () => {
-        const contentContainer = document.querySelector(
-          ".m-grid.m-grid--hor.m-grid--root.m-page",
-        );
-
-        if (!contentContainer) return false;
-
-        const tables = contentContainer.querySelectorAll("table");
-        const hasPopulatedTables = Array.from(tables).some(
-          (table) => table.querySelectorAll("tbody tr").length > 0,
-        );
-
-        return hasPopulatedTables;
-      };
-
-      const initialStylingTimeout = setTimeout(() => {
-        if (checkForCompleteRender()) {
-          applyCustomStyling();
-          contentLoaded.current = true;
-        } else {
-          const stylingInterval = setInterval(() => {
-            if (checkForCompleteRender()) {
-              clearInterval(stylingInterval);
-              applyCustomStyling();
-              contentLoaded.current = true;
-            }
-          }, 500);
-
-          setTimeout(() => {
-            clearInterval(stylingInterval);
-
-            if (!contentLoaded.current) {
-              applyCustomStyling();
-              contentLoaded.current = true;
-            }
-          }, 15000);
-        }
-      }, 500);
-
-      return () => clearTimeout(initialStylingTimeout);
-    }
-  }, [elemContent]);
-
-  const applyCustomStyling = () => {
-    const element = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
-    if (!element) return;
-
-    document.querySelectorAll(".col-lg-7").forEach((col) => {
-      col.classList.add("!w-full", "!max-w-full");
-    });
-
-    const portlet = element.querySelector(".m-portlet");
-    if (portlet) {
-      portlet.classList.add(
-        "!bg-black",
-        "!border-none",
-        "!rounded-3xl",
-        "!p-4",
-        "!shadow-lg",
-      );
-    }
-
-    const portletHead = element.querySelector(".m-portlet__head");
-    if (portletHead) {
-      portletHead.classList.add(
-        "!bg-black",
-        "!border",
-        "!border-white/10",
-        "!rounded-t-3xl",
-        "!h-fit",
-        "!p-4",
-        "!flex",
-        "!items-center",
-        "!justify-between",
-        "!mb-4",
-      );
-
-      const headingText = portletHead.querySelector(".m-portlet__head-text");
-      if (headingText) {
-        headingText.classList.add("!text-white", "!text-xl", "!font-bold");
-        headingText.innerHTML = "Fee Collection Details";
-      }
-    }
-
-    const portletBody = element.querySelector(".m-portlet__body");
-    if (portletBody) {
-      portletBody.classList.add(
-        "!bg-black",
-        "!rounded-b-3xl",
-        "!p-6",
-        "!border",
-        "!border-white/10",
-        "!shadow-lg",
-        "!text-white",
-        "!h-[calc(100vh-220px)]",
-        "!max-h-[800px]",
-        "!overflow-y-auto",
-        "custom-scrollbar",
-      );
-    }
-
-    const styleElement = document.createElement("style");
-    styleElement.textContent = `
-            .custom-scrollbar::-webkit-scrollbar {
-                width: 8px;
-                height: 8px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-track {
-                background: rgba(255, 255, 255, 0.05);
-                border-radius: 10px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 10px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                background: rgba(255, 255, 255, 0.3);
-            }
-        `;
-    document.head.appendChild(styleElement);
-
-    const semesterHeaders = element.querySelectorAll(
-      "[id^='rowStdDetailHeader_']",
-    );
-    semesterHeaders.forEach((header) => {
-      const row = header.querySelector(".row");
-      if (row) {
-        row.classList.add(
-          "!bg-zinc-900/50",
-          "!rounded-xl",
-          "!p-4",
-          "!border",
-          "!border-white/10",
-          "!mb-4",
-          "!flex",
-          "!items-center",
-        );
-      }
-
-      const colDiv = header.querySelector(".col-lg-3");
-      if (colDiv) {
-        colDiv.classList.add("!flex", "!items-center");
-      }
-
-      const expandBtn = header.querySelector("[id^='BtnhideshowInternal']");
-      if (expandBtn) {
-        expandBtn.classList.remove(
-          "btn-brand",
-          "m-btn",
-          "m-btn--custom",
-          "m-btn--icon",
-          "m-btn--pill",
-          "m-btn--air",
-        );
-        expandBtn.classList.add(
-          "!bg-x",
-          "!rounded-lg",
-          "!w-8",
-          "!h-8",
-          "!flex",
-          "!items-center",
-          "!justify-center",
-          "!mr-2",
-          "!border-none",
-          "!shadow-lg",
-          "!transition-all",
-          "!duration-300",
-          "!p-0",
-        );
-
-        expandBtn.addEventListener("click", function () {
-          const icon = this.querySelector("i");
-          const targetId = this.getAttribute("onclick").match(
-            /ftn_ShowHideDivandData\((\d+)/,
-          )[1];
-          const targetDiv = document.getElementById(`rowStdDetail_${targetId}`);
-
-          if (targetDiv.style.display === "none") {
-            icon.classList.remove("fa-angle-right");
-            icon.classList.add("fa-angle-down");
-          } else {
-            icon.classList.remove("fa-angle-down");
-            icon.classList.add("fa-angle-right");
-          }
-        });
-      }
-
-      const semesterLabel = header.querySelector("label");
-      if (semesterLabel) {
-        semesterLabel.classList.add(
-          "!text-white",
-          "!font-medium",
-          "!text-lg",
-          "!mb-0",
-        );
-      }
-
-      const amountCells = header.querySelectorAll("p.text-center");
-      amountCells.forEach((cell, index) => {
-        cell.classList.add("!text-white/80", "!font-medium");
-
-        const amount = parseFloat(cell.textContent.replace(/[(),%]/g, ""));
-        if (!isNaN(amount)) {
-          if (index === 4) {
-            cell.classList.add("!text-emerald-400", "!font-bold");
-          }
-
-          if (index === 5) {
-            if (amount < 0) {
-              cell.classList.add("!text-rose-400");
-            } else if (amount > 0) {
-              cell.classList.add("!text-amber-400");
-            }
-          }
-
-          if (index === 0 && amount < 0) {
-            cell.classList.add("!text-rose-400");
-          }
-        }
-      });
-    });
-
-    const sampleStdFeeDetail = document.getElementById("sample_StdFeeDetail");
-    if (sampleStdFeeDetail) {
-      sampleStdFeeDetail.classList.add("!p-6");
-    }
-
-    const sumhead = document.getElementById("rowStdDetailHeaderRow_0");
-    if (sumhead) {
-      sumhead.classList.add("!p-2", "!bg-white/10", "!mb-2");
-    }
-
-    const semesterDetails = element.querySelectorAll("[id^='rowStdDetail_']");
-    semesterDetails.forEach((detail) => {
-      detail.classList.add("!mt-2", "!mb-6", "!rounded-xl", "!overflow-hidden");
-
-      const feeDetailsRow = detail.querySelector(".row");
-      if (feeDetailsRow) {
-        feeDetailsRow.classList.add("!flex", "!flex-col", "!w-full", "!gap-6");
-        feeDetailsRow.classList.remove("row");
-
-        const feeInSemesterCol = feeDetailsRow.querySelector(".col-lg-5");
-        const registrationLogCol = feeDetailsRow.querySelector(".col-lg-7");
-
-        if (feeInSemesterCol) {
-          feeInSemesterCol.classList.remove("col-lg-5");
-          feeInSemesterCol.classList.add("!w-full");
-
-          const feeInSemesterHeader = feeInSemesterCol.querySelector("h4");
-          if (feeInSemesterHeader) {
-            feeInSemesterHeader.classList.add(
-              "!text-xl",
-              "!font-bold",
-              "!text-white",
-              "!mb-3",
-            );
-          }
-
-          const feeBreakdownContainer = feeInSemesterCol.querySelector(
-            ".border.border-secondary",
-          );
-          if (feeBreakdownContainer) {
-            feeBreakdownContainer.classList.remove(
-              "border",
-              "border-secondary",
-            );
-            feeBreakdownContainer.classList.add(
-              "!bg-zinc-900/40",
-              "!rounded-xl",
-              "!p-5",
-              "!border",
-              "!border-white/10",
-            );
-          }
-
-          const feeItems = feeInSemesterCol.querySelectorAll(".row");
-          feeItems.forEach((row) => {
-            row.classList.add(
-              "!flex",
-              "!justify-between",
-              "!items-center",
-              "!mb-3",
-            );
-
-            const labels = row.querySelectorAll("label");
-            labels.forEach((label) => {
-              label.removeAttribute("style");
-              label.classList.add("!text-white/80", "!font-medium");
-
-              const boldText = label.querySelector("b");
-              if (boldText && boldText.textContent.match(/[A-G]\)/)) {
-                boldText.classList.add("!text-x", "!font-bold", "!mr-1");
-              }
-            });
-          });
-
-          const feeLists = feeInSemesterCol.querySelectorAll("ul");
-          feeLists.forEach((list) => {
-            list.classList.add("!pl-6", "!mt-1", "!mb-3", "!text-white/70");
-
-            const listItems = list.querySelectorAll("li");
-            listItems.forEach((item) => {
-              item.classList.add("!mb-1");
-
-              const boldAmount = item.querySelector("b");
-              if (boldAmount) {
-                boldAmount.classList.add("!text-white", "!font-medium");
-              }
-            });
-          });
-        }
-
-        if (registrationLogCol) {
-          registrationLogCol.classList.remove("col-lg-7");
-          registrationLogCol.classList.add("!w-full");
-
-          const regLogHeader = registrationLogCol.querySelector("h4");
-          if (regLogHeader) {
-            regLogHeader.classList.add(
-              "!text-xl",
-              "!font-bold",
-              "!text-white",
-              "!mb-3",
-            );
-          }
-
-          const hrElements = registrationLogCol.querySelectorAll("hr");
-          hrElements.forEach((hr) => {
-            hr.classList.add("!border-white/10", "!mb-4");
-          });
-
-          const gpaRows = registrationLogCol.querySelectorAll(
-            ".row:not(:last-child)",
-          );
-          gpaRows.forEach((row) => {
-            row.classList.add("!flex", "!items-center", "!mb-2");
-
-            const labels = row.querySelectorAll("label");
-            labels.forEach((label, index) => {
-              label.removeAttribute("style");
-              if (index === 0) {
-                label.classList.add(
-                  "!text-white/70",
-                  "!font-medium",
-                  "!mr-2",
-                  "!min-w-[50px]",
-                );
-              } else {
-                label.classList.add("!text-white", "!font-bold");
-              }
-            });
-          });
-
-          const installmentHeader = registrationLogCol.querySelector(
-            "#lbIsntallmentHead_0",
-          );
-          if (installmentHeader) {
-            installmentHeader.classList.add(
-              "!text-lg",
-              "!font-bold",
-              "!text-white",
-              "!mt-4",
-              "!mb-3",
-            );
-          }
-        }
-      }
-
-      const sectionHeadings = detail.querySelectorAll("h4");
-      sectionHeadings.forEach((heading) => {
-        heading.classList.add("!text-white", "!font-bold", "!text-lg", "!mb-2");
-      });
-
-      const borderContainers = detail.querySelectorAll(
-        ".border.border-secondary",
-      );
-      borderContainers.forEach((container) => {
-        container.classList.remove("border", "border-secondary");
-        container.classList.add(
-          "!border",
-          "!border-white/10",
-          "!rounded-xl",
-          "!p-4",
-          "!bg-zinc-900/30",
-          "!mb-4",
-        );
-      });
-
-      detail.querySelectorAll("label").forEach((label) => {
-        label.classList.add("!text-white/80");
-
-        if (label.textContent.includes(")")) {
-          const boldText = label.querySelector("b");
-          if (boldText) {
-            boldText.classList.add("!text-x", "!font-bold");
-          }
-        }
-      });
-
-      const tables = detail.querySelectorAll("table");
-      tables.forEach((table) => {
-        table.classList.add(
-          "!w-full",
-          "!border-collapse",
-          "!rounded-lg",
-          "!overflow-hidden",
-          "!border",
-          "!border-white/10",
-          "!mb-4",
-        );
-
-        table.classList.remove(
-          "table-responsive",
-          "m-table--border-info",
-          "m-table--head-bg-info",
-        );
-
-        const thead = table.querySelector("thead");
-        if (thead) {
-          thead.classList.add("!bg-zinc-900");
-
-          const headerRows = thead.querySelectorAll("tr");
-          headerRows.forEach((row) => {
-            row.removeAttribute("style");
-            row.classList.add("!border-b", "!border-white/10");
-
-            const headerCells = row.querySelectorAll("th");
-            headerCells.forEach((cell) => {
-              cell.removeAttribute("style");
-              cell.classList.add(
-                "!text-gray-400",
-                "!font-medium",
-                "!p-3",
-                "!text-left",
-                "!bg-transparent",
-              );
-            });
-          });
-        }
-
-        const tbody = table.querySelector("tbody");
-        if (tbody) {
-          tbody.classList.add("!divide-y", "!divide-white/10");
-
-          const rows = tbody.querySelectorAll("tr");
-          rows.forEach((row) => {
-            row.classList.add(
-              "!bg-black",
-              "!hover:bg-white/5",
-              "!transition-colors",
-            );
-
-            const cells = row.querySelectorAll("td");
-            cells.forEach((cell) => {
-              cell.classList.add(
-                "!p-3",
-                "!text-white/80",
-                "!border-y",
-                "!border-white/10",
-              );
-            });
-          });
-        }
-      });
-    });
-
-    const collectionTable = element.querySelector("#sample_CollectionDetail");
-    if (collectionTable) {
-      const tableContainer = document.createElement("div");
-      tableContainer.className =
-        "rounded-xl overflow-hidden !border !border-white/10 mb-6";
-      collectionTable.parentNode.insertBefore(tableContainer, collectionTable);
-      tableContainer.appendChild(collectionTable);
-
-      collectionTable.classList.add("!w-full", "!border-collapse", "!border-0");
-      collectionTable.classList.remove("table-bordered", "table-responsive");
-
-      const thead = collectionTable.querySelector("thead");
-      if (thead) {
-        thead.classList.add("!bg-zinc-900", "!sticky", "!top-0", "!z-10");
-
-        const headers = thead.querySelectorAll("th");
-        headers.forEach((header) => {
-          header.classList.add(
-            "!bg-transparent",
-            "!text-gray-400",
-            "!font-medium",
-            "!p-3",
-            "!text-left",
-            "!border-b",
-            "!border-white/10",
-          );
-        });
-      }
-
-      const tbody = collectionTable.querySelector("tbody");
-      if (tbody) {
-        tbody.classList.add("!divide-y", "!divide-white/10");
-
-        const rows = tbody.querySelectorAll("tr");
-        rows.forEach((row) => {
-          row.classList.add(
-            "!bg-black",
-            "!hover:bg-white/5",
-            "!transition-colors",
-          );
-
-          const cells = row.querySelectorAll("td");
-          cells.forEach((cell, index) => {
-            cell.classList.add(
-              "!p-4",
-              "!text-white/80",
-              "!border-y",
-              "!border-white/10",
-            );
-
-            if (index === 5) {
-              cell.classList.add("!font-medium", "!text-emerald-400");
-            }
-
-            if (index === 9) {
-              const status = cell.textContent.trim();
-              cell.innerHTML = `<span class="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-md font-medium">${status}</span>`;
-            }
-
-            if (index === 6 || index === 7) {
-              cell.classList.add("!text-blue-400");
-            }
-
-            if (index === 10) {
-              const link = cell.querySelector("a");
-              if (link) {
-                link.removeAttribute("style");
-                link.classList.add(
-                  "!text-x",
-                  "!font-medium",
-                  "!hover:text-x/80",
-                  "!transition-colors",
-                  "!cursor-pointer",
-                );
-              }
-            }
-          });
-        });
-      }
-    }
-
-    const summaryContainer = document.createElement("div");
-    summaryContainer.className =
-      "bg-zinc-900 rounded-2xl p-6 mb-6 !border !border-white/10";
-
-    let totalPaid = 0;
-    const paymentAmounts = element.querySelectorAll(
-      "#sample_CollectionDetail tbody tr td:nth-child(6)",
-    );
-    paymentAmounts.forEach((cell) => {
-      const amount = parseFloat(cell.textContent.replace(/[^0-9.-]+/g, ""));
-      if (!isNaN(amount)) {
-        totalPaid += amount;
-      }
-    });
-
-    const latestPaymentRow = element.querySelector(
-      "#sample_CollectionDetail tbody tr",
-    );
-    let latestPaymentInfo = "";
-    if (latestPaymentRow) {
-      const semester =
-        latestPaymentRow.querySelector("td:nth-child(2)")?.textContent || "";
-      const amount =
-        latestPaymentRow.querySelector("td:nth-child(6)")?.textContent || "";
-      const date =
-        latestPaymentRow.querySelector("td:nth-child(8)")?.textContent || "";
-
-      latestPaymentInfo = `
-                <div class="mt-4 pt-4 !border-t !border-white/10">
-                    <h4 class="text-sm font-medium text-white/70 mb-2">Latest Payment</h4>
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <span class="block text-white font-medium">${semester}</span>
-                            <span class="text-sm text-white/70">${date}</span>
-                        </div>
-                        <span class="text-lg font-bold text-emerald-400">${amount}</span>
-                    </div>
-                </div>
-            `;
-    }
-
-    summaryContainer.innerHTML = `
-            <div class="flex flex-col md:flex-row justify-between items-start gap-4">
-                <div class="flex items-start gap-4">
-                    <div class="h-12 w-12 rounded-xl bg-x flex items-center justify-center">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
-                            <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-                            <line x1="2" y1="10" x2="22" y2="10"></line>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-white">Fee Payment Summary</h3>
-                        <p class="text-sm text-white/70 mt-1">Showing all fee transactions</p>
-                    </div>
-                </div>
-                <div class="bg-black rounded-xl px-6 py-3 !border !border-white/10 text-center w-full md:w-auto">
-                    <span class="block text-xs text-white/70 mb-1">Total Paid</span>
-                    <span class="text-2xl font-bold text-emerald-400">Rs. ${totalPaid.toLocaleString()}</span>
-                </div>
-            </div>
-            ${latestPaymentInfo}
-        `;
-
-    if (portletBody && portletBody.firstChild) {
-      portletBody.insertBefore(summaryContainer, portletBody.firstChild);
-    }
-  };
-
-  const handleRetry = () => {
-    loadContent();
-  };
+import { LoadingSpinner } from "../LoadingOverlay";
+import {
+  DollarSign,
+  ChevronDown,
+  FileText,
+  History,
+  CreditCard,
+  Layers,
+  BookOpen,
+  TrendingUp,
+  AlertTriangle,
+} from "lucide-react";
+import NotificationBanner from "../NotificationBanner";
+import PageHeader from "../PageHeader";
+import StatsCard from "../StatsCard";
+
+
+/**
+ * Interactive Semester Accordion
+ */
+const SemesterAccordion = ({ semester }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const hasDetails = semester.feeItems.length > 0 || semester.courses.length > 0;
 
   return (
-    <PageLayout currentPage={window.location.pathname}>
-      {elemContent ? (
-        <div
-          className="m-grid m-grid--hor m-grid--root m-page"
-          dangerouslySetInnerHTML={{ __html: elemContent }}
-        />
-      ) : (
-        <div className="bg-black rounded-3xl border border-white/10 p-6 shadow-lg text-white">
-          {}
-          <div className="bg-zinc-900 rounded-2xl p-6 mb-6 !border !border-white/10">
-            <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-              <div className="flex items-start gap-4">
-                <div className="h-12 w-12 rounded-xl bg-x flex items-center justify-center">
-                  <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-white"
-                  >
-                    <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-                    <line x1="2" y1="10" x2="22" y2="10"></line>
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white">
-                    Fee Payment Summary
-                  </h3>
-                  <p className="text-sm text-white/70 mt-1">
-                    {loadingError
-                      ? "Failed to load fee transactions"
-                      : "Loading fee information..."}
-                  </p>
+    <div className="group border border-white/5 bg-zinc-900/40 rounded-[2.5rem] overflow-hidden transition-all duration-300 hover:border-white/10">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 text-left"
+      >
+        <div className="flex items-center gap-5">
+          <div className={`p-4 rounded-2xl bg-white/5 transition-all duration-500 ${isOpen ? 'bg-[#a098ff]/20 text-[#a098ff]' : 'text-zinc-400 group-hover:text-white'}`}>
+            <Layers size={22} />
+          </div>
+          <div>
+            <h4 className="text-xl font-black text-white font-sans uppercase tracking-tight">{semester.name}</h4>
+            <div className="flex items-center gap-3 mt-1">
+               <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+                 {semester.courses.length || 0} Registered Items
+               </p>
+               <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
+               <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+                 GPA: {semester.academic.sgpa || "0.00"}
+               </p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-8">
+          <div className="text-right hidden sm:block">
+            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none mb-2">Collection</p>
+            <p className="text-xl font-black text-white font-sans tracking-tight">Rs. {semester.totalPaid}</p>
+          </div>
+          <div className={`p-3 rounded-xl bg-white/5 transition-all duration-500 ${isOpen ? 'rotate-180 bg-white/10' : ''}`}>
+            <ChevronDown size={20} className="text-zinc-500" />
+          </div>
+        </div>
+      </button>
+
+      {isOpen && (
+        <div className="px-8 pb-8 space-y-10 animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="flex flex-col gap-10">
+            <div className="lg:col-span-5 space-y-8">
+              <div className="space-y-4">
+                <h5 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#a098ff]">
+                  <DollarSign size={12} /> Fee Breakdown
+                </h5>
+                <div className="space-y-3">
+                  {semester.feeItems.map((item, idx) => (
+                    <div key={idx} className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 group/item hover:border-white/10 transition-all">
+                      <div className="flex justify-between items-center">
+                        <span className="text-zinc-400 font-bold font-sans text-xs uppercase tracking-tight">{item.name}</span>
+                        <span className="text-white font-black font-sans">Rs. {item.val}</span>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-white/5">
+                    <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5">
+                      <p className="text-[8px] text-zinc-500 font-black uppercase tracking-widest mb-1.5">Net Dues</p>
+                      <p className="text-lg font-black text-white font-sans tracking-tight">Rs. {semester.summary.due}</p>
+                    </div>
+                    <div className="p-5 rounded-2xl bg-[#a098ff]/5 border border-[#a098ff]/10">
+                      <p className="text-[8px] text-[#a098ff]/70 font-black uppercase tracking-widest mb-1.5">Balance</p>
+                      <p className={`text-lg font-black font-sans tracking-tight ${semester.summary.balance === '0' ? 'text-emerald-400' : 'text-white'}`}>
+                        Rs. {semester.summary.balance}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="bg-black rounded-xl px-6 py-3 !border !border-white/10 text-center w-full md:w-auto">
-                <span className="block text-xs text-white/70 mb-1">Status</span>
-                <span className="text-lg font-bold text-amber-400">
-                  {loadingError ? "Error" : "Loading..."}
-                </span>
+
+               <div className="grid grid-cols-2 gap-4">
+                 <div className="p-6 rounded-[1.8rem] bg-emerald-500/5 border border-emerald-500/10 flex flex-col gap-1 relative overflow-hidden group/gpa">
+                  <span className="text-[9px] text-emerald-500/50 font-black uppercase tracking-widest">SGPA</span>
+                  <span className="text-3xl font-black text-emerald-400 font-sans tracking-tight leading-none">{semester.academic.sgpa}</span>
+                </div>
+                <div className="p-6 rounded-[1.8rem] bg-white/5 border border-white/10 flex flex-col gap-1 relative overflow-hidden">
+                  <span className="text-[9px] text-zinc-500 font-black uppercase tracking-widest">CGPA</span>
+                  <span className="text-3xl font-black text-white font-sans tracking-tight leading-none">{semester.academic.cgpa}</span>
+                </div>
               </div>
             </div>
 
-            {loadingError && (
-              <div className="mt-4 pt-4 !border-t !border-white/10">
-                <div className="flex justify-between items-center">
-                  <p className="text-white/70">
-                    The fee details couldn't be loaded. This might happen if the
-                    data hasn't been properly initialized.
-                  </p>
-                  <button
-                    onClick={handleRetry}
-                    className="bg-x hover:bg-x/80 text-white font-medium py-2 px-4 rounded-xl flex items-center transition-colors ml-4"
-                  >
-                    <svg
-                      className="w-5 h-5 mr-2"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M21 2v6h-6"></path>
-                      <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
-                      <path d="M3 22v-6h6"></path>
-                      <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
-                    </svg>
-                    Try Again
-                  </button>
-                </div>
+            <div className="lg:col-span-7 space-y-6">
+              <h5 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                <BookOpen size={12} /> Registration Log
+              </h5>
+              <div className="overflow-hidden rounded-[2rem] border border-white/5 bg-zinc-900/20 backdrop-blur-md">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="bg-white/5">
+                      <th className="p-5 text-[9px] font-black uppercase tracking-widest text-zinc-500 font-sans border-b border-white/5">Course</th>
+                      <th className="p-5 text-[9px] font-black uppercase tracking-widest text-zinc-500 font-sans border-b border-white/5">Type</th>
+                      <th className="p-5 text-[9px] font-black uppercase tracking-widest text-zinc-500 font-sans border-b border-white/5 text-right">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {semester.courses.map((course, idx) => (
+                      <tr key={idx} className="group/course hover:bg-white/[0.02]">
+                        <td className="p-5">
+                          <p className="text-xs font-black text-white font-sans tracking-tight">{course.title}</p>
+                          {course.date && <p className="text-[9px] text-zinc-600 font-medium mt-1 uppercase">{course.date}</p>}
+                        </td>
+                        <td className="p-5">
+                          <span className="text-[10px] font-bold text-zinc-400 font-sans uppercase tracking-widest">{course.type}</span>
+                        </td>
+                        <td className="p-5 text-right">
+                          <span className={`px-2.5 py-1 rounded-lg border font-black uppercase font-sans text-[8px] tracking-widest ${
+                            course.status.toLowerCase().includes('registered') 
+                            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
+                            : 'bg-rose-500/10 border-rose-500/20 text-rose-400'
+                          }`}>
+                            {course.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            )}
-          </div>
-
-          {}
-          <div className="mb-3 !p-6" id="sample_StdFeeDetail"></div>
-          <div className="table-scrollable">
-            <div className="rounded-xl overflow-hidden !border !border-white/10 mb-6">
-              <table
-                className="table !w-full !border-collapse !border-0"
-                id="sample_CollectionDetail"
-              >
-                <thead className="!bg-zinc-900 !sticky !top-0 !z-10">
-                  <tr>
-                    <th className="!bg-transparent !text-gray-400 !font-medium !p-3 !text-left !border-b !border-white/10">
-                      S No
-                    </th>
-                    <th className="!bg-transparent !text-gray-400 !font-medium !p-3 !text-left !border-b !border-white/10">
-                      Semester
-                    </th>
-                    <th className="!bg-transparent !text-gray-400 !font-medium !p-3 !text-left !border-b !border-white/10">
-                      Challan No
-                    </th>
-                    <th className="!bg-transparent !text-gray-400 !font-medium !p-3 !text-left !border-b !border-white/10">
-                      Instrument Type
-                    </th>
-                    <th className="!bg-transparent !text-gray-400 !font-medium !p-3 !text-left !border-b !border-white/10">
-                      Instrument No
-                    </th>
-                    <th className="!bg-transparent !text-gray-400 !font-medium !p-3 !text-left !border-b !border-white/10">
-                      Amount
-                    </th>
-                    <th className="!bg-transparent !text-gray-400 !font-medium !p-3 !text-left !border-b !border-white/10">
-                      Due Date
-                    </th>
-                    <th className="!bg-transparent !text-gray-400 !font-medium !p-3 !text-left !border-b !border-white/10">
-                      Payment Date
-                    </th>
-                    <th className="!bg-transparent !text-gray-400 !font-medium !p-3 !text-left !border-b !border-white/10">
-                      Entered By
-                    </th>
-                    <th className="!bg-transparent !text-gray-400 !font-medium !p-3 !text-left !border-b !border-white/10">
-                      Status
-                    </th>
-                    <th className="!bg-transparent !text-gray-400 !font-medium !p-3 !text-left !border-b !border-white/10">
-                      Operation
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="!divide-y !divide-white/10">
-                  {loadingError ? (
-                    <tr className="!bg-black">
-                      <td
-                        colSpan="11"
-                        className="!p-4 !text-center !text-white/70"
-                      >
-                        No fee records available
-                      </td>
-                    </tr>
-                  ) : (
-                    <tr className="!bg-black">
-                      <td
-                        colSpan="11"
-                        className="!p-4 !text-center !text-white/70"
-                      >
-                        <div className="flex items-center justify-center">
-                          <svg
-                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
-                          Loading fee transactions...
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
             </div>
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+function FeeDetailsPage() {
+  const [loading, setLoading] = useState(true);
+  const [semesters, setSemesters] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+  const [totalPaid, setTotalPaid] = useState("0");
+
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
+
+    const bootstrapAndHydrate = () => {
+      const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
+      if (!root) {
+        setTimeout(bootstrapAndHydrate, 500);
+        return;
+      }
+
+      try {
+        // STEP 0: Parse Alerts
+        const alertList = [];
+        root.querySelectorAll(".m-alert, .alert").forEach(alert => {
+          if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
+
+          const textContainer = alert.querySelector(".m-alert__text") || alert;
+          const clone = textContainer.cloneNode(true);
+          // Remove standard UI elements that shouldn't be in the message
+          clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
+          
+          let message = clone.textContent
+            .replace(/Alert!/gi, "")
+            .replace(/Close/gi, "")
+            .replace(/&nbsp;/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+          if (message && message.length > 3) {
+              const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
+              alertList.push({ type, message });
+          }
+        });
+        setAlerts(alertList);
+
+        // STEP 1: Detect all valid semester blocks
+        const blocks = root.querySelectorAll("[id^='tablerow_']");
+        if (blocks.length === 0) {
+          setTimeout(bootstrapAndHydrate, 500);
+          return;
+        }
+
+        // STEP 2: Programmatically hydrate EACH semester sequence
+        blocks.forEach((block, idx) => {
+          setTimeout(() => {
+            const btn = block.querySelector("button[id^='BtnhideshowInternal']");
+            const icon = btn?.querySelector('.fa-angle-right');
+            if (icon) btn.click();
+          }, idx * 300);
+        });
+
+        // STEP 3: Advanced Polling for FULL hydration
+        let checks = 0;
+        const checkCycle = setInterval(() => {
+          const semesterIds = Array.from(blocks).map(b => b.id.split('_')[1]);
+          const hydrationStatus = semesterIds.map(id => {
+            const label = root.querySelector(`#lbSGPA_${id}`);
+            return label && label.textContent.trim() !== "";
+          });
+
+          const allHydrated = hydrationStatus.every(status => status === true);
+          
+          if (allHydrated || checks > 25) { 
+            clearInterval(checkCycle);
+            finishMapping(root, semesterIds);
+          }
+          checks++;
+        }, 500);
+
+      } catch (e) {
+        console.error("Hydration Failure", e);
+        setLoading(false);
+      }
+    };
+
+    const finishMapping = (root, semesterIds) => {
+      const cleanT = (el) => el?.textContent.trim() || "";
+      const cleanN = (el) => el?.textContent.replace(/[^\d.()-]/g, '').trim() || "0";
+
+      const mappedSemesters = semesterIds.map(id => {
+        const block = root.querySelector(`#tablerow_${id}`);
+        const header = root.querySelector(`#rowStdDetailHeader_${id}`);
+        
+        const feeItems = [];
+        block.querySelectorAll(`#tblDueInSem_${id} li`).forEach(li => {
+          const parts = li.textContent.split(':');
+          if (parts.length >= 2) feeItems.push({ name: parts[0].trim(), val: parts[1].trim() });
+        });
+
+        const courses = [];
+        block.querySelectorAll(`#tblRegisteredCoursesDetail_${id} tbody tr`).forEach(tr => {
+          const td = tr.querySelectorAll('td');
+          if (td.length >= 4) {
+            courses.push({
+              title: cleanT(td[1]),
+              type: cleanT(td[2]),
+              status: cleanT(td[3]),
+              date: cleanT(td[4])
+            });
+          }
+        });
+
+        return {
+          id,
+          name: cleanT(header.querySelector('label')),
+          totalPaid: cleanN(header.querySelectorAll('p')[4]),
+          academic: {
+            sgpa: cleanT(block.querySelector(`#lbSGPA_${id}`)) || "0.00",
+            cgpa: cleanT(block.querySelector(`#lbCGPA_${id}`)) || "0.00"
+          },
+          summary: {
+            due: cleanN(block.querySelector(`#lbDueInSem_${id}`)),
+            balance: cleanN(block.querySelector(`#lbBalance_${id}`))
+          },
+          feeItems,
+          courses
+        };
+      });
+
+      const txHistory = [];
+      root.querySelectorAll("#sample_CollectionDetail tbody tr").forEach((tr, i) => {
+        const td = tr.querySelectorAll('td');
+        if (td.length >= 10) {
+          txHistory.push({
+            sNo: cleanT(td[0]),
+            semester: cleanT(td[1]),
+            challanNo: cleanT(td[2]),
+            instrumentType: cleanT(td[3]),
+            instrumentNo: cleanT(td[4]),
+            amount: cleanN(td[5]),
+            dueDate: cleanT(td[6]),
+            paymentDate: cleanT(td[7]),
+            enteredBy: cleanT(td[8]),
+            status: cleanT(td[9])
+          });
+        }
+      });
+
+      setSemesters(mappedSemesters);
+      setTransactions(txHistory);
+
+      let total = 0;
+      txHistory.forEach(t => total += parseFloat(t.amount.replace(/,/g, '')) || 0);
+      setTotalPaid(total.toLocaleString());
+
+      root.style.display = "none";
+      setLoading(false);
+      window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
+    };
+
+    bootstrapAndHydrate();
+  }, []);
+
+  if (loading) return (
+    <PageLayout currentPage={window.location.pathname}>
+      <div className="flex flex-col items-center justify-center py-40 space-y-8">
+        <div className="relative">
+          <div className="absolute inset-0 bg-[#a098ff]/10 blur-3xl rounded-full scale-150 animate-pulse"></div>
+          <LoadingSpinner />
+        </div>
+        <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.4em] animate-pulse">Hydrating Financial Ledger...</p>
+      </div>
+    </PageLayout>
+  );
+
+  return (
+    <PageLayout currentPage={window.location.pathname}>
+      <div className="w-full min-h-screen p-6 md:p-12 space-y-12 relative z-10 font-sans">
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full pointer-events-none -mr-64 -mt-64 z-0"></div>
+        
+        <PageHeader
+          title="Fee Vault"
+          subtitle="Academic Portfolio & Accounts"
+        >
+          <div className="flex items-center gap-6 bg-zinc-900/50 p-6 rounded-[2rem] border border-white/5 backdrop-blur-xl group hover:bg-zinc-900/70 transition-all">
+            <div className="text-right">
+              <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest leading-none mb-2">Total Paid</p>
+              <h4 className="text-3xl font-black text-white">Rs. {totalPaid}</h4>
+            </div>
+            <div className="p-4 rounded-2xl bg-[#a098ff]/10 text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
+              <CreditCard size={24} />
+            </div>
+          </div>
+        </PageHeader>
+
+        <NotificationBanner alerts={alerts} />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatsCard icon={DollarSign} label="Lifetime Paid" value={`Rs. ${totalPaid}`} delay={100} />
+          <StatsCard icon={TrendingUp} label="Current CGPA" value={semesters[0]?.academic.cgpa || "N/A"} delay={200} />
+          <StatsCard icon={Layers} label="Semesters" value={semesters.length} subValue="Logged" delay={300} />
+          <StatsCard icon={History} label="Last Entry" value={transactions[0]?.amount ? `Rs. ${transactions[0].amount}` : "N/A"} subValue={transactions[0]?.paymentDate} delay={400} />
+        </div>
+
+        <div className="grid grid-cols-1 gap-12">
+          {/* Section 1: Financial Books (Accordions) */}
+          <div className="space-y-10">
+            <div className="flex items-center gap-4 px-2">
+              <div className="p-3 rounded-2xl bg-zinc-900 border border-white/5 text-zinc-500"><FileText size={20} /></div>
+              <h3 className="text-xl font-black text-white uppercase tracking-tight">Financial Books</h3>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {semesters.map(sem => <SemesterAccordion key={sem.id} semester={sem} />)}
+            </div>
+          </div>
+
+          {/* Section 2: Full Transaction Journal (Table) */}
+          <div className="space-y-10">
+            <div className="flex items-center gap-4 px-2">
+              <div className="p-3 rounded-2xl bg-zinc-900 border border-white/5 text-zinc-500"><History size={20} /></div>
+              <h3 className="text-xl font-black text-white uppercase tracking-tight">Transaction Journal</h3>
+            </div>
+            
+            <div className="overflow-hidden rounded-[2.5rem] border border-white/5 bg-zinc-900/20 backdrop-blur-xl">
+              <div className="overflow-x-auto custom-scrollbar">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="bg-white/5 border-b border-white/5">
+                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">S#</th>
+                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">Semester</th>
+                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">Challan No</th>
+                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">Instrument</th>
+                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">Instrument No</th>
+                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#a098ff] font-sans">Amount</th>
+                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">Due Date</th>
+                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400 font-sans">Payment Date</th>
+                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">Source</th>
+                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {transactions.map((t, idx) => (
+                      <tr key={idx} className="group hover:bg-white/[0.02] transition-colors">
+                        <td className="p-5 text-[10px] text-zinc-600 font-black">{t.sNo}</td>
+                        <td className="p-5 text-[10px] text-white font-black uppercase tracking-tight">{t.semester}</td>
+                        <td className="p-5 text-[10px] text-zinc-400 font-bold">{t.challanNo}</td>
+                        <td className="p-5 text-[10px] text-zinc-500 font-medium uppercase">{t.instrumentType}</td>
+                        <td className="p-5 text-[10px] text-zinc-400 font-bold">{t.instrumentNo}</td>
+                        <td className="p-5 text-[11px] text-white font-black">Rs. {t.amount}</td>
+                        <td className="p-5 text-[10px] text-zinc-500 font-medium">{t.dueDate}</td>
+                        <td className="p-5 text-[10px] text-emerald-400 font-bold">{t.paymentDate}</td>
+                        <td className="p-5 text-[10px] text-zinc-500 font-black uppercase tracking-widest">{t.enteredBy}</td>
+                        <td className="p-5">
+                          <span className={`px-2 py-0.5 rounded-md border text-[8px] font-black uppercase tracking-widest leading-none ${
+                            t.status.toLowerCase().includes('paid')
+                            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                            : 'bg-rose-500/10 border-rose-500/20 text-rose-400'
+                          }`}>
+                            {t.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          height: 4px;
+          width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.1);
+        }
+      `}</style>
     </PageLayout>
   );
 }

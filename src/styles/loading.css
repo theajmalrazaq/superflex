@@ -7,14 +7,18 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: 10000;
+  background-color: #000;
   opacity: 1;
-  transition: opacity 0.5s ease;
-  will-change: opacity;
+  visibility: visible;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s;
+  will-change: opacity, transform;
 }
 
 .loading-overlay.fade-out {
   opacity: 0;
+  visibility: hidden;
+  transform: scale(1.05); /* Subtle zoom out effect during fade */
 }
 .border {
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
