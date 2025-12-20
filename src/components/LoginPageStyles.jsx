@@ -108,11 +108,8 @@ function LoginPageStyles() {
     document.querySelectorAll(".btn-primary").forEach((button) => {
       button.classList.add(
         "!bg-[#a098ff]",
-        "!text-zinc-950",
-        "!font-black",
+        "!text-white",
         "!uppercase",
-        "!tracking-widest",
-        "!text-[10px]",
         "!border-none",
         "!rounded-2xl",
         "!w-full",
@@ -125,7 +122,6 @@ function LoginPageStyles() {
         "justify-center",
         "items-center",
         "hover:!bg-[#8f86ff]",
-        "hover:!scale-[1.02]",
         "!transition-all",
         "!duration-300",
       );
@@ -153,7 +149,7 @@ function LoginPageStyles() {
         "!flex-col",
         "!items-center",
         "!justify-center",
-        "!w-[440px]",
+        "!w-[355px]",
         "!hidden",
         "!fixed",
         "!top-1/2",
@@ -195,7 +191,7 @@ function LoginPageStyles() {
         "!flex",
         "!flex-col",
         "!gap-8",
-        "!w-[440px]",
+        "!w-[356px]",
         "!hidden",
         "!fixed",
         "!top-1/2",
@@ -345,8 +341,7 @@ function LoginPageStyles() {
     signInButton.id = "show-login-btn";
     signInButton.className = `
       !bg-[#a098ff] 
-      !text-white 
-      !font-semibold 
+      !text-white
       !border-none 
       !rounded-2xl 
       !px-7 
@@ -360,8 +355,7 @@ function LoginPageStyles() {
       !z-[50]
     `;
     signInButton.style.fontFamily = "'Google Sans Flex', sans-serif";
-    signInButton.innerHTML = `
-      <span class="font-black uppercase tracking-widest text-[11px]">Initiate Access</span>
+    signInButton.innerHTML = `Sign In
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
         <polyline points="10 17 15 12 10 7"/>
@@ -370,16 +364,15 @@ function LoginPageStyles() {
     `;
 
     const suggestionButton = document.createElement("a");
-    suggestionButton.href =
-      "https://github.com/theajmalrazaq/superflex/issues/new";
+    suggestionButton.href = "https://github.com/theajmalrazaq/superflex";
     suggestionButton.target = "_blank";
     suggestionButton.className =
       "group relative bg-white/10 backdrop-blur-sm px-7 py-3.5 rounded-xl font-semibold text-white hover:bg-white/20 hover:border-white/40 transition-all duration-300 flex items-center gap-3";
     suggestionButton.style.fontFamily = "'Google Sans Flex', sans-serif";
     suggestionButton.innerHTML = `
-      <span class="font-light">Give Suggestion</span>
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      <span class="font-semibold text-sm">Star on Github (<span id="starCount">...</span>)</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[#a098ff]">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
       </svg>
     `;
 
@@ -479,19 +472,157 @@ function LoginPageStyles() {
     const bgUrl = chrome.runtime.getURL("public/bg.png");
     const logoUrl = chrome.runtime.getURL("public/logo.svg");
 
+    // Inject Marquee Styles
+    const styleId = "feature-marquee-styles";
+    let styleElement = document.getElementById(styleId);
+    if (!styleElement) {
+      styleElement = document.createElement("style");
+      styleElement.id = styleId;
+      document.head.appendChild(styleElement);
+    }
+    styleElement.textContent = `
+        @keyframes featureMarquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .feature-marquee-container {
+          overflow: hidden;
+          width: 100vw;
+          margin-left: calc(-50vw + 50%);
+          position: relative;
+          padding: 40px 0;
+          -webkit-mask-image: linear-gradient(to right, transparent, #fff 15%, #fff 85%, transparent);
+          mask-image: linear-gradient(to right, transparent, #fff 15%, #fff 85%, transparent);
+        }
+        .marquee-overlay {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 20%;
+          z-index: 30;
+          pointer-events: none;
+        }
+        .marquee-overlay-left {
+          left: 0;
+          background: linear-gradient(to right, black 0%, rgba(0,0,0,0.9) 20%, transparent 100%);
+        }
+        .marquee-overlay-right {
+          right: 0;
+          background: linear-gradient(to left, black 0%, rgba(0,0,0,0.9) 20%, transparent 100%);
+        }
+        .feature-marquee-track {
+          display: flex;
+          gap: 24px;
+          width: max-content;
+          animation: featureMarquee 80s linear infinite;
+          position: relative;
+          z-index: 10;
+        }
+        .review-card {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          text-align: left;
+          gap: 12px;
+          background: rgba(255, 255, 255, 0.03);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          padding: 20px 24px;
+          border-radius: 24px;
+          width: 320px;
+          white-space: normal;
+          transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+          cursor: default;
+        }
+        .review-card:hover {
+          background: rgba(160, 152, 255, 0.08);
+          border-color: rgba(160, 152, 255, 0.3);
+          transform: translateY(-6px) scale(1.02);
+        }
+        .review-header {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 4px;
+          width: 100%;
+        }
+        .review-user-info {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          text-align: left;
+        }
+        .review-name {
+          color: white;
+          font-weight: 700;
+          font-size: 13px;
+        }
+        .review-verified {
+          color: #a098ff;
+          font-size: 10px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .review-comment {
+          color: rgba(255, 255, 255, 0.7);
+          font-size: 13px;
+          line-height: 1.6;
+          font-weight: 500;
+          text-align: left;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .feature-marquee-track:hover {
+          animation-play-state: paused;
+        }
+      `;
+
+    const generateReviewCards = (items) => {
+      return items.map(item => `
+        <div class="review-card">
+            <div class="review-header">
+                <div class="review-user-info">
+                    <span class="review-name">${item.name}</span>
+                    <span class="review-verified">Student Verified</span>
+                </div>
+            </div>
+            <p class="review-comment">"${item.comment}"</p>
+        </div>
+      `).join('');
+    };
+
+    const reviewsUrl = chrome.runtime.getURL("reviews.json");
+    fetch(reviewsUrl)
+      .then(res => res.json())
+      .then(reviews => {
+        const track = document.getElementById("review-track");
+        if (track) {
+          // Use first 20 reviews for performance
+          const subset = reviews.slice(0, 20);
+          track.innerHTML = generateReviewCards(subset) + generateReviewCards(subset);
+        }
+      })
+      .catch(err => console.error("Failed to load reviews:", err));
+
+    const CURRENT_VERSION = "0.0.9";
+
     heroDiv.innerHTML = `
-    <!-- GitHub Star Button -->
-    <a href="https://github.com/theajmalrazaq/superflex" target="_blank" class="mt-4 md:mt-0 mb-6">
-        <button class="group relative dark:bg-neutral-800 bg-neutral-200 rounded-full p-px overflow-hidden cursor-pointer transition-all duration-200 ease-in-out hover:scale-105">
+    <!-- Version Display Button -->
+    <a href="https://theajmalrazaq.github.io/superflex" target="_blank" class="mt-4 md:mt-0 mb-6">
+        <button class="group relative dark:bg-neutral-800 bg-neutral-200 rounded-full p-px overflow-hidden cursor-pointer transition-all duration-200 ease-in-out">
           <span class="flex items-center justify-center gap-1 relative z-[1] dark:bg-neutral-950/90 bg-neutral-50/90 rounded-full py-2 px-4 pl-2 w-full">
-            <span class="relative group-hover:scale-105 transition-transform group-hover:rotate-[360deg] duration-500">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-950 dark:text-neutral-50">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            <span class="relative transition-transform duration-500">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a098ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
               </svg>
               <span class="rounded-full size-11 absolute opacity-0 dark:opacity-30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-lg" style="animation: 14s ease-in-out 0s infinite alternate none running star-shine; background: #a098ff;"></span>
             </span>
-            <span class="bg-gradient-to-b ml-1.5 dark:from-white dark:to-white/50 from-neutral-950 to-neutral-950/50 bg-clip-text text-xs text-transparent group-hover:scale-105 transition transform-gpu">
-              Star SuperFlex on Github (<span id="starCount" class="text-neutral-950 dark:text-neutral-50 text-xs"></span>)
+            <span id="version-text" class="bg-gradient-to-b ml-1.5 dark:from-white dark:to-white/50 from-neutral-950 to-neutral-950/50 bg-clip-text text-xs text-transparent uppercase font-bold">
+              SuperFlex v${CURRENT_VERSION}
             </span>
           </span>
         </button>
@@ -509,11 +640,11 @@ function LoginPageStyles() {
           </div>
         </div>
         
-        <div class="space-y-2">
+        <div class="space-y-2 flex items-center flex-col gap-2">
           <img src="https://theajmalrazaq.github.io/superflex/res/logo.svg" alt="SuperFlex" class="w-96 hero-logo filter" />
           <div class="flex items-center justify-center gap-3">
             <span class="w-12 h-px bg-gradient-to-r from-transparent to-white/20"></span>
-            <span class="font-black text-[10px] uppercase tracking-[0.4em] text-[#a098ff]/80">Next Gen Academic Portal</span>
+            <span class="font-black text-[10px] uppercase tracking-[0.4em] text-[#a098ff]/80">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span>
             <span class="w-12 h-px bg-gradient-to-l from-transparent to-white/20"></span>
           </div>
         </div>
@@ -527,118 +658,24 @@ function LoginPageStyles() {
     <div id="login-buttons-container" class="flex flex-row gap-4 justify-center mt-8 hero-buttons">
     </div>
 
-    <!-- Feature Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full px-6 feature-grid mt-12 mb-12 relative z-10">
-        <div class="bg-zinc-900/40 backdrop-blur-2xl border border-white/5 rounded-[2rem] p-8 hover:bg-zinc-900/60 hover:border-[#a098ff]/20 transition-all duration-500 group cursor-default">
-          <div className="flex flex-col items-start gap-4">
-            <div class="w-12 h-12 bg-[#a098ff]/10 rounded-2xl flex items-center justify-center text-[#a098ff] group-hover:scale-110 transition duration-500 border border-[#a098ff]/20">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect width="16" height="20" x="4" y="2" rx="2" ry="2"/>
-                <line x1="8" x2="16" y1="6" y2="6"/>
-                <line x1="8" x2="16" y1="10" y2="10"/>
-                <line x1="8" x2="16" y1="14" y2="14"/>
-                <line x1="8" x2="16" y1="18" y2="18"/>
-              </svg>
-            </div>
-            <div class="space-y-2">
-              <h3 class="text-lg font-black text-white tracking-tight uppercase tracking-tighter">Advanced GPA Tools</h3>
-              <p class="text-zinc-500 text-sm leading-relaxed font-medium">
-                Calculate semester GPA, plan target CGPA, and track your academic progress with a precision-engineered calculator.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-zinc-900/40 backdrop-blur-2xl border border-white/5 rounded-[2rem] p-8 hover:bg-zinc-900/60 hover:border-[#a098ff]/20 transition-all duration-500 group cursor-default">
-          <div className="flex flex-col items-start gap-4">
-            <div class="w-12 h-12 bg-[#a098ff]/10 rounded-2xl flex items-center justify-center text-[#a098ff] group-hover:scale-110 transition duration-500 border border-[#a098ff]/20">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 3v18h18"/>
-                <path d="m19 9-5 5-4-4-3 3"/>
-              </svg>
-            </div>
-            <div class="space-y-2">
-              <h3 class="text-lg font-black text-white tracking-tight uppercase tracking-tighter">Statistical Insights</h3>
-              <p class="text-zinc-500 text-sm leading-relaxed font-medium">
-                Deep dive into your performance with grand totals, sessional averages, and comparative analytics.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-zinc-900/40 backdrop-blur-2xl border border-white/5 rounded-[2rem] p-8 hover:bg-zinc-900/60 hover:border-[#a098ff]/20 transition-all duration-500 group cursor-default">
-          <div className="flex flex-col items-start gap-4">
-            <div class="w-12 h-12 bg-[#a098ff]/10 rounded-2xl flex items-center justify-center text-[#a098ff] group-hover:scale-110 transition duration-500 border border-[#a098ff]/20">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect width="7" height="9" x="3" y="3" rx="1"/>
-                <rect width="7" height="5" x="14" y="3" rx="1"/>
-                <rect width="7" height="9" x="14" y="12" rx="1"/>
-                <rect width="7" height="5" x="3" y="16" rx="1"/>
-              </svg>
-            </div>
-            <div class="space-y-2">
-              <h3 class="text-lg font-black text-white tracking-tight uppercase tracking-tighter">Modern Experience</h3>
-              <p class="text-zinc-500 text-sm leading-relaxed font-medium">
-                Experience the portal like never before with glassmorphism, fluid animations, and a dark aesthetic.
-              </p>
-            </div>
-          </div>
+    <!-- Review Marquee -->
+    <div class="feature-marquee-container mt-12 mb-12 relative z-10">
+        <div class="marquee-overlay marquee-overlay-left"></div>
+        <div class="marquee-overlay marquee-overlay-right"></div>
+        <div id="review-track" class="feature-marquee-track">
+            <!-- Dynamically populated -->
         </div>
     </div>
 
-    <!-- Update Notification Section -->
-    <div id="update-notification-section" class="w-full max-w-4xl px-6 mt-5 hidden opacity-0 transition-opacity duration-300">
-      <div class="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-md border border-white/20 rounded-3xl p-5  transition duration-300 group">
-        <div class="flex items-center justify-between gap-6">
-          <div class="flex flex items-center gap-3 flex-1">
-            <div class="bg-[#a098ff] p-2.5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition duration-300">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white">
-                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                <path d="M3 3v5h5"/>
-                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
-                <path d="M16 16h5v5"/>
-              </svg>
-            </div>
-            <div class="flex flex-col gap-1">
-            <h3 class="text-base font-semibold text-white text-left">
-              New Update Available! 🎉
-            </h3>
-            <p class="text-white/80 text-sm leading-relaxed text-left">
-              Version <span id="latest-version"></span> is ready to download with exciting improvements.
-            </p>
-            </div>
-          </div>
-          <div class="flex items-center gap-3 flex-shrink-0">
-            <a href="https://theajmalrazaq.github.io/superflex" target="_blank" class="bg-[#a098ff] hover:bg-[#8f86ff] text-white text-sm font-semibold px-5 py-2 rounded-xl transition-all duration-200 flex items-center gap-2 whitespace-nowrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              Download
-            </a>
-            <button id="dismiss-update-btn" class="text-white/60 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-lg" title="Dismiss">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
+
+
+
+
     </div>
     `;
-    const CURRENT_VERSION = "0.0.9";
     const checkForUpdates = async () => {
       try {
-        const lastDismissed = localStorage.getItem(
-          "updateNotificationDismissed",
-        );
         const today = new Date().toDateString();
-
-        if (lastDismissed === today) {
-          return;
-        }
 
         const response = await fetch(
           "https://api.github.com/repos/theajmalrazaq/superflex/releases/latest",
@@ -667,26 +704,9 @@ function LoginPageStyles() {
           }
 
           if (isNewer) {
-            const updateSection = document.getElementById(
-              "update-notification-section",
-            );
-            const versionEl = document.getElementById("latest-version");
-            const dismissBtn = document.getElementById("dismiss-update-btn");
-
-            if (updateSection && versionEl) {
-              versionEl.textContent = latestVer;
-              updateSection.classList.remove("hidden");
-              setTimeout(() => updateSection.classList.remove("opacity-0"), 10);
-            }
-
-            if (dismissBtn) {
-              dismissBtn.addEventListener("click", () => {
-                updateSection.classList.add("opacity-0");
-                setTimeout(() => {
-                  updateSection.classList.add("hidden");
-                  localStorage.setItem("updateNotificationDismissed", today);
-                }, 300);
-              });
+            const versionText = document.getElementById("version-text");
+            if (versionText) {
+              versionText.innerHTML = `New Update Available: v${latestVer}`;
             }
           }
         }

@@ -105,7 +105,7 @@ const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
         <button 
            onClick={() => onSubmit(file, remarks)}
            disabled={!file || !remarks}
-           className="w-full bg-[#a098ff] hover:bg-[#b0a8ff] disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-950 px-6 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all active:scale-[0.98]"
+           className="w-full bg-[#a098ff] hover:bg-[#b0a8ff] disabled:bg-zinc-800 disabled:text-zinc-600 text-white px-6 py-4 rounded-xl font-bold uppercase"
         >
             Confirm & Submit Request
         </button>

@@ -128,7 +128,7 @@ const CGPAPlannerModal = ({ isOpen, onClose, currentCGPA, currentCreditHours }) 
 
             <button 
               type="submit"
-              className="w-full h-[48px] bg-[#a098ff] hover:bg-[#8f86ff] text-white rounded-xl font-bold text-sm transition-all active:scale-[0.98]"
+              className="w-full h-[48px] bg-[#a098ff] hover:bg-[#8f86ff] text-white rounded-xl font-bold text-sm"
             >
               Generate Strategy
             </button>

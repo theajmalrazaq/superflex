@@ -9,7 +9,7 @@ const NotificationBanner = ({ alerts, onActionClick, actionLabel = "More Instruc
           {onActionClick && (
             <button 
                onClick={onActionClick}
-               className="group/btn flex items-center gap-2 px-4 py-1.5 bg-white/5 hover:bg-white/10 text-white rounded-full text-[9px] font-black uppercase tracking-widest transition-all active:scale-95 border border-white/5"
+               className="group/btn flex items-center gap-2 px-4 py-1.5 bg-white/5 hover:bg-white/10 text-white rounded-full text-[9px] font-black uppercase border border-white/5"
             >
                {actionLabel}
                <ChevronRight size={10} className="group-hover/btn:translate-x-1 transition-transform" />

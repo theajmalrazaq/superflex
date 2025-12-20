@@ -11,6 +11,9 @@ import {
   Award,
   Activity,
   BarChart2,
+  Settings,
+  X,
+  RotateCcw,
 } from "lucide-react";
 import NotificationBanner from "../NotificationBanner";
 import PageHeader from "../PageHeader";
@@ -293,14 +296,99 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
   );
 };
 
+const BestOfModal = ({ isOpen, onClose, onApply, itemCount }) => {
+  const [count, setCount] = useState(4);
+  const [totalWeight, setTotalWeight] = useState(20);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-[#161616] border border-white/10 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl">
+        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-[#a098ff]/10 text-[#a098ff]">
+              <Settings size={20} />
+            </div>
+            <h3 className="text-xl font-bold text-white">Best Of Calculator</h3>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-white/10 rounded-full text-zinc-400 hover:text-white transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="p-8 space-y-6">
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-zinc-400 uppercase tracking-wider">
+              Number of Best Items
+            </label>
+            <div className="relative">
+              <input
+                type="number"
+                value={count}
+                onChange={(e) => setCount(parseInt(e.target.value) || 0)}
+                max={itemCount}
+                min={1}
+                className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-[#a098ff] transition-all text-xl font-bold"
+                placeholder="e.g. 4"
+              />
+              <span className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">
+                out of {itemCount}
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-zinc-400 uppercase tracking-wider">
+              Total Weightage (%)
+            </label>
+            <input
+              type="number"
+              value={totalWeight}
+              onChange={(e) => setTotalWeight(parseFloat(e.target.value) || 0)}
+              className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-[#a098ff] transition-all text-xl font-bold"
+              placeholder="e.g. 20"
+            />
+          </div>
+
+          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex gap-3">
+            <AlertCircle className="text-amber-400 shrink-0" size={18} />
+            <p className="text-xs text-amber-200/70 leading-relaxed">
+              This will automatically pick the highest scoring {count} items and
+              assign them an equal portion of the {totalWeight}% total weightage.
+            </p>
+          </div>
+
+          <button
+            onClick={() => onApply(count, totalWeight)}
+            className="w-full bg-[#a098ff] hover:bg-[#a098ff]/90 text-white font-bold py-4 rounded-2xl transition-all"
+          >
+            Apply Calculation
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AssessmentView = ({
   section,
   onUpdate,
   markedItems,
   onToggleMark,
   courseId,
+  onBestOf,
+  onReset,
 }) => {
+  const [isBestOfOpen, setIsBestOfOpen] = useState(false);
   const isGrandTotal = section.title.includes("Grand Total");
+  const isBestOfEligible =
+    section.title.toLowerCase().includes("quiz") ||
+    section.title.toLowerCase().includes("assignment") ||
+    section.title.toLowerCase().includes("lab");
   const obtained = section.obtained || 0;
   const weight = section.weight || 0;
   const percentage = weight > 0 ? (obtained / weight) * 100 : 0;
@@ -353,7 +441,35 @@ const AssessmentView = ({
             </p>
           </div>
 
-          {}
+          {isBestOfEligible && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsBestOfOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#a098ff]/10 text-[#a098ff] border border-[#a098ff]/20 hover:bg-[#a098ff]/20 transition-all font-bold text-sm"
+              >
+                <Settings size={16} />
+                Best Of
+              </button>
+              <button
+                onClick={onReset}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800 text-zinc-400 border border-white/5 hover:bg-zinc-700 hover:text-white transition-all font-bold text-sm"
+                title="Reset to original scores"
+              >
+                <RotateCcw size={16} />
+                Reset
+              </button>
+            </div>
+          )}
+
+          <BestOfModal
+            isOpen={isBestOfOpen}
+            onClose={() => setIsBestOfOpen(false)}
+            itemCount={section.rows.filter((r) => r.title !== "Total").length}
+            onApply={(count, weight) => {
+              onBestOf(count, weight);
+              setIsBestOfOpen(false);
+            }}
+          />
         </div>
 
         {/* Assessment Stats */}
@@ -685,6 +801,7 @@ function MarksPage() {
   const [alerts, setAlerts] = useState([]);
   const hiddenFormRef = useRef(null);
   const [activeSectionId, setActiveSectionId] = useState(null);
+  const initialCoursesRef = useRef([]);
 
   const [markedItems, setMarkedItems] = useState(() => {
     if (typeof window !== "undefined") {
@@ -959,7 +1076,9 @@ function MarksPage() {
           });
         });
 
+
         setCourses(parsedCourses);
+        initialCoursesRef.current = JSON.parse(JSON.stringify(parsedCourses));
         if (parsedCourses.length > 0) {
           const firstId = parsedCourses[0].id;
           setSelectedCourseId(firstId);
@@ -1007,6 +1126,94 @@ function MarksPage() {
 
       const tempCourse = { ...course, sections: updatedSections };
 
+      const recalculatedCourse = recalculateCourse(tempCourse);
+
+      const newCourses = [...prevCourses];
+      newCourses[courseIdx] = recalculatedCourse;
+      return newCourses;
+    });
+  };
+
+  const handleBestOfUpdate = (sectionId, count, totalWeight) => {
+    if (!selectedCourseId) return;
+
+    setCourses((prevCourses) => {
+      const courseIdx = prevCourses.findIndex((c) => c.id === selectedCourseId);
+      if (courseIdx === -1) return prevCourses;
+
+      const course = prevCourses[courseIdx];
+      const sectionIdx = course.sections.findIndex((s) => s.id === sectionId);
+      if (sectionIdx === -1) return prevCourses;
+
+      const section = course.sections[sectionIdx];
+      const items = section.rows.filter((r) => r.title !== "Total");
+
+      // Calculate percentage for each item to find the best ones
+      const sorted = items
+        .map((r, i) => ({
+          ...r,
+          originalIdx: i,
+          ratio: r.total > 0 ? r.obtained / r.total : 0,
+        }))
+        .sort((a, b) => b.ratio - a.ratio);
+
+      const topIndices = new Set(
+        sorted.slice(0, count).map((item) => item.originalIdx),
+      );
+
+      const weightPerItem = count > 0 ? totalWeight / count : 0;
+
+      const newRows = section.rows.map((row, idx) => {
+        if (row.title === "Total") return row;
+        const isTop = topIndices.has(idx);
+        return {
+          ...row,
+          weight: isTop ? weightPerItem : 0,
+          included: isTop,
+        };
+      });
+
+      const updatedSections = [...course.sections];
+      updatedSections[sectionIdx] = {
+        ...section,
+        rows: newRows,
+        weight: totalWeight,
+      };
+
+      const tempCourse = { ...course, sections: updatedSections };
+      const recalculatedCourse = recalculateCourse(tempCourse);
+
+      const newCourses = [...prevCourses];
+      newCourses[courseIdx] = recalculatedCourse;
+      return newCourses;
+    });
+  };
+
+  const handleResetSection = (sectionId) => {
+    if (!selectedCourseId || !initialCoursesRef.current.length) return;
+
+    const initialCourse = initialCoursesRef.current.find(
+      (c) => c.id === selectedCourseId,
+    );
+    if (!initialCourse) return;
+
+    const initialSection = initialCourse.sections.find(
+      (s) => s.id === sectionId,
+    );
+    if (!initialSection) return;
+
+    setCourses((prevCourses) => {
+      const courseIdx = prevCourses.findIndex((c) => c.id === selectedCourseId);
+      if (courseIdx === -1) return prevCourses;
+
+      const course = prevCourses[courseIdx];
+      const sectionIdx = course.sections.findIndex((s) => s.id === sectionId);
+      if (sectionIdx === -1) return prevCourses;
+
+      const updatedSections = [...course.sections];
+      updatedSections[sectionIdx] = JSON.parse(JSON.stringify(initialSection));
+
+      const tempCourse = { ...course, sections: updatedSections };
       const recalculatedCourse = recalculateCourse(tempCourse);
 
       const newCourses = [...prevCourses];
@@ -1098,6 +1305,10 @@ function MarksPage() {
                   markedItems={markedItems}
                   onToggleMark={handleToggleMark}
                   courseId={selectedCourse.id}
+                  onBestOf={(count, weight) =>
+                    handleBestOfUpdate(activeSectionId, count, weight)
+                  }
+                  onReset={() => handleResetSection(activeSectionId)}
                 />
               ) : selectedCourse.sections.length > 0 ? (
                 <AssessmentView
@@ -1113,6 +1324,16 @@ function MarksPage() {
                   markedItems={markedItems}
                   onToggleMark={handleToggleMark}
                   courseId={selectedCourse.id}
+                  onBestOf={(count, weight) =>
+                    handleBestOfUpdate(
+                      selectedCourse.sections[0].id,
+                      count,
+                      weight,
+                    )
+                  }
+                  onReset={() =>
+                    handleResetSection(selectedCourse.sections[0].id)
+                  }
                 />
               ) : (
                 <div className="text-center py-24 bg-[#161616] rounded-[30px] border border-white/5 opacity-50">

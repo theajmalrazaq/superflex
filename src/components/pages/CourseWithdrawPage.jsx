@@ -129,7 +129,7 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
         <button 
            onClick={() => onSubmit({ remarks, files })}
            disabled={!isFormValid}
-           className="w-full bg-[#a098ff] hover:bg-[#8f86ff] disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-950 px-6 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+           className="w-full bg-[#a098ff] hover:bg-[#8f86ff] disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-950 px-6 py-4 rounded-xl font-white uppercase text-[10px] flex items-center justify-center gap-2"
         >
             <Send size={16} />
             Confirm & Submit Request
@@ -663,7 +663,7 @@ function CourseWithdrawPage() {
                             <button 
                                 onClick={handleWithdrawAction}
                                 disabled={selectedCount === 0 || isSubmitting}
-                                className="group flex items-center justify-center gap-3 w-full bg-rose-500 hover:bg-rose-600 disabled:bg-zinc-800 disabled:text-zinc-600 text-white px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95"
+                                className="group flex items-center justify-center gap-3 w-full bg-rose-500 hover:bg-rose-600 disabled:bg-zinc-800 disabled:text-zinc-600 text-white px-6 py-4 rounded-2xl text-[10px] font-bold uppercase"
                             >
                                 <Trash2 size={16} className="group-hover:rotate-12 transition-transform" />
                                 {isSubmitting ? "Processing..." : "Initiate Withdraw"}
