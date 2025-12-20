@@ -1,3 +1,11 @@
+/* most critical part whole flash problem is solved by this */
+/* do not remove */
+body {
+  visibility: hidden !important;
+  overflow: hidden;
+  background: black;
+}
+/* end here */
 .loading-overlay {
   position: fixed;
   top: 0;

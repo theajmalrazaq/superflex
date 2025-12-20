@@ -612,8 +612,13 @@ function LoginPageStyles() {
         .join("");
     };
 
-    const reviewsUrl = chrome.runtime.getURL("reviews.json");
+    const reviewsUrl = chrome.runtime.getURL("public/reviews.json");
+
     fetch(reviewsUrl)
+      .then((res) => {
+        if (!res.ok) return fetch(chrome.runtime.getURL("reviews.json"));
+        return res;
+      })
       .then((res) => res.json())
       .then((reviews) => {
         const track = document.getElementById("review-track");

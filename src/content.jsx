@@ -12,6 +12,31 @@ import "./styles/tailwind.css";
   document.head.appendChild(script);
 })();
 
+const fontLinks = [
+  { rel: "preconnect", href: "https://fonts.googleapis.com" },
+  {
+    rel: "preconnect",
+    href: "https://fonts.gstatic.com",
+    crossOrigin: "anonymous",
+  },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap",
+  },
+];
+
+fontLinks.forEach((linkDef) => {
+  if (!document.querySelector(`link[href="${linkDef.href}"]`)) {
+    const link = document.createElement("link");
+    link.rel = linkDef.rel;
+    link.href = linkDef.href;
+    if (linkDef.crossOrigin) {
+      link.crossOrigin = "";
+    }
+    document.head.appendChild(link);
+  }
+});
+
 const container = document.createElement("div");
 container.id = "react-chrome-app";
 document.body.insertBefore(container, document.body.firstChild);
