@@ -12,16 +12,24 @@ function ChangePasswordPage() {
     );
 
     if (targetElement) {
-      // Parse Alerts
       const alertList = [];
-      targetElement.querySelectorAll(".m-alert, .alert").forEach(alert => {
-        if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
+      targetElement.querySelectorAll(".m-alert, .alert").forEach((alert) => {
+        if (
+          alert.style.display === "none" ||
+          alert.id === "DataErrormsgdiv" ||
+          alert.closest(".modal")
+        )
+          return;
 
         const textContainer = alert.querySelector(".m-alert__text") || alert;
         const clone = textContainer.cloneNode(true);
-        // Remove standard UI elements that shouldn't be in the message
-        clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
-        
+
+        clone
+          .querySelectorAll(
+            ".m-alert__close, button, a, strong, .m-alert__icon",
+          )
+          .forEach((el) => el.remove());
+
         let message = clone.textContent
           .replace(/Alert!/gi, "")
           .replace(/Close/gi, "")
@@ -30,8 +38,12 @@ function ChangePasswordPage() {
           .trim();
 
         if (message && message.length > 3) {
-            const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
-            alertList.push({ type, message });
+          const type =
+            alert.classList.contains("alert-danger") ||
+            alert.classList.contains("m-alert--outline-danger")
+              ? "error"
+              : "info";
+          alertList.push({ type, message });
         }
       });
       setAlerts(alertList);
@@ -311,8 +323,8 @@ function ChangePasswordPage() {
   return (
     <PageLayout currentPage={window.location.pathname}>
       <div className="p-8 space-y-8">
-        <PageHeader 
-          title="Security" 
+        <PageHeader
+          title="Security"
           subtitle="Manage your account password and security settings"
         />
         <NotificationBanner alerts={alerts} />

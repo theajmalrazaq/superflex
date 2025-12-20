@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import PageLayout from "../layouts/PageLayout";
 import { LoadingSpinner } from "../LoadingOverlay";
-import { 
-  BarChart3, 
-  TrendingUp, 
+import {
+  BarChart3,
+  TrendingUp,
   Target,
   FileBarChart,
   Layout,
@@ -21,7 +21,7 @@ function MarksPloReportPage() {
   const [reportHtml, setReportHtml] = useState(null);
   const [summaryData, setSummaryData] = useState(null);
   const [alerts, setAlerts] = useState([]);
-  
+
   const hiddenContentRef = useRef(null);
 
   useEffect(() => {
@@ -32,30 +32,40 @@ function MarksPloReportPage() {
     const parseData = () => {
       try {
         let root = document.querySelector(".m-wrapper");
-        
-        // Fallback for strict mode / re-renders
+
         if (!root || root.children.length === 0) {
-            if (hiddenContentRef.current && hiddenContentRef.current.children.length > 0) {
-                root = hiddenContentRef.current;
-            } else {
-                setLoading(false);
-                window.dispatchEvent(
-                    new CustomEvent("superflex-update-loading", { detail: false }),
-                );
-                return;
-            }
+          if (
+            hiddenContentRef.current &&
+            hiddenContentRef.current.children.length > 0
+          ) {
+            root = hiddenContentRef.current;
+          } else {
+            setLoading(false);
+            window.dispatchEvent(
+              new CustomEvent("superflex-update-loading", { detail: false }),
+            );
+            return;
+          }
         }
 
-        // 0. Parse Alerts
         const alertList = [];
-        root.querySelectorAll(".m-alert, .alert").forEach(alert => {
-          if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
+        root.querySelectorAll(".m-alert, .alert").forEach((alert) => {
+          if (
+            alert.style.display === "none" ||
+            alert.id === "DataErrormsgdiv" ||
+            alert.closest(".modal")
+          )
+            return;
 
           const textContainer = alert.querySelector(".m-alert__text") || alert;
           const clone = textContainer.cloneNode(true);
-          // Remove standard UI elements that shouldn't be in the message
-          clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
-          
+
+          clone
+            .querySelectorAll(
+              ".m-alert__close, button, a, strong, .m-alert__icon",
+            )
+            .forEach((el) => el.remove());
+
           let message = clone.textContent
             .replace(/Alert!/gi, "")
             .replace(/Close/gi, "")
@@ -64,133 +74,153 @@ function MarksPloReportPage() {
             .trim();
 
           if (message && message.length > 3) {
-              const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
-              alertList.push({ type, message });
+            const type =
+              alert.classList.contains("alert-danger") ||
+              alert.classList.contains("m-alert--outline-danger")
+                ? "error"
+                : "info";
+            alertList.push({ type, message });
           }
         });
         setAlerts(alertList);
 
-        // 1. Parse Semesters
-        const legacyForm = root.querySelector("form") || root.querySelector(".row"); // Sometimes form IS the row
+        const legacyForm =
+          root.querySelector("form") || root.querySelector(".row");
         if (legacyForm) {
-            const select = legacyForm.querySelector("select#SemId");
-            if (select) {
-                const opts = Array.from(select.options).map((o) => ({
-                    label: o.text.trim(),
-                    value: o.value,
-                    selected: o.selected,
-                }));
-                setSemesters(opts);
-            }
+          const select = legacyForm.querySelector("select#SemId");
+          if (select) {
+            const opts = Array.from(select.options).map((o) => ({
+              label: o.text.trim(),
+              value: o.value,
+              selected: o.selected,
+            }));
+            setSemesters(opts);
+          }
         }
 
-        // 2. Parse Report Table
         const table = root.querySelector("table.sum_table");
         if (table) {
-            // Process Summary Data from Table Footer
-            const lastRow = table.querySelector("tr:last-child");
-            if (lastRow) {
-                // Assuming last valid cell is percentage
-                // Logic based on previous code: obtainPercentage = tr:last-child td.text-center.bold
-                const boldCells = lastRow.querySelectorAll("td.bold.text-center");
-                const percentageCell = boldCells.length > 0 ? boldCells[boldCells.length - 1] : null;
+          const lastRow = table.querySelector("tr:last-child");
+          if (lastRow) {
+            const boldCells = lastRow.querySelectorAll("td.bold.text-center");
+            const percentageCell =
+              boldCells.length > 0 ? boldCells[boldCells.length - 1] : null;
 
-                if (percentageCell) {
-                    const percentage = parseFloat(percentageCell.textContent.trim()) || 0;
-                    
-                    // Parse PLO Breakdown
-                    // PLO cells are between some indices in the last row.
-                    // Previous code: slice(2, -1) from "td.text-center"
-                    const allCenterCells = Array.from(lastRow.querySelectorAll("td.text-center"));
-                    // Heuristic: PLO values are usually numeric cells before the final total?
-                    // Let's deduce from headers if possible, or stick to the heuristic
-                    // The previous code used slice(2, -1). Let's try to map all numeric values found that are NOT the total
-                    
-                    const ploValues = [];
-                    // Using the previous code's logic as it was specific to this page's structure
-                    const validPloCells = allCenterCells.slice(2, -1);
-                    validPloCells.forEach((cell, idx) => {
-                        const txt = cell.textContent.trim();
-                        if (txt !== '-' && txt !== '') {
-                            ploValues.push({
-                                id: idx + 1,
-                                value: parseFloat(txt) || 0
-                            });
-                        }
-                    });
+            if (percentageCell) {
+              const percentage =
+                parseFloat(percentageCell.textContent.trim()) || 0;
 
-                    setSummaryData({
-                        percentage,
-                        ploBreakdown: ploValues
-                    });
+              const allCenterCells = Array.from(
+                lastRow.querySelectorAll("td.text-center"),
+              );
+
+              const ploValues = [];
+
+              const validPloCells = allCenterCells.slice(2, -1);
+              validPloCells.forEach((cell, idx) => {
+                const txt = cell.textContent.trim();
+                if (txt !== "-" && txt !== "") {
+                  ploValues.push({
+                    id: idx + 1,
+                    value: parseFloat(txt) || 0,
+                  });
                 }
+              });
+
+              setSummaryData({
+                percentage,
+                ploBreakdown: ploValues,
+              });
             }
+          }
 
-            // Style and Save Table HTML
-            // We clone it to modify it safeley
-            const clonedTable = table.cloneNode(true);
-            
-            // Apply Tailwind Classes
-            clonedTable.classList.add("w-full", "border-collapse");
-            clonedTable.classList.remove("table-bordered", "table-striped", "table-responsive", "m-table", "sum_table");
-            
-            // Header
-            const thead = clonedTable.querySelector("thead");
-            if (thead) {
-                thead.classList.add("bg-zinc-900/50", "text-xs", "uppercase", "tracking-wider", "font-bold", "text-zinc-400");
-                const ths = thead.querySelectorAll("th");
-                ths.forEach(th => {
-                   th.classList.add("p-3", "border", "border-white/5", "text-center"); 
-                   th.removeAttribute("style"); // remove inline borders
-                });
-            }
+          const clonedTable = table.cloneNode(true);
 
-            // Body
-            const tbody = clonedTable.querySelector("tbody");
-            if (tbody) {
-                const trs = tbody.querySelectorAll("tr");
-                trs.forEach(tr => {
-                    tr.classList.add("border-b", "border-white/5", "hover:bg-white/5", "transition-colors");
-                    tr.removeAttribute("style"); // remove legacy bg colors
+          clonedTable.classList.add("w-full", "border-collapse");
+          clonedTable.classList.remove(
+            "table-bordered",
+            "table-striped",
+            "table-responsive",
+            "m-table",
+            "sum_table",
+          );
 
-                    const tds = tr.querySelectorAll("td");
-                    tds.forEach(td => {
-                        td.classList.add("p-3", "text-sm", "border-x", "border-white/5", "text-zinc-300");
-                        
-                        // Colorize scores
-                        const txt = td.textContent.trim();
-                        if (/^\d+(\.\d+)?$/.test(txt)) { // Is number
-                            const val = parseFloat(txt);
-                            if (val < 30) td.classList.add("text-rose-400", "font-bold");
-                            else if (val < 60) td.classList.add("text-amber-400", "font-bold");
-                            else if (val >= 60) td.classList.add("text-emerald-400", "font-bold");
-                        }
-                        
-                        // Handle 'bold' class from legacy
-                        if (td.classList.contains("bold")) td.classList.add("font-bold", "text-white");
-                    });
-                });
-                
-                // Highlight last row (Totals)
-                const lastTr = tbody.querySelector("tr:last-child");
-                if (lastTr) {
-                    lastTr.classList.add("bg-white/5", "!font-bold");
-                    const tds = lastTr.querySelectorAll("td");
-                    tds.forEach(td => td.classList.add("!text-white")); // Ensure visible
+          const thead = clonedTable.querySelector("thead");
+          if (thead) {
+            thead.classList.add(
+              "bg-zinc-900/50",
+              "text-xs",
+              "uppercase",
+              "tracking-wider",
+              "font-bold",
+              "text-zinc-400",
+            );
+            const ths = thead.querySelectorAll("th");
+            ths.forEach((th) => {
+              th.classList.add(
+                "p-3",
+                "border",
+                "border-white/5",
+                "text-center",
+              );
+              th.removeAttribute("style");
+            });
+          }
+
+          const tbody = clonedTable.querySelector("tbody");
+          if (tbody) {
+            const trs = tbody.querySelectorAll("tr");
+            trs.forEach((tr) => {
+              tr.classList.add(
+                "border-b",
+                "border-white/5",
+                "hover:bg-white/5",
+                "transition-colors",
+              );
+              tr.removeAttribute("style");
+
+              const tds = tr.querySelectorAll("td");
+              tds.forEach((td) => {
+                td.classList.add(
+                  "p-3",
+                  "text-sm",
+                  "border-x",
+                  "border-white/5",
+                  "text-zinc-300",
+                );
+
+                const txt = td.textContent.trim();
+                if (/^\d+(\.\d+)?$/.test(txt)) {
+                  const val = parseFloat(txt);
+                  if (val < 30) td.classList.add("text-rose-400", "font-bold");
+                  else if (val < 60)
+                    td.classList.add("text-amber-400", "font-bold");
+                  else if (val >= 60)
+                    td.classList.add("text-emerald-400", "font-bold");
                 }
-            }
 
-            setReportHtml(clonedTable.outerHTML);
+                if (td.classList.contains("bold"))
+                  td.classList.add("font-bold", "text-white");
+              });
+            });
+
+            const lastTr = tbody.querySelector("tr:last-child");
+            if (lastTr) {
+              lastTr.classList.add("bg-white/5", "!font-bold");
+              const tds = lastTr.querySelectorAll("td");
+              tds.forEach((td) => td.classList.add("!text-white"));
+            }
+          }
+
+          setReportHtml(clonedTable.outerHTML);
         } else {
-            console.log("No table found");
         }
 
-        // 3. Move Content for Legacy Form Functionality
         if (hiddenContentRef.current && root !== hiddenContentRef.current) {
-            hiddenContentRef.current.innerHTML = "";
-            while (root.firstChild) {
-                hiddenContentRef.current.appendChild(root.firstChild);
-            }
+          hiddenContentRef.current.innerHTML = "";
+          while (root.firstChild) {
+            hiddenContentRef.current.appendChild(root.firstChild);
+          }
         }
 
         setLoading(false);
@@ -211,28 +241,36 @@ function MarksPloReportPage() {
 
   const handleSemesterChange = (val) => {
     if (hiddenContentRef.current) {
-        const select = hiddenContentRef.current.querySelector("select#SemId");
-        if (select) {
-            select.value = val;
-            select.dispatchEvent(new Event('change'));
-            // If there's a form, submit it
-            const form = select.closest("form");
-            if (form) form.submit();
-        }
+      const select = hiddenContentRef.current.querySelector("select#SemId");
+      if (select) {
+        select.value = val;
+        select.dispatchEvent(new Event("change"));
+
+        const form = select.closest("form");
+        if (form) form.submit();
+      }
     }
   };
 
-  // Helper for status visual
   const getStatus = (pct) => {
-      if (pct < 30) return { label: "Poor", color: "text-rose-400", bg: "bg-rose-500/20" };
-      if (pct < 60) return { label: "Average", color: "text-amber-400", bg: "bg-amber-500/20" };
-      return { label: "Excellent", color: "text-emerald-400", bg: "bg-emerald-500/20" };
+    if (pct < 30)
+      return { label: "Poor", color: "text-rose-400", bg: "bg-rose-500/20" };
+    if (pct < 60)
+      return {
+        label: "Average",
+        color: "text-amber-400",
+        bg: "bg-amber-500/20",
+      };
+    return {
+      label: "Excellent",
+      color: "text-emerald-400",
+      bg: "bg-emerald-500/20",
+    };
   };
 
   return (
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-6 md:p-8 space-y-8 print:p-0 print:bg-white">
-        
         <PageHeader
           className="print:hidden"
           title="PLO Report"
@@ -253,87 +291,103 @@ function MarksPloReportPage() {
           </div>
         ) : (
           <div className="space-y-8">
-            {/* Notifications */}
+            {}
             <NotificationBanner alerts={alerts} />
-            
-            {/* Dashboard Summary */}
+
+            {}
             {summaryData && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 print:gap-4">
-                    <StatsCard 
-                        icon={Target}
-                        label="Overall Attainment"
-                        value={`${summaryData.percentage}%`}
-                        subValue="Based on CLO mapping"
-                        delay={100}
-                        className={`print:border-gray-200 print:bg-white ${getStatus(summaryData.percentage).color}`}
-                    />
-                    <StatsCard 
-                        icon={TrendingUp}
-                        label="Performance Status"
-                        value={getStatus(summaryData.percentage).label}
-                        subValue="Performance Level"
-                        delay={200}
-                        className={`print:border-gray-200 print:bg-white ${getStatus(summaryData.percentage).color}`}
-                    />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 print:gap-4">
+                <StatsCard
+                  icon={Target}
+                  label="Overall Attainment"
+                  value={`${summaryData.percentage}%`}
+                  subValue="Based on CLO mapping"
+                  delay={100}
+                  className={`print:border-gray-200 print:bg-white ${getStatus(summaryData.percentage).color}`}
+                />
+                <StatsCard
+                  icon={TrendingUp}
+                  label="Performance Status"
+                  value={getStatus(summaryData.percentage).label}
+                  subValue="Performance Level"
+                  delay={200}
+                  className={`print:border-gray-200 print:bg-white ${getStatus(summaryData.percentage).color}`}
+                />
 
-                    {/* PLO Breakdown */}
-                    <div className="flex-1 min-w-[140px] p-6 rounded-[2rem] border bg-zinc-900/50 backdrop-blur-xl hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group print:border-gray-200 print:bg-white">
-                        <div className="flex justify-between items-start mb-6">
-                            <div className="p-3.5 rounded-2xl bg-[#a098ff]/10 text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
-                                <FileBarChart size={24} />
-                            </div>
-                        </div>
-                        <div className="space-y-4">
-                            <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1 print:text-black">PLO Breakdown</p>
-                            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
-                                 {summaryData.ploBreakdown.map((plo, i) => (
-                                     <div key={i} className="flex flex-col items-center bg-black/20 rounded-lg p-2 border border-white/5 hover:border-white/10 transition-colors print:border-gray-200 print:bg-transparent">
-                                         <span className="text-[9px] text-zinc-500 uppercase font-black tracking-widest print:text-black leading-none mb-1">PLO{plo.id}</span>
-                                         <span className={`text-[11px] font-black text-[#a098ff] print:text-black`}>
-                                             {plo.value}%
-                                         </span>
-                                     </div>
-                                 ))}
-                            </div>
-                        </div>
+                {}
+                <div className="flex-1 min-w-[140px] p-6 rounded-[2rem] border bg-zinc-900/50 backdrop-blur-xl hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group print:border-gray-200 print:bg-white">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="p-3.5 rounded-2xl bg-[#a098ff]/10 text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
+                      <FileBarChart size={24} />
                     </div>
+                  </div>
+                  <div className="space-y-4">
+                    <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1 print:text-black">
+                      PLO Breakdown
+                    </p>
+                    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
+                      {summaryData.ploBreakdown.map((plo, i) => (
+                        <div
+                          key={i}
+                          className="flex flex-col items-center bg-black/20 rounded-lg p-2 border border-white/5 hover:border-white/10 transition-colors print:border-gray-200 print:bg-transparent"
+                        >
+                          <span className="text-[9px] text-zinc-500 uppercase font-black tracking-widest print:text-black leading-none mb-1">
+                            PLO{plo.id}
+                          </span>
+                          <span
+                            className={`text-[11px] font-black text-[#a098ff] print:text-black`}
+                          >
+                            {plo.value}%
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
+              </div>
             )}
 
-            {/* Printable section removed */}
+            {}
 
-            {/* Detailed Report Table */}
+            {}
             {reportHtml ? (
-                <div className="bg-zinc-900/50 border border-white/5 rounded-3xl overflow-hidden">
-                    <div className="p-6 border-b border-white/5 flex items-center gap-3 bg-white/5">
-                        <div className="p-2 bg-[#a098ff]/10 rounded-lg text-[#a098ff]">
-                            <Layout size={20} />
-                        </div>
-                        <h3 className="font-bold text-lg text-white">Detailed Result</h3>
-                    </div>
-                    {/* Render extracted HTML */}
-                    <div className="overflow-x-auto custom-scrollbar p-0">
-                         <div 
-                            className="legacy-table-wrapper w-full [&_table]:w-full [&_table]:border-collapse [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap"
-                            dangerouslySetInnerHTML={{ __html: reportHtml }} 
-                         />
-                    </div>
+              <div className="bg-zinc-900/50 border border-white/5 rounded-3xl overflow-hidden">
+                <div className="p-6 border-b border-white/5 flex items-center gap-3 bg-white/5">
+                  <div className="p-2 bg-[#a098ff]/10 rounded-lg text-[#a098ff]">
+                    <Layout size={20} />
+                  </div>
+                  <h3 className="font-bold text-lg text-white">
+                    Detailed Result
+                  </h3>
                 </div>
+                {}
+                <div className="overflow-x-auto custom-scrollbar p-0">
+                  <div
+                    className="legacy-table-wrapper w-full [&_table]:w-full [&_table]:border-collapse [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap"
+                    dangerouslySetInnerHTML={{ __html: reportHtml }}
+                  />
+                </div>
+              </div>
             ) : (
-                <div className="flex flex-col items-center justify-center py-20 text-center opacity-50 border border-white/5 rounded-3xl bg-zinc-900/20">
-                    <Info size={48} className="mb-4 text-zinc-500" />
-                    <p className="text-xl font-bold text-white">No PLO Report Available</p>
-                    <p className="text-zinc-400 mt-2">There is no PLO attainment data available for the selected semester.</p>
-                    <p className="text-zinc-500 text-sm mt-1">Please select a different semester.</p>
-                </div>
+              <div className="flex flex-col items-center justify-center py-20 text-center opacity-50 border border-white/5 rounded-3xl bg-zinc-900/20">
+                <Info size={48} className="mb-4 text-zinc-500" />
+                <p className="text-xl font-bold text-white">
+                  No PLO Report Available
+                </p>
+                <p className="text-zinc-400 mt-2">
+                  There is no PLO attainment data available for the selected
+                  semester.
+                </p>
+                <p className="text-zinc-500 text-sm mt-1">
+                  Please select a different semester.
+                </p>
+              </div>
             )}
-
           </div>
         )}
 
-        {/* Hidden Legacy Container */}
+        {}
         <div ref={hiddenContentRef} className="hidden" />
-
       </div>
     </PageLayout>
   );

@@ -2,7 +2,7 @@ import React from "react";
 
 const PageHeader = ({ title, subtitle, children, className = "" }) => {
   return (
-    <div 
+    <div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
@@ -13,9 +13,7 @@ const PageHeader = ({ title, subtitle, children, className = "" }) => {
           {title}
         </h1>
         {subtitle && (
-          <p className="text-zinc-400 font-medium text-lg">
-            {subtitle}
-          </p>
+          <p className="text-zinc-400 font-medium text-lg">{subtitle}</p>
         )}
       </div>
       <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto justify-start lg:justify-end">

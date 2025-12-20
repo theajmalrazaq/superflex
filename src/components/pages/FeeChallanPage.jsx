@@ -17,7 +17,6 @@ import NotificationBanner from "../NotificationBanner";
 import PageHeader from "../PageHeader";
 import StatsCard from "../StatsCard";
 
-
 function FeeChallanPage() {
   const [loading, setLoading] = useState(true);
   const [challans, setChallans] = useState([]);
@@ -31,22 +30,32 @@ function FeeChallanPage() {
 
     const parseData = () => {
       try {
-        const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
+        const root = document.querySelector(
+          ".m-grid.m-grid--hor.m-grid--root.m-page",
+        );
         if (!root) {
           setTimeout(parseData, 500);
           return;
         }
 
-        // 0. Parse Alerts
         const alertList = [];
-        root.querySelectorAll(".m-alert, .alert").forEach(alert => {
-          if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
+        root.querySelectorAll(".m-alert, .alert").forEach((alert) => {
+          if (
+            alert.style.display === "none" ||
+            alert.id === "DataErrormsgdiv" ||
+            alert.closest(".modal")
+          )
+            return;
 
           const textContainer = alert.querySelector(".m-alert__text") || alert;
           const clone = textContainer.cloneNode(true);
-          // Remove standard UI elements that shouldn't be in the message
-          clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
-          
+
+          clone
+            .querySelectorAll(
+              ".m-alert__close, button, a, strong, .m-alert__icon",
+            )
+            .forEach((el) => el.remove());
+
           let message = clone.textContent
             .replace(/Alert!/gi, "")
             .replace(/Close/gi, "")
@@ -55,13 +64,16 @@ function FeeChallanPage() {
             .trim();
 
           if (message && message.length > 3) {
-              const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
-              alertList.push({ type, message });
+            const type =
+              alert.classList.contains("alert-danger") ||
+              alert.classList.contains("m-alert--outline-danger")
+                ? "error"
+                : "info";
+            alertList.push({ type, message });
           }
         });
         setAlerts(alertList);
 
-        // 1. Parse Challans
         const challanList = [];
         const challanTable = root.querySelector("table table");
         if (challanTable) {
@@ -69,12 +81,14 @@ function FeeChallanPage() {
           rows.forEach((row) => {
             const cells = row.querySelectorAll("td");
             if (cells.length >= 6) {
-              const amountMatch = cells[cells.length - 2]?.textContent.trim().match(/\d+(,\d+)?(\.\d+)?/);
+              const amountMatch = cells[cells.length - 2]?.textContent
+                .trim()
+                .match(/\d+(,\d+)?(\.\d+)?/);
               const amount = amountMatch ? amountMatch[0] : "0";
-              
+
               const printBtn = cells[cells.length - 1]?.querySelector("a");
-              const onclick = printBtn?.getAttribute('onclick') || "";
-              // Extract the numeric ID from ftn_PrintChallanForm(ID)
+              const onclick = printBtn?.getAttribute("onclick") || "";
+
               const challanNoMatch = onclick.match(/\d+/);
               const challanNo = challanNoMatch ? challanNoMatch[0] : null;
 
@@ -85,14 +99,15 @@ function FeeChallanPage() {
                 dueDate: cells[3].textContent.trim(),
                 status: cells[4].textContent.trim(),
                 amount: amount,
-                challanNo: challanNo
+                challanNo: challanNo,
               });
             }
           });
         }
 
-        // 2. Parse Instructions
-        const infoPanel = root.querySelector("td[style*='border-right:solid 1px']");
+        const infoPanel = root.querySelector(
+          "td[style*='border-right:solid 1px']",
+        );
         if (infoPanel) {
           setInstructions(infoPanel.innerHTML);
         }
@@ -116,22 +131,32 @@ function FeeChallanPage() {
   }, []);
 
   const stats = useMemo(() => {
-    const unpaid = challans.filter(c => c.status.toLowerCase().includes("unpaid")).length;
-    const paid = challans.filter(c => c.status.toLowerCase().includes("paid")).length;
+    const unpaid = challans.filter((c) =>
+      c.status.toLowerCase().includes("unpaid"),
+    ).length;
+    const paid = challans.filter((c) =>
+      c.status.toLowerCase().includes("paid"),
+    ).length;
     const latestAmount = challans.length > 0 ? challans[0].amount : "0";
-    
+
     return { unpaid, paid, latestAmount, total: challans.length };
   }, [challans]);
 
   const handlePrint = (challanNo) => {
     if (challanNo) {
-      window.open(`../Student/PrintStdChallanForm?ChallanNo=${challanNo}`, '_blank');
+      window.open(
+        `../Student/PrintStdChallanForm?ChallanNo=${challanNo}`,
+        "_blank",
+      );
     }
   };
 
   const handleOnlinePayment = (challanNo) => {
     if (challanNo) {
-      window.open(`../Student/CardPaymentThroughKuickpay?ChallanNo=${challanNo}`, '_blank');
+      window.open(
+        `../Student/CardPaymentThroughKuickpay?ChallanNo=${challanNo}`,
+        "_blank",
+      );
     }
   };
 
@@ -141,20 +166,35 @@ function FeeChallanPage() {
         {[
           {
             step: "Step 1",
-            text: "Sign in to your Internet Banking, Mobile Banking or visit an ATM machine"
+            text: "Sign in to your Internet Banking, Mobile Banking or visit an ATM machine",
           },
           {
             step: "Step 2",
-            text: <>Select Bill Payment / Payments and then select <span className="text-[#a098ff] font-bold">'kuickpay'</span> from given categories</>
+            text: (
+              <>
+                Select Bill Payment / Payments and then select{" "}
+                <span className="text-[#a098ff] font-bold">'kuickpay'</span>{" "}
+                from given categories
+              </>
+            ),
           },
           {
             step: "Step 3",
-            text: <>Enter the voucher or invoice number & continue. Make sure to enter <span className="text-emerald-400 font-bold">Institution ID as prefix</span> (mentioned on challan)</>
+            text: (
+              <>
+                Enter the voucher or invoice number & continue. Make sure to
+                enter{" "}
+                <span className="text-emerald-400 font-bold">
+                  Institution ID as prefix
+                </span>{" "}
+                (mentioned on challan)
+              </>
+            ),
           },
           {
             step: "Step 4",
-            text: "Confirm your voucher details and proceed to payment. Payment alerts will be received accordingly."
-          }
+            text: "Confirm your voucher details and proceed to payment. Payment alerts will be received accordingly.",
+          },
         ].map((item, idx) => (
           <div key={idx} className="flex gap-4">
             <div className="mt-1">
@@ -178,7 +218,11 @@ function FeeChallanPage() {
             * Supported Banks
           </p>
           <p className="text-[11px] text-zinc-500 leading-relaxed font-medium">
-            Allied Bank, Askari Bank, Bank Al Habib, Bank Alfalah, Bank Islami, Bank of Punjab, Dubai Islamic Bank, Faysal Bank, First Women Bank, Habib Metro Bank, Habib Bank Limited, JS Bank, MCB Bank, MCB Islamic Bank, Meezan Bank, National Bank, NRSP Bank, SAMBA Bank, Soneri bank, Summit Bank, UBL and Keenu App.
+            Allied Bank, Askari Bank, Bank Al Habib, Bank Alfalah, Bank Islami,
+            Bank of Punjab, Dubai Islamic Bank, Faysal Bank, First Women Bank,
+            Habib Metro Bank, Habib Bank Limited, JS Bank, MCB Bank, MCB Islamic
+            Bank, Meezan Bank, National Bank, NRSP Bank, SAMBA Bank, Soneri
+            bank, Summit Bank, UBL and Keenu App.
           </p>
         </div>
 
@@ -188,10 +232,10 @@ function FeeChallanPage() {
             EasyPaisa & JazzCash Supported via Kuickpay
           </p>
         </div>
-        
+
         <div className="pt-2">
-          <a 
-            href="https://app.kuickpay.com/PaymentsBillPayment" 
+          <a
+            href="https://app.kuickpay.com/PaymentsBillPayment"
             className="flex items-center justify-center gap-2 w-full p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-white transition-all text-xs font-bold"
             target="_blank"
             rel="noopener noreferrer"
@@ -205,12 +249,18 @@ function FeeChallanPage() {
       <div className="pt-6 border-t border-white/5">
         <div className="flex gap-4">
           <div className="w-5 h-5 rounded-full border border-amber-500/50 flex items-center justify-center shrink-0">
-             <div className="w-1.5 h-1.5 rounded-full bg-amber-500/20"></div>
+            <div className="w-1.5 h-1.5 rounded-full bg-amber-500/20"></div>
           </div>
           <div className="space-y-1">
-            <p className="text-white font-bold tracking-wide uppercase text-xs">Physical Cash Deposit</p>
+            <p className="text-white font-bold tracking-wide uppercase text-xs">
+              Physical Cash Deposit
+            </p>
             <p className="text-zinc-500 text-xs leading-relaxed font-medium">
-              Print the challan form and then visit any nearest <strong className="text-white font-bold">Faysal Bank branch</strong> for cash deposit.
+              Print the challan form and then visit any nearest{" "}
+              <strong className="text-white font-bold">
+                Faysal Bank branch
+              </strong>{" "}
+              for cash deposit.
             </p>
           </div>
         </div>
@@ -231,19 +281,23 @@ function FeeChallanPage() {
   return (
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-6 md:p-10 space-y-10 relative z-10">
-        {/* Glow Effects */}
+        {}
         <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
-        <PageHeader 
+        <PageHeader
           title="Fee Challans"
           subtitle="Manage your semester invoices and payments"
         >
           <div className="flex items-center gap-4 bg-zinc-900/50 px-6 py-3 rounded-2xl border border-white/5 backdrop-blur-xl group hover:bg-zinc-900/70 transition-all">
             <div className="text-right">
-              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Payment Status</p>
-              <h4 className={`text-lg font-bold font-sans ${stats.unpaid > 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
-                {stats.unpaid > 0 ? `${stats.unpaid} Outstanding` : 'All Paid'}
+              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                Payment Status
+              </p>
+              <h4
+                className={`text-lg font-bold font-sans ${stats.unpaid > 0 ? "text-amber-400" : "text-emerald-400"}`}
+              >
+                {stats.unpaid > 0 ? `${stats.unpaid} Outstanding` : "All Paid"}
               </h4>
             </div>
             <div className="w-px h-8 bg-white/10 mx-2"></div>
@@ -252,123 +306,181 @@ function FeeChallanPage() {
         </PageHeader>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsCard icon={AlertCircle} label="Outstanding" value={stats.unpaid} subValue="Challans" delay={100} />
-          <StatsCard icon={CheckCircle2} label="Paid" value={stats.paid} subValue="Total" delay={200} />
-          <StatsCard icon={DollarSign} label="Latest Amount" value={`Rs. ${stats.latestAmount}`} delay={300} />
-          <StatsCard icon={Calendar} label="Total Generated" value={stats.total} subValue="Invoices" delay={400} />
+          <StatsCard
+            icon={AlertCircle}
+            label="Outstanding"
+            value={stats.unpaid}
+            subValue="Challans"
+            delay={100}
+          />
+          <StatsCard
+            icon={CheckCircle2}
+            label="Paid"
+            value={stats.paid}
+            subValue="Total"
+            delay={200}
+          />
+          <StatsCard
+            icon={DollarSign}
+            label="Latest Amount"
+            value={`Rs. ${stats.latestAmount}`}
+            delay={300}
+          />
+          <StatsCard
+            icon={Calendar}
+            label="Total Generated"
+            value={stats.total}
+            subValue="Invoices"
+            delay={400}
+          />
         </div>
 
-        {/* Content Section */}
+        {}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          {/* Challan List */}
+          {}
           <div className="xl:col-span-2 space-y-6">
-            {/* Notifications */}
-            <NotificationBanner alerts={[
+            {}
+            <NotificationBanner
+              alerts={[
                 ...alerts,
-                { type: "info", message: "Payments made through the online portal are verified automatically within 24-48 hours. Please keep your receipt until the status is updated." }
-            ].filter((v, i, a) => a.findIndex(t => t.message === v.message) === i)} />
+                {
+                  type: "info",
+                  message:
+                    "Payments made through the online portal are verified automatically within 24-48 hours. Please keep your receipt until the status is updated.",
+                },
+              ].filter(
+                (v, i, a) => a.findIndex((t) => t.message === v.message) === i,
+              )}
+            />
 
             <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden">
-               <div className="flex items-center gap-3 mb-10 border-b border-white/5 pb-8">
-                  <div className="p-3 bg-zinc-800 rounded-xl text-zinc-400">
-                    <FileText size={20} />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-white tracking-tight font-sans">Invoice History</h3>
-                    <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest font-sans">Download and proof of payment</p>
-                  </div>
+              <div className="flex items-center gap-3 mb-10 border-b border-white/5 pb-8">
+                <div className="p-3 bg-zinc-800 rounded-xl text-zinc-400">
+                  <FileText size={20} />
                 </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white tracking-tight font-sans">
+                    Invoice History
+                  </h3>
+                  <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest font-sans">
+                    Download and proof of payment
+                  </p>
+                </div>
+              </div>
 
-                <div className="overflow-x-auto custom-scrollbar">
-                  <table className="w-full text-left order-collapse border-spacing-0">
-                    <thead>
-                      <tr className="border-b border-white/5">
-                        <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Sr.</th>
-                        <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Description</th>
-                        <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider font-sans">Status</th>
-                        <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider text-right font-sans">Amount</th>
-                        <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider text-right font-sans">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                      {challans.map((c, idx) => (
-                        <tr key={idx} className="group hover:bg-white/[0.02] transition-colors">
-                          <td className="px-6 py-5">
-                            <span className="text-zinc-500 font-bold font-sans text-xs">
-                              {c.srNo}
+              <div className="overflow-x-auto custom-scrollbar">
+                <table className="w-full text-left order-collapse border-spacing-0">
+                  <thead>
+                    <tr className="border-b border-white/5">
+                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider font-sans">
+                        Sr.
+                      </th>
+                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider font-sans">
+                        Description
+                      </th>
+                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider font-sans">
+                        Status
+                      </th>
+                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider text-right font-sans">
+                        Amount
+                      </th>
+                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider text-right font-sans">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {challans.map((c, idx) => (
+                      <tr
+                        key={idx}
+                        className="group hover:bg-white/[0.02] transition-colors"
+                      >
+                        <td className="px-6 py-5">
+                          <span className="text-zinc-500 font-bold font-sans text-xs">
+                            {c.srNo}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5">
+                          <div className="flex flex-col">
+                            <span className="text-white font-bold group-hover:text-[#a098ff] transition-colors font-sans">
+                              {c.description}
                             </span>
-                          </td>
-                          <td className="px-6 py-5">
-                            <div className="flex flex-col">
-                              <span className="text-white font-bold group-hover:text-[#a098ff] transition-colors font-sans">
-                                {c.description}
+                            <div className="flex items-center gap-3 mt-1">
+                              <span className="flex items-center gap-1 text-[10px] text-zinc-500 font-bold uppercase tracking-tighter font-sans">
+                                <Clock size={12} /> Issued: {c.issueDate}
                               </span>
-                              <div className="flex items-center gap-3 mt-1">
-                                <span className="flex items-center gap-1 text-[10px] text-zinc-500 font-bold uppercase tracking-tighter font-sans">
-                                  <Clock size={12} /> Issued: {c.issueDate}
-                                </span>
-                                <span className="flex items-center gap-1 text-[10px] text-zinc-500 font-bold uppercase tracking-tighter font-sans">
-                                  <Calendar size={12} /> Due: {c.dueDate}
-                                </span>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-5">
-                             <div className="flex justify-center w-full">
-                               <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest font-sans ${
-                                c.status.toLowerCase().includes("paid") 
-                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
-                                : "bg-rose-500/10 text-rose-400 border border-rose-500/20 animate-pulse"
-                              }`}>
-                                {c.status}
+                              <span className="flex items-center gap-1 text-[10px] text-zinc-500 font-bold uppercase tracking-tighter font-sans">
+                                <Calendar size={12} /> Due: {c.dueDate}
                               </span>
                             </div>
-                          </td>
-                          <td className="px-6 py-5 text-right font-sans">
-                             <span className="text-white font-black text-sm">
-                               Rs. {c.amount}
-                             </span>
-                          </td>
-                          <td className="px-6 py-5 text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              {c.status.toLowerCase().includes("unpaid") && (
-                                <button
-                                  onClick={() => handleOnlinePayment(c.challanNo)}
-                                  className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all group/pay"
-                                  title="Pay Online (KuickPay)"
-                                >
-                                  <ExternalLink size={18} className="group-hover/pay:scale-110 transition-transform" />
-                                </button>
-                              )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-5">
+                          <div className="flex justify-center w-full">
+                            <span
+                              className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest font-sans ${
+                                c.status.toLowerCase().includes("paid")
+                                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                  : "bg-rose-500/10 text-rose-400 border border-rose-500/20 animate-pulse"
+                              }`}
+                            >
+                              {c.status}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-5 text-right font-sans">
+                          <span className="text-white font-black text-sm">
+                            Rs. {c.amount}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            {c.status.toLowerCase().includes("unpaid") && (
                               <button
-                                onClick={() => handlePrint(c.challanNo)}
-                                className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:bg-[#a098ff] hover:border-[#a098ff] transition-all group/btn disabled:opacity-30 disabled:cursor-not-allowed"
-                                title="Download/Print Challan"
-                                disabled={!c.challanNo}
+                                onClick={() => handleOnlinePayment(c.challanNo)}
+                                className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all group/pay"
+                                title="Pay Online (KuickPay)"
                               >
-                                <Printer size={18} className="group-hover/btn:scale-110 transition-transform" />
+                                <ExternalLink
+                                  size={18}
+                                  className="group-hover/pay:scale-110 transition-transform"
+                                />
                               </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                      {challans.length === 0 && (
-                        <tr>
-                          <td colSpan="5" className="px-6 py-20 text-center">
-                            <div className="flex flex-col items-center gap-4 opacity-50">
-                              <Receipt size={48} className="text-zinc-500" />
-                              <p className="text-zinc-400 font-medium font-sans">No challans found in the records.</p>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                            )}
+                            <button
+                              onClick={() => handlePrint(c.challanNo)}
+                              className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:bg-[#a098ff] hover:border-[#a098ff] transition-all group/btn disabled:opacity-30 disabled:cursor-not-allowed"
+                              title="Download/Print Challan"
+                              disabled={!c.challanNo}
+                            >
+                              <Printer
+                                size={18}
+                                className="group-hover/btn:scale-110 transition-transform"
+                              />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {challans.length === 0 && (
+                      <tr>
+                        <td colSpan="5" className="px-6 py-20 text-center">
+                          <div className="flex flex-col items-center gap-4 opacity-50">
+                            <Receipt size={48} className="text-zinc-500" />
+                            <p className="text-zinc-400 font-medium font-sans">
+                              No challans found in the records.
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
-          {/* Side Panel: Instructions */}
+          {}
           <div className="space-y-6">
             <div className="bg-[#a098ff]/5 border border-[#a098ff]/10 backdrop-blur-2xl rounded-[2.5rem] p-8">
               <div className="flex items-center gap-3 mb-8 border-b border-white/5 pb-6">
@@ -376,8 +488,12 @@ function FeeChallanPage() {
                   <Printer size={20} />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white tracking-tight font-sans">Payment Portal</h3>
-                  <p className="text-[10px] text-[#a098ff] font-bold uppercase tracking-widest font-sans underline decoration-[#a098ff]/30 underline-offset-4">Legal Roadmap</p>
+                  <h3 className="text-lg font-bold text-white tracking-tight font-sans">
+                    Payment Portal
+                  </h3>
+                  <p className="text-[10px] text-[#a098ff] font-bold uppercase tracking-widest font-sans underline decoration-[#a098ff]/30 underline-offset-4">
+                    Legal Roadmap
+                  </p>
                 </div>
               </div>
 
@@ -386,7 +502,7 @@ function FeeChallanPage() {
           </div>
         </div>
       </div>
-      
+
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           height: 6px;
@@ -408,19 +524,19 @@ function FeeChallanPage() {
 }
 
 const ChevronRight = ({ size, className }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    width={size} 
-    height={size} 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
     className={className}
   >
-    <path d="m9 18 6-6-6-6"/>
+    <path d="m9 18 6-6-6-6" />
   </svg>
 );
 

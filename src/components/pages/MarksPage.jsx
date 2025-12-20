@@ -358,7 +358,8 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount }) => {
             <AlertCircle className="text-amber-400 shrink-0" size={18} />
             <p className="text-xs text-amber-200/70 leading-relaxed">
               This will automatically pick the highest scoring {count} items and
-              assign them an equal portion of the {totalWeight}% total weightage.
+              assign them an equal portion of the {totalWeight}% total
+              weightage.
             </p>
           </div>
 
@@ -472,7 +473,7 @@ const AssessmentView = ({
           />
         </div>
 
-        {/* Assessment Stats */}
+        {}
         <div className="flex flex-wrap items-center gap-4 p-6 border-b border-white/5">
           <StatsCard
             icon={Layers}
@@ -837,16 +838,24 @@ function MarksPage() {
         );
         if (!root) return;
 
-        // Parse Alerts
         const alertList = [];
-        root.querySelectorAll(".m-alert, .alert").forEach(alert => {
-          if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
+        root.querySelectorAll(".m-alert, .alert").forEach((alert) => {
+          if (
+            alert.style.display === "none" ||
+            alert.id === "DataErrormsgdiv" ||
+            alert.closest(".modal")
+          )
+            return;
 
           const textContainer = alert.querySelector(".m-alert__text") || alert;
           const clone = textContainer.cloneNode(true);
-          // Remove standard UI elements that shouldn't be in the message
-          clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
-          
+
+          clone
+            .querySelectorAll(
+              ".m-alert__close, button, a, strong, .m-alert__icon",
+            )
+            .forEach((el) => el.remove());
+
           let message = clone.textContent
             .replace(/Alert!/gi, "")
             .replace(/Close/gi, "")
@@ -855,8 +864,12 @@ function MarksPage() {
             .trim();
 
           if (message && message.length > 3) {
-              const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
-              alertList.push({ type, message });
+            const type =
+              alert.classList.contains("alert-danger") ||
+              alert.classList.contains("m-alert--outline-danger")
+                ? "error"
+                : "info";
+            alertList.push({ type, message });
           }
         });
         setAlerts(alertList);
@@ -1076,7 +1089,6 @@ function MarksPage() {
           });
         });
 
-
         setCourses(parsedCourses);
         initialCoursesRef.current = JSON.parse(JSON.stringify(parsedCourses));
         if (parsedCourses.length > 0) {
@@ -1148,7 +1160,6 @@ function MarksPage() {
       const section = course.sections[sectionIdx];
       const items = section.rows.filter((r) => r.title !== "Total");
 
-      // Calculate percentage for each item to find the best ones
       const sorted = items
         .map((r, i) => ({
           ...r,
@@ -1283,7 +1294,7 @@ function MarksPage() {
         </PageHeader>
 
         {}
-        {/* Notifications */}
+        {}
         <NotificationBanner alerts={alerts} />
 
         {loading ? (

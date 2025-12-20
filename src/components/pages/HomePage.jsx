@@ -219,16 +219,24 @@ function HomePage() {
 
       document.querySelector(".m-scroll-top")?.remove();
 
-      // Parse Alerts
       const alertList = [];
-      targetElement.querySelectorAll(".m-alert, .alert").forEach(alert => {
-        if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
+      targetElement.querySelectorAll(".m-alert, .alert").forEach((alert) => {
+        if (
+          alert.style.display === "none" ||
+          alert.id === "DataErrormsgdiv" ||
+          alert.closest(".modal")
+        )
+          return;
 
         const textContainer = alert.querySelector(".m-alert__text") || alert;
         const clone = textContainer.cloneNode(true);
-        // Remove standard UI elements that shouldn't be in the message
-        clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
-        
+
+        clone
+          .querySelectorAll(
+            ".m-alert__close, button, a, strong, .m-alert__icon",
+          )
+          .forEach((el) => el.remove());
+
         let message = clone.textContent
           .replace(/Alert!/gi, "")
           .replace(/Close/gi, "")
@@ -237,8 +245,12 @@ function HomePage() {
           .trim();
 
         if (message && message.length > 3) {
-            const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
-            alertList.push({ type, message });
+          const type =
+            alert.classList.contains("alert-danger") ||
+            alert.classList.contains("m-alert--outline-danger")
+              ? "error"
+              : "info";
+          alertList.push({ type, message });
         }
       });
       setAlerts(alertList);
@@ -588,10 +600,7 @@ function HomePage() {
                     : "text-zinc-500 hover:text-white hover:bg-white/5"
                 }`}
               >
-                <Activity
-                  size={16}
-                  className={""}
-                />
+                <Activity size={16} className={""} />
                 Stats
               </button>
               <button
@@ -616,29 +625,37 @@ function HomePage() {
           <div className="space-y-8">
             {}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <StatsCard 
-                icon={GraduationCap} 
-                label="Degree Program" 
-                value={universityInfo?.Degree || "..."} 
+              <StatsCard
+                icon={GraduationCap}
+                label="Degree Program"
+                value={universityInfo?.Degree || "..."}
                 delay={0}
               />
-              <StatsCard 
-                icon={Users} 
-                label="Section" 
-                value={universityInfo?.Section || "..."} 
+              <StatsCard
+                icon={Users}
+                label="Section"
+                value={universityInfo?.Section || "..."}
                 delay={100}
               />
-              <StatsCard 
-                icon={Award} 
-                label="Registered Courses" 
-                value={coursesData?.length || 0} 
+              <StatsCard
+                icon={Award}
+                label="Registered Courses"
+                value={coursesData?.length || 0}
                 delay={200}
               />
-              <StatsCard 
-                icon={Activity} 
-                label="Critical Attendance" 
-                value={loadingAttendance ? "..." : mostAbsentSubject ? mostAbsentSubject.title : "None"} 
-                subValue={mostAbsentSubject ? `${mostAbsentSubject.absent} Absents` : ""}
+              <StatsCard
+                icon={Activity}
+                label="Critical Attendance"
+                value={
+                  loadingAttendance
+                    ? "..."
+                    : mostAbsentSubject
+                      ? mostAbsentSubject.title
+                      : "None"
+                }
+                subValue={
+                  mostAbsentSubject ? `${mostAbsentSubject.absent} Absents` : ""
+                }
                 delay={300}
               />
             </div>
@@ -661,42 +678,39 @@ function HomePage() {
                         Detailed marks and assessments
                       </p>
                     </div>
-                      {links.marks && (
-                        <a
-                          href={links.marks}
-                          className="bg-white/5 hover:bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-lg  transition-colors flex items-center gap-1.5"
-                        >
-                          View Details
-                          <ArrowRight size={12} />
-                        </a>
-                      )}
-                    </div>
+                    {links.marks && (
+                      <a
+                        href={links.marks}
+                        className="bg-white/5 hover:bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-lg  transition-colors flex items-center gap-1.5"
+                      >
+                        View Details
+                        <ArrowRight size={12} />
+                      </a>
+                    )}
+                  </div>
 
-                    {}
-                    <div className="w-full overflow-x-auto custom-scrollbar no-scrollbar">
-                      <div className="flex gap-2 bg-black/40 p-1.5 rounded-full border border-white/5 backdrop-blur-sm w-fit">
-                        {coursesData.map((course) => (
-                          <button
-                            key={course.id}
-                            onClick={() => setActiveCourse(course.id)}
-                            className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
-                              activeCourse === course.id
-                                ? "bg-[#a098ff] text-white"
-                                : "text-zinc-500 hover:text-white"
-                            }`}
-                          >
-                            {course.id}
-                          </button>
-                        ))}
-                      </div>
+                  {}
+                  <div className="w-full overflow-x-auto custom-scrollbar no-scrollbar">
+                    <div className="flex gap-2 bg-black/40 p-1.5 rounded-full border border-white/5 backdrop-blur-sm w-fit">
+                      {coursesData.map((course) => (
+                        <button
+                          key={course.id}
+                          onClick={() => setActiveCourse(course.id)}
+                          className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
+                            activeCourse === course.id
+                              ? "bg-[#a098ff] text-white"
+                              : "text-zinc-500 hover:text-white"
+                          }`}
+                        >
+                          {course.id}
+                        </button>
+                      ))}
                     </div>
+                  </div>
 
                   {}
                   {activeCourseData && (
-                    <div
-                      key={activeCourse}
-                      className=""
-                    >
+                    <div key={activeCourse} className="">
                       <div className="flex flex-col gap-2 mb-4">
                         <h2 className="text-xl font-bold text-white leading-tight">
                           {activeCourseData.title}

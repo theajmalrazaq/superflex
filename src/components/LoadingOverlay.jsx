@@ -66,9 +66,7 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
         !show || !loading ? "fade-out" : ""
       }`}
     >
-      <div
-        className="bg-[url('res/bg.png')] bg-black border-[1px] border-white/10 bg-cover flex items-center justify-center h-24 w-24 rounded-[32px]  relative overflow-hidden"
-      >
+      <div className="bg-[url('res/bg.png')] bg-black border-[1px] border-white/10 bg-cover flex items-center justify-center h-24 w-24 rounded-[32px]  relative overflow-hidden">
         <div className="absolute inset-0 bg-[#a098ff]/10 blur-xl"></div>
         <svg
           viewBox="0 0 24 24"

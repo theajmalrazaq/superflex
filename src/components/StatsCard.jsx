@@ -1,6 +1,13 @@
 import React from "react";
 
-const StatsCard = ({ icon: Icon, label, value, subValue, delay = 0, className = "" }) => {
+const StatsCard = ({
+  icon: Icon,
+  label,
+  value,
+  subValue,
+  delay = 0,
+  className = "",
+}) => {
   return (
     <div
       className={`flex-1 min-w-[200px] p-6 rounded-[2rem] border border-white/5 bg-zinc-900/50 backdrop-blur-xl hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group ${className}`}

@@ -93,7 +93,7 @@ function LoginPageStyles() {
         "focus:!border-[#a098ff]/30",
         "focus:!bg-white/[0.08]",
         "!transition-all",
-        "!duration-300"
+        "!duration-300",
       );
       element.style.fontFamily = "'Google Sans Flex', sans-serif";
     });
@@ -161,11 +161,10 @@ function LoginPageStyles() {
         "!scale-95",
         "!transition-all",
         "!duration-500",
-        "!ease-out"
+        "!ease-out",
       );
       bglogin.setAttribute("id", "login-popup");
-      
-      // Add a header to the login popup if it doesn't exist
+
       if (!bglogin.querySelector(".login-header")) {
         const header = document.createElement("div");
         header.className = "login-header w-full text-left mb-8 space-y-1";
@@ -203,7 +202,7 @@ function LoginPageStyles() {
         "!scale-95",
         "!transition-all",
         "!duration-500",
-        "!ease-out"
+        "!ease-out",
       );
       forgotPasswordSection.setAttribute("id", "forgot-password-popup");
 
@@ -367,10 +366,10 @@ function LoginPageStyles() {
     suggestionButton.href = "https://github.com/theajmalrazaq/superflex";
     suggestionButton.target = "_blank";
     suggestionButton.className =
-      "group relative bg-white/10 backdrop-blur-sm px-7 py-3.5 rounded-xl font-semibold text-white hover:bg-white/20 hover:border-white/40 transition-all duration-300 flex items-center gap-3";
+      "group relative bg-white/10 backdrop-blur-sm px-7 py-3.5 rounded-xl text-white hover:bg-white/20 hover:border-white/40 transition-all duration-300 flex items-center gap-3";
     suggestionButton.style.fontFamily = "'Google Sans Flex', sans-serif";
     suggestionButton.innerHTML = `
-      <span class="font-semibold text-sm">Star on Github (<span id="starCount">...</span>)</span>
+      <span class="text-sm">Star on Github (<span id="starCount">...</span>)</span>
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[#a098ff]">
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
       </svg>
@@ -440,24 +439,39 @@ function LoginPageStyles() {
     if (!rightImage) {
       rightImage = document.createElement("div");
       rightImage.id = "login-background-image";
-      rightImage.classList.add("fixed", "inset-0", "w-full", "h-full", "z-0", "overflow-hidden");
+      rightImage.classList.add(
+        "fixed",
+        "inset-0",
+        "w-full",
+        "h-full",
+        "z-0",
+        "overflow-hidden",
+      );
 
-      // Atmospheric Glows - Matching Internal Pages
       const glow1 = document.createElement("div");
-      glow1.className = "fixed top-0 right-0 w-[800px] h-[800px] bg-[#a098ff]/10 blur-[150px] rounded-full -mr-96 -mt-96 pointer-events-none z-10 animate-pulse";
+      glow1.className =
+        "fixed top-0 right-0 w-[800px] h-[800px] bg-[#a098ff]/10 blur-[150px] rounded-full -mr-96 -mt-96 pointer-events-none z-10 animate-pulse";
       glow1.style.animationDuration = "10s";
-      
+
       const glow2 = document.createElement("div");
-      glow2.className = "fixed bottom-0 left-0 w-[600px] h-[600px] bg-emerald-500/5 blur-[150px] rounded-full -ml-96 -mb-96 pointer-events-none z-10 animate-pulse";
+      glow2.className =
+        "fixed bottom-0 left-0 w-[600px] h-[600px] bg-emerald-500/5 blur-[150px] rounded-full -ml-96 -mb-96 pointer-events-none z-10 animate-pulse";
       glow2.style.animationDuration = "15s";
 
       const img = document.createElement("img");
       img.src = "https://theajmalrazaq.github.io/superflex/res/intro.svg";
-      img.classList.add("w-full", "h-full", "object-cover", "opacity-20", "mix-blend-luminosity");
-      
+      img.classList.add(
+        "w-full",
+        "h-full",
+        "object-cover",
+        "opacity-20",
+        "mix-blend-luminosity",
+      );
+
       const blackMask = document.createElement("div");
-      blackMask.className = "absolute inset-0 bg-gradient-to-b from-black/40 via-black/80 to-black z-10";
-      
+      blackMask.className =
+        "absolute inset-0 bg-gradient-to-b from-black/40 via-black/80 to-black z-10";
+
       rightImage.appendChild(glow1);
       rightImage.appendChild(glow2);
       rightImage.appendChild(img);
@@ -472,7 +486,6 @@ function LoginPageStyles() {
     const bgUrl = chrome.runtime.getURL("public/bg.png");
     const logoUrl = chrome.runtime.getURL("public/logo.svg");
 
-    // Inject Marquee Styles
     const styleId = "feature-marquee-styles";
     let styleElement = document.getElementById(styleId);
     if (!styleElement) {
@@ -582,7 +595,9 @@ function LoginPageStyles() {
       `;
 
     const generateReviewCards = (items) => {
-      return items.map(item => `
+      return items
+        .map(
+          (item) => `
         <div class="review-card">
             <div class="review-header">
                 <div class="review-user-info">
@@ -592,21 +607,23 @@ function LoginPageStyles() {
             </div>
             <p class="review-comment">"${item.comment}"</p>
         </div>
-      `).join('');
+      `,
+        )
+        .join("");
     };
 
     const reviewsUrl = chrome.runtime.getURL("reviews.json");
     fetch(reviewsUrl)
-      .then(res => res.json())
-      .then(reviews => {
+      .then((res) => res.json())
+      .then((reviews) => {
         const track = document.getElementById("review-track");
         if (track) {
-          // Use first 20 reviews for performance
           const subset = reviews.slice(0, 20);
-          track.innerHTML = generateReviewCards(subset) + generateReviewCards(subset);
+          track.innerHTML =
+            generateReviewCards(subset) + generateReviewCards(subset);
         }
       })
-      .catch(err => console.error("Failed to load reviews:", err));
+      .catch((err) => console.error("Failed to load reviews:", err));
 
     const CURRENT_VERSION = "0.0.9";
 

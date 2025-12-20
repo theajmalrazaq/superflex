@@ -15,7 +15,6 @@ import PageHeader from "../PageHeader";
 import StatsCard from "../StatsCard";
 import SuperTabs from "../SuperTabs";
 
-
 function StudyPlanPage() {
   const [loading, setLoading] = useState(true);
   const [semesters, setSemesters] = useState([]);
@@ -23,7 +22,6 @@ function StudyPlanPage() {
   const [activeSemIdx, setActiveSemIdx] = useState(0);
 
   useEffect(() => {
-    // Notify loading start
     window.dispatchEvent(
       new CustomEvent("superflex-update-loading", { detail: true }),
     );
@@ -40,17 +38,25 @@ function StudyPlanPage() {
           );
           return;
         }
-        
-        // Parse Alerts
+
         const alertList = [];
-        root.querySelectorAll(".m-alert, .alert").forEach(alert => {
-          if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
+        root.querySelectorAll(".m-alert, .alert").forEach((alert) => {
+          if (
+            alert.style.display === "none" ||
+            alert.id === "DataErrormsgdiv" ||
+            alert.closest(".modal")
+          )
+            return;
 
           const textContainer = alert.querySelector(".m-alert__text") || alert;
           const clone = textContainer.cloneNode(true);
-          // Remove standard UI elements that shouldn't be in the message
-          clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
-          
+
+          clone
+            .querySelectorAll(
+              ".m-alert__close, button, a, strong, .m-alert__icon",
+            )
+            .forEach((el) => el.remove());
+
           let message = clone.textContent
             .replace(/Alert!/gi, "")
             .replace(/Close/gi, "")
@@ -59,8 +65,12 @@ function StudyPlanPage() {
             .trim();
 
           if (message && message.length > 3) {
-              const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
-              alertList.push({ type, message });
+            const type =
+              alert.classList.contains("alert-danger") ||
+              alert.classList.contains("m-alert--outline-danger")
+                ? "error"
+                : "info";
+            alertList.push({ type, message });
           }
         });
         setAlerts(alertList);
@@ -72,7 +82,9 @@ function StudyPlanPage() {
           const h4 = col.querySelector("h4");
           if (!h4) return;
 
-          const title = h4.textContent.replace(h4.querySelector("small")?.textContent || "", "").trim();
+          const title = h4.textContent
+            .replace(h4.querySelector("small")?.textContent || "", "")
+            .trim();
           const crHrsText = h4.querySelector("small")?.textContent || "";
           const crHrs = parseInt(crHrsText.match(/\d+/)?.[0] || "0");
 
@@ -96,10 +108,9 @@ function StudyPlanPage() {
         });
 
         setSemesters(parsedSemesters);
-        
-        // Hide original content
+
         root.style.display = "none";
-        
+
         setLoading(false);
         window.dispatchEvent(
           new CustomEvent("superflex-update-loading", { detail: false }),
@@ -122,11 +133,12 @@ function StudyPlanPage() {
     let coreCourses = 0;
     let electives = 0;
 
-    semesters.forEach(sem => {
-      sem.courses.forEach(course => {
-        const isNC = course.type.toLowerCase().includes("non credit") || 
-                     course.code.toLowerCase().includes("nc");
-        
+    semesters.forEach((sem) => {
+      sem.courses.forEach((course) => {
+        const isNC =
+          course.type.toLowerCase().includes("non credit") ||
+          course.code.toLowerCase().includes("nc");
+
         if (!isNC) {
           totalCredits += course.crHrs;
           totalCourses++;
@@ -154,7 +166,7 @@ function StudyPlanPage() {
   return (
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-6 md:p-10 space-y-10 relative z-10">
-        {/* Glow Effects */}
+        {}
         <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
@@ -164,7 +176,9 @@ function StudyPlanPage() {
         >
           <div className="flex items-center gap-4 bg-zinc-900/50 px-6 py-3 rounded-2xl border border-white/5 backdrop-blur-xl">
             <div className="text-right">
-              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Graduation Path</p>
+              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                Graduation Path
+              </p>
               <h4 className="text-lg font-bold text-white">4 Year Degree</h4>
             </div>
             <div className="w-px h-8 bg-white/10 mx-2"></div>
@@ -174,55 +188,63 @@ function StudyPlanPage() {
 
         <NotificationBanner alerts={alerts} />
 
-        {/* Stats Grid */}
+        {}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsCard 
-            icon={BookOpen} 
-            label="Total Credits" 
-            value={stats.totalCredits} 
+          <StatsCard
+            icon={BookOpen}
+            label="Total Credits"
+            value={stats.totalCredits}
             subValue="to Graduate"
             delay={100}
           />
-          <StatsCard 
-            icon={Layers} 
-            label="Core Courses" 
-            value={stats.coreCourses} 
+          <StatsCard
+            icon={Layers}
+            label="Core Courses"
+            value={stats.coreCourses}
             subValue="Required"
             delay={200}
           />
-          <StatsCard 
-            icon={TrendingUp} 
-            label="Electives" 
-            value={stats.electives} 
+          <StatsCard
+            icon={TrendingUp}
+            label="Electives"
+            value={stats.electives}
             subValue="Available"
             delay={300}
           />
-          <StatsCard 
-            icon={CheckCircle2} 
-            label="Semesters" 
-            value={semesters.length} 
+          <StatsCard
+            icon={CheckCircle2}
+            label="Semesters"
+            value={semesters.length}
             subValue="Planned"
             delay={400}
           />
         </div>
 
-        {/* Content Section */}
+        {}
         <div className="space-y-8">
-          {/* Semester Selector */}
+          {}
           <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
               <SuperTabs
-                tabs={semesters.map((s, idx) => ({ value: idx, label: s.title }))}
+                tabs={semesters.map((s, idx) => ({
+                  value: idx,
+                  label: s.title,
+                }))}
                 activeTab={activeSemIdx}
                 onTabChange={setActiveSemIdx}
               />
-              
+
               {activeSemData && (
                 <div className="flex items-center gap-6 pr-4">
                   <div className="text-right">
-                    <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">Semester Load</p>
+                    <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">
+                      Semester Load
+                    </p>
                     <span className="text-xl font-bold text-[#a098ff] font-sans">
-                      {activeSemData.crHrs} <span className="text-xs text-zinc-500 uppercase ml-1">Credits</span>
+                      {activeSemData.crHrs}{" "}
+                      <span className="text-xs text-zinc-500 uppercase ml-1">
+                        Credits
+                      </span>
                     </span>
                   </div>
                 </div>
@@ -230,61 +252,78 @@ function StudyPlanPage() {
             </div>
           </div>
 
-          {/* Active Semester Courses */}
+          {}
           {activeSemData && (
             <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden">
-               <div className="flex items-center gap-3 mb-10 border-b border-white/5 pb-8">
-                  <div className="p-3 bg-zinc-800 rounded-xl text-zinc-400">
-                    <BookOpen size={20} />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-white tracking-tight">{activeSemData.title} Timeline</h3>
-                    <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Curriculum Roadmap</p>
-                  </div>
+              <div className="flex items-center gap-3 mb-10 border-b border-white/5 pb-8">
+                <div className="p-3 bg-zinc-800 rounded-xl text-zinc-400">
+                  <BookOpen size={20} />
                 </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white tracking-tight">
+                    {activeSemData.title} Timeline
+                  </h3>
+                  <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">
+                    Curriculum Roadmap
+                  </p>
+                </div>
+              </div>
 
-                <div className="overflow-x-auto custom-scrollbar">
-                  <table className="w-full text-left order-collapse border-spacing-0">
-                    <thead>
-                      <tr className="border-b border-white/5">
-                        <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Code</th>
-                        <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">Course Title</th>
-                        <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider text-center">Cr.H</th>
-                        <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider text-right">Category</th>
+              <div className="overflow-x-auto custom-scrollbar">
+                <table className="w-full text-left order-collapse border-spacing-0">
+                  <thead>
+                    <tr className="border-b border-white/5">
+                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
+                        Code
+                      </th>
+                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
+                        Course Title
+                      </th>
+                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider text-center">
+                        Cr.H
+                      </th>
+                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider text-right">
+                        Category
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {activeSemData.courses.map((course, cIdx) => (
+                      <tr
+                        key={cIdx}
+                        className="group hover:bg-white/[0.02] transition-colors"
+                      >
+                        <td className="px-6 py-5">
+                          <span className="px-2.5 py-1 rounded-lg bg-zinc-800 text-zinc-400 text-[10px] font-bold tracking-tight border border-white/5">
+                            {course.code}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5">
+                          <span className="text-white font-medium group-hover:text-[#a098ff] transition-colors">
+                            {course.title}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5 text-center">
+                          <span className="text-zinc-400 font-bold font-sans">
+                            {course.crHrs}
+                          </span>
+                        </td>
+                        <td className="px-6 py-5 text-right">
+                          <span
+                            className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                              course.type === "Core"
+                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                            }`}
+                          >
+                            {course.type}
+                          </span>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                      {activeSemData.courses.map((course, cIdx) => (
-                        <tr key={cIdx} className="group hover:bg-white/[0.02] transition-colors">
-                          <td className="px-6 py-5">
-                            <span className="px-2.5 py-1 rounded-lg bg-zinc-800 text-zinc-400 text-[10px] font-bold tracking-tight border border-white/5">
-                              {course.code}
-                            </span>
-                          </td>
-                          <td className="px-6 py-5">
-                            <span className="text-white font-medium group-hover:text-[#a098ff] transition-colors">
-                              {course.title}
-                            </span>
-                          </td>
-                          <td className="px-6 py-5 text-center">
-                            <span className="text-zinc-400 font-bold font-sans">
-                              {course.crHrs}
-                            </span>
-                          </td>
-                          <td className="px-6 py-5 text-right">
-                            <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                              course.type === "Core" 
-                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" 
-                              : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                            }`}>
-                              {course.type}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

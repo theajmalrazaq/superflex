@@ -167,8 +167,6 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
   );
 };
 
-
-
 const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -426,11 +424,10 @@ function AttendancePage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-6 md:p-8 space-y-8">
         {}
-        <PageHeader 
-          title="Attendance" 
+        <PageHeader
+          title="Attendance"
           subtitle="Track your presence and schedule"
         >
-
           <div className="flex flex-col lg:flex-row items-center gap-4">
             <SuperTabs
               tabs={semesters}
@@ -447,7 +444,13 @@ function AttendancePage() {
               }}
             />
             <div className="flex items-center gap-4">
-              {courses.length > 0 && <CourseSelector courses={courses} selectedId={selectedCourseId} onSelect={setSelectedCourseId} />}
+              {courses.length > 0 && (
+                <CourseSelector
+                  courses={courses}
+                  selectedId={selectedCourseId}
+                  onSelect={setSelectedCourseId}
+                />
+              )}
               <BookmarksMenu
                 markedRecords={markedRecords}
                 courses={courses}
@@ -467,10 +470,7 @@ function AttendancePage() {
           <>
             {}
             {selectedCourseData && (
-              <div
-                key={selectedCourseId}
-                className="space-y-16"
-              >
+              <div key={selectedCourseId} className="space-y-16">
                 {}
                 <div className="flex flex-wrap gap-4">
                   <StatsCard
@@ -547,7 +547,8 @@ function AttendancePage() {
             }`}
           >
             {alerts.length > 0 ? (
-              <NotificationBanner alerts={alerts.filter((alert) => {
+              <NotificationBanner
+                alerts={alerts.filter((alert) => {
                   const hasNoRecord = alerts.some((a) =>
                     a.message.toLowerCase().includes("no record"),
                   );
@@ -557,7 +558,7 @@ function AttendancePage() {
                   )
                     return false;
                   return true;
-                })} 
+                })}
               />
             ) : (
               <div className="flex flex-col items-center justify-center opacity-50 py-12">

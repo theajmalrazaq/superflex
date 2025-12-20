@@ -43,28 +43,30 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
 );
 
 const GRADE_POINTS = {
   "A+": 4.0,
-  "A": 4.0,
+  A: 4.0,
   "A-": 3.67,
   "B+": 3.33,
-  "B": 3.0,
+  B: 3.0,
   "B-": 2.67,
   "C+": 2.33,
-  "C": 2.0,
+  C: 2.0,
   "C-": 1.67,
   "D+": 1.33,
-  "D": 1.0,
-  "F": 0.0,
+  D: 1.0,
+  F: 0.0,
 };
 
-
-
-
-const CGPAPlannerModal = ({ isOpen, onClose, currentCGPA, currentCreditHours }) => {
+const CGPAPlannerModal = ({
+  isOpen,
+  onClose,
+  currentCGPA,
+  currentCreditHours,
+}) => {
   const [targetCGPA, setTargetCGPA] = useState("");
   const [nextCH, setNextCH] = useState("");
   const [result, setResult] = useState(null);
@@ -73,60 +75,74 @@ const CGPAPlannerModal = ({ isOpen, onClose, currentCGPA, currentCreditHours }) 
     e.preventDefault();
     const target = parseFloat(targetCGPA);
     const nextHours = parseFloat(nextCH);
-    
+
     if (isNaN(target) || isNaN(nextHours) || nextHours <= 0) return;
 
-    const requiredGPA = (target * (currentCreditHours + nextHours) - currentCGPA * currentCreditHours) / nextHours;
+    const requiredGPA =
+      (target * (currentCreditHours + nextHours) -
+        currentCGPA * currentCreditHours) /
+      nextHours;
     setResult(requiredGPA);
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300" onClick={onClose}>
-      <div 
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300"
+      onClick={onClose}
+    >
+      <div
         className="bg-black/20 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 w-full max-w-[420px] animate-in zoom-in-95 fade-in duration-300 relative overflow-hidden "
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#a098ff]/5 blur-[80px] rounded-full -mr-32 -mt-32 pointer-events-none"></div>
-        
+
         <div className="relative">
           <div className="flex flex-col items-center text-center mb-8">
             <div className="p-4 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] mb-4">
               <Target size={32} />
             </div>
-            <h2 className="text-2xl font-bold text-white tracking-tight">CGPA Planner</h2>
-            <p className="text-zinc-400 font-medium text-sm mt-1">Calculate your future strategy</p>
+            <h2 className="text-2xl font-bold text-white tracking-tight">
+              CGPA Planner
+            </h2>
+            <p className="text-zinc-400 font-medium text-sm mt-1">
+              Calculate your future strategy
+            </p>
           </div>
 
           <form onSubmit={calculate} className="space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-white/50 uppercase tracking-widest ml-1">Target CGPA</label>
-                <input 
-                  type="number" 
+                <label className="text-xs font-bold text-white/50 uppercase tracking-widest ml-1">
+                  Target CGPA
+                </label>
+                <input
+                  type="number"
                   step="0.01"
                   min="0"
                   max="4"
                   value={targetCGPA}
-                  onChange={e => setTargetCGPA(e.target.value)}
+                  onChange={(e) => setTargetCGPA(e.target.value)}
                   placeholder="e.g. 3.70"
                   className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-[#a098ff]/50 focus:ring-4 focus:ring-[#a098ff]/5 transition-all font-medium placeholder:text-white/20"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-white/50 uppercase tracking-widest ml-1">Next Cr.Hrs</label>
-                <input 
-                  type="number" 
+                <label className="text-xs font-bold text-white/50 uppercase tracking-widest ml-1">
+                  Next Cr.Hrs
+                </label>
+                <input
+                  type="number"
                   value={nextCH}
-                  onChange={e => setNextCH(e.target.value)}
+                  onChange={(e) => setNextCH(e.target.value)}
                   placeholder="e.g. 18"
                   className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-[#a098ff]/50 focus:ring-4 focus:ring-[#a098ff]/5 transition-all font-medium placeholder:text-white/20"
                 />
               </div>
             </div>
 
-            <button 
+            <button
               type="submit"
               className="w-full h-[48px] bg-[#a098ff] hover:bg-[#8f86ff] text-white rounded-xl font-bold text-sm"
             >
@@ -136,10 +152,14 @@ const CGPAPlannerModal = ({ isOpen, onClose, currentCGPA, currentCreditHours }) 
 
           {result !== null && (
             <div className="mt-8 p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Required GPA Strategy</p>
+              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">
+                Required GPA Strategy
+              </p>
               {result > 4.0 ? (
                 <div className="text-rose-400">
-                  <p className="text-3xl font-bold tracking-tight mb-2">{result.toFixed(2)}</p>
+                  <p className="text-3xl font-bold tracking-tight mb-2">
+                    {result.toFixed(2)}
+                  </p>
                   <div className="flex items-center gap-2 text-xs font-medium bg-rose-500/10 p-2 rounded-lg">
                     <Info size={14} />
                     Target unreachable in one semester.
@@ -155,9 +175,14 @@ const CGPAPlannerModal = ({ isOpen, onClose, currentCGPA, currentCreditHours }) 
                 </div>
               ) : (
                 <div className="text-[#a098ff]">
-                  <p className="text-4xl font-bold tracking-tight mb-3">{result.toFixed(2)}</p>
+                  <p className="text-4xl font-bold tracking-tight mb-3">
+                    {result.toFixed(2)}
+                  </p>
                   <p className="text-xs text-zinc-400 font-medium leading-relaxed">
-                    Maintain an average of <span className="text-white">{result.toFixed(2)}</span> in your next <span className="text-white">{nextCH}</span> credit hours.
+                    Maintain an average of{" "}
+                    <span className="text-white">{result.toFixed(2)}</span> in
+                    your next <span className="text-white">{nextCH}</span>{" "}
+                    credit hours.
                   </p>
                 </div>
               )}
@@ -168,7 +193,6 @@ const CGPAPlannerModal = ({ isOpen, onClose, currentCGPA, currentCreditHours }) 
     </div>
   );
 };
-
 
 function TranscriptPage() {
   const [loading, setLoading] = useState(true);
@@ -182,22 +206,32 @@ function TranscriptPage() {
   useEffect(() => {
     const parse = () => {
       try {
-        const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
+        const root = document.querySelector(
+          ".m-grid.m-grid--hor.m-grid--root.m-page",
+        );
         if (!root) {
           setTimeout(parse, 500);
           return;
         }
 
-        // 0. Parse Alerts
         const alertList = [];
-        root.querySelectorAll(".m-alert, .alert").forEach(alert => {
-          if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) return;
+        root.querySelectorAll(".m-alert, .alert").forEach((alert) => {
+          if (
+            alert.style.display === "none" ||
+            alert.id === "DataErrormsgdiv" ||
+            alert.closest(".modal")
+          )
+            return;
 
           const textContainer = alert.querySelector(".m-alert__text") || alert;
           const clone = textContainer.cloneNode(true);
-          // Remove standard UI elements that shouldn't be in the message
-          clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach(el => el.remove());
-          
+
+          clone
+            .querySelectorAll(
+              ".m-alert__close, button, a, strong, .m-alert__icon",
+            )
+            .forEach((el) => el.remove());
+
           let message = clone.textContent
             .replace(/Alert!/gi, "")
             .replace(/Close/gi, "")
@@ -206,21 +240,30 @@ function TranscriptPage() {
             .trim();
 
           if (message && message.length > 3) {
-              const type = alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger") ? "error" : "info";
-              alertList.push({ type, message });
+            const type =
+              alert.classList.contains("alert-danger") ||
+              alert.classList.contains("m-alert--outline-danger")
+                ? "error"
+                : "info";
+            alertList.push({ type, message });
           }
         });
         setAlerts(alertList);
 
         const semesterData = [];
-        const semesterCols = root.querySelectorAll(".m-section__content .row .col-md-6");
+        const semesterCols = root.querySelectorAll(
+          ".m-section__content .row .col-md-6",
+        );
 
         semesterCols.forEach((col) => {
-          const title = col.querySelector("h5")?.textContent.trim() || "Untitled Semester";
-          
+          const title =
+            col.querySelector("h5")?.textContent.trim() || "Untitled Semester";
+
           const summarySpans = col.querySelectorAll(".pull-right span");
-          const summaryArr = Array.from(summarySpans).map(s => s.textContent.split(":")[1]?.trim() || "0");
-          
+          const summaryArr = Array.from(summarySpans).map(
+            (s) => s.textContent.split(":")[1]?.trim() || "0",
+          );
+
           const summary = {
             crRegistered: parseInt(summaryArr[0]),
             crEarned: parseInt(summaryArr[1]),
@@ -246,7 +289,6 @@ function TranscriptPage() {
             }
           });
 
-
           semesterData.push({
             title,
             summary,
@@ -258,7 +300,7 @@ function TranscriptPage() {
           setSemesters(semesterData);
           setActiveSemIdx(semesterData.length - 1);
         }
-        
+
         root.style.display = "none";
         setLoading(false);
       } catch (e) {
@@ -273,16 +315,16 @@ function TranscriptPage() {
   const activeSemData = semesters[activeSemIdx];
 
   const { calculatedStats, originalCGPA } = useMemo(() => {
-    if (semesters.length === 0) return { calculatedStats: null, originalCGPA: 0 };
+    if (semesters.length === 0)
+      return { calculatedStats: null, originalCGPA: 0 };
 
     let cumulativeGradePoints = 0;
     let cumulativeCreditsForGPA = 0;
     let totalCreditsAttempted = 0;
-    
-    // Map to track unique courses earned (passed)
-    const passedUniqueCredits = new Map(); // courseCode -> max_crHrs
-    const courseStatsMap = new Map(); // courseCode -> { gp, crHrs }
-    
+
+    const passedUniqueCredits = new Map();
+    const courseStatsMap = new Map();
+
     let lastNonEmptyCGPA = 0;
 
     const semesterStats = semesters.map((sem, sIdx) => {
@@ -292,20 +334,20 @@ function TranscriptPage() {
       let semCreditsEarned = 0;
       let hasOverriddenGrade = false;
 
-      // Temporary collectors for this semester to decide if we include them in global totals
       const tempPassedCredits = new Map();
 
-      sem.courses.forEach(course => {
+      sem.courses.forEach((course) => {
         const key = `${sem.title}-${course.code}`;
         if (overriddenGrades[key]) hasOverriddenGrade = true;
 
         const grade = overriddenGrades[key] || course.grade;
         const gp = GRADE_POINTS[grade];
         const isGraded = gp !== undefined;
-        
-        const isNonCredit = course.type.toLowerCase().includes('non credit') || 
-                           grade === 'S' || 
-                           grade === 'U';
+
+        const isNonCredit =
+          course.type.toLowerCase().includes("non credit") ||
+          grade === "S" ||
+          grade === "U";
 
         if (isNonCredit) return;
 
@@ -314,19 +356,18 @@ function TranscriptPage() {
         if (isGraded) {
           semGradePoints += gp * course.crHrs;
           semCreditsForGPA += course.crHrs;
-          
-          // Handle repeats for CGPA calculation
+
           if (courseStatsMap.has(course.code)) {
             const prev = courseStatsMap.get(course.code);
             cumulativeGradePoints -= prev.gp * prev.crHrs;
             cumulativeCreditsForGPA -= prev.crHrs;
           }
-          
+
           cumulativeGradePoints += gp * course.crHrs;
           cumulativeCreditsForGPA += course.crHrs;
           courseStatsMap.set(course.code, { gp, crHrs: course.crHrs });
 
-          if (grade !== 'F') {
+          if (grade !== "F") {
             semCreditsEarned += course.crHrs;
             tempPassedCredits.set(course.code, course.crHrs);
           }
@@ -339,27 +380,36 @@ function TranscriptPage() {
       if (!isEmptySemester) {
         totalCreditsAttempted += semCreditsAttempted;
         tempPassedCredits.forEach((ch, code) => {
-          passedUniqueCredits.set(code, Math.max(passedUniqueCredits.get(code) || 0, ch));
+          passedUniqueCredits.set(
+            code,
+            Math.max(passedUniqueCredits.get(code) || 0, ch),
+          );
         });
       }
 
-      const cgpa = cumulativeCreditsForGPA > 0 ? cumulativeGradePoints / cumulativeCreditsForGPA : 0;
+      const cgpa =
+        cumulativeCreditsForGPA > 0
+          ? cumulativeGradePoints / cumulativeCreditsForGPA
+          : 0;
 
       if (!isEmptySemester || sIdx === 0) {
         lastNonEmptyCGPA = cgpa;
       }
-      
+
       return {
         title: sem.title,
         sgpa: sgpa,
         cgpa: cgpa,
         attempted: semCreditsAttempted,
         earned: semCreditsEarned,
-        isEmptySemester
+        isEmptySemester,
       };
     });
 
-    const totalCreditsEarned = Array.from(passedUniqueCredits.values()).reduce((sum, ch) => sum + ch, 0);
+    const totalCreditsEarned = Array.from(passedUniqueCredits.values()).reduce(
+      (sum, ch) => sum + ch,
+      0,
+    );
 
     return {
       calculatedStats: {
@@ -368,24 +418,22 @@ function TranscriptPage() {
         totalCreditsEarned: totalCreditsEarned,
         totalCreditsAttempted: totalCreditsAttempted,
         totalCreditsForGPA: cumulativeCreditsForGPA,
-        actualSemestersCount: semesterStats.filter(s => !s.isEmptySemester).length,
-        actualCoursesCount: Array.from(courseStatsMap.keys()).length
+        actualSemestersCount: semesterStats.filter((s) => !s.isEmptySemester)
+          .length,
+        actualCoursesCount: Array.from(courseStatsMap.keys()).length,
       },
-      originalCGPA: semesters[semesters.length - 1].summary.cgpa
+      originalCGPA: semesters[semesters.length - 1].summary.cgpa,
     };
   }, [semesters, overriddenGrades]);
-
-
-
 
   const chartData = useMemo(() => {
     if (!calculatedStats) return null;
     return {
-      labels: calculatedStats.history.map(h => h.title.split(' ')[0]),
+      labels: calculatedStats.history.map((h) => h.title.split(" ")[0]),
       datasets: [
         {
           label: "SGPA",
-          data: calculatedStats.history.map(h => h.sgpa),
+          data: calculatedStats.history.map((h) => h.sgpa),
           borderColor: "#a098ff",
           backgroundColor: (context) => {
             const ctx = context.chart.ctx;
@@ -405,7 +453,7 @@ function TranscriptPage() {
         },
         {
           label: "CGPA",
-          data: calculatedStats.history.map(h => h.cgpa),
+          data: calculatedStats.history.map((h) => h.cgpa),
           borderColor: "#10b981",
           tension: 0.45,
           fill: false,
@@ -416,8 +464,7 @@ function TranscriptPage() {
           pointHoverRadius: 6,
           borderWidth: 3,
           borderDash: [5, 5],
-        }
-
+        },
       ],
     };
   }, [calculatedStats]);
@@ -429,7 +476,7 @@ function TranscriptPage() {
       legend: { display: false },
       tooltip: {
         backgroundColor: "#18181b",
-        titleFont: { size: 13, weight: 'bold' },
+        titleFont: { size: 13, weight: "bold" },
         bodyFont: { size: 12 },
         padding: 16,
         borderRadius: 16,
@@ -437,28 +484,29 @@ function TranscriptPage() {
         borderWidth: 1,
         displayColors: false,
         callbacks: {
-          label: (context) => `${context.dataset.label}: ${context.parsed.y.toFixed(2)}`
-        }
-      }
+          label: (context) =>
+            `${context.dataset.label}: ${context.parsed.y.toFixed(2)}`,
+        },
+      },
     },
     scales: {
       y: {
         min: 0,
         max: 4,
-        ticks: { color: "#3f3f46", stepSize: 1, font: { weight: 'bold' } },
-        grid: { color: "rgba(255,255,255,0.03)" }
+        ticks: { color: "#3f3f46", stepSize: 1, font: { weight: "bold" } },
+        grid: { color: "rgba(255,255,255,0.03)" },
       },
       x: {
-        ticks: { color: "#3f3f46", font: { weight: 'bold' } },
-        grid: { display: false }
-      }
-    }
+        ticks: { color: "#3f3f46", font: { weight: "bold" } },
+        grid: { display: false },
+      },
+    },
   };
 
   const handleGradeChange = (semTitle, courseCode, newGrade) => {
-    setOverriddenGrades(prev => ({
+    setOverriddenGrades((prev) => ({
       ...prev,
-      [`${semTitle}-${courseCode}`]: newGrade
+      [`${semTitle}-${courseCode}`]: newGrade,
     }));
   };
 
@@ -472,23 +520,30 @@ function TranscriptPage() {
 
       <div className="w-full p-6 md:p-10 space-y-10 relative z-10">
         {}
-        <PageHeader 
-          title="Transcript Report" 
+        <PageHeader
+          title="Transcript Report"
           subtitle="Academic performance and degree analytics"
         >
-          <button 
+          <button
             onClick={() => setIsPlannerOpen(true)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/5 bg-zinc-900/50 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-300 group"
           >
-            <Target size={16} className="group-hover:scale-110 transition-transform" />
+            <Target
+              size={16}
+              className="group-hover:scale-110 transition-transform"
+            />
             Strategic Planner
           </button>
-          <button 
-            onClick={() => whatIfMode ? (setOverriddenGrades({}), setWhatIfMode(false)) : setWhatIfMode(true)}
+          <button
+            onClick={() =>
+              whatIfMode
+                ? (setOverriddenGrades({}), setWhatIfMode(false))
+                : setWhatIfMode(true)
+            }
             className={`flex items-center gap-2 px-5 py-2.5 rounded-full border transition-all duration-300 text-xs font-bold ${
-              whatIfMode 
-              ? "bg-[#a098ff]/10 text-[#a098ff] border-[#a098ff]/20" 
-              : "bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
+              whatIfMode
+                ? "bg-[#a098ff]/10 text-[#a098ff] border-[#a098ff]/20"
+                : "bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
             }`}
           >
             <Calculator size={16} />
@@ -498,39 +553,39 @@ function TranscriptPage() {
 
         <NotificationBanner alerts={alerts} />
 
-
         {}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsCard 
-            icon={TrendingUp} 
-            label="Cumulative GPA" 
-            value={calculatedStats?.currentCGPA.toFixed(2) || "0.00"} 
-            subValue={whatIfMode ? `(Was ${originalCGPA.toFixed(2)})` : "Current"}
+          <StatsCard
+            icon={TrendingUp}
+            label="Cumulative GPA"
+            value={calculatedStats?.currentCGPA.toFixed(2) || "0.00"}
+            subValue={
+              whatIfMode ? `(Was ${originalCGPA.toFixed(2)})` : "Current"
+            }
             delay={0}
           />
-          <StatsCard 
-            icon={Award} 
-            label="Credits Cleared" 
-            value={calculatedStats?.totalCreditsEarned || "0"} 
+          <StatsCard
+            icon={Award}
+            label="Credits Cleared"
+            value={calculatedStats?.totalCreditsEarned || "0"}
             subValue={`of ${calculatedStats?.totalCreditsAttempted || 0} attempted`}
             delay={100}
           />
-          <StatsCard 
-            icon={Calendar} 
-            label="Semesters" 
-            value={calculatedStats?.actualSemestersCount || 0} 
+          <StatsCard
+            icon={Calendar}
+            label="Semesters"
+            value={calculatedStats?.actualSemestersCount || 0}
             subValue="Completed"
             delay={200}
           />
-          <StatsCard 
-            icon={BookOpen} 
-            label="Degree Progress" 
-            value={calculatedStats?.actualCoursesCount || 0} 
+          <StatsCard
+            icon={BookOpen}
+            label="Degree Progress"
+            value={calculatedStats?.actualCoursesCount || 0}
             subValue="Graded Courses"
             delay={300}
           />
         </div>
-
 
         {}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
@@ -541,49 +596,94 @@ function TranscriptPage() {
 
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
                 <SuperTabs
-                  tabs={semesters.map((s, idx) => ({ value: idx, label: s.title }))}
+                  tabs={semesters.map((s, idx) => ({
+                    value: idx,
+                    label: s.title,
+                  }))}
                   activeTab={activeSemIdx}
                   onTabChange={setActiveSemIdx}
                 />
               </div>
 
-
               {activeSemData && (
                 <div className="space-y-10 relative z-10">
                   <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-10">
                     <div className="space-y-1">
-                      <h2 className="text-3xl font-black text-white tracking-tighter">{activeSemData.title}</h2>
-                      <p className="text-xs text-zinc-500 font-black uppercase tracking-widest">Semester Detail Report</p>
+                      <h2 className="text-3xl font-black text-white tracking-tighter">
+                        {activeSemData.title}
+                      </h2>
+                      <p className="text-xs text-zinc-500 font-black uppercase tracking-widest">
+                        Semester Detail Report
+                      </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-x-12 lg:gap-x-16 gap-y-6">
                       <div className="text-right flex flex-col items-end min-w-[70px]">
-                        <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">Attemp.</span>
+                        <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">
+                          Attemp.
+                        </span>
                         <span className="text-3xl font-bold font-sans text-white tracking-tighter">
                           {activeSemData.courses.reduce((acc, c) => {
-                            const grade = overriddenGrades[`${activeSemData.title}-${c.code}`] || c.grade;
-                            const isNonCredit = c.type.toLowerCase().includes('non credit') || grade === 'S' || grade === 'U';
+                            const grade =
+                              overriddenGrades[
+                                `${activeSemData.title}-${c.code}`
+                              ] || c.grade;
+                            const isNonCredit =
+                              c.type.toLowerCase().includes("non credit") ||
+                              grade === "S" ||
+                              grade === "U";
                             return isNonCredit ? acc : acc + c.crHrs;
                           }, 0)}
                         </span>
                       </div>
                       <div className="text-right flex flex-col items-end min-w-[70px]">
-                        <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">Earned</span>
+                        <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">
+                          Earned
+                        </span>
                         <span className="text-3xl font-bold font-sans text-emerald-400 tracking-tighter">
-                          {activeSemIdx === semesters.length - 1 && !overriddenGrades[Object.keys(overriddenGrades).find(k => k.startsWith(activeSemData.title))] ? "0" : (calculatedStats?.history.find(h => h.title === activeSemData.title)?.earned || 0)}
+                          {activeSemIdx === semesters.length - 1 &&
+                          !overriddenGrades[
+                            Object.keys(overriddenGrades).find((k) =>
+                              k.startsWith(activeSemData.title),
+                            )
+                          ]
+                            ? "0"
+                            : calculatedStats?.history.find(
+                                (h) => h.title === activeSemData.title,
+                              )?.earned || 0}
                         </span>
                       </div>
                       <div className="text-right flex flex-col items-end min-w-[70px]">
-                        <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">SGPA</span>
+                        <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">
+                          SGPA
+                        </span>
                         <span className="text-3xl font-bold font-sans text-[#a098ff] tracking-tighter">
-                          {activeSemIdx === semesters.length - 1 && !overriddenGrades[Object.keys(overriddenGrades).find(k => k.startsWith(activeSemData.title))] ? "0.00" : (calculatedStats?.history.find(h => h.title === activeSemData.title)?.sgpa.toFixed(2) || "0.00")}
+                          {activeSemIdx === semesters.length - 1 &&
+                          !overriddenGrades[
+                            Object.keys(overriddenGrades).find((k) =>
+                              k.startsWith(activeSemData.title),
+                            )
+                          ]
+                            ? "0.00"
+                            : calculatedStats?.history
+                                .find((h) => h.title === activeSemData.title)
+                                ?.sgpa.toFixed(2) || "0.00"}
                         </span>
                       </div>
                       <div className="text-right flex flex-col items-end min-w-[70px]">
-                        <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">CGPA</span>
+                        <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">
+                          CGPA
+                        </span>
                         <span className="text-3xl font-bold font-sans text-white tracking-tighter">
-                          {activeSemIdx === semesters.length - 1 && !overriddenGrades[Object.keys(overriddenGrades).find(k => k.startsWith(activeSemData.title))] 
-                            ? calculatedStats?.currentCGPA.toFixed(2) 
-                            : (calculatedStats?.history.find(h => h.title === activeSemData.title)?.cgpa.toFixed(2) || "0.00")}
+                          {activeSemIdx === semesters.length - 1 &&
+                          !overriddenGrades[
+                            Object.keys(overriddenGrades).find((k) =>
+                              k.startsWith(activeSemData.title),
+                            )
+                          ]
+                            ? calculatedStats?.currentCGPA.toFixed(2)
+                            : calculatedStats?.history
+                                .find((h) => h.title === activeSemData.title)
+                                ?.cgpa.toFixed(2) || "0.00"}
                         </span>
                       </div>
                     </div>
@@ -593,20 +693,39 @@ function TranscriptPage() {
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-white/[0.02]">
-                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5">Code</th>
-                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5">Course Name</th>
-                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-center">Cr.H</th>
-                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-center">Grade</th>
-                          <th className="px-8 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-right">Points</th>
+                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5">
+                            Code
+                          </th>
+                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5">
+                            Course Name
+                          </th>
+                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-center">
+                            Cr.H
+                          </th>
+                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-center">
+                            Grade
+                          </th>
+                          <th className="px-8 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-right">
+                            Points
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {activeSemData.courses.map((course, idx) => {
-                          const currentGrade = overriddenGrades[`${activeSemData.title}-${course.code}`] || course.grade;
-                          const isSimulated = !!overriddenGrades[`${activeSemData.title}-${course.code}`];
-                          
+                          const currentGrade =
+                            overriddenGrades[
+                              `${activeSemData.title}-${course.code}`
+                            ] || course.grade;
+                          const isSimulated =
+                            !!overriddenGrades[
+                              `${activeSemData.title}-${course.code}`
+                            ];
+
                           return (
-                            <tr key={idx} className={`group transition-all duration-300 border-b border-white/5 last:border-0 hover:bg-white/[0.03]`}>
+                            <tr
+                              key={idx}
+                              className={`group transition-all duration-300 border-b border-white/5 last:border-0 hover:bg-white/[0.03]`}
+                            >
                               <td className="px-6 py-4">
                                 <span className="text-xs font-bold text-white px-2.5 py-1 bg-white/5 rounded-lg group-hover:bg-[#a098ff]/20 group-hover:text-[#a098ff] transition-all">
                                   {course.code}
@@ -614,50 +733,78 @@ function TranscriptPage() {
                               </td>
                               <td className="px-6 py-4">
                                 <div className="space-y-0.5">
-                                  <p className="text-sm font-bold text-white leading-tight">{course.description}</p>
-                                  <p className="text-[10px] font-medium text-zinc-600 uppercase tracking-wide">{course.type}</p>
+                                  <p className="text-sm font-bold text-white leading-tight">
+                                    {course.description}
+                                  </p>
+                                  <p className="text-[10px] font-medium text-zinc-600 uppercase tracking-wide">
+                                    {course.type}
+                                  </p>
                                 </div>
                               </td>
                               <td className="px-6 py-4 text-center">
-                                <span className="text-sm font-medium text-zinc-400 group-hover:text-white transition-colors">{course.crHrs}</span>
+                                <span className="text-sm font-medium text-zinc-400 group-hover:text-white transition-colors">
+                                  {course.crHrs}
+                                </span>
                               </td>
                               <td className="px-6 py-4 text-center">
                                 {whatIfMode ? (
-                                  <select 
+                                  <select
                                     value={currentGrade}
-                                    onChange={(e) => handleGradeChange(activeSemData.title, course.code, e.target.value)}
+                                    onChange={(e) =>
+                                      handleGradeChange(
+                                        activeSemData.title,
+                                        course.code,
+                                        e.target.value,
+                                      )
+                                    }
                                     className={`text-xs font-bold px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/10 text-center cursor-pointer hover:border-[#a098ff]/50 transition-all outline-none appearance-none ${
-                                      currentGrade.startsWith('A') ? 'text-emerald-400' : 
-                                      currentGrade.startsWith('B') ? 'text-blue-400' :
-                                      currentGrade.startsWith('C') ? 'text-amber-400' :
-                                      currentGrade === 'F' ? 'text-rose-400' : 'text-zinc-500'
+                                      currentGrade.startsWith("A")
+                                        ? "text-emerald-400"
+                                        : currentGrade.startsWith("B")
+                                          ? "text-blue-400"
+                                          : currentGrade.startsWith("C")
+                                            ? "text-amber-400"
+                                            : currentGrade === "F"
+                                              ? "text-rose-400"
+                                              : "text-zinc-500"
                                     }`}
                                   >
-                                    {Object.keys(GRADE_POINTS).concat(['I', 'S', 'U', 'W']).map(g => (
-                                      <option key={g} value={g}>{g}</option>
-                                    ))}
+                                    {Object.keys(GRADE_POINTS)
+                                      .concat(["I", "S", "U", "W"])
+                                      .map((g) => (
+                                        <option key={g} value={g}>
+                                          {g}
+                                        </option>
+                                      ))}
                                   </select>
                                 ) : (
                                   <div className="flex justify-center">
-                                    <span className={`text-[10px] font-bold px-3 py-1 rounded-full border ${
-                                      currentGrade.startsWith('A') 
-                                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
-                                        : currentGrade.startsWith('B')
-                                          ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-                                          : currentGrade.startsWith('C')
-                                            ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                                            : currentGrade === 'F'
-                                              ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
-                                              : 'bg-zinc-800 text-zinc-500 border-transparent'
-                                    }`}>
+                                    <span
+                                      className={`text-[10px] font-bold px-3 py-1 rounded-full border ${
+                                        currentGrade.startsWith("A")
+                                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                          : currentGrade.startsWith("B")
+                                            ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                                            : currentGrade.startsWith("C")
+                                              ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                                              : currentGrade === "F"
+                                                ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                                                : "bg-zinc-800 text-zinc-500 border-transparent"
+                                      }`}
+                                    >
                                       {currentGrade}
                                     </span>
                                   </div>
                                 )}
                               </td>
                               <td className="px-8 py-4 text-right">
-                                <span className={`text-sm font-bold font-sans ${isSimulated ? 'text-[#a098ff]' : 'text-zinc-300'}`}>
-                                  {((GRADE_POINTS[currentGrade] || 0) * course.crHrs).toFixed(1)}
+                                <span
+                                  className={`text-sm font-bold font-sans ${isSimulated ? "text-[#a098ff]" : "text-zinc-300"}`}
+                                >
+                                  {(
+                                    (GRADE_POINTS[currentGrade] || 0) *
+                                    course.crHrs
+                                  ).toFixed(1)}
                                 </span>
                               </td>
                             </tr>
@@ -666,7 +813,6 @@ function TranscriptPage() {
                       </tbody>
                     </table>
                   </div>
-
                 </div>
               )}
             </div>
@@ -678,8 +824,12 @@ function TranscriptPage() {
             <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 relative overflow-hidden group">
               <div className="flex items-center justify-between mb-8">
                 <div className="space-y-1">
-                  <h3 className="text-xl font-bold text-white tracking-tight">Performance Flow</h3>
-                  <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Historical GPA Trend</p>
+                  <h3 className="text-xl font-bold text-white tracking-tight">
+                    Performance Flow
+                  </h3>
+                  <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+                    Historical GPA Trend
+                  </p>
                 </div>
                 <div className="p-3 bg-[#a098ff]/10 rounded-2xl text-[#a098ff]">
                   <TrendingUp size={18} />
@@ -690,42 +840,57 @@ function TranscriptPage() {
               </div>
             </div>
 
-
             {}
             <div className="bg-[#111] border border-[#a098ff]/20 rounded-[2.5rem] p-7 relative overflow-hidden ">
               <div className="absolute top-0 right-0 w-64 h-64 bg-[#a098ff]/5 blur-[80px] rounded-full -mr-32 -mt-32"></div>
-              
+
               <div className="relative z-10 flex flex-col h-full">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="p-3 bg-[#a098ff]/10 rounded-xl text-[#a098ff]">
                     <Zap size={20} />
                   </div>
-                  <h3 className="text-lg font-bold text-white tracking-tight">Simulation Desk</h3>
+                  <h3 className="text-lg font-bold text-white tracking-tight">
+                    Simulation Desk
+                  </h3>
                 </div>
 
                 <div className="space-y-4 flex-1">
                   <div className="p-5 rounded-[1.5rem] bg-zinc-900/40 border border-white/5  transition-colors">
-                    <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">Projected CGPA</p>
+                    <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">
+                      Projected CGPA
+                    </p>
                     <div className="flex items-end justify-between">
                       <span className="text-4xl font-bold font-sans text-white tracking-tighter">
                         {calculatedStats?.currentCGPA.toFixed(2)}
                       </span>
                       {whatIfMode && (
-                        <div className={`flex items-center gap-1 text-xs font-medium font-sans ${calculatedStats.currentCGPA >= originalCGPA ? 'text-emerald-400' : 'text-rose-400'}`}>
-                          {calculatedStats.currentCGPA >= originalCGPA ? '+' : ''}{(calculatedStats.currentCGPA - originalCGPA).toFixed(3)}
+                        <div
+                          className={`flex items-center gap-1 text-xs font-medium font-sans ${calculatedStats.currentCGPA >= originalCGPA ? "text-emerald-400" : "text-rose-400"}`}
+                        >
+                          {calculatedStats.currentCGPA >= originalCGPA
+                            ? "+"
+                            : ""}
+                          {(calculatedStats.currentCGPA - originalCGPA).toFixed(
+                            3,
+                          )}
                         </div>
                       )}
                     </div>
                   </div>
 
                   <div className="p-5 rounded-[1.5rem] bg-zinc-900/40 border border-white/5  transition-colors">
-                    <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">Simulation Impact</p>
+                    <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">
+                      Simulation Impact
+                    </p>
                     <div className="flex items-center justify-between">
                       <span className="text-xl font-medium font-sans text-zinc-400">
-                        {Object.keys(overriddenGrades).length} <span className="text-[10px] uppercase ml-1 opacity-60">Changes</span>
+                        {Object.keys(overriddenGrades).length}{" "}
+                        <span className="text-[10px] uppercase ml-1 opacity-60">
+                          Changes
+                        </span>
                       </span>
                       {whatIfMode && (
-                        <button 
+                        <button
                           onClick={() => setOverriddenGrades({})}
                           className="p-1.5 text-zinc-600 hover:text-white transition-colors"
                         >
@@ -734,8 +899,6 @@ function TranscriptPage() {
                       )}
                     </div>
                   </div>
-
-                 
                 </div>
               </div>
             </div>
@@ -743,9 +906,9 @@ function TranscriptPage() {
         </div>
       </div>
 
-      <CGPAPlannerModal 
-        isOpen={isPlannerOpen} 
-        onClose={() => setIsPlannerOpen(false)} 
+      <CGPAPlannerModal
+        isOpen={isPlannerOpen}
+        onClose={() => setIsPlannerOpen(false)}
         currentCGPA={calculatedStats?.currentCGPA || 0}
         currentCreditHours={calculatedStats?.totalCreditsForGPA || 0}
       />
