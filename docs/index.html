@@ -1,0 +1,1025 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SuperFlex - Transform Your Flex Portal Experience</title>
+    <meta
+      name="description"
+      content="SuperFlex is a modern Chrome extension that transforms the outdated Flex Portal into a sleek, user-friendly dashboard with glassmorphic design and enhanced features."
+    />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap");
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-size: 90%;
+        font-family: "Google Sans Flex", sans-serif;
+      }
+
+      body {
+        font-family: "Google Sans Flex", sans-serif;
+        background: #000000;
+        color: white;
+        overflow-x: hidden;
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(160, 152, 255, 0.3);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(160, 152, 255, 0.5);
+      }
+
+      /* Animated Background */
+      .animated-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        overflow: hidden;
+      }
+
+      /* Atmospheric Glows */
+      @keyframes pulse-glow {
+        0%,
+        100% {
+          opacity: 0.3;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.6;
+          transform: scale(1.1);
+        }
+      }
+
+      .glow-1 {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 800px;
+        height: 800px;
+        background: radial-gradient(
+          circle,
+          rgba(160, 152, 255, 0.15) 0%,
+          transparent 70%
+        );
+        filter: blur(150px);
+        margin-right: -400px;
+        margin-top: -400px;
+        pointer-events: none;
+        animation: pulse-glow 10s ease-in-out infinite;
+      }
+
+      .glow-2 {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(
+          circle,
+          rgba(16, 185, 129, 0.08) 0%,
+          transparent 70%
+        );
+        filter: blur(150px);
+        margin-left: -300px;
+        margin-bottom: -300px;
+        pointer-events: none;
+        animation: pulse-glow 15s ease-in-out infinite;
+        animation-delay: 2s;
+      }
+
+      /* Hero Logo Animation */
+      @keyframes splash {
+        0% {
+          transform: scale(0.2);
+          opacity: 0.8;
+        }
+        80% {
+          transform: scale(1.2);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(2.2);
+          opacity: 0;
+        }
+      }
+
+      /* Feature Marquee */
+      @keyframes featureMarquee {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+
+      .feature-marquee-container {
+        overflow: hidden;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        position: relative;
+        padding: 40px 0;
+        -webkit-mask-image: linear-gradient(
+          to right,
+          transparent,
+          #fff 15%,
+          #fff 85%,
+          transparent
+        );
+        mask-image: linear-gradient(
+          to right,
+          transparent,
+          #fff 15%,
+          #fff 85%,
+          transparent
+        );
+      }
+
+      .feature-marquee-track {
+        display: flex;
+        gap: 24px;
+        width: max-content;
+        animation: featureMarquee 80s linear infinite;
+      }
+
+      .feature-marquee-track:hover {
+        animation-play-state: paused;
+      }
+
+      .review-card {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        gap: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 20px 24px;
+        border-radius: 24px;
+        width: 320px;
+        white-space: normal;
+        transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        cursor: default;
+      }
+
+      .review-card:hover {
+        background: rgba(160, 152, 255, 0.08);
+        border-color: rgba(160, 152, 255, 0.3);
+        transform: translateY(-6px) scale(1.02);
+      }
+
+      /* Feature Cards */
+      .feature-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 32px;
+        padding: 32px;
+        transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      }
+
+      .feature-card:hover {
+        background: rgba(160, 152, 255, 0.08);
+        border-color: rgba(160, 152, 255, 0.3);
+        transform: translateY(-8px);
+      }
+
+      /* Stats Counter Animation */
+      @keyframes countUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .stat-card {
+        animation: countUp 0.6s ease-out forwards;
+      }
+
+      /* Button Hover Effects */
+      .btn-primary {
+        background: #a098ff;
+        color: white;
+        border: none;
+        border-radius: 16px;
+        padding: 16px 32px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .btn-primary:hover {
+        background: #8f86ff;
+        transform: translateY(-2px);
+        box-shadow: 0 20px 40px rgba(160, 152, 255, 0.3);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        padding: 16px 32px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-2px);
+      }
+
+      /* Smooth Scroll */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Section Spacing */
+      section {
+        position: relative;
+        z-index: 10;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+      <div class="glow-1"></div>
+      <div class="glow-2"></div>
+      <img
+        src="https://theajmalrazaq.github.io/superflex/res/intro.svg"
+        class="fixed inset-0 w-full h-full object-cover opacity-20 mix-blend-luminosity"
+        alt="Background"
+      />
+      <div
+        class="fixed inset-0 bg-gradient-to-b from-black/40 via-black/80 to-black z-10"
+      ></div>
+    </div>
+
+    <!-- Hero Section -->
+    <section
+      class="min-h-screen flex flex-col items-center justify-center px-6 relative z-20"
+    >
+      <div class="flex flex-col pt-7 justify-center text-center w-full mb-6">
+        <!-- Version Badge -->
+        <a
+          href="https://theajmalrazaq.github.io/superflex"
+          target="_blank"
+          class="mt-4 md:mt-0 mb-6"
+        >
+          <button
+            class="group relative dark:bg-neutral-800 bg-neutral-200 rounded-full p-px overflow-hidden cursor-pointer transition-all duration-200 ease-in-out"
+          >
+            <span
+              class="flex items-center justify-center gap-1 relative z-[1] dark:bg-neutral-950/90 bg-neutral-50/90 rounded-full py-2 px-4 pl-2 w-full"
+            >
+              <span class="relative transition-transform duration-500">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#a098ff"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+                <span
+                  class="rounded-full size-11 absolute opacity-0 dark:opacity-30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-lg"
+                  style="
+                    animation: 14s ease-in-out 0s infinite alternate none
+                      running star-shine;
+                    background: #a098ff;
+                  "
+                ></span>
+              </span>
+              <span
+                id="version-text"
+                class="bg-gradient-to-b ml-1.5 dark:from-white dark:to-white/50 from-neutral-950 to-neutral-950/50 bg-clip-text text-xs text-transparent uppercase font-bold"
+              >
+                SuperFlex v0.0.9
+              </span>
+            </span>
+          </button>
+        </a>
+
+        <!-- Logo & Icon -->
+        <div
+          class="flex flex-col gap-6 justify-center items-center text-center relative z-10"
+        >
+          <div class="group relative">
+            <div
+              class="absolute -inset-4 bg-[#a098ff]/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition duration-700"
+            ></div>
+            <div
+              class="h-24 w-24 bg-black border-8 border-white/5 bg-cover rounded-[32px] flex items-center justify-center relative z-10"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                width="96"
+                height="96"
+                fill="none"
+              >
+                <style>
+                  @keyframes splash {
+                    0% {
+                      transform: scale(0.2);
+                      opacity: 0.8;
+                    }
+                    80% {
+                      transform: scale(1.2);
+                      opacity: 0;
+                    }
+                    to {
+                      transform: scale(2.2);
+                      opacity: 0;
+                    }
+                  }
+                </style>
+                <path
+                  fill="#a098ff"
+                  d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
+                  style="
+                    animation: splash 1.5s cubic-bezier(0.165, 0.84, 0.44, 1)
+                      infinite both;
+                    transform-origin: center center;
+                  "
+                />
+              </svg>
+            </div>
+          </div>
+
+          <!-- Logo Text -->
+          <div class="space-y-2 flex items-center flex-col gap-2">
+            <img
+              src="https://theajmalrazaq.github.io/superflex/res/logo.svg"
+              alt="SuperFlex"
+              class="w-96 hero-logo filter"
+            />
+            <div class="flex items-center justify-center gap-3">
+              <span
+                class="w-12 h-px bg-gradient-to-r from-transparent to-white/20"
+              ></span>
+              <span
+                class="font-bold text-[10px] uppercase tracking-[0.4em] text-[#a098ff]/80"
+                >Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span
+              >
+              <span
+                class="w-12 h-px bg-gradient-to-l from-transparent to-white/20"
+              ></span>
+            </div>
+          </div>
+
+          <!-- Subtitle -->
+          <p class="text-zinc-400 text-sm font-medium">
+            Crafted with obsession by
+            <a
+              href="https://github.com/theajmalrazaq"
+              target="_blank"
+              class="text-white hover:text-[#a098ff] transition-colors decoration-[#a098ff]/30 underline-offset-4 underline"
+              >Ajmal Razaq Bhatti</a
+            >
+          </p>
+        </div>
+
+        <!-- Buttons Container -->
+        <div
+          id="hero-buttons-container"
+          class="flex flex-row gap-4 justify-center mt-8 hero-buttons"
+        >
+          <a
+            href="https://chromewebstore.google.com/detail/superflex/your-extension-id"
+            target="_blank"
+            class="bg-[#a098ff] text-white border-none rounded-2xl px-7 py-3.5 cursor-pointer transition-all duration-300 flex items-center gap-3 hover:bg-[#8f86ff]"
+            style="font-family: &quot;Google Sans Flex&quot;, sans-serif"
+          >
+            <span class="text-sm font-medium">Add to Chrome</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+              <polyline points="10 17 15 12 10 7" />
+              <line x1="15" y1="12" x2="3" y2="12" />
+            </svg>
+          </a>
+          <button
+            id="how-to-use-btn"
+            class="group relative bg-white/10 backdrop-blur-sm px-7 py-3.5 rounded-xl text-white hover:bg-white/20 transition-all duration-300 flex items-center gap-3"
+            style="font-family: &quot;Google Sans Flex&quot;, sans-serif"
+          >
+            <span class="text-sm font-medium">How to Use</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="w-5 h-5 text-[#a098ff]"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Video Modal -->
+        <div
+          id="video-modal"
+          class="fixed inset-0 z-[100] hidden items-center justify-center p-4"
+        >
+          <div
+            class="absolute inset-0 bg-black/60 backdrop-blur-md"
+            id="modal-backdrop"
+          ></div>
+          <div
+            class="relative w-full max-w-4xl bg-zinc-900 border border-white/10 rounded-[2rem] overflow-hidden animate-in zoom-in-95 duration-300"
+          >
+            <!-- Modal Header -->
+            <div
+              class="p-5 border-b border-white/5 flex justify-between items-center bg-zinc-900/50 backdrop-blur-xl"
+            >
+              <h3 class="font-bold text-sm text-white flex items-center gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="text-[#a098ff]"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" />
+                </svg>
+                How to Use SuperFlex
+              </h3>
+              <button
+                id="close-modal-btn"
+                class="p-2 rounded-full hover:bg-white/10 transition-all"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <!-- Modal Body -->
+            <div class="p-6">
+              <div class="relative rounded-2xl overflow-hidden bg-black">
+                <video id="tutorial-video" class="w-full h-auto" controls>
+                  <source src="video.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              <p class="text-zinc-400 text-sm mt-4 text-center font-medium">
+                Watch this quick tutorial to learn how to use SuperFlex and
+                transform your Flex Portal experience.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review Marquee -->
+        <div class="feature-marquee-container mt-12 mb-12 relative z-10">
+          <div class="marquee-overlay marquee-overlay-left"></div>
+          <div class="marquee-overlay marquee-overlay-right"></div>
+          <div id="review-track" class="feature-marquee-track">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-24 px-6 relative z-20">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
+            Features That Actually Matter
+          </h2>
+          <p class="text-zinc-400 font-medium text-lg max-w-2xl mx-auto">
+            Say goodbye to the clunky interface. SuperFlex brings premium
+            features that make managing your academic life a breeze.
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Feature 1 -->
+          <div class="feature-card group">
+            <div
+              class="w-14 h-14 rounded-2xl bg-[#a098ff]/10 flex items-center justify-center mb-6 group-hover:bg-[#a098ff]/20 transition-all"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#a098ff"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M3 9h18M9 21V9" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-white">Modern Dashboard</h3>
+            <p class="text-zinc-400 font-medium text-sm leading-relaxed">
+              Stunning glassmorphic UI with smooth animations, dark mode, and a
+              layout that doesn't make your eyes bleed.
+            </p>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="feature-card group">
+            <div
+              class="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-6 group-hover:bg-emerald-500/20 transition-all"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#10b981"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="12" y1="1" x2="12" y2="23" />
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-white">Smart Analytics</h3>
+            <p class="text-zinc-400 font-medium text-sm leading-relaxed">
+              Visualize your CGPA trends, grade distributions, and attendance
+              patterns with interactive charts and insights.
+            </p>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="feature-card group">
+            <div
+              class="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-6 group-hover:bg-blue-500/20 transition-all"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#3b82f6"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-white">Grade Calculator</h3>
+            <p class="text-zinc-400 font-medium text-sm leading-relaxed">
+              What-if scenarios, CGPA target planning, and best-of calculations
+              to predict and plan your academic future.
+            </p>
+          </div>
+
+          <!-- Feature 4 -->
+          <div class="feature-card group">
+            <div
+              class="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-6 group-hover:bg-purple-500/20 transition-all"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#a855f7"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-white">
+              Real-Time Tracking
+            </h3>
+            <p class="text-zinc-400 font-medium text-sm leading-relaxed">
+              Monitor attendance percentages with color-coded warnings and never
+              miss an important deadline again.
+            </p>
+          </div>
+
+          <!-- Feature 5 -->
+          <div class="feature-card group">
+            <div
+              class="w-14 h-14 rounded-2xl bg-orange-500/10 flex items-center justify-center mb-6 group-hover:bg-orange-500/20 transition-all"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#f97316"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-white">Fee Management</h3>
+            <p class="text-zinc-400 font-medium text-sm leading-relaxed">
+              View fee structures, payment history, and upcoming dues in a
+              clean, organized interface.
+            </p>
+          </div>
+
+          <!-- Feature 6 -->
+          <div class="feature-card group">
+            <div
+              class="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center mb-6 group-hover:bg-pink-500/20 transition-all"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#ec4899"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
+                />
+                <line x1="7" y1="7" x2="7.01" y2="7" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-white">Quick Actions</h3>
+            <p class="text-zinc-400 font-medium text-sm leading-relaxed">
+              One-click access to course registration, withdrawals, transcript
+              downloads, and other common tasks.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer
+      class="py-24 px-6 relative z-20 border-t border-white/10 overflow-hidden"
+    >
+      <!-- Large Gradient Text Background -->
+      <div
+        class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden"
+      >
+        <h1
+          class="text-[12rem] md:text-[18rem] lg:text-[24rem] font-black bg-gradient-to-b from-white/5 to-transparent bg-clip-text text-transparent select-none whitespace-nowrap"
+        >
+          SUPERFLEX
+        </h1>
+      </div>
+
+      <div class="max-w-7xl mx-auto relative z-10">
+        <div class="flex flex-col items-center gap-12">
+          <!-- Logo Section -->
+          <div class="flex flex-col items-center gap-6">
+            <div class="group relative">
+              <div
+                class="absolute -inset-4 bg-[#a098ff]/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition duration-700"
+              ></div>
+              <div
+                class="h-20 w-20 bg-black border-8 border-white/5 rounded-[28px] flex items-center justify-center relative z-10"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="80"
+                  height="80"
+                  fill="none"
+                >
+                  <path
+                    fill="#a098ff"
+                    d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
+                    style="
+                      animation: splash 1.5s cubic-bezier(0.165, 0.84, 0.44, 1)
+                        infinite both;
+                      transform-origin: center center;
+                    "
+                  />
+                </svg>
+              </div>
+            </div>
+            <img
+              src="https://theajmalrazaq.github.io/superflex/res/logo.svg"
+              alt="SuperFlex"
+              class="w-64 filter opacity-90"
+            />
+          </div>
+
+          <!-- Tagline -->
+          <p class="text-zinc-400 text-sm font-medium text-center max-w-md">
+            pov: you're tired of flex portal being mid 🗿 (we gotchu fam) 💯
+          </p>
+
+          <!-- Social Links -->
+          <div class="flex gap-4">
+            <a
+              href="https://github.com/theajmalrazaq/superflex"
+              target="_blank"
+              class="p-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#a098ff]/30 text-zinc-400 hover:text-[#a098ff] transition-all"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+                />
+              </svg>
+            </a>
+            <a
+              href="https://superflex.fr"
+              target="_blank"
+              class="p-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#a098ff]/30 text-zinc-400 hover:text-[#a098ff] transition-all"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+              </svg>
+            </a>
+          </div>
+
+          <!-- Copyright -->
+          <div class="text-center pt-8 border-t border-white/5 w-full">
+            <p class="text-zinc-600 text-xs font-medium">
+              © 2024 superflex • free forever fr fr ✨
+            </p>
+            <p class="text-zinc-700 text-xs mt-2">
+              coded with ☕ + 🎧 by
+              <a
+                href="https://github.com/theajmalrazaq"
+                target="_blank"
+                class="text-zinc-500 hover:text-[#a098ff] transition-colors"
+                >ajmal</a
+              >
+              • drinking chai while u complain abt flex ☕
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+      // Video Modal Functionality
+      const modal = document.getElementById("video-modal");
+      const openModalBtn = document.getElementById("how-to-use-btn");
+      const closeModalBtn = document.getElementById("close-modal-btn");
+      const modalBackdrop = document.getElementById("modal-backdrop");
+      const tutorialVideo = document.getElementById("tutorial-video");
+
+      // Open modal
+      openModalBtn.addEventListener("click", () => {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        document.body.style.overflow = "hidden";
+      });
+
+      // Close modal function
+      const closeModal = () => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        document.body.style.overflow = "auto";
+        tutorialVideo.pause();
+      };
+
+      // Close on button click
+      closeModalBtn.addEventListener("click", closeModal);
+
+      // Close on backdrop click
+      modalBackdrop.addEventListener("click", closeModal);
+
+      // Close on Escape key
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !modal.classList.contains("hidden")) {
+          closeModal();
+        }
+      });
+
+      // Generate Review Cards
+      const reviews = [
+        {
+          name: "Ali Hassan",
+          comment:
+            "Finally, a Flex Portal that doesn't look like it's from 2005. The grade calculator is a lifesaver!",
+        },
+        {
+          name: "Sara Ahmed",
+          comment:
+            "The attendance tracker with color coding is exactly what I needed. No more surprises!",
+        },
+        {
+          name: "Zain Malik",
+          comment:
+            "This extension should be mandatory for every student. It's THAT good.",
+        },
+        {
+          name: "Fatima Khan",
+          comment:
+            "The UI is absolutely gorgeous. Makes checking my grades actually enjoyable.",
+        },
+        {
+          name: "Hamza Sheikh",
+          comment:
+            "What-if calculator helped me plan my semester perfectly. 10/10 would recommend.",
+        },
+        {
+          name: "Ayesha Butt",
+          comment:
+            "Clean, fast, and actually useful. Best student extension I've ever used.",
+        },
+        {
+          name: "Usman Raza",
+          comment: "The dark mode is *chef's kiss*. My eyes thank you!",
+        },
+        {
+          name: "Maria Siddiqui",
+          comment:
+            "Never knew I needed this until I tried it. Can't go back to regular Flex now.",
+        },
+        {
+          name: "Bilal Ahmad",
+          comment:
+            "The analytics and charts make understanding my performance so much easier.",
+        },
+        {
+          name: "Hira Aziz",
+          comment:
+            "Installation took 2 seconds. Life changed forever. Simple as that.",
+        },
+        {
+          name: "Adnan Tariq",
+          comment:
+            "Makes managing multiple courses actually manageable. Thank you!",
+        },
+        {
+          name: "Nida Farooq",
+          comment:
+            "The fee management section is so clean. No more digging through messy tables.",
+        },
+        {
+          name: "Kashif Iqbal",
+          comment: "Open source and free? You guys are legends. Keep it up!",
+        },
+        {
+          name: "Sana Yousuf",
+          comment:
+            "Best thing that happened to my academic life this semester.",
+        },
+        {
+          name: "Arslan Mir",
+          comment:
+            "The developer clearly understands student pain points. Every feature is thoughtful.",
+        },
+        {
+          name: "Laiba Hassan",
+          comment:
+            "My CGPA looks better in this UI. Okay, maybe that's psychological, but still!",
+        },
+        {
+          name: "Shahzaib Khan",
+          comment: "Quick actions saved me so much time. One-click everything!",
+        },
+        {
+          name: "Rida Shah",
+          comment:
+            "The glassmorphic design is straight fire. Love the aesthetic.",
+        },
+        {
+          name: "Farhan Ali",
+          comment:
+            "Finally someone made Flex Portal usable. You're doing God's work.",
+        },
+        {
+          name: "Mahnoor Asif",
+          comment:
+            "Showed this to my friends, now everyone in my class uses it. Game changer!",
+        },
+      ];
+
+      const generateReviewCards = (items) => {
+        return items
+          .map(
+            (item) => `
+                <div class="review-card">
+                    <div class="flex flex-col gap-1 w-full">
+                        <span class="text-white font-bold text-sm">${item.name}</span>
+                        <span class="text-[#a098ff] text-[10px] font-extrabold uppercase tracking-wider">Student Verified</span>
+                    </div>
+                    <p class="text-white/70 text-sm leading-relaxed">"${item.comment}"</p>
+                </div>
+            `,
+          )
+          .join("");
+      };
+
+      const track = document.getElementById("review-track");
+      if (track) {
+        track.innerHTML =
+          generateReviewCards(reviews) + generateReviewCards(reviews);
+      }
+
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth" });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
