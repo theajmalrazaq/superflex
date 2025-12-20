@@ -9,6 +9,9 @@
       content="SuperFlex is a modern Chrome extension that transforms the outdated Flex Portal into a sleek, user-friendly dashboard with glassmorphic design and enhanced features."
     />
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../public/favicon.svg" />
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -420,7 +423,8 @@
           class="flex flex-row gap-4 justify-center mt-8 hero-buttons"
         >
           <a
-            href="https://chromewebstore.google.com/detail/superflex/your-extension-id"
+            id="add-to-chrome-btn"
+            href="#"
             target="_blank"
             class="bg-[#a098ff] text-white border-none rounded-2xl px-7 py-3.5 cursor-pointer transition-all duration-300 flex items-center gap-3 hover:bg-[#8f86ff]"
             style="font-family: &quot;Google Sans Flex&quot;, sans-serif"
@@ -843,7 +847,6 @@
                 class="text-zinc-500 hover:text-[#a098ff] transition-colors"
                 >ajmal</a
               >
-              • drinking chai while u complain abt flex ☕
             </p>
           </div>
         </div>
@@ -886,6 +889,28 @@
           closeModal();
         }
       });
+
+      // Fetch latest release and update Add to Chrome button
+      fetch(
+        "https://api.github.com/repos/theajmalrazaq/superflex/releases/latest",
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          const addToChromeBtn = document.getElementById("add-to-chrome-btn");
+          if (addToChromeBtn && data.assets && data.assets.length > 0) {
+            // Use the first asset's download URL
+            addToChromeBtn.href = data.assets[0].browser_download_url;
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to fetch latest release:", err);
+          // Fallback to GitHub releases page
+          const addToChromeBtn = document.getElementById("add-to-chrome-btn");
+          if (addToChromeBtn) {
+            addToChromeBtn.href =
+              "https://github.com/theajmalrazaq/superflex/releases/latest";
+          }
+        });
 
       // Generate Review Cards
       const reviews = [
@@ -1013,10 +1038,14 @@
       // Smooth scroll for anchor links
       document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
         anchor.addEventListener("click", function (e) {
-          e.preventDefault();
-          const target = document.querySelector(this.getAttribute("href"));
-          if (target) {
-            target.scrollIntoView({ behavior: "smooth" });
+          const href = this.getAttribute("href");
+          // Only prevent default and smooth scroll if it's an internal anchor
+          if (href && href.startsWith("#") && href.length > 1) {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+              target.scrollIntoView({ behavior: "smooth" });
+            }
           }
         });
       });

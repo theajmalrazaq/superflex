@@ -1,17 +1,30 @@
+import React, { useEffect, useState } from "react";
 import PageLayout from "../layouts/PageLayout";
 import NotificationBanner from "../NotificationBanner";
 import PageHeader from "../PageHeader";
+import {
+  ShieldCheck,
+  Check,
+  KeyRound,
+  Lock,
+  AlertTriangle,
+} from "lucide-react";
 
 function ChangePasswordPage() {
   const [elemContent, setElemContent] = useState(null);
   const [alerts, setAlerts] = useState([]);
 
   useEffect(() => {
-    const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
+    const parse = () => {
+      const targetElement = document.querySelector(
+        ".m-grid.m-grid--hor.m-grid--root.m-page",
+      );
 
-    if (targetElement) {
+      if (!targetElement) {
+        setTimeout(parse, 100);
+        return;
+      }
+
       const alertList = [];
       targetElement.querySelectorAll(".m-alert, .alert").forEach((alert) => {
         if (
@@ -52,18 +65,22 @@ function ChangePasswordPage() {
 
       setElemContent(targetElement.innerHTML);
       targetElement.remove();
-    }
+    };
+
+    parse();
   }, []);
 
   const applyCustomStyling = (element) => {
     const portlet = element.querySelector(".m-portlet");
     if (portlet) {
       portlet.classList.add(
-        "!bg-black",
-        "!border-none",
-        "!rounded-3xl",
-        "!p-4",
-        "",
+        "!bg-zinc-900/40",
+        "!backdrop-blur-2xl",
+        "!border",
+        "!border-white/5",
+        "!rounded-[2.5rem]",
+        "!p-8",
+        "!shadow-xl",
       );
 
       portlet.classList.remove(
@@ -71,59 +88,55 @@ function ChangePasswordPage() {
         "m-portlet--head-solid-bg",
         "m-portlet--bordered",
         "m-portlet--head-sm",
+        "m-portlet",
       );
     }
 
     const portletHead = element.querySelector(".m-portlet__head");
     if (portletHead) {
-      portletHead.classList.add(
-        "!bg-black",
-        "!border",
-        "!border-white/10",
-        "!rounded-t-3xl",
-        "!h-fit",
-        "!p-4",
-        "!flex",
-        "!items-center",
-        "!justify-between",
-        "!mb-4",
-      );
-
-      const headingText = portletHead.querySelector(".m-portlet__head-text");
-      if (headingText) {
-        headingText.classList.add("!text-white", "!text-xl", "!font-bold");
-      }
+      portletHead.style.display = "none";
     }
 
     const portletBody = element.querySelector(".m-portlet__body");
     if (portletBody) {
-      portletBody.classList.add(
-        "!bg-black",
-        "!rounded-b-3xl",
-        "!p-6",
-        "!border",
-        "!border-white/10",
-        "",
-        "!text-white",
-      );
+      portletBody.classList.add("!p-0", "!text-zinc-300", "bg-transparent");
     }
+
+    const legacyButtons = element.querySelectorAll("#success, #error");
+    legacyButtons.forEach((btn) => btn.remove());
 
     const form = element.querySelector("#ChangePassword");
     if (form) {
+      const gridContainer = document.createElement("div");
+      gridContainer.className =
+        "grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24";
+
+      const formColumn = document.createElement("div");
+      formColumn.className = "space-y-8";
+
+      const headerDiv = document.createElement("div");
+      headerDiv.className = "space-y-2";
+      headerDiv.innerHTML = `
+          <h3 class="text-xl font-bold text-white flex items-center gap-3">
+              <div class="p-2 rounded-lg bg-[#a098ff]/10 text-[#a098ff]">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </div>
+              Update Password
+          </h3>
+          <p class="text-sm text-zinc-400">Ensure your account is using a strong, unique password.</p>
+      `;
+      formColumn.appendChild(headerDiv);
+
       const inputsContainer = document.createElement("div");
-      inputsContainer.classList.add(
-        "flex",
-        "flex-col",
-        "gap-4",
-        "w-full",
-        "mb-6",
-      );
+      inputsContainer.classList.add("flex", "flex-col", "gap-5", "w-full");
 
       const formRows = form.querySelectorAll(".form-group.m-form__group.row");
       const extractedInputs = [];
 
       formRows.forEach((row) => {
         const inputContainer = row.querySelector(".m-input-icon");
+        const label = row.querySelector("label");
+
         if (inputContainer) {
           const iconSpans = inputContainer.querySelectorAll(
             ".m-input-icon__icon",
@@ -135,91 +148,72 @@ function ChangePasswordPage() {
             const clonedInput = input.cloneNode(true);
 
             clonedInput.classList.add(
-              "!bg-black",
+              "!bg-white/5",
               "!text-white",
               "!border",
-              "!border-white/20",
+              "!border-white/10",
               "!rounded-xl",
-              "!p-3",
-              "!transition-colors",
-              "!focus:border-x",
+              "!p-4",
+              "!px-4",
+              "!transition-all",
+              "!duration-300",
+              "!focus:border-[#a098ff]/50",
+              "!focus:ring-4",
+              "!focus:ring-[#a098ff]/10",
               "!focus:outline-none",
               "!w-full",
+              "!h-[50px]",
+              "!font-medium",
+              "!placeholder-white/20",
             );
 
-            clonedInput.classList.remove("m-input--pill", "m-input--air");
-
-            if (clonedInput.hasAttribute("style")) {
+            clonedInput.classList.remove(
+              "m-input--pill",
+              "m-input--air",
+              "form-control",
+              "m-input",
+            );
+            if (clonedInput.hasAttribute("style"))
               clonedInput.removeAttribute("style");
-            }
 
             const inputWrapper = document.createElement("div");
-            inputWrapper.classList.add("relative", "w-full");
+            inputWrapper.classList.add("relative", "w-full", "group");
 
-            const lockIcon = document.createElementNS(
-              "http://www.w3.org/2000/svg",
-              "svg",
-            );
-            lockIcon.setAttribute("width", "18");
-            lockIcon.setAttribute("height", "18");
-            lockIcon.setAttribute("viewBox", "0 0 24 24");
-            lockIcon.setAttribute("fill", "none");
-            lockIcon.setAttribute("stroke", "currentColor");
-            lockIcon.setAttribute("stroke-width", "2");
-            lockIcon.setAttribute("stroke-linecap", "round");
-            lockIcon.setAttribute("stroke-linejoin", "round");
-            lockIcon.classList.add(
-              "absolute",
-              "left-3",
-              "top-3.5",
-              "text-white/40",
+            const labelText = label ? label.textContent.trim() : "Input";
+            const labelElem = document.createElement("label");
+            labelElem.textContent = labelText;
+            labelElem.classList.add(
+              "text-xs",
+              "font-bold",
+              "text-zinc-400",
+              "mb-2",
+              "uppercase",
+              "tracking-wider",
+              "ml-1",
+              "block",
             );
 
-            const lockPath = document.createElementNS(
-              "http://www.w3.org/2000/svg",
-              "path",
-            );
-            lockPath.setAttribute(
-              "d",
-              "M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2z",
-            );
-            lockIcon.appendChild(lockPath);
-
-            const lockRect = document.createElementNS(
-              "http://www.w3.org/2000/svg",
-              "rect",
-            );
-            lockRect.setAttribute("x", "7");
-            lockRect.setAttribute("y", "11");
-            lockRect.setAttribute("width", "10");
-            lockRect.setAttribute("height", "10");
-            lockRect.setAttribute("rx", "2");
-            lockRect.setAttribute("ry", "2");
-            lockIcon.appendChild(lockRect);
-
-            const lockLine = document.createElementNS(
-              "http://www.w3.org/2000/svg",
-              "path",
-            );
-            lockLine.setAttribute("d", "M8 11V7a4 4 0 018 0v4");
-            lockIcon.appendChild(lockLine);
-
-            clonedInput.classList.add("!pl-10");
-
-            inputWrapper.appendChild(lockIcon);
+            inputWrapper.appendChild(labelElem);
             inputWrapper.appendChild(clonedInput);
 
             const errorMsg = row.querySelector(".matcherror");
             if (errorMsg) {
               const errorMsgClone = errorMsg.cloneNode(true);
-              errorMsgClone.classList.add("!text-red-400", "!mt-1", "!text-sm");
+              errorMsgClone.classList.add(
+                "!text-rose-400",
+                "!mt-2",
+                "!text-xs",
+                "!font-medium",
+                "!flex",
+                "!items-center",
+                "!gap-1",
+              );
               inputWrapper.appendChild(errorMsgClone);
             }
 
             extractedInputs.push(inputWrapper);
           }
         }
-
         row.dataset.toRemove = "true";
       });
 
@@ -227,80 +221,47 @@ function ChangePasswordPage() {
         inputsContainer.appendChild(inputElem);
       });
 
-      form
-        .querySelectorAll('[data-to-remove="true"]')
-        .forEach((row) => row.remove());
-
-      if (form.firstChild) {
-        form.insertBefore(inputsContainer, form.firstChild);
-      } else {
-        form.appendChild(inputsContainer);
-      }
+      formColumn.appendChild(inputsContainer);
 
       const buttonRow = form.querySelector(".row:not(.form-group)");
       if (buttonRow) {
-        buttonRow.classList.add("!mt-8");
+        const clonedBtnRow = buttonRow.cloneNode(true);
+        buttonRow.remove();
 
-        const submitButton = buttonRow.querySelector("button#submit");
+        clonedBtnRow.classList.add("!mt-8", "flex");
+        clonedBtnRow
+          .querySelectorAll(".col-lg-12")
+          .forEach((col) => (col.className = "w-full"));
+
+        const submitButton = clonedBtnRow.querySelector("button#submit");
         if (submitButton) {
           submitButton.innerHTML = "";
 
-          const saveIcon = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "svg",
-          );
-          saveIcon.setAttribute("width", "20");
-          saveIcon.setAttribute("height", "20");
-          saveIcon.setAttribute("viewBox", "0 0 24 24");
-          saveIcon.setAttribute("fill", "none");
-          saveIcon.setAttribute("stroke", "currentColor");
-          saveIcon.setAttribute("stroke-width", "2");
-          saveIcon.setAttribute("stroke-linecap", "round");
-          saveIcon.setAttribute("stroke-linejoin", "round");
-          saveIcon.classList.add("mr-2");
-
-          const savePath = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "path",
-          );
-          savePath.setAttribute(
-            "d",
-            "M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z",
-          );
-          saveIcon.appendChild(savePath);
-
-          const saveLine1 = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "polyline",
-          );
-          saveLine1.setAttribute("points", "17 21 17 13 7 13 7 21");
-          saveIcon.appendChild(saveLine1);
-
-          const saveLine2 = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "polyline",
-          );
-          saveLine2.setAttribute("points", "7 3 7 8 15 8");
-          saveIcon.appendChild(saveLine2);
+          const iconStr = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`;
 
           const buttonContent = document.createElement("span");
-          buttonContent.className = "flex items-center";
-          buttonContent.appendChild(saveIcon);
-          buttonContent.appendChild(document.createTextNode("Update Password"));
+          buttonContent.className = "flex items-center justify-center";
+          buttonContent.innerHTML = iconStr + "Update Password";
 
           submitButton.appendChild(buttonContent);
 
           submitButton.classList.add(
-            "!bg-x",
-            "hover:!bg-x/80",
+            "!bg-[#a098ff]",
+            "hover:!bg-[#8f86ff]",
             "!text-white",
-            "!font-medium",
-            "!py-3",
+            "!font-bold",
+            "!py-4",
             "!px-8",
             "!rounded-xl",
-            "!transition-colors",
+            "!transition-all",
+            "!shadow-lg",
+            "!shadow-[#a098ff]/20",
+            "!hover:shadow-[#a098ff]/40",
             "!border-0",
-            "",
+            "!w-full",
+            "!flex",
+            "!items-center",
+            "!justify-center",
           );
 
           submitButton.classList.remove(
@@ -309,30 +270,97 @@ function ChangePasswordPage() {
             "m-btn--icon",
             "m-btn--pill",
             "m-btn--air",
+            "btn",
+            "btn-focus",
           );
         }
+        formColumn.appendChild(clonedBtnRow);
+      }
+
+      form
+        .querySelectorAll('[data-to-remove="true"]')
+        .forEach((row) => row.remove());
+
+      gridContainer.appendChild(formColumn);
+
+      const infoColumn = document.createElement("div");
+      infoColumn.className = "flex flex-col gap-6";
+      infoColumn.innerHTML = `
+        <div class="p-6 rounded-2xl bg-white/5 border border-white/5 space-y-4">
+            <h4 class="text-white font-bold flex items-center gap-2">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                Password Requirements
+            </h4>
+            <ul class="space-y-3">
+                <li class="flex items-start gap-3 text-sm text-zinc-400">
+                    <div class="mt-1 w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0"></div>
+                    Minimum 8 characters long
+                </li>
+                 <li class="flex items-start gap-3 text-sm text-zinc-400">
+                    <div class="mt-1 w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0"></div>
+                    At least one uppercase letter
+                </li>
+                 <li class="flex items-start gap-3 text-sm text-zinc-400">
+                    <div class="mt-1 w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0"></div>
+                    At least one number
+                </li>
+                 <li class="flex items-start gap-3 text-sm text-zinc-400">
+                    <div class="mt-1 w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0"></div>
+                    At least one special character
+                </li>
+            </ul>
+        </div>
+
+         <div class="p-6 rounded-2xl bg-[#a098ff]/5 border border-[#a098ff]/10 space-y-3">
+            <h4 class="text-[#a098ff] font-bold flex items-center gap-2 text-sm uppercase tracking-wide">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                Security Tip
+            </h4>
+            <p class="text-sm text-zinc-400 leading-relaxed">
+                Regularly updating your password helps protect your academic records and personal information from unauthorized access.
+            </p>
+        </div>
+      `;
+      gridContainer.appendChild(infoColumn);
+
+      if (form.firstChild) {
+        form.insertBefore(gridContainer, form.firstChild);
+      } else {
+        form.appendChild(gridContainer);
       }
 
       const feedbackElements = form.querySelectorAll(".matcherror");
       feedbackElements.forEach((element) => {
-        element.classList.add("!text-red-400", "!mt-1", "!text-sm");
+        element.classList.add(
+          "!text-rose-400",
+          "!mt-2",
+          "!text-xs",
+          "!font-medium",
+        );
       });
     }
   };
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="p-8 space-y-8">
+      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
+
+      <div className="w-full p-6 md:p-10 space-y-10 relative z-10">
         <PageHeader
-          title="Security"
-          subtitle="Manage your account password and security settings"
+          title="Security Settings"
+          subtitle="Manage your account password and authentication"
         />
         <NotificationBanner alerts={alerts} />
-        {elemContent && (
+        {elemContent ? (
           <div
-            className="m-grid m-grid--hor m-grid--root m-page"
+            className="m-grid m-grid--hor m-grid--root m-page animate-in fade-in duration-500"
             dangerouslySetInnerHTML={{ __html: elemContent }}
           />
+        ) : (
+          <div className="flex items-center justify-center p-20">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#a098ff]"></div>
+          </div>
         )}
       </div>
     </PageLayout>

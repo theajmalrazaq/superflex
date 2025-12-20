@@ -401,15 +401,16 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           {openDropdown === "profile" && (
             <div className="absolute right-0 top-full mt-2 z-[999] w-56 animate-in fade-in slide-in-from-top-2 duration-200">
               <div className="bg-black border border-white/10 rounded-2xl p-2 ">
-                <button
+                <a
+                  href="/Student/ChangePassword"
                   onClick={() => {
                     setOpenDropdown(null);
                   }}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all text-left text-zinc-300 hover:text-white"
+                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all text-left text-zinc-300 hover:text-white no-underline"
                 >
                   <Lock size={18} />
                   <span className="text-sm font-medium">Change Password</span>
-                </button>
+                </a>
                 <div className="h-px bg-white/10 my-1"></div>
                 <a
                   href="/Login/logout"

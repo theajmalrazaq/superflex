@@ -50,3 +50,81 @@ h6 {
   font-family: "Google Sans Flex", sans-serif;
   font-weight: 700;
 }
+
+/* Toast Redesign */
+#toast-container {
+  display: flex !important;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px !important;
+}
+
+#toast-container > div {
+  opacity: 1 !important;
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.5),
+    0 8px 10px -6px rgb(0 0 0 / 0.5) !important;
+  width: 350px !important;
+  border-radius: 20px !important;
+  padding: 16px 20px !important;
+  background-color: rgba(24, 24, 27, 0.6) !important; /* zinc-900/60 */
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  font-family: "Google Sans Flex", sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important; /* text-sm */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  background-image: none !important; /* Remove older library background images */
+  position: relative;
+  overflow: hidden;
+}
+
+#toast-container > div:hover {
+  box-shadow: 0 0 20px rgba(160, 152, 255, 0.2) !important; /* Glow effect on hover */
+  border-color: rgba(160, 152, 255, 0.3) !important;
+  transform: translateY(-2px);
+}
+
+.toast-message {
+  color: #fff !important;
+  margin-left: 0 !important;
+}
+
+/* Toast Types */
+.toast-success {
+  border-left: 4px solid #10b981 !important; /* Emerald-500 */
+}
+
+.toast-error {
+  border-left: 4px solid #f43f5e !important; /* Rose-500 */
+}
+
+.toast-info {
+  border-left: 4px solid #3b82f6 !important; /* Blue-500 */
+}
+
+.toast-warning {
+  border-left: 4px solid #f59e0b !important; /* Amber-500 */
+}
+
+/* Explicitly remove background images (icons) from all toast types with high specificity */
+#toast-container > .toast-success,
+#toast-container > .toast-error,
+#toast-container > .toast-info,
+#toast-container > .toast-warning {
+  background-image: none !important;
+}
+
+/* Remove pseudo-elements that might be used for icons or effects */
+#toast-container > div::before,
+#toast-container > div::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Override legacy positioning if needed to be safe */
+.toast-top-right {
+  top: 12px;
+  right: 12px;
+}
