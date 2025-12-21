@@ -17,13 +17,12 @@ import StatsCard from "../StatsCard";
 const FeedbackCard = ({ course, onAction, index }) => {
   const isPending = course.hasAction;
   return (
-    <div className="group cursor-default flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5">
+    <div className="group cursor-default flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border transition-all duration-300 bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5 gap-4">
       <div className="flex items-center gap-4">
         <span className="font-bold text-sm min-w-[1.5rem] text-zinc-600">
           {index}.
         </span>
 
-        {}
         <div
           className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-300 ${
             isPending
@@ -34,12 +33,12 @@ const FeedbackCard = ({ course, onAction, index }) => {
           {isPending ? <Clock size={20} /> : <CheckCircle2 size={20} />}
         </div>
 
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black text-[#a098ff] uppercase tracking-tighter opacity-80">
+        <div className="flex flex-col gap-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] font-black text-[#a098ff] uppercase tracking-tighter opacity-80 shrink-0">
               {course.code}
             </span>
-            <span className="text-white font-medium text-sm leading-tight">
+            <span className="text-white font-medium text-sm leading-tight truncate">
               {course.courseName}
             </span>
           </div>
@@ -57,7 +56,7 @@ const FeedbackCard = ({ course, onAction, index }) => {
         </div>
       </div>
 
-      <div className="flex flex-col items-end gap-2">
+      <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-white/5">
         <div
           className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all duration-300 ${
             isPending
@@ -217,7 +216,7 @@ function CourseFeedbackPage() {
   if (loading)
     return (
       <PageLayout currentPage={window.location.pathname}>
-        <div className="w-full min-h-screen p-6 md:p-8 space-y-8">
+        <div className="w-full min-h-screen p-4 md:p-8 space-y-8">
           <div className="flex justify-center py-20">
             <LoadingSpinner />
           </div>
@@ -227,7 +226,7 @@ function CourseFeedbackPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-6 md:p-8 space-y-8">
+      <div className="w-full min-h-screen p-4 md:p-8 space-y-8">
         {}
         <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
@@ -303,18 +302,18 @@ function CourseFeedbackPage() {
       </div>
 
       <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
+        .scrollbar-hide::-webkit-scrollbar {
           height: 6px;
           width: 6px;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
+        .scrollbar-hide::-webkit-scrollbar-track {
           background: transparent;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
+        .scrollbar-hide::-webkit-scrollbar-thumb {
           background: rgba(255, 255, 255, 0.1);
           border-radius: 10px;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        .scrollbar-hide::-webkit-scrollbar-thumb:hover {
           background: rgba(255, 255, 255, 0.2);
         }
       `}</style>

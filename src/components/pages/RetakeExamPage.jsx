@@ -148,7 +148,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <div className="p-5 overflow-y-auto custom-scrollbar flex-1 space-y-6 text-left">
+        <div className="p-5 overflow-y-auto scrollbar-hide flex-1 space-y-6 text-left">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <div className="w-1 h-4 bg-[#a098ff] rounded-full"></div>
@@ -228,54 +228,50 @@ const RetakeCourseCard = ({ course, isSelected, onToggle, index }) => {
   return (
     <div
       onClick={onToggle}
-      className={`group cursor-pointer flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${
+      className={`group cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border transition-all duration-300 gap-4 ${
         isSelected
-          ? "bg-[#a098ff]/10 border-[#a098ff]/50"
+          ? "bg-[#a098ff]/10 border-[#a098ff]/50 shadow-[0_0_20px_rgba(160,152,255,0.05)]"
           : "bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5"
       }`}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 min-w-0 flex-1">
         <span
-          className={`font-bold text-sm min-w-[1.5rem] ${isSelected ? "text-[#a098ff]" : "text-zinc-600"}`}
+          className={`font-bold text-xs min-w-[1.2rem] ${isSelected ? "text-[#a098ff]" : "text-zinc-600"}`}
         >
           {index}.
         </span>
 
         <div
-          className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-300 ${
+          className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 transition-all duration-300 ${
             isSelected
               ? "bg-[#a098ff]/20 border-[#a098ff]/30 text-[#a098ff] scale-105"
               : "bg-zinc-800/50 border-white/5 text-zinc-500"
           }`}
         >
-          <BookOpen size={20} />
+          <BookOpen size={18} />
         </div>
 
-        <div className="flex flex-col gap-1 min-w-0 flex-1">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+          <div className="flex items-center gap-2 min-w-0">
             <span className="text-[10px] font-black text-[#a098ff] uppercase tracking-tighter opacity-80 shrink-0">
               {course.code}
             </span>
-            <span className="text-white font-medium text-sm leading-tight truncate">
+            <h4 className="text-white font-bold text-sm leading-tight truncate">
               {course.courseName}
-            </span>
+            </h4>
           </div>
 
-          <div className="flex items-center gap-3 text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
-            <span className="flex items-center gap-1.5">
-              {course.credits} Credits
-            </span>
-            <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
-            <span className="flex items-center gap-1.5">
-              Section {course.section}
-            </span>
+          <div className="flex items-center gap-2.5 text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
+            <span className="shrink-0">{course.credits} Credits</span>
+            <span className="w-1 h-1 rounded-full bg-zinc-700 shrink-0"></span>
+            <span className="truncate">Section {course.section}</span>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex flex-row items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-white/5">
         {course.status && (
-          <div className="px-3 py-1 rounded-lg bg-white/5 border border-white/5 text-[10px] font-black text-zinc-400 uppercase tracking-widest">
+          <div className="px-3 py-1 rounded-lg bg-white/5 border border-white/5 text-[9px] font-black text-zinc-400 uppercase tracking-widest">
             {course.status}
           </div>
         )}
@@ -330,7 +326,7 @@ const ExamTypeSelector = ({ types, selectedValue, onSelect }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-[2rem] bg-black/50 backdrop-blur-2xl border border-white/10 max-h-[60vh] overflow-y-auto no-scrollbar animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-[2rem] bg-black/50 backdrop-blur-2xl border border-white/10 max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200">
           <div className="flex flex-col gap-2">
             {types.map((type, idx) => (
               <button
@@ -640,7 +636,7 @@ function RetakeExamPage() {
   if (loading)
     return (
       <PageLayout currentPage={window.location.pathname}>
-        <div className="w-full min-h-screen p-6 md:p-8 space-y-8">
+        <div className="w-full min-h-screen p-4 md:p-8 space-y-8">
           <div className="flex justify-center py-20">
             <LoadingSpinner />
           </div>
@@ -650,7 +646,7 @@ function RetakeExamPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-6 md:p-8 space-y-8 relative z-10">
+      <div className="w-full min-h-screen p-4 md:p-8 space-y-8 relative z-10">
         <RetakeModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
@@ -866,10 +862,10 @@ function RetakeExamPage() {
       </div>
 
       <style>{`
-        .no-scrollbar::-webkit-scrollbar {
+        .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }
-        .no-scrollbar {
+        .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;
         }

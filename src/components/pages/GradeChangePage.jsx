@@ -148,17 +148,27 @@ function GradeChangePage() {
             const cells = row.querySelectorAll("td");
 
             if (cells.length >= 7) {
+              const code = cells[1]?.textContent.trim();
+              const course = cells[2]?.textContent.trim();
+
+              if (!code || !course || code.toLowerCase().includes("course code") || code.length < 2) return;
+
+              let grade = cells[5]?.textContent.trim();
+              if (grade.toLowerCase().includes("initiate")) {
+                grade = "N/A";
+              }
+
+              let status = cells[7]?.textContent.trim() || cells[6]?.textContent.trim() || "N/A";
+              if (status.toLowerCase().includes("initiate")) status = "Eligible";
+
               requestList.push({
                 id: idx,
-                code: cells[1]?.textContent.trim(),
-                course: cells[2]?.textContent.trim(),
+                code: code,
+                course: course,
                 section: cells[3]?.textContent.trim(),
                 credits: cells[4]?.textContent.trim(),
-                grade: cells[5]?.textContent.trim(),
-                status:
-                  cells[7]?.textContent.trim() ||
-                  cells[6]?.textContent.trim() ||
-                  "N/A",
+                grade: grade,
+                status: status,
                 checkboxId: cells[6]?.querySelector('input[type="checkbox"]')
                   ?.id,
                 fullRowHtml: row.innerHTML,
@@ -186,9 +196,14 @@ function GradeChangePage() {
 
         if (hiddenContentRef.current) {
           hiddenContentRef.current.innerHTML = "";
-          root.id = "legacy-root-hidden";
-          hiddenContentRef.current.appendChild(root);
+          const clone = root.cloneNode(true);
+          hiddenContentRef.current.appendChild(clone);
         }
+
+        root.style.opacity = "0";
+        root.style.pointerEvents = "none";
+        root.style.position = "absolute";
+        root.style.zIndex = "-1";
 
         setLoading(false);
         window.dispatchEvent(
@@ -212,21 +227,23 @@ function GradeChangePage() {
   }, []);
 
   const handleSemesterChange = (val) => {
-    const legacySelect = document.querySelector(
-      "#legacy-root-hidden select#SemId",
+    const root = document.querySelector(
+      ".m-grid.m-grid--hor.m-grid--root.m-page",
     );
-    if (legacySelect) {
-      legacySelect.value = val;
-      legacySelect.dispatchEvent(new Event("change", { bubbles: true }));
-      const form = legacySelect.closest("form");
+    const select = root?.querySelector("select#SemId");
+    if (select) {
+      select.value = val;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      const form = select.closest("form");
       if (form) form.submit();
     }
   };
 
   const handleCheckboxToggle = (checkboxId) => {
-    const legacyCb = document.querySelector(
-      `#legacy-root-hidden #${checkboxId}`,
+    const root = document.querySelector(
+      ".m-grid.m-grid--hor.m-grid--root.m-page",
     );
+    const legacyCb = root?.querySelector(`#${checkboxId}`);
     if (legacyCb && !legacyCb.disabled) {
       legacyCb.checked = !legacyCb.checked;
       legacyCb.dispatchEvent(new Event("change", { bubbles: true }));
@@ -240,20 +257,21 @@ function GradeChangePage() {
   };
 
   const handleSelectAll = (checked) => {
-    const legacyCheckboxes = document.querySelectorAll(
-      '#legacy-root-hidden input[name="OfferIdCheckBox"]:not(:disabled)',
+    const root = document.querySelector(
+      ".m-grid.m-grid--hor.m-grid--root.m-page",
+    );
+    const legacyCheckboxes = root?.querySelectorAll(
+      'input[name="OfferIdCheckBox"]:not(:disabled)',
     );
     const ids = [];
-    legacyCheckboxes.forEach((cb) => {
+    legacyCheckboxes?.forEach((cb) => {
       cb.checked = checked;
       cb.dispatchEvent(new Event("change", { bubbles: true }));
       if (checked) ids.push(cb.id);
     });
     setSelectedIds(checked ? ids : []);
 
-    const legacySelectAll = document.querySelector(
-      "#legacy-root-hidden #checkall",
-    );
+    const legacySelectAll = root?.querySelector("#checkall");
     if (legacySelectAll) {
       legacySelectAll.checked = checked;
       legacySelectAll.dispatchEvent(new Event("change", { bubbles: true }));
@@ -261,11 +279,12 @@ function GradeChangePage() {
   };
 
   const handleOpenRequestModal = () => {
+    const root = document.querySelector(
+      ".m-grid.m-grid--hor.m-grid--root.m-page",
+    );
     const legacyBtn =
-      document.querySelector("#legacy-root-hidden #btnModalGradeChange") ||
-      document.querySelector(
-        "#legacy-root-hidden [data-target='#RemarksDetail']",
-      );
+      root?.querySelector("#btnModalGradeChange") ||
+      root?.querySelector("[data-target='#RemarksDetail']");
 
     if (selectedIds.length === 0) {
       alert("Kindly select at least one course to proceed.");
@@ -284,7 +303,7 @@ function GradeChangePage() {
   if (loading)
     return (
       <PageLayout currentPage={window.location.pathname}>
-        <div className="w-full min-h-screen p-6 md:p-8 space-y-8">
+        <div className="w-full min-h-screen p-4 md:p-8 space-y-8">
           <div className="flex justify-center py-20">
             <LoadingSpinner />
           </div>
@@ -294,7 +313,7 @@ function GradeChangePage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-6 md:p-8 space-y-8 relative z-10">
+      <div className="w-full min-h-screen p-4 md:p-8 space-y-8 relative z-10">
         {}
         <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
@@ -369,7 +388,7 @@ function GradeChangePage() {
         <NotificationBanner alerts={alerts} />
 
         <div className="grid grid-cols-1 gap-8">
-          <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden">
+          <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-4 md:p-8 overflow-hidden">
             <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/5">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-[#a098ff]/10 rounded-xl text-[#a098ff]">
@@ -381,7 +400,7 @@ function GradeChangePage() {
               </div>
             </div>
 
-            <div className="overflow-x-auto custom-scrollbar">
+            <div className="hidden md:block overflow-x-auto scrollbar-hide">
               <table className="w-full min-w-[800px]">
                 <thead>
                   <tr className="border-b border-white/5">
@@ -473,29 +492,107 @@ function GradeChangePage() {
                       </td>
                     </tr>
                   ))}
-                  {requests.length === 0 && (
-                    <tr>
-                      <td colSpan="7" className="py-20 text-center">
-                        <div className="flex flex-col items-center gap-4">
-                          <div className="p-6 bg-zinc-800/50 rounded-full text-zinc-600 border border-white/5">
-                            <Search size={40} />
-                          </div>
-                          <div className="space-y-1">
-                            <p className="text-zinc-500 font-black uppercase tracking-widest text-xs">
-                              No records available
-                            </p>
-                            <p className="text-zinc-600 text-[10px] font-medium">
-                              There are currently no subjects available for
-                              grade change in this semester.
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
                 </tbody>
               </table>
             </div>
+
+            {}
+            <div className="md:hidden space-y-4">
+              {hasAvailableRequests && requests.length > 0 && (
+                <div className="flex items-center gap-2 px-2 pb-2">
+                  <input
+                    type="checkbox"
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    className="w-5 h-5 rounded-lg border-white/10 bg-white/5 checked:bg-[#a098ff] transition-all cursor-pointer"
+                  />
+                  <span className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.15em]">Select All Courses</span>
+                </div>
+              )}
+              {requests.map((req, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => req.checkboxId && handleCheckboxToggle(req.checkboxId)}
+                  className={`p-5 rounded-[2rem] border transition-all duration-300 ${
+                    selectedIds.includes(req.checkboxId)
+                      ? "bg-[#a098ff]/10 border-[#a098ff]/30 shadow-[0_0_20px_rgba(160,152,255,0.05)]"
+                      : "bg-white/[0.02] border-white/5 hover:border-white/10"
+                  }`}
+                >
+                  <div className="flex justify-between items-start mb-5">
+                    <div className="flex items-center gap-3">
+                      {req.checkboxId ? (
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(req.checkboxId)}
+                          readOnly
+                          className="w-5 h-5 rounded-lg border-white/10 bg-white/5 checked:bg-[#a098ff] transition-all cursor-pointer"
+                        />
+                      ) : (
+                        <div className="w-5 h-5 rounded-lg bg-zinc-800/50 flex items-center justify-center">
+                           <span className="text-[8px] font-black text-zinc-600">#</span>
+                        </div>
+                      )}
+                      <span className="text-xs font-black text-zinc-500">{idx + 1}.</span>
+                    </div>
+                    <span
+                      className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
+                        req.status.toLowerCase().includes("pending")
+                          ? "bg-amber-500/5 text-amber-500 border-amber-500/20"
+                          : req.status.toLowerCase().includes("rejected")
+                            ? "bg-rose-500/5 text-rose-400 border-rose-500/20"
+                            : "bg-emerald-500/5 text-emerald-400 border-emerald-500/20"
+                      }`}
+                    >
+                      {req.status}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <h4 className="text-white font-black text-[15px] leading-tight tracking-tight">{req.course}</h4>
+                    
+                    <div className="flex flex-wrap gap-2">
+                      <div className="px-3 py-1.5 rounded-xl bg-zinc-800/80 border border-white/5 flex items-center gap-2">
+                        <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">Code</span>
+                        <span className="text-zinc-300 font-bold text-[10px] uppercase">{req.code}</span>
+                      </div>
+                      <div className="px-3 py-1.5 rounded-xl bg-zinc-800/80 border border-white/5 flex items-center gap-2">
+                        <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">Credits</span>
+                        <span className="text-zinc-300 font-bold text-[10px] uppercase">{req.credits}</span>
+                      </div>
+                      <div className="px-3 py-1.5 rounded-xl bg-zinc-800/80 border border-white/5 flex items-center gap-2">
+                        <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">Sec</span>
+                        <span className="text-zinc-300 font-bold text-[10px] uppercase">{req.section}</span>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 flex items-center justify-between border-t border-white/[0.03]">
+                      <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Initial Grade</span>
+                      <span className="px-4 py-1.5 rounded-xl bg-[#a098ff]/10 text-[#a098ff] font-black text-sm shadow-[0_0_15px_rgba(160,152,255,0.1)]">
+                        {req.grade}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {requests.length === 0 && (
+              <div className="py-20 text-center">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="p-6 bg-zinc-800/50 rounded-full text-zinc-600 border border-white/5">
+                    <Search size={40} />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-zinc-500 font-black uppercase tracking-widest text-xs">
+                      No records available
+                    </p>
+                    <p className="text-zinc-600 text-[10px] font-medium px-4">
+                      There are currently no subjects available for grade change in this semester.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

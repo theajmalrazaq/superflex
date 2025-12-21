@@ -16,6 +16,8 @@ import {
   GraduationCap,
   LogOut,
   Lock,
+  Menu,
+  X,
 } from "lucide-react";
 
 function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
@@ -46,17 +48,17 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
   useEffect(() => {
     const scrollbarStyle = `
-      .custom-scrollbar::-webkit-scrollbar {
+      .scrollbar-hide::-webkit-scrollbar {
         width: 6px;
       }
-      .custom-scrollbar::-webkit-scrollbar-track {
+      .scrollbar-hide::-webkit-scrollbar-track {
         background: transparent;
       }
-      .custom-scrollbar::-webkit-scrollbar-thumb {
+      .scrollbar-hide::-webkit-scrollbar-thumb {
         background-color: rgba(255, 255, 255, 0.1);
         border-radius: 20px;
       }
-      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      .scrollbar-hide::-webkit-scrollbar-thumb:hover {
         background-color: rgba(255, 255, 255, 0.2);
       }
     `;
@@ -220,7 +222,9 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
   const NavItem = ({ link, isActive }) => (
     <button
-      onClick={() => (window.location.href = link.href)}
+      onClick={() => {
+        window.location.href = link.href;
+      }}
       className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 text-[13px] font-medium whitespace-nowrap cursor-pointer ${isActive ? "bg-[#a098ff]/10 text-[#a098ff] border  border-white/10" : "text-zinc-400 border-transparent hover:text-white hover:bg-white/5"}`}
     >
       <span className={isActive ? "text-inherit" : "text-current"}>
@@ -231,9 +235,11 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   );
 
   const DropdownItem = ({ link, isActive }) => (
-    <a
-      href={link.href}
-      className={`group flex items-center !bg-zinc-900/50 backdrop-blur-xl gap-4 p-4 rounded-xl transition-all duration-200 no-underline hover:no-underline border
+    <div
+      onClick={() => {
+        window.location.href = link.href;
+      }}
+      className={`group flex items-center !bg-zinc-900/50 backdrop-blur-xl gap-4 p-4 rounded-xl transition-all duration-200 no-underline hover:no-underline border cursor-pointer
         ${
           isActive
             ? "bg-zinc-800 border-white/10"
@@ -256,10 +262,22 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           View {link.text.toLowerCase()}
         </div>
       </div>
-    </a>
+    </div>
   );
 
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openMobileCategories, setOpenMobileCategories] = useState({});
+
+  useEffect(() => {
+    // Pre-expand active category on mobile
+    const activeCategory = ["Academics", "Finance", "Services", "More"].find(
+      (cat) => groupedLinks[cat] && isCategoryActive(groupedLinks[cat]),
+    );
+    if (activeCategory) {
+      setOpenMobileCategories((prev) => ({ ...prev, [activeCategory]: true }));
+    }
+  }, [groupedLinks, currentPage]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -272,31 +290,40 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   }, []);
 
   return (
-    <div className="flex items-center px-6 py-3 w-fit relative">
-      {}
-      <div className="flex items-center shrink-0">
-        <img
-          src={chrome.runtime.getURL("public/logo.svg")}
-          alt="Logo"
-          className="h-8 w-auto"
-        />
+    <div className="flex items-center justify-between lg:justify-start px-4 lg:px-6 py-2.5 lg:py-3 w-full lg:w-fit relative">
+      <div className="flex items-center gap-4">
+        {/* Mobile Menu Toggle */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="lg:hidden p-2 text-zinc-400 hover:text-white transition-colors"
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        <div className="flex items-center shrink-0">
+          <img
+            src={chrome.runtime.getURL("public/logo.svg")}
+            alt="Logo"
+            className="h-7 lg:h-8 w-auto"
+          />
+        </div>
       </div>
 
-      {}
-      <div className="flex justify-center !px-8">
+      {/* Desktop Navigation */}
+      <div className="hidden lg:flex justify-center !px-8">
         <nav>
           {menuLinks.length === 0 ? (
             <div className="text-white/50 text-sm">Loading...</div>
           ) : (
             <div className="flex items-center gap-1">
-              {}
+              {/* Root Links (Home) */}
               {groupedLinks.root?.map((link, index) => {
                 const isActive =
                   currentPage === "/" || currentPage.startsWith("/?dump=");
                 return <NavItem key={index} link={link} isActive={isActive} />;
               })}
 
-              {}
+              {/* Category Dropdowns */}
               {["Academics", "Finance", "Services", "More"].map((category) => {
                 const links = groupedLinks[category];
                 if (!links || links.length === 0) return null;
@@ -312,7 +339,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         setOpenDropdown(isOpen ? null : category);
                       }}
                       className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-white/5
-                        ${isActive ? "bg-[#a098ff]/10 text-[#a098ff] border  border-white/10" : "!text-zinc-400 hover:!text-white"}
+                        ${isActive ? "bg-[#a098ff]/10 text-[#a098ff] border border-white/10" : "!text-zinc-400 hover:!text-white"}
                       `}
                     >
                       {category}
@@ -331,11 +358,11 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         <path d="m6 9 6 6 6-6" />
                       </svg>
                     </button>
-                    {}
+
                     {isOpen && (
                       <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-[999] w-max animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="bg-black border border-white/10 rounded-2xl p-2  min-w-[520px]">
-                          <div className="grid grid-cols-2 gap-2 max-h-[70vh] overflow-y-auto custom-scrollbar p-1">
+                        <div className="bg-black border border-white/10 rounded-2xl p-2 min-w-[520px]">
+                          <div className="grid grid-cols-2 gap-2 max-h-[70vh] overflow-y-auto scrollbar-hide p-1">
                             {links.map((link, idx) => {
                               const isLinkActive =
                                 link.path &&
@@ -360,6 +387,99 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           )}
         </nav>
       </div>
+
+      {/* Mobile Navigation Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden fixed inset-x-4 top-20 bg-black/95 backdrop-blur-3xl border border-white/10 rounded-3xl p-4 z-[999] animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[calc(100vh-120px)] scrollbar-hide">
+          <div className="flex flex-col gap-6">
+            {/* Root Links */}
+            <div className="flex flex-col gap-1">
+              {groupedLinks.root?.map((link, index) => {
+                const isActive =
+                  currentPage === "/" || currentPage.startsWith("/?dump=");
+                return (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      window.location.href = link.href;
+                    }}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive ? "bg-[#a098ff]/10 text-[#a098ff]" : "text-zinc-400"}`}
+                  >
+                    {React.cloneElement(getIcon(link), { size: 20 })}
+                    <span className="font-medium">{link.text}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Category Groups */}
+            {["Academics", "Finance", "Services", "More"].map((category) => {
+              const links = groupedLinks[category];
+              if (!links || links.length === 0) return null;
+
+              const isExpanded = openMobileCategories[category];
+
+              return (
+                <div key={category} className="flex flex-col gap-2">
+                  <button
+                    onClick={() =>
+                      setOpenMobileCategories((prev) => ({
+                        ...prev,
+                        [category]: !prev[category],
+                      }))
+                    }
+                    className="flex items-center justify-between px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-zinc-500 hover:text-white transition-colors"
+                  >
+                    <span>{category}</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+                  {isExpanded && (
+                    <div className="grid grid-cols-1 gap-1 animate-in slide-in-from-top-2 duration-200">
+                      {links.map((link, idx) => {
+                        const isActive =
+                          link.path &&
+                          currentPage &&
+                          currentPage.includes(link.path);
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              window.location.href = link.href;
+                            }}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive ? "bg-[#a098ff]/10 text-[#a098ff]" : "text-zinc-300 hover:bg-white/5"}`}
+                          >
+                            <div
+                              className={`p-2 rounded-lg ${isActive ? "bg-[#a098ff] text-white" : "bg-zinc-800 text-[#a098ff]"}`}
+                            >
+                              {React.cloneElement(getIcon(link), { size: 18 })}
+                            </div>
+                            <span className="text-sm font-medium">
+                              {link.text}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {}
       <div className="shrink-0 flex items-center gap-3">

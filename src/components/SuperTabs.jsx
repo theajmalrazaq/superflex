@@ -15,7 +15,7 @@ const SuperTabs = ({
 
   return (
     <div
-      className={`flex gap-1.5 bg-zinc-900/50 p-1 rounded-full border border-white/5 backdrop-blur-md overflow-x-auto no-scrollbar max-w-full ${className}`}
+      className={`flex gap-1.5 bg-zinc-900/50 p-1 rounded-full border border-white/5 backdrop-blur-md overflow-x-auto scrollbar-hide max-w-full ${className}`}
     >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.value;

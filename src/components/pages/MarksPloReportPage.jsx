@@ -270,7 +270,7 @@ function MarksPloReportPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-6 md:p-8 space-y-8 print:p-0 print:bg-white">
+      <div className="w-full min-h-screen p-4 md:p-8 space-y-8 print:p-0 print:bg-white">
         <PageHeader
           className="print:hidden"
           title="PLO Report"
@@ -361,7 +361,7 @@ function MarksPloReportPage() {
                   </h3>
                 </div>
                 {}
-                <div className="overflow-x-auto custom-scrollbar p-0">
+                <div className="overflow-x-auto scrollbar-hide p-0">
                   <div
                     className="legacy-table-wrapper w-full [&_table]:w-full [&_table]:border-collapse [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap"
                     dangerouslySetInnerHTML={{ __html: reportHtml }}

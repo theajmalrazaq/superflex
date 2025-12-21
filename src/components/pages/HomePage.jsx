@@ -189,10 +189,10 @@ function HomePage() {
 
   useEffect(() => {
     const scrollbarStyle = `
-      .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-      .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-      .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.1); border-radius: 20px; }
-      .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: rgba(255, 255, 255, 0.2); }
+      .scrollbar-hide::-webkit-scrollbar { width: 6px; }
+      .scrollbar-hide::-webkit-scrollbar-track { background: transparent; }
+      .scrollbar-hide::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.1); border-radius: 20px; }
+      .scrollbar-hide::-webkit-scrollbar-thumb:hover { background-color: rgba(255, 255, 255, 0.2); }
     `;
     const styleElement = document.createElement("style");
     styleElement.textContent = scrollbarStyle;
@@ -552,7 +552,7 @@ function HomePage() {
       currentPage={window.location.pathname}
       onLinksFound={handleLinksFound}
     >
-      <div className="w-full px-6 py-8 space-y-8">
+      <div className="w-full px-4 md:px-6 py-6 md:py-8 space-y-8">
         {}
         {}
         <div className="relative rounded-[2rem] bg-black p-6 overflow-hidden group">
@@ -578,13 +578,48 @@ function HomePage() {
 
                 <div className="flex flex-col text-left space-y-0.5">
                   <h1 className="text-2xl md:text-4xl font-black text-white tracking-tight leading-none">
-                    Hey Pookie,{" "}
+                    {useMemo(() => {
+                      const greetings = [
+                        "Hey Pookie,",
+                        "Academic Comeback,",
+                        "Yo Bestie,",
+                        "No Cap,",
+                        "Main Character,",
+                        "Still Mid,",
+                        "Wait, you're here?",
+                        "Manifesting 4.0,",
+                      ];
+                      return greetings[Math.floor(Math.random() * greetings.length)];
+                    }, [])}{" "}
                     <span className="text-[#a098ff]">
-                      {personalInfo?.Name || "Student"}
+                      {personalInfo?.Name?.split(" ")[0] || "Student"}
                     </span>
                   </h1>
                   <p className="text-zinc-500 text-sm font-medium">
-                    Nice to see you!
+                    {useMemo(() => {
+                      const roasts = [
+                        "Nice to see you! (not really)",
+                        "Your attendance is giving 'dropout'.",
+                        "Is it giving 4.0 or 0.4?",
+                        "Caught in 4k checking your grades.",
+                        "Don't let them catch you lacking.",
+                        "Real ones check SuperFlex every hour.",
+                        "Go touch some grass after this.",
+                        "Imagine having 8am classes in 2025.",
+                        "Your aggregate is looking real quiet...",
+                        "Academic comeback starts... never?",
+                      ];
+                      
+                      // Contextual roasts
+                      if (mostAbsentSubject && mostAbsentSubject.absent > 3) {
+                        return `Bestie, ${mostAbsentSubject.absent} absents in ${mostAbsentSubject.title.split(' ')[0]}? You're cooked.`;
+                      }
+                      if (currentAggregate.percentage > 85) {
+                        return "Okay nerd, we get it, you're smart.";
+                      }
+                      
+                      return roasts[Math.floor(Math.random() * roasts.length)];
+                    }, [mostAbsentSubject, currentAggregate])}
                   </p>
                 </div>
               </div>
@@ -690,7 +725,7 @@ function HomePage() {
                   </div>
 
                   {}
-                  <div className="w-full overflow-x-auto custom-scrollbar no-scrollbar">
+                  <div className="w-full overflow-x-auto scrollbar-hide scrollbar-hide">
                     <div className="flex gap-2 bg-black/40 p-1.5 rounded-full border border-white/5 backdrop-blur-sm w-fit">
                       {coursesData.map((course) => (
                         <button

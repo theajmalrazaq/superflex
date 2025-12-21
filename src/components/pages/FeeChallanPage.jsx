@@ -280,7 +280,7 @@ function FeeChallanPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-6 md:p-10 space-y-10 relative z-10">
+      <div className="w-full min-h-screen p-4 md:p-8 space-y-10 relative z-10">
         {}
         <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
@@ -368,7 +368,7 @@ function FeeChallanPage() {
                 </div>
               </div>
 
-              <div className="overflow-x-auto custom-scrollbar">
+              <div className="overflow-x-auto scrollbar-hide">
                 <table className="w-full text-left order-collapse border-spacing-0">
                   <thead>
                     <tr className="border-b border-white/5">
@@ -504,18 +504,18 @@ function FeeChallanPage() {
       </div>
 
       <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
+        .scrollbar-hide::-webkit-scrollbar {
           height: 6px;
           width: 6px;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
+        .scrollbar-hide::-webkit-scrollbar-track {
           background: transparent;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
+        .scrollbar-hide::-webkit-scrollbar-thumb {
           background: rgba(255, 255, 255, 0.1);
           border-radius: 10px;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        .scrollbar-hide::-webkit-scrollbar-thumb:hover {
           background: rgba(255, 255, 255, 0.2);
         }
       `}</style>

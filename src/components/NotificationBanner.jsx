@@ -44,7 +44,7 @@ const NotificationBanner = ({
           </div>
 
           <div className="space-y-0.5 flex-1 min-w-0">
-            <p className="text-sm font-medium leading-relaxed truncate group-hover:whitespace-normal transition-all">
+            <p className="text-xs md:text-sm font-medium leading-relaxed">
               {alert.message}
             </p>
           </div>

@@ -57,7 +57,7 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10  max-h-[60vh] overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10  max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200">
           <div className="flex flex-col gap-3">
             {courses.map((course) => (
               <button
@@ -154,10 +154,10 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
           {isPresent ? "Present" : "Absent"}
         </div>
         <div
-          className={`p-2 rounded-full transition-all duration-300 ${
+          className={`p-2 rounded-full shrink-0 transition-all duration-300 border ${
             isMarked
-              ? "text-[#a098ff] bg-[#a098ff]/10"
-              : "text-zinc-700 group-hover:text-zinc-500"
+              ? "text-[#a098ff] bg-[#a098ff]/10 border-[#a098ff]/30"
+              : "text-zinc-700 bg-zinc-900/50 border-white/5 group-hover:text-zinc-500 hover:bg-white/10"
           }`}
         >
           <Bookmark size={18} fill={isMarked ? "currentColor" : "none"} />
@@ -201,7 +201,7 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
   }
 
   return (
-    <div className="relative z-[999]" ref={dropdownRef}>
+    <div className="relative z-[900]" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`p-3 rounded-full border transition-all ${
@@ -225,7 +225,7 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
             </h3>
           </div>
 
-          <div className="max-h-[60vh] overflow-y-auto custom-scrollbar p-2 space-y-1">
+          <div className="max-h-[60vh] overflow-y-auto scrollbar-hide p-2 space-y-1">
             {bookmarkedDetails.length === 0 ? (
               <div className="p-8 text-center text-zinc-500 text-sm">
                 <p>No bookmarks yet.</p>
@@ -422,7 +422,7 @@ function AttendancePage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-6 md:p-8 space-y-8">
+      <div className="w-full min-h-screen p-4 md:p-8 space-y-8">
         {}
         <PageHeader
           title="Attendance"

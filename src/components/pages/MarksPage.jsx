@@ -69,7 +69,7 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10  max-h-[60vh] overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200 z-[60]">
+        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10  max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200 z-[60]">
           <div className="flex flex-col gap-3">
             {courses.map((course) => (
               <button
@@ -155,7 +155,7 @@ const SectionSelector = ({ sections, selectedId, onSelect }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10  max-h-[60vh] overflow-y-auto custom-scrollbar animate-in fade-in zoom-in-95 duration-200 z-[60]">
+        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10  max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200 z-[60]">
           <div className="flex flex-col gap-2">
             {sections.map((section) => (
               <button
@@ -220,7 +220,7 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
   }
 
   return (
-    <div className="relative z-[999]" ref={dropdownRef}>
+    <div className="relative z-[900]" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`p-3 rounded-full border transition-all ${
@@ -244,7 +244,7 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
             </h3>
           </div>
 
-          <div className="max-h-[60vh] overflow-y-auto custom-scrollbar p-2 space-y-1">
+          <div className="max-h-[60vh] overflow-y-auto scrollbar-hide p-2 space-y-1">
             {bookmarkedDetails.length === 0 ? (
               <div className="p-8 text-center text-zinc-500 text-sm">
                 <p>No bookmarks yet.</p>
@@ -491,32 +491,32 @@ const AssessmentView = ({
           />
         </div>
         <div className="p-6">
-          <div className="w-full overflow-x-auto rounded-xl border border-white/5 custom-scrollbar bg-black/20">
-            <table className="w-full text-sm text-left border-collapse">
+          <div className="w-full overflow-x-auto rounded-xl border border-white/5 scrollbar-hide bg-black/20">
+            <table className="w-full text-sm text-left border-collapse scrollbar-hide">
               <thead>
                 <tr className="border-b border-white/10 bg-black/40 backdrop-blur-md">
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider sticky top-0 bg-[#161616]/90">
+                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider sticky top-0 bg-[#161616]/90 z-20">
                     Item Name
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90">
+                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90 z-20">
                     Weightage
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90">
+                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90 z-20">
                     Total Marks
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90">
+                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90 z-20">
                     Obtained
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90">
+                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90 z-20">
                     Avg
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90">
+                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90 z-20">
                     Std Dev
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90">
+                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90 z-20">
                     Min
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90">
+                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90 z-20">
                     Max
                   </th>
                 </tr>
@@ -543,10 +543,10 @@ const AssessmentView = ({
                           <div className="flex items-center gap-3">
                             <button
                               onClick={() => onToggleMark?.(uniqueId)}
-                              className={`p-1.5 rounded-lg transition-all ${
+                              className={`p-1.5 rounded-full shrink-0 transition-all border ${
                                 isMarked
-                                  ? "bg-[#a098ff]/20 text-[#a098ff]"
-                                  : "text-zinc-600 hover:text-zinc-400 hover:bg-white/5"
+                                  ? "bg-[#a098ff]/20 text-[#a098ff] border-[#a098ff]/30"
+                                  : "bg-zinc-900/50 text-zinc-600 border-white/5 hover:text-zinc-400 hover:bg-white/10"
                               }`}
                             >
                               <Bookmark

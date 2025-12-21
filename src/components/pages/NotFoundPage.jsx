@@ -16,8 +16,8 @@ function NotFoundPage() {
       <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
       <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-140px)] p-6">
-        <div className="bg-zinc-900/40 backdrop-blur-2xl border border-white/5 rounded-[3rem] p-12 md:p-16 flex flex-col items-center text-center max-w-lg w-full relative overflow-hidden">
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-140px)] p-4">
+        <div className="bg-zinc-900/40 backdrop-blur-2xl border border-white/5 rounded-[3rem] p-8 md:p-16 flex flex-col items-center text-center max-w-lg w-full relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#a098ff]/10 blur-[80px] rounded-full -mr-32 -mt-32 pointer-events-none"></div>
 
           <div className="h-32 w-32 rounded-full bg-white/5 flex items-center justify-center mb-8 relative group">

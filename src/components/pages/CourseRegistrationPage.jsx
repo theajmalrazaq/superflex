@@ -122,7 +122,7 @@ function CourseRegistrationPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-6 md:p-8 space-y-8">
+      <div className="w-full min-h-screen p-4 md:p-8 space-y-8">
         <PageHeader
           title="Course Registration"
           subtitle="Manage your semester course enrollments"
@@ -153,7 +153,7 @@ function CourseRegistrationPage() {
                       </h3>
                     </div>
 
-                    <div className="overflow-x-auto custom-scrollbar">
+                    <div className="overflow-x-auto scrollbar-hide">
                       <table className="w-full min-w-[800px]">
                         <thead>
                           <tr className="border-b border-white/10">

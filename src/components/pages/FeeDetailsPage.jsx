@@ -137,7 +137,7 @@ const SemesterAccordion = ({ semester }) => {
               <h5 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
                 <BookOpen size={12} /> Registration Log
               </h5>
-              <div className="overflow-hidden rounded-[2rem] border border-white/5 bg-zinc-900/20 backdrop-blur-md">
+              <div className="!overflow-x-scroll rounded-[2rem] border border-white/5 bg-zinc-900/20 backdrop-blur-md">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-white/5">
@@ -400,7 +400,7 @@ function FeeDetailsPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-6 md:p-12 space-y-12 relative z-10 font-sans">
+      <div className="w-full min-h-screen p-4 md:p-8 space-y-12 relative z-10 font-sans">
         <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full pointer-events-none -mr-64 -mt-64 z-0"></div>
 
         <PageHeader title="Fee Vault" subtitle="Academic Portfolio & Accounts">
@@ -482,7 +482,7 @@ function FeeDetailsPage() {
             </div>
 
             <div className="overflow-hidden rounded-[2.5rem] border border-white/5 bg-zinc-900/20 backdrop-blur-xl">
-              <div className="overflow-x-auto custom-scrollbar">
+              <div className="overflow-x-auto scrollbar-hide">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-white/5 border-b border-white/5">
@@ -573,18 +573,18 @@ function FeeDetailsPage() {
       </div>
 
       <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
+        .scrollbar-hide::-webkit-scrollbar {
           height: 4px;
           width: 4px;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
+        .scrollbar-hide::-webkit-scrollbar-track {
           background: transparent;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
+        .scrollbar-hide::-webkit-scrollbar-thumb {
           background: rgba(255, 255, 255, 0.05);
           border-radius: 10px;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        .scrollbar-hide::-webkit-scrollbar-thumb:hover {
           background: rgba(255, 255, 255, 0.1);
         }
       `}</style>

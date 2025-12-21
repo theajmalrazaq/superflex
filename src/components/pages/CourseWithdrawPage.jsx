@@ -58,7 +58,7 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
         className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-lg bg-zinc-900 border border-white/10 rounded-[2rem] p-6 animate-in zoom-in-95 duration-300 space-y-6 max-h-[90vh] overflow-y-auto custom-scrollbar no-scrollbar">
+      <div className="relative w-full max-w-lg bg-zinc-900 border border-white/10 rounded-[2rem] p-6 animate-in zoom-in-95 duration-300 space-y-6 max-h-[90vh] overflow-y-auto scrollbar-hide scrollbar-hide">
         <div className="flex justify-between items-start">
           <div className="space-y-0.5">
             <h2 className="text-xl font-black text-white tracking-tight">
@@ -186,7 +186,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <div className="p-5 overflow-y-auto custom-scrollbar flex-1 space-y-6 text-left no-scrollbar">
+        <div className="p-5 overflow-y-auto scrollbar-hide flex-1 space-y-6 text-left scrollbar-hide">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <div className="w-1 h-4 bg-[#a098ff] rounded-full"></div>
@@ -263,7 +263,7 @@ const WithdrawalCourseCard = ({ course, isSelected, onToggle, index }) => {
   return (
     <div
       onClick={() => course.canSelect && onToggle(course.id)}
-      className={`group flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${
+      className={`group flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border transition-all duration-300 gap-4 ${
         course.canSelect ? "cursor-pointer" : "cursor-not-allowed opacity-60"
       } ${
         isSelected
@@ -271,46 +271,42 @@ const WithdrawalCourseCard = ({ course, isSelected, onToggle, index }) => {
           : "bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5"
       }`}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 min-w-0 flex-1">
         <span
-          className={`font-bold text-sm min-w-[1.5rem] ${isSelected ? "text-[#a098ff]" : "text-zinc-600"}`}
+          className={`font-bold text-xs min-w-[1.2rem] ${isSelected ? "text-[#a098ff]" : "text-zinc-600"}`}
         >
           {index}.
         </span>
 
         <div
-          className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-300 ${
+          className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 transition-all duration-300 ${
             isSelected
               ? "bg-[#a098ff]/20 border-[#a098ff]/30 text-[#a098ff] scale-105"
               : "bg-zinc-800/50 border-white/5 text-zinc-500"
           }`}
         >
-          <BookOpen size={20} />
+          <BookOpen size={18} />
         </div>
 
-        <div className="flex flex-col gap-1 min-w-0 flex-1">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+          <div className="flex items-center gap-2 min-w-0">
             <span className="text-[10px] font-black text-[#a098ff] uppercase tracking-tighter opacity-80 shrink-0">
               {course.code}
             </span>
-            <span className="text-white font-medium text-sm leading-tight truncate">
+            <h4 className="text-white font-bold text-sm leading-tight truncate">
               {course.name}
-            </span>
+            </h4>
           </div>
 
-          <div className="flex items-center gap-3 text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
-            <span className="flex items-center gap-1.5">
-              {course.credits} Credits
-            </span>
-            <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
-            <span className="flex items-center gap-1.5 capitalize">
-              {course.type}
-            </span>
+          <div className="flex items-center gap-2.5 text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
+            <span className="shrink-0">{course.credits} Credits</span>
+            <span className="w-1 h-1 rounded-full bg-zinc-700 shrink-0"></span>
+            <span className="capitalize truncate">{course.type}</span>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex flex-row sm:flex-row items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-white/5">
         {course.status && (
           <div
             className={`px-3 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest ${
@@ -574,7 +570,7 @@ function CourseWithdrawPage() {
   if (loading)
     return (
       <PageLayout currentPage={window.location.pathname}>
-        <div className="w-full min-h-screen p-6 md:p-8 space-y-8">
+        <div className="w-full min-h-screen p-4 md:p-8 space-y-8">
           <div className="flex justify-center py-20">
             <LoadingSpinner />
           </div>
@@ -587,7 +583,7 @@ function CourseWithdrawPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-6 md:p-8 space-y-8 relative z-10">
+      <div className="w-full min-h-screen p-4 md:p-8 space-y-8 relative z-10">
         <RemarksModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}

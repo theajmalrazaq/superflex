@@ -47,7 +47,8 @@ function LoginPageStyles() {
         "!flex",
         "!flex-col",
         "!items-center",
-        "!w-fit",
+        "!w-full",
+        "!max-w-full",
         "!p-0",
       );
     });
@@ -141,7 +142,8 @@ function LoginPageStyles() {
       bglogin.classList.add(
         "!bg-zinc-900/90",
         "backdrop-blur-2xl",
-        "!p-10",
+        "!p-6",
+        "sm:!p-10",
         "!rounded-[2.5rem]",
         "!border",
         "!border-white/10",
@@ -149,7 +151,8 @@ function LoginPageStyles() {
         "!flex-col",
         "!items-center",
         "!justify-center",
-        "!w-[355px]",
+        "!w-[90vw]",
+        "!max-w-[355px]",
         "!hidden",
         "!fixed",
         "!top-1/2",
@@ -183,14 +186,16 @@ function LoginPageStyles() {
       forgotPasswordSection.classList.add(
         "!bg-zinc-900/95",
         "backdrop-blur-2xl",
-        "!p-10",
+        "!p-6",
+        "sm:!p-10",
         "!rounded-[2.5rem]",
         "!border",
         "!border-white/10",
         "!flex",
         "!flex-col",
         "!gap-8",
-        "!w-[356px]",
+        "!w-[90vw]",
+        "!max-w-[356px]",
         "!hidden",
         "!fixed",
         "!top-1/2",
@@ -343,18 +348,23 @@ function LoginPageStyles() {
       !text-white
       !border-none 
       !rounded-2xl 
-      !px-7 
+      !px-8
       !py-3.5 
       !cursor-pointer
       !transition-all 
       !duration-300
       !flex
       !items-center
+      !justify-center
       !gap-3
       !z-[50]
+      !w-full
+      !sm:w-auto
+      !whitespace-nowrap
+      !h-[52px]
     `;
     signInButton.style.fontFamily = "'Google Sans Flex', sans-serif";
-    signInButton.innerHTML = `Sign In
+    signInButton.innerHTML = `<span class="text-sm font-medium">Sign In</span>
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
         <polyline points="10 17 15 12 10 7"/>
@@ -366,10 +376,10 @@ function LoginPageStyles() {
     suggestionButton.href = "https://github.com/theajmalrazaq/superflex";
     suggestionButton.target = "_blank";
     suggestionButton.className =
-      "group relative bg-white/10 backdrop-blur-sm px-7 py-3.5 rounded-xl text-white hover:bg-white/20 hover:border-white/40 transition-all duration-300 flex items-center gap-3";
+      "group relative bg-white/10 backdrop-blur-sm px-8 py-3.5 rounded-2xl text-white hover:bg-white/20 hover:border-white/40 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto whitespace-nowrap h-[52px]";
     suggestionButton.style.fontFamily = "'Google Sans Flex', sans-serif";
     suggestionButton.innerHTML = `
-      <span class="text-sm">Star on Github (<span id="starCount">...</span>)</span>
+      <span class="text-sm font-medium">Star on Github (<span id="starCount">...</span>)</span>
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[#a098ff]">
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
       </svg>
@@ -481,7 +491,7 @@ function LoginPageStyles() {
 
     const heroDiv = document.createElement("div");
     heroDiv.className =
-      "flex flex-col pt-7 justify-center text-center w-full mb-6";
+      "flex flex-col pt-7 justify-center items-center text-center w-full px-4 sm:px-6 mb-6 relative z-10";
 
     const bgUrl = chrome.runtime.getURL("public/bg.png");
     const logoUrl = chrome.runtime.getURL("public/logo.svg");
@@ -543,7 +553,7 @@ function LoginPageStyles() {
           border: 1px solid rgba(255, 255, 255, 0.08);
           padding: 20px 24px;
           border-radius: 24px;
-          width: 320px;
+          width: 280px;
           white-space: normal;
           transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
           cursor: default;
@@ -592,6 +602,9 @@ function LoginPageStyles() {
         .feature-marquee-track:hover {
           animation-play-state: paused;
         }
+        .hero-logo.filter {
+          filter: brightness(0) invert(1);
+        }
       `;
 
     const generateReviewCards = (items) => {
@@ -635,15 +648,15 @@ function LoginPageStyles() {
     heroDiv.innerHTML = `
     <!-- Version Display Button -->
     <a href="https://theajmalrazaq.github.io/superflex" target="_blank" class="mt-4 md:mt-0 mb-6">
-        <button class="group relative dark:bg-neutral-800 bg-neutral-200 rounded-full p-px overflow-hidden cursor-pointer transition-all duration-200 ease-in-out">
-          <span class="flex items-center justify-center gap-1 relative z-[1] dark:bg-neutral-950/90 bg-neutral-50/90 rounded-full py-2 px-4 pl-2 w-full">
+        <button class="group relative bg-neutral-800 rounded-full p-px overflow-hidden cursor-pointer transition-all duration-200 ease-in-out">
+          <span class="flex items-center justify-center gap-1 relative z-[1] bg-neutral-950/90 rounded-full py-2 px-4 pl-2 w-full">
             <span class="relative transition-transform duration-500">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a098ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
               </svg>
-              <span class="rounded-full size-11 absolute opacity-0 dark:opacity-30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-lg" style="animation: 14s ease-in-out 0s infinite alternate none running star-shine; background: #a098ff;"></span>
+              <span class="rounded-full size-11 absolute opacity-30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-lg" style="animation: 14s ease-in-out 0s infinite alternate none running star-shine; background: #a098ff;"></span>
             </span>
-            <span id="version-text" class="bg-gradient-to-b ml-1.5 dark:from-white dark:to-white/50 from-neutral-950 to-neutral-950/50 bg-clip-text text-xs text-transparent uppercase font-bold">
+            <span id="version-text" class="bg-gradient-to-b ml-1.5 from-white to-white/50 bg-clip-text text-xs text-transparent uppercase font-bold">
               SuperFlex v${CURRENT_VERSION}
             </span>
           </span>
@@ -662,12 +675,12 @@ function LoginPageStyles() {
           </div>
         </div>
         
-        <div class="space-y-2 flex items-center flex-col gap-2">
-          <img src="https://theajmalrazaq.github.io/superflex/res/logo.svg" alt="SuperFlex" class="w-96 hero-logo filter" />
-          <div class="flex items-center justify-center gap-3">
-            <span class="w-12 h-px bg-gradient-to-r from-transparent to-white/20"></span>
-            <span class="font-black text-[10px] uppercase tracking-[0.4em] text-[#a098ff]/80">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span>
-            <span class="w-12 h-px bg-gradient-to-l from-transparent to-white/20"></span>
+        <div class="space-y-4 flex items-center flex-col gap-2 w-full px-4 sm:px-6">
+          <img src="https://theajmalrazaq.github.io/superflex/res/logo.svg" alt="SuperFlex" class="w-full max-w-[280px] sm:max-w-md hero-logo filter" />
+          <div class="flex items-center justify-center gap-3 w-full">
+            <span class="w-8 sm:w-12 h-px bg-gradient-to-r from-transparent to-white/20"></span>
+            <span class="font-black text-[8px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.4em] text-[#a098ff]/80 text-center">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span>
+            <span class="w-8 sm:w-12 h-px bg-gradient-to-l from-transparent to-white/20"></span>
           </div>
         </div>
         
@@ -677,7 +690,7 @@ function LoginPageStyles() {
     </div>
 
     <!-- Buttons Container -->
-    <div id="login-buttons-container" class="flex flex-row gap-4 justify-center mt-8 hero-buttons">
+    <div id="login-buttons-container" class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8 hero-buttons px-4 sm:px-6 w-full sm:w-auto">
     </div>
 
     <!-- Review Marquee -->

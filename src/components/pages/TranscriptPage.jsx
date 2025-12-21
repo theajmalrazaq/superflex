@@ -518,7 +518,7 @@ function TranscriptPage() {
       <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
       <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
-      <div className="w-full p-6 md:p-10 space-y-10 relative z-10">
+      <div className="w-full p-4 md:p-8 space-y-10 relative z-10">
         {}
         <PageHeader
           title="Transcript Report"
@@ -689,7 +689,7 @@ function TranscriptPage() {
                     </div>
                   </div>
 
-                  <div className="overflow-x-auto custom-scrollbar -mx-2">
+                  <div className="overflow-x-auto scrollbar-hide -mx-2">
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-white/[0.02]">
