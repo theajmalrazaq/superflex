@@ -21,8 +21,8 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-size: 90%;
         font-family: "Google Sans Flex", sans-serif;
+        font-size: 90%;
       }
 
       body {
@@ -179,7 +179,7 @@
         border: 1px solid rgba(255, 255, 255, 0.08);
         padding: 20px 24px;
         border-radius: 24px;
-        width: 320px;
+        width: 280px;
         white-space: normal;
         transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
         cursor: default;
@@ -189,6 +189,48 @@
         background: rgba(160, 152, 255, 0.08);
         border-color: rgba(160, 152, 255, 0.3);
         transform: translateY(-6px) scale(1.02);
+      }
+
+      .review-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        width: 100%;
+      }
+
+      .review-user-info {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+      }
+
+      .review-name {
+        color: white;
+        font-weight: 700;
+        font-size: 13px;
+      }
+
+      .review-verified {
+        color: #a098ff;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .review-comment {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 13px;
+        line-height: 1.6;
+        font-weight: 500;
+        text-align: left;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
       }
 
       /* Feature Cards */
@@ -288,7 +330,7 @@
 
     <!-- Hero Section -->
     <section
-      class="min-h-screen flex flex-col items-center justify-center px-6 relative z-20"
+      class="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 relative z-20"
     >
       <div class="flex flex-col pt-7 justify-center text-center w-full mb-6">
         <!-- Version Badge -->
@@ -331,7 +373,7 @@
                 id="version-text"
                 class="bg-gradient-to-b ml-1.5 dark:from-white dark:to-white/50 from-neutral-950 to-neutral-950/50 bg-clip-text text-xs text-transparent uppercase font-bold"
               >
-                SuperFlex v0.0.9
+                SuperFlex V1.0.0
               </span>
             </span>
           </button>
@@ -385,22 +427,22 @@
           </div>
 
           <!-- Logo Text -->
-          <div class="space-y-2 flex items-center flex-col gap-2">
+          <div class="space-y-4 flex items-center flex-col gap-2 w-full px-6">
             <img
               src="https://theajmalrazaq.github.io/superflex/res/logo.svg"
               alt="SuperFlex"
-              class="w-96 hero-logo filter"
+              class="w-full max-w-[280px] sm:max-w-md hero-logo filter"
             />
-            <div class="flex items-center justify-center gap-3">
+            <div class="flex items-center justify-center gap-3 w-full">
               <span
-                class="w-12 h-px bg-gradient-to-r from-transparent to-white/20"
+                class="w-8 sm:w-12 h-px bg-gradient-to-r from-transparent to-white/20"
               ></span>
               <span
-                class="font-bold text-[10px] uppercase tracking-[0.4em] text-[#a098ff]/80"
+                class="font-black text-[8px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.4em] text-[#a098ff]/80 text-center"
                 >Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span
               >
               <span
-                class="w-12 h-px bg-gradient-to-l from-transparent to-white/20"
+                class="w-8 sm:w-12 h-px bg-gradient-to-l from-transparent to-white/20"
               ></span>
             </div>
           </div>
@@ -420,13 +462,14 @@
         <!-- Buttons Container -->
         <div
           id="hero-buttons-container"
-          class="flex flex-row gap-4 justify-center mt-8 hero-buttons"
+          class="flex flex-col sm:flex-row gap-4 justify-center mt-8 hero-buttons px-4 sm:px-6 w-full sm:w-auto"
         >
+          <!--
           <a
             id="add-to-chrome-btn"
             href="#"
             target="_blank"
-            class="bg-[#a098ff] text-white border-none rounded-2xl px-7 py-3.5 cursor-pointer transition-all duration-300 flex items-center gap-3 hover:bg-[#8f86ff]"
+            class="bg-[#a098ff] text-white border-none rounded-2xl px-8 py-3.5 cursor-pointer transition-all duration-300 flex items-center justify-center gap-3 hover:bg-[#8f86ff] w-full sm:w-auto whitespace-nowrap h-[52px]"
             style="font-family: &quot;Google Sans Flex&quot;, sans-serif"
           >
             <span class="text-sm font-medium">Add to Chrome</span>
@@ -448,7 +491,7 @@
           </a>
           <button
             id="how-to-use-btn"
-            class="group relative bg-white/10 backdrop-blur-sm px-7 py-3.5 rounded-xl text-white hover:bg-white/20 transition-all duration-300 flex items-center gap-3"
+            class="group relative bg-white/10 backdrop-blur-sm px-8 py-3.5 rounded-2xl text-white hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto whitespace-nowrap h-[52px]"
             style="font-family: &quot;Google Sans Flex&quot;, sans-serif"
           >
             <span class="text-sm font-medium">How to Use</span>
@@ -468,6 +511,25 @@
               <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" />
             </svg>
           </button>
+          -->
+
+          <!-- Coming Soon Message -->
+          <div
+            class="group relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-8 py-4 flex items-center gap-3 transition-all duration-500 hover:bg-white/10 hover:border-[#a098ff]/30"
+          >
+            <div class="relative">
+              <div
+                class="w-2.5 h-2.5 rounded-full bg-[#a098ff] animate-ping absolute inset-0"
+              ></div>
+              <div
+                class="w-2.5 h-2.5 rounded-full bg-[#a098ff] relative"
+              ></div>
+            </div>
+            <span
+              class="text-sm font-bold tracking-[0.2em] uppercase text-white/90"
+              >Coming Soon</span
+            >
+          </div>
         </div>
 
         <!-- Video Modal -->
@@ -552,7 +614,7 @@
     </section>
 
     <!-- Features Section -->
-    <section class="py-24 px-6 relative z-20">
+    <section class="py-24 px-4 sm:px-6 relative z-20">
       <div class="max-w-7xl mx-auto">
         <div class="text-center mb-16">
           <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
@@ -737,14 +799,14 @@
 
     <!-- Footer -->
     <footer
-      class="py-24 px-6 relative z-20 border-t border-white/10 overflow-hidden"
+      class="py-24 px-4 sm:px-6 relative z-20 border-t border-white/10 overflow-hidden"
     >
       <!-- Large Gradient Text Background -->
       <div
         class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden"
       >
         <h1
-          class="text-[12rem] md:text-[18rem] lg:text-[24rem] font-black bg-gradient-to-b from-white/5 to-transparent bg-clip-text text-transparent select-none whitespace-nowrap"
+          class="text-[8rem] sm:text-[12rem] md:text-[18rem] lg:text-[24rem] font-black bg-gradient-to-b from-white/5 to-transparent bg-clip-text text-transparent select-none whitespace-nowrap"
         >
           SUPERFLEX
         </h1>
@@ -863,29 +925,37 @@
       const tutorialVideo = document.getElementById("tutorial-video");
 
       // Open modal
-      openModalBtn.addEventListener("click", () => {
-        modal.classList.remove("hidden");
-        modal.classList.add("flex");
-        document.body.style.overflow = "hidden";
-      });
+      if (openModalBtn) {
+        openModalBtn.addEventListener("click", () => {
+          modal.classList.remove("hidden");
+          modal.classList.add("flex");
+          document.body.style.overflow = "hidden";
+        });
+      }
 
       // Close modal function
       const closeModal = () => {
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-        document.body.style.overflow = "auto";
-        tutorialVideo.pause();
+        if (modal) {
+          modal.classList.add("hidden");
+          modal.classList.remove("flex");
+          document.body.style.overflow = "auto";
+          if (tutorialVideo) tutorialVideo.pause();
+        }
       };
 
       // Close on button click
-      closeModalBtn.addEventListener("click", closeModal);
+      if (closeModalBtn) closeModalBtn.addEventListener("click", closeModal);
 
       // Close on backdrop click
-      modalBackdrop.addEventListener("click", closeModal);
+      if (modalBackdrop) modalBackdrop.addEventListener("click", closeModal);
 
       // Close on Escape key
       document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && !modal.classList.contains("hidden")) {
+        if (
+          e.key === "Escape" &&
+          modal &&
+          !modal.classList.contains("hidden")
+        ) {
           closeModal();
         }
       });
@@ -913,127 +983,44 @@
         });
 
       // Generate Review Cards
-      const reviews = [
-        {
-          name: "Ali Hassan",
-          comment:
-            "Finally, a Flex Portal that doesn't look like it's from 2005. The grade calculator is a lifesaver!",
-        },
-        {
-          name: "Sara Ahmed",
-          comment:
-            "The attendance tracker with color coding is exactly what I needed. No more surprises!",
-        },
-        {
-          name: "Zain Malik",
-          comment:
-            "This extension should be mandatory for every student. It's THAT good.",
-        },
-        {
-          name: "Fatima Khan",
-          comment:
-            "The UI is absolutely gorgeous. Makes checking my grades actually enjoyable.",
-        },
-        {
-          name: "Hamza Sheikh",
-          comment:
-            "What-if calculator helped me plan my semester perfectly. 10/10 would recommend.",
-        },
-        {
-          name: "Ayesha Butt",
-          comment:
-            "Clean, fast, and actually useful. Best student extension I've ever used.",
-        },
-        {
-          name: "Usman Raza",
-          comment: "The dark mode is *chef's kiss*. My eyes thank you!",
-        },
-        {
-          name: "Maria Siddiqui",
-          comment:
-            "Never knew I needed this until I tried it. Can't go back to regular Flex now.",
-        },
-        {
-          name: "Bilal Ahmad",
-          comment:
-            "The analytics and charts make understanding my performance so much easier.",
-        },
-        {
-          name: "Hira Aziz",
-          comment:
-            "Installation took 2 seconds. Life changed forever. Simple as that.",
-        },
-        {
-          name: "Adnan Tariq",
-          comment:
-            "Makes managing multiple courses actually manageable. Thank you!",
-        },
-        {
-          name: "Nida Farooq",
-          comment:
-            "The fee management section is so clean. No more digging through messy tables.",
-        },
-        {
-          name: "Kashif Iqbal",
-          comment: "Open source and free? You guys are legends. Keep it up!",
-        },
-        {
-          name: "Sana Yousuf",
-          comment:
-            "Best thing that happened to my academic life this semester.",
-        },
-        {
-          name: "Arslan Mir",
-          comment:
-            "The developer clearly understands student pain points. Every feature is thoughtful.",
-        },
-        {
-          name: "Laiba Hassan",
-          comment:
-            "My CGPA looks better in this UI. Okay, maybe that's psychological, but still!",
-        },
-        {
-          name: "Shahzaib Khan",
-          comment: "Quick actions saved me so much time. One-click everything!",
-        },
-        {
-          name: "Rida Shah",
-          comment:
-            "The glassmorphic design is straight fire. Love the aesthetic.",
-        },
-        {
-          name: "Farhan Ali",
-          comment:
-            "Finally someone made Flex Portal usable. You're doing God's work.",
-        },
-        {
-          name: "Mahnoor Asif",
-          comment:
-            "Showed this to my friends, now everyone in my class uses it. Game changer!",
-        },
-      ];
-
       const generateReviewCards = (items) => {
         return items
           .map(
             (item) => `
                 <div class="review-card">
-                    <div class="flex flex-col gap-1 w-full">
-                        <span class="text-white font-bold text-sm">${item.name}</span>
-                        <span class="text-[#a098ff] text-[10px] font-extrabold uppercase tracking-wider">Student Verified</span>
+                    <div class="review-header">
+                        <div class="review-user-info">
+                            <span class="review-name">${item.name}</span>
+                            <span class="review-verified">Student Verified</span>
+                        </div>
                     </div>
-                    <p class="text-white/70 text-sm leading-relaxed">"${item.comment}"</p>
+                    <p class="review-comment">"${item.comment}"</p>
                 </div>
             `,
           )
           .join("");
       };
 
-      const track = document.getElementById("review-track");
-      if (track) {
-        track.innerHTML =
-          generateReviewCards(reviews) + generateReviewCards(reviews);
-      }
+      // Fetch and populate reviews
+      fetch("../public/reviews.json")
+        .then((res) => res.json())
+        .then((reviews) => {
+          const track = document.getElementById("review-track");
+          if (track) {
+            // Limit to first 20 for consistency and performance
+            const subset = reviews.slice(0, 20);
+            const reviewHtml = generateReviewCards(subset);
+            track.innerHTML = reviewHtml + reviewHtml;
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to load reviews:", err);
+          const track = document.getElementById("review-track");
+          if (track) {
+            track.innerHTML =
+              '<p class="text-zinc-500 text-sm">Feedback loading...</p>';
+          }
+        });
 
       // Smooth scroll for anchor links
       document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
