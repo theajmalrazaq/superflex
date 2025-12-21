@@ -9,8 +9,7 @@
       content="SuperFlex is a modern Chrome extension that transforms the outdated Flex Portal into a sleek, user-friendly dashboard with glassmorphic design and enhanced features."
     />
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="../public/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="res/favicon.svg" />
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1015,7 +1014,7 @@
       };
 
       // Fetch and populate reviews
-      fetch("../public/reviews.json")
+      fetch("reviews.json")
         .then((res) => res.json())
         .then((reviews) => {
           const track = document.getElementById("review-track");
