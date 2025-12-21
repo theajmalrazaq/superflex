@@ -340,10 +340,10 @@
           class="mt-4 md:mt-0 mb-6"
         >
           <button
-            class="group relative dark:bg-neutral-800 bg-neutral-200 rounded-full p-px overflow-hidden cursor-pointer transition-all duration-200 ease-in-out"
+            class="group relative bg-neutral-800 rounded-full p-px overflow-hidden cursor-pointer transition-all duration-200 ease-in-out"
           >
             <span
-              class="flex items-center justify-center gap-1 relative z-[1] dark:bg-neutral-950/90 bg-neutral-50/90 rounded-full py-2 px-4 pl-2 w-full"
+              class="flex items-center justify-center gap-1 relative z-[1] bg-neutral-950/90 rounded-full py-2 px-4 pl-2 w-full"
             >
               <span class="relative transition-transform duration-500">
                 <svg
@@ -361,7 +361,7 @@
                   <path d="m9 12 2 2 4-4" />
                 </svg>
                 <span
-                  class="rounded-full size-11 absolute opacity-0 dark:opacity-30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-lg"
+                  class="rounded-full size-11 absolute opacity-30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-lg"
                   style="
                     animation: 14s ease-in-out 0s infinite alternate none
                       running star-shine;
@@ -371,7 +371,7 @@
               </span>
               <span
                 id="version-text"
-                class="bg-gradient-to-b ml-1.5 dark:from-white dark:to-white/50 from-neutral-950 to-neutral-950/50 bg-clip-text text-xs text-transparent uppercase font-bold"
+                class="bg-gradient-to-b ml-1.5 from-white to-white/50 bg-clip-text text-xs text-transparent uppercase font-bold"
               >
                 SuperFlex V1.0.0
               </span>
@@ -527,10 +527,18 @@
             </div>
             <span
               class="text-sm font-bold tracking-[0.2em] uppercase text-white/90"
-              >Coming Soon</span
+              >V2.0.0 Coming Soon</span
             >
           </div>
         </div>
+        <a
+          id="download-v1-link"
+          href="https://github.com/theajmalrazaq/superflex/releases/latest"
+          target="_blank"
+          class="text-[#a098ff] hover:text-[#8f86ff] text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 decoration-[#a098ff]/30 underline-offset-8 underline flex items-center justify-center h-[52px]"
+        >
+          Download V1.0.0 (Latest)
+        </a>
 
         <!-- Video Modal -->
         <div
@@ -967,19 +975,24 @@
         .then((res) => res.json())
         .then((data) => {
           const addToChromeBtn = document.getElementById("add-to-chrome-btn");
-          if (addToChromeBtn && data.assets && data.assets.length > 0) {
-            // Use the first asset's download URL
-            addToChromeBtn.href = data.assets[0].browser_download_url;
+          const downloadV1Btn = document.getElementById("download-v1-link");
+
+          if (data.assets && data.assets.length > 0) {
+            const downloadUrl = data.assets[0].browser_download_url;
+            if (addToChromeBtn) addToChromeBtn.href = downloadUrl;
+            if (downloadV1Btn) downloadV1Btn.href = downloadUrl;
           }
         })
         .catch((err) => {
           console.error("Failed to fetch latest release:", err);
           // Fallback to GitHub releases page
           const addToChromeBtn = document.getElementById("add-to-chrome-btn");
-          if (addToChromeBtn) {
-            addToChromeBtn.href =
-              "https://github.com/theajmalrazaq/superflex/releases/latest";
-          }
+          const downloadV1Btn = document.getElementById("download-v1-link");
+          const releaseUrl =
+            "https://github.com/theajmalrazaq/superflex/releases/latest";
+
+          if (addToChromeBtn) addToChromeBtn.href = releaseUrl;
+          if (downloadV1Btn) downloadV1Btn.href = releaseUrl;
         });
 
       // Generate Review Cards
