@@ -151,15 +151,25 @@ function GradeChangePage() {
               const code = cells[1]?.textContent.trim();
               const course = cells[2]?.textContent.trim();
 
-              if (!code || !course || code.toLowerCase().includes("course code") || code.length < 2) return;
+              if (
+                !code ||
+                !course ||
+                code.toLowerCase().includes("course code") ||
+                code.length < 2
+              )
+                return;
 
               let grade = cells[5]?.textContent.trim();
               if (grade.toLowerCase().includes("initiate")) {
                 grade = "N/A";
               }
 
-              let status = cells[7]?.textContent.trim() || cells[6]?.textContent.trim() || "N/A";
-              if (status.toLowerCase().includes("initiate")) status = "Eligible";
+              let status =
+                cells[7]?.textContent.trim() ||
+                cells[6]?.textContent.trim() ||
+                "N/A";
+              if (status.toLowerCase().includes("initiate"))
+                status = "Eligible";
 
               requestList.push({
                 id: idx,
@@ -505,13 +515,17 @@ function GradeChangePage() {
                     onChange={(e) => handleSelectAll(e.target.checked)}
                     className="w-5 h-5 rounded-lg border-white/10 bg-white/5 checked:bg-[#a098ff] transition-all cursor-pointer"
                   />
-                  <span className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.15em]">Select All Courses</span>
+                  <span className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.15em]">
+                    Select All Courses
+                  </span>
                 </div>
               )}
               {requests.map((req, idx) => (
                 <div
                   key={idx}
-                  onClick={() => req.checkboxId && handleCheckboxToggle(req.checkboxId)}
+                  onClick={() =>
+                    req.checkboxId && handleCheckboxToggle(req.checkboxId)
+                  }
                   className={`p-5 rounded-[2rem] border transition-all duration-300 ${
                     selectedIds.includes(req.checkboxId)
                       ? "bg-[#a098ff]/10 border-[#a098ff]/30 shadow-[0_0_20px_rgba(160,152,255,0.05)]"
@@ -529,10 +543,14 @@ function GradeChangePage() {
                         />
                       ) : (
                         <div className="w-5 h-5 rounded-lg bg-zinc-800/50 flex items-center justify-center">
-                           <span className="text-[8px] font-black text-zinc-600">#</span>
+                          <span className="text-[8px] font-black text-zinc-600">
+                            #
+                          </span>
                         </div>
                       )}
-                      <span className="text-xs font-black text-zinc-500">{idx + 1}.</span>
+                      <span className="text-xs font-black text-zinc-500">
+                        {idx + 1}.
+                      </span>
                     </div>
                     <span
                       className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
@@ -546,27 +564,43 @@ function GradeChangePage() {
                       {req.status}
                     </span>
                   </div>
-                  
+
                   <div className="space-y-4">
-                    <h4 className="text-white font-black text-[15px] leading-tight tracking-tight">{req.course}</h4>
-                    
+                    <h4 className="text-white font-black text-[15px] leading-tight tracking-tight">
+                      {req.course}
+                    </h4>
+
                     <div className="flex flex-wrap gap-2">
                       <div className="px-3 py-1.5 rounded-xl bg-zinc-800/80 border border-white/5 flex items-center gap-2">
-                        <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">Code</span>
-                        <span className="text-zinc-300 font-bold text-[10px] uppercase">{req.code}</span>
+                        <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">
+                          Code
+                        </span>
+                        <span className="text-zinc-300 font-bold text-[10px] uppercase">
+                          {req.code}
+                        </span>
                       </div>
                       <div className="px-3 py-1.5 rounded-xl bg-zinc-800/80 border border-white/5 flex items-center gap-2">
-                        <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">Credits</span>
-                        <span className="text-zinc-300 font-bold text-[10px] uppercase">{req.credits}</span>
+                        <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">
+                          Credits
+                        </span>
+                        <span className="text-zinc-300 font-bold text-[10px] uppercase">
+                          {req.credits}
+                        </span>
                       </div>
                       <div className="px-3 py-1.5 rounded-xl bg-zinc-800/80 border border-white/5 flex items-center gap-2">
-                        <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">Sec</span>
-                        <span className="text-zinc-300 font-bold text-[10px] uppercase">{req.section}</span>
+                        <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">
+                          Sec
+                        </span>
+                        <span className="text-zinc-300 font-bold text-[10px] uppercase">
+                          {req.section}
+                        </span>
                       </div>
                     </div>
 
                     <div className="pt-2 flex items-center justify-between border-t border-white/[0.03]">
-                      <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Initial Grade</span>
+                      <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">
+                        Initial Grade
+                      </span>
                       <span className="px-4 py-1.5 rounded-xl bg-[#a098ff]/10 text-[#a098ff] font-black text-sm shadow-[0_0_15px_rgba(160,152,255,0.1)]">
                         {req.grade}
                       </span>
@@ -587,7 +621,8 @@ function GradeChangePage() {
                       No records available
                     </p>
                     <p className="text-zinc-600 text-[10px] font-medium px-4">
-                      There are currently no subjects available for grade change in this semester.
+                      There are currently no subjects available for grade change
+                      in this semester.
                     </p>
                   </div>
                 </div>

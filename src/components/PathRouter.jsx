@@ -15,6 +15,7 @@ import StudyPlanPage from "./pages/StudyPlanPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import SessionExpirePage from "./pages/SessionExpirePage";
 import NotFoundPage from "./pages/NotFoundPage";
+import SuperFlexAI from "./SuperFlexAI";
 
 function PathRouter() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
@@ -26,16 +27,36 @@ function PathRouter() {
     };
 
     const checkSession = () => {
-      const txt = (document.body?.innerText + document.title + document.querySelector("h1")?.innerText).toLowerCase();
-      const isError = ["server error", "runtime error", "internal server error", "500"].some(err => txt.includes(err));
+      const txt = (
+        document.body?.innerText +
+        document.title +
+        document.querySelector("h1")?.innerText
+      ).toLowerCase();
+      const isError = [
+        "server error",
+        "runtime error",
+        "internal server error",
+        "500",
+      ].some((err) => txt.includes(err));
 
       setIsSessionExpired(isError);
       if (isError) {
-        Object.assign(document.body.style, { backgroundColor: "black", backgroundImage: "none", fontFamily: "'Google Sans Flex', sans-serif" });
+        Object.assign(document.body.style, {
+          backgroundColor: "black",
+          backgroundImage: "none",
+          fontFamily: "'Google Sans Flex', sans-serif",
+        });
         document.body.removeAttribute("bgcolor");
-        document.body.classList.add("!bg-black", "!overflow-hidden", "!font-sans");
-        Array.from(document.body.children).forEach(c => {
-          if (!["react-chrome-app", "SCRIPT", "LINK"].includes(c.id || c.tagName)) c.style.display = "none";
+        document.body.classList.add(
+          "!bg-black",
+          "!overflow-hidden",
+          "!font-sans",
+        );
+        Array.from(document.body.children).forEach((c) => {
+          if (
+            !["react-chrome-app", "SCRIPT", "LINK"].includes(c.id || c.tagName)
+          )
+            c.style.display = "none";
         });
       }
     };
@@ -112,7 +133,12 @@ function PathRouter() {
     return <NotFoundPage />;
   };
 
-  return renderComponent();
+  return (
+    <>
+      {renderComponent()}
+      <SuperFlexAI />
+    </>
+  );
 }
 
 export default PathRouter;

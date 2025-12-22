@@ -44,6 +44,37 @@ ChartJS.register(
   Filler,
 );
 
+const MarksContentSkeleton = () => (
+  <div className="flex flex-col gap-8 h-full animate-pulse">
+    <div className="flex gap-2">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="h-8 w-20 bg-zinc-800 rounded-full"></div>
+      ))}
+    </div>
+    <div className="space-y-6 mt-4">
+      <div className="space-y-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-14 w-full bg-zinc-800/50 rounded-2xl"></div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+const AttendanceContentSkeleton = () => (
+  <div className="flex-1 space-y-6 animate-pulse pt-4">
+    {[1, 2, 3, 4, 5, 6].map((i) => (
+      <div key={i} className="flex items-center gap-4">
+        <div className="w-32 md:w-48 h-3 bg-zinc-800 rounded-md shrink-0"></div>
+        <div className="flex-1 h-8 bg-zinc-900 rounded-full overflow-hidden border border-white/5 flex">
+          <div className="w-[70%] h-full bg-[#a098ff]/20 rounded-l-full"></div>
+          <div className="flex-1 h-full bg-white/5"></div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
 const CategoryAccordion = ({ category, isOpen, onToggle }) => {
   return (
     <div className=" rounded-xl overflow-hidden bg-zinc-900/50 backdrop-blur-sm mb-4">
@@ -161,8 +192,8 @@ function HomePage() {
   const [links, setLinks] = useState({});
   const [chartPattern, setChartPattern] = useState(null);
 
-  const [loadingMarks, setLoadingMarks] = useState(false);
-  const [loadingAttendance, setLoadingAttendance] = useState(false);
+  const [loadingMarks, setLoadingMarks] = useState(true);
+  const [loadingAttendance, setLoadingAttendance] = useState(true);
 
   useEffect(() => {
     const canvas = document.createElement("canvas");
@@ -197,15 +228,6 @@ function HomePage() {
     const styleElement = document.createElement("style");
     styleElement.textContent = scrollbarStyle;
     document.head.appendChild(styleElement);
-
-    const savedHistory = localStorage.getItem("superflex_marks_history");
-    if (savedHistory) {
-      try {
-        setMarksHistory(JSON.parse(savedHistory));
-      } catch (e) {
-        console.error("History parse fail", e);
-      }
-    }
 
     const targetElement = document.querySelector(
       ".m-grid.m-grid--hor.m-grid--root.m-page",
@@ -301,27 +323,79 @@ function HomePage() {
     };
   }, []);
 
-  const handleLinksFound = (foundLinks) => {
-    const linkMap = {};
-    foundLinks.forEach((l) => {
-      if (l.text.includes("Attendance")) linkMap.attendance = l.href;
-      if (l.text.includes("Marks") && !l.text.includes("PLO"))
-        linkMap.marks = l.href;
-    });
-    setLinks(linkMap);
-  };
+  const handleLinksFound = useMemo(
+    () => (foundLinks) => {
+      const linkMap = {};
+      foundLinks.forEach((l) => {
+        if (l.text.includes("Attendance")) linkMap.attendance = l.href;
+        if (l.text.includes("Marks") && !l.text.includes("PLO"))
+          linkMap.marks = l.href;
+        if (l.text.includes("Transcript")) linkMap.transcript = l.href;
+      });
+      setLinks(linkMap);
+    },
+    [],
+  );
 
   useEffect(() => {
-    if (links.attendance) {
-      setLoadingAttendance(true);
-      fetchAttendance(links.attendance).finally(() =>
-        setLoadingAttendance(false),
-      );
-    }
-    if (links.marks) {
-      setLoadingMarks(true);
-      fetchMarks(links.marks).finally(() => setLoadingMarks(false));
-    }
+    if (window.superflex_is_syncing) return;
+
+    const syncAllData = async () => {
+      const isOnHome = window.location.pathname === "/";
+      if (
+        !isOnHome ||
+        window.superflex_navigating ||
+        window.superflex_is_syncing ||
+        document.visibilityState !== "visible"
+      )
+        return;
+
+      window.superflex_is_syncing = true;
+      const now = Date.now();
+      const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+      try {
+        await delay(2000);
+
+        const stillOnHome = () =>
+          window.location.pathname === "/" && !window.superflex_navigating;
+
+        if (links.attendance && stillOnHome()) {
+          setLoadingAttendance(true);
+          await fetchAttendance(links.attendance).finally(() =>
+            setLoadingAttendance(false),
+          );
+          await delay(2000);
+          if (stillOnHome()) await fetch("/").catch(() => {});
+        } else if (!links.attendance) {
+          setLoadingAttendance(false);
+        }
+
+        if (links.marks && stillOnHome()) {
+          setLoadingMarks(true);
+          await fetchMarks(links.marks).finally(() => setLoadingMarks(false));
+          await delay(2000);
+          if (stillOnHome()) await fetch("/").catch(() => {});
+        } else if (!links.marks) {
+          setLoadingMarks(false);
+        }
+
+        localStorage.setItem("superflex_last_full_sync", now.toString());
+      } catch (e) {
+        console.error("Sync loop error", e);
+      } finally {
+        window.superflex_is_syncing = false;
+      }
+    };
+
+    syncAllData();
+
+    const timeout = setTimeout(() => {
+      setLoadingAttendance((prev) => (prev ? false : prev));
+      setLoadingMarks((prev) => (prev ? false : prev));
+    }, 15000);
+
+    return () => clearTimeout(timeout);
   }, [links]);
 
   const fetchAttendance = async (url) => {
@@ -348,10 +422,20 @@ function HomePage() {
         const rows = table.querySelectorAll("tbody tr");
         let present = 0,
           absent = 0;
+        const logs = [];
+
         rows.forEach((r) => {
-          const marker = r.querySelector("td:nth-child(4)")?.textContent.trim();
-          if (marker?.includes("P")) present++;
-          if (marker?.includes("A")) absent++;
+          const cells = r.querySelectorAll("td");
+          if (cells.length >= 4) {
+            const date = cells[1].textContent.trim();
+            const type = cells[2].textContent.trim();
+            const status = cells[3].textContent.trim();
+
+            logs.push({ date, type, status });
+
+            if (status.includes("P")) present++;
+            if (status.includes("A")) absent++;
+          }
         });
 
         let percentage = 0;
@@ -366,11 +450,14 @@ function HomePage() {
           absent,
           total: rows.length,
           percentage,
+          logs,
         });
       });
       setAttendanceData(summaryData);
     } catch (e) {
       console.error("Attendance fetch error", e);
+    } finally {
+      await fetch("/").catch(() => {});
     }
   };
 
@@ -506,16 +593,60 @@ function HomePage() {
         } else {
           updated = [...prev, newHistoryItem];
         }
-        localStorage.setItem(
-          "superflex_marks_history",
-          JSON.stringify(updated),
-        );
         return updated;
       });
     } catch (e) {
       console.error("Marks fetch error", e);
+    } finally {
+      await fetch("/").catch(() => {});
     }
   };
+
+  useEffect(() => {
+    if (!coursesData.length && !attendanceData?.length) return;
+
+    const context = {
+      marks: coursesData.map((c) => ({
+        course: c.title,
+        totalObtained: c.obtained,
+        totalWeight: c.total,
+        percentage: c.percentage,
+        marks: c.categories.map((cat) => ({
+          type: cat.name,
+          rows: cat.assessments.map((a) => ({
+            item: a.name,
+            obtained: a.obtained,
+            total: a.total,
+            percentage: a.percentage,
+          })),
+        })),
+      })),
+      attendance: attendanceData?.map((a) => ({
+        title: a.title,
+        present: a.present,
+        absent: a.absent,
+        total: a.total,
+        percentage: a.percentage,
+        logs: a.logs,
+      })),
+      universityInfo,
+      personalInfo,
+      studentName: personalInfo?.Name,
+      studentCms: personalInfo?.["Student ID"] || universityInfo?.["CMS ID"],
+      alerts: alerts.map((a) => ({ message: a.message })),
+      lastScanned: new Date().toISOString(),
+    };
+
+    const existing = JSON.parse(
+      localStorage.getItem("superflex_ai_context") || "{}",
+    );
+    localStorage.setItem(
+      "superflex_ai_context",
+      JSON.stringify({ ...existing, ...context }),
+    );
+
+    window.dispatchEvent(new Event("storage"));
+  }, [coursesData, attendanceData, universityInfo, personalInfo]);
 
   const performanceChartData = useMemo(() => {
     if (!marksHistory || marksHistory.length === 0) return null;
@@ -589,7 +720,9 @@ function HomePage() {
                         "Wait, you're here?",
                         "Manifesting 4.0,",
                       ];
-                      return greetings[Math.floor(Math.random() * greetings.length)];
+                      return greetings[
+                        Math.floor(Math.random() * greetings.length)
+                      ];
                     }, [])}{" "}
                     <span className="text-[#a098ff]">
                       {personalInfo?.Name?.split(" ")[0] || "Student"}
@@ -609,15 +742,14 @@ function HomePage() {
                         "Your aggregate is looking real quiet...",
                         "Academic comeback starts... never?",
                       ];
-                      
-                      // Contextual roasts
+
                       if (mostAbsentSubject && mostAbsentSubject.absent > 3) {
-                        return `Bestie, ${mostAbsentSubject.absent} absents in ${mostAbsentSubject.title.split(' ')[0]}? You're cooked.`;
+                        return `Bestie, ${mostAbsentSubject.absent} absents in ${mostAbsentSubject.title.split(" ")[0]}? You're cooked.`;
                       }
                       if (currentAggregate.percentage > 85) {
                         return "Okay nerd, we get it, you're smart.";
                       }
-                      
+
                       return roasts[Math.floor(Math.random() * roasts.length)];
                     }, [mostAbsentSubject, currentAggregate])}
                   </p>
@@ -698,100 +830,97 @@ function HomePage() {
             {}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               {}
-              {loadingMarks ? (
-                <div className="bg-black rounded-3xl p-6 min-h-[300px] flex items-center justify-center">
-                  <LoadingSpinner />
-                </div>
-              ) : coursesData.length > 0 ? (
-                <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden flex flex-col gap-8 h-full">
-                  <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-                    <div className="space-y-1">
-                      <h3 className="text-xl font-bold text-white tracking-tight">
-                        Course Performance
-                      </h3>
-                      <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
-                        Detailed marks and assessments
-                      </p>
-                    </div>
-                    {links.marks && (
-                      <a
-                        href={links.marks}
-                        className="bg-white/5 hover:bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-lg  transition-colors flex items-center gap-1.5"
-                      >
-                        View Details
-                        <ArrowRight size={12} />
-                      </a>
-                    )}
+              <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden flex flex-col gap-8 h-full">
+                <div className="flex flex-col md:flex-row justify-between items-start gap-6">
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-bold text-white tracking-tight">
+                      Course Performance
+                    </h3>
+                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+                      Detailed marks and assessments
+                    </p>
                   </div>
-
-                  {}
-                  <div className="w-full overflow-x-auto scrollbar-hide scrollbar-hide">
-                    <div className="flex gap-2 bg-black/40 p-1.5 rounded-full border border-white/5 backdrop-blur-sm w-fit">
-                      {coursesData.map((course) => (
-                        <button
-                          key={course.id}
-                          onClick={() => setActiveCourse(course.id)}
-                          className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
-                            activeCourse === course.id
-                              ? "bg-[#a098ff] text-white"
-                              : "text-zinc-500 hover:text-white"
-                          }`}
-                        >
-                          {course.id}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {}
-                  {activeCourseData && (
-                    <div key={activeCourse} className="">
-                      <div className="flex flex-col gap-2 mb-4">
-                        <h2 className="text-xl font-bold text-white leading-tight">
-                          {activeCourseData.title}
-                        </h2>
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded-md bg-zinc-900  text-zinc-400 text-xs font-medium">
-                            {activeCourseData.id}
-                          </span>
-                          <span className="text-xs text-zinc-500">
-                            {activeCourseData.categories.reduce(
-                              (acc, cat) => acc + cat.assessments.length,
-                              0,
-                            )}{" "}
-                            Assessments
-                          </span>
-                        </div>
-                      </div>
-
-                      {}
-                      <div className="space-y-3">
-                        {activeCourseData.categories.map((category, idx) => (
-                          <CategoryAccordion
-                            key={idx}
-                            category={category}
-                            isOpen={openCategoryIdx === idx}
-                            onToggle={() =>
-                              setOpenCategoryIdx(
-                                openCategoryIdx === idx ? null : idx,
-                              )
-                            }
-                          />
-                        ))}
-                        {activeCourseData.categories.length === 0 && (
-                          <div className="p-8 text-center text-zinc-500 text-sm  rounded-xl bg-black">
-                            No assessments uploaded yet.
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                  {links.marks && (
+                    <a
+                      href={links.marks}
+                      className="bg-white/5 hover:bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-lg  transition-colors flex items-center gap-1.5"
+                    >
+                      View Details
+                      <ArrowRight size={12} />
+                    </a>
                   )}
                 </div>
-              ) : (
-                <div className="bg-black rounded-3xl  p-6 flex items-center justify-center text-zinc-500 min-h-[300px]">
-                  No marks data available
-                </div>
-              )}
+
+                {loadingMarks ? (
+                  <MarksContentSkeleton />
+                ) : coursesData.length > 0 ? (
+                  <>
+                    <div className="w-full overflow-x-auto scrollbar-hide scrollbar-hide">
+                      <div className="flex gap-2 bg-black/40 p-1.5 rounded-full border border-white/5 backdrop-blur-sm w-fit">
+                        {coursesData.map((course) => (
+                          <button
+                            key={course.id}
+                            onClick={() => setActiveCourse(course.id)}
+                            className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
+                              activeCourse === course.id
+                                ? "bg-[#a098ff] text-white"
+                                : "text-zinc-500 hover:text-white"
+                            }`}
+                          >
+                            {course.id}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {activeCourseData && (
+                      <div key={activeCourse} className="">
+                        <div className="flex flex-col gap-2 mb-4">
+                          <h2 className="text-xl font-bold text-white leading-tight">
+                            {activeCourseData.title}
+                          </h2>
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded-md bg-zinc-900  text-zinc-400 text-xs font-medium">
+                              {activeCourseData.id}
+                            </span>
+                            <span className="text-xs text-zinc-500">
+                              {activeCourseData.categories.reduce(
+                                (acc, cat) => acc + cat.assessments.length,
+                                0,
+                              )}{" "}
+                              Assessments
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3">
+                          {activeCourseData.categories.map((category, idx) => (
+                            <CategoryAccordion
+                              key={idx}
+                              category={category}
+                              isOpen={openCategoryIdx === idx}
+                              onToggle={() =>
+                                setOpenCategoryIdx(
+                                  openCategoryIdx === idx ? null : idx,
+                                )
+                              }
+                            />
+                          ))}
+                          {activeCourseData.categories.length === 0 && (
+                            <div className="p-8 text-center text-zinc-500 text-sm  rounded-xl bg-black">
+                              No assessments uploaded yet.
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="bg-black rounded-3xl p-6 flex items-center justify-center text-zinc-500 min-h-[300px]">
+                    No marks data available
+                  </div>
+                )}
+              </div>
               {}
               <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 h-full flex flex-col">
                 <div className="flex justify-between items-start mb-8">
@@ -814,7 +943,9 @@ function HomePage() {
                   )}
                 </div>
                 <div className="flex-1 w-full overflow-hidden relative min-h-[400px]">
-                  {attendanceData && chartPattern ? (
+                  {loadingAttendance ? (
+                    <AttendanceContentSkeleton />
+                  ) : attendanceData && chartPattern ? (
                     <div
                       style={{
                         height: `${Math.max(400, attendanceData.length * 60)}px`,
@@ -899,8 +1030,6 @@ function HomePage() {
                         }}
                       />
                     </div>
-                  ) : loadingAttendance ? (
-                    <LoadingSpinner />
                   ) : null}
                 </div>
               </div>

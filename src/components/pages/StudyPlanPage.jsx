@@ -127,6 +127,28 @@ function StudyPlanPage() {
     parseData();
   }, []);
 
+  useEffect(() => {
+    if (semesters.length === 0) return;
+
+    try {
+      const existing = JSON.parse(
+        localStorage.getItem("superflex_ai_context") || "{}",
+      );
+      localStorage.setItem(
+        "superflex_ai_context",
+        JSON.stringify({
+          ...existing,
+          studyPlan: semesters,
+          lastScanned: new Date().toISOString(),
+        }),
+      );
+
+      window.dispatchEvent(new Event("storage"));
+    } catch (e) {
+      console.error("AI Sync Error (Study Plan):", e);
+    }
+  }, [semesters]);
+
   const stats = useMemo(() => {
     let totalCredits = 0;
     let totalCourses = 0;

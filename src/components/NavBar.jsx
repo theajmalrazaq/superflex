@@ -83,13 +83,18 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
             try {
               if (element.href && !element.href.includes("javascript:void")) {
                 const url = new URL(element.href);
+                const path =
+                  url.pathname === "/Student/Home" ? "/" : url.pathname;
+                const href =
+                  url.pathname === "/Student/Home" ? "/" : element.href;
                 links.push({
-                  href: element.href,
+                  href: href,
                   icon: element.querySelector("i")?.outerHTML || "",
-                  text:
-                    element.querySelector(".m-menu__link-text")?.innerHTML ||
-                    element.textContent.trim(),
-                  path: url.pathname,
+                  text: (
+                    element.querySelector(".m-menu__link-text")?.textContent ||
+                    element.textContent
+                  ).trim(),
+                  path: path,
                 });
               }
             } catch (e) {
@@ -102,13 +107,18 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           try {
             if (element.href) {
               const url = new URL(element.href);
+              const path =
+                url.pathname === "/Student/Home" ? "/" : url.pathname;
+              const href =
+                url.pathname === "/Student/Home" ? "/" : element.href;
               links.push({
-                href: element.href,
+                href: href,
                 icon: element.querySelector("i")?.outerHTML || "",
-                text:
-                  element.querySelector(".m-menu__link-text")?.innerHTML ||
-                  element.textContent.trim(),
-                path: url.pathname,
+                text: (
+                  element.querySelector(".m-menu__link-text")?.textContent ||
+                  element.textContent
+                ).trim(),
+                path: path,
               });
             }
           } catch (e) {
@@ -124,8 +134,9 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
     if (links.length > 0) {
       setMenuLinks(links);
-      const attendanceLink = links.find(
-        (link) => link.text.trim() === "Attendance",
+      localStorage.setItem("superflex_extracted_links", JSON.stringify(links));
+      const attendanceLink = links.find((link) =>
+        link.text.includes("Attendance"),
       );
 
       if (attendanceLink && onAttendanceLinkFound) {
@@ -216,15 +227,22 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
   const isCategoryActive = (categoryLinks) => {
     return categoryLinks.some(
-      (link) => link.path && currentPage && currentPage.includes(link.path),
+      (link) =>
+        link.path &&
+        currentPage &&
+        (currentPage === link.path ||
+          (link.path !== "/" && currentPage.includes(link.path))),
     );
+  };
+
+  const handleSafeNavigation = (link) => {
+    window.superflex_navigating = true;
+    window.location.href = link.href;
   };
 
   const NavItem = ({ link, isActive }) => (
     <button
-      onClick={() => {
-        window.location.href = link.href;
-      }}
+      onClick={() => handleSafeNavigation(link)}
       className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 text-[13px] font-medium whitespace-nowrap cursor-pointer ${isActive ? "bg-[#a098ff]/10 text-[#a098ff] border  border-white/10" : "text-zinc-400 border-transparent hover:text-white hover:bg-white/5"}`}
     >
       <span className={isActive ? "text-inherit" : "text-current"}>
@@ -236,9 +254,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
   const DropdownItem = ({ link, isActive }) => (
     <div
-      onClick={() => {
-        window.location.href = link.href;
-      }}
+      onClick={() => handleSafeNavigation(link)}
       className={`group flex items-center !bg-zinc-900/50 backdrop-blur-xl gap-4 p-4 rounded-xl transition-all duration-200 no-underline hover:no-underline border cursor-pointer
         ${
           isActive
@@ -270,7 +286,6 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   const [openMobileCategories, setOpenMobileCategories] = useState({});
 
   useEffect(() => {
-    // Pre-expand active category on mobile
     const activeCategory = ["Academics", "Finance", "Services", "More"].find(
       (cat) => groupedLinks[cat] && isCategoryActive(groupedLinks[cat]),
     );
@@ -292,7 +307,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   return (
     <div className="flex items-center justify-between lg:justify-start px-4 lg:px-6 py-2.5 lg:py-3 w-full lg:w-fit relative">
       <div className="flex items-center gap-4">
-        {/* Mobile Menu Toggle */}
+        {}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="lg:hidden p-2 text-zinc-400 hover:text-white transition-colors"
@@ -300,30 +315,35 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
 
-        <div className="flex items-center shrink-0">
+        <div
+          className="flex items-center shrink-0 cursor-pointer"
+          onClick={() => (window.location.href = "/")}
+        >
           <img
-            src={chrome.runtime.getURL("public/logo.svg")}
+            src={chrome.runtime.getURL("logo.svg")}
             alt="Logo"
-            className="h-7 lg:h-8 w-auto"
+            className="h-7 lg:h-8 w-auto hover:opacity-80 transition-opacity"
           />
         </div>
       </div>
 
-      {/* Desktop Navigation */}
+      {}
       <div className="hidden lg:flex justify-center !px-8">
         <nav>
           {menuLinks.length === 0 ? (
             <div className="text-white/50 text-sm">Loading...</div>
           ) : (
             <div className="flex items-center gap-1">
-              {/* Root Links (Home) */}
+              {}
               {groupedLinks.root?.map((link, index) => {
                 const isActive =
-                  currentPage === "/" || currentPage.startsWith("/?dump=");
+                  currentPage === "/" ||
+                  currentPage.startsWith("/?dump=") ||
+                  (link.path && currentPage === link.path);
                 return <NavItem key={index} link={link} isActive={isActive} />;
               })}
 
-              {/* Category Dropdowns */}
+              {}
               {["Academics", "Finance", "Services", "More"].map((category) => {
                 const links = groupedLinks[category];
                 if (!links || links.length === 0) return null;
@@ -388,21 +408,21 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         </nav>
       </div>
 
-      {/* Mobile Navigation Menu */}
+      {}
       {isMobileMenuOpen && (
         <div className="lg:hidden fixed inset-x-4 top-20 bg-black/95 backdrop-blur-3xl border border-white/10 rounded-3xl p-4 z-[999] animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[calc(100vh-120px)] scrollbar-hide">
           <div className="flex flex-col gap-6">
-            {/* Root Links */}
+            {}
             <div className="flex flex-col gap-1">
               {groupedLinks.root?.map((link, index) => {
                 const isActive =
-                  currentPage === "/" || currentPage.startsWith("/?dump=");
+                  currentPage === "/" ||
+                  currentPage.startsWith("/?dump=") ||
+                  (link.path && currentPage === link.path);
                 return (
                   <button
                     key={index}
-                    onClick={() => {
-                      window.location.href = link.href;
-                    }}
+                    onClick={() => handleSafeNavigation(link)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive ? "bg-[#a098ff]/10 text-[#a098ff]" : "text-zinc-400"}`}
                   >
                     {React.cloneElement(getIcon(link), { size: 20 })}
@@ -412,7 +432,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
               })}
             </div>
 
-            {/* Category Groups */}
+            {}
             {["Academics", "Finance", "Services", "More"].map((category) => {
               const links = groupedLinks[category];
               if (!links || links.length === 0) return null;
@@ -456,9 +476,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         return (
                           <button
                             key={idx}
-                            onClick={() => {
-                              window.location.href = link.href;
-                            }}
+                            onClick={() => handleSafeNavigation(link)}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive ? "bg-[#a098ff]/10 text-[#a098ff]" : "text-zinc-300 hover:bg-white/5"}`}
                           >
                             <div
@@ -529,6 +547,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                   className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all text-left text-zinc-300 hover:text-white no-underline"
                 >
                   <Lock size={18} />
+
                   <span className="text-sm font-medium">Change Password</span>
                 </a>
                 <div className="h-px bg-white/10 my-1"></div>

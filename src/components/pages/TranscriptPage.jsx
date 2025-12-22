@@ -312,6 +312,41 @@ function TranscriptPage() {
     setTimeout(parse, 300);
   }, []);
 
+  useEffect(() => {
+    if (semesters.length === 0) return;
+
+    try {
+      const transContext = semesters.map((sem) => ({
+        title: sem.title,
+        summary: sem.summary,
+        courses: sem.courses.map((c) => ({
+          code: c.code,
+          name: c.description,
+          type: c.type,
+          crHrs: c.crHrs,
+          grade: c.grade,
+          points: c.points,
+        })),
+      }));
+
+      const existing = JSON.parse(
+        localStorage.getItem("superflex_ai_context") || "{}",
+      );
+      localStorage.setItem(
+        "superflex_ai_context",
+        JSON.stringify({
+          ...existing,
+          transcript: transContext,
+          lastScanned: new Date().toISOString(),
+        }),
+      );
+
+      window.dispatchEvent(new Event("storage"));
+    } catch (e) {
+      console.error("AI Sync Error (Transcript):", e);
+    }
+  }, [semesters]);
+
   const activeSemData = semesters[activeSemIdx];
 
   const { calculatedStats, originalCGPA } = useMemo(() => {

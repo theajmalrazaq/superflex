@@ -5,11 +5,16 @@ import PathRouter from "./components/PathRouter";
 import "./styles/tailwind.css";
 
 (() => {
-  const script = document.createElement("script");
-  script.src = chrome.runtime.getURL("umami.js");
-  script.defer = true;
-  script.dataset.websiteId = "17490ccf-0b15-4d8a-a908-5e774ad648de";
-  document.head.appendChild(script);
+  const scriptUmami = document.createElement("script");
+  scriptUmami.src = chrome.runtime.getURL("umami.js");
+  scriptUmami.defer = true;
+  scriptUmami.dataset.websiteId = "17490ccf-0b15-4d8a-a908-5e774ad648de";
+  document.head.appendChild(scriptUmami);
+
+  const scriptPuter = document.createElement("script");
+  scriptPuter.src = chrome.runtime.getURL("puter.js");
+  scriptPuter.defer = true;
+  document.head.appendChild(scriptPuter);
 })();
 
 const fontLinks = [
@@ -56,7 +61,7 @@ if (!favicon) {
   document.head.appendChild(favicon);
 }
 
-favicon.href = `${chrome.runtime.getURL("public/favicon.svg")}`;
+favicon.href = `${chrome.runtime.getURL("favicon.svg")}`;
 if (document.querySelector(".m-grid__item.m-footer")) {
   document.querySelector(".m-grid__item.m-footer").remove();
 }
@@ -80,7 +85,7 @@ document.documentElement.classList.add("dark");
 document.body.style.backgroundColor = "black";
 
 document.body.style.backgroundImage = `url("${chrome.runtime.getURL(
-  "public/overlay.png",
+  "overlay.png",
 )}")`;
 document.body.style.backgroundRepeat = "no-repeat";
 

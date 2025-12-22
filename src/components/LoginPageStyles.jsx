@@ -493,8 +493,8 @@ function LoginPageStyles() {
     heroDiv.className =
       "flex flex-col pt-7 justify-center items-center text-center w-full px-4 sm:px-6 mb-6 relative z-10";
 
-    const bgUrl = chrome.runtime.getURL("public/bg.png");
-    const logoUrl = chrome.runtime.getURL("public/logo.svg");
+    const bgUrl = chrome.runtime.getURL("bg.png");
+    const logoUrl = chrome.runtime.getURL("logo.svg");
 
     const styleId = "feature-marquee-styles";
     let styleElement = document.getElementById(styleId);
@@ -625,7 +625,7 @@ function LoginPageStyles() {
         .join("");
     };
 
-    const reviewsUrl = chrome.runtime.getURL("public/reviews.json");
+    const reviewsUrl = chrome.runtime.getURL("reviews.json");
 
     fetch(reviewsUrl)
       .then((res) => {
