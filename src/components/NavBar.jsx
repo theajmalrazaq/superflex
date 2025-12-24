@@ -21,6 +21,11 @@ import {
 } from "lucide-react";
 
 function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
+  const [syncedData, setSyncedData] = useState({
+    attendance: null,
+    marks: null,
+    studyPlan: null,
+  });
   const [menuLinks, setMenuLinks] = useState([]);
   const iconMapping = {
     Home: <Home />,
@@ -83,18 +88,13 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
             try {
               if (element.href && !element.href.includes("javascript:void")) {
                 const url = new URL(element.href);
-                const path =
-                  url.pathname === "/Student/Home" ? "/" : url.pathname;
-                const href =
-                  url.pathname === "/Student/Home" ? "/" : element.href;
                 links.push({
-                  href: href,
+                  href: element.href,
                   icon: element.querySelector("i")?.outerHTML || "",
-                  text: (
-                    element.querySelector(".m-menu__link-text")?.textContent ||
-                    element.textContent
-                  ).trim(),
-                  path: path,
+                  text:
+                    element.querySelector(".m-menu__link-text")?.innerHTML ||
+                    element.textContent.trim(),
+                  path: url.pathname,
                 });
               }
             } catch (e) {
@@ -107,18 +107,13 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           try {
             if (element.href) {
               const url = new URL(element.href);
-              const path =
-                url.pathname === "/Student/Home" ? "/" : url.pathname;
-              const href =
-                url.pathname === "/Student/Home" ? "/" : element.href;
               links.push({
-                href: href,
+                href: element.href,
                 icon: element.querySelector("i")?.outerHTML || "",
-                text: (
-                  element.querySelector(".m-menu__link-text")?.textContent ||
-                  element.textContent
-                ).trim(),
-                path: path,
+                text:
+                  element.querySelector(".m-menu__link-text")?.innerHTML ||
+                  element.textContent.trim(),
+                path: url.pathname,
               });
             }
           } catch (e) {
@@ -127,16 +122,19 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         });
       }
 
-      return links.filter((link) => link.text.trim() !== "Grade Report");
+      return links.filter(
+        (link) =>
+          link.text.trim() !== "Grade Report" &&
+          link.text.trim() !== "Transcript",
+      );
     };
 
     const links = extractMenuLinks();
 
     if (links.length > 0) {
       setMenuLinks(links);
-      localStorage.setItem("superflex_extracted_links", JSON.stringify(links));
-      const attendanceLink = links.find((link) =>
-        link.text.includes("Attendance"),
+      const attendanceLink = links.find(
+        (link) => link.text.trim() === "Attendance",
       );
 
       if (attendanceLink && onAttendanceLinkFound) {
@@ -225,24 +223,284 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     setGroupedLinks(newGroupedLinks);
   }, [menuLinks]);
 
+  useEffect(() => {
+    const fetchAndSyncData = async () => {
+      const links = {};
+      menuLinks.forEach((l) => {
+        const text = l.text.trim();
+        if (text.includes("Attendance")) links.attendance = l.href;
+        if (text.includes("Marks") && !text.includes("PLO"))
+          links.marks = l.href;
+        if (text.includes("Tentative Study Plan")) links.studyPlan = l.href;
+      });
+
+      if (!links.attendance && !links.marks && !links.studyPlan) return;
+
+      const newData = { ...syncedData };
+      let hasUpdates = false;
+
+      if (links.attendance && !newData.attendance) {
+        try {
+          const res = await fetch(links.attendance);
+          const html = await res.text();
+          const doc = new DOMParser().parseFromString(html, "text/html");
+
+          const summaryData = [];
+          const tables = doc.querySelectorAll(
+            ".table.table-bordered.table-responsive",
+          );
+
+          tables.forEach((table) => {
+            const tabPane = table.closest(".tab-pane");
+            let title =
+              tabPane?.querySelector("h5")?.textContent.trim() || "Course";
+            const titleParts = title.split("-");
+            if (titleParts.length > 1) {
+              title = titleParts
+                .slice(1)
+                .join("-")
+                .trim()
+                .replace(/\(.*\)/, "")
+                .trim();
+            }
+            const rows = table.querySelectorAll("tbody tr");
+            let present = 0,
+              absent = 0;
+            const logs = [];
+
+            rows.forEach((r) => {
+              const cells = r.querySelectorAll("td");
+              if (cells.length >= 4) {
+                const date = cells[1].textContent.trim();
+                const type = cells[2].textContent.trim();
+                const status = cells[3].textContent.trim();
+                if (status.includes("P")) present++;
+                if (status.includes("A")) absent++;
+                logs.push({ date, type, status });
+              }
+            });
+
+            let percentage = 0;
+            const progress = tabPane?.querySelector(".progress-bar");
+            if (progress)
+              percentage = parseFloat(
+                progress.getAttribute("aria-valuenow") || 0,
+              );
+
+            summaryData.push({
+              title,
+              present,
+              absent,
+              total: rows.length,
+              percentage,
+              logs,
+            });
+          });
+
+          newData.attendance = summaryData;
+          hasUpdates = true;
+        } catch (e) {
+          console.error("NavBar: Attendance sync failed", e);
+        }
+      }
+
+      if (links.marks && !newData.marks) {
+        try {
+          const res = await fetch(links.marks);
+          const html = await res.text();
+          const doc = new DOMParser().parseFromString(html, "text/html");
+          const parsedCourses = [];
+
+          let semesterTotalObtained = 0;
+          let semesterTotalWeight = 0;
+
+          const tabPanes = doc.querySelectorAll(".tab-pane");
+          tabPanes.forEach((pane) => {
+            const courseId = pane.id;
+            let courseTitle =
+              pane.querySelector("h5")?.textContent.trim() || courseId;
+            const titleParts = courseTitle.split("-");
+            if (titleParts.length > 1) {
+              courseTitle = titleParts
+                .slice(1)
+                .join("-")
+                .trim()
+                .replace(/\(.*\)/, "")
+                .trim();
+            }
+
+            let courseTotalObtained = 0;
+            let courseTotalWeight = 0;
+            const categories = [];
+
+            const cards = pane.querySelectorAll(".card");
+            cards.forEach((card) => {
+              const header = card
+                .querySelector(".card-header button")
+                ?.textContent.trim();
+              if (!header || header.includes("Grand Total")) return;
+
+              const categoryAssessments = [];
+              const rows = card.querySelectorAll("tbody tr");
+              rows.forEach((tr) => {
+                if (tr.classList.contains("totalColumn_1471")) return;
+                const tds = tr.querySelectorAll("td");
+                if (tds.length < 4) return;
+
+                const name = tds[0]?.textContent.trim();
+                const obtainedStr = tds[2]?.textContent.trim();
+                const totalStr = tds[3]?.textContent.trim();
+
+                if (name === "Total" || name === "Grand Total") return;
+
+                if (obtainedStr && obtainedStr !== "-" && obtainedStr !== "") {
+                  const obtained = parseFloat(obtainedStr);
+                  const total = parseFloat(totalStr);
+                  if (!isNaN(obtained)) {
+                    categoryAssessments.push({
+                      name,
+                      obtained,
+                      total: isNaN(total) ? 0 : total,
+                      percentage:
+                        total > 0 && !isNaN(total)
+                          ? (obtained / total) * 100
+                          : 0,
+                    });
+                  }
+                }
+              });
+              if (categoryAssessments.length > 0) {
+                categories.push({
+                  name: header,
+                  assessments: categoryAssessments,
+                });
+              }
+            });
+
+            const calcRows = pane.querySelectorAll(
+              ".sum_table .calculationrow",
+            );
+            calcRows.forEach((row) => {
+              const w = parseFloat(
+                row.querySelector(".weightage")?.textContent || "0",
+              );
+              const o = parseFloat(
+                row.querySelector(".ObtMarks")?.textContent || "0",
+              );
+              if (!isNaN(w) && !isNaN(o)) {
+                courseTotalObtained += o;
+                courseTotalWeight += w;
+              }
+            });
+
+            semesterTotalObtained += courseTotalObtained;
+            semesterTotalWeight += courseTotalWeight;
+
+            parsedCourses.push({
+              id: courseId,
+              title: courseTitle,
+              categories,
+              obtained: courseTotalObtained,
+              total: courseTotalWeight,
+              percentage:
+                courseTotalWeight > 0
+                  ? (courseTotalObtained / courseTotalWeight) * 100
+                  : 0,
+            });
+          });
+
+          newData.marks = parsedCourses;
+
+          const currentPerc =
+            semesterTotalWeight > 0
+              ? (semesterTotalObtained / semesterTotalWeight) * 100
+              : 0;
+
+          hasUpdates = true;
+        } catch (e) {
+          console.error("NavBar: Marks sync failed", e);
+        }
+      }
+
+      if (links.studyPlan && !newData.studyPlan) {
+        try {
+          const res = await fetch(links.studyPlan);
+          const html = await res.text();
+          const doc = new DOMParser().parseFromString(html, "text/html");
+
+          const parsedSemesters = [];
+          const semesterCols = doc.querySelectorAll(".col-md-6");
+
+          semesterCols.forEach((col) => {
+            const h4 = col.querySelector("h4");
+            if (!h4) return;
+            const title = h4.textContent
+              .replace(h4.querySelector("small")?.textContent || "", "")
+              .trim();
+            const crHrs = parseInt(
+              (h4.querySelector("small")?.textContent || "").match(
+                /\d+/,
+              )?.[0] || "0",
+            );
+            const courses = [];
+
+            const table = col.querySelector("table");
+            if (table) {
+              table.querySelectorAll("tbody tr").forEach((tr) => {
+                const cells = tr.querySelectorAll("td");
+                if (cells.length >= 4) {
+                  courses.push({
+                    code: cells[0].textContent.trim(),
+                    title: cells[1].textContent.trim(),
+                    crHrs: parseInt(cells[2].textContent.trim()),
+                    type: cells[3].textContent.trim(),
+                  });
+                }
+              });
+            }
+            parsedSemesters.push({ title, crHrs, courses });
+          });
+
+          if (parsedSemesters.length > 0) {
+            newData.studyPlan = parsedSemesters;
+            hasUpdates = true;
+          }
+        } catch (e) {
+          console.error("NavBar: StudyPlan sync failed", e);
+        }
+      }
+
+      if (hasUpdates) {
+        setSyncedData(newData);
+
+        const existingContext = window.superflex_ai_context || {};
+        const newContext = {
+          ...existingContext,
+          ...newData,
+          lastScanned: new Date().toISOString(),
+        };
+
+        window.superflex_ai_context = newContext;
+        window.dispatchEvent(
+          new CustomEvent("superflex-data-updated", { detail: newContext }),
+        );
+      }
+    };
+
+    fetchAndSyncData();
+  }, [menuLinks]);
+
   const isCategoryActive = (categoryLinks) => {
     return categoryLinks.some(
-      (link) =>
-        link.path &&
-        currentPage &&
-        (currentPage === link.path ||
-          (link.path !== "/" && currentPage.includes(link.path))),
+      (link) => link.path && currentPage && currentPage.includes(link.path),
     );
-  };
-
-  const handleSafeNavigation = (link) => {
-    window.superflex_navigating = true;
-    window.location.href = link.href;
   };
 
   const NavItem = ({ link, isActive }) => (
     <button
-      onClick={() => handleSafeNavigation(link)}
+      onClick={() => {
+        window.location.href = link.href;
+      }}
       className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 text-[13px] font-medium whitespace-nowrap cursor-pointer ${isActive ? "bg-[#a098ff]/10 text-[#a098ff] border  border-white/10" : "text-zinc-400 border-transparent hover:text-white hover:bg-white/5"}`}
     >
       <span className={isActive ? "text-inherit" : "text-current"}>
@@ -254,7 +512,9 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
   const DropdownItem = ({ link, isActive }) => (
     <div
-      onClick={() => handleSafeNavigation(link)}
+      onClick={() => {
+        window.location.href = link.href;
+      }}
       className={`group flex items-center !bg-zinc-900/50 backdrop-blur-xl gap-4 p-4 rounded-xl transition-all duration-200 no-underline hover:no-underline border cursor-pointer
         ${
           isActive
@@ -315,14 +575,11 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
 
-        <div
-          className="flex items-center shrink-0 cursor-pointer"
-          onClick={() => (window.location.href = "/")}
-        >
+        <div className="flex items-center shrink-0">
           <img
             src={chrome.runtime.getURL("logo.svg")}
             alt="Logo"
-            className="h-7 lg:h-8 w-auto hover:opacity-80 transition-opacity"
+            className="h-7 lg:h-8 w-auto"
           />
         </div>
       </div>
@@ -337,9 +594,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
               {}
               {groupedLinks.root?.map((link, index) => {
                 const isActive =
-                  currentPage === "/" ||
-                  currentPage.startsWith("/?dump=") ||
-                  (link.path && currentPage === link.path);
+                  currentPage === "/" || currentPage.startsWith("/?dump=");
                 return <NavItem key={index} link={link} isActive={isActive} />;
               })}
 
@@ -416,13 +671,13 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
             <div className="flex flex-col gap-1">
               {groupedLinks.root?.map((link, index) => {
                 const isActive =
-                  currentPage === "/" ||
-                  currentPage.startsWith("/?dump=") ||
-                  (link.path && currentPage === link.path);
+                  currentPage === "/" || currentPage.startsWith("/?dump=");
                 return (
                   <button
                     key={index}
-                    onClick={() => handleSafeNavigation(link)}
+                    onClick={() => {
+                      window.location.href = link.href;
+                    }}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive ? "bg-[#a098ff]/10 text-[#a098ff]" : "text-zinc-400"}`}
                   >
                     {React.cloneElement(getIcon(link), { size: 20 })}
@@ -476,7 +731,9 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         return (
                           <button
                             key={idx}
-                            onClick={() => handleSafeNavigation(link)}
+                            onClick={() => {
+                              window.location.href = link.href;
+                            }}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive ? "bg-[#a098ff]/10 text-[#a098ff]" : "text-zinc-300 hover:bg-white/5"}`}
                           >
                             <div
@@ -547,7 +804,6 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                   className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all text-left text-zinc-300 hover:text-white no-underline"
                 >
                   <Lock size={18} />
-
                   <span className="text-sm font-medium">Change Password</span>
                 </a>
                 <div className="h-px bg-white/10 my-1"></div>

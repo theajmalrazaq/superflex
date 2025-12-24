@@ -15,6 +15,11 @@ import "./styles/tailwind.css";
   scriptPuter.src = chrome.runtime.getURL("puter.js");
   scriptPuter.defer = true;
   document.head.appendChild(scriptPuter);
+
+  const scriptBridge = document.createElement("script");
+  scriptBridge.src = chrome.runtime.getURL("bridge.js");
+  scriptBridge.defer = true;
+  document.head.appendChild(scriptBridge);
 })();
 
 const fontLinks = [
@@ -71,6 +76,13 @@ const unwantedCss = document.querySelector(
 );
 if (unwantedCss) {
   unwantedCss.remove();
+}
+
+const unwantedVendorsCss = document.querySelector(
+  'link[href="/Assets/vendors/base/vendors.bundle.css"]',
+);
+if (unwantedVendorsCss) {
+  unwantedVendorsCss.remove();
 }
 
 document.body.style.fontFamily = "'Google Sans Flex', sans-serif";

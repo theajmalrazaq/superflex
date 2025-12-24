@@ -329,19 +329,19 @@ function TranscriptPage() {
         })),
       }));
 
-      const existing = JSON.parse(
-        localStorage.getItem("superflex_ai_context") || "{}",
-      );
-      localStorage.setItem(
-        "superflex_ai_context",
-        JSON.stringify({
-          ...existing,
-          transcript: transContext,
-          lastScanned: new Date().toISOString(),
-        }),
-      );
+      const existingContext = window.superflex_ai_context || {};
 
-      window.dispatchEvent(new Event("storage"));
+      const newContext = {
+        ...existingContext,
+        transcript: transContext,
+        lastScanned: new Date().toISOString(),
+      };
+
+      window.superflex_ai_context = newContext;
+
+      window.dispatchEvent(
+        new CustomEvent("superflex-data-updated", { detail: newContext }),
+      );
     } catch (e) {
       console.error("AI Sync Error (Transcript):", e);
     }

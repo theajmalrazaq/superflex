@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Send, X, User, Trash2 } from "lucide-react";
+import { Send, X, User, Trash2, Shield } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -30,14 +30,10 @@ const AnimatedLogo = ({ size = 24, animated = true, className = "" }) => (
         fill="none"
         className="absolute inset-0 pointer-events-none"
       >
-        <style>{`@keyframes splash{0%{transform:scale(.2);opacity:.8}80%{transform:scale(1.2);opacity:0}to{transform:scale(2.2);opacity:0}}`}</style>
         <path
           fill="#a098ff"
+          className="animate-splash"
           d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
-          style={{
-            animation: "splash 1.5s cubic-bezier(.165,.84,.44,1) infinite both",
-            transformOrigin: "center center",
-          }}
         />
       </svg>
     )}
@@ -62,40 +58,56 @@ const SuperFlexAI = () => {
     lastScanned: null,
   });
 
+  const [permissionStatus, setPermissionStatus] = useState(
+    () => localStorage.getItem("superflex_ai_data_permission") || "pending",
+  );
   const scrollRef = useRef(null);
 
   useEffect(() => {
-    const loadContext = () => {
-      const savedContext = localStorage.getItem("superflex_ai_context");
-      if (savedContext) {
-        try {
-          const parsed = JSON.parse(savedContext);
-          setDataContext((prev) => ({ ...prev, ...parsed }));
-        } catch (e) {}
-      }
+    if (window.superflex_ai_context) {
+      setDataContext(window.superflex_ai_context);
+    }
+
+    const handleDataUpdate = (e) => {
+      const newData = e.detail;
+      setDataContext((prev) => {
+        const updated = { ...prev, ...newData };
+        window.superflex_ai_context = updated;
+        return updated;
+      });
     };
 
-    loadContext();
-    window.addEventListener("storage", loadContext);
+    window.addEventListener("superflex-data-updated", handleDataUpdate);
 
-    if (messages.length === 0) {
-      setMessages([
-        {
-          role: "assistant",
-          content:
-            "Hi! I'm your SuperFlex AI assistant. I have access to your marks, attendance, academic history, and degree roadmap. How can I help you today?",
-        },
-      ]);
+    const savedMessages = localStorage.getItem("superflex_ai_messages");
+    if (savedMessages) {
+      try {
+        setMessages(JSON.parse(savedMessages));
+      } catch (e) {
+        console.error("Failed to parse chat history", e);
+      }
+    } else {
+      if (messages.length === 0 && permissionStatus !== "pending") {
+        setMessages([
+          {
+            role: "assistant",
+            content:
+              "Hi! I'm your SuperFlex AI assistant. I have fresh access to your marks, attendance, academic history, and degree roadmap. How can I help you today?",
+          },
+        ]);
+      }
     }
 
     return () => {
-      window.removeEventListener("storage", loadContext);
+      window.removeEventListener("superflex-data-updated", handleDataUpdate);
     };
-  }, []);
+  }, [permissionStatus]);
 
   useEffect(() => {
-    localStorage.setItem("superflex_ai_context", JSON.stringify(dataContext));
-  }, [dataContext]);
+    if (messages.length > 0) {
+      localStorage.setItem("superflex_ai_messages", JSON.stringify(messages));
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -111,29 +123,56 @@ const SuperFlexAI = () => {
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setIsLoading(true);
 
-    try {
-      if (typeof window.puter === "undefined") {
-        throw new Error(
-          "Puter.js library not found. Please refresh or check your connection.",
-        );
-      }
+    const requestId = crypto.randomUUID();
+    let responseText = "";
 
-      const isSignedIn = await window.puter.auth.isSignedIn();
-      if (!isSignedIn) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content:
-              "It looks like you're not signed in to Puter. I need a secure connection to process your academic data. Please sign in to Puter when the popup appears to continue our chat!",
-          },
-        ]);
+    setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+
+    const responseHandler = (e) => {
+      const { id, text, error, done } = e.detail;
+      if (id !== requestId) return;
+
+      if (error) {
+        document.removeEventListener("superflex-ai-response", responseHandler);
         setIsLoading(false);
 
-        await window.puter.auth.signIn();
+        let errorMsg = "Sorry, I encountered an error.";
+        if (error === "auth_required" || error === "auth_canceled") {
+          errorMsg =
+            "Please sign in to Puter to continue. A popup should appear.";
+
+          if (error === "auth_required") {
+            document.dispatchEvent(new CustomEvent("superflex-auth-trigger"));
+          }
+        } else {
+          errorMsg = `Error: ${error}`;
+        }
+
+        setMessages((prev) => {
+          const others = prev.slice(0, -1);
+          return [...others, { role: "assistant", content: errorMsg }];
+        });
         return;
       }
 
+      if (text) {
+        responseText += text;
+        setMessages((prev) => {
+          const last = prev[prev.length - 1];
+          const others = prev.slice(0, -1);
+          return [...others, { ...last, content: responseText }];
+        });
+      }
+
+      if (done) {
+        document.removeEventListener("superflex-ai-response", responseHandler);
+        setIsLoading(false);
+      }
+    };
+
+    document.addEventListener("superflex-ai-response", responseHandler);
+
+    try {
       const chatHistory = messages
         .map((m) => `${m.role.toUpperCase()}: ${m.content}`)
         .join("\n");
@@ -146,8 +185,14 @@ const SuperFlexAI = () => {
           section: dataContext.universityInfo?.Section,
         },
         currentPerformance: {
-          marks: dataContext.marks || "Not scanned yet (Visit Home)",
-          attendance: dataContext.attendance || "Not scanned yet (Visit Home)",
+          marks:
+            dataContext.marks && dataContext.marks.length > 0
+              ? dataContext.marks
+              : "Not scanned yet (Visit Home)",
+          attendance:
+            dataContext.attendance && dataContext.attendance.length > 0
+              ? dataContext.attendance
+              : "Not scanned yet (Visit Home)",
         },
         academicHistory: {
           transcript:
@@ -157,6 +202,18 @@ const SuperFlexAI = () => {
         },
         systemAlerts: dataContext.alerts || [],
       };
+
+      if (permissionStatus !== "granted") {
+        academicData.student = { name: "Student", cmsId: "N/A" };
+        academicData.currentPerformance = {
+          marks: "Permission denied",
+          attendance: "Permission denied",
+        };
+        academicData.academicHistory = {
+          transcript: "Permission denied",
+          studyPlan: "Permission denied",
+        };
+      }
 
       const prompt = `
         You are "SuperFlex AI", the intelligent academic advisor for SuperFlex (a premium student portal).
@@ -193,58 +250,52 @@ const SuperFlexAI = () => {
         3. Use "ACADEMIC TRANSCRIPT" for CGPA/SGPA and history questions.
         4. Use "DEGREE ROADMAP" for graduation, core courses, and remaining credits.
         5. If marks or attendance are missing, ask them to visit Home.
-        6. If transcript data is missing, explicitly tell them: "I need you to hop onto the Transcript page for a sec so I can sync your academic history without getting us logged out. It's for the bestie vibes and session stability."
+        6. If transcript data is missing, explicitly tell them: "Could you please visit the Transcript page for a moment? I need to sync your academic history from there to ensure accurate data without risking a session timeout."
         7. If study plan is missing, ask them to visit the Tentative Study Plan page.
-        8. Be concise, friendly, and Gen-Z savvy (e.g., using "bestie", "cooked", "locked in", "clutch", "fr fr").
+        8. Be concise, friendly, and casually professional. Speak naturally but avoid excessive slang or overly formal language.
         9. Format performance data in clean Markdown tables when answering.
       `;
 
-      const response = await window.puter.ai.chat(prompt, {
-        model: "gemini-2.0-flash",
-        stream: true,
-      });
-
-      let fullResponse = "";
-      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
-
-      for await (const part of response) {
-        if (part?.text) {
-          fullResponse += part.text;
-          setMessages((prev) => {
-            const last = prev[prev.length - 1];
-            const others = prev.slice(0, -1);
-            return [...others, { ...last, content: fullResponse }];
-          });
-        }
-      }
+      document.dispatchEvent(
+        new CustomEvent("superflex-ai-query", {
+          detail: {
+            id: requestId,
+            prompt: prompt,
+          },
+        }),
+      );
     } catch (e) {
-      console.error("AI Error:", e);
-      let errorMsg =
-        "Sorry, I encountered an error while connecting to Gemini.";
-
-      if (e.code === "auth_canceled") {
-        errorMsg =
-          "Authentication was canceled. I need you to sign in to Puter so I can safely process your request. Want to try again?";
-      } else if (e.message?.includes("401")) {
-        errorMsg =
-          "Session expired or unauthorized. Please sign in to Puter to continue.";
-      } else {
-        errorMsg += " " + (e.message || "Unknown error");
-      }
-
+      document.removeEventListener("superflex-ai-response", responseHandler);
+      console.error("AI Setup Error:", e);
       setMessages((prev) => [
-        ...prev,
+        ...prev.slice(0, -1),
         {
           role: "assistant",
-          content: errorMsg,
+          content:
+            "Sorry, I encountered an internal error setting up the request.",
         },
       ]);
-    } finally {
       setIsLoading(false);
     }
   };
 
+  const handlePermission = (status) => {
+    setPermissionStatus(status);
+    localStorage.setItem("superflex_ai_data_permission", status);
+
+    const welcomeMsg =
+      status === "granted"
+        ? "Thanks! I've connected to your academic data. How can I help you?"
+        : "Understood. I will not access your academic data. I can still help you with general questions.";
+
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: welcomeMsg },
+    ]);
+  };
+
   const clearChat = () => {
+    localStorage.removeItem("superflex_ai_messages");
     setMessages([
       {
         role: "assistant",
@@ -257,12 +308,14 @@ const SuperFlexAI = () => {
     <>
       <div className="fixed bottom-6 right-6 z-[9999]">
         <style>{`
-          @keyframes gradient-spin {
+          @keyframes superflex-gradient-spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
           }
            .markdown-body table {
+            display: block;
             width: 100%;
+            overflow-x: auto;
             border-collapse: collapse;
             margin: 10px 0;
             font-size: 12px;
@@ -271,6 +324,7 @@ const SuperFlexAI = () => {
             border: 1px solid rgba(255,255,255,0.1);
             padding: 8px;
             text-align: left;
+            white-space: nowrap;
           }
           .markdown-body th {
             background: rgba(160,152,255,0.1);
@@ -284,7 +338,7 @@ const SuperFlexAI = () => {
             style={{
               background:
                 "conic-gradient(from 0deg, transparent 0%, #a098ff 30%, #ec4899 50%, #a098ff 70%, transparent 100%)",
-              animation: "gradient-spin 3s linear infinite",
+              animation: "superflex-gradient-spin 3s linear infinite",
             }}
           ></div>
         )}
@@ -292,7 +346,7 @@ const SuperFlexAI = () => {
         {!isOpen && (
           <div className="absolute -inset-[1px] rounded-full z-0 overflow-hidden">
             <div
-              className="absolute inset-[-100%] animate-[gradient-spin_3s_linear_infinite]"
+              className="absolute inset-[-100%] animate-[superflex-gradient-spin_3s_linear_infinite]"
               style={{
                 background:
                   "conic-gradient(from 0deg, transparent 0%, #a098ff 30%, #ec4899 50%, #a098ff 70%, transparent 100%)",
@@ -317,7 +371,7 @@ const SuperFlexAI = () => {
       </div>
 
       {isOpen && (
-        <div className="fixed bottom-24 right-6 w-[95vw] md:w-[420px] h-[650px] max-h-[80vh] bg-[#0c0c0c]/80 backdrop-blur-2xl border border-white/10 rounded-[2rem] flex flex-col z-[9999] overflow-hidden animate-in slide-in-from-bottom-8 zoom-in-95 duration-500 ease-out">
+        <div className="fixed bottom-20 left-4 right-4 md:left-auto md:right-6 md:bottom-24 md:w-[420px] h-[65vh] md:h-[650px] md:max-h-[80vh] bg-[#0c0c0c]/90 backdrop-blur-2xl border border-white/10 rounded-3xl md:rounded-[2rem] flex flex-col z-[9999] overflow-hidden animate-in slide-in-from-bottom-8 zoom-in-95 duration-500 ease-out shadow-2xl shadow-black/50">
           <div className="p-6 border-b border-white/5 bg-white/5 flex items-center justify-between relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#a098ff] to-transparent opacity-50"></div>
             <div className="flex items-center gap-3">
@@ -351,7 +405,7 @@ const SuperFlexAI = () => {
                 className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
               >
                 <div
-                  className={`max-w-[85%] px-4 py-3 rounded-2xl text-sm relative ${
+                  className={`max-w-fit px-4 py-3 rounded-2xl text-sm relative ${
                     m.role === "user"
                       ? "bg-[#a098ff] text-white rounded-tr-none"
                       : "bg-zinc-900/50 backdrop-blur-md text-zinc-200 border border-white/10 rounded-tl-none"
@@ -379,9 +433,22 @@ const SuperFlexAI = () => {
                   </div>
                   <div className="leading-relaxed prose prose-invert prose-sm font-medium text-white markdown-body">
                     {m.role === "assistant" ? (
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {m.content}
-                      </ReactMarkdown>
+                      m.content ? (
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {m.content}
+                        </ReactMarkdown>
+                      ) : (
+                        <div className="flex items-center gap-3 py-2 px-1">
+                          <div className="flex gap-1">
+                            <div className="w-1.5 h-1.5 bg-[#a098ff] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                            <div className="w-1.5 h-1.5 bg-[#a098ff] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                            <div className="w-1.5 h-1.5 bg-[#a098ff] rounded-full animate-bounce"></div>
+                          </div>
+                          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+                            Thinking...
+                          </span>
+                        </div>
+                      )
                     ) : (
                       <div className="whitespace-pre-wrap">{m.content}</div>
                     )}
@@ -389,33 +456,40 @@ const SuperFlexAI = () => {
                 </div>
               </div>
             ))}
-            {isLoading && (
-              <div className="flex justify-start animate-pulse">
-                <div className="bg-zinc-900/50 backdrop-blur-md px-4 py-3 rounded-2xl rounded-tl-none border border-white/10 flex items-center gap-3">
-                  <div className="flex gap-1.5">
-                    <AnimatedLogo
-                      size={12}
-                      animated={false}
-                      className="animate-pulse"
-                    />
-                    <AnimatedLogo
-                      size={12}
-                      animated={false}
-                      className="animate-pulse [animation-delay:200ms]"
-                    />
-                    <AnimatedLogo
-                      size={12}
-                      animated={false}
-                      className="animate-pulse [animation-delay:400ms]"
-                    />
-                  </div>
-                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
-                    Analyzing Context...
-                  </span>
-                </div>
-              </div>
-            )}
           </div>
+
+          {}
+          {permissionStatus === "pending" && (
+            <div className="flex flex-col gap-3 p-5 bg-zinc-900/50 border border-white/10 rounded-2xl mx-2 my-4 animate-in fade-in slide-in-from-bottom-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-[#a098ff]/10 flex items-center justify-center text-[#a098ff]">
+                  <Shield size={20} />
+                </div>
+                <h3 className="text-white font-bold text-sm">
+                  Data Access Request
+                </h3>
+              </div>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                To provide personalized academic advice, SuperFlex AI needs
+                access to your marks, attendance, and transcript data. This data
+                is processed locally and securely.
+              </p>
+              <div className="flex gap-2 mt-2">
+                <button
+                  onClick={() => handlePermission("granted")}
+                  className="flex-1 bg-[#a098ff] hover:bg-[#a098ff]/90 text-white text-xs font-bold py-2.5 rounded-xl transition-colors"
+                >
+                  Allow Access
+                </button>
+                <button
+                  onClick={() => handlePermission("denied")}
+                  className="flex-1 bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white text-xs font-bold py-2.5 rounded-xl transition-colors"
+                >
+                  Deny
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="p-6 bg-white/5 border-t border-white/10 backdrop-blur-xl">
             <div className="relative flex items-center group">
@@ -424,8 +498,13 @@ const SuperFlexAI = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                placeholder="Ask your SuperFlex advisor..."
-                className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#a098ff]/50 focus:ring-4 focus:ring-[#a098ff]/5 transition-all pr-14"
+                placeholder={
+                  permissionStatus === "pending"
+                    ? "Please select an option above..."
+                    : "Ask your SuperFlex advisor..."
+                }
+                disabled={permissionStatus === "pending"}
+                className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#a098ff]/50 focus:ring-4 focus:ring-[#a098ff]/5 transition-all pr-14 disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <button
                 onClick={handleSend}

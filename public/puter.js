@@ -1,4 +1,8594 @@
+// Copyright 2024-present Puter Technologies Inc. All rights reserved.
+// Generated on 2025-12-23 09:23
 
-
-
-(()=>{"use strict";var e={429:(e,t,s)=>{const r=s(614);function n(e,t){const s=e.toLowerCase(),r=t.toLowerCase();if(""===r)return!1;if(-1===r.indexOf("*")&&-1===r.indexOf("?")&&-1===r.indexOf("[")&&-1===r.indexOf("{"))return s===r;let i=r;const o=i.match(/\{([^}]+)\}/);if(o)return o[1].split(",").map(e=>i.replace(o[0],e.trim())).some(t=>n(e,t));let a="",c=0;for(;c<i.length;){const e=i[c];if("*"===e)a+=".*";else if("?"===e)a+=".";else if("["===e){let e=c+1,t="[";for(;e<i.length&&"]"!==i[e];)t+=i[e],e++;e<i.length?(t+="]",a+=t,c=e):a+="\\["}else/[.+^${}()|\\]/.test(e)?a+="\\"+e:a+=e;c++}try{return new RegExp("^"+a+"$","i").test(e)}catch(e){return s===r}}e.exports=class{constructor(e={}){"string"==typeof e&&(e={dbName:e}),this.store=new r,this.expireTimes=new r,this.db=null,this.dbName=e.dbName,this.dbVersion=e.dbVersion||1,this.isIndexedDBAvailable=!1,this.isInitialized=!1,this.initPromise=null,this.storeSet=(e,t)=>{this.store.set(e,t),this._initCleanupLoop(20),this.isIndexedDBAvailable&&this.db&&this._persistToIndexedDB(e,t)},this._initIndexedDB()}_initIndexedDB(){"undefined"!=typeof window&&window.indexedDB&&this.dbName?(this.isIndexedDBAvailable=!0,this.initPromise=this._setupIndexedDB()):this.isInitialized=!0}async _setupIndexedDB(){try{this.db=await this._openDatabase(),await this._loadFromIndexedDB(),this.isInitialized=!0}catch(e){console.warn("Failed to initialize IndexedDB:",e),this.isIndexedDBAvailable=!1,this.isInitialized=!0}}_openDatabase(){return new Promise((e,t)=>{const s=indexedDB.open(this.dbName,this.dbVersion);s.onerror=()=>t(s.error),s.onsuccess=()=>e(s.result),s.onupgradeneeded=e=>{const t=e.target.result;t.objectStoreNames.contains("store")||t.createObjectStore("store",{keyPath:"key"}),t.objectStoreNames.contains("expireTimes")||t.createObjectStore("expireTimes",{keyPath:"key"})}})}async _loadFromIndexedDB(){if(this.db)try{const e=this.db.transaction(["store","expireTimes"],"readonly"),t=e.objectStore("store"),s=e.objectStore("expireTimes"),r=t.getAll(),n=s.getAll(),[i,o]=await Promise.all([new Promise((e,t)=>{r.onsuccess=()=>e(r.result),r.onerror=()=>t(r.error)}),new Promise((e,t)=>{n.onsuccess=()=>e(n.result),n.onerror=()=>t(n.error)})]);i.forEach(e=>{this.store.set(e.key,e.value)}),o.forEach(e=>{this.expireTimes.set(e.key,e.expireTime)});const a=Date.now();for(const[e,t]of this.expireTimes.entries())a>t&&(this.store.delete(e),this.expireTimes.delete(e),this._removeFromIndexedDB(e))}catch(e){console.warn("Failed to load data from IndexedDB:",e)}}async _persistToIndexedDB(e,t){if(this.db)try{this.db.transaction(["store"],"readwrite").objectStore("store").put({key:e,value:t})}catch(e){console.warn("Failed to persist to IndexedDB:",e)}}async _persistExpirationToIndexedDB(e,t){if(this.db)try{const s=this.db.transaction(["expireTimes"],"readwrite").objectStore("expireTimes");void 0!==t?s.put({key:e,expireTime:t}):s.delete(e)}catch(e){console.warn("Failed to persist expiration to IndexedDB:",e)}}async _removeFromIndexedDB(e){if(this.db)try{const t=this.db.transaction(["store","expireTimes"],"readwrite"),s=t.objectStore("store"),r=t.objectStore("expireTimes");s.delete(e),r.delete(e)}catch(e){console.warn("Failed to remove from IndexedDB:",e)}}async waitForInitialization(){this.isInitialized||this.initPromise&&await this.initPromise}set(e,t,s={}){const{NX:r=!1,XX:n=!1,GET:i=!1,EX:o,PX:a,EXAT:c,PXAT:l,KEEPTTL:h=!1}=s,u=r,p=n,d=i;let g=o?parseInt(o,10):void 0,f=a?parseInt(a,10):void 0,m=c?parseInt(c,10):void 0,y=l?parseInt(l,10):void 0;const b=h,w=this.store.has(e);if(p&&!w)return;if(u&&w)return;let v;if(d&&w&&(v=this.store.get(e)),this.storeSet(e,t),void 0!==g||void 0!==f||void 0!==m||void 0!==y||b){let t;void 0!==g?t=Date.now()+1e3*g:void 0!==f?t=Date.now()+f:void 0!==m?t=1e3*m:void 0!==y?t=y:b&&w&&(t=this.expireTimes.get(e)),void 0!==t&&(this.expireTimes.set(e,t),this.isIndexedDBAvailable&&this.db&&this._persistExpirationToIndexedDB(e,t))}else this.expireTimes.delete(e),this.isIndexedDBAvailable&&this.db&&this._persistExpirationToIndexedDB(e,void 0);return!d||v}get(e){if(!this._checkAndRemoveExpiredKey(e))return this.store.get(e)}del(...e){let t=0;for(const s of e)this._checkAndRemoveExpiredKey(s)||this.store.delete(s)&&(this.expireTimes.delete(s),this.isIndexedDBAvailable&&this.db&&this._removeFromIndexedDB(s),t++);return t}exists(...e){let t=0;for(const s of e)this._checkAndRemoveExpiredKey(s)||this.store.has(s)&&t++;return t}incr(e){return this.incrby(e,1)}incrby(e,t){let s=this.store.get(e);if(void 0===s)s=0;else if(!Number.isInteger(Number(s)))throw new Error("ERR value is not an integer");const r=Number(s)+t;return this.storeSet(e,r.toString()),r}decr(e){try{return this.decrby(e,1)}catch(e){throw e}}decrby(e,t){let s=this.store.get(e);if(void 0===s)s=0;else if(!Number.isInteger(Number(s)))throw new Error("ERR value is not an integer");const r=Number(s)-t;return this.storeSet(e,r.toString()),r}expire(e,t,s={}){if(!this.store.has(e))return 0;const{NX:r=!1,XX:n=!1,GT:i=!1,LT:o=!1}=s,a=Date.now(),c=this.expireTimes.get(e);return r&&void 0!==c||n&&void 0===c||i&&(void 0===c||c<=a+1e3*t)||o&&(void 0===c||c>=a+1e3*t)?0:(this.expireTimes.set(e,a+1e3*t),1)}keys(e){const t=[];for(const[s,r]of this.store.entries())if(n(s,e)){const e=this.expireTimes.get(s);(void 0===e||e>Date.now())&&t.push(s)}return t}mget(...e){return e.map(e=>this.get(e))}mset(...e){if(e.length%2!=0)throw new Error("MSET requires an even number of arguments");for(let t=0;t<e.length;t+=2)this.set(e[t],e[t+1]);return!0}renamenx(e,t){if(!this.store.has(e)||this.store.has(t))return 0;const s=this.store.get(e);if(this.store.delete(e),this.storeSet(t,s),this.expireTimes.has(e)){const s=this.expireTimes.get(e);this.expireTimes.delete(e),this.expireTimes.set(t,s)}return 1}randomkey(){const e=Array.from(this.store.keys());if(0!==e.length)return e[Math.floor(Math.random()*e.length)]}expireat(e,t,s={}){if("number"!=typeof t||isNaN(t))throw new Error("ERR invalid expire time in SETEX");if(!this.store.has(e))return 0;const{NX:r=!1,XX:n=!1,GT:i=!1,LT:o=!1}=s,a=1e3*t-Date.now();if(a<=0)return this.store.delete(e),this.expireTimes.delete(e),0;const c=this.pttl(e);return n&&-1===c||r&&-1!==c||i&&-1!==c&&a<=c||o&&-1!==c&&a>=c?0:this.pexpire(e,a)}pexpire(e,t,s={}){const{NX:r=!1,XX:n=!1,GT:i=!1,LT:o=!1}=s;if(r&&this.store.has(e)||n&&!this.store.has(e))return 0;if(i||o){const s=this.pttl(e);if(i&&s>=t||o&&s<=t)return 0}return this.expireTimes.set(e,Date.now()+t),1}pexpireat(e,t){const s=t-Date.now();return s<=0?(this.store.delete(e),this.expireTimes.delete(e),0):this.pexpire(e,s)}pttl(e){if(!this.store.has(e))return-2;if(!this.expireTimes.has(e))return-1;const t=this.expireTimes.get(e)-Date.now();return t>0?t:-2}ttl(e){if(!this.store.has(e))return-2;if(!this.expireTimes.has(e))return-1;const t=Math.floor((this.expireTimes.get(e)-Date.now())/1e3);return t>0?t:-2}persist(e){return this.store.has(e)&&this.expireTimes.has(e)?(this.expireTimes.delete(e),this.isIndexedDBAvailable&&this.db&&this._persistExpirationToIndexedDB(e,void 0),1):0}getrange(e,t,s){const r=this.get(e);return"string"!=typeof r?"":r.slice(t,s+1)}getset(e,t){const s=this.get(e);return this.set(e,t),s}setex(e,t,s){if(this.store.has(e))return this.set(e,t),this.expire(e,s),!0}setrange(e,t,s){if("number"!=typeof t||t<0)throw new Error("Invalid offset value");if("string"!=typeof s)throw new Error("Value must be a string");let r=this.get(e);void 0!==r&&void 0!==r||(r="");const n=r.slice(0,t)+s+r.slice(t+s.length);return this.set(e,n),n.length}strlen(e){const t=this.get(e);return void 0===t?0:t.length}msetnx(...e){if(e.length%2!=0)throw new Error("MSETNX requires an even number of arguments");for(let t=0;t<e.length;t+=2)if(this.store.has(e[t]))return 0;for(let t=0;t<e.length;t+=2)this.set(e[t],e[t+1]);return 1}incrbyfloat(e,t){let s=this.store.get(e);if(void 0===s)s=0;else if(isNaN(parseFloat(s)))throw new Error("ERR value is not a valid float");const r=parseFloat(s)+t;return this.storeSet(e,r.toString()),r}append(e,t){const s=this.get(e),r=void 0===s?t:s+t;return this.set(e,r),r.length}getbit(e,t){const s=this.get(e);if(void 0===s||t>=8*s.length)return 0;const r=Math.floor(t/8),n=7-t%8;return s.charCodeAt(r)>>n&1}setbit(e,t,s){if(0!==s&&1!==s)throw new Error("ERR bit is not an integer or out of range");let r=this.get(e);void 0===r&&(r="");const n=Math.floor(t/8),i=7-t%8;for(;n>=r.length;)r+="\0";const o=r.charCodeAt(n),a=o>>i&1,c=o&~(1<<i)|s<<i,l=String.fromCharCode(c),h=r.slice(0,n)+l+r.slice(n+1);return this.set(e,h),a}copy(e,t){const s=this.get(e);return void 0===s?0:(this.set(t,s),1)}rename(e,t){if(!this.store.has(e))throw new Error("ERR no such key");if(e===t)return!0;const s=this.store.get(e),r=this.expireTimes.get(e);return this.storeSet(t,s),this.store.delete(e),void 0!==r&&(this.expireTimes.set(t,r),this.expireTimes.delete(e)),!0}type(e){return this.store.has(e)?typeof this.store.get(e):"none"}sadd(e,...t){this.store.has(e)||this.storeSet(e,new Set);const s=this.store.get(e);if(!(s instanceof Set))throw new Error("ERR Operation against a key holding the wrong kind of value");let r=0;for(const e of t)s.has(e)||(s.add(e),r++);return r}scard(e){const t=this.store.get(e);if(void 0===t)return 0;if(!(t instanceof Set))throw new Error("ERR Operation against a key holding the wrong kind of value");return t.size}sdiff(e,...t){const s=this.store.get(e)||new Set;if(!(s instanceof Set))throw new Error("ERR Operation against a key holding the wrong kind of value");const r=new Set(s);for(const e of t){const t=this.store.get(e)||new Set;if(!(t instanceof Set))throw new Error("ERR Operation against a key holding the wrong kind of value");for(const e of t)r.delete(e)}return Array.from(r)}sdiffstore(e,t,...s){const r=this.sdiff(t,...s),n=new Set(r);return this.storeSet(e,n),n.size}sinter(...e){if(0===e.length)return[];const t=e.map(e=>{const t=this.store.get(e);if(void 0===t)return new Set;if(!(t instanceof Set))throw new Error("ERR Operation against a key holding the wrong kind of value");return t}),s=new Set(t[0]);for(let e=1;e<t.length;e++)for(const r of s)t[e].has(r)||s.delete(r);return Array.from(s)}sintercard(...e){return this.sinter(...e).length}sinterstore(e,...t){const s=this.sinter(...t),r=new Set(s);return this.storeSet(e,r),r.size}sismember(e,t){const s=this.store.get(e);if(void 0===s)return!1;if(!(s instanceof Set))throw new Error("ERR Operation against a key holding the wrong kind of value");return!!s.has(t)}smembers(e){const t=this.store.get(e);if(void 0===t)return[];if(!(t instanceof Set))throw new Error("ERR Operation against a key holding the wrong kind of value");return Array.from(t)}smismember(e,...t){const s=this.store.get(e)||new Set;if(!(s instanceof Set))throw new Error("ERR Operation against a key holding the wrong kind of value");return t.map(e=>s.has(e)?1:0)}smove(e,t,s){const r=this.store.get(e);if(void 0===r||!r.has(s))return 0;if(!(r instanceof Set))throw new Error("ERR Operation against a key holding the wrong kind of value");const n=this.store.get(t)||new Set;if(!(n instanceof Set))throw new Error("ERR Operation against a key holding the wrong kind of value");return r.delete(s),n.add(s),this.storeSet(t,n),1}spop(e,t=1){const s=this.store.get(e);if(void 0===s)return[];if(!(s instanceof Set))throw new Error("ERR Operation against a key holding the wrong kind of value");const r=[];for(const e of s){if(r.length>=t)break;r.push(e),s.delete(e)}return r}srandmember(e,t=1){const s=this.store.get(e);if(void 0===s)return[];if(!(s instanceof Set))throw new Error("ERR Operation against a key holding the wrong kind of value");const r=Array.from(s),n=[];for(let e=0;e<t&&e<r.length;e++){const e=Math.floor(Math.random()*r.length);n.push(r[e]),r.splice(e,1)}return n}srem(e,...t){const s=this.store.get(e);if(void 0===s)return 0;if(!(s instanceof Set))throw new Error("ERR Operation against a key holding the wrong kind of value");let r=0;for(const e of t)s.delete(e)&&r++;return r}sscan(e,t,s={}){const{match:r="*",count:n=10}=s,i=this.store.get(e);if(void 0===i)return[0,[]];if(!(i instanceof Set))throw new Error("ERR Operation against a key holding the wrong kind of value");const o=new RegExp(r.replace("*",".*")),a=Array.from(i),c=[];let l=t;for(let e=t;e<a.length&&c.length<n;e++)o.test(a[e])&&c.push(a[e]),l=e+1;return[l>=a.length?0:l,c]}sunion(...e){const t=new Set;for(const s of e){const e=this.store.get(s)||new Set;if(!(e instanceof Set))throw new Error("ERR Operation against a key holding the wrong kind of value");for(const s of e)t.add(s)}return Array.from(t)}sunionstore(e,...t){const s=new Set;for(const e of t){const t=this.store.get(e)||new Set;if(!(t instanceof Set))throw new Error("ERR Operation against a key holding the wrong kind of value");for(const e of t)s.add(e)}return this.storeSet(e,s),s.size}lset(e,t,s){const r=this.store.get(e);if(void 0===r)throw new Error("ERR no such key");if(!Array.isArray(r))throw new Error("ERR Operation against a key holding the wrong kind of value");if(t<0||t>=r.length)throw new Error("ERR index out of range");return r[t]=s,!0}ltrim(e,t,s){const r=this.store.get(e);if(void 0===r)return!0;if(!Array.isArray(r))throw new Error("ERR Operation against a key holding the wrong kind of value");const n=r.length,i=t>=0?t:Math.max(n+t,0),o=s>=0?s:Math.max(n+s,-1),a=r.slice(i,o+1);return this.storeSet(e,a),!0}rpop(e){const t=this.store.get(e);return void 0!==t&&Array.isArray(t)?t.pop():null}rpoplpush(e,t){const s=this.rpop(e);return void 0===s?null:(this.lpush(t,s),s)}rpush(e,...t){let s=this.store.get(e);if(void 0===s)s=[],this.storeSet(e,s);else if(!Array.isArray(s))throw new Error("ERR Operation against a key holding the wrong kind of value");return s.push(...t),s.length}rpushx(e,t){const s=this.store.get(e);return void 0!==s&&Array.isArray(s)?(s.push(t),s.length):0}lpush(e,...t){let s=this.store.get(e);if(void 0===s)s=[],this.storeSet(e,s);else if(!Array.isArray(s))throw new Error("ERR Operation against a key holding the wrong kind of value");return s.unshift(...t),s.length}lpushx(e,...t){const s=this.store.get(e);return void 0!==s&&Array.isArray(s)?(s.unshift(...t),s.length):0}lrange(e,t,s){const r=this.store.get(e);if(void 0===r||!Array.isArray(r))return[];const n=r.length,i=t>=0?t:Math.max(n+t,0),o=s>=0?s:Math.max(n+s,-1);return r.slice(i,o+1)}lrem(e,t,s){const r=this.store.get(e);if(void 0===r||!Array.isArray(r))return 0;let n=0;if(t>0)for(let e=0;e<r.length&&n<t;e++)r[e]===s&&(r.splice(e,1),n++,e--);else if(t<0)for(let e=r.length-1;e>=0&&n<-t;e--)r[e]===s&&(r.splice(e,1),n++);else n=r.filter(e=>e===s).length,this.storeSet(e,r.filter(e=>e!==s));return n}lmove(e,t,s,r){const n="LEFT"===r?"lpush":"rpush",i=this["LEFT"===s?"lpop":"rpop"](e);return void 0===i?null:(this[n](t,i),i)}lmpop(e,t,s){const r="LEFT"===s?"lpop":"rpop",n=[];for(let s=0;s<e;s++){const e=this[r](t);if(void 0===e)break;n.push(e)}return n}lpop(e){const t=this.store.get(e);return void 0!==t&&Array.isArray(t)?t.shift():null}lpos(e,t,s={}){const{rank:r=0,start:n=0,stop:i=-1}=s,o=this.store.get(e);if(void 0===o||!Array.isArray(o))return;let a=0;const c=o.length,l=n>=0?n:Math.max(c+n,0),h=i>=0?i:Math.max(c+i,-1);for(let e=l;e<=h;e++)if(o[e]===t){if(a===r)return e;a++}}brpoplpush(e,t,s){const r=this.brpop(e,s);return void 0===r?null:(this.lpush(t,r),r)}lindex(e,t){const s=this.store.get(e);return void 0!==s&&Array.isArray(s)?(t<0&&(t=s.length+t),void 0!==s[t]?s[t]:null):null}linsert(e,t,s,r){const n=this.store.get(e);if(void 0===n)return 0;if(!Array.isArray(n))throw new Error("ERR Operation against a key holding the wrong kind of value");const i=n.indexOf(s);if(-1===i)return 0;if("BEFORE"===t)n.splice(i,0,r);else{if("AFTER"!==t)throw new Error("ERR syntax error");n.splice(i+1,0,r)}return n.length}llen(e){const t=this.store.get(e);return void 0===t?0:t.length}blmove(e,t,s,r,n){const i="LEFT"===r?"lpush":"rpush",o=this["LEFT"===s?"blpop":"brpop"]([e],n);return void 0===o?null:(this[i](t,o[1]),o[1])}blmpop(e,t,...s){const r=[],n=1e3*t,i=1===s.length?"brpop":"brpoplpush",o=s.concat(n);for(let t=0;t<e;t++){const e=this[i](o);if(void 0===e)break;r.push(e)}return r}blpop(e,...t){return this.blmpop(1,e,...t)[0]}brpop(e,...t){const s=1e3*e,r=Date.now()+s;for(;Date.now()<r;)for(let e=0;e<t.length;e++){const s=t[e],r=this.store.get(s);if(void 0!==r&&Array.isArray(r)&&r.length>0){const e=r.pop();return 0===r.length&&this.store.delete(s),[s,e]}}return null}expiretime(e){return this.expireTimes.get(e)}pexpiretime(e){const t=this.expireTimes.get(e);return t?1e3*t:null}zadd(e,t,s){return this._checkAndRemoveExpiredKey(e)?0:(this.store.has(e)||this.storeSet(e,new r),this.store.get(e).set(s,Number(t)),1)}zcard(e){return this._checkAndRemoveExpiredKey(e)?0:this.store.has(e)?this.store.get(e).size:0}zcount(e,t,s){if(this._checkAndRemoveExpiredKey(e))return 0;if(!this.store.has(e))return 0;const r=this.store.get(e);let n=0;for(const e of r.values())e>=t&&e<=s&&n++;return n}zdiff(...e){if(0===e.length)return new Set;const t=e.map(e=>this._checkAndRemoveExpiredKey(e)?new r:this.store.get(e)||new r),s=new Set(t[0].keys());for(let e=1;e<t.length;e++)for(const r of t[e].keys())s.delete(r);return s}zdiffstore(e,...t){const s=this.ZDIFF(...t),n=new r;for(const e of s){const s=t.map(t=>{const s=this.store.get(t);return s?s.get(e):void 0}).filter(e=>void 0!==e);s.length>0&&n.set(e,Math.min(...s))}return this.storeSet(e,n),n.size}bzmpop(e,...t){const s=[];for(const r of t){const t=this.store.get(r);if(t&&t.size>0){const n=Array.from(t.entries()).sort((e,t)=>e[1]-t[1]).slice(0,e).map(([e,s])=>(t.delete(e),[e,s]));s.push([r,...n]);break}}return s}bzpopmax(e,t){const s=this.store.get(e);if(!s||0===s.size)return[];const r=Array.from(s.entries()).sort((e,t)=>t[1]-e[1]).slice(0,t).map(([e,t])=>(s.delete(e),[e,t]));return[e,...r]}bzpopmin(e,t){const s=this.store.get(e);if(!s||0===s.size)return[];const r=Array.from(s.entries()).sort((e,t)=>e[1]-t[1]).slice(0,t).map(([e,t])=>(s.delete(e),[e,t]));return[e,...r]}zincrby(e,t,s){this.store.has(e)||this.storeSet(e,new r);const n=this.store.get(e),i=(n.get(s)||0)+Number(t);return n.set(s,i),i}zinter(...e){if(0===e.length)return new Set;const t=e.map(e=>this.store.get(e)||new r),s=new Set(t[0].keys());for(let e=1;e<t.length;e++){const r=new Set;for(const n of t[e].keys())s.has(n)&&r.add(n);s.clear();for(const e of r)s.add(e)}return s}zintercard(...e){return this.ZINTER(...e).size}zinterstore(e,...t){const s=this.ZINTER(...t),n=new r;for(const e of s){const s=t.map(t=>{const s=this.store.get(t);return s?s.get(e):void 0}).filter(e=>void 0!==e);s.length>0&&n.set(e,Math.max(...s))}return this.storeSet(e,n),n.size}zlexcount(e,t,s){const n=this.store.get(e)||new r,i=Array.from(n.keys()).sort();let o=0;for(const e of i)e>=t&&e<=s&&o++;return o}zmpop(e,...t){const s=[];for(const r of t){const t=this.store.get(r);if(t&&t.size>0){const n=Array.from(t.entries()).sort((e,t)=>e[1]-t[1]).slice(0,e).map(([e,s])=>(t.delete(e),[e,s]));s.push([r,...n]);break}}return s}zmscore(e,...t){const s=this.store.get(e)||new r;return t.map(e=>s.get(e))}zpopmax(e,t){const s=this.store.get(e);if(!s||0===s.size)return[];const r=Array.from(s.entries()).sort((e,t)=>t[1]-e[1]).slice(0,t).map(([e,t])=>(s.delete(e),[e,t]));return r}zpopmin(e,t){const s=this.store.get(e);if(!s||0===s.size)return[];const r=Array.from(s.entries()).sort((e,t)=>e[1]-t[1]).slice(0,t).map(([e,t])=>(s.delete(e),[e,t]));return r}zrandmember(e,t=1){const s=this.store.get(e);if(!s||0===s.size)return[];const r=Array.from(s.keys()),n=[];for(let e=0;e<t;e++){const e=Math.floor(Math.random()*r.length);n.push(r[e])}return n}zrange(e,t,s){const n=this.store.get(e)||new r,i=Array.from(n.entries()).sort((e,t)=>e[1]-t[1]);return t<0&&(t=i.length+t),s<0&&(s=i.length+s),i.slice(t,s+1).map(([e,t])=>[e,t])}zrangebylex(e,t,s,n={}){const i=this.store.get(e)||new r;let o=Array.from(i.keys()).sort().filter(e=>e>=t&&e<=s);if(n.limit){const{offset:e,count:t}=n.limit;o=o.slice(e,e+t)}return o}zrangebyscore(e,t,s,n={}){const i=this.store.get(e)||new r,o=Array.from(i.entries()).sort((e,t)=>e[1]-t[1]);let a=o.filter(([,e])=>e>=t&&e<=s);if(a=n.withscores?a.map(([e,t])=>[e,t]):a.map(([e])=>e),n.limit){const{offset:e,count:t}=n.limit;a=a.slice(e,e+t)}return a}zrangestore(e,t,s,n){const i=this.store.get(t)||new r,o=Array.from(i.entries()).sort((e,t)=>e[1]-t[1]);s<0&&(s=o.length+s),n<0&&(n=o.length+n);const a=new r(o.slice(s,n+1));return this.storeSet(e,a),a.size}zrank(e,t){const s=this.store.get(e);if(!s)return;const r=Array.from(s.entries()).sort((e,t)=>e[1]-t[1]);for(let e=0;e<r.length;e++)if(r[e][0]===t)return e}zrem(e,...t){const s=this.store.get(e);if(!s)return 0;let r=0;for(const e of t)s.delete(e)&&r++;return r}zremrangebylex(e,t,s){const r=this.store.get(e);if(!r)return 0;const n=Array.from(r.keys()).sort();let i=0;for(const e of n)e>=t&&e<=s&&(r.delete(e),i++);return i}zremrangebyrank(e,t,s){const r=this.store.get(e);if(!r)return 0;const n=Array.from(r.entries()).sort((e,t)=>e[1]-t[1]);t<0&&(t=n.length+t),s<0&&(s=n.length+s);let i=0;for(let e=t;e<=s;e++)r.delete(n[e][0])&&i++;return i}zremrangebyscore(e,t,s){const r=this.store.get(e);if(!r)return 0;const n=Array.from(r.entries()).sort((e,t)=>e[1]-t[1]);let i=0;for(const[e,o]of n)o>=t&&o<=s&&(r.delete(e),i++);return i}zrevrange(e,t,s){const n=this.store.get(e)||new r,i=Array.from(n.entries()).sort((e,t)=>t[1]-e[1]);return t<0&&(t=i.length+t),s<0&&(s=i.length+s),i.slice(t,s+1).map(([e,t])=>[e,t])}zrevrangebylex(e,t,s,n={}){const i=this.store.get(e)||new r;let o=Array.from(i.keys()).sort().reverse().filter(e=>e>=s&&e<=t);if(n.limit){const{offset:e,count:t}=n.limit;o=o.slice(e,e+t)}return o}zrevrangebyscore(e,t,s,n={}){const i=this.store.get(e)||new r,o=Array.from(i.entries()).sort((e,t)=>t[1]-e[1]);let a=o.filter(([,e])=>e>=s&&e<=t);if(a=n.withscores?a.map(([e,t])=>[e,t]):a.map(([e])=>e),n.limit){const{offset:e,count:t}=n.limit;a=a.slice(e,e+t)}return a}zrevrank(e,t){const s=this.store.get(e);if(!s)return;const r=Array.from(s.entries()).sort((e,t)=>t[1]-e[1]);for(let e=0;e<r.length;e++)if(r[e][0]===t)return e}zscan(e,t,s={}){const n=this.store.get(e)||new r,i=Array.from(n.entries()).sort((e,t)=>e[1]-t[1]),o=[];let a=s.count||10,c=t;for(;a>0&&c<i.length;)s.match&&!new RegExp(s.match.replace("*",".*")).test(i[c][0])||(o.push(i[c]),a--),c++;return[c>=i.length?0:c,o]}zscore(e,t){const s=this.store.get(e);if(s)return s.get(t)}zunion(e){const t=new r;for(const s of e){const e=this.store.get(s);if(e)for(const[s,r]of e.entries())t.set(s,(t.get(s)||0)+r)}return Array.from(t.entries()).sort((e,t)=>e[1]-t[1])}zunionstore(e,t){const s=this.zunion(t),n=new r(s);return this.storeSet(e,n),n.size}geoadd(e,t,s,n){if("number"!=typeof t||"number"!=typeof s)throw new Error("Invalid longitude or latitude value");const i=this.store.get(e)||new r;if(!i.get(n)){const r={longitude:t,latitude:s};return i.set(n,r),this.storeSet(e,i),1}return 0}geodist(e,t,s,r="m"){const n=this.store.get(e);if(!n)return;const i=n.get(t),o=n.get(s);if(!i||!o)return;const a=this._haversineDistance(i.latitude,i.longitude,o.latitude,o.longitude);return this._convertDistance(a,r)}geohash(e,...t){const s=this.store.get(e);return s?t.map(e=>{const t=s.get(e);return t?this._encodeGeohash(t.latitude,t.longitude):null}):[]}geopos(e,...t){const s=this.store.get(e);return s?t.map(e=>{const t=s.get(e);return t?[t.latitude,t.longitude]:null}):[]}georadius(e,t,s,r,n="m"){const i=this.store.get(e);if(!i)return[];const o=this._convertDistance(r,n,"m"),a=[];for(const[e,r]of i.entries())this._haversineDistance(s,t,r.latitude,r.longitude)<=o&&a.push(e);return a}georadius_ro(e,t,s,r){return this.georadius(e,t,s,r,!0)}georadiusbymember(e,t,s){const r=this.geopos(e,t);if(r)return this.georadius(r[0],r[1],s,e)}georadiusbymember_ro(e,t,s){const r=this.geopos(e,t);if(r)return this.georadius(r[0],r[1],s,e,!0)}geosearch(e,t,s,r){return this.georadius(t,s,r,e)}geosearchstore(e,t,s,r,n){const i=this.georadius(s,r,n,t);return this.set(e,i),i.length}scan(e,t="*",s=10){const r=this.keys(t),n=Math.min(e+s,r.length);return[n===r.length?0:n,r.slice(e,n)]}sort(e,t="ASC",s=!1){const r=this.store.get(e);if(!Array.isArray(r))return[];const n=r.slice().sort((e,r)=>s?"ASC"===t?e.localeCompare(r):r.localeCompare(e):"ASC"===t?e-r:r-e);return n}touch(...e){return e.reduce((e,t)=>e+(this.exists(t)?1:0),0)}sort_ro(e,t="ASC",s=!1){return this.sort(e,t,s)}unlink(...e){let t=0;for(const s of e)this.del(s)&&t++;return t}hset(e,t,s){this.store.has(e)||this.storeSet(e,new r);const n=this.store.get(e),i=!n.has(t);return n.set(t,s),i?1:0}hdel(e,...t){const s=this.store.get(e);if(!s)return 0;let r=0;for(const e of t)s.delete(e)&&r++;return r}hget(e,t){const s=this.store.get(e);return s?s.get(t):void 0}hgetall(e){const t=this.store.get(e);if(!t)return{};const s={};for(const[e,r]of t)s[e]=r;return s}hincrby(e,t,s){const n=this.store.get(e)||new r,i=parseInt(n.get(t)||0,10)+s;return n.set(t,i.toString()),this.storeSet(e,n),i}hincrbyfloat(e,t,s){const n=this.store.get(e)||new r,i=parseFloat(n.get(t)||0)+s;return n.set(t,i.toString()),this.storeSet(e,n),i}hkeys(e){const t=this.store.get(e);return t?Array.from(t.keys()):[]}hlen(e){const t=this.store.get(e);return t?t.size:0}hmget(e,...t){const s=this.store.get(e)||new r;return t.map(e=>s.get(e))}hmset(e,...t){const s=this.store.get(e)||new r;for(let e=0;e<t.length;e+=2){const r=t[e],n=t[e+1];s.set(r,n)}return this.storeSet(e,s),!0}hsetnx(e,t,s){const n=this.store.get(e)||new r;return n.has(t)?0:(n.set(t,s),this.storeSet(e,n),1)}hstrlen(e,t){const s=this.store.get(e),r=s?s.get(t):null;return r?r.length:0}hvals(e){const t=this.store.get(e);return t?Array.from(t.values()):[]}hscan(e,t,s="*",n=10){const i=this.store.get(e)||new r,o=Array.from(i.keys()).filter(e=>e.includes(s)),a=Math.min(t+n,o.length);return[a===o.length?0:a,o.slice(t,a).map(e=>[e,i.get(e)])]}hexists(e,t){const s=this.store.get(e);return s&&s.has(t)?1:0}hrandfield(e,t=1){const s=this.store.get(e);if(!s)return[];const r=Array.from(s.keys()),n=[];for(let e=0;e<t;e++){const e=Math.floor(Math.random()*r.length);n.push(r[e])}return n}_checkAndRemoveExpiredKey(e){const t=this.expireTimes.get(e);return!!(t&&Date.now()>t)&&(this.store.delete(e),this.expireTimes.delete(e),this.isIndexedDBAvailable&&this.db&&this._removeFromIndexedDB(e),!0)}_initCleanupLoop(e){1===this.store.size&&(this.cleanupLoop=setInterval(()=>{if(0===this.store.size&&this.cleanupLoop)clearInterval(this.cleanupLoop);else for(const e of this.expireTimes.keys())this._checkAndRemoveExpiredKey(e)},e),"object"==typeof this.cleanupLoop&&"function"==typeof this.cleanupLoop.unref&&this.cleanupLoop.unref())}_haversineDistance(e,t,s,r){const n=e=>e*Math.PI/180,i=n(s-e),o=n(r-t),a=Math.sin(i/2)*Math.sin(i/2)+Math.cos(n(e))*Math.cos(n(s))*Math.sin(o/2)*Math.sin(o/2);return 2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*6371e3}_convertDistance(e,t,s){const r={m:1,km:.001,mi:621371e-9,ft:3.28084};if(!r[t]||!r[s])throw new Error("Invalid distance unit");return e*r[t]/r[s]}_encodeGeohash(e,t){let s="",r=-90,n=90,i=-180,o=180,a=!0,c=0,l=0;for(;s.length<12;){if(a){const e=(i+o)/2;t>e?(l=1+(l<<1),i=e):(l<<=1,o=e)}else{const t=(r+n)/2;e>t?(l=1+(l<<1),r=t):(l<<=1,n=t)}a=!a,c<4?c++:(s+="0123456789bcdefghjkmnpqrstuvwxyz"[l],c=0,l=0)}return s}flushall(){return this.store.clear(),this.expireTimes.clear(),this.isIndexedDBAvailable&&this.db&&this._clearIndexedDB(),!0}async _clearIndexedDB(){if(this.db)try{const e=this.db.transaction(["store","expireTimes"],"readwrite"),t=e.objectStore("store"),s=e.objectStore("expireTimes");t.clear(),s.clear()}catch(e){console.warn("Failed to clear IndexedDB:",e)}}}},614:e=>{class t{#e;constructor(e=[]){this.#e=[new Map(e)]}get size(){return this.#e.reduce((e,t)=>e+t.size,0)}clear(){this.#e=[new Map]}delete(e){return this.#e.some(t=>t.delete(e))}get(e){for(const t of this.#e)if(t.has(e))return t.get(e)}has(e){return this.#e.some(t=>t.has(e))}set(e,t){let s=this.#e[0];for(const t of this.#e)if(t.has(e)){s=t;break}return!s.has(e)&&s.size>=8388608&&(this.#e.unshift(new Map),s=this.#e[0]),s.set(e,t),this}*[Symbol.iterator](){for(const e of this.#e)yield*e}*keys(){for(const e of this.#e)yield*e.keys()}*values(){for(const e of this.#e)yield*e.values()}*entries(){for(const e of this.#e)yield*e.entries()}forEach(e,t){for(const[s,r]of this)e.call(t,r,s,this)}}e.exports=t}},t={},s=function s(r){var n=t[r];if(void 0!==n)return n.exports;var i=t[r]={exports:{}};return e[r](i,i.exports,s),i.exports}(429);const r=class{constructor(e={}){this.config={enabled:e.enabled??!1,...e}}updateConfig(e){this.config={...this.config,...e}}enable(){this.config.enabled=!0}disable(){this.config.enabled=!1}isEnabled(){return this.config.enabled}logRequest(e={}){if(!this.isEnabled())return;const{service:t="unknown",operation:s="unknown",params:r={},result:n=null,error:i=null}=e;let o="{}";if(r&&Object.keys(r).length>0)try{o=JSON.stringify(r)}catch(e){o="[Unable to serialize params]"}const a=`${t} - ${s} - [1m${o}[22m`;i?console.error(a,{error:i.message||i,result:n}):console.log(a,n)}getStats(){return{enabled:this.config.enabled,config:{...this.config}}}},n=47;function i(e){return e===n}function o(e,t,s,r){let i="",o=0,a=-1,c=0,l=0;for(let h=0;h<=e.length;++h){if(h<e.length)l=e.charCodeAt(h);else{if(r(l))break;l=n}if(r(l)){if(a===h-1||1===c);else if(2===c){if(i.length<2||2!==o||46!==i.charCodeAt(i.length-1)||46!==i.charCodeAt(i.length-2)){if(i.length>2){const e=i.lastIndexOf(s);-1===e?(i="",o=0):(i=i.slice(0,e),o=i.length-1-i.lastIndexOf(i,s)),a=h,c=0;continue}if(0!==i.length){i="",o=0,a=h,c=0;continue}}t&&(i+=i.length>0?`${s}..`:"..",o=2)}else i.length>0?i+=`${s}${e.slice(a+1,h)}`:i=e.slice(a+1,h),o=h-a-1;a=h,c=0}else 46===l&&-1!==c?++c:c=-1}return i}const a={resolve(...e){let t="",s=!1;for(let r=e.length-1;r>=-1&&!s;r--){const i=r>=0?e[r]:"/";0!==i.length&&(t=`${i}/${t}`,s=i.charCodeAt(0)===n)}return t=o(t,!s,"/",i),s?`/${t}`:t.length>0?t:"."},normalize(e){if(0===e.length)return".";const t=e.charCodeAt(0)===n,s=e.charCodeAt(e.length-1)===n;return 0===(e=o(e,!t,"/",i)).length?t?"/":s?"./":".":(s&&(e+="/"),t?`/${e}`:e)},isAbsolute:e=>e.length>0&&e.charCodeAt(0)===n,join(...e){if(0===e.length)return".";let t;for(let s=0;s<e.length;++s){const r=e[s];r.length>0&&(void 0===t?t=r:t+=`/${r}`)}return void 0===t?".":a.normalize(t)},relative(e,t){if(e===t)return"";if((e=a.resolve(e))===(t=a.resolve(t)))return"";const s=e.length,r=s-1,i=t.length-1,o=r<i?r:i;let c=-1,l=0;for(;l<o;l++){const s=e.charCodeAt(1+l);if(s!==t.charCodeAt(1+l))break;s===n&&(c=l)}if(l===o)if(i>o){if(t.charCodeAt(1+l)===n)return t.slice(1+l+1);if(0===l)return t.slice(1+l)}else r>o&&(e.charCodeAt(1+l)===n?c=l:0===l&&(c=0));let h="";for(l=1+c+1;l<=s;++l)l!==s&&e.charCodeAt(l)!==n||(h+=0===h.length?"..":"/..");return`${h}${t.slice(1+c)}`},toNamespacedPath:e=>e,dirname(e){if(0===e.length)return".";const t=e.charCodeAt(0)===n;let s=-1,r=!0;for(let t=e.length-1;t>=1;--t)if(e.charCodeAt(t)===n){if(!r){s=t;break}}else r=!1;return-1===s?t?"/":".":t&&1===s?"//":e.slice(0,s)},basename(e,t){let s=0,r=-1,i=!0;if(void 0!==t&&t.length>0&&t.length<=e.length){if(t===e)return"";let o=t.length-1,a=-1;for(let c=e.length-1;c>=0;--c){const l=e.charCodeAt(c);if(l===n){if(!i){s=c+1;break}}else-1===a&&(i=!1,a=c+1),o>=0&&(l===t.charCodeAt(o)?-1===--o&&(r=c):(o=-1,r=a))}return s===r?r=a:-1===r&&(r=e.length),e.slice(s,r)}for(let t=e.length-1;t>=0;--t)if(e.charCodeAt(t)===n){if(!i){s=t+1;break}}else-1===r&&(i=!1,r=t+1);return-1===r?"":e.slice(s,r)},extname(e){let t=-1,s=0,r=-1,i=!0,o=0;for(let a=e.length-1;a>=0;--a){const c=e.charCodeAt(a);if(c!==n)-1===r&&(i=!1,r=a+1),46===c?-1===t?t=a:1!==o&&(o=1):-1!==t&&(o=-1);else if(!i){s=a+1;break}}return-1===t||-1===r||0===o||1===o&&t===r-1&&t===s+1?"":e.slice(t,r)},format:function(e,t){validateObject(t,"pathObject");const s=t.dir||t.root,r=t.base||`${t.name||""}${t.ext||""}`;return s?s===t.root?`${s}${r}`:`${s}${e}${r}`:r}.bind(null,"/"),parse(e){const t={root:"",dir:"",base:"",ext:"",name:""};if(0===e.length)return t;const s=e.charCodeAt(0)===n;let r;s?(t.root="/",r=1):r=0;let i=-1,o=0,a=-1,c=!0,l=e.length-1,h=0;for(;l>=r;--l){const t=e.charCodeAt(l);if(t!==n)-1===a&&(c=!1,a=l+1),46===t?-1===i?i=l:1!==h&&(h=1):-1!==i&&(h=-1);else if(!c){o=l+1;break}}if(-1!==a){const r=0===o&&s?1:o;-1===i||0===h||1===h&&i===a-1&&i===o+1?t.base=t.name=e.slice(r,a):(t.name=e.slice(r,i),t.base=e.slice(r,a),t.ext=e.slice(i,a))}return o>0?t.dir=e.slice(0,o-1):s&&(t.dir="/"),t},sep:"/",delimiter:":",win32:null,posix:null},c=a;var l={},h={};l.length=0,l.getItem=function(e){return e in h?h[e]:null},l.setItem=function(e,t){void 0===t?l.removeItem(e):(h.hasOwnProperty(e)||l.length++,h[e]=`${t}`)},l.removeItem=function(e){h.hasOwnProperty(e)&&(delete h[e],l.length--)},l.key=function(e){return Object.keys(h)[e]||null},l.clear=function(){h={},l.length=0},"object"==typeof exports&&(module.exports=l);const u=l,p=Symbol("readyState"),d=Symbol("headers"),g=Symbol("response headers"),f=Symbol("AbortController"),m=Symbol("method"),y=Symbol("URL"),b=Symbol("MIME"),w=Symbol("dispatch"),v=Symbol("errored"),k=Symbol("timeout"),A=Symbol("timedOut"),I=Symbol("isResponseText");function _(...e){const t=e.reduce((e,t)=>e+t.length,0),s=new Uint8Array(t);return e.forEach((e,t,r)=>{const n=r.slice(0,t).reduce((e,t)=>e+t.length,0);s.set(e,n)}),s}async function x(e){const t=this.responseType||"text",s=new TextDecoder,r=this[b]||this[g].get("content-type")||"text/plain";switch(t){case"text":this.response=s.decode(e);break;case"blob":this.response=new Blob([e],{type:r});break;case"arraybuffer":this.response=e.buffer;break;case"json":this.response=JSON.parse(s.decode(e))}}const T=class extends EventTarget{onreadystatechange(){}set readyState(e){this[p]!==e&&(this[p]=e,this.dispatchEvent(new Event("readystatechange")),this.onreadystatechange(new Event("readystatechange")))}get readyState(){return this[p]}constructor(){super(),this.readyState=this.constructor.UNSENT,this.response=null,this.responseType="",this.responseURL="",this.status=0,this.statusText="",this.timeout=0,this.withCredentials=!1,this[d]=Object.create(null),this[d].accept="*/*",this[g]=Object.create(null),this[f]=new AbortController,this[m]="",this[y]="",this[b]="",this[v]=!1,this[k]=0,this[A]=!1,this[I]=!0}static get UNSENT(){return 0}static get OPENED(){return 1}static get HEADERS_RECEIVED(){return 2}static get LOADING(){return 3}static get DONE(){return 4}upload={addEventListener(){}};get responseText(){if(this[v])return null;if(this.readyState<this.constructor.HEADERS_RECEIVED)return"";if(this[I])return this.response;throw new DOMException("Response type not set to text","InvalidStateError")}get responseXML(){throw new Error("XML not supported")}[w](e){const t=`on${e.type}`;"function"==typeof this[t]&&this.addEventListener(e.type,this[t].bind(this),{once:!0}),this.dispatchEvent(e)}abort(){this[f].abort(),this.status=0,this.readyState=this.constructor.UNSENT}open(e,t){this.status=0,this[m]=e,this[y]=t,this.readyState=this.constructor.OPENED}setRequestHeader(e,t){e=String(e).toLowerCase(),void 0===this[d][e]?this[d][e]=String(t):this[d][e]+=`, ${t}`}overrideMimeType(e){this[b]=String(e)}getAllResponseHeaders(){return this[v]||this.readyState<this.constructor.HEADERS_RECEIVED?"":Array.from(this[g].entries().map(([e,t])=>`${e}: ${t}`)).join("\r\n")}getResponseHeader(e){const t=this[g].get(String(e).toLowerCase());return"string"==typeof t?t:null}send(e=null){this.timeout>0&&(this[k]=setTimeout(()=>{this[A]=!0,this[f].abort()},this.timeout));const t=this.responseType||"text";this[I]="text"===t,this.setRequestHeader("user-agent","puter-js/1.0"),this.setRequestHeader("origin","https://puter.work"),this.setRequestHeader("referer","https://puter.work/"),fetch(this[y],{method:this[m]||"GET",signal:this[f].signal,headers:this[d],credentials:this.withCredentials?"include":"same-origin",body:e}).then(async e=>{if(this.responseURL=e.url,this.status=e.status,this.statusText=e.statusText,this[g]=e.headers,this.readyState=this.constructor.HEADERS_RECEIVED,e.headers.get("content-type").includes("application/x-ndjson")||this.streamRequestBadForPerformance){let t=new Uint8Array;for await(const s of e.body)this.readyState=this.constructor.LOADING,t=_(t,s),x.call(this,t),this[w](new CustomEvent("progress"))}else{const t=[];for await(const s of e.body)t.push(s);x.call(this,_(...t))}this.readyState=this.constructor.DONE,this[w](new CustomEvent("load"))},e=>{let t="abort";"AbortError"!==e.name?(this[v]=!0,t="error"):this[A]&&(t="timeout"),this.readyState=this.constructor.DONE,this[w](new CustomEvent(t))}).finally(()=>this[w](new CustomEvent("loadend"))).finally(()=>{clearTimeout(this[k]),this[w](new CustomEvent("loadstart"))})}};"object"==typeof module&&module.exports?module.exports=T:(globalThis||self).XMLHttpRequestShim=T;const E=T;class S{constructor(){this.result=null,this.error=null,this.onloadend=null}readAsDataURL(e){const t=this;!async function(){try{let s;s=e&&"function"==typeof e.arrayBuffer?await e.arrayBuffer():e instanceof ArrayBuffer?e:ArrayBuffer.isView(e)?e.buffer:new Uint8Array(0).buffer;const r=function(e){const t=new Uint8Array(e).reduce((e,t)=>e+String.fromCharCode(t),"");return"function"==typeof btoa?btoa(t):Buffer.from(t,"binary").toString("base64")}(s),n=e&&e.type||"application/octet-stream";t.result="data:"+n+";base64,"+r,"function"==typeof t.onloadend&&t.onloadend()}catch(e){t.error=e,"function"==typeof t.onloadend&&t.onloadend()}}()}}class C extends(globalThis.HTMLElement||Object){constructor(e){super(),this.message=e||"You have reached your usage limit for this account.",this.attachShadow({mode:"open"}),this.shadowRoot.innerHTML=`\n        <style>\n            dialog {\n                background: transparent;\n                border: none;\n                box-shadow: none;\n                outline: none;\n                padding: 0;\n                max-width: 90vw;\n            }\n            \n            dialog::backdrop {\n                background: rgba(0, 0, 0, 0.5);\n            }\n            \n            .dialog-content {\n                border: 1px solid #e8e8e8;\n                border-radius: 12px;\n                padding: 32px;\n                background: white;\n                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);\n                -webkit-font-smoothing: antialiased;\n                color: #333;\n                position: relative;\n                max-width: 420px;\n                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;\n            }\n            \n            .close-btn {\n                position: absolute;\n                right: 16px;\n                top: 12px;\n                font-size: 20px;\n                color: #999;\n                cursor: pointer;\n                width: 28px;\n                height: 28px;\n                display: flex;\n                align-items: center;\n                justify-content: center;\n                border-radius: 50%;\n                transition: background 0.2s, color 0.2s;\n            }\n            \n            .close-btn:hover {\n                background: #f0f0f0;\n                color: #333;\n            }\n            \n            .icon-container {\n                width: 64px;\n                height: 64px;\n                margin: 0 auto 20px;\n                background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);\n                border-radius: 50%;\n                display: flex;\n                align-items: center;\n                justify-content: center;\n            }\n            \n            .icon-container svg {\n                width: 32px;\n                height: 32px;\n                color: #f57c00;\n            }\n            \n            h2 {\n                margin: 0 0 12px;\n                font-size: 20px;\n                font-weight: 600;\n                text-align: center;\n                color: #1a1a1a;\n            }\n            \n            .message {\n                text-align: center;\n                font-size: 14px;\n                line-height: 1.5;\n                color: #666;\n                margin-bottom: 24px;\n            }\n            \n            .buttons {\n                display: flex;\n                gap: 12px;\n                justify-content: center;\n            }\n            \n            .button {\n                padding: 10px 24px;\n                border-radius: 8px;\n                font-size: 14px;\n                font-weight: 500;\n                cursor: pointer;\n                transition: all 0.2s;\n                border: none;\n                font-family: inherit;\n            }\n            \n            .button-secondary {\n                background: #f5f5f5;\n                color: #666;\n            }\n            \n            .button-secondary:hover {\n                background: #e8e8e8;\n            }\n            \n            .button-primary {\n                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);\n                color: white;\n            }\n            \n            .button-primary:hover {\n                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);\n                box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);\n            }\n        </style>\n        <dialog>\n            <div class="dialog-content">\n                <span class="close-btn">&#x2715;</span>\n                <div class="icon-container">\n                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">\n                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />\n                    </svg>\n                </div>\n                <h2>Low Balance</h2>\n                <p class="message">${this.message}</p>\n                <div class="buttons">\n                    <button class="button button-secondary" id="close-btn">Close</button>\n                    <button class="button button-primary" id="upgrade-btn">Upgrade Now</button>\n                </div>\n            </div>\n        </dialog>\n        `}connectedCallback(){const e=this.shadowRoot.querySelector("dialog");this.shadowRoot.querySelector(".close-btn").addEventListener("click",()=>{this.close()}),this.shadowRoot.querySelector("#close-btn").addEventListener("click",()=>{this.close()}),this.shadowRoot.querySelector("#upgrade-btn").addEventListener("click",()=>{window.open("https://puter.com/dashboard","_blank"),this.close()}),e.addEventListener("click",t=>{t.target===e&&this.close()})}open(){this.shadowRoot.querySelector("dialog").showModal()}close(){this.shadowRoot.querySelector("dialog").close(),this.remove()}}function P(e){if(void 0===globalThis.document)return void console.warn("[Puter]",e);if(document.querySelector("usage-limit-dialog"))return;const t=new C(e);document.body.appendChild(t),t.open()}async function D(e){if("blob"===e.responseType){const t=e.getResponseHeader("content-type");if(t.startsWith("application/json")){const t=await e.response.text();try{return JSON.parse(t)}catch(e){return t}}else if(t.startsWith("application/octet-stream"))return e.response;return{success:!0,result:e.response}}const t=e.responseText;try{return JSON.parse(t)}catch(e){return t}}void 0!==globalThis.HTMLElement&&globalThis.customElements&&(customElements.get("usage-limit-dialog")||customElements.define("usage-limit-dialog",C));const O=()=>{let e,t;return{promise:new Promise((s,r)=>{e=s,t=r}),resolve:e,reject:t}};function L(e,t,s,r="post",n="text/plain;actually=json",i=void 0){const o=new XMLHttpRequest;return o.open(r,t+e,!0),s&&o.setRequestHeader("Authorization",`Bearer ${s}`),o.setRequestHeader("Content-Type",n),o.responseType=i??"",globalThis.puter?.apiCallLogger?.isEnabled()&&(o._puterRequestId={method:r,service:"xhr",operation:e.replace(/^\
+(() => {
+    "use strict";
+    var e = {
+            429: (e, t, s) => {
+                const r = s(614);
+                function n(e, t) {
+                    const s = e.toLowerCase(),
+                        r = t.toLowerCase();
+                    if ("" === r) return !1;
+                    if (
+                        -1 === r.indexOf("*") &&
+                        -1 === r.indexOf("?") &&
+                        -1 === r.indexOf("[") &&
+                        -1 === r.indexOf("{")
+                    )
+                        return s === r;
+                    let i = r;
+                    const o = i.match(/\{([^}]+)\}/);
+                    if (o)
+                        return o[1]
+                            .split(",")
+                            .map((e) => i.replace(o[0], e.trim()))
+                            .some((t) => n(e, t));
+                    let a = "",
+                        c = 0;
+                    for (; c < i.length; ) {
+                        const e = i[c];
+                        if ("*" === e) a += ".*";
+                        else if ("?" === e) a += ".";
+                        else if ("[" === e) {
+                            let e = c + 1,
+                                t = "[";
+                            for (; e < i.length && "]" !== i[e]; ) (t += i[e]), e++;
+                            e < i.length ? ((t += "]"), (a += t), (c = e)) : (a += "\\[");
+                        } else /[.+^${}()|\\]/.test(e) ? (a += "\\" + e) : (a += e);
+                        c++;
+                    }
+                    try {
+                        return new RegExp("^" + a + "$", "i").test(e);
+                    } catch (e) {
+                        return s === r;
+                    }
+                }
+                e.exports = class {
+                    constructor(e = {}) {
+                        "string" == typeof e && (e = { dbName: e }),
+                            (this.store = new r()),
+                            (this.expireTimes = new r()),
+                            (this.db = null),
+                            (this.dbName = e.dbName),
+                            (this.dbVersion = e.dbVersion || 1),
+                            (this.isIndexedDBAvailable = !1),
+                            (this.isInitialized = !1),
+                            (this.initPromise = null),
+                            (this.storeSet = (e, t) => {
+                                this.store.set(e, t),
+                                    this._initCleanupLoop(20),
+                                    this.isIndexedDBAvailable && this.db && this._persistToIndexedDB(e, t);
+                            }),
+                            this._initIndexedDB();
+                    }
+                    _initIndexedDB() {
+                        "undefined" != typeof window && window.indexedDB && this.dbName
+                            ? ((this.isIndexedDBAvailable = !0), (this.initPromise = this._setupIndexedDB()))
+                            : (this.isInitialized = !0);
+                    }
+                    async _setupIndexedDB() {
+                        try {
+                            (this.db = await this._openDatabase()),
+                                await this._loadFromIndexedDB(),
+                                (this.isInitialized = !0);
+                        } catch (e) {
+                            console.warn("Failed to initialize IndexedDB:", e),
+                                (this.isIndexedDBAvailable = !1),
+                                (this.isInitialized = !0);
+                        }
+                    }
+                    _openDatabase() {
+                        return new Promise((e, t) => {
+                            const s = indexedDB.open(this.dbName, this.dbVersion);
+                            (s.onerror = () => t(s.error)),
+                                (s.onsuccess = () => e(s.result)),
+                                (s.onupgradeneeded = (e) => {
+                                    const t = e.target.result;
+                                    t.objectStoreNames.contains("store") ||
+                                        t.createObjectStore("store", { keyPath: "key" }),
+                                        t.objectStoreNames.contains("expireTimes") ||
+                                            t.createObjectStore("expireTimes", { keyPath: "key" });
+                                });
+                        });
+                    }
+                    async _loadFromIndexedDB() {
+                        if (this.db)
+                            try {
+                                const e = this.db.transaction(["store", "expireTimes"], "readonly"),
+                                    t = e.objectStore("store"),
+                                    s = e.objectStore("expireTimes"),
+                                    r = t.getAll(),
+                                    n = s.getAll(),
+                                    [i, o] = await Promise.all([
+                                        new Promise((e, t) => {
+                                            (r.onsuccess = () => e(r.result)), (r.onerror = () => t(r.error));
+                                        }),
+                                        new Promise((e, t) => {
+                                            (n.onsuccess = () => e(n.result)), (n.onerror = () => t(n.error));
+                                        }),
+                                    ]);
+                                i.forEach((e) => {
+                                    this.store.set(e.key, e.value);
+                                }),
+                                    o.forEach((e) => {
+                                        this.expireTimes.set(e.key, e.expireTime);
+                                    });
+                                const a = Date.now();
+                                for (const [e, t] of this.expireTimes.entries())
+                                    a > t &&
+                                        (this.store.delete(e),
+                                        this.expireTimes.delete(e),
+                                        this._removeFromIndexedDB(e));
+                            } catch (e) {
+                                console.warn("Failed to load data from IndexedDB:", e);
+                            }
+                    }
+                    async _persistToIndexedDB(e, t) {
+                        if (this.db)
+                            try {
+                                this.db
+                                    .transaction(["store"], "readwrite")
+                                    .objectStore("store")
+                                    .put({ key: e, value: t });
+                            } catch (e) {
+                                console.warn("Failed to persist to IndexedDB:", e);
+                            }
+                    }
+                    async _persistExpirationToIndexedDB(e, t) {
+                        if (this.db)
+                            try {
+                                const s = this.db.transaction(["expireTimes"], "readwrite").objectStore("expireTimes");
+                                void 0 !== t ? s.put({ key: e, expireTime: t }) : s.delete(e);
+                            } catch (e) {
+                                console.warn("Failed to persist expiration to IndexedDB:", e);
+                            }
+                    }
+                    async _removeFromIndexedDB(e) {
+                        if (this.db)
+                            try {
+                                const t = this.db.transaction(["store", "expireTimes"], "readwrite"),
+                                    s = t.objectStore("store"),
+                                    r = t.objectStore("expireTimes");
+                                s.delete(e), r.delete(e);
+                            } catch (e) {
+                                console.warn("Failed to remove from IndexedDB:", e);
+                            }
+                    }
+                    async waitForInitialization() {
+                        this.isInitialized || (this.initPromise && (await this.initPromise));
+                    }
+                    set(e, t, s = {}) {
+                        const {
+                                NX: r = !1,
+                                XX: n = !1,
+                                GET: i = !1,
+                                EX: o,
+                                PX: a,
+                                EXAT: c,
+                                PXAT: l,
+                                KEEPTTL: h = !1,
+                            } = s,
+                            u = r,
+                            p = n,
+                            d = i;
+                        let g = o ? parseInt(o, 10) : void 0,
+                            f = a ? parseInt(a, 10) : void 0,
+                            m = c ? parseInt(c, 10) : void 0,
+                            y = l ? parseInt(l, 10) : void 0;
+                        const b = h,
+                            w = this.store.has(e);
+                        if (p && !w) return;
+                        if (u && w) return;
+                        let v;
+                        if (
+                            (d && w && (v = this.store.get(e)),
+                            this.storeSet(e, t),
+                            void 0 !== g || void 0 !== f || void 0 !== m || void 0 !== y || b)
+                        ) {
+                            let t;
+                            void 0 !== g
+                                ? (t = Date.now() + 1e3 * g)
+                                : void 0 !== f
+                                  ? (t = Date.now() + f)
+                                  : void 0 !== m
+                                    ? (t = 1e3 * m)
+                                    : void 0 !== y
+                                      ? (t = y)
+                                      : b && w && (t = this.expireTimes.get(e)),
+                                void 0 !== t &&
+                                    (this.expireTimes.set(e, t),
+                                    this.isIndexedDBAvailable && this.db && this._persistExpirationToIndexedDB(e, t));
+                        } else
+                            this.expireTimes.delete(e),
+                                this.isIndexedDBAvailable && this.db && this._persistExpirationToIndexedDB(e, void 0);
+                        return !d || v;
+                    }
+                    get(e) {
+                        if (!this._checkAndRemoveExpiredKey(e)) return this.store.get(e);
+                    }
+                    del(...e) {
+                        let t = 0;
+                        for (const s of e)
+                            this._checkAndRemoveExpiredKey(s) ||
+                                (this.store.delete(s) &&
+                                    (this.expireTimes.delete(s),
+                                    this.isIndexedDBAvailable && this.db && this._removeFromIndexedDB(s),
+                                    t++));
+                        return t;
+                    }
+                    exists(...e) {
+                        let t = 0;
+                        for (const s of e) this._checkAndRemoveExpiredKey(s) || (this.store.has(s) && t++);
+                        return t;
+                    }
+                    incr(e) {
+                        return this.incrby(e, 1);
+                    }
+                    incrby(e, t) {
+                        let s = this.store.get(e);
+                        if (void 0 === s) s = 0;
+                        else if (!Number.isInteger(Number(s))) throw new Error("ERR value is not an integer");
+                        const r = Number(s) + t;
+                        return this.storeSet(e, r.toString()), r;
+                    }
+                    decr(e) {
+                        try {
+                            return this.decrby(e, 1);
+                        } catch (e) {
+                            throw e;
+                        }
+                    }
+                    decrby(e, t) {
+                        let s = this.store.get(e);
+                        if (void 0 === s) s = 0;
+                        else if (!Number.isInteger(Number(s))) throw new Error("ERR value is not an integer");
+                        const r = Number(s) - t;
+                        return this.storeSet(e, r.toString()), r;
+                    }
+                    expire(e, t, s = {}) {
+                        if (!this.store.has(e)) return 0;
+                        const { NX: r = !1, XX: n = !1, GT: i = !1, LT: o = !1 } = s,
+                            a = Date.now(),
+                            c = this.expireTimes.get(e);
+                        return (r && void 0 !== c) ||
+                            (n && void 0 === c) ||
+                            (i && (void 0 === c || c <= a + 1e3 * t)) ||
+                            (o && (void 0 === c || c >= a + 1e3 * t))
+                            ? 0
+                            : (this.expireTimes.set(e, a + 1e3 * t), 1);
+                    }
+                    keys(e) {
+                        const t = [];
+                        for (const [s, r] of this.store.entries())
+                            if (n(s, e)) {
+                                const e = this.expireTimes.get(s);
+                                (void 0 === e || e > Date.now()) && t.push(s);
+                            }
+                        return t;
+                    }
+                    mget(...e) {
+                        return e.map((e) => this.get(e));
+                    }
+                    mset(...e) {
+                        if (e.length % 2 != 0) throw new Error("MSET requires an even number of arguments");
+                        for (let t = 0; t < e.length; t += 2) this.set(e[t], e[t + 1]);
+                        return !0;
+                    }
+                    renamenx(e, t) {
+                        if (!this.store.has(e) || this.store.has(t)) return 0;
+                        const s = this.store.get(e);
+                        if ((this.store.delete(e), this.storeSet(t, s), this.expireTimes.has(e))) {
+                            const s = this.expireTimes.get(e);
+                            this.expireTimes.delete(e), this.expireTimes.set(t, s);
+                        }
+                        return 1;
+                    }
+                    randomkey() {
+                        const e = Array.from(this.store.keys());
+                        if (0 !== e.length) return e[Math.floor(Math.random() * e.length)];
+                    }
+                    expireat(e, t, s = {}) {
+                        if ("number" != typeof t || isNaN(t)) throw new Error("ERR invalid expire time in SETEX");
+                        if (!this.store.has(e)) return 0;
+                        const { NX: r = !1, XX: n = !1, GT: i = !1, LT: o = !1 } = s,
+                            a = 1e3 * t - Date.now();
+                        if (a <= 0) return this.store.delete(e), this.expireTimes.delete(e), 0;
+                        const c = this.pttl(e);
+                        return (n && -1 === c) ||
+                            (r && -1 !== c) ||
+                            (i && -1 !== c && a <= c) ||
+                            (o && -1 !== c && a >= c)
+                            ? 0
+                            : this.pexpire(e, a);
+                    }
+                    pexpire(e, t, s = {}) {
+                        const { NX: r = !1, XX: n = !1, GT: i = !1, LT: o = !1 } = s;
+                        if ((r && this.store.has(e)) || (n && !this.store.has(e))) return 0;
+                        if (i || o) {
+                            const s = this.pttl(e);
+                            if ((i && s >= t) || (o && s <= t)) return 0;
+                        }
+                        return this.expireTimes.set(e, Date.now() + t), 1;
+                    }
+                    pexpireat(e, t) {
+                        const s = t - Date.now();
+                        return s <= 0 ? (this.store.delete(e), this.expireTimes.delete(e), 0) : this.pexpire(e, s);
+                    }
+                    pttl(e) {
+                        if (!this.store.has(e)) return -2;
+                        if (!this.expireTimes.has(e)) return -1;
+                        const t = this.expireTimes.get(e) - Date.now();
+                        return t > 0 ? t : -2;
+                    }
+                    ttl(e) {
+                        if (!this.store.has(e)) return -2;
+                        if (!this.expireTimes.has(e)) return -1;
+                        const t = Math.floor((this.expireTimes.get(e) - Date.now()) / 1e3);
+                        return t > 0 ? t : -2;
+                    }
+                    persist(e) {
+                        return this.store.has(e) && this.expireTimes.has(e)
+                            ? (this.expireTimes.delete(e),
+                              this.isIndexedDBAvailable && this.db && this._persistExpirationToIndexedDB(e, void 0),
+                              1)
+                            : 0;
+                    }
+                    getrange(e, t, s) {
+                        const r = this.get(e);
+                        return "string" != typeof r ? "" : r.slice(t, s + 1);
+                    }
+                    getset(e, t) {
+                        const s = this.get(e);
+                        return this.set(e, t), s;
+                    }
+                    setex(e, t, s) {
+                        if (this.store.has(e)) return this.set(e, t), this.expire(e, s), !0;
+                    }
+                    setrange(e, t, s) {
+                        if ("number" != typeof t || t < 0) throw new Error("Invalid offset value");
+                        if ("string" != typeof s) throw new Error("Value must be a string");
+                        let r = this.get(e);
+                        (void 0 !== r && void 0 !== r) || (r = "");
+                        const n = r.slice(0, t) + s + r.slice(t + s.length);
+                        return this.set(e, n), n.length;
+                    }
+                    strlen(e) {
+                        const t = this.get(e);
+                        return void 0 === t ? 0 : t.length;
+                    }
+                    msetnx(...e) {
+                        if (e.length % 2 != 0) throw new Error("MSETNX requires an even number of arguments");
+                        for (let t = 0; t < e.length; t += 2) if (this.store.has(e[t])) return 0;
+                        for (let t = 0; t < e.length; t += 2) this.set(e[t], e[t + 1]);
+                        return 1;
+                    }
+                    incrbyfloat(e, t) {
+                        let s = this.store.get(e);
+                        if (void 0 === s) s = 0;
+                        else if (isNaN(parseFloat(s))) throw new Error("ERR value is not a valid float");
+                        const r = parseFloat(s) + t;
+                        return this.storeSet(e, r.toString()), r;
+                    }
+                    append(e, t) {
+                        const s = this.get(e),
+                            r = void 0 === s ? t : s + t;
+                        return this.set(e, r), r.length;
+                    }
+                    getbit(e, t) {
+                        const s = this.get(e);
+                        if (void 0 === s || t >= 8 * s.length) return 0;
+                        const r = Math.floor(t / 8),
+                            n = 7 - (t % 8);
+                        return (s.charCodeAt(r) >> n) & 1;
+                    }
+                    setbit(e, t, s) {
+                        if (0 !== s && 1 !== s) throw new Error("ERR bit is not an integer or out of range");
+                        let r = this.get(e);
+                        void 0 === r && (r = "");
+                        const n = Math.floor(t / 8),
+                            i = 7 - (t % 8);
+                        for (; n >= r.length; ) r += "\0";
+                        const o = r.charCodeAt(n),
+                            a = (o >> i) & 1,
+                            c = (o & ~(1 << i)) | (s << i),
+                            l = String.fromCharCode(c),
+                            h = r.slice(0, n) + l + r.slice(n + 1);
+                        return this.set(e, h), a;
+                    }
+                    copy(e, t) {
+                        const s = this.get(e);
+                        return void 0 === s ? 0 : (this.set(t, s), 1);
+                    }
+                    rename(e, t) {
+                        if (!this.store.has(e)) throw new Error("ERR no such key");
+                        if (e === t) return !0;
+                        const s = this.store.get(e),
+                            r = this.expireTimes.get(e);
+                        return (
+                            this.storeSet(t, s),
+                            this.store.delete(e),
+                            void 0 !== r && (this.expireTimes.set(t, r), this.expireTimes.delete(e)),
+                            !0
+                        );
+                    }
+                    type(e) {
+                        return this.store.has(e) ? typeof this.store.get(e) : "none";
+                    }
+                    sadd(e, ...t) {
+                        this.store.has(e) || this.storeSet(e, new Set());
+                        const s = this.store.get(e);
+                        if (!(s instanceof Set))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        let r = 0;
+                        for (const e of t) s.has(e) || (s.add(e), r++);
+                        return r;
+                    }
+                    scard(e) {
+                        const t = this.store.get(e);
+                        if (void 0 === t) return 0;
+                        if (!(t instanceof Set))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        return t.size;
+                    }
+                    sdiff(e, ...t) {
+                        const s = this.store.get(e) || new Set();
+                        if (!(s instanceof Set))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        const r = new Set(s);
+                        for (const e of t) {
+                            const t = this.store.get(e) || new Set();
+                            if (!(t instanceof Set))
+                                throw new Error("ERR Operation against a key holding the wrong kind of value");
+                            for (const e of t) r.delete(e);
+                        }
+                        return Array.from(r);
+                    }
+                    sdiffstore(e, t, ...s) {
+                        const r = this.sdiff(t, ...s),
+                            n = new Set(r);
+                        return this.storeSet(e, n), n.size;
+                    }
+                    sinter(...e) {
+                        if (0 === e.length) return [];
+                        const t = e.map((e) => {
+                                const t = this.store.get(e);
+                                if (void 0 === t) return new Set();
+                                if (!(t instanceof Set))
+                                    throw new Error("ERR Operation against a key holding the wrong kind of value");
+                                return t;
+                            }),
+                            s = new Set(t[0]);
+                        for (let e = 1; e < t.length; e++) for (const r of s) t[e].has(r) || s.delete(r);
+                        return Array.from(s);
+                    }
+                    sintercard(...e) {
+                        return this.sinter(...e).length;
+                    }
+                    sinterstore(e, ...t) {
+                        const s = this.sinter(...t),
+                            r = new Set(s);
+                        return this.storeSet(e, r), r.size;
+                    }
+                    sismember(e, t) {
+                        const s = this.store.get(e);
+                        if (void 0 === s) return !1;
+                        if (!(s instanceof Set))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        return !!s.has(t);
+                    }
+                    smembers(e) {
+                        const t = this.store.get(e);
+                        if (void 0 === t) return [];
+                        if (!(t instanceof Set))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        return Array.from(t);
+                    }
+                    smismember(e, ...t) {
+                        const s = this.store.get(e) || new Set();
+                        if (!(s instanceof Set))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        return t.map((e) => (s.has(e) ? 1 : 0));
+                    }
+                    smove(e, t, s) {
+                        const r = this.store.get(e);
+                        if (void 0 === r || !r.has(s)) return 0;
+                        if (!(r instanceof Set))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        const n = this.store.get(t) || new Set();
+                        if (!(n instanceof Set))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        return r.delete(s), n.add(s), this.storeSet(t, n), 1;
+                    }
+                    spop(e, t = 1) {
+                        const s = this.store.get(e);
+                        if (void 0 === s) return [];
+                        if (!(s instanceof Set))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        const r = [];
+                        for (const e of s) {
+                            if (r.length >= t) break;
+                            r.push(e), s.delete(e);
+                        }
+                        return r;
+                    }
+                    srandmember(e, t = 1) {
+                        const s = this.store.get(e);
+                        if (void 0 === s) return [];
+                        if (!(s instanceof Set))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        const r = Array.from(s),
+                            n = [];
+                        for (let e = 0; e < t && e < r.length; e++) {
+                            const e = Math.floor(Math.random() * r.length);
+                            n.push(r[e]), r.splice(e, 1);
+                        }
+                        return n;
+                    }
+                    srem(e, ...t) {
+                        const s = this.store.get(e);
+                        if (void 0 === s) return 0;
+                        if (!(s instanceof Set))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        let r = 0;
+                        for (const e of t) s.delete(e) && r++;
+                        return r;
+                    }
+                    sscan(e, t, s = {}) {
+                        const { match: r = "*", count: n = 10 } = s,
+                            i = this.store.get(e);
+                        if (void 0 === i) return [0, []];
+                        if (!(i instanceof Set))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        const o = new RegExp(r.replace("*", ".*")),
+                            a = Array.from(i),
+                            c = [];
+                        let l = t;
+                        for (let e = t; e < a.length && c.length < n; e++) o.test(a[e]) && c.push(a[e]), (l = e + 1);
+                        return [l >= a.length ? 0 : l, c];
+                    }
+                    sunion(...e) {
+                        const t = new Set();
+                        for (const s of e) {
+                            const e = this.store.get(s) || new Set();
+                            if (!(e instanceof Set))
+                                throw new Error("ERR Operation against a key holding the wrong kind of value");
+                            for (const s of e) t.add(s);
+                        }
+                        return Array.from(t);
+                    }
+                    sunionstore(e, ...t) {
+                        const s = new Set();
+                        for (const e of t) {
+                            const t = this.store.get(e) || new Set();
+                            if (!(t instanceof Set))
+                                throw new Error("ERR Operation against a key holding the wrong kind of value");
+                            for (const e of t) s.add(e);
+                        }
+                        return this.storeSet(e, s), s.size;
+                    }
+                    lset(e, t, s) {
+                        const r = this.store.get(e);
+                        if (void 0 === r) throw new Error("ERR no such key");
+                        if (!Array.isArray(r))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        if (t < 0 || t >= r.length) throw new Error("ERR index out of range");
+                        return (r[t] = s), !0;
+                    }
+                    ltrim(e, t, s) {
+                        const r = this.store.get(e);
+                        if (void 0 === r) return !0;
+                        if (!Array.isArray(r))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        const n = r.length,
+                            i = t >= 0 ? t : Math.max(n + t, 0),
+                            o = s >= 0 ? s : Math.max(n + s, -1),
+                            a = r.slice(i, o + 1);
+                        return this.storeSet(e, a), !0;
+                    }
+                    rpop(e) {
+                        const t = this.store.get(e);
+                        return void 0 !== t && Array.isArray(t) ? t.pop() : null;
+                    }
+                    rpoplpush(e, t) {
+                        const s = this.rpop(e);
+                        return void 0 === s ? null : (this.lpush(t, s), s);
+                    }
+                    rpush(e, ...t) {
+                        let s = this.store.get(e);
+                        if (void 0 === s) (s = []), this.storeSet(e, s);
+                        else if (!Array.isArray(s))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        return s.push(...t), s.length;
+                    }
+                    rpushx(e, t) {
+                        const s = this.store.get(e);
+                        return void 0 !== s && Array.isArray(s) ? (s.push(t), s.length) : 0;
+                    }
+                    lpush(e, ...t) {
+                        let s = this.store.get(e);
+                        if (void 0 === s) (s = []), this.storeSet(e, s);
+                        else if (!Array.isArray(s))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        return s.unshift(...t), s.length;
+                    }
+                    lpushx(e, ...t) {
+                        const s = this.store.get(e);
+                        return void 0 !== s && Array.isArray(s) ? (s.unshift(...t), s.length) : 0;
+                    }
+                    lrange(e, t, s) {
+                        const r = this.store.get(e);
+                        if (void 0 === r || !Array.isArray(r)) return [];
+                        const n = r.length,
+                            i = t >= 0 ? t : Math.max(n + t, 0),
+                            o = s >= 0 ? s : Math.max(n + s, -1);
+                        return r.slice(i, o + 1);
+                    }
+                    lrem(e, t, s) {
+                        const r = this.store.get(e);
+                        if (void 0 === r || !Array.isArray(r)) return 0;
+                        let n = 0;
+                        if (t > 0) for (let e = 0; e < r.length && n < t; e++) r[e] === s && (r.splice(e, 1), n++, e--);
+                        else if (t < 0)
+                            for (let e = r.length - 1; e >= 0 && n < -t; e--) r[e] === s && (r.splice(e, 1), n++);
+                        else
+                            (n = r.filter((e) => e === s).length),
+                                this.storeSet(
+                                    e,
+                                    r.filter((e) => e !== s)
+                                );
+                        return n;
+                    }
+                    lmove(e, t, s, r) {
+                        const n = "LEFT" === r ? "lpush" : "rpush",
+                            i = this["LEFT" === s ? "lpop" : "rpop"](e);
+                        return void 0 === i ? null : (this[n](t, i), i);
+                    }
+                    lmpop(e, t, s) {
+                        const r = "LEFT" === s ? "lpop" : "rpop",
+                            n = [];
+                        for (let s = 0; s < e; s++) {
+                            const e = this[r](t);
+                            if (void 0 === e) break;
+                            n.push(e);
+                        }
+                        return n;
+                    }
+                    lpop(e) {
+                        const t = this.store.get(e);
+                        return void 0 !== t && Array.isArray(t) ? t.shift() : null;
+                    }
+                    lpos(e, t, s = {}) {
+                        const { rank: r = 0, start: n = 0, stop: i = -1 } = s,
+                            o = this.store.get(e);
+                        if (void 0 === o || !Array.isArray(o)) return;
+                        let a = 0;
+                        const c = o.length,
+                            l = n >= 0 ? n : Math.max(c + n, 0),
+                            h = i >= 0 ? i : Math.max(c + i, -1);
+                        for (let e = l; e <= h; e++)
+                            if (o[e] === t) {
+                                if (a === r) return e;
+                                a++;
+                            }
+                    }
+                    brpoplpush(e, t, s) {
+                        const r = this.brpop(e, s);
+                        return void 0 === r ? null : (this.lpush(t, r), r);
+                    }
+                    lindex(e, t) {
+                        const s = this.store.get(e);
+                        return void 0 !== s && Array.isArray(s)
+                            ? (t < 0 && (t = s.length + t), void 0 !== s[t] ? s[t] : null)
+                            : null;
+                    }
+                    linsert(e, t, s, r) {
+                        const n = this.store.get(e);
+                        if (void 0 === n) return 0;
+                        if (!Array.isArray(n))
+                            throw new Error("ERR Operation against a key holding the wrong kind of value");
+                        const i = n.indexOf(s);
+                        if (-1 === i) return 0;
+                        if ("BEFORE" === t) n.splice(i, 0, r);
+                        else {
+                            if ("AFTER" !== t) throw new Error("ERR syntax error");
+                            n.splice(i + 1, 0, r);
+                        }
+                        return n.length;
+                    }
+                    llen(e) {
+                        const t = this.store.get(e);
+                        return void 0 === t ? 0 : t.length;
+                    }
+                    blmove(e, t, s, r, n) {
+                        const i = "LEFT" === r ? "lpush" : "rpush",
+                            o = this["LEFT" === s ? "blpop" : "brpop"]([e], n);
+                        return void 0 === o ? null : (this[i](t, o[1]), o[1]);
+                    }
+                    blmpop(e, t, ...s) {
+                        const r = [],
+                            n = 1e3 * t,
+                            i = 1 === s.length ? "brpop" : "brpoplpush",
+                            o = s.concat(n);
+                        for (let t = 0; t < e; t++) {
+                            const e = this[i](o);
+                            if (void 0 === e) break;
+                            r.push(e);
+                        }
+                        return r;
+                    }
+                    blpop(e, ...t) {
+                        return this.blmpop(1, e, ...t)[0];
+                    }
+                    brpop(e, ...t) {
+                        const s = 1e3 * e,
+                            r = Date.now() + s;
+                        for (; Date.now() < r; )
+                            for (let e = 0; e < t.length; e++) {
+                                const s = t[e],
+                                    r = this.store.get(s);
+                                if (void 0 !== r && Array.isArray(r) && r.length > 0) {
+                                    const e = r.pop();
+                                    return 0 === r.length && this.store.delete(s), [s, e];
+                                }
+                            }
+                        return null;
+                    }
+                    expiretime(e) {
+                        return this.expireTimes.get(e);
+                    }
+                    pexpiretime(e) {
+                        const t = this.expireTimes.get(e);
+                        return t ? 1e3 * t : null;
+                    }
+                    zadd(e, t, s) {
+                        return this._checkAndRemoveExpiredKey(e)
+                            ? 0
+                            : (this.store.has(e) || this.storeSet(e, new r()), this.store.get(e).set(s, Number(t)), 1);
+                    }
+                    zcard(e) {
+                        return this._checkAndRemoveExpiredKey(e) ? 0 : this.store.has(e) ? this.store.get(e).size : 0;
+                    }
+                    zcount(e, t, s) {
+                        if (this._checkAndRemoveExpiredKey(e)) return 0;
+                        if (!this.store.has(e)) return 0;
+                        const r = this.store.get(e);
+                        let n = 0;
+                        for (const e of r.values()) e >= t && e <= s && n++;
+                        return n;
+                    }
+                    zdiff(...e) {
+                        if (0 === e.length) return new Set();
+                        const t = e.map((e) =>
+                                this._checkAndRemoveExpiredKey(e) ? new r() : this.store.get(e) || new r()
+                            ),
+                            s = new Set(t[0].keys());
+                        for (let e = 1; e < t.length; e++) for (const r of t[e].keys()) s.delete(r);
+                        return s;
+                    }
+                    zdiffstore(e, ...t) {
+                        const s = this.ZDIFF(...t),
+                            n = new r();
+                        for (const e of s) {
+                            const s = t
+                                .map((t) => {
+                                    const s = this.store.get(t);
+                                    return s ? s.get(e) : void 0;
+                                })
+                                .filter((e) => void 0 !== e);
+                            s.length > 0 && n.set(e, Math.min(...s));
+                        }
+                        return this.storeSet(e, n), n.size;
+                    }
+                    bzmpop(e, ...t) {
+                        const s = [];
+                        for (const r of t) {
+                            const t = this.store.get(r);
+                            if (t && t.size > 0) {
+                                const n = Array.from(t.entries())
+                                    .sort((e, t) => e[1] - t[1])
+                                    .slice(0, e)
+                                    .map(([e, s]) => (t.delete(e), [e, s]));
+                                s.push([r, ...n]);
+                                break;
+                            }
+                        }
+                        return s;
+                    }
+                    bzpopmax(e, t) {
+                        const s = this.store.get(e);
+                        if (!s || 0 === s.size) return [];
+                        const r = Array.from(s.entries())
+                            .sort((e, t) => t[1] - e[1])
+                            .slice(0, t)
+                            .map(([e, t]) => (s.delete(e), [e, t]));
+                        return [e, ...r];
+                    }
+                    bzpopmin(e, t) {
+                        const s = this.store.get(e);
+                        if (!s || 0 === s.size) return [];
+                        const r = Array.from(s.entries())
+                            .sort((e, t) => e[1] - t[1])
+                            .slice(0, t)
+                            .map(([e, t]) => (s.delete(e), [e, t]));
+                        return [e, ...r];
+                    }
+                    zincrby(e, t, s) {
+                        this.store.has(e) || this.storeSet(e, new r());
+                        const n = this.store.get(e),
+                            i = (n.get(s) || 0) + Number(t);
+                        return n.set(s, i), i;
+                    }
+                    zinter(...e) {
+                        if (0 === e.length) return new Set();
+                        const t = e.map((e) => this.store.get(e) || new r()),
+                            s = new Set(t[0].keys());
+                        for (let e = 1; e < t.length; e++) {
+                            const r = new Set();
+                            for (const n of t[e].keys()) s.has(n) && r.add(n);
+                            s.clear();
+                            for (const e of r) s.add(e);
+                        }
+                        return s;
+                    }
+                    zintercard(...e) {
+                        return this.ZINTER(...e).size;
+                    }
+                    zinterstore(e, ...t) {
+                        const s = this.ZINTER(...t),
+                            n = new r();
+                        for (const e of s) {
+                            const s = t
+                                .map((t) => {
+                                    const s = this.store.get(t);
+                                    return s ? s.get(e) : void 0;
+                                })
+                                .filter((e) => void 0 !== e);
+                            s.length > 0 && n.set(e, Math.max(...s));
+                        }
+                        return this.storeSet(e, n), n.size;
+                    }
+                    zlexcount(e, t, s) {
+                        const n = this.store.get(e) || new r(),
+                            i = Array.from(n.keys()).sort();
+                        let o = 0;
+                        for (const e of i) e >= t && e <= s && o++;
+                        return o;
+                    }
+                    zmpop(e, ...t) {
+                        const s = [];
+                        for (const r of t) {
+                            const t = this.store.get(r);
+                            if (t && t.size > 0) {
+                                const n = Array.from(t.entries())
+                                    .sort((e, t) => e[1] - t[1])
+                                    .slice(0, e)
+                                    .map(([e, s]) => (t.delete(e), [e, s]));
+                                s.push([r, ...n]);
+                                break;
+                            }
+                        }
+                        return s;
+                    }
+                    zmscore(e, ...t) {
+                        const s = this.store.get(e) || new r();
+                        return t.map((e) => s.get(e));
+                    }
+                    zpopmax(e, t) {
+                        const s = this.store.get(e);
+                        if (!s || 0 === s.size) return [];
+                        const r = Array.from(s.entries())
+                            .sort((e, t) => t[1] - e[1])
+                            .slice(0, t)
+                            .map(([e, t]) => (s.delete(e), [e, t]));
+                        return r;
+                    }
+                    zpopmin(e, t) {
+                        const s = this.store.get(e);
+                        if (!s || 0 === s.size) return [];
+                        const r = Array.from(s.entries())
+                            .sort((e, t) => e[1] - t[1])
+                            .slice(0, t)
+                            .map(([e, t]) => (s.delete(e), [e, t]));
+                        return r;
+                    }
+                    zrandmember(e, t = 1) {
+                        const s = this.store.get(e);
+                        if (!s || 0 === s.size) return [];
+                        const r = Array.from(s.keys()),
+                            n = [];
+                        for (let e = 0; e < t; e++) {
+                            const e = Math.floor(Math.random() * r.length);
+                            n.push(r[e]);
+                        }
+                        return n;
+                    }
+                    zrange(e, t, s) {
+                        const n = this.store.get(e) || new r(),
+                            i = Array.from(n.entries()).sort((e, t) => e[1] - t[1]);
+                        return (
+                            t < 0 && (t = i.length + t),
+                            s < 0 && (s = i.length + s),
+                            i.slice(t, s + 1).map(([e, t]) => [e, t])
+                        );
+                    }
+                    zrangebylex(e, t, s, n = {}) {
+                        const i = this.store.get(e) || new r();
+                        let o = Array.from(i.keys())
+                            .sort()
+                            .filter((e) => e >= t && e <= s);
+                        if (n.limit) {
+                            const { offset: e, count: t } = n.limit;
+                            o = o.slice(e, e + t);
+                        }
+                        return o;
+                    }
+                    zrangebyscore(e, t, s, n = {}) {
+                        const i = this.store.get(e) || new r(),
+                            o = Array.from(i.entries()).sort((e, t) => e[1] - t[1]);
+                        let a = o.filter(([, e]) => e >= t && e <= s);
+                        if (((a = n.withscores ? a.map(([e, t]) => [e, t]) : a.map(([e]) => e)), n.limit)) {
+                            const { offset: e, count: t } = n.limit;
+                            a = a.slice(e, e + t);
+                        }
+                        return a;
+                    }
+                    zrangestore(e, t, s, n) {
+                        const i = this.store.get(t) || new r(),
+                            o = Array.from(i.entries()).sort((e, t) => e[1] - t[1]);
+                        s < 0 && (s = o.length + s), n < 0 && (n = o.length + n);
+                        const a = new r(o.slice(s, n + 1));
+                        return this.storeSet(e, a), a.size;
+                    }
+                    zrank(e, t) {
+                        const s = this.store.get(e);
+                        if (!s) return;
+                        const r = Array.from(s.entries()).sort((e, t) => e[1] - t[1]);
+                        for (let e = 0; e < r.length; e++) if (r[e][0] === t) return e;
+                    }
+                    zrem(e, ...t) {
+                        const s = this.store.get(e);
+                        if (!s) return 0;
+                        let r = 0;
+                        for (const e of t) s.delete(e) && r++;
+                        return r;
+                    }
+                    zremrangebylex(e, t, s) {
+                        const r = this.store.get(e);
+                        if (!r) return 0;
+                        const n = Array.from(r.keys()).sort();
+                        let i = 0;
+                        for (const e of n) e >= t && e <= s && (r.delete(e), i++);
+                        return i;
+                    }
+                    zremrangebyrank(e, t, s) {
+                        const r = this.store.get(e);
+                        if (!r) return 0;
+                        const n = Array.from(r.entries()).sort((e, t) => e[1] - t[1]);
+                        t < 0 && (t = n.length + t), s < 0 && (s = n.length + s);
+                        let i = 0;
+                        for (let e = t; e <= s; e++) r.delete(n[e][0]) && i++;
+                        return i;
+                    }
+                    zremrangebyscore(e, t, s) {
+                        const r = this.store.get(e);
+                        if (!r) return 0;
+                        const n = Array.from(r.entries()).sort((e, t) => e[1] - t[1]);
+                        let i = 0;
+                        for (const [e, o] of n) o >= t && o <= s && (r.delete(e), i++);
+                        return i;
+                    }
+                    zrevrange(e, t, s) {
+                        const n = this.store.get(e) || new r(),
+                            i = Array.from(n.entries()).sort((e, t) => t[1] - e[1]);
+                        return (
+                            t < 0 && (t = i.length + t),
+                            s < 0 && (s = i.length + s),
+                            i.slice(t, s + 1).map(([e, t]) => [e, t])
+                        );
+                    }
+                    zrevrangebylex(e, t, s, n = {}) {
+                        const i = this.store.get(e) || new r();
+                        let o = Array.from(i.keys())
+                            .sort()
+                            .reverse()
+                            .filter((e) => e >= s && e <= t);
+                        if (n.limit) {
+                            const { offset: e, count: t } = n.limit;
+                            o = o.slice(e, e + t);
+                        }
+                        return o;
+                    }
+                    zrevrangebyscore(e, t, s, n = {}) {
+                        const i = this.store.get(e) || new r(),
+                            o = Array.from(i.entries()).sort((e, t) => t[1] - e[1]);
+                        let a = o.filter(([, e]) => e >= s && e <= t);
+                        if (((a = n.withscores ? a.map(([e, t]) => [e, t]) : a.map(([e]) => e)), n.limit)) {
+                            const { offset: e, count: t } = n.limit;
+                            a = a.slice(e, e + t);
+                        }
+                        return a;
+                    }
+                    zrevrank(e, t) {
+                        const s = this.store.get(e);
+                        if (!s) return;
+                        const r = Array.from(s.entries()).sort((e, t) => t[1] - e[1]);
+                        for (let e = 0; e < r.length; e++) if (r[e][0] === t) return e;
+                    }
+                    zscan(e, t, s = {}) {
+                        const n = this.store.get(e) || new r(),
+                            i = Array.from(n.entries()).sort((e, t) => e[1] - t[1]),
+                            o = [];
+                        let a = s.count || 10,
+                            c = t;
+                        for (; a > 0 && c < i.length; )
+                            (s.match && !new RegExp(s.match.replace("*", ".*")).test(i[c][0])) || (o.push(i[c]), a--),
+                                c++;
+                        return [c >= i.length ? 0 : c, o];
+                    }
+                    zscore(e, t) {
+                        const s = this.store.get(e);
+                        if (s) return s.get(t);
+                    }
+                    zunion(e) {
+                        const t = new r();
+                        for (const s of e) {
+                            const e = this.store.get(s);
+                            if (e) for (const [s, r] of e.entries()) t.set(s, (t.get(s) || 0) + r);
+                        }
+                        return Array.from(t.entries()).sort((e, t) => e[1] - t[1]);
+                    }
+                    zunionstore(e, t) {
+                        const s = this.zunion(t),
+                            n = new r(s);
+                        return this.storeSet(e, n), n.size;
+                    }
+                    geoadd(e, t, s, n) {
+                        if ("number" != typeof t || "number" != typeof s)
+                            throw new Error("Invalid longitude or latitude value");
+                        const i = this.store.get(e) || new r();
+                        if (!i.get(n)) {
+                            const r = { longitude: t, latitude: s };
+                            return i.set(n, r), this.storeSet(e, i), 1;
+                        }
+                        return 0;
+                    }
+                    geodist(e, t, s, r = "m") {
+                        const n = this.store.get(e);
+                        if (!n) return;
+                        const i = n.get(t),
+                            o = n.get(s);
+                        if (!i || !o) return;
+                        const a = this._haversineDistance(i.latitude, i.longitude, o.latitude, o.longitude);
+                        return this._convertDistance(a, r);
+                    }
+                    geohash(e, ...t) {
+                        const s = this.store.get(e);
+                        return s
+                            ? t.map((e) => {
+                                  const t = s.get(e);
+                                  return t ? this._encodeGeohash(t.latitude, t.longitude) : null;
+                              })
+                            : [];
+                    }
+                    geopos(e, ...t) {
+                        const s = this.store.get(e);
+                        return s
+                            ? t.map((e) => {
+                                  const t = s.get(e);
+                                  return t ? [t.latitude, t.longitude] : null;
+                              })
+                            : [];
+                    }
+                    georadius(e, t, s, r, n = "m") {
+                        const i = this.store.get(e);
+                        if (!i) return [];
+                        const o = this._convertDistance(r, n, "m"),
+                            a = [];
+                        for (const [e, r] of i.entries())
+                            this._haversineDistance(s, t, r.latitude, r.longitude) <= o && a.push(e);
+                        return a;
+                    }
+                    georadius_ro(e, t, s, r) {
+                        return this.georadius(e, t, s, r, !0);
+                    }
+                    georadiusbymember(e, t, s) {
+                        const r = this.geopos(e, t);
+                        if (r) return this.georadius(r[0], r[1], s, e);
+                    }
+                    georadiusbymember_ro(e, t, s) {
+                        const r = this.geopos(e, t);
+                        if (r) return this.georadius(r[0], r[1], s, e, !0);
+                    }
+                    geosearch(e, t, s, r) {
+                        return this.georadius(t, s, r, e);
+                    }
+                    geosearchstore(e, t, s, r, n) {
+                        const i = this.georadius(s, r, n, t);
+                        return this.set(e, i), i.length;
+                    }
+                    scan(e, t = "*", s = 10) {
+                        const r = this.keys(t),
+                            n = Math.min(e + s, r.length);
+                        return [n === r.length ? 0 : n, r.slice(e, n)];
+                    }
+                    sort(e, t = "ASC", s = !1) {
+                        const r = this.store.get(e);
+                        if (!Array.isArray(r)) return [];
+                        const n = r
+                            .slice()
+                            .sort((e, r) =>
+                                s
+                                    ? "ASC" === t
+                                        ? e.localeCompare(r)
+                                        : r.localeCompare(e)
+                                    : "ASC" === t
+                                      ? e - r
+                                      : r - e
+                            );
+                        return n;
+                    }
+                    touch(...e) {
+                        return e.reduce((e, t) => e + (this.exists(t) ? 1 : 0), 0);
+                    }
+                    sort_ro(e, t = "ASC", s = !1) {
+                        return this.sort(e, t, s);
+                    }
+                    unlink(...e) {
+                        let t = 0;
+                        for (const s of e) this.del(s) && t++;
+                        return t;
+                    }
+                    hset(e, t, s) {
+                        this.store.has(e) || this.storeSet(e, new r());
+                        const n = this.store.get(e),
+                            i = !n.has(t);
+                        return n.set(t, s), i ? 1 : 0;
+                    }
+                    hdel(e, ...t) {
+                        const s = this.store.get(e);
+                        if (!s) return 0;
+                        let r = 0;
+                        for (const e of t) s.delete(e) && r++;
+                        return r;
+                    }
+                    hget(e, t) {
+                        const s = this.store.get(e);
+                        return s ? s.get(t) : void 0;
+                    }
+                    hgetall(e) {
+                        const t = this.store.get(e);
+                        if (!t) return {};
+                        const s = {};
+                        for (const [e, r] of t) s[e] = r;
+                        return s;
+                    }
+                    hincrby(e, t, s) {
+                        const n = this.store.get(e) || new r(),
+                            i = parseInt(n.get(t) || 0, 10) + s;
+                        return n.set(t, i.toString()), this.storeSet(e, n), i;
+                    }
+                    hincrbyfloat(e, t, s) {
+                        const n = this.store.get(e) || new r(),
+                            i = parseFloat(n.get(t) || 0) + s;
+                        return n.set(t, i.toString()), this.storeSet(e, n), i;
+                    }
+                    hkeys(e) {
+                        const t = this.store.get(e);
+                        return t ? Array.from(t.keys()) : [];
+                    }
+                    hlen(e) {
+                        const t = this.store.get(e);
+                        return t ? t.size : 0;
+                    }
+                    hmget(e, ...t) {
+                        const s = this.store.get(e) || new r();
+                        return t.map((e) => s.get(e));
+                    }
+                    hmset(e, ...t) {
+                        const s = this.store.get(e) || new r();
+                        for (let e = 0; e < t.length; e += 2) {
+                            const r = t[e],
+                                n = t[e + 1];
+                            s.set(r, n);
+                        }
+                        return this.storeSet(e, s), !0;
+                    }
+                    hsetnx(e, t, s) {
+                        const n = this.store.get(e) || new r();
+                        return n.has(t) ? 0 : (n.set(t, s), this.storeSet(e, n), 1);
+                    }
+                    hstrlen(e, t) {
+                        const s = this.store.get(e),
+                            r = s ? s.get(t) : null;
+                        return r ? r.length : 0;
+                    }
+                    hvals(e) {
+                        const t = this.store.get(e);
+                        return t ? Array.from(t.values()) : [];
+                    }
+                    hscan(e, t, s = "*", n = 10) {
+                        const i = this.store.get(e) || new r(),
+                            o = Array.from(i.keys()).filter((e) => e.includes(s)),
+                            a = Math.min(t + n, o.length);
+                        return [a === o.length ? 0 : a, o.slice(t, a).map((e) => [e, i.get(e)])];
+                    }
+                    hexists(e, t) {
+                        const s = this.store.get(e);
+                        return s && s.has(t) ? 1 : 0;
+                    }
+                    hrandfield(e, t = 1) {
+                        const s = this.store.get(e);
+                        if (!s) return [];
+                        const r = Array.from(s.keys()),
+                            n = [];
+                        for (let e = 0; e < t; e++) {
+                            const e = Math.floor(Math.random() * r.length);
+                            n.push(r[e]);
+                        }
+                        return n;
+                    }
+                    _checkAndRemoveExpiredKey(e) {
+                        const t = this.expireTimes.get(e);
+                        return (
+                            !!(t && Date.now() > t) &&
+                            (this.store.delete(e),
+                            this.expireTimes.delete(e),
+                            this.isIndexedDBAvailable && this.db && this._removeFromIndexedDB(e),
+                            !0)
+                        );
+                    }
+                    _initCleanupLoop(e) {
+                        1 === this.store.size &&
+                            ((this.cleanupLoop = setInterval(() => {
+                                if (0 === this.store.size && this.cleanupLoop) clearInterval(this.cleanupLoop);
+                                else for (const e of this.expireTimes.keys()) this._checkAndRemoveExpiredKey(e);
+                            }, e)),
+                            "object" == typeof this.cleanupLoop &&
+                                "function" == typeof this.cleanupLoop.unref &&
+                                this.cleanupLoop.unref());
+                    }
+                    _haversineDistance(e, t, s, r) {
+                        const n = (e) => (e * Math.PI) / 180,
+                            i = n(s - e),
+                            o = n(r - t),
+                            a =
+                                Math.sin(i / 2) * Math.sin(i / 2) +
+                                Math.cos(n(e)) * Math.cos(n(s)) * Math.sin(o / 2) * Math.sin(o / 2);
+                        return 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 6371e3;
+                    }
+                    _convertDistance(e, t, s) {
+                        const r = { m: 1, km: 0.001, mi: 621371e-9, ft: 3.28084 };
+                        if (!r[t] || !r[s]) throw new Error("Invalid distance unit");
+                        return (e * r[t]) / r[s];
+                    }
+                    _encodeGeohash(e, t) {
+                        let s = "",
+                            r = -90,
+                            n = 90,
+                            i = -180,
+                            o = 180,
+                            a = !0,
+                            c = 0,
+                            l = 0;
+                        for (; s.length < 12; ) {
+                            if (a) {
+                                const e = (i + o) / 2;
+                                t > e ? ((l = 1 + (l << 1)), (i = e)) : ((l <<= 1), (o = e));
+                            } else {
+                                const t = (r + n) / 2;
+                                e > t ? ((l = 1 + (l << 1)), (r = t)) : ((l <<= 1), (n = t));
+                            }
+                            (a = !a), c < 4 ? c++ : ((s += "0123456789bcdefghjkmnpqrstuvwxyz"[l]), (c = 0), (l = 0));
+                        }
+                        return s;
+                    }
+                    flushall() {
+                        return (
+                            this.store.clear(),
+                            this.expireTimes.clear(),
+                            this.isIndexedDBAvailable && this.db && this._clearIndexedDB(),
+                            !0
+                        );
+                    }
+                    async _clearIndexedDB() {
+                        if (this.db)
+                            try {
+                                const e = this.db.transaction(["store", "expireTimes"], "readwrite"),
+                                    t = e.objectStore("store"),
+                                    s = e.objectStore("expireTimes");
+                                t.clear(), s.clear();
+                            } catch (e) {
+                                console.warn("Failed to clear IndexedDB:", e);
+                            }
+                    }
+                };
+            },
+            614: (e) => {
+                class t {
+                    #e;
+                    constructor(e = []) {
+                        this.#e = [new Map(e)];
+                    }
+                    get size() {
+                        return this.#e.reduce((e, t) => e + t.size, 0);
+                    }
+                    clear() {
+                        this.#e = [new Map()];
+                    }
+                    delete(e) {
+                        return this.#e.some((t) => t.delete(e));
+                    }
+                    get(e) {
+                        for (const t of this.#e) if (t.has(e)) return t.get(e);
+                    }
+                    has(e) {
+                        return this.#e.some((t) => t.has(e));
+                    }
+                    set(e, t) {
+                        let s = this.#e[0];
+                        for (const t of this.#e)
+                            if (t.has(e)) {
+                                s = t;
+                                break;
+                            }
+                        return (
+                            !s.has(e) && s.size >= 8388608 && (this.#e.unshift(new Map()), (s = this.#e[0])),
+                            s.set(e, t),
+                            this
+                        );
+                    }
+                    *[Symbol.iterator]() {
+                        for (const e of this.#e) yield* e;
+                    }
+                    *keys() {
+                        for (const e of this.#e) yield* e.keys();
+                    }
+                    *values() {
+                        for (const e of this.#e) yield* e.values();
+                    }
+                    *entries() {
+                        for (const e of this.#e) yield* e.entries();
+                    }
+                    forEach(e, t) {
+                        for (const [s, r] of this) e.call(t, r, s, this);
+                    }
+                }
+                e.exports = t;
+            },
+        },
+        t = {},
+        s = (function s(r) {
+            var n = t[r];
+            if (void 0 !== n) return n.exports;
+            var i = (t[r] = { exports: {} });
+            return e[r](i, i.exports, s), i.exports;
+        })(429);
+    const r = class {
+            constructor(e = {}) {
+                this.config = { enabled: e.enabled ?? !1, ...e };
+            }
+            updateConfig(e) {
+                this.config = { ...this.config, ...e };
+            }
+            enable() {
+                this.config.enabled = !0;
+            }
+            disable() {
+                this.config.enabled = !1;
+            }
+            isEnabled() {
+                return this.config.enabled;
+            }
+            logRequest(e = {}) {
+                if (!this.isEnabled()) return;
+                const {
+                    service: t = "unknown",
+                    operation: s = "unknown",
+                    params: r = {},
+                    result: n = null,
+                    error: i = null,
+                } = e;
+                let o = "{}";
+                if (r && Object.keys(r).length > 0)
+                    try {
+                        o = JSON.stringify(r);
+                    } catch (e) {
+                        o = "[Unable to serialize params]";
+                    }
+                const a = `${t} - ${s} - [1m${o}[22m`;
+                i ? console.error(a, { error: i.message || i, result: n }) : console.log(a, n);
+            }
+            getStats() {
+                return { enabled: this.config.enabled, config: { ...this.config } };
+            }
+        },
+        n = 47;
+    function i(e) {
+        return e === n;
+    }
+    function o(e, t, s, r) {
+        let i = "",
+            o = 0,
+            a = -1,
+            c = 0,
+            l = 0;
+        for (let h = 0; h <= e.length; ++h) {
+            if (h < e.length) l = e.charCodeAt(h);
+            else {
+                if (r(l)) break;
+                l = n;
+            }
+            if (r(l)) {
+                if (a === h - 1 || 1 === c);
+                else if (2 === c) {
+                    if (
+                        i.length < 2 ||
+                        2 !== o ||
+                        46 !== i.charCodeAt(i.length - 1) ||
+                        46 !== i.charCodeAt(i.length - 2)
+                    ) {
+                        if (i.length > 2) {
+                            const e = i.lastIndexOf(s);
+                            -1 === e
+                                ? ((i = ""), (o = 0))
+                                : ((i = i.slice(0, e)), (o = i.length - 1 - i.lastIndexOf(i, s))),
+                                (a = h),
+                                (c = 0);
+                            continue;
+                        }
+                        if (0 !== i.length) {
+                            (i = ""), (o = 0), (a = h), (c = 0);
+                            continue;
+                        }
+                    }
+                    t && ((i += i.length > 0 ? `${s}..` : ".."), (o = 2));
+                } else i.length > 0 ? (i += `${s}${e.slice(a + 1, h)}`) : (i = e.slice(a + 1, h)), (o = h - a - 1);
+                (a = h), (c = 0);
+            } else 46 === l && -1 !== c ? ++c : (c = -1);
+        }
+        return i;
+    }
+    const a = {
+            resolve(...e) {
+                let t = "",
+                    s = !1;
+                for (let r = e.length - 1; r >= -1 && !s; r--) {
+                    const i = r >= 0 ? e[r] : "/";
+                    0 !== i.length && ((t = `${i}/${t}`), (s = i.charCodeAt(0) === n));
+                }
+                return (t = o(t, !s, "/", i)), s ? `/${t}` : t.length > 0 ? t : ".";
+            },
+            normalize(e) {
+                if (0 === e.length) return ".";
+                const t = e.charCodeAt(0) === n,
+                    s = e.charCodeAt(e.length - 1) === n;
+                return 0 === (e = o(e, !t, "/", i)).length
+                    ? t
+                        ? "/"
+                        : s
+                          ? "./"
+                          : "."
+                    : (s && (e += "/"), t ? `/${e}` : e);
+            },
+            isAbsolute: (e) => e.length > 0 && e.charCodeAt(0) === n,
+            join(...e) {
+                if (0 === e.length) return ".";
+                let t;
+                for (let s = 0; s < e.length; ++s) {
+                    const r = e[s];
+                    r.length > 0 && (void 0 === t ? (t = r) : (t += `/${r}`));
+                }
+                return void 0 === t ? "." : a.normalize(t);
+            },
+            relative(e, t) {
+                if (e === t) return "";
+                if ((e = a.resolve(e)) === (t = a.resolve(t))) return "";
+                const s = e.length,
+                    r = s - 1,
+                    i = t.length - 1,
+                    o = r < i ? r : i;
+                let c = -1,
+                    l = 0;
+                for (; l < o; l++) {
+                    const s = e.charCodeAt(1 + l);
+                    if (s !== t.charCodeAt(1 + l)) break;
+                    s === n && (c = l);
+                }
+                if (l === o)
+                    if (i > o) {
+                        if (t.charCodeAt(1 + l) === n) return t.slice(1 + l + 1);
+                        if (0 === l) return t.slice(1 + l);
+                    } else r > o && (e.charCodeAt(1 + l) === n ? (c = l) : 0 === l && (c = 0));
+                let h = "";
+                for (l = 1 + c + 1; l <= s; ++l)
+                    (l !== s && e.charCodeAt(l) !== n) || (h += 0 === h.length ? ".." : "/..");
+                return `${h}${t.slice(1 + c)}`;
+            },
+            toNamespacedPath: (e) => e,
+            dirname(e) {
+                if (0 === e.length) return ".";
+                const t = e.charCodeAt(0) === n;
+                let s = -1,
+                    r = !0;
+                for (let t = e.length - 1; t >= 1; --t)
+                    if (e.charCodeAt(t) === n) {
+                        if (!r) {
+                            s = t;
+                            break;
+                        }
+                    } else r = !1;
+                return -1 === s ? (t ? "/" : ".") : t && 1 === s ? "//" : e.slice(0, s);
+            },
+            basename(e, t) {
+                let s = 0,
+                    r = -1,
+                    i = !0;
+                if (void 0 !== t && t.length > 0 && t.length <= e.length) {
+                    if (t === e) return "";
+                    let o = t.length - 1,
+                        a = -1;
+                    for (let c = e.length - 1; c >= 0; --c) {
+                        const l = e.charCodeAt(c);
+                        if (l === n) {
+                            if (!i) {
+                                s = c + 1;
+                                break;
+                            }
+                        } else
+                            -1 === a && ((i = !1), (a = c + 1)),
+                                o >= 0 && (l === t.charCodeAt(o) ? -1 === --o && (r = c) : ((o = -1), (r = a)));
+                    }
+                    return s === r ? (r = a) : -1 === r && (r = e.length), e.slice(s, r);
+                }
+                for (let t = e.length - 1; t >= 0; --t)
+                    if (e.charCodeAt(t) === n) {
+                        if (!i) {
+                            s = t + 1;
+                            break;
+                        }
+                    } else -1 === r && ((i = !1), (r = t + 1));
+                return -1 === r ? "" : e.slice(s, r);
+            },
+            extname(e) {
+                let t = -1,
+                    s = 0,
+                    r = -1,
+                    i = !0,
+                    o = 0;
+                for (let a = e.length - 1; a >= 0; --a) {
+                    const c = e.charCodeAt(a);
+                    if (c !== n)
+                        -1 === r && ((i = !1), (r = a + 1)),
+                            46 === c ? (-1 === t ? (t = a) : 1 !== o && (o = 1)) : -1 !== t && (o = -1);
+                    else if (!i) {
+                        s = a + 1;
+                        break;
+                    }
+                }
+                return -1 === t || -1 === r || 0 === o || (1 === o && t === r - 1 && t === s + 1) ? "" : e.slice(t, r);
+            },
+            format: function (e, t) {
+                validateObject(t, "pathObject");
+                const s = t.dir || t.root,
+                    r = t.base || `${t.name || ""}${t.ext || ""}`;
+                return s ? (s === t.root ? `${s}${r}` : `${s}${e}${r}`) : r;
+            }.bind(null, "/"),
+            parse(e) {
+                const t = { root: "", dir: "", base: "", ext: "", name: "" };
+                if (0 === e.length) return t;
+                const s = e.charCodeAt(0) === n;
+                let r;
+                s ? ((t.root = "/"), (r = 1)) : (r = 0);
+                let i = -1,
+                    o = 0,
+                    a = -1,
+                    c = !0,
+                    l = e.length - 1,
+                    h = 0;
+                for (; l >= r; --l) {
+                    const t = e.charCodeAt(l);
+                    if (t !== n)
+                        -1 === a && ((c = !1), (a = l + 1)),
+                            46 === t ? (-1 === i ? (i = l) : 1 !== h && (h = 1)) : -1 !== i && (h = -1);
+                    else if (!c) {
+                        o = l + 1;
+                        break;
+                    }
+                }
+                if (-1 !== a) {
+                    const r = 0 === o && s ? 1 : o;
+                    -1 === i || 0 === h || (1 === h && i === a - 1 && i === o + 1)
+                        ? (t.base = t.name = e.slice(r, a))
+                        : ((t.name = e.slice(r, i)), (t.base = e.slice(r, a)), (t.ext = e.slice(i, a)));
+                }
+                return o > 0 ? (t.dir = e.slice(0, o - 1)) : s && (t.dir = "/"), t;
+            },
+            sep: "/",
+            delimiter: ":",
+            win32: null,
+            posix: null,
+        },
+        c = a;
+    var l = {},
+        h = {};
+    (l.length = 0),
+        (l.getItem = function (e) {
+            return e in h ? h[e] : null;
+        }),
+        (l.setItem = function (e, t) {
+            void 0 === t ? l.removeItem(e) : (h.hasOwnProperty(e) || l.length++, (h[e] = `${t}`));
+        }),
+        (l.removeItem = function (e) {
+            h.hasOwnProperty(e) && (delete h[e], l.length--);
+        }),
+        (l.key = function (e) {
+            return Object.keys(h)[e] || null;
+        }),
+        (l.clear = function () {
+            (h = {}), (l.length = 0);
+        }),
+        "object" == typeof exports && (module.exports = l);
+    const u = l,
+        p = Symbol("readyState"),
+        d = Symbol("headers"),
+        g = Symbol("response headers"),
+        f = Symbol("AbortController"),
+        m = Symbol("method"),
+        y = Symbol("URL"),
+        b = Symbol("MIME"),
+        w = Symbol("dispatch"),
+        v = Symbol("errored"),
+        k = Symbol("timeout"),
+        A = Symbol("timedOut"),
+        I = Symbol("isResponseText");
+    function _(...e) {
+        const t = e.reduce((e, t) => e + t.length, 0),
+            s = new Uint8Array(t);
+        return (
+            e.forEach((e, t, r) => {
+                const n = r.slice(0, t).reduce((e, t) => e + t.length, 0);
+                s.set(e, n);
+            }),
+            s
+        );
+    }
+    async function x(e) {
+        const t = this.responseType || "text",
+            s = new TextDecoder(),
+            r = this[b] || this[g].get("content-type") || "text/plain";
+        switch (t) {
+            case "text":
+                this.response = s.decode(e);
+                break;
+            case "blob":
+                this.response = new Blob([e], { type: r });
+                break;
+            case "arraybuffer":
+                this.response = e.buffer;
+                break;
+            case "json":
+                this.response = JSON.parse(s.decode(e));
+        }
+    }
+    const T = class extends EventTarget {
+        onreadystatechange() {}
+        set readyState(e) {
+            this[p] !== e &&
+                ((this[p] = e),
+                this.dispatchEvent(new Event("readystatechange")),
+                this.onreadystatechange(new Event("readystatechange")));
+        }
+        get readyState() {
+            return this[p];
+        }
+        constructor() {
+            super(),
+                (this.readyState = this.constructor.UNSENT),
+                (this.response = null),
+                (this.responseType = ""),
+                (this.responseURL = ""),
+                (this.status = 0),
+                (this.statusText = ""),
+                (this.timeout = 0),
+                (this.withCredentials = !1),
+                (this[d] = Object.create(null)),
+                (this[d].accept = "*/*"),
+                (this[g] = Object.create(null)),
+                (this[f] = new AbortController()),
+                (this[m] = ""),
+                (this[y] = ""),
+                (this[b] = ""),
+                (this[v] = !1),
+                (this[k] = 0),
+                (this[A] = !1),
+                (this[I] = !0);
+        }
+        static get UNSENT() {
+            return 0;
+        }
+        static get OPENED() {
+            return 1;
+        }
+        static get HEADERS_RECEIVED() {
+            return 2;
+        }
+        static get LOADING() {
+            return 3;
+        }
+        static get DONE() {
+            return 4;
+        }
+        upload = { addEventListener() {} };
+        get responseText() {
+            if (this[v]) return null;
+            if (this.readyState < this.constructor.HEADERS_RECEIVED) return "";
+            if (this[I]) return this.response;
+            throw new DOMException("Response type not set to text", "InvalidStateError");
+        }
+        get responseXML() {
+            throw new Error("XML not supported");
+        }
+        [w](e) {
+            const t = `on${e.type}`;
+            "function" == typeof this[t] && this.addEventListener(e.type, this[t].bind(this), { once: !0 }),
+                this.dispatchEvent(e);
+        }
+        abort() {
+            this[f].abort(), (this.status = 0), (this.readyState = this.constructor.UNSENT);
+        }
+        open(e, t) {
+            (this.status = 0), (this[m] = e), (this[y] = t), (this.readyState = this.constructor.OPENED);
+        }
+        setRequestHeader(e, t) {
+            (e = String(e).toLowerCase()), void 0 === this[d][e] ? (this[d][e] = String(t)) : (this[d][e] += `, ${t}`);
+        }
+        overrideMimeType(e) {
+            this[b] = String(e);
+        }
+        getAllResponseHeaders() {
+            return this[v] || this.readyState < this.constructor.HEADERS_RECEIVED
+                ? ""
+                : Array.from(this[g].entries().map(([e, t]) => `${e}: ${t}`)).join("\r\n");
+        }
+        getResponseHeader(e) {
+            const t = this[g].get(String(e).toLowerCase());
+            return "string" == typeof t ? t : null;
+        }
+        send(e = null) {
+            this.timeout > 0 &&
+                (this[k] = setTimeout(() => {
+                    (this[A] = !0), this[f].abort();
+                }, this.timeout));
+            const t = this.responseType || "text";
+            (this[I] = "text" === t),
+                this.setRequestHeader("user-agent", "puter-js/1.0"),
+                this.setRequestHeader("origin", "https://puter.work"),
+                this.setRequestHeader("referer", "https://puter.work/"),
+                fetch(this[y], {
+                    method: this[m] || "GET",
+                    signal: this[f].signal,
+                    headers: this[d],
+                    credentials: this.withCredentials ? "include" : "same-origin",
+                    body: e,
+                })
+                    .then(
+                        async (e) => {
+                            if (
+                                ((this.responseURL = e.url),
+                                (this.status = e.status),
+                                (this.statusText = e.statusText),
+                                (this[g] = e.headers),
+                                (this.readyState = this.constructor.HEADERS_RECEIVED),
+                                e.headers.get("content-type").includes("application/x-ndjson") ||
+                                    this.streamRequestBadForPerformance)
+                            ) {
+                                let t = new Uint8Array();
+                                for await (const s of e.body)
+                                    (this.readyState = this.constructor.LOADING),
+                                        (t = _(t, s)),
+                                        x.call(this, t),
+                                        this[w](new CustomEvent("progress"));
+                            } else {
+                                const t = [];
+                                for await (const s of e.body) t.push(s);
+                                x.call(this, _(...t));
+                            }
+                            (this.readyState = this.constructor.DONE), this[w](new CustomEvent("load"));
+                        },
+                        (e) => {
+                            let t = "abort";
+                            "AbortError" !== e.name ? ((this[v] = !0), (t = "error")) : this[A] && (t = "timeout"),
+                                (this.readyState = this.constructor.DONE),
+                                this[w](new CustomEvent(t));
+                        }
+                    )
+                    .finally(() => this[w](new CustomEvent("loadend")))
+                    .finally(() => {
+                        clearTimeout(this[k]), this[w](new CustomEvent("loadstart"));
+                    });
+        }
+    };
+    "object" == typeof module && module.exports ? (module.exports = T) : ((globalThis || self).XMLHttpRequestShim = T);
+    const E = T;
+    class S {
+        constructor() {
+            (this.result = null), (this.error = null), (this.onloadend = null);
+        }
+        readAsDataURL(e) {
+            const t = this;
+            !(async function () {
+                try {
+                    let s;
+                    s =
+                        e && "function" == typeof e.arrayBuffer
+                            ? await e.arrayBuffer()
+                            : e instanceof ArrayBuffer
+                              ? e
+                              : ArrayBuffer.isView(e)
+                                ? e.buffer
+                                : new Uint8Array(0).buffer;
+                    const r = (function (e) {
+                            const t = new Uint8Array(e).reduce((e, t) => e + String.fromCharCode(t), "");
+                            return "function" == typeof btoa ? btoa(t) : Buffer.from(t, "binary").toString("base64");
+                        })(s),
+                        n = (e && e.type) || "application/octet-stream";
+                    (t.result = "data:" + n + ";base64," + r), "function" == typeof t.onloadend && t.onloadend();
+                } catch (e) {
+                    (t.error = e), "function" == typeof t.onloadend && t.onloadend();
+                }
+            })();
+        }
+    }
+    class C extends (globalThis.HTMLElement || Object) {
+        constructor(e) {
+            super(),
+                (this.message = e || "You have reached your usage limit for this account."),
+                this.attachShadow({ mode: "open" }),
+                (this.shadowRoot.innerHTML = `\n        <style>\n            dialog {\n                background: transparent;\n                border: none;\n                box-shadow: none;\n                outline: none;\n                padding: 0;\n                max-width: 90vw;\n            }\n            \n            dialog::backdrop {\n                background: rgba(0, 0, 0, 0.5);\n            }\n            \n            .dialog-content {\n                border: 1px solid #e8e8e8;\n                border-radius: 12px;\n                padding: 32px;\n                background: white;\n                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);\n                -webkit-font-smoothing: antialiased;\n                color: #333;\n                position: relative;\n                max-width: 420px;\n                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;\n            }\n            \n            .close-btn {\n                position: absolute;\n                right: 16px;\n                top: 12px;\n                font-size: 20px;\n                color: #999;\n                cursor: pointer;\n                width: 28px;\n                height: 28px;\n                display: flex;\n                align-items: center;\n                justify-content: center;\n                border-radius: 50%;\n                transition: background 0.2s, color 0.2s;\n            }\n            \n            .close-btn:hover {\n                background: #f0f0f0;\n                color: #333;\n            }\n            \n            .icon-container {\n                width: 64px;\n                height: 64px;\n                margin: 0 auto 20px;\n                background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);\n                border-radius: 50%;\n                display: flex;\n                align-items: center;\n                justify-content: center;\n            }\n            \n            .icon-container svg {\n                width: 32px;\n                height: 32px;\n                color: #f57c00;\n            }\n            \n            h2 {\n                margin: 0 0 12px;\n                font-size: 20px;\n                font-weight: 600;\n                text-align: center;\n                color: #1a1a1a;\n            }\n            \n            .message {\n                text-align: center;\n                font-size: 14px;\n                line-height: 1.5;\n                color: #666;\n                margin-bottom: 24px;\n            }\n            \n            .buttons {\n                display: flex;\n                gap: 12px;\n                justify-content: center;\n            }\n            \n            .button {\n                padding: 10px 24px;\n                border-radius: 8px;\n                font-size: 14px;\n                font-weight: 500;\n                cursor: pointer;\n                transition: all 0.2s;\n                border: none;\n                font-family: inherit;\n            }\n            \n            .button-secondary {\n                background: #f5f5f5;\n                color: #666;\n            }\n            \n            .button-secondary:hover {\n                background: #e8e8e8;\n            }\n            \n            .button-primary {\n                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);\n                color: white;\n            }\n            \n            .button-primary:hover {\n                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);\n                box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);\n            }\n        </style>\n        <dialog>\n            <div class="dialog-content">\n                <span class="close-btn">&#x2715;</span>\n                <div class="icon-container">\n                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">\n                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />\n                    </svg>\n                </div>\n                <h2>Low Balance</h2>\n                <p class="message">${this.message}</p>\n                <div class="buttons">\n                    <button class="button button-secondary" id="close-btn">Close</button>\n                    <button class="button button-primary" id="upgrade-btn">Upgrade Now</button>\n                </div>\n            </div>\n        </dialog>\n        `);
+        }
+        connectedCallback() {
+            const e = this.shadowRoot.querySelector("dialog");
+            this.shadowRoot.querySelector(".close-btn").addEventListener("click", () => {
+                this.close();
+            }),
+                this.shadowRoot.querySelector("#close-btn").addEventListener("click", () => {
+                    this.close();
+                }),
+                this.shadowRoot.querySelector("#upgrade-btn").addEventListener("click", () => {
+                    window.open("https://puter.com/dashboard", "_blank"), this.close();
+                }),
+                e.addEventListener("click", (t) => {
+                    t.target === e && this.close();
+                });
+        }
+        open() {
+            this.shadowRoot.querySelector("dialog").showModal();
+        }
+        close() {
+            this.shadowRoot.querySelector("dialog").close(), this.remove();
+        }
+    }
+    function P(e) {
+        if (void 0 === globalThis.document) return void console.warn("[Puter]", e);
+        if (document.querySelector("usage-limit-dialog")) return;
+        const t = new C(e);
+        document.body.appendChild(t), t.open();
+    }
+    async function D(e) {
+        if ("blob" === e.responseType) {
+            const t = e.getResponseHeader("content-type");
+            if (t.startsWith("application/json")) {
+                const t = await e.response.text();
+                try {
+                    return JSON.parse(t);
+                } catch (e) {
+                    return t;
+                }
+            } else if (t.startsWith("application/octet-stream")) return e.response;
+            return { success: !0, result: e.response };
+        }
+        const t = e.responseText;
+        try {
+            return JSON.parse(t);
+        } catch (e) {
+            return t;
+        }
+    }
+    void 0 !== globalThis.HTMLElement &&
+        globalThis.customElements &&
+        (customElements.get("usage-limit-dialog") || customElements.define("usage-limit-dialog", C));
+    const O = () => {
+        let e, t;
+        return {
+            promise: new Promise((s, r) => {
+                (e = s), (t = r);
+            }),
+            resolve: e,
+            reject: t,
+        };
+    };
+    function L(e, t, s, r = "post", n = "text/plain;actually=json", i = void 0) {
+        const o = new XMLHttpRequest();
+        return (
+            o.open(r, t + e, !0),
+            s && o.setRequestHeader("Authorization", `Bearer ${s}`),
+            o.setRequestHeader("Content-Type", n),
+            (o.responseType = i ?? ""),
+            globalThis.puter?.apiCallLogger?.isEnabled() &&
+                (o._puterRequestId = {
+                    method: r,
+                    service: "xhr",
+                    operation: e.replace(/^\//, ""),
+                    params: { endpoint: e, contentType: n, responseType: i },
+                }),
+            o
+        );
+    }
+    function R(e, t, s) {
+        return e && "function" == typeof e && e(s), t(s);
+    }
+    function q(e, t, s, r, n) {
+        e.addEventListener("load", async function (e) {
+            if (globalThis.puter?.apiCallLogger?.isEnabled() && this._puterRequestId) {
+                const e = await D(this).catch(() => null);
+                globalThis.puter.apiCallLogger.logRequest({
+                    service: this._puterRequestId.service,
+                    operation: this._puterRequestId.operation,
+                    params: this._puterRequestId.params,
+                    result: this.status >= 400 ? null : e,
+                    error: this.status >= 400 ? { message: this.statusText, status: this.status } : null,
+                });
+            }
+            return (async function (e, t, s, r, n) {
+                const i = await D(n);
+                return 401 === n.status
+                    ? (t && "function" == typeof t && t({ status: 401, message: "Unauthorized" }),
+                      r({ status: 401, message: "Unauthorized" }))
+                    : 200 !== n.status
+                      ? (t && "function" == typeof t && t(i), r(i))
+                      : (!1 === i.success &&
+                            "permission_denied" === i.error?.code &&
+                            (await puter.ui.requestPermission({ permission: "driver:puter-image-generation:generate" }))
+                                .granted,
+                        e && "function" == typeof e && e(i),
+                        s(i));
+            })(t, s, r, n, this);
+        }),
+            e.addEventListener("error", function (e) {
+                return (
+                    globalThis.puter?.apiCallLogger?.isEnabled() &&
+                        this._puterRequestId &&
+                        globalThis.puter.apiCallLogger.logRequest({
+                            service: this._puterRequestId.service,
+                            operation: this._puterRequestId.operation,
+                            params: this._puterRequestId.params,
+                            error: { message: "Network error occurred", event: e.type },
+                        }),
+                    R(s, n, this)
+                );
+            });
+    }
+    const U = () => {};
+    class M {
+        static callback(e) {
+            return e && "function" == typeof e ? e : void 0;
+        }
+    }
+    function B(e, t, s, r, n = {}) {
+        return async function (...i) {
+            let o = {},
+                a = {};
+            return (
+                1 !== i.length || "object" != typeof i[0] || Array.isArray(i[0])
+                    ? (e.forEach((e, t) => {
+                          o[e] = i[t];
+                      }),
+                      (a = { success: i[e.length], error: i[e.length + 1] }))
+                    : ((o = { ...i[0] }),
+                      (a = { success: o.success, error: o.error }),
+                      delete o.success,
+                      delete o.error),
+                n.preprocess && "function" == typeof n.preprocess && (o = n.preprocess(o)),
+                await (async function (e, t, s, r, n, i) {
+                    const o = O();
+                    return z(e, o.resolve, o.reject, t, s, r, n, void 0, void 0, i), await o.promise;
+                })(a, t, s, r, o, n)
+            );
+        };
+    }
+    async function z(e = {}, t, s, r, n, i, o, a, c = "text/plain;actually=json", l = {}) {
+        let h = null;
+        if (
+            (globalThis.puter?.apiCallLogger?.isEnabled() && (h = { interface: r, driver: n, method: i, args: o }),
+            !puter.authToken && "web" === puter.env)
+        )
+            try {
+                await puter.ui.authenticateWithPuter();
+            } catch (e) {
+                return (
+                    h &&
+                        globalThis.puter?.apiCallLogger?.isEnabled() &&
+                        globalThis.puter.apiCallLogger.logRequest({
+                            service: "drivers",
+                            operation: `${r}::${i}`,
+                            params: { interface: r, driver: n, method: i, args: o },
+                            error: { code: "auth_canceled", message: "Authentication canceled" },
+                        }),
+                    s({ error: { code: "auth_canceled", message: "Authentication canceled" } })
+                );
+            }
+        const u = M.callback(e.success) ?? U,
+            p = M.callback(e.error) ?? U,
+            d = L("/drivers/call", puter.APIOrigin, void 0, "POST", c);
+        h && (d._puterDriverRequestInfo = h), l.responseType && (d.responseType = l.responseType);
+        let g = !1,
+            f = null,
+            m = 0,
+            y = !1,
+            b = "";
+        const w = [];
+        (d.onreadystatechange = () => {
+            if (2 === d.readyState) {
+                if ("application/x-ndjson" !== d.getResponseHeader("Content-Type")) return;
+                g = !0;
+                const e = (async function* () {
+                    for (; !y; ) {
+                        const e = O();
+                        if (((f = e.resolve), await e.promise, y)) break;
+                        for (; w.length > 0; ) {
+                            const e = w.shift();
+                            if ("" === e.trim()) continue;
+                            const t = JSON.parse(e);
+                            ("insufficient_funds" !== t?.error?.code && !0 !== t?.metadata?.usage_limited) ||
+                                ("web" === puter.env &&
+                                    P(
+                                        "You have reached your usage limit for this account.<br>Please upgrade to continue."
+                                    )),
+                                "string" == typeof t.text &&
+                                    Object.defineProperty(t, "toString", { enumerable: !1, value: () => t.text }),
+                                yield t;
+                        }
+                    }
+                })();
+                return (
+                    Object.defineProperty(e, "start", {
+                        enumerable: !1,
+                        value: async (t) => {
+                            const s = new TextEncoder();
+                            for await (const r of e) t.enqueue(s.encode(r));
+                            t.close();
+                        },
+                    }),
+                    t(e)
+                );
+            }
+            4 === d.readyState && ((y = !0), g && f?.());
+        }),
+            (d.onprogress = function () {
+                if (!f) return;
+                const e = d.responseText.slice(m);
+                m = d.responseText.length;
+                let t = !1;
+                for (let s = 0; s < e.length; s++) (b += e[s]), "\n" === e[s] && ((t = !0), w.push(b), (b = ""));
+                t && f();
+            }),
+            d.addEventListener("load", async function (n) {
+                if (g) return;
+                const h = await D(n.target);
+                if (
+                    (this._puterDriverRequestInfo &&
+                        globalThis.puter?.apiCallLogger?.isEnabled() &&
+                        globalThis.puter.apiCallLogger.logRequest({
+                            service: "drivers",
+                            operation: `${this._puterDriverRequestInfo.interface}::${this._puterDriverRequestInfo.method}`,
+                            params: {
+                                interface: this._puterDriverRequestInfo.interface,
+                                driver: this._puterDriverRequestInfo.driver,
+                                method: this._puterDriverRequestInfo.method,
+                                args: this._puterDriverRequestInfo.args,
+                            },
+                            result: n.status >= 400 || !1 === h?.success ? null : h,
+                            error: n.status >= 400 || !1 === h?.success ? h : null,
+                        }),
+                    (402 === n.target?.status ||
+                        "insufficient_funds" === h?.error?.code ||
+                        402 === h?.error?.status ||
+                        !0 === h?.metadata?.usage_limited) &&
+                        "web" === puter.env &&
+                        P(
+                            "Your account has not enough funding to complete this request.<br>Please upgrade to continue."
+                        ),
+                    401 === n.status || "token_auth_failed" === h?.code)
+                ) {
+                    if ("token_auth_failed" === h?.code && "web" === puter.env)
+                        try {
+                            puter.resetAuthToken(), await puter.ui.authenticateWithPuter();
+                        } catch (e) {
+                            return s({ error: { code: "auth_canceled", message: "Authentication canceled" } });
+                        }
+                    return (
+                        p && "function" == typeof p && p({ status: 401, message: "Unauthorized" }),
+                        s({ status: 401, message: "Unauthorized" })
+                    );
+                }
+                if (n.status && 200 !== n.status) return p(h), s(h);
+                {
+                    if (!1 === h.success && "permission_denied" === h.error?.code)
+                        return (await puter.ui.requestPermission({ permission: `driver:${r}:${i}` })).granted
+                            ? z(e, t, s, r, i, o, a, c, l)
+                            : (p(h), s(h));
+                    if (!1 === h.success) return p(h), s(h);
+                    let n = void 0 !== h.result ? h.result : h;
+                    return l.transform && (n = await l.transform(n)), t.success && u(n), t(n);
+                }
+            }),
+            d.addEventListener("error", function (e) {
+                return (
+                    this._puterDriverRequestInfo &&
+                        globalThis.puter?.apiCallLogger?.isEnabled() &&
+                        globalThis.puter.apiCallLogger.logRequest({
+                            service: "drivers",
+                            operation: `${this._puterDriverRequestInfo.interface}::${this._puterDriverRequestInfo.method}`,
+                            params: {
+                                interface: this._puterDriverRequestInfo.interface,
+                                driver: this._puterDriverRequestInfo.driver,
+                                method: this._puterDriverRequestInfo.method,
+                                args: this._puterDriverRequestInfo.args,
+                            },
+                            error: { message: "Network error occurred", event: e.type },
+                        }),
+                    R(p, s, this)
+                );
+            }),
+            d.send(
+                JSON.stringify({
+                    interface: r,
+                    driver: n,
+                    test_mode: l?.test_mode,
+                    method: i,
+                    args: o,
+                    auth_token: puter.authToken,
+                })
+            );
+    }
+    async function j(e) {
+        const t = new (globalThis.FileReader || S)();
+        return await new Promise((s, r) => {
+            (t.onloadend = () => s(t.result)), (t.onerror = r), t.readAsDataURL(e);
+        });
+    }
+    function F(e) {
+        return new Promise((t, s) => {
+            const r = new (globalThis.FileReader || S)();
+            (r.onload = function (e) {
+                t(e.target.result);
+            }),
+                (r.onerror = function (e) {
+                    s(e);
+                }),
+                r.readAsDataURL(e);
+        });
+    }
+    const N = (e) => {
+            if ("string" != typeof e) return "aws-polly";
+            const t = e.toLowerCase();
+            return "openai" === t
+                ? "openai"
+                : ["elevenlabs", "eleven", "11labs", "11-labs", "eleven-labs", "elevenlabs-tts"].includes(t)
+                  ? "elevenlabs"
+                  : "aws" === t || "polly" === t || "aws-polly" === t
+                    ? "aws-polly"
+                    : e;
+        },
+        W = ["minimax/", "google/", "bytedance/", "pixverse/", "kwaivgi/", "vidu/", "wan-ai/"],
+        X = class {
+            constructor(e) {
+                (this.puter = e),
+                    (this.authToken = e.authToken),
+                    (this.APIOrigin = e.APIOrigin),
+                    (this.appID = e.appID);
+            }
+            setAuthToken(e) {
+                this.authToken = e;
+            }
+            setAPIOrigin(e) {
+                this.APIOrigin = e;
+            }
+            async listModels(e) {
+                const t = this.authToken ? { Authorization: `Bearer ${this.authToken}` } : {},
+                    s = async () => {
+                        const s = await fetch(`${this.APIOrigin}/puterai/chat/models/details`, { headers: t });
+                        if (!s.ok) return null;
+                        const r = await s.json(),
+                            n = Array.isArray(r?.models) ? r.models : [];
+                        return e ? n.filter((t) => t.provider === e) : n;
+                    };
+                return await (async () => {
+                    try {
+                        const e = await s();
+                        if (null !== e) return e;
+                    } catch (e) {}
+                    try {
+                        return await (async () => {
+                            const t = await puter.drivers.call("puter-chat-completion", "ai-chat", "models"),
+                                s = Array.isArray(t?.result) ? t.result : [];
+                            return e ? s.filter((t) => t.provider === e) : s;
+                        })();
+                    } catch (e) {
+                        return [];
+                    }
+                })();
+            }
+            async listModelProviders() {
+                const e = await this.listModels(),
+                    t = new Set();
+                return (
+                    (e ?? []).forEach((e) => {
+                        e?.provider && t.add(e.provider);
+                    }),
+                    Array.from(t)
+                );
+            }
+            img2txt = async (...e) => {
+                if (!e || 0 === e.length) throw { message: "Arguments are required", code: "arguments_required" };
+                const t = (e) =>
+                        "undefined" != typeof Blob &&
+                        (e instanceof Blob || ("undefined" != typeof File && e instanceof File)),
+                    s = (e) => e && "object" == typeof e && !Array.isArray(e) && !t(e);
+                let r = {};
+                s(e[0]) ? (r = { ...e[0] }) : (r.source = e[0]);
+                let n = !1;
+                for (let t = 1; t < e.length; t++) {
+                    const i = e[t];
+                    "boolean" == typeof i ? (n = n || i) : s(i) && (r = { ...r, ...i });
+                }
+                "boolean" == typeof r.testMode && (n = r.testMode);
+                const i = ((e) => {
+                    if (!e) return "aws-textract";
+                    const t = String(e).toLowerCase();
+                    return ["aws", "textract", "aws-textract"].includes(t)
+                        ? "aws-textract"
+                        : ["mistral", "mistral-ocr"].includes(t)
+                          ? "mistral"
+                          : "aws-textract";
+                })(r.provider);
+                if ((delete r.provider, delete r.testMode, !r.source))
+                    throw { message: "Source is required", code: "source_required" };
+                if (
+                    (t(r.source)
+                        ? (r.source = await F(r.source))
+                        : r.source?.source && t(r.source.source) && (r.source = await F(r.source.source)),
+                    "string" == typeof r.source && r.source.startsWith("data:") && r.source.length > 10485760)
+                )
+                    throw { message: "Input size cannot be larger than 10485760", code: "input_too_large" };
+                const o = B(["source"], "puter-ocr", i, "recognize", {
+                    test_mode: n ?? !1,
+                    transform: async (e) =>
+                        ((e) => {
+                            if (!e) return "";
+                            if (Array.isArray(e.blocks) && e.blocks.length) {
+                                let t = "";
+                                for (const s of e.blocks)
+                                    "string" == typeof s?.text &&
+                                        ((s.type && "text/textract:LINE" !== s.type && !s.type.startsWith("text/")) ||
+                                            (t += `${s.text}\n`));
+                                if (t.trim()) return t;
+                            }
+                            if (Array.isArray(e.pages) && e.pages.length) {
+                                const t = e.pages
+                                    .map((e) => (e?.markdown || "").trim())
+                                    .filter(Boolean)
+                                    .join("\n\n");
+                                if (t.trim()) return t;
+                            }
+                            return "string" == typeof e.document_annotation
+                                ? e.document_annotation
+                                : "string" == typeof e.text
+                                  ? e.text
+                                  : "";
+                        })(e),
+                });
+                return await o.call(this, r);
+            };
+            txt2speech = async (...e) => {
+                let t = {},
+                    s = !1;
+                if (!e) throw { message: "Arguments are required", code: "arguments_required" };
+                if (
+                    ("string" == typeof e[0] && (t = { text: e[0] }),
+                    e[1] && "object" == typeof e[1] && !Array.isArray(e[1]))
+                )
+                    Object.assign(t, e[1]);
+                else if (e[1] && "string" == typeof e[1])
+                    (t.language = e[1]),
+                        e[2] && "string" == typeof e[2] && (t.voice = e[2]),
+                        e[3] && "string" == typeof e[3] && (t.engine = e[3]);
+                else if (e[1] && "boolean" != typeof e[1])
+                    throw {
+                        message:
+                            'Second argument must be an options object or language string. Use: txt2speech("text", { voice: "name", engine: "type", language: "code" }) or txt2speech("text", "language", "voice", "engine")',
+                        code: "invalid_arguments",
+                    };
+                if (!t.text) throw { message: "Text parameter is required", code: "text_required" };
+                const r = ["standard", "neural", "long-form", "generative"];
+                let n = N(t.provider);
+                if (
+                    (t.engine && "openai" === N(t.engine) && !t.provider && (n = "openai"),
+                    t.engine && "elevenlabs" === N(t.engine) && !t.provider && (n = "elevenlabs"),
+                    "openai" === n)
+                )
+                    t.model || "string" != typeof t.engine || (t.model = t.engine),
+                        t.voice || (t.voice = "alloy"),
+                        t.model || (t.model = "gpt-4o-mini-tts"),
+                        t.response_format || (t.response_format = "mp3"),
+                        delete t.engine;
+                else if ("elevenlabs" === n)
+                    t.voice || (t.voice = "21m00Tcm4TlvDq8ikWAM"),
+                        t.model || "string" != typeof t.engine || (t.model = t.engine),
+                        t.model || (t.model = "eleven_multilingual_v2"),
+                        t.output_format || t.response_format || (t.output_format = "mp3_44100_128"),
+                        t.response_format && !t.output_format && (t.output_format = t.response_format),
+                        delete t.engine;
+                else {
+                    if (((n = "aws-polly"), t.engine && !r.includes(t.engine)))
+                        throw { message: `Invalid engine. Must be one of: ${r.join(", ")}`, code: "invalid_engine" };
+                    t.voice || (t.voice = "Joanna"),
+                        t.engine || (t.engine = "standard"),
+                        t.language || (t.language = "en-US");
+                }
+                if (t.text.length > 3e3)
+                    throw { message: "Input size cannot be larger than 3000", code: "input_too_large" };
+                for (let t = 0; t < e.length; t++)
+                    if ("boolean" == typeof e[t] && !0 === e[t]) {
+                        s = !0;
+                        break;
+                    }
+                const i = "openai" === n ? "openai-tts" : "elevenlabs" === n ? "elevenlabs-tts" : "aws-polly";
+                return await B(["source"], "puter-tts", i, "synthesize", {
+                    responseType: "blob",
+                    test_mode: s ?? !1,
+                    transform: async (e) => {
+                        let t;
+                        if ("string" == typeof e) t = e;
+                        else if (e instanceof Blob) t = await j(e);
+                        else if (e instanceof ArrayBuffer) {
+                            const s = new Blob([e]);
+                            t = await j(s);
+                        } else {
+                            if (!e || "object" != typeof e || "function" != typeof e.arrayBuffer)
+                                throw { message: "Unexpected audio response format", code: "invalid_audio_response" };
+                            {
+                                const s = await e.arrayBuffer(),
+                                    r = new Blob([s], { type: e.type || void 0 });
+                                t = await j(r);
+                            }
+                        }
+                        const s = new (globalThis.Audio || Object)();
+                        return (s.src = t), (s.toString = () => t), (s.valueOf = () => t), s;
+                    },
+                }).call(this, t);
+            };
+            speech2speech = async (...e) => {
+                if (!e || !e.length) throw { message: "Arguments are required", code: "arguments_required" };
+                const t = async (e) => (e instanceof Blob ? await F(e) : e);
+                let s = {},
+                    r = !1;
+                const n = e[0];
+                if (
+                    (!n || "object" != typeof n || Array.isArray(n) || n instanceof Blob
+                        ? (s.audio = await t(n))
+                        : (s = { ...n }),
+                    !e[1] || "object" != typeof e[1] || Array.isArray(e[1]) || e[1] instanceof Blob
+                        ? "boolean" == typeof e[1] && (r = e[1])
+                        : (s = { ...s, ...e[1] }),
+                    "boolean" == typeof e[2] && (r = e[2]),
+                    s.file && ((s.audio = await t(s.file)), delete s.file),
+                    s.audio instanceof Blob && (s.audio = await t(s.audio)),
+                    !s.audio)
+                )
+                    throw { message: "Audio input is required", code: "audio_required" };
+                if ("string" == typeof s.audio && s.audio.startsWith("data:")) {
+                    const e = s.audio.split(",")[1] || "",
+                        t = e.endsWith("==") ? 2 : e.endsWith("=") ? 1 : 0;
+                    if (Math.floor((3 * e.length) / 4) - t > 26214400)
+                        throw { message: "Input size cannot be larger than 25 MB", code: "input_too_large" };
+                }
+                const i = ((e = {}) => {
+                    const t = { ...e };
+                    return (
+                        !t.voiceId || t.voice || t.voice_id || (t.voice = t.voiceId),
+                        !t.modelId || t.model || t.model_id || (t.model = t.modelId),
+                        t.outputFormat && !t.output_format && (t.output_format = t.outputFormat),
+                        t.voiceSettings && !t.voice_settings && (t.voice_settings = t.voiceSettings),
+                        t.fileFormat && !t.file_format && (t.file_format = t.fileFormat),
+                        void 0 !== t.removeBackgroundNoise &&
+                            void 0 === t.remove_background_noise &&
+                            (t.remove_background_noise = t.removeBackgroundNoise),
+                        void 0 !== t.optimizeStreamingLatency &&
+                            void 0 === t.optimize_streaming_latency &&
+                            (t.optimize_streaming_latency = t.optimizeStreamingLatency),
+                        void 0 !== t.enableLogging &&
+                            void 0 === t.enable_logging &&
+                            (t.enable_logging = t.enableLogging),
+                        delete t.voiceId,
+                        delete t.modelId,
+                        delete t.outputFormat,
+                        delete t.voiceSettings,
+                        delete t.fileFormat,
+                        delete t.removeBackgroundNoise,
+                        delete t.optimizeStreamingLatency,
+                        delete t.enableLogging,
+                        t
+                    );
+                })({ ...s });
+                return (
+                    delete i.provider,
+                    await B(["audio"], "puter-speech2speech", "elevenlabs-voice-changer", "convert", {
+                        responseType: "blob",
+                        test_mode: r,
+                        transform: async (e) => {
+                            let t;
+                            if ("string" == typeof e) t = e;
+                            else if (e instanceof Blob) t = await j(e);
+                            else if (e instanceof ArrayBuffer) {
+                                const s = new Blob([e]);
+                                t = await j(s);
+                            } else {
+                                if (!e || "object" != typeof e || "function" != typeof e.arrayBuffer)
+                                    throw {
+                                        message: "Unexpected audio response format",
+                                        code: "invalid_audio_response",
+                                    };
+                                {
+                                    const s = await e.arrayBuffer(),
+                                        r = new Blob([s], { type: e.type || void 0 });
+                                    t = await j(r);
+                                }
+                            }
+                            const s = new Audio(t);
+                            return (s.toString = () => t), (s.valueOf = () => t), s;
+                        },
+                    }).call(this, i)
+                );
+            };
+            speech2txt = async (...e) => {
+                if (!e || !e.length) throw { message: "Arguments are required", code: "arguments_required" };
+                const t = async (e) => (e instanceof Blob ? await F(e) : e);
+                let s = {},
+                    r = !1;
+                const n = e[0];
+                if (
+                    (!n || "object" != typeof n || Array.isArray(n) || n instanceof Blob
+                        ? (s.file = await t(n))
+                        : (s = { ...n }),
+                    !e[1] || "object" != typeof e[1] || Array.isArray(e[1]) || e[1] instanceof Blob
+                        ? "boolean" == typeof e[1] && (r = e[1])
+                        : (s = { ...s, ...e[1] }),
+                    "boolean" == typeof e[2] && (r = e[2]),
+                    s.audio && ((s.file = await t(s.audio)), delete s.audio),
+                    s.file instanceof Blob && (s.file = await t(s.file)),
+                    !s.file)
+                )
+                    throw { message: "Audio input is required", code: "audio_required" };
+                if ("string" == typeof s.file && s.file.startsWith("data:")) {
+                    const e = s.file.split(",")[1] || "",
+                        t = e.endsWith("==") ? 2 : e.endsWith("=") ? 1 : 0;
+                    if (Math.floor((3 * e.length) / 4) - t > 26214400)
+                        throw { message: "Input size cannot be larger than 25 MB", code: "input_too_large" };
+                }
+                const i = s.translate ? "translate" : "transcribe",
+                    o = { ...s };
+                delete o.translate;
+                const a = o.response_format;
+                return await B([], "puter-speech2txt", "openai-speech2txt", i, {
+                    test_mode: r,
+                    transform: async (e) =>
+                        "text" === a && e && "object" == typeof e && "string" == typeof e.text ? e.text : e,
+                }).call(this, o);
+            };
+            txt2speech = Object.assign(this.txt2speech, {
+                listEngines: async (e = {}) => {
+                    let t = "aws-polly",
+                        s = {};
+                    "string" == typeof e
+                        ? (t = N(e))
+                        : e && "object" == typeof e && ((t = N(e.provider) || t), (s = { ...e }), delete s.provider),
+                        "openai" === t && (s.provider = "openai"),
+                        "elevenlabs" === t && (s.provider = "elevenlabs");
+                    const r = "openai" === t ? "openai-tts" : "elevenlabs" === t ? "elevenlabs-tts" : "aws-polly";
+                    return await B(["source"], "puter-tts", r, "list_engines", { responseType: "text" }).call(this, s);
+                },
+                listVoices: async (e) => {
+                    let t = "aws-polly",
+                        s = {};
+                    return (
+                        "string" == typeof e
+                            ? (s.engine = e)
+                            : e &&
+                              "object" == typeof e &&
+                              ((t = N(e.provider) || t), (s = { ...e }), delete s.provider),
+                        "openai" === t && ((s.provider = "openai"), delete s.engine),
+                        "elevenlabs" === t && (s.provider = "elevenlabs"),
+                        B(
+                            ["source"],
+                            "puter-tts",
+                            "openai" === t ? "openai-tts" : "elevenlabs" === t ? "elevenlabs-tts" : "aws-polly",
+                            "list_voices",
+                            { responseType: "text" }
+                        ).call(this, s)
+                    );
+                },
+            });
+            chat = async (...e) => {
+                let t = {},
+                    s = {},
+                    r = !1,
+                    n = "ai-chat";
+                if (!e) throw { message: "Arguments are required", code: "arguments_required" };
+                if (
+                    ("string" == typeof e[0] && (t = { messages: [{ content: e[0] }] }),
+                    "string" != typeof e[0] || (e[1] && "boolean" != typeof e[1]))
+                )
+                    if ("string" == typeof e[0] && ("string" == typeof e[1] || e[1] instanceof File))
+                        e[1] instanceof File && (e[1] = await F(e[1])),
+                            (t = { vision: !0, messages: [{ content: [e[0], { image_url: { url: e[1] } }] }] });
+                    else if ("string" == typeof e[0] && Array.isArray(e[1])) {
+                        for (let t = 0; t < e[1].length; t++) e[1][t] = { image_url: { url: e[1][t] } };
+                        t = { vision: !0, messages: [{ content: [e[0], ...e[1]] }] };
+                    } else Array.isArray(e[0]) && (t = { messages: e[0] });
+                else t = { messages: [{ content: e[0] }] };
+                (("boolean" == typeof e[1] && !0 === e[1]) ||
+                    ("boolean" == typeof e[2] && !0 === e[2]) ||
+                    ("boolean" == typeof e[3] && !0 === e[3])) &&
+                    (r = !0);
+                const i = (e) => "object" == typeof e && !Array.isArray(e) && null !== e;
+                for (let t = 0; t < e.length; t++)
+                    if (i(e[t])) {
+                        s = e[t];
+                        break;
+                    }
+                s.model && (t.model = s.model),
+                    s.temperature && (t.temperature = s.temperature),
+                    s.max_tokens && (t.max_tokens = s.max_tokens),
+                    (t.model = t.model ?? ""),
+                    void 0 !== s.stream && "boolean" == typeof s.stream && (t.stream = s.stream),
+                    s.driver && (n = s.driver);
+                const o = ["tools", "response", "reasoning", "reasoning_effort", "text", "verbosity"];
+                for (const e of o) s[e] && (t[e] = s[e]);
+                return (
+                    "" === t.model && delete t.model,
+                    await B(["messages"], "puter-chat-completion", n, "complete", {
+                        test_mode: r ?? !1,
+                        transform: async (e) => (
+                            (e.toString = () => e.message?.content), (e.valueOf = () => e.message?.content), e
+                        ),
+                    }).call(this, t)
+                );
+            };
+            txt2img = async (...e) => {
+                let t = {},
+                    s = !1;
+                if (!e) throw { message: "Arguments are required", code: "arguments_required" };
+                "string" == typeof e[0] && (t = { prompt: e[0] }),
+                    "boolean" == typeof e[1] && !0 === e[1] && (s = !0),
+                    "string" == typeof e[0] && "object" == typeof e[1] && ((t = e[1]), (t.prompt = e[0])),
+                    "object" == typeof e[0] && (t = e[0]);
+                let r = "openai-image-generation";
+                "nano-banana" === t.model && (t.model = "gemini-2.5-flash-image-preview"),
+                    "nano-banana-pro" === t.model && (t.model = "gemini-3-pro-image-preview");
+                return (
+                    (r = ("string" == typeof t.driver ? t.driver : void 0) || "ai-image"),
+                    await B(["prompt"], "puter-image-generation", r, "generate", {
+                        responseType: "blob",
+                        test_mode: s ?? !1,
+                        transform: async (e) => {
+                            let t;
+                            if ("string" == typeof e) t = e;
+                            else if (e instanceof Blob) t = await j(e);
+                            else if (e instanceof ArrayBuffer) {
+                                const s = new Blob([e]);
+                                t = await j(s);
+                            } else {
+                                if (!e || "object" != typeof e || "function" != typeof e.arrayBuffer)
+                                    throw {
+                                        message: "Unexpected image response format",
+                                        code: "invalid_image_response",
+                                    };
+                                {
+                                    const s = await e.arrayBuffer(),
+                                        r = new Blob([s], { type: e.type || void 0 });
+                                    t = await j(r);
+                                }
+                            }
+                            let s = new (globalThis.Image || Object)();
+                            return (s.src = t), (s.toString = () => s.src), (s.valueOf = () => s.src), s;
+                        },
+                    }).call(this, t)
+                );
+            };
+            txt2vid = async (...e) => {
+                let t = {},
+                    s = !1;
+                if (!e) throw { message: "Arguments are required", code: "arguments_required" };
+                if (
+                    ("string" == typeof e[0] && (t = { prompt: e[0] }),
+                    "boolean" == typeof e[1] && !0 === e[1] && (s = !0),
+                    "string" == typeof e[0] && "object" == typeof e[1] && ((t = e[1]), (t.prompt = e[0])),
+                    "object" == typeof e[0] && (t = e[0]),
+                    !t.prompt)
+                )
+                    throw { message: "Prompt parameter is required", code: "prompt_required" };
+                t.model || (t.model = "sora-2"),
+                    void 0 !== t.duration && void 0 === t.seconds && (t.seconds = t.duration);
+                let r = "openai-video-generation";
+                const n = "string" == typeof t.driver ? t.driver : void 0,
+                    i = n ? n.toLowerCase() : void 0,
+                    o = "string" == typeof t.provider ? t.provider : "string" == typeof t.service ? t.service : void 0,
+                    a = "string" == typeof o ? o.toLowerCase() : void 0,
+                    c = "string" == typeof t.model ? t.model.toLowerCase() : "",
+                    l = "string" == typeof t.model && W.some((e) => c.startsWith(e));
+                return (
+                    "together" === i || "together-ai" === i || "together-video-generation" === i
+                        ? (r = "together-video-generation")
+                        : "openai" === i
+                          ? (r = "openai-video-generation")
+                          : n
+                            ? (r = n)
+                            : ("together" === a || "together-ai" === a || l) && (r = "together-video-generation"),
+                    await B(["prompt"], "puter-video-generation", r, "generate", {
+                        responseType: "blob",
+                        test_mode: s ?? !1,
+                        transform: async (e) => {
+                            let t = null,
+                                s = null;
+                            if (
+                                (e instanceof Blob
+                                    ? ((t = await j(e)), (s = e.type || "video/mp4"))
+                                    : "string" == typeof e
+                                      ? (t = e)
+                                      : e &&
+                                        "object" == typeof e &&
+                                        ((t = e.asset_url || e.url || e.href || null),
+                                        (s = e.mime_type || e.content_type || null)),
+                                !t)
+                            )
+                                return e;
+                            const r = globalThis.document?.createElement("video") || { setAttribute: () => {} };
+                            return (
+                                (r.src = t),
+                                (r.controls = !0),
+                                (r.preload = "metadata"),
+                                s && r.setAttribute("data-mime-type", s),
+                                r.setAttribute("data-source", t),
+                                (r.toString = () => r.src),
+                                (r.valueOf = () => r.src),
+                                r
+                            );
+                        },
+                    }).call(this, t)
+                );
+            };
+        },
+        V = class {
+            constructor(e) {
+                (this.puter = e),
+                    (this.authToken = e.authToken),
+                    (this.APIOrigin = e.APIOrigin),
+                    (this.appID = e.appID);
+            }
+            #t(e) {
+                return (
+                    (e.getUsers = async (t) => (
+                        (t = t ?? {}),
+                        (
+                            await puter.drivers.call("app-telemetry", "app-telemetry", "get_users", {
+                                app_uuid: e.uid,
+                                limit: t.limit,
+                                offset: t.offset,
+                            })
+                        ).result
+                    )),
+                    (e.users = async function* (t = 100) {
+                        let s = 0;
+                        for (;;) {
+                            const r = await e.getUsers({ limit: t, offset: s });
+                            if (!r || 0 === r.length) return;
+                            for (const e of r) yield e;
+                            if (((s += r.length), r.length < t)) return;
+                        }
+                    }),
+                    e
+                );
+            }
+            #s(e) {
+                return (
+                    e.forEach((e) => {
+                        this.#t(e);
+                    }),
+                    e
+                );
+            }
+            setAuthToken(e) {
+                this.authToken = e;
+            }
+            setAPIOrigin(e) {
+                this.APIOrigin = e;
+            }
+            list = async (...e) => {
+                let t = {};
+                return (
+                    "object" == typeof e[0] && null !== e[0] && (t.params = e[0]),
+                    (t.predicate = ["user-can-edit"]),
+                    this.#s(await B(["uid"], "puter-apps", "es:app", "select").call(this, t))
+                );
+            };
+            create = async (...e) => {
+                let t = {};
+                if ("string" == typeof e[0]) {
+                    let s = e[1],
+                        r = e[2] ?? e[0];
+                    t = { object: { name: e[0], index_url: s, title: r } };
+                } else if ("object" == typeof e[0] && null !== e[0]) {
+                    let s = e[0];
+                    t = {
+                        object: {
+                            name: s.name,
+                            index_url: s.indexURL,
+                            title: s.title ?? s.name,
+                            description: s.description,
+                            icon: s.icon,
+                            maximize_on_start: s.maximizeOnStart,
+                            background: s.background,
+                            filetype_associations: s.filetypeAssociations,
+                            metadata: s.metadata,
+                        },
+                        options: { dedupe_name: s.dedupeName ?? !1 },
+                    };
+                }
+                if (!t.object.name)
+                    throw { success: !1, error: { code: "invalid_request", message: "Name is required" } };
+                if (!t.object.index_url)
+                    throw { success: !1, error: { code: "invalid_request", message: "Index URL is required" } };
+                return this.#t(await B(["object"], "puter-apps", "es:app", "create").call(this, t));
+            };
+            update = async (...e) => {
+                let t = {};
+                if (Array.isArray(e) && "string" == typeof e[0]) {
+                    let s = e[1],
+                        r = {
+                            name: s.name,
+                            index_url: s.indexURL,
+                            title: s.title,
+                            description: s.description,
+                            icon: s.icon,
+                            maximize_on_start: s.maximizeOnStart,
+                            background: s.background,
+                            filetype_associations: s.filetypeAssociations,
+                            metadata: s.metadata,
+                        };
+                    t = { id: { name: e[0] }, object: r };
+                }
+                return this.#t(await B(["object"], "puter-apps", "es:app", "update").call(this, t));
+            };
+            get = async (...e) => {
+                let t = {};
+                return (
+                    Array.isArray(e) &&
+                        "string" == typeof e[0] &&
+                        ("object" == typeof e[1] && null !== e[1] && (t.params = e[1]), (t.id = { name: e[0] })),
+                    "object" == typeof e[0] && null !== e[0] && (t.params = e[0]),
+                    this.#t(await B(["uid"], "puter-apps", "es:app", "read").call(this, t))
+                );
+            };
+            delete = async (...e) => {
+                let t = {};
+                return (
+                    Array.isArray(e) && "string" == typeof e[0] && (t = { id: { name: e[0] } }),
+                    B(["uid"], "puter-apps", "es:app", "delete").call(this, t)
+                );
+            };
+            getDeveloperProfile = function (...e) {
+                let t;
+                return (
+                    (t = "object" == typeof e[0] && null !== e[0] ? e[0] : { success: e[0], error: e[1] }),
+                    new Promise((t, s) => {
+                        let r;
+                        return (
+                            (r = "object" == typeof e[0] && null !== e[0] ? e[0] : { success: e[0], error: e[1] }),
+                            new Promise((e, t) => {
+                                const s = L("/get-dev-profile", puter.APIOrigin, puter.authToken, "get");
+                                q(s, r.success, r.error, e, t), s.send();
+                            })
+                        );
+                    })
+                );
+            };
+        },
+        K = class {
+            #r = 1;
+            constructor(e) {
+                (this.puter = e),
+                    (this.authToken = e.authToken),
+                    (this.APIOrigin = e.APIOrigin),
+                    (this.appID = e.appID);
+            }
+            setAuthToken(e) {
+                this.authToken = e;
+            }
+            setAPIOrigin(e) {
+                this.APIOrigin = e;
+            }
+            signIn = (e) => (
+                (e = e || {}),
+                new Promise((t, s) => {
+                    let r = this.#r++;
+                    var n = screen.width / 2 - 300,
+                        i = screen.height / 2 - 300;
+                    const o = window.open(
+                            `${puter.defaultGUIOrigin}/action/sign-in?embedded_in_popup=true&msg_id=${r}${window.crossOriginIsolated ? "&cross_origin_isolated=true" : ""}${e.attempt_temp_user_creation ? "&attempt_temp_user_creation=true" : ""}`,
+                            "Puter",
+                            `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=600, height=600, top=${i}, left=${n}`
+                        ),
+                        a = setInterval(() => {
+                            o.closed &&
+                                (clearInterval(a),
+                                window.removeEventListener("message", c),
+                                s({
+                                    error: "auth_window_closed",
+                                    msg: "Authentication window was closed by the user without completing the process.",
+                                }));
+                        }, 100);
+                    function c(e) {
+                        e.data.msg_id == r &&
+                            (clearInterval(a),
+                            delete e.data.msg_id,
+                            delete e.data.msg,
+                            e.data.success ? (puter.setAuthToken(e.data.token), t(e.data)) : s(e.data),
+                            window.removeEventListener("message", c));
+                    }
+                    window.addEventListener("message", c);
+                })
+            );
+            isSignedIn = () => !!puter.authToken;
+            getUser = function (...e) {
+                let t;
+                return (
+                    (t = "object" == typeof e[0] && null !== e[0] ? e[0] : { success: e[0], error: e[1] }),
+                    new Promise((e, s) => {
+                        const r = L("/whoami", puter.APIOrigin, puter.authToken, "get");
+                        q(r, t.success, t.error, e, s), r.send();
+                    })
+                );
+            };
+            signOut = () => {
+                puter.resetAuthToken();
+            };
+            async whoami() {
+                try {
+                    const e = await fetch(`${this.APIOrigin}/whoami`, {
+                            headers: { Authorization: `Bearer ${this.authToken}` },
+                        }),
+                        t = await e.json();
+                    return (
+                        globalThis.puter?.apiCallLogger?.isEnabled() &&
+                            globalThis.puter.apiCallLogger.logRequest({
+                                service: "auth",
+                                operation: "whoami",
+                                params: {},
+                                result: t,
+                            }),
+                        t
+                    );
+                } catch (e) {
+                    throw (
+                        (globalThis.puter?.apiCallLogger?.isEnabled() &&
+                            globalThis.puter.apiCallLogger.logRequest({
+                                service: "auth",
+                                operation: "whoami",
+                                params: {},
+                                error: { message: e.message || e.toString(), stack: e.stack },
+                            }),
+                        e)
+                    );
+                }
+            }
+            async getMonthlyUsage() {
+                try {
+                    const e = await fetch(`${this.APIOrigin}/metering/usage`, {
+                            headers: { Authorization: `Bearer ${this.authToken}` },
+                        }),
+                        t = await e.json();
+                    return (
+                        globalThis.puter?.apiCallLogger?.isEnabled() &&
+                            globalThis.puter.apiCallLogger.logRequest({
+                                service: "auth",
+                                operation: "usage",
+                                params: {},
+                                result: t,
+                            }),
+                        t
+                    );
+                } catch (e) {
+                    throw (
+                        (globalThis.puter?.apiCallLogger?.isEnabled() &&
+                            globalThis.puter.apiCallLogger.logRequest({
+                                service: "auth",
+                                operation: "usage",
+                                params: {},
+                                error: { message: e.message || e.toString(), stack: e.stack },
+                            }),
+                        e)
+                    );
+                }
+            }
+            async getDetailedAppUsage(e) {
+                if (!e) throw new Error("appId is required");
+                try {
+                    const t = await fetch(`${this.APIOrigin}/metering/usage/${e}`, {
+                            headers: { Authorization: `Bearer ${this.authToken}` },
+                        }),
+                        s = await t.json();
+                    return (
+                        globalThis.puter?.apiCallLogger?.isEnabled() &&
+                            globalThis.puter.apiCallLogger.logRequest({
+                                service: "auth",
+                                operation: "detailed_app_usage",
+                                params: { appId: e },
+                                result: s,
+                            }),
+                        s
+                    );
+                } catch (t) {
+                    throw (
+                        (globalThis.puter?.apiCallLogger?.isEnabled() &&
+                            globalThis.puter.apiCallLogger.logRequest({
+                                service: "auth",
+                                operation: "detailed_app_usage",
+                                params: { appId: e },
+                                error: { message: t.message || t.toString(), stack: t.stack },
+                            }),
+                        t)
+                    );
+                }
+            }
+            async getGlobalUsage() {
+                try {
+                    const e = await fetch(`${this.APIOrigin}/metering/globalUsage`, {
+                            headers: { Authorization: `Bearer ${this.authToken}` },
+                        }),
+                        t = await e.json();
+                    return (
+                        globalThis.puter?.apiCallLogger?.isEnabled() &&
+                            globalThis.puter.apiCallLogger.logRequest({
+                                service: "auth",
+                                operation: "global_usage",
+                                params: {},
+                                result: t,
+                            }),
+                        t
+                    );
+                } catch (e) {
+                    throw (
+                        (globalThis.puter?.apiCallLogger?.isEnabled() &&
+                            globalThis.puter.apiCallLogger.logRequest({
+                                service: "auth",
+                                operation: "global_usage",
+                                params: {},
+                                error: { message: e.message || e.toString(), stack: e.stack },
+                            }),
+                        e)
+                    );
+                }
+            }
+        };
+    class G {
+        constructor(e, t) {
+            (this.puter = e), (this.parameters = t), this._init();
+        }
+        _init() {
+            let e = new URL(location.href).searchParams.get("enabled_logs");
+            e || (e = ""), (e = e.split(";"));
+            for (const t of e) "" !== t && this.puter.logger.on(t);
+            globalThis.addEventListener("message", async (e) => {
+                e.source === globalThis.parent &&
+                    e.data.$ &&
+                    "puterjs-debug" === e.data.$ &&
+                    (console.log("Got a puter.js debug event!", e.data),
+                    "log.on" === e.data.cmd &&
+                        (console.log("Got instruction to turn logs on!"), this.puter.logger.on(e.data.category)));
+            });
+        }
+    }
+    class H {
+        constructor({ getAPIOrigin: e, getAuthToken: t }) {
+            (this.getAPIOrigin = e),
+                (this.getAuthToken = t),
+                (this.response_handlers = this.constructor.response_handlers);
+        }
+        static response_handlers = {
+            "application/x-ndjson": async (e) =>
+                (async function* (e) {
+                    const t = e.getReader();
+                    let s, r;
+                    for (; !r && (({ value: s, done: r } = await t.read()), !r); ) {
+                        const e = new TextDecoder().decode(s).split("\n");
+                        for (const t of e) "" !== t.trim() && (yield JSON.parse(t));
+                    }
+                })(e.body),
+            "application/json": async (e) => await e.json(),
+            "application/octet-stream": async (e) => await e.blob(),
+        };
+        async call({ driver: e, method_name: t, parameters: s }) {
+            try {
+                const r = await fetch(`${this.getAPIOrigin()}/drivers/call`, {
+                        headers: { "Content-Type": "text/plain;actually=json" },
+                        method: "POST",
+                        body: JSON.stringify({
+                            interface: e.iface_name,
+                            ...(e.service_name ? { service: e.service_name } : {}),
+                            method: t,
+                            args: s,
+                            auth_token: this.getAuthToken(),
+                        }),
+                    }),
+                    n = r.headers.get("content-type").split(";")[0].trim(),
+                    i = this.response_handlers[n];
+                if (!i) {
+                    const i = `unrecognized content type: ${n}`;
+                    throw (
+                        (console.error(i),
+                        console.error("creating blob so dev tools shows response..."),
+                        await r.blob(),
+                        globalThis.puter?.apiCallLogger?.isEnabled() &&
+                            globalThis.puter.apiCallLogger.logRequest({
+                                service: "drivers",
+                                operation: `${e.iface_name}::${t}`,
+                                params: {
+                                    interface: e.iface_name,
+                                    driver: e.service_name || e.iface_name,
+                                    method: t,
+                                    args: s,
+                                },
+                                error: { message: i },
+                            }),
+                        new Error(i))
+                    );
+                }
+                const o = await i(r);
+                return (
+                    globalThis.puter?.apiCallLogger?.isEnabled() &&
+                        globalThis.puter.apiCallLogger.logRequest({
+                            service: "drivers",
+                            operation: `${e.iface_name}::${t}`,
+                            params: {
+                                interface: e.iface_name,
+                                driver: e.service_name || e.iface_name,
+                                method: t,
+                                args: s,
+                            },
+                            result: o,
+                        }),
+                    o
+                );
+            } catch (r) {
+                throw (
+                    (globalThis.puter?.apiCallLogger?.isEnabled() &&
+                        globalThis.puter.apiCallLogger.logRequest({
+                            service: "drivers",
+                            operation: `${e.iface_name}::${t}`,
+                            params: {
+                                interface: e.iface_name,
+                                driver: e.service_name || e.iface_name,
+                                method: t,
+                                args: s,
+                            },
+                            error: { message: r.message || r.toString(), stack: r.stack },
+                        }),
+                    r)
+                );
+            }
+        }
+    }
+    class Y {
+        constructor({ iface: e, iface_name: t, service_name: s, call_backend: r }) {
+            (this.iface = e), (this.iface_name = t), (this.service_name = s), (this.call_backend = r);
+        }
+        async call(e, t) {
+            return await this.call_backend.call({ driver: this, method_name: e, parameters: t });
+        }
+    }
+    const Q = class {
+            constructor(e) {
+                (this.puter = e),
+                    (this.authToken = e.authToken),
+                    (this.APIOrigin = e.APIOrigin),
+                    (this.appID = e.appID),
+                    (this.drivers_ = {});
+            }
+            _init({ puter: e }) {
+                e.call = this.call.bind(this);
+            }
+            setAuthToken(e) {
+                this.authToken = e;
+            }
+            setAPIOrigin(e) {
+                this.APIOrigin = e;
+            }
+            async list() {
+                try {
+                    const e = await fetch(`${this.APIOrigin}/lsmod`, {
+                            headers: { Authorization: `Bearer ${this.authToken}` },
+                            method: "POST",
+                        }),
+                        t = await e.json();
+                    return (
+                        globalThis.puter?.apiCallLogger?.isEnabled() &&
+                            globalThis.puter.apiCallLogger.logRequest({
+                                service: "drivers",
+                                operation: "list",
+                                params: {},
+                                result: t.interfaces,
+                            }),
+                        t.interfaces
+                    );
+                } catch (e) {
+                    throw (
+                        (globalThis.puter?.apiCallLogger?.isEnabled() &&
+                            globalThis.puter.apiCallLogger.logRequest({
+                                service: "drivers",
+                                operation: "list",
+                                params: {},
+                                error: { message: e.message || e.toString(), stack: e.stack },
+                            }),
+                        e)
+                    );
+                }
+            }
+            async get(e, t) {
+                t || (t = e);
+                const s = `${e}:${t}`;
+                return this.drivers_[s]
+                    ? this.drivers_[s]
+                    : (this.drivers_[s] = new Y({
+                          call_backend: new H({
+                              getAPIOrigin: () => this.APIOrigin,
+                              getAuthToken: () => this.authToken,
+                          }),
+                          iface_name: e,
+                          service_name: t,
+                      }));
+            }
+            async call(...e) {
+                let t, s, r, n;
+                4 === e.length
+                    ? ([t, s, r, n] = e)
+                    : 3 === e.length
+                      ? ([t, r, n] = e)
+                      : 2 === e.length && (([t, n] = e), (r = t));
+                const i = await this.get(t, s);
+                return await i.call(r, n);
+            }
+        },
+        Z = Object.create(null);
+    (Z.open = "0"),
+        (Z.close = "1"),
+        (Z.ping = "2"),
+        (Z.pong = "3"),
+        (Z.message = "4"),
+        (Z.upgrade = "5"),
+        (Z.noop = "6");
+    const J = Object.create(null);
+    Object.keys(Z).forEach((e) => {
+        J[Z[e]] = e;
+    });
+    const $ = { type: "error", data: "parser error" },
+        ee =
+            "function" == typeof Blob ||
+            ("undefined" != typeof Blob && "[object BlobConstructor]" === Object.prototype.toString.call(Blob)),
+        te = "function" == typeof ArrayBuffer,
+        se = (e) =>
+            "function" == typeof ArrayBuffer.isView ? ArrayBuffer.isView(e) : e && e.buffer instanceof ArrayBuffer,
+        re = ({ type: e, data: t }, s, r) =>
+            ee && t instanceof Blob
+                ? s
+                    ? r(t)
+                    : ne(t, r)
+                : te && (t instanceof ArrayBuffer || se(t))
+                  ? s
+                      ? r(t)
+                      : ne(new Blob([t]), r)
+                  : r(Z[e] + (t || "")),
+        ne = (e, t) => {
+            const s = new FileReader();
+            return (
+                (s.onload = function () {
+                    const e = s.result.split(",")[1];
+                    t("b" + (e || ""));
+                }),
+                s.readAsDataURL(e)
+            );
+        };
+    function ie(e) {
+        return e instanceof Uint8Array
+            ? e
+            : e instanceof ArrayBuffer
+              ? new Uint8Array(e)
+              : new Uint8Array(e.buffer, e.byteOffset, e.byteLength);
+    }
+    let oe;
+    const ae = "undefined" == typeof Uint8Array ? [] : new Uint8Array(256);
+    for (let e = 0; e < 64; e++)
+        ae["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".charCodeAt(e)] = e;
+    const ce = "function" == typeof ArrayBuffer,
+        le = (e, t) => {
+            if ("string" != typeof e) return { type: "message", data: ue(e, t) };
+            const s = e.charAt(0);
+            return "b" === s
+                ? { type: "message", data: he(e.substring(1), t) }
+                : J[s]
+                  ? e.length > 1
+                      ? { type: J[s], data: e.substring(1) }
+                      : { type: J[s] }
+                  : $;
+        },
+        he = (e, t) => {
+            if (ce) {
+                const s = ((e) => {
+                    let t,
+                        s,
+                        r,
+                        n,
+                        i,
+                        o = 0.75 * e.length,
+                        a = e.length,
+                        c = 0;
+                    "=" === e[e.length - 1] && (o--, "=" === e[e.length - 2] && o--);
+                    const l = new ArrayBuffer(o),
+                        h = new Uint8Array(l);
+                    for (t = 0; t < a; t += 4)
+                        (s = ae[e.charCodeAt(t)]),
+                            (r = ae[e.charCodeAt(t + 1)]),
+                            (n = ae[e.charCodeAt(t + 2)]),
+                            (i = ae[e.charCodeAt(t + 3)]),
+                            (h[c++] = (s << 2) | (r >> 4)),
+                            (h[c++] = ((15 & r) << 4) | (n >> 2)),
+                            (h[c++] = ((3 & n) << 6) | (63 & i));
+                    return l;
+                })(e);
+                return ue(s, t);
+            }
+            return { base64: !0, data: e };
+        },
+        ue = (e, t) =>
+            "blob" === t ? (e instanceof Blob ? e : new Blob([e])) : e instanceof ArrayBuffer ? e : e.buffer,
+        pe = String.fromCharCode(30);
+    function de() {
+        return new TransformStream({
+            transform(e, t) {
+                !(function (e, t) {
+                    ee && e.data instanceof Blob
+                        ? e.data.arrayBuffer().then(ie).then(t)
+                        : te && (e.data instanceof ArrayBuffer || se(e.data))
+                          ? t(ie(e.data))
+                          : re(e, !1, (e) => {
+                                oe || (oe = new TextEncoder()), t(oe.encode(e));
+                            });
+                })(e, (s) => {
+                    const r = s.length;
+                    let n;
+                    if (r < 126) (n = new Uint8Array(1)), new DataView(n.buffer).setUint8(0, r);
+                    else if (r < 65536) {
+                        n = new Uint8Array(3);
+                        const e = new DataView(n.buffer);
+                        e.setUint8(0, 126), e.setUint16(1, r);
+                    } else {
+                        n = new Uint8Array(9);
+                        const e = new DataView(n.buffer);
+                        e.setUint8(0, 127), e.setBigUint64(1, BigInt(r));
+                    }
+                    e.data && "string" != typeof e.data && (n[0] |= 128), t.enqueue(n), t.enqueue(s);
+                });
+            },
+        });
+    }
+    let ge;
+    function fe(e) {
+        return e.reduce((e, t) => e + t.length, 0);
+    }
+    function me(e, t) {
+        if (e[0].length === t) return e.shift();
+        const s = new Uint8Array(t);
+        let r = 0;
+        for (let n = 0; n < t; n++) (s[n] = e[0][r++]), r === e[0].length && (e.shift(), (r = 0));
+        return e.length && r < e[0].length && (e[0] = e[0].slice(r)), s;
+    }
+    function ye(e) {
+        if (e)
+            return (function (e) {
+                for (var t in ye.prototype) e[t] = ye.prototype[t];
+                return e;
+            })(e);
+    }
+    (ye.prototype.on = ye.prototype.addEventListener =
+        function (e, t) {
+            return (
+                (this._callbacks = this._callbacks || {}),
+                (this._callbacks["$" + e] = this._callbacks["$" + e] || []).push(t),
+                this
+            );
+        }),
+        (ye.prototype.once = function (e, t) {
+            function s() {
+                this.off(e, s), t.apply(this, arguments);
+            }
+            return (s.fn = t), this.on(e, s), this;
+        }),
+        (ye.prototype.off =
+            ye.prototype.removeListener =
+            ye.prototype.removeAllListeners =
+            ye.prototype.removeEventListener =
+                function (e, t) {
+                    if (((this._callbacks = this._callbacks || {}), 0 == arguments.length))
+                        return (this._callbacks = {}), this;
+                    var s,
+                        r = this._callbacks["$" + e];
+                    if (!r) return this;
+                    if (1 == arguments.length) return delete this._callbacks["$" + e], this;
+                    for (var n = 0; n < r.length; n++)
+                        if ((s = r[n]) === t || s.fn === t) {
+                            r.splice(n, 1);
+                            break;
+                        }
+                    return 0 === r.length && delete this._callbacks["$" + e], this;
+                }),
+        (ye.prototype.emit = function (e) {
+            this._callbacks = this._callbacks || {};
+            for (
+                var t = new Array(arguments.length - 1), s = this._callbacks["$" + e], r = 1;
+                r < arguments.length;
+                r++
+            )
+                t[r - 1] = arguments[r];
+            if (s) {
+                r = 0;
+                for (var n = (s = s.slice(0)).length; r < n; ++r) s[r].apply(this, t);
+            }
+            return this;
+        }),
+        (ye.prototype.emitReserved = ye.prototype.emit),
+        (ye.prototype.listeners = function (e) {
+            return (this._callbacks = this._callbacks || {}), this._callbacks["$" + e] || [];
+        }),
+        (ye.prototype.hasListeners = function (e) {
+            return !!this.listeners(e).length;
+        });
+    const be = "undefined" != typeof self ? self : "undefined" != typeof window ? window : Function("return this")();
+    function we(e, ...t) {
+        return t.reduce((t, s) => (e.hasOwnProperty(s) && (t[s] = e[s]), t), {});
+    }
+    const ve = be.setTimeout,
+        ke = be.clearTimeout;
+    function Ae(e, t) {
+        t.useNativeTimers
+            ? ((e.setTimeoutFn = ve.bind(be)), (e.clearTimeoutFn = ke.bind(be)))
+            : ((e.setTimeoutFn = be.setTimeout.bind(be)), (e.clearTimeoutFn = be.clearTimeout.bind(be)));
+    }
+    class Ie extends Error {
+        constructor(e, t, s) {
+            super(e), (this.description = t), (this.context = s), (this.type = "TransportError");
+        }
+    }
+    class _e extends ye {
+        constructor(e) {
+            super(),
+                (this.writable = !1),
+                Ae(this, e),
+                (this.opts = e),
+                (this.query = e.query),
+                (this.socket = e.socket);
+        }
+        onError(e, t, s) {
+            return super.emitReserved("error", new Ie(e, t, s)), this;
+        }
+        open() {
+            return (this.readyState = "opening"), this.doOpen(), this;
+        }
+        close() {
+            return (
+                ("opening" !== this.readyState && "open" !== this.readyState) || (this.doClose(), this.onClose()), this
+            );
+        }
+        send(e) {
+            "open" === this.readyState && this.write(e);
+        }
+        onOpen() {
+            (this.readyState = "open"), (this.writable = !0), super.emitReserved("open");
+        }
+        onData(e) {
+            const t = le(e, this.socket.binaryType);
+            this.onPacket(t);
+        }
+        onPacket(e) {
+            super.emitReserved("packet", e);
+        }
+        onClose(e) {
+            (this.readyState = "closed"), super.emitReserved("close", e);
+        }
+        pause(e) {}
+        createUri(e, t = {}) {
+            return e + "://" + this._hostname() + this._port() + this.opts.path + this._query(t);
+        }
+        _hostname() {
+            const e = this.opts.hostname;
+            return -1 === e.indexOf(":") ? e : "[" + e + "]";
+        }
+        _port() {
+            return this.opts.port &&
+                ((this.opts.secure && Number(443 !== this.opts.port)) ||
+                    (!this.opts.secure && 80 !== Number(this.opts.port)))
+                ? ":" + this.opts.port
+                : "";
+        }
+        _query(e) {
+            const t = (function (e) {
+                let t = "";
+                for (let s in e)
+                    e.hasOwnProperty(s) &&
+                        (t.length && (t += "&"), (t += encodeURIComponent(s) + "=" + encodeURIComponent(e[s])));
+                return t;
+            })(e);
+            return t.length ? "?" + t : "";
+        }
+    }
+    const xe = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_".split(""),
+        Te = {};
+    let Ee,
+        Se = 0,
+        Ce = 0;
+    function Pe(e) {
+        let t = "";
+        do {
+            (t = xe[e % 64] + t), (e = Math.floor(e / 64));
+        } while (e > 0);
+        return t;
+    }
+    function De() {
+        const e = Pe(+new Date());
+        return e !== Ee ? ((Se = 0), (Ee = e)) : e + "." + Pe(Se++);
+    }
+    for (; Ce < 64; Ce++) Te[xe[Ce]] = Ce;
+    let Oe = !1;
+    try {
+        Oe = "undefined" != typeof XMLHttpRequest && "withCredentials" in new XMLHttpRequest();
+    } catch (Z) {}
+    const Le = Oe;
+    function Re(e) {
+        const t = e.xdomain;
+        try {
+            if ("undefined" != typeof XMLHttpRequest && (!t || Le)) return new XMLHttpRequest();
+        } catch (e) {}
+        if (!t)
+            try {
+                return new be[["Active"].concat("Object").join("X")]("Microsoft.XMLHTTP");
+            } catch (e) {}
+    }
+    function qe() {}
+    const Ue = null != new Re({ xdomain: !1 }).responseType;
+    class Me extends ye {
+        constructor(e, t) {
+            super(),
+                Ae(this, t),
+                (this.opts = t),
+                (this.method = t.method || "GET"),
+                (this.uri = e),
+                (this.data = void 0 !== t.data ? t.data : null),
+                this.create();
+        }
+        create() {
+            var e;
+            const t = we(
+                this.opts,
+                "agent",
+                "pfx",
+                "key",
+                "passphrase",
+                "cert",
+                "ca",
+                "ciphers",
+                "rejectUnauthorized",
+                "autoUnref"
+            );
+            t.xdomain = !!this.opts.xd;
+            const s = (this.xhr = new Re(t));
+            try {
+                s.open(this.method, this.uri, !0);
+                try {
+                    if (this.opts.extraHeaders) {
+                        s.setDisableHeaderCheck && s.setDisableHeaderCheck(!0);
+                        for (let e in this.opts.extraHeaders)
+                            this.opts.extraHeaders.hasOwnProperty(e) &&
+                                s.setRequestHeader(e, this.opts.extraHeaders[e]);
+                    }
+                } catch (e) {}
+                if ("POST" === this.method)
+                    try {
+                        s.setRequestHeader("Content-type", "text/plain;charset=UTF-8");
+                    } catch (e) {}
+                try {
+                    s.setRequestHeader("Accept", "*/*");
+                } catch (e) {}
+                null === (e = this.opts.cookieJar) || void 0 === e || e.addCookies(s),
+                    "withCredentials" in s && (s.withCredentials = this.opts.withCredentials),
+                    this.opts.requestTimeout && (s.timeout = this.opts.requestTimeout),
+                    (s.onreadystatechange = () => {
+                        var e;
+                        3 === s.readyState && (null === (e = this.opts.cookieJar) || void 0 === e || e.parseCookies(s)),
+                            4 === s.readyState &&
+                                (200 === s.status || 1223 === s.status
+                                    ? this.onLoad()
+                                    : this.setTimeoutFn(() => {
+                                          this.onError("number" == typeof s.status ? s.status : 0);
+                                      }, 0));
+                    }),
+                    s.send(this.data);
+            } catch (e) {
+                return void this.setTimeoutFn(() => {
+                    this.onError(e);
+                }, 0);
+            }
+            "undefined" != typeof document && ((this.index = Me.requestsCount++), (Me.requests[this.index] = this));
+        }
+        onError(e) {
+            this.emitReserved("error", e, this.xhr), this.cleanup(!0);
+        }
+        cleanup(e) {
+            if (void 0 !== this.xhr && null !== this.xhr) {
+                if (((this.xhr.onreadystatechange = qe), e))
+                    try {
+                        this.xhr.abort();
+                    } catch (e) {}
+                "undefined" != typeof document && delete Me.requests[this.index], (this.xhr = null);
+            }
+        }
+        onLoad() {
+            const e = this.xhr.responseText;
+            null !== e && (this.emitReserved("data", e), this.emitReserved("success"), this.cleanup());
+        }
+        abort() {
+            this.cleanup();
+        }
+    }
+    function Be() {
+        for (let e in Me.requests) Me.requests.hasOwnProperty(e) && Me.requests[e].abort();
+    }
+    (Me.requestsCount = 0),
+        (Me.requests = {}),
+        "undefined" != typeof document &&
+            ("function" == typeof attachEvent
+                ? attachEvent("onunload", Be)
+                : "function" == typeof addEventListener &&
+                  addEventListener("onpagehide" in be ? "pagehide" : "unload", Be, !1));
+    const ze =
+            "function" == typeof Promise && "function" == typeof Promise.resolve
+                ? (e) => Promise.resolve().then(e)
+                : (e, t) => t(e, 0),
+        je = be.WebSocket || be.MozWebSocket,
+        Fe =
+            "undefined" != typeof navigator &&
+            "string" == typeof navigator.product &&
+            "reactnative" === navigator.product.toLowerCase(),
+        Ne = {
+            websocket: class extends _e {
+                constructor(e) {
+                    super(e), (this.supportsBinary = !e.forceBase64);
+                }
+                get name() {
+                    return "websocket";
+                }
+                doOpen() {
+                    if (!this.check()) return;
+                    const e = this.uri(),
+                        t = this.opts.protocols,
+                        s = Fe
+                            ? {}
+                            : we(
+                                  this.opts,
+                                  "agent",
+                                  "perMessageDeflate",
+                                  "pfx",
+                                  "key",
+                                  "passphrase",
+                                  "cert",
+                                  "ca",
+                                  "ciphers",
+                                  "rejectUnauthorized",
+                                  "localAddress",
+                                  "protocolVersion",
+                                  "origin",
+                                  "maxPayload",
+                                  "family",
+                                  "checkServerIdentity"
+                              );
+                    this.opts.extraHeaders && (s.headers = this.opts.extraHeaders);
+                    try {
+                        this.ws = Fe ? new je(e, t, s) : t ? new je(e, t) : new je(e);
+                    } catch (e) {
+                        return this.emitReserved("error", e);
+                    }
+                    (this.ws.binaryType = this.socket.binaryType), this.addEventListeners();
+                }
+                addEventListeners() {
+                    (this.ws.onopen = () => {
+                        this.opts.autoUnref && this.ws._socket.unref(), this.onOpen();
+                    }),
+                        (this.ws.onclose = (e) =>
+                            this.onClose({ description: "websocket connection closed", context: e })),
+                        (this.ws.onmessage = (e) => this.onData(e.data)),
+                        (this.ws.onerror = (e) => this.onError("websocket error", e));
+                }
+                write(e) {
+                    this.writable = !1;
+                    for (let t = 0; t < e.length; t++) {
+                        const s = e[t],
+                            r = t === e.length - 1;
+                        re(s, this.supportsBinary, (e) => {
+                            try {
+                                this.ws.send(e);
+                            } catch (e) {}
+                            r &&
+                                ze(() => {
+                                    (this.writable = !0), this.emitReserved("drain");
+                                }, this.setTimeoutFn);
+                        });
+                    }
+                }
+                doClose() {
+                    void 0 !== this.ws && (this.ws.close(), (this.ws = null));
+                }
+                uri() {
+                    const e = this.opts.secure ? "wss" : "ws",
+                        t = this.query || {};
+                    return (
+                        this.opts.timestampRequests && (t[this.opts.timestampParam] = De()),
+                        this.supportsBinary || (t.b64 = 1),
+                        this.createUri(e, t)
+                    );
+                }
+                check() {
+                    return !!je;
+                }
+            },
+            webtransport: class extends _e {
+                get name() {
+                    return "webtransport";
+                }
+                doOpen() {
+                    "function" == typeof WebTransport &&
+                        ((this.transport = new WebTransport(
+                            this.createUri("https"),
+                            this.opts.transportOptions[this.name]
+                        )),
+                        this.transport.closed
+                            .then(() => {
+                                this.onClose();
+                            })
+                            .catch((e) => {
+                                this.onError("webtransport error", e);
+                            }),
+                        this.transport.ready.then(() => {
+                            this.transport.createBidirectionalStream().then((e) => {
+                                const t = (function (e, t) {
+                                        ge || (ge = new TextDecoder());
+                                        const s = [];
+                                        let r = 0,
+                                            n = -1,
+                                            i = !1;
+                                        return new TransformStream({
+                                            transform(o, a) {
+                                                for (s.push(o); ; ) {
+                                                    if (0 === r) {
+                                                        if (fe(s) < 1) break;
+                                                        const e = me(s, 1);
+                                                        (i = !(128 & ~e[0])),
+                                                            (n = 127 & e[0]),
+                                                            (r = n < 126 ? 3 : 126 === n ? 1 : 2);
+                                                    } else if (1 === r) {
+                                                        if (fe(s) < 2) break;
+                                                        const e = me(s, 2);
+                                                        (n = new DataView(e.buffer, e.byteOffset, e.length).getUint16(
+                                                            0
+                                                        )),
+                                                            (r = 3);
+                                                    } else if (2 === r) {
+                                                        if (fe(s) < 8) break;
+                                                        const e = me(s, 8),
+                                                            t = new DataView(e.buffer, e.byteOffset, e.length),
+                                                            i = t.getUint32(0);
+                                                        if (i > Math.pow(2, 21) - 1) {
+                                                            a.enqueue($);
+                                                            break;
+                                                        }
+                                                        (n = i * Math.pow(2, 32) + t.getUint32(4)), (r = 3);
+                                                    } else {
+                                                        if (fe(s) < n) break;
+                                                        const e = me(s, n);
+                                                        a.enqueue(le(i ? e : ge.decode(e), t)), (r = 0);
+                                                    }
+                                                    if (0 === n || n > e) {
+                                                        a.enqueue($);
+                                                        break;
+                                                    }
+                                                }
+                                            },
+                                        });
+                                    })(Number.MAX_SAFE_INTEGER, this.socket.binaryType),
+                                    s = e.readable.pipeThrough(t).getReader(),
+                                    r = de();
+                                r.readable.pipeTo(e.writable), (this.writer = r.writable.getWriter());
+                                const n = () => {
+                                    s.read()
+                                        .then(({ done: e, value: t }) => {
+                                            e || (this.onPacket(t), n());
+                                        })
+                                        .catch((e) => {});
+                                };
+                                n();
+                                const i = { type: "open" };
+                                this.query.sid && (i.data = `{"sid":"${this.query.sid}"}`),
+                                    this.writer.write(i).then(() => this.onOpen());
+                            });
+                        }));
+                }
+                write(e) {
+                    this.writable = !1;
+                    for (let t = 0; t < e.length; t++) {
+                        const s = e[t],
+                            r = t === e.length - 1;
+                        this.writer.write(s).then(() => {
+                            r &&
+                                ze(() => {
+                                    (this.writable = !0), this.emitReserved("drain");
+                                }, this.setTimeoutFn);
+                        });
+                    }
+                }
+                doClose() {
+                    var e;
+                    null === (e = this.transport) || void 0 === e || e.close();
+                }
+            },
+            polling: class extends _e {
+                constructor(e) {
+                    if ((super(e), (this.polling = !1), "undefined" != typeof location)) {
+                        const t = "https:" === location.protocol;
+                        let s = location.port;
+                        s || (s = t ? "443" : "80"),
+                            (this.xd =
+                                ("undefined" != typeof location && e.hostname !== location.hostname) || s !== e.port);
+                    }
+                    const t = e && e.forceBase64;
+                    (this.supportsBinary = Ue && !t), this.opts.withCredentials && (this.cookieJar = void 0);
+                }
+                get name() {
+                    return "polling";
+                }
+                doOpen() {
+                    this.poll();
+                }
+                pause(e) {
+                    this.readyState = "pausing";
+                    const t = () => {
+                        (this.readyState = "paused"), e();
+                    };
+                    if (this.polling || !this.writable) {
+                        let e = 0;
+                        this.polling &&
+                            (e++,
+                            this.once("pollComplete", function () {
+                                --e || t();
+                            })),
+                            this.writable ||
+                                (e++,
+                                this.once("drain", function () {
+                                    --e || t();
+                                }));
+                    } else t();
+                }
+                poll() {
+                    (this.polling = !0), this.doPoll(), this.emitReserved("poll");
+                }
+                onData(e) {
+                    ((e, t) => {
+                        const s = e.split(pe),
+                            r = [];
+                        for (let e = 0; e < s.length; e++) {
+                            const n = le(s[e], t);
+                            if ((r.push(n), "error" === n.type)) break;
+                        }
+                        return r;
+                    })(e, this.socket.binaryType).forEach((e) => {
+                        if (("opening" === this.readyState && "open" === e.type && this.onOpen(), "close" === e.type))
+                            return this.onClose({ description: "transport closed by the server" }), !1;
+                        this.onPacket(e);
+                    }),
+                        "closed" !== this.readyState &&
+                            ((this.polling = !1),
+                            this.emitReserved("pollComplete"),
+                            "open" === this.readyState && this.poll());
+                }
+                doClose() {
+                    const e = () => {
+                        this.write([{ type: "close" }]);
+                    };
+                    "open" === this.readyState ? e() : this.once("open", e);
+                }
+                write(e) {
+                    (this.writable = !1),
+                        ((e, t) => {
+                            const s = e.length,
+                                r = new Array(s);
+                            let n = 0;
+                            e.forEach((e, i) => {
+                                re(e, !1, (e) => {
+                                    (r[i] = e), ++n === s && t(r.join(pe));
+                                });
+                            });
+                        })(e, (e) => {
+                            this.doWrite(e, () => {
+                                (this.writable = !0), this.emitReserved("drain");
+                            });
+                        });
+                }
+                uri() {
+                    const e = this.opts.secure ? "https" : "http",
+                        t = this.query || {};
+                    return (
+                        !1 !== this.opts.timestampRequests && (t[this.opts.timestampParam] = De()),
+                        this.supportsBinary || t.sid || (t.b64 = 1),
+                        this.createUri(e, t)
+                    );
+                }
+                request(e = {}) {
+                    return (
+                        Object.assign(e, { xd: this.xd, cookieJar: this.cookieJar }, this.opts), new Me(this.uri(), e)
+                    );
+                }
+                doWrite(e, t) {
+                    const s = this.request({ method: "POST", data: e });
+                    s.on("success", t),
+                        s.on("error", (e, t) => {
+                            this.onError("xhr post error", e, t);
+                        });
+                }
+                doPoll() {
+                    const e = this.request();
+                    e.on("data", this.onData.bind(this)),
+                        e.on("error", (e, t) => {
+                            this.onError("xhr poll error", e, t);
+                        }),
+                        (this.pollXhr = e);
+                }
+            },
+        },
+        We =
+            /^(?:(?![^:@\/?#]+:[^:@\/]*@)(http|https|ws|wss):\/\/)?((?:(([^:@\/?#]*)(?::([^:@\/?#]*))?)?@)?((?:[a-f0-9]{0,4}:){2,7}[a-f0-9]{0,4}|[^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/,
+        Xe = [
+            "source",
+            "protocol",
+            "authority",
+            "userInfo",
+            "user",
+            "password",
+            "host",
+            "port",
+            "relative",
+            "path",
+            "directory",
+            "file",
+            "query",
+            "anchor",
+        ];
+    function Ve(e) {
+        const t = e,
+            s = e.indexOf("["),
+            r = e.indexOf("]");
+        -1 != s && -1 != r && (e = e.substring(0, s) + e.substring(s, r).replace(/:/g, ";") + e.substring(r, e.length));
+        let n = We.exec(e || ""),
+            i = {},
+            o = 14;
+        for (; o--; ) i[Xe[o]] = n[o] || "";
+        return (
+            -1 != s &&
+                -1 != r &&
+                ((i.source = t),
+                (i.host = i.host.substring(1, i.host.length - 1).replace(/;/g, ":")),
+                (i.authority = i.authority.replace("[", "").replace("]", "").replace(/;/g, ":")),
+                (i.ipv6uri = !0)),
+            (i.pathNames = (function (e, t) {
+                const s = t.replace(/\/{2,9}/g, "/").split("/");
+                return (
+                    ("/" != t.slice(0, 1) && 0 !== t.length) || s.splice(0, 1),
+                    "/" == t.slice(-1) && s.splice(s.length - 1, 1),
+                    s
+                );
+            })(0, i.path)),
+            (i.queryKey = (function (e, t) {
+                const s = {};
+                return (
+                    t.replace(/(?:^|&)([^&=]*)=?([^&]*)/g, function (e, t, r) {
+                        t && (s[t] = r);
+                    }),
+                    s
+                );
+            })(0, i.query)),
+            i
+        );
+    }
+    class Ke extends ye {
+        constructor(e, t = {}) {
+            super(),
+                (this.binaryType = "arraybuffer"),
+                (this.writeBuffer = []),
+                e && "object" == typeof e && ((t = e), (e = null)),
+                e
+                    ? ((e = Ve(e)),
+                      (t.hostname = e.host),
+                      (t.secure = "https" === e.protocol || "wss" === e.protocol),
+                      (t.port = e.port),
+                      e.query && (t.query = e.query))
+                    : t.host && (t.hostname = Ve(t.host).host),
+                Ae(this, t),
+                (this.secure =
+                    null != t.secure ? t.secure : "undefined" != typeof location && "https:" === location.protocol),
+                t.hostname && !t.port && (t.port = this.secure ? "443" : "80"),
+                (this.hostname = t.hostname || ("undefined" != typeof location ? location.hostname : "localhost")),
+                (this.port =
+                    t.port ||
+                    ("undefined" != typeof location && location.port ? location.port : this.secure ? "443" : "80")),
+                (this.transports = t.transports || ["polling", "websocket", "webtransport"]),
+                (this.writeBuffer = []),
+                (this.prevBufferLen = 0),
+                (this.opts = Object.assign(
+                    {
+                        path: "/engine.io",
+                        agent: !1,
+                        withCredentials: !1,
+                        upgrade: !0,
+                        timestampParam: "t",
+                        rememberUpgrade: !1,
+                        addTrailingSlash: !0,
+                        rejectUnauthorized: !0,
+                        perMessageDeflate: { threshold: 1024 },
+                        transportOptions: {},
+                        closeOnBeforeunload: !1,
+                    },
+                    t
+                )),
+                (this.opts.path = this.opts.path.replace(/\/$/, "") + (this.opts.addTrailingSlash ? "/" : "")),
+                "string" == typeof this.opts.query &&
+                    (this.opts.query = (function (e) {
+                        let t = {},
+                            s = e.split("&");
+                        for (let e = 0, r = s.length; e < r; e++) {
+                            let r = s[e].split("=");
+                            t[decodeURIComponent(r[0])] = decodeURIComponent(r[1]);
+                        }
+                        return t;
+                    })(this.opts.query)),
+                (this.id = null),
+                (this.upgrades = null),
+                (this.pingInterval = null),
+                (this.pingTimeout = null),
+                (this.pingTimeoutTimer = null),
+                "function" == typeof addEventListener &&
+                    (this.opts.closeOnBeforeunload &&
+                        ((this.beforeunloadEventListener = () => {
+                            this.transport && (this.transport.removeAllListeners(), this.transport.close());
+                        }),
+                        addEventListener("beforeunload", this.beforeunloadEventListener, !1)),
+                    "localhost" !== this.hostname &&
+                        ((this.offlineEventListener = () => {
+                            this.onClose("transport close", { description: "network connection lost" });
+                        }),
+                        addEventListener("offline", this.offlineEventListener, !1))),
+                this.open();
+        }
+        createTransport(e) {
+            const t = Object.assign({}, this.opts.query);
+            (t.EIO = 4), (t.transport = e), this.id && (t.sid = this.id);
+            const s = Object.assign(
+                {},
+                this.opts,
+                { query: t, socket: this, hostname: this.hostname, secure: this.secure, port: this.port },
+                this.opts.transportOptions[e]
+            );
+            return new Ne[e](s);
+        }
+        open() {
+            let e;
+            if (this.opts.rememberUpgrade && Ke.priorWebsocketSuccess && -1 !== this.transports.indexOf("websocket"))
+                e = "websocket";
+            else {
+                if (0 === this.transports.length)
+                    return void this.setTimeoutFn(() => {
+                        this.emitReserved("error", "No transports available");
+                    }, 0);
+                e = this.transports[0];
+            }
+            this.readyState = "opening";
+            try {
+                e = this.createTransport(e);
+            } catch (e) {
+                return this.transports.shift(), void this.open();
+            }
+            e.open(), this.setTransport(e);
+        }
+        setTransport(e) {
+            this.transport && this.transport.removeAllListeners(),
+                (this.transport = e),
+                e
+                    .on("drain", this.onDrain.bind(this))
+                    .on("packet", this.onPacket.bind(this))
+                    .on("error", this.onError.bind(this))
+                    .on("close", (e) => this.onClose("transport close", e));
+        }
+        probe(e) {
+            let t = this.createTransport(e),
+                s = !1;
+            Ke.priorWebsocketSuccess = !1;
+            const r = () => {
+                s ||
+                    (t.send([{ type: "ping", data: "probe" }]),
+                    t.once("packet", (e) => {
+                        if (!s)
+                            if ("pong" === e.type && "probe" === e.data) {
+                                if (((this.upgrading = !0), this.emitReserved("upgrading", t), !t)) return;
+                                (Ke.priorWebsocketSuccess = "websocket" === t.name),
+                                    this.transport.pause(() => {
+                                        s ||
+                                            ("closed" !== this.readyState &&
+                                                (l(),
+                                                this.setTransport(t),
+                                                t.send([{ type: "upgrade" }]),
+                                                this.emitReserved("upgrade", t),
+                                                (t = null),
+                                                (this.upgrading = !1),
+                                                this.flush()));
+                                    });
+                            } else {
+                                const e = new Error("probe error");
+                                (e.transport = t.name), this.emitReserved("upgradeError", e);
+                            }
+                    }));
+            };
+            function n() {
+                s || ((s = !0), l(), t.close(), (t = null));
+            }
+            const i = (e) => {
+                const s = new Error("probe error: " + e);
+                (s.transport = t.name), n(), this.emitReserved("upgradeError", s);
+            };
+            function o() {
+                i("transport closed");
+            }
+            function a() {
+                i("socket closed");
+            }
+            function c(e) {
+                t && e.name !== t.name && n();
+            }
+            const l = () => {
+                t.removeListener("open", r),
+                    t.removeListener("error", i),
+                    t.removeListener("close", o),
+                    this.off("close", a),
+                    this.off("upgrading", c);
+            };
+            t.once("open", r),
+                t.once("error", i),
+                t.once("close", o),
+                this.once("close", a),
+                this.once("upgrading", c),
+                -1 !== this.upgrades.indexOf("webtransport") && "webtransport" !== e
+                    ? this.setTimeoutFn(() => {
+                          s || t.open();
+                      }, 200)
+                    : t.open();
+        }
+        onOpen() {
+            if (
+                ((this.readyState = "open"),
+                (Ke.priorWebsocketSuccess = "websocket" === this.transport.name),
+                this.emitReserved("open"),
+                this.flush(),
+                "open" === this.readyState && this.opts.upgrade)
+            ) {
+                let e = 0;
+                const t = this.upgrades.length;
+                for (; e < t; e++) this.probe(this.upgrades[e]);
+            }
+        }
+        onPacket(e) {
+            if ("opening" === this.readyState || "open" === this.readyState || "closing" === this.readyState)
+                switch (
+                    (this.emitReserved("packet", e), this.emitReserved("heartbeat"), this.resetPingTimeout(), e.type)
+                ) {
+                    case "open":
+                        this.onHandshake(JSON.parse(e.data));
+                        break;
+                    case "ping":
+                        this.sendPacket("pong"), this.emitReserved("ping"), this.emitReserved("pong");
+                        break;
+                    case "error":
+                        const t = new Error("server error");
+                        (t.code = e.data), this.onError(t);
+                        break;
+                    case "message":
+                        this.emitReserved("data", e.data), this.emitReserved("message", e.data);
+                }
+        }
+        onHandshake(e) {
+            this.emitReserved("handshake", e),
+                (this.id = e.sid),
+                (this.transport.query.sid = e.sid),
+                (this.upgrades = this.filterUpgrades(e.upgrades)),
+                (this.pingInterval = e.pingInterval),
+                (this.pingTimeout = e.pingTimeout),
+                (this.maxPayload = e.maxPayload),
+                this.onOpen(),
+                "closed" !== this.readyState && this.resetPingTimeout();
+        }
+        resetPingTimeout() {
+            this.clearTimeoutFn(this.pingTimeoutTimer),
+                (this.pingTimeoutTimer = this.setTimeoutFn(() => {
+                    this.onClose("ping timeout");
+                }, this.pingInterval + this.pingTimeout)),
+                this.opts.autoUnref && this.pingTimeoutTimer.unref();
+        }
+        onDrain() {
+            this.writeBuffer.splice(0, this.prevBufferLen),
+                (this.prevBufferLen = 0),
+                0 === this.writeBuffer.length ? this.emitReserved("drain") : this.flush();
+        }
+        flush() {
+            if ("closed" !== this.readyState && this.transport.writable && !this.upgrading && this.writeBuffer.length) {
+                const e = this.getWritablePackets();
+                this.transport.send(e), (this.prevBufferLen = e.length), this.emitReserved("flush");
+            }
+        }
+        getWritablePackets() {
+            if (!(this.maxPayload && "polling" === this.transport.name && this.writeBuffer.length > 1))
+                return this.writeBuffer;
+            let e = 1;
+            for (let s = 0; s < this.writeBuffer.length; s++) {
+                const r = this.writeBuffer[s].data;
+                if (
+                    (r &&
+                        (e +=
+                            "string" == typeof (t = r)
+                                ? (function (e) {
+                                      let t = 0,
+                                          s = 0;
+                                      for (let r = 0, n = e.length; r < n; r++)
+                                          (t = e.charCodeAt(r)),
+                                              t < 128
+                                                  ? (s += 1)
+                                                  : t < 2048
+                                                    ? (s += 2)
+                                                    : t < 55296 || t >= 57344
+                                                      ? (s += 3)
+                                                      : (r++, (s += 4));
+                                      return s;
+                                  })(t)
+                                : Math.ceil(1.33 * (t.byteLength || t.size))),
+                    s > 0 && e > this.maxPayload)
+                )
+                    return this.writeBuffer.slice(0, s);
+                e += 2;
+            }
+            var t;
+            return this.writeBuffer;
+        }
+        write(e, t, s) {
+            return this.sendPacket("message", e, t, s), this;
+        }
+        send(e, t, s) {
+            return this.sendPacket("message", e, t, s), this;
+        }
+        sendPacket(e, t, s, r) {
+            if (
+                ("function" == typeof t && ((r = t), (t = void 0)),
+                "function" == typeof s && ((r = s), (s = null)),
+                "closing" === this.readyState || "closed" === this.readyState)
+            )
+                return;
+            (s = s || {}).compress = !1 !== s.compress;
+            const n = { type: e, data: t, options: s };
+            this.emitReserved("packetCreate", n), this.writeBuffer.push(n), r && this.once("flush", r), this.flush();
+        }
+        close() {
+            const e = () => {
+                    this.onClose("forced close"), this.transport.close();
+                },
+                t = () => {
+                    this.off("upgrade", t), this.off("upgradeError", t), e();
+                },
+                s = () => {
+                    this.once("upgrade", t), this.once("upgradeError", t);
+                };
+            return (
+                ("opening" !== this.readyState && "open" !== this.readyState) ||
+                    ((this.readyState = "closing"),
+                    this.writeBuffer.length
+                        ? this.once("drain", () => {
+                              this.upgrading ? s() : e();
+                          })
+                        : this.upgrading
+                          ? s()
+                          : e()),
+                this
+            );
+        }
+        onError(e) {
+            (Ke.priorWebsocketSuccess = !1), this.emitReserved("error", e), this.onClose("transport error", e);
+        }
+        onClose(e, t) {
+            ("opening" !== this.readyState && "open" !== this.readyState && "closing" !== this.readyState) ||
+                (this.clearTimeoutFn(this.pingTimeoutTimer),
+                this.transport.removeAllListeners("close"),
+                this.transport.close(),
+                this.transport.removeAllListeners(),
+                "function" == typeof removeEventListener &&
+                    (removeEventListener("beforeunload", this.beforeunloadEventListener, !1),
+                    removeEventListener("offline", this.offlineEventListener, !1)),
+                (this.readyState = "closed"),
+                (this.id = null),
+                this.emitReserved("close", e, t),
+                (this.writeBuffer = []),
+                (this.prevBufferLen = 0));
+        }
+        filterUpgrades(e) {
+            const t = [];
+            let s = 0;
+            const r = e.length;
+            for (; s < r; s++) ~this.transports.indexOf(e[s]) && t.push(e[s]);
+            return t;
+        }
+    }
+    Ke.protocol = 4;
+    const Ge = "function" == typeof ArrayBuffer,
+        He = Object.prototype.toString,
+        Ye = "function" == typeof Blob || ("undefined" != typeof Blob && "[object BlobConstructor]" === He.call(Blob)),
+        Qe = "function" == typeof File || ("undefined" != typeof File && "[object FileConstructor]" === He.call(File));
+    function Ze(e) {
+        return (
+            (Ge &&
+                (e instanceof ArrayBuffer ||
+                    ((e) =>
+                        "function" == typeof ArrayBuffer.isView
+                            ? ArrayBuffer.isView(e)
+                            : e.buffer instanceof ArrayBuffer)(e))) ||
+            (Ye && e instanceof Blob) ||
+            (Qe && e instanceof File)
+        );
+    }
+    function Je(e, t) {
+        if (!e || "object" != typeof e) return !1;
+        if (Array.isArray(e)) {
+            for (let t = 0, s = e.length; t < s; t++) if (Je(e[t])) return !0;
+            return !1;
+        }
+        if (Ze(e)) return !0;
+        if (e.toJSON && "function" == typeof e.toJSON && 1 === arguments.length) return Je(e.toJSON(), !0);
+        for (const t in e) if (Object.prototype.hasOwnProperty.call(e, t) && Je(e[t])) return !0;
+        return !1;
+    }
+    function $e(e) {
+        const t = [],
+            s = e.data,
+            r = e;
+        return (r.data = et(s, t)), (r.attachments = t.length), { packet: r, buffers: t };
+    }
+    function et(e, t) {
+        if (!e) return e;
+        if (Ze(e)) {
+            const s = { _placeholder: !0, num: t.length };
+            return t.push(e), s;
+        }
+        if (Array.isArray(e)) {
+            const s = new Array(e.length);
+            for (let r = 0; r < e.length; r++) s[r] = et(e[r], t);
+            return s;
+        }
+        if ("object" == typeof e && !(e instanceof Date)) {
+            const s = {};
+            for (const r in e) Object.prototype.hasOwnProperty.call(e, r) && (s[r] = et(e[r], t));
+            return s;
+        }
+        return e;
+    }
+    function tt(e, t) {
+        return (e.data = st(e.data, t)), delete e.attachments, e;
+    }
+    function st(e, t) {
+        if (!e) return e;
+        if (e && !0 === e._placeholder) {
+            if ("number" == typeof e.num && e.num >= 0 && e.num < t.length) return t[e.num];
+            throw new Error("illegal attachments");
+        }
+        if (Array.isArray(e)) for (let s = 0; s < e.length; s++) e[s] = st(e[s], t);
+        else if ("object" == typeof e)
+            for (const s in e) Object.prototype.hasOwnProperty.call(e, s) && (e[s] = st(e[s], t));
+        return e;
+    }
+    const rt = ["connect", "connect_error", "disconnect", "disconnecting", "newListener", "removeListener"];
+    var nt;
+    function it(e) {
+        return "[object Object]" === Object.prototype.toString.call(e);
+    }
+    !(function (e) {
+        (e[(e.CONNECT = 0)] = "CONNECT"),
+            (e[(e.DISCONNECT = 1)] = "DISCONNECT"),
+            (e[(e.EVENT = 2)] = "EVENT"),
+            (e[(e.ACK = 3)] = "ACK"),
+            (e[(e.CONNECT_ERROR = 4)] = "CONNECT_ERROR"),
+            (e[(e.BINARY_EVENT = 5)] = "BINARY_EVENT"),
+            (e[(e.BINARY_ACK = 6)] = "BINARY_ACK");
+    })(nt || (nt = {}));
+    class ot extends ye {
+        constructor(e) {
+            super(), (this.reviver = e);
+        }
+        add(e) {
+            let t;
+            if ("string" == typeof e) {
+                if (this.reconstructor) throw new Error("got plaintext data when reconstructing a packet");
+                t = this.decodeString(e);
+                const s = t.type === nt.BINARY_EVENT;
+                s || t.type === nt.BINARY_ACK
+                    ? ((t.type = s ? nt.EVENT : nt.ACK),
+                      (this.reconstructor = new at(t)),
+                      0 === t.attachments && super.emitReserved("decoded", t))
+                    : super.emitReserved("decoded", t);
+            } else {
+                if (!Ze(e) && !e.base64) throw new Error("Unknown type: " + e);
+                if (!this.reconstructor) throw new Error("got binary data when not reconstructing a packet");
+                (t = this.reconstructor.takeBinaryData(e)),
+                    t && ((this.reconstructor = null), super.emitReserved("decoded", t));
+            }
+        }
+        decodeString(e) {
+            let t = 0;
+            const s = { type: Number(e.charAt(0)) };
+            if (void 0 === nt[s.type]) throw new Error("unknown packet type " + s.type);
+            if (s.type === nt.BINARY_EVENT || s.type === nt.BINARY_ACK) {
+                const r = t + 1;
+                for (; "-" !== e.charAt(++t) && t != e.length; );
+                const n = e.substring(r, t);
+                if (n != Number(n) || "-" !== e.charAt(t)) throw new Error("Illegal attachments");
+                s.attachments = Number(n);
+            }
+            if ("/" === e.charAt(t + 1)) {
+                const r = t + 1;
+                for (; ++t && "," !== e.charAt(t) && t !== e.length; );
+                s.nsp = e.substring(r, t);
+            } else s.nsp = "/";
+            const r = e.charAt(t + 1);
+            if ("" !== r && Number(r) == r) {
+                const r = t + 1;
+                for (; ++t; ) {
+                    const s = e.charAt(t);
+                    if (null == s || Number(s) != s) {
+                        --t;
+                        break;
+                    }
+                    if (t === e.length) break;
+                }
+                s.id = Number(e.substring(r, t + 1));
+            }
+            if (e.charAt(++t)) {
+                const r = this.tryParse(e.substr(t));
+                if (!ot.isPayloadValid(s.type, r)) throw new Error("invalid payload");
+                s.data = r;
+            }
+            return s;
+        }
+        tryParse(e) {
+            try {
+                return JSON.parse(e, this.reviver);
+            } catch (e) {
+                return !1;
+            }
+        }
+        static isPayloadValid(e, t) {
+            switch (e) {
+                case nt.CONNECT:
+                    return it(t);
+                case nt.DISCONNECT:
+                    return void 0 === t;
+                case nt.CONNECT_ERROR:
+                    return "string" == typeof t || it(t);
+                case nt.EVENT:
+                case nt.BINARY_EVENT:
+                    return (
+                        Array.isArray(t) &&
+                        ("number" == typeof t[0] || ("string" == typeof t[0] && -1 === rt.indexOf(t[0])))
+                    );
+                case nt.ACK:
+                case nt.BINARY_ACK:
+                    return Array.isArray(t);
+            }
+        }
+        destroy() {
+            this.reconstructor && (this.reconstructor.finishedReconstruction(), (this.reconstructor = null));
+        }
+    }
+    class at {
+        constructor(e) {
+            (this.packet = e), (this.buffers = []), (this.reconPack = e);
+        }
+        takeBinaryData(e) {
+            if ((this.buffers.push(e), this.buffers.length === this.reconPack.attachments)) {
+                const e = tt(this.reconPack, this.buffers);
+                return this.finishedReconstruction(), e;
+            }
+            return null;
+        }
+        finishedReconstruction() {
+            (this.reconPack = null), (this.buffers = []);
+        }
+    }
+    var ct = Object.freeze({
+        __proto__: null,
+        protocol: 5,
+        get PacketType() {
+            return nt;
+        },
+        Encoder: class {
+            constructor(e) {
+                this.replacer = e;
+            }
+            encode(e) {
+                return (e.type !== nt.EVENT && e.type !== nt.ACK) || !Je(e)
+                    ? [this.encodeAsString(e)]
+                    : this.encodeAsBinary({
+                          type: e.type === nt.EVENT ? nt.BINARY_EVENT : nt.BINARY_ACK,
+                          nsp: e.nsp,
+                          data: e.data,
+                          id: e.id,
+                      });
+            }
+            encodeAsString(e) {
+                let t = "" + e.type;
+                return (
+                    (e.type !== nt.BINARY_EVENT && e.type !== nt.BINARY_ACK) || (t += e.attachments + "-"),
+                    e.nsp && "/" !== e.nsp && (t += e.nsp + ","),
+                    null != e.id && (t += e.id),
+                    null != e.data && (t += JSON.stringify(e.data, this.replacer)),
+                    t
+                );
+            }
+            encodeAsBinary(e) {
+                const t = $e(e),
+                    s = this.encodeAsString(t.packet),
+                    r = t.buffers;
+                return r.unshift(s), r;
+            }
+        },
+        Decoder: ot,
+    });
+    function lt(e, t, s) {
+        return (
+            e.on(t, s),
+            function () {
+                e.off(t, s);
+            }
+        );
+    }
+    const ht = Object.freeze({
+        connect: 1,
+        connect_error: 1,
+        disconnect: 1,
+        disconnecting: 1,
+        newListener: 1,
+        removeListener: 1,
+    });
+    class ut extends ye {
+        constructor(e, t, s) {
+            super(),
+                (this.connected = !1),
+                (this.recovered = !1),
+                (this.receiveBuffer = []),
+                (this.sendBuffer = []),
+                (this._queue = []),
+                (this._queueSeq = 0),
+                (this.ids = 0),
+                (this.acks = {}),
+                (this.flags = {}),
+                (this.io = e),
+                (this.nsp = t),
+                s && s.auth && (this.auth = s.auth),
+                (this._opts = Object.assign({}, s)),
+                this.io._autoConnect && this.open();
+        }
+        get disconnected() {
+            return !this.connected;
+        }
+        subEvents() {
+            if (this.subs) return;
+            const e = this.io;
+            this.subs = [
+                lt(e, "open", this.onopen.bind(this)),
+                lt(e, "packet", this.onpacket.bind(this)),
+                lt(e, "error", this.onerror.bind(this)),
+                lt(e, "close", this.onclose.bind(this)),
+            ];
+        }
+        get active() {
+            return !!this.subs;
+        }
+        connect() {
+            return (
+                this.connected ||
+                    (this.subEvents(),
+                    this.io._reconnecting || this.io.open(),
+                    "open" === this.io._readyState && this.onopen()),
+                this
+            );
+        }
+        open() {
+            return this.connect();
+        }
+        send(...e) {
+            return e.unshift("message"), this.emit.apply(this, e), this;
+        }
+        emit(e, ...t) {
+            if (ht.hasOwnProperty(e)) throw new Error('"' + e.toString() + '" is a reserved event name');
+            if ((t.unshift(e), this._opts.retries && !this.flags.fromQueue && !this.flags.volatile))
+                return this._addToQueue(t), this;
+            const s = { type: nt.EVENT, data: t, options: {} };
+            if (((s.options.compress = !1 !== this.flags.compress), "function" == typeof t[t.length - 1])) {
+                const e = this.ids++,
+                    r = t.pop();
+                this._registerAckCallback(e, r), (s.id = e);
+            }
+            const r = this.io.engine && this.io.engine.transport && this.io.engine.transport.writable;
+            return (
+                (this.flags.volatile && (!r || !this.connected)) ||
+                    (this.connected ? (this.notifyOutgoingListeners(s), this.packet(s)) : this.sendBuffer.push(s)),
+                (this.flags = {}),
+                this
+            );
+        }
+        _registerAckCallback(e, t) {
+            var s;
+            const r = null !== (s = this.flags.timeout) && void 0 !== s ? s : this._opts.ackTimeout;
+            if (void 0 === r) return void (this.acks[e] = t);
+            const n = this.io.setTimeoutFn(() => {
+                delete this.acks[e];
+                for (let t = 0; t < this.sendBuffer.length; t++)
+                    this.sendBuffer[t].id === e && this.sendBuffer.splice(t, 1);
+                t.call(this, new Error("operation has timed out"));
+            }, r);
+            this.acks[e] = (...e) => {
+                this.io.clearTimeoutFn(n), t.apply(this, [null, ...e]);
+            };
+        }
+        emitWithAck(e, ...t) {
+            const s = void 0 !== this.flags.timeout || void 0 !== this._opts.ackTimeout;
+            return new Promise((r, n) => {
+                t.push((e, t) => (s ? (e ? n(e) : r(t)) : r(e))), this.emit(e, ...t);
+            });
+        }
+        _addToQueue(e) {
+            let t;
+            "function" == typeof e[e.length - 1] && (t = e.pop());
+            const s = {
+                id: this._queueSeq++,
+                tryCount: 0,
+                pending: !1,
+                args: e,
+                flags: Object.assign({ fromQueue: !0 }, this.flags),
+            };
+            e.push((e, ...r) => {
+                if (s === this._queue[0])
+                    return (
+                        null !== e
+                            ? s.tryCount > this._opts.retries && (this._queue.shift(), t && t(e))
+                            : (this._queue.shift(), t && t(null, ...r)),
+                        (s.pending = !1),
+                        this._drainQueue()
+                    );
+            }),
+                this._queue.push(s),
+                this._drainQueue();
+        }
+        _drainQueue(e = !1) {
+            if (!this.connected || 0 === this._queue.length) return;
+            const t = this._queue[0];
+            (t.pending && !e) ||
+                ((t.pending = !0), t.tryCount++, (this.flags = t.flags), this.emit.apply(this, t.args));
+        }
+        packet(e) {
+            (e.nsp = this.nsp), this.io._packet(e);
+        }
+        onopen() {
+            "function" == typeof this.auth
+                ? this.auth((e) => {
+                      this._sendConnectPacket(e);
+                  })
+                : this._sendConnectPacket(this.auth);
+        }
+        _sendConnectPacket(e) {
+            this.packet({
+                type: nt.CONNECT,
+                data: this._pid ? Object.assign({ pid: this._pid, offset: this._lastOffset }, e) : e,
+            });
+        }
+        onerror(e) {
+            this.connected || this.emitReserved("connect_error", e);
+        }
+        onclose(e, t) {
+            (this.connected = !1), delete this.id, this.emitReserved("disconnect", e, t);
+        }
+        onpacket(e) {
+            if (e.nsp === this.nsp)
+                switch (e.type) {
+                    case nt.CONNECT:
+                        e.data && e.data.sid
+                            ? this.onconnect(e.data.sid, e.data.pid)
+                            : this.emitReserved(
+                                  "connect_error",
+                                  new Error(
+                                      "It seems you are trying to reach a Socket.IO server in v2.x with a v3.x client, but they are not compatible (more information here: https://socket.io/docs/v3/migrating-from-2-x-to-3-0/)"
+                                  )
+                              );
+                        break;
+                    case nt.EVENT:
+                    case nt.BINARY_EVENT:
+                        this.onevent(e);
+                        break;
+                    case nt.ACK:
+                    case nt.BINARY_ACK:
+                        this.onack(e);
+                        break;
+                    case nt.DISCONNECT:
+                        this.ondisconnect();
+                        break;
+                    case nt.CONNECT_ERROR:
+                        this.destroy();
+                        const t = new Error(e.data.message);
+                        (t.data = e.data.data), this.emitReserved("connect_error", t);
+                }
+        }
+        onevent(e) {
+            const t = e.data || [];
+            null != e.id && t.push(this.ack(e.id)),
+                this.connected ? this.emitEvent(t) : this.receiveBuffer.push(Object.freeze(t));
+        }
+        emitEvent(e) {
+            if (this._anyListeners && this._anyListeners.length) {
+                const t = this._anyListeners.slice();
+                for (const s of t) s.apply(this, e);
+            }
+            super.emit.apply(this, e),
+                this._pid && e.length && "string" == typeof e[e.length - 1] && (this._lastOffset = e[e.length - 1]);
+        }
+        ack(e) {
+            const t = this;
+            let s = !1;
+            return function (...r) {
+                s || ((s = !0), t.packet({ type: nt.ACK, id: e, data: r }));
+            };
+        }
+        onack(e) {
+            const t = this.acks[e.id];
+            "function" == typeof t && (t.apply(this, e.data), delete this.acks[e.id]);
+        }
+        onconnect(e, t) {
+            (this.id = e),
+                (this.recovered = t && this._pid === t),
+                (this._pid = t),
+                (this.connected = !0),
+                this.emitBuffered(),
+                this.emitReserved("connect"),
+                this._drainQueue(!0);
+        }
+        emitBuffered() {
+            this.receiveBuffer.forEach((e) => this.emitEvent(e)),
+                (this.receiveBuffer = []),
+                this.sendBuffer.forEach((e) => {
+                    this.notifyOutgoingListeners(e), this.packet(e);
+                }),
+                (this.sendBuffer = []);
+        }
+        ondisconnect() {
+            this.destroy(), this.onclose("io server disconnect");
+        }
+        destroy() {
+            this.subs && (this.subs.forEach((e) => e()), (this.subs = void 0)), this.io._destroy(this);
+        }
+        disconnect() {
+            return (
+                this.connected && this.packet({ type: nt.DISCONNECT }),
+                this.destroy(),
+                this.connected && this.onclose("io client disconnect"),
+                this
+            );
+        }
+        close() {
+            return this.disconnect();
+        }
+        compress(e) {
+            return (this.flags.compress = e), this;
+        }
+        get volatile() {
+            return (this.flags.volatile = !0), this;
+        }
+        timeout(e) {
+            return (this.flags.timeout = e), this;
+        }
+        onAny(e) {
+            return (this._anyListeners = this._anyListeners || []), this._anyListeners.push(e), this;
+        }
+        prependAny(e) {
+            return (this._anyListeners = this._anyListeners || []), this._anyListeners.unshift(e), this;
+        }
+        offAny(e) {
+            if (!this._anyListeners) return this;
+            if (e) {
+                const t = this._anyListeners;
+                for (let s = 0; s < t.length; s++) if (e === t[s]) return t.splice(s, 1), this;
+            } else this._anyListeners = [];
+            return this;
+        }
+        listenersAny() {
+            return this._anyListeners || [];
+        }
+        onAnyOutgoing(e) {
+            return (
+                (this._anyOutgoingListeners = this._anyOutgoingListeners || []),
+                this._anyOutgoingListeners.push(e),
+                this
+            );
+        }
+        prependAnyOutgoing(e) {
+            return (
+                (this._anyOutgoingListeners = this._anyOutgoingListeners || []),
+                this._anyOutgoingListeners.unshift(e),
+                this
+            );
+        }
+        offAnyOutgoing(e) {
+            if (!this._anyOutgoingListeners) return this;
+            if (e) {
+                const t = this._anyOutgoingListeners;
+                for (let s = 0; s < t.length; s++) if (e === t[s]) return t.splice(s, 1), this;
+            } else this._anyOutgoingListeners = [];
+            return this;
+        }
+        listenersAnyOutgoing() {
+            return this._anyOutgoingListeners || [];
+        }
+        notifyOutgoingListeners(e) {
+            if (this._anyOutgoingListeners && this._anyOutgoingListeners.length) {
+                const t = this._anyOutgoingListeners.slice();
+                for (const s of t) s.apply(this, e.data);
+            }
+        }
+    }
+    function pt(e) {
+        (e = e || {}),
+            (this.ms = e.min || 100),
+            (this.max = e.max || 1e4),
+            (this.factor = e.factor || 2),
+            (this.jitter = e.jitter > 0 && e.jitter <= 1 ? e.jitter : 0),
+            (this.attempts = 0);
+    }
+    (pt.prototype.duration = function () {
+        var e = this.ms * Math.pow(this.factor, this.attempts++);
+        if (this.jitter) {
+            var t = Math.random(),
+                s = Math.floor(t * this.jitter * e);
+            e = 1 & Math.floor(10 * t) ? e + s : e - s;
+        }
+        return 0 | Math.min(e, this.max);
+    }),
+        (pt.prototype.reset = function () {
+            this.attempts = 0;
+        }),
+        (pt.prototype.setMin = function (e) {
+            this.ms = e;
+        }),
+        (pt.prototype.setMax = function (e) {
+            this.max = e;
+        }),
+        (pt.prototype.setJitter = function (e) {
+            this.jitter = e;
+        });
+    class dt extends ye {
+        constructor(e, t) {
+            var s;
+            super(),
+                (this.nsps = {}),
+                (this.subs = []),
+                e && "object" == typeof e && ((t = e), (e = void 0)),
+                ((t = t || {}).path = t.path || "/socket.io"),
+                (this.opts = t),
+                Ae(this, t),
+                this.reconnection(!1 !== t.reconnection),
+                this.reconnectionAttempts(t.reconnectionAttempts || 1 / 0),
+                this.reconnectionDelay(t.reconnectionDelay || 1e3),
+                this.reconnectionDelayMax(t.reconnectionDelayMax || 5e3),
+                this.randomizationFactor(null !== (s = t.randomizationFactor) && void 0 !== s ? s : 0.5),
+                (this.backoff = new pt({
+                    min: this.reconnectionDelay(),
+                    max: this.reconnectionDelayMax(),
+                    jitter: this.randomizationFactor(),
+                })),
+                this.timeout(null == t.timeout ? 2e4 : t.timeout),
+                (this._readyState = "closed"),
+                (this.uri = e);
+            const r = t.parser || ct;
+            (this.encoder = new r.Encoder()),
+                (this.decoder = new r.Decoder()),
+                (this._autoConnect = !1 !== t.autoConnect),
+                this._autoConnect && this.open();
+        }
+        reconnection(e) {
+            return arguments.length ? ((this._reconnection = !!e), this) : this._reconnection;
+        }
+        reconnectionAttempts(e) {
+            return void 0 === e ? this._reconnectionAttempts : ((this._reconnectionAttempts = e), this);
+        }
+        reconnectionDelay(e) {
+            var t;
+            return void 0 === e
+                ? this._reconnectionDelay
+                : ((this._reconnectionDelay = e), null === (t = this.backoff) || void 0 === t || t.setMin(e), this);
+        }
+        randomizationFactor(e) {
+            var t;
+            return void 0 === e
+                ? this._randomizationFactor
+                : ((this._randomizationFactor = e),
+                  null === (t = this.backoff) || void 0 === t || t.setJitter(e),
+                  this);
+        }
+        reconnectionDelayMax(e) {
+            var t;
+            return void 0 === e
+                ? this._reconnectionDelayMax
+                : ((this._reconnectionDelayMax = e), null === (t = this.backoff) || void 0 === t || t.setMax(e), this);
+        }
+        timeout(e) {
+            return arguments.length ? ((this._timeout = e), this) : this._timeout;
+        }
+        maybeReconnectOnOpen() {
+            !this._reconnecting && this._reconnection && 0 === this.backoff.attempts && this.reconnect();
+        }
+        open(e) {
+            if (~this._readyState.indexOf("open")) return this;
+            this.engine = new Ke(this.uri, this.opts);
+            const t = this.engine,
+                s = this;
+            (this._readyState = "opening"), (this.skipReconnect = !1);
+            const r = lt(t, "open", function () {
+                    s.onopen(), e && e();
+                }),
+                n = (t) => {
+                    this.cleanup(),
+                        (this._readyState = "closed"),
+                        this.emitReserved("error", t),
+                        e ? e(t) : this.maybeReconnectOnOpen();
+                },
+                i = lt(t, "error", n);
+            if (!1 !== this._timeout) {
+                const e = this._timeout,
+                    s = this.setTimeoutFn(() => {
+                        r(), n(new Error("timeout")), t.close();
+                    }, e);
+                this.opts.autoUnref && s.unref(),
+                    this.subs.push(() => {
+                        this.clearTimeoutFn(s);
+                    });
+            }
+            return this.subs.push(r), this.subs.push(i), this;
+        }
+        connect(e) {
+            return this.open(e);
+        }
+        onopen() {
+            this.cleanup(), (this._readyState = "open"), this.emitReserved("open");
+            const e = this.engine;
+            this.subs.push(
+                lt(e, "ping", this.onping.bind(this)),
+                lt(e, "data", this.ondata.bind(this)),
+                lt(e, "error", this.onerror.bind(this)),
+                lt(e, "close", this.onclose.bind(this)),
+                lt(this.decoder, "decoded", this.ondecoded.bind(this))
+            );
+        }
+        onping() {
+            this.emitReserved("ping");
+        }
+        ondata(e) {
+            try {
+                this.decoder.add(e);
+            } catch (e) {
+                this.onclose("parse error", e);
+            }
+        }
+        ondecoded(e) {
+            ze(() => {
+                this.emitReserved("packet", e);
+            }, this.setTimeoutFn);
+        }
+        onerror(e) {
+            this.emitReserved("error", e);
+        }
+        socket(e, t) {
+            let s = this.nsps[e];
+            return (
+                s ? this._autoConnect && !s.active && s.connect() : ((s = new ut(this, e, t)), (this.nsps[e] = s)), s
+            );
+        }
+        _destroy(e) {
+            const t = Object.keys(this.nsps);
+            for (const e of t) if (this.nsps[e].active) return;
+            this._close();
+        }
+        _packet(e) {
+            const t = this.encoder.encode(e);
+            for (let s = 0; s < t.length; s++) this.engine.write(t[s], e.options);
+        }
+        cleanup() {
+            this.subs.forEach((e) => e()), (this.subs.length = 0), this.decoder.destroy();
+        }
+        _close() {
+            (this.skipReconnect = !0),
+                (this._reconnecting = !1),
+                this.onclose("forced close"),
+                this.engine && this.engine.close();
+        }
+        disconnect() {
+            return this._close();
+        }
+        onclose(e, t) {
+            this.cleanup(),
+                this.backoff.reset(),
+                (this._readyState = "closed"),
+                this.emitReserved("close", e, t),
+                this._reconnection && !this.skipReconnect && this.reconnect();
+        }
+        reconnect() {
+            if (this._reconnecting || this.skipReconnect) return this;
+            const e = this;
+            if (this.backoff.attempts >= this._reconnectionAttempts)
+                this.backoff.reset(), this.emitReserved("reconnect_failed"), (this._reconnecting = !1);
+            else {
+                const t = this.backoff.duration();
+                this._reconnecting = !0;
+                const s = this.setTimeoutFn(() => {
+                    e.skipReconnect ||
+                        (this.emitReserved("reconnect_attempt", e.backoff.attempts),
+                        e.skipReconnect ||
+                            e.open((t) => {
+                                t
+                                    ? ((e._reconnecting = !1), e.reconnect(), this.emitReserved("reconnect_error", t))
+                                    : e.onreconnect();
+                            }));
+                }, t);
+                this.opts.autoUnref && s.unref(),
+                    this.subs.push(() => {
+                        this.clearTimeoutFn(s);
+                    });
+            }
+        }
+        onreconnect() {
+            const e = this.backoff.attempts;
+            (this._reconnecting = !1), this.backoff.reset(), this.emitReserved("reconnect", e);
+        }
+    }
+    const gt = {};
+    function ft(e, t) {
+        "object" == typeof e && ((t = e), (e = void 0));
+        const s = (function (e, t = "", s) {
+                let r = e;
+                (s = s || ("undefined" != typeof location && location)),
+                    null == e && (e = s.protocol + "//" + s.host),
+                    "string" == typeof e &&
+                        ("/" === e.charAt(0) && (e = "/" === e.charAt(1) ? s.protocol + e : s.host + e),
+                        /^(https?|wss?):\/\//.test(e) || (e = void 0 !== s ? s.protocol + "//" + e : "https://" + e),
+                        (r = Ve(e))),
+                    r.port ||
+                        (/^(http|ws)$/.test(r.protocol)
+                            ? (r.port = "80")
+                            : /^(http|ws)s$/.test(r.protocol) && (r.port = "443")),
+                    (r.path = r.path || "/");
+                const n = -1 !== r.host.indexOf(":") ? "[" + r.host + "]" : r.host;
+                return (
+                    (r.id = r.protocol + "://" + n + ":" + r.port + t),
+                    (r.href = r.protocol + "://" + n + (s && s.port === r.port ? "" : ":" + r.port)),
+                    r
+                );
+            })(e, (t = t || {}).path || "/socket.io"),
+            r = s.source,
+            n = s.id,
+            i = s.path,
+            o = gt[n] && i in gt[n].nsps;
+        let a;
+        return (
+            t.forceNew || t["force new connection"] || !1 === t.multiplex || o
+                ? (a = new dt(r, t))
+                : (gt[n] || (gt[n] = new dt(r, t)), (a = gt[n])),
+            s.query && !t.query && (t.query = s.queryKey),
+            a.socket(s.path, t)
+        );
+    }
+    Object.assign(ft, { Manager: dt, Socket: ut, io: ft, connect: ft });
+    const mt = (e) => (
+            "gui" === puter.env ||
+                (e || (e = "."),
+                (e && (e.startsWith("/") || e.startsWith("~") || !puter.appID)) ||
+                    (e = c.join("~/AppData", puter.appID, e))),
+            e
+        ),
+        yt = function (...e) {
+            let t;
+            return (
+                (t =
+                    "object" == typeof e[0] && null !== e[0]
+                        ? e[0]
+                        : {
+                              source: e[0],
+                              destination: e[1],
+                              overwrite: e[2]?.overwrite,
+                              new_name: e[2]?.newName || e[2]?.new_name,
+                              create_missing_parents: e[2]?.createMissingParents || e[2]?.create_missing_parents,
+                              new_metadata: e[2]?.newMetadata || e[2]?.new_metadata,
+                              original_client_socket_id: e[2]?.excludeSocketID || e[2]?.original_client_socket_id,
+                              success: e[3],
+                              error: e[4],
+                          }),
+                new Promise(async (e, s) => {
+                    if (!puter.authToken && "web" === puter.env)
+                        try {
+                            await puter.ui.authenticateWithPuter();
+                        } catch (e) {
+                            s("Authentication failed.");
+                        }
+                    (t.source = mt(t.source)), (t.destination = mt(t.destination));
+                    const r = L("/copy", this.APIOrigin, this.authToken);
+                    q(r, t.success, t.error, e, s),
+                        r.send(
+                            JSON.stringify({
+                                original_client_socket_id: this.socket.id,
+                                socket_id: this.socket.id,
+                                source: t.source,
+                                destination: t.destination,
+                                overwrite: t.overwrite,
+                                new_name: t.new_name || t.newName,
+                                dedupe_name: t.dedupe_name || t.dedupeName,
+                            })
+                        );
+                })
+            );
+        },
+        bt = function (...e) {
+            let t = {};
+            return (
+                ("string" == typeof e[0] && "object" == typeof e[1] && !(e[1] instanceof Function)) ||
+                ("object" == typeof e[0] && null !== e[0])
+                    ? "string" == typeof e[0]
+                        ? ((t.path = e[0]), Object.assign(t, e[1]), (t.success = e[2]), (t.error = e[3]))
+                        : (t = e[0])
+                    : "string" == typeof e[0] && ((t.path = e[0]), (t.success = e[1]), (t.error = e[2])),
+                new Promise(async (e, s) => {
+                    if (!puter.authToken && "web" === puter.env)
+                        try {
+                            await puter.ui.authenticateWithPuter();
+                        } catch (e) {
+                            s("Authentication failed.");
+                        }
+                    const r = L("/mkdir", this.APIOrigin, this.authToken);
+                    q(r, t.success, t.error, e, s),
+                        (t.path = mt(t.path)),
+                        r.send(
+                            JSON.stringify({
+                                parent: c.dirname(t.path),
+                                path: c.basename(t.path),
+                                overwrite: t.overwrite ?? !1,
+                                dedupe_name: (t.rename || t.dedupeName) ?? !1,
+                                shortcut_to: t.shortcutTo,
+                                original_client_socket_id: this.socket.id,
+                                create_missing_parents: (t.recursive || t.createMissingParents) ?? !1,
+                            })
+                        );
+                })
+            );
+        },
+        wt = new Map(),
+        vt = async function (...e) {
+            let t;
+            return (
+                (t =
+                    "object" == typeof e[0] && null !== e[0]
+                        ? e[0]
+                        : {
+                              path: e[0],
+                              options: "object" == typeof e[1] ? e[1] : {},
+                              success: "object" == typeof e[1] ? e[2] : e[1],
+                              error: "object" == typeof e[1] ? e[3] : e[2],
+                          }),
+                new Promise(async (e, s) => {
+                    let r;
+                    if (
+                        (t.consistency || (t.consistency = "strong"),
+                        t.path && (r = `item:${t.path}`),
+                        !(
+                            "eventual" !== t.consistency ||
+                            t.returnSubdomains ||
+                            t.returnPermissions ||
+                            t.returnVersions ||
+                            t.returnSize
+                        ))
+                    ) {
+                        const t = await puter._cache.get(r);
+                        if (t) return void e(t);
+                    }
+                    const n = JSON.stringify({
+                            path: t.path,
+                            uid: t.uid,
+                            returnSubdomains: t.returnSubdomains,
+                            returnPermissions: t.returnPermissions,
+                            returnVersions: t.returnVersions,
+                            returnSize: t.returnSize,
+                            consistency: t.consistency,
+                        }),
+                        i = wt.get(n),
+                        o = Date.now();
+                    if (i) {
+                        if (o - i.timestamp < 2e3) {
+                            try {
+                                e(await i.promise);
+                            } catch (e) {
+                                s(e);
+                            }
+                            return;
+                        }
+                        wt.delete(n);
+                    }
+                    const a = new Promise(async (e, s) => {
+                        if (!puter.authToken && "web" === puter.env)
+                            try {
+                                await puter.ui.authenticateWithPuter();
+                            } catch (e) {
+                                return void s("Authentication failed.");
+                            }
+                        const n = L("/stat", this.APIOrigin, void 0, "post", "text/plain;actually=json");
+                        q(
+                            n,
+                            t.success,
+                            t.error,
+                            async (t) => {
+                                JSON.stringify(t).length <= 20971520 && puter._cache.set(r, t), e(t);
+                            },
+                            s
+                        );
+                        let i = {};
+                        void 0 !== t.uid ? (i.uid = t.uid) : void 0 !== t.path && (i.path = mt(t.path)),
+                            (i.return_subdomains = t.returnSubdomains),
+                            (i.return_permissions = t.returnPermissions),
+                            (i.return_versions = t.returnVersions),
+                            (i.return_size = t.returnSize),
+                            (i.auth_token = this.authToken),
+                            n.send(JSON.stringify(i));
+                    });
+                    wt.set(n, { promise: a, timestamp: o });
+                    try {
+                        const t = await a;
+                        wt.delete(n), e(t);
+                    } catch (e) {
+                        wt.delete(n), s(e);
+                    }
+                })
+            );
+        },
+        kt = function (...e) {
+            let t;
+            return (
+                (t =
+                    "object" == typeof e[0] && null !== e[0]
+                        ? e[0]
+                        : {
+                              source: e[0],
+                              destination: e[1],
+                              overwrite: e[2]?.overwrite,
+                              new_name: e[2]?.newName || e[2]?.new_name,
+                              create_missing_parents: e[2]?.createMissingParents || e[2]?.create_missing_parents,
+                              new_metadata: e[2]?.newMetadata || e[2]?.new_metadata,
+                              original_client_socket_id: e[2]?.excludeSocketID || e[2]?.original_client_socket_id,
+                          }),
+                new Promise(async (e, s) => {
+                    if (!puter.authToken && "web" === puter.env)
+                        try {
+                            await puter.ui.authenticateWithPuter();
+                        } catch (e) {
+                            s("Authentication failed.");
+                        }
+                    if (((t.source = mt(t.source)), (t.destination = mt(t.destination)), !t.new_name))
+                        try {
+                            if (!(await vt.bind(this)(t.destination)).is_dir) throw "is not directory";
+                        } catch (e) {
+                            (t.new_name = c.basename(t.destination)), (t.destination = c.dirname(t.destination));
+                        }
+                    const r = L("/move", this.APIOrigin, this.authToken);
+                    q(r, t.success, t.error, e, s),
+                        r.send(
+                            JSON.stringify({
+                                source: t.source,
+                                destination: t.destination,
+                                overwrite: t.overwrite,
+                                new_name: t.new_name || t.newName,
+                                create_missing_parents: t.create_missing_parents || t.createMissingParents,
+                                new_metadata: t.new_metadata || t.newMetadata,
+                                original_client_socket_id: t.excludeSocketID,
+                            })
+                        );
+                })
+            );
+        },
+        At = function (...e) {
+            let t;
+            return (
+                (t =
+                    "object" == typeof e[0] && null !== e[0]
+                        ? e[0]
+                        : {
+                              path:
+                                  "string" == typeof e[0]
+                                      ? e[0]
+                                      : "object" == typeof e[0] && null !== e[0]
+                                        ? e[0].path
+                                        : e[0],
+                              ...("object" == typeof e[1] ? e[1] : { success: e[1], error: e[2] }),
+                          }),
+                new Promise(async (e, s) => {
+                    if (!puter.authToken && "web" === puter.env)
+                        try {
+                            await puter.ui.authenticateWithPuter();
+                        } catch (e) {
+                            s("Authentication failed.");
+                        }
+                    t.path = mt(t.path);
+                    const r = L(
+                        `/read?${new URLSearchParams({ file: t.path, ...(t.offset ? { offset: t.offset } : {}), ...(t.byte_count ? { byte_count: t.byte_count } : {}) }).toString()}`,
+                        this.APIOrigin,
+                        this.authToken,
+                        "get",
+                        "application/json;charset=UTF-8",
+                        "blob"
+                    );
+                    q(r, t.success, t.error, e, s), r.send();
+                })
+            );
+        },
+        It = new Map(),
+        _t = async function (...e) {
+            let t;
+            return (
+                (t = "object" == typeof e[0] && null !== e[0] ? e[0] : { path: e[0], success: e[1], error: e[2] }),
+                new Promise(async (e, s) => {
+                    if ((t.consistency || (t.consistency = "strong"), !t.path && !t.uid))
+                        throw new Error({ code: "NO_PATH_OR_UID", message: "Either path or uid must be provided." });
+                    let r;
+                    if ((t.path && (r = `readdir:${t.path}`), "eventual" === t.consistency)) {
+                        const t = await puter._cache.get(r);
+                        if (t) return void e(t);
+                    }
+                    const n = JSON.stringify({
+                            path: t.path,
+                            uid: t.uid,
+                            no_thumbs: t.no_thumbs,
+                            no_assocs: t.no_assocs,
+                            consistency: t.consistency,
+                        }),
+                        i = It.get(n),
+                        o = Date.now();
+                    if (i) {
+                        if (o - i.timestamp < 2e3) {
+                            try {
+                                e(await i.promise);
+                            } catch (e) {
+                                s(e);
+                            }
+                            return;
+                        }
+                        It.delete(n);
+                    }
+                    const a = new Promise(async (e, s) => {
+                        if (!puter.authToken && "web" === puter.env)
+                            try {
+                                await puter.ui.authenticateWithPuter();
+                            } catch (e) {
+                                return void s("Authentication failed.");
+                            }
+                        const n = L("/readdir", this.APIOrigin, void 0, "post", "text/plain;actually=json");
+                        q(
+                            n,
+                            t.success,
+                            t.error,
+                            async (t) => {
+                                JSON.stringify(t).length <= 104857600 && puter._cache.set(r, t);
+                                for (const e of t) puter._cache.set(`item:${e.path}`, e);
+                                e(t);
+                            },
+                            s
+                        );
+                        const i = { no_thumbs: t.no_thumbs, no_assocs: t.no_assocs, auth_token: this.authToken };
+                        t.uid ? (i.uid = t.uid) : t.path && (i.path = mt(t.path)), n.send(JSON.stringify(i));
+                    });
+                    It.set(n, { promise: a, timestamp: o });
+                    try {
+                        const t = await a;
+                        It.delete(n), e(t);
+                    } catch (e) {
+                        It.delete(n), s(e);
+                    }
+                })
+            );
+        },
+        xt = function (...e) {
+            let t;
+            return (
+                (t =
+                    "object" == typeof e[0] && null !== e[0]
+                        ? e[0]
+                        : { path: e[0], new_name: e[1], success: e[2], error: e[3] }),
+                new Promise(async (e, s) => {
+                    if (!puter.authToken && "web" === puter.env)
+                        try {
+                            await puter.ui.authenticateWithPuter();
+                        } catch (e) {
+                            s("Authentication failed.");
+                        }
+                    const r = L("/rename", this.APIOrigin, this.authToken);
+                    q(r, t.success, t.error, e, s);
+                    let n = {
+                        original_client_socket_id: t.excludeSocketID || t.original_client_socket_id,
+                        new_name: t.new_name || t.newName,
+                    };
+                    void 0 !== t.uid ? (n.uid = t.uid) : void 0 !== t.path && (n.path = mt(t.path)),
+                        r.send(JSON.stringify(n));
+                })
+            );
+        },
+        Tt = function (...e) {
+            let t;
+            return (
+                (t = { app_uid: e[0], items: e[1], success: e[2], error: e[3] }),
+                new Promise(async (e, s) => {
+                    if (!puter.authToken && "web" === puter.env)
+                        try {
+                            await puter.ui.authenticateWithPuter();
+                        } catch (e) {
+                            s("Authentication failed.");
+                        }
+                    let r = t.items;
+                    Array.isArray(r) || (r = [r]);
+                    const n = L("/sign", this.APIOrigin, this.authToken);
+                    n.addEventListener("load", async function (n) {
+                        const i = await D(this);
+                        if (200 !== this.status) return t.error && "function" == typeof t.error && t.error(i), s(i);
+                        {
+                            let s,
+                                n = i,
+                                o = n.token;
+                            if (1 == r.length) s = { ...n.signatures[0] };
+                            else {
+                                let e = [];
+                                for (let t = 0; t < n.signatures.length; t++) e.push({ ...n.signatures[t] });
+                                s = e;
+                            }
+                            return (
+                                t.success && "function" == typeof t.success && t.success({ token: o, items: s }),
+                                e({ token: o, items: s })
+                            );
+                        }
+                    }),
+                        n.upload.addEventListener("progress", function (e) {}),
+                        n.addEventListener("error", function (e) {
+                            return R(t.error, s, this);
+                        }),
+                        n.send(JSON.stringify({ app_uid: t.app_uid, items: r }));
+                })
+            );
+        },
+        Et = function (...e) {
+            let t;
+            return (
+                (t = "object" == typeof e[0] && null !== e[0] ? e[0] : { success: e[0], error: e[1] }),
+                new Promise(async (e, s) => {
+                    if (!puter.authToken && "web" === puter.env)
+                        try {
+                            await puter.ui.authenticateWithPuter();
+                        } catch (e) {
+                            s("Authentication failed.");
+                        }
+                    const r = L("/df", this.APIOrigin, this.authToken);
+                    q(r, t.success, t.error, e, s), r.send();
+                })
+            );
+        },
+        St = async function (e, t) {
+            if (!puter.authToken && "web" === puter.env)
+                try {
+                    await puter.ui.authenticateWithPuter();
+                } catch (e) {
+                    throw "Authentication failed.";
+                }
+            (t = mt(t)), (e = mt(e));
+            const s = c.basename(t),
+                r = { op: "symlink", path: c.dirname(t), name: s, target: e },
+                n = new FormData();
+            n.append("operation", JSON.stringify(r));
+            try {
+                const e = await fetch(`${this.APIOrigin}/batch`, {
+                    method: "POST",
+                    headers: { Authorization: `Bearer ${puter.authToken}` },
+                    body: n,
+                });
+                if (200 !== e.status) {
+                    const t = await e.text();
+                    throw (console.error("[symlink] fetch error: ", t), t);
+                }
+            } catch (e) {
+                throw (console.error("[symlink] fetch error: ", e), e);
+            }
+        },
+        Ct = async function (e, t, s = {}) {
+            return new Promise(async (r, n) => {
+                const i = globalThis.DataTransfer || class {},
+                    o = globalThis.FileList || class {},
+                    a = globalThis.DataTransferItemList || class {};
+                if (!puter.authToken && "web" === puter.env)
+                    try {
+                        await puter.ui.authenticateWithPuter();
+                    } catch (e) {
+                        n(e);
+                    }
+                const l = (e) => (s.error && "function" == typeof s.error && s.error(e), n(e));
+                let h = new XMLHttpRequest();
+                if ("/" === t) return l("Can not upload to root directory.");
+                t = mt(t);
+                const u = ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (e) =>
+                    (e ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (e / 4)))).toString(16)
+                );
+                s.init && "function" == typeof s.init && s.init(u, h);
+                let p,
+                    d = 0,
+                    g = 0,
+                    f = 0,
+                    m = !1;
+                if (Array.isArray(e) && e.length > 0)
+                    for (let t = 0; t < e.length; t++) (e[t] instanceof i || e[t] instanceof a) && (m = !0);
+                if (e instanceof a || e instanceof i || e[0] instanceof i || s.parsedDataTransferItems)
+                    (p = s.parsedDataTransferItems ? e : await puter.ui.getEntriesFromDataTransferItems(e)),
+                        p.sort((e, t) =>
+                            e.isDirectory && !t.isDirectory
+                                ? -1
+                                : !e.isDirectory && t.isDirectory
+                                  ? 1
+                                  : e.isDirectory && t.isDirectory
+                                    ? 0
+                                    : e.size - t.size
+                        );
+                else if (e instanceof File || e[0] instanceof File || e instanceof o || e[0] instanceof o) {
+                    (p = Array.isArray(e) ? e : e instanceof o ? Array.from(e) : [e]),
+                        p.sort((e, t) => e.size - t.size);
+                    for (let e = 0; e < p.length; e++) (p[e].filepath = p[e].name), (p[e].fullPath = p[e].name);
+                } else if (e instanceof Blob) {
+                    p = [new File([e], s.name, { type: "application/octet-stream" })];
+                    for (let e = 0; e < p.length; e++) (p[e].filepath = p[e].name), (p[e].fullPath = p[e].name);
+                } else {
+                    if ("string" != typeof e)
+                        return l({ code: "field_invalid", message: "upload() items parameter is an invalid type" });
+                    p = [new File([e], "default.txt", { type: "text/plain" })];
+                    for (let e = 0; e < p.length; e++) (p[e].filepath = p[e].name), (p[e].fullPath = p[e].name);
+                }
+                let y,
+                    b = [],
+                    w = {},
+                    v = [];
+                for (let e = 0; e < p.length; e++)
+                    if (p[e]) {
+                        if (p[e].isDirectory)
+                            b.push({ path: c.join(t, p[e].finalPath ? p[e].finalPath : p[e].fullPath) });
+                        else {
+                            let r = p[e].finalPath ? p[e].finalPath : p[e].fullPath,
+                                [n, i] = [r?.slice(0, r?.lastIndexOf("/")), r?.slice(r?.lastIndexOf("/") + 1)];
+                            if (("" != i && v.push(p[e]), s.createFileParent && r.includes("/"))) {
+                                let e;
+                                n.split("/").forEach((s) => {
+                                    e = e ? `${e}/${s}` : s;
+                                    let r = c.join(t, e);
+                                    w[r] || ((w[r] = !0), b.push({ path: r }));
+                                });
+                            }
+                        }
+                        void 0 !== p[e].size && (f += p[e].size);
+                    }
+                if (0 === b.length && 0 === v.length)
+                    return l({ code: "EMPTY_UPLOAD", message: "No files or directories to upload." });
+                if ("web" !== puter.env)
+                    try {
+                        if (((y = await this.space()), y.capacity - y.used < f))
+                            return l({ code: "NOT_ENOUGH_SPACE", message: "Not enough storage space available." });
+                    } catch (e) {}
+                f *= 2;
+                const k = new FormData();
+                b.sort((e, t) => t.path.length - e.path.length);
+                let A = [];
+                for (let e = 0; e < b.length; e++) {
+                    for (let s = 0; s < v.length; s++)
+                        !v[s].puter_path_param &&
+                            c.join(t, v[s].filepath).startsWith(`${b[e].path}/`) &&
+                            (v[s].puter_path_param = `$dir_${e}/${c.basename(v[s].filepath)}`);
+                    for (let t = 0; t < b.length; t++)
+                        !b[t].puter_path_param &&
+                            b[t].path.startsWith(`${b[e].path}/`) &&
+                            (b[t].puter_path_param = `$dir_${e}/${c.basename(b[t].path)}`);
+                }
+                for (let e = 0; e < b.length; e++) {
+                    let t = c.dirname(b[e].puter_path_param || b[e].path),
+                        r = b[e].puter_path_param || b[e].path;
+                    "/" !== t && (r = r.replace(t, "")),
+                        A.push({
+                            op: "mkdir",
+                            parent: t,
+                            path: r,
+                            overwrite: s.overwrite ?? !1,
+                            dedupe_name: s.dedupeName ?? !0,
+                            create_missing_ancestors: s.createMissingAncestors ?? !0,
+                            as: `dir_${e}`,
+                        });
+                }
+                A.reverse(),
+                    k.append("operation_id", u),
+                    k.append("socket_id", this.socket.id),
+                    k.append("original_client_socket_id", this.socket.id);
+                for (let e = 0; e < A.length; e++) k.append("operation", JSON.stringify(A[e]));
+                if (!s.shortcutTo)
+                    for (let e = 0; e < v.length; e++)
+                        k.append("fileinfo", JSON.stringify({ name: v[e].name, type: v[e].type, size: v[e].size }));
+                for (let e = 0; e < v.length; e++)
+                    k.append(
+                        "operation",
+                        JSON.stringify({
+                            op: s.shortcutTo ? "shortcut" : "write",
+                            dedupe_name: s.dedupeName ?? !0,
+                            overwrite: s.overwrite ?? !1,
+                            create_missing_ancestors: s.createMissingAncestors || s.createMissingParents,
+                            operation_id: u,
+                            path:
+                                (v[e].puter_path_param && c.dirname(v[e].puter_path_param ?? "")) ||
+                                (v[e].filepath && c.join(t, c.dirname(v[e].filepath))) ||
+                                "",
+                            name: c.basename(v[e].filepath),
+                            item_upload_id: e,
+                            shortcut_to: s.shortcutTo,
+                            shortcut_to_uid: s.shortcutTo,
+                            app_uid: s.appUID,
+                        })
+                    );
+                if (!s.shortcutTo) for (let e = 0; e < v.length; e++) k.append("file", v[e] ?? "");
+                const I = (e) => {
+                    e.operation_id === u && (g += e.loaded_diff);
+                };
+                this.socket.on("upload.progress", I);
+                let _ = null;
+                h.open("post", `${this.APIOrigin}/batch`, !0),
+                    h.setRequestHeader("Authorization", `Bearer ${this.authToken}`),
+                    h.upload.addEventListener("progress", function (e) {
+                        let t;
+                        null === _ ? ((t = e.loaded), (_ = 0)) : (t = e.loaded - _), (_ += t), (d += t);
+                        let r = (((g + d) / f) * 100).toFixed(2);
+                        (r = r > 100 ? 100 : r), s.progress && "function" == typeof s.progress && s.progress(u, r);
+                    });
+                let x = setInterval(function () {
+                    let e = (((g + d) / f) * 100).toFixed(2);
+                    (e = e > 100 ? 100 : e), s.progress && "function" == typeof s.progress && s.progress(u, e);
+                }, 100);
+                (h.onabort = () => {
+                    clearInterval(x),
+                        this.socket.off("upload.progress", I),
+                        s.abort && "function" == typeof s.abort && s.abort(u);
+                }),
+                    (h.onreadystatechange = async (e) => {
+                        if (4 === h.readyState) {
+                            const e = await D(h);
+                            if ((h.status >= 400 && h.status < 600) || (s.strict && 218 === h.status)) {
+                                if (
+                                    (clearInterval(x),
+                                    this.socket.off("upload.progress", I),
+                                    s.strict && 218 === h.status)
+                                ) {
+                                    let t;
+                                    for (let s = 0; s < e.results?.length; s++)
+                                        if (200 !== e.results[s].status) {
+                                            t = e.results[s];
+                                            break;
+                                        }
+                                    return l(t);
+                                }
+                                return l(e);
+                            }
+                            {
+                                (e && e.results && 0 !== e.results.length) ||
+                                    (puter.debugMode && console.log("no results"));
+                                let t = e.results;
+                                return (
+                                    (t = 1 === t.length ? t[0] : t),
+                                    s.success && "function" == typeof s.success && s.success(t),
+                                    clearInterval(x),
+                                    this.socket.off("upload.progress", I),
+                                    r(t)
+                                );
+                            }
+                        }
+                    }),
+                    s.start && "function" == typeof s.start && s.start(),
+                    h.send(k);
+            });
+        },
+        Pt = async function (e, t, s = {}) {
+            if (!e) throw new Error({ code: "NO_TARGET_PATH", message: "No target path provided." });
+            e instanceof File && void 0 === t && (e = (t = e).name),
+                (s.strict = !0),
+                (s.overwrite = s.overwrite ?? !0),
+                s.overwrite && void 0 === s.dedupeName && (s.dedupeName = !1),
+                (e = mt(e));
+            const r = c.basename(e),
+                n = c.dirname(e);
+            if (
+                ("string" == typeof t
+                    ? (t = new File([t ?? ""], r ?? "Untitled.txt", { type: "text/plain" }))
+                    : t instanceof Blob
+                      ? (t = new File([t ?? ""], r ?? "Untitled", { type: t.type }))
+                      : (t instanceof ArrayBuffer || ArrayBuffer.isView(t)) &&
+                        (t = new File([t], r ?? "Untitled", { type: "application/octet-stream" })),
+                t || (t = new File([t ?? ""], r)),
+                !(t instanceof File))
+            )
+                throw new Error({ code: "field_invalid", message: "write() data parameter is an invalid type" });
+            return this.upload(t, n, s);
+        },
+        Dt = class {
+            constructor(e) {
+                (this.readURL = e.readURL ?? e.read_url),
+                    (this.writeURL = e.writeURL ?? e.write_url),
+                    (this.metadataURL = e.metadataURL ?? e.metadata_url),
+                    (this.name = e.name ?? e.fsentry_name),
+                    (this.uid = e.uid ?? e.uuid ?? e.fsentry_uid ?? e.fsentry_id ?? e.fsentry_uuid ?? e.id),
+                    (this.id = this.uid),
+                    (this.uuid = this.uid),
+                    (this.path = e.path ?? e.fsentry_path),
+                    (this.size = e.size ?? e.fsentry_size),
+                    (this.accessed = e.accessed ?? e.fsentry_accessed),
+                    (this.modified = e.modified ?? e.fsentry_modified),
+                    (this.created = e.created ?? e.fsentry_created),
+                    (this.isDirectory = !!(e.isDirectory || e.is_dir || e.fsentry_is_dir));
+                const t = {};
+                Object.defineProperty(this, "_internalProperties", { enumerable: !1, value: t }),
+                    (t.signature =
+                        e.signature ?? (() => new URL(this.writeURL ?? this.readURL).searchParams.get("signature"))()),
+                    (t.expires =
+                        e.expires ?? (() => new URL(this.writeURL ?? this.readURL).searchParams.get("expires"))()),
+                    Object.defineProperty(t, "file_signature", {
+                        get: () => ({
+                            read_url: this.readURL,
+                            write_url: this.writeURL,
+                            metadata_url: this.metadataURL,
+                            fsentry_accessed: this.accessed,
+                            fsentry_modified: this.modified,
+                            fsentry_created: this.created,
+                            fsentry_is_dir: this.isDirectory,
+                            fsentry_size: this.size,
+                            fsentry_name: this.name,
+                            path: this.path,
+                            uid: this.uid,
+                        }),
+                    });
+            }
+            write = async function (e) {
+                return puter.fs.write(this.path, new File([e], this.name), { overwrite: !0, dedupeName: !1 });
+            };
+            watch = function (e) {};
+            open = function (e) {};
+            setAsWallpaper = function (e, t) {};
+            rename = function (e) {
+                return puter.fs.rename(this.uid, e);
+            };
+            move = function (e, t = !1, s) {
+                return puter.fs.move(this.path, e, t, s);
+            };
+            copy = function (e, t = !1, s = !1) {
+                return puter.fs.copy(this.path, e, t, s);
+            };
+            delete = function () {
+                return puter.fs.delete(this.path);
+            };
+            versions = async function () {};
+            trash = function () {};
+            mkdir = async function (e, t = !1) {
+                if (!this.isDirectory) throw new Error("mkdir() can only be called on a directory");
+                return puter.fs.mkdir(c.join(this.path, e));
+            };
+            metadata = async function () {};
+            readdir = async function () {
+                if (!this.isDirectory) throw new Error("readdir() can only be called on a directory");
+                return puter.fs.readdir(this.path);
+            };
+            read = async function () {
+                return puter.fs.read(this.path);
+            };
+        },
+        Ot = async function (...e) {
+            let t;
+            t =
+                "object" == typeof e[0] && null !== e[0]
+                    ? e[0]
+                    : { paths: e[0], recursive: e[1]?.recursive ?? !0, descendantsOnly: e[1]?.descendantsOnly ?? !1 };
+            let s = t.paths;
+            return (
+                "string" == typeof s && (s = [s]),
+                new Promise(async (e, r) => {
+                    if (!puter.authToken && "web" === puter.env)
+                        try {
+                            await puter.ui.authenticateWithPuter();
+                        } catch (e) {
+                            r("Authentication failed.");
+                        }
+                    const n = L("/delete", this.APIOrigin, this.authToken);
+                    q(n, t.success, t.error, e, r),
+                        (s = s.map((e) => mt(e))),
+                        n.send(
+                            JSON.stringify({
+                                paths: s,
+                                descendants_only: (t.descendants_only || t.descendantsOnly) ?? !1,
+                                recursive: t.recursive ?? !0,
+                            })
+                        );
+                })
+            );
+        },
+        Lt = async function (e, t = "24h") {
+            return new Promise(async (s, r) => {
+                if (!puter.authToken && "web" === puter.env)
+                    try {
+                        await puter.ui.authenticateWithPuter();
+                    } catch (e) {
+                        r("Authentication failed.");
+                    }
+                try {
+                    const { uid: n, is_dir: i } = await vt.call(this, e);
+                    if (i) return void r("Cannot create readUrl for directory");
+                    const o = L("/auth/create-access-token", this.APIOrigin, this.authToken);
+                    q(
+                        o,
+                        () => {},
+                        () => {},
+                        ({ token: e }) => {
+                            s(
+                                `${this.APIOrigin}/token-read?uid=${encodeURIComponent(n)}&token=${encodeURIComponent(e)}`
+                            );
+                        },
+                        r
+                    ),
+                        o.send(JSON.stringify({ expiresIn: t, permissions: [`fs:${n}:read`] }));
+                } catch (e) {
+                    r(e);
+                }
+            });
+        },
+        Rt = "last_valid_ts";
+    class qt {
+        space = Et;
+        mkdir = bt;
+        copy = yt;
+        rename = xt;
+        upload = Ct;
+        read = At;
+        delete = Ot;
+        move = kt;
+        write = Pt;
+        sign = Tt;
+        symlink = St;
+        getReadURL = Lt;
+        readdir = _t;
+        stat = vt;
+        FSItem = Dt;
+        constructor(e) {
+            (this.puter = e),
+                (this.authToken = e.authToken),
+                (this.APIOrigin = e.APIOrigin),
+                (this.appID = e.appID),
+                (this.cacheUpdateTimer = null),
+                this.initializeSocket();
+            const t = {};
+            Object.defineProperty(t, "authToken", { get: () => this.authToken }),
+                Object.defineProperty(t, "APIOrigin", { get: () => this.APIOrigin });
+        }
+        initializeSocket() {
+            this.socket && this.socket.disconnect(),
+                (this.socket = ft(this.APIOrigin, {
+                    auth: { auth_token: this.authToken },
+                    autoUnref: "nodejs" === this.puter.env,
+                })),
+                this.bindSocketEvents();
+        }
+        bindSocketEvents() {
+            this.socket.on("item.renamed", (e) => {
+                puter._cache.flushall(), console.log("Flushed cache for item.renamed");
+            }),
+                this.socket.on("item.removed", (e) => {
+                    puter._cache.flushall(), console.log("Flushed cache for item.removed");
+                }),
+                this.socket.on("item.added", (e) => {
+                    puter._cache.del(`readdir:${c.dirname(e.path)}`),
+                        console.log(`deleted cache for readdir:${c.dirname(e.path)}`),
+                        puter._cache.del(`item:${c.dirname(e.path)}`),
+                        console.log(`deleted cache for item:${c.dirname(e.path)}`);
+                }),
+                this.socket.on("item.updated", (e) => {
+                    puter._cache.flushall(), console.log("Flushed cache for item.updated");
+                }),
+                this.socket.on("item.moved", (e) => {
+                    puter._cache.flushall(), console.log("Flushed cache for item.moved");
+                }),
+                this.socket.on("connect", () => {
+                    puter.debugMode && console.log("FileSystem Socket: Connected", this.socket.id);
+                }),
+                this.socket.on("disconnect", () => {
+                    puter.debugMode && console.log("FileSystem Socket: Disconnected");
+                }),
+                this.socket.on("reconnect", (e) => {
+                    puter.debugMode && console.log("FileSystem Socket: Reconnected", this.socket.id);
+                }),
+                this.socket.on("reconnect_attempt", (e) => {
+                    puter.debugMode && console.log("FileSystem Socket: Reconnection Attemps", e);
+                }),
+                this.socket.on("reconnect_error", (e) => {
+                    puter.debugMode && console.log("FileSystem Socket: Reconnection Error", e);
+                }),
+                this.socket.on("reconnect_failed", () => {
+                    puter.debugMode && console.log("FileSystem Socket: Reconnection Failed");
+                }),
+                this.socket.on("error", (e) => {
+                    puter.debugMode && console.error("FileSystem Socket Error:", e);
+                });
+        }
+        setAuthToken(e) {
+            (this.authToken = e),
+                "gui" === this.puter.env && (this.checkCacheAndPurge(), this.startCacheUpdateTimer()),
+                this.initializeSocket();
+        }
+        setAPIOrigin(e) {
+            (this.APIOrigin = e), this.initializeSocket();
+        }
+        invalidateCache() {
+            localStorage.setItem(Rt, "0"), puter._cache.flushall();
+        }
+        async getCacheTimestamp() {
+            return new Promise((e, t) => {
+                const s = L("/cache/last-change-timestamp", this.APIOrigin, this.authToken, "get", "application/json");
+                q(
+                    s,
+                    void 0,
+                    void 0,
+                    async (s) => {
+                        try {
+                            const t = "string" == typeof s ? JSON.parse(s) : s;
+                            e(t.timestamp || Date.now());
+                        } catch (e) {
+                            t(new Error("Failed to parse response"));
+                        }
+                    },
+                    t
+                ),
+                    s.send();
+            });
+        }
+        async checkCacheAndPurge() {
+            try {
+                (await this.getCacheTimestamp()) - (parseInt(localStorage.getItem(Rt)) || 0) > 2e3 &&
+                    (console.log("Cache is not up to date, purging cache"),
+                    puter._cache.flushall(),
+                    localStorage.setItem(Rt, "0"));
+            } catch (e) {
+                console.error("Error checking cache timestamp:", e);
+            }
+        }
+        startCacheUpdateTimer() {
+            "gui" === this.puter.env &&
+                (this.cacheUpdateTimer = setInterval(() => {
+                    localStorage.setItem(Rt, Date.now().toString());
+                }, 1e3));
+        }
+        stopCacheUpdateTimer() {
+            this.cacheUpdateTimer && (clearInterval(this.cacheUpdateTimer), (this.cacheUpdateTimer = null));
+        }
+    }
+    const Ut = class {
+            constructor(e) {
+                (this.puter = e),
+                    (this.authToken = e.authToken),
+                    (this.APIOrigin = e.APIOrigin),
+                    (this.appID = e.appID);
+            }
+            setAuthToken(e) {
+                this.authToken = e;
+            }
+            setAPIOrigin(e) {
+                this.APIOrigin = e;
+            }
+            list = async (...e) =>
+                (await B([], "puter-subdomains", void 0, "select")(...e)).filter(
+                    (e) => !e.subdomain.startsWith("workers.puter.")
+                );
+            create = async (...e) => {
+                let t = {};
+                return (
+                    "string" == typeof e[0] && 1 === e.length
+                        ? (e[0].match(/^[a-z0-9]+\.puter\.(site|com)$/) && (e[0] = e[0].split(".")[0]),
+                          (t = { object: { subdomain: e[0] } }))
+                        : Array.isArray(e) && 2 === e.length && "string" == typeof e[0]
+                          ? (e[0].match(/^[a-z0-9]+\.puter\.(site|com)$/) && (e[0] = e[0].split(".")[0]),
+                            e[1] && (e[1] = mt(e[1])),
+                            (t = { object: { subdomain: e[0], root_dir: e[1] } }))
+                          : "object" == typeof e[0] && (t = { object: e[0] }),
+                    await B(["object"], "puter-subdomains", void 0, "create").call(this, t)
+                );
+            };
+            update = async (...e) => {
+                let t = {};
+                return (
+                    Array.isArray(e) &&
+                        "string" == typeof e[0] &&
+                        (e[0].match(/^[a-z0-9]+\.puter\.(site|com)$/) && (e[0] = e[0].split(".")[0]),
+                        e[1] && (e[1] = mt(e[1])),
+                        (t = { id: { subdomain: e[0] }, object: { root_dir: e[1] ?? null } })),
+                    await B(["object"], "puter-subdomains", void 0, "update").call(this, t)
+                );
+            };
+            get = async (...e) => {
+                let t = {};
+                return (
+                    Array.isArray(e) &&
+                        "string" == typeof e[0] &&
+                        (e[0].match(/^[a-z0-9]+\.puter\.(site|com)$/) && (e[0] = e[0].split(".")[0]),
+                        (t = { id: { subdomain: e[0] } })),
+                    B(["uid"], "puter-subdomains", void 0, "read").call(this, t)
+                );
+            };
+            delete = async (...e) => {
+                let t = {};
+                return (
+                    Array.isArray(e) &&
+                        "string" == typeof e[0] &&
+                        (e[0].match(/^[a-z0-9]+\.puter\.(site|com)$/) && (e[0] = e[0].split(".")[0]),
+                        (t = { id: { subdomain: e[0] } })),
+                    B(["uid"], "puter-subdomains", void 0, "delete").call(this, t)
+                );
+            };
+        },
+        Mt = () => {
+            let e, t;
+            return {
+                promise: new Promise((s, r) => {
+                    (e = s), (t = r);
+                }),
+                resolve: e,
+                reject: t,
+            };
+        },
+        Bt = [
+            "has_set_default_app_user_permissions",
+            "window_sidebar_width",
+            "sidebar_items",
+            "menubar_style",
+            "user_preferences.auto_arrange_desktop",
+            "user_preferences.show_hidden_files",
+            "user_preferences.language",
+            "user_preferences.clock_visible",
+            "toolbar_auto_hide_enabled",
+            "has_seen_welcome_window",
+            "desktop_item_positions",
+            "desktop_icons_hidden",
+            "taskbar_position",
+            "has_seen_toolbar_animation",
+        ];
+    function zt(e, t) {
+        let s = ((r = e), r.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+            .replace(/\\\*/g, ".*")
+            .replace(/\\\?/g, ".")
+            .replace(/\\\[/g, "[")
+            .replace(/\\\]/g, "]")
+            .replace(/\\\^/g, "^");
+        var r;
+        return new RegExp(`^${s}$`).test(t);
+    }
+    const jt = class {
+        MAX_KEY_SIZE = 1024;
+        MAX_VALUE_SIZE = 408576;
+        constructor(e) {
+            (this.puter = e),
+                (this.authToken = e.authToken),
+                (this.APIOrigin = e.APIOrigin),
+                (this.appID = e.appID),
+                (this.gui_cached = Mt()),
+                (this.gui_cache_init = Mt()),
+                (async () => {
+                    await this.gui_cache_init.promise, (this.gui_cache_init = null);
+                    const e = await fetch(`${this.APIOrigin}/drivers/call`, {
+                            method: "POST",
+                            headers: { "Content-Type": "text/plain;actually=json" },
+                            body: JSON.stringify({
+                                interface: "puter-kvstore",
+                                method: "get",
+                                args: { key: Bt },
+                                auth_token: this.authToken,
+                            }),
+                        }),
+                        t = await e.json();
+                    if (!Array.isArray(t?.result))
+                        return (
+                            this.gui_cached.resolve({}),
+                            void setTimeout(() => {
+                                this.gui_cached = null;
+                            }, 4e3)
+                        );
+                    const s = {};
+                    for (let e = 0; e < Bt.length; e++) s[Bt[e]] = t.result[e];
+                    this.gui_cached.resolve(s),
+                        setTimeout(() => {
+                            this.gui_cached = null;
+                        }, 4e3);
+                })();
+        }
+        setAuthToken(e) {
+            this.authToken = e;
+        }
+        setAPIOrigin(e) {
+            this.APIOrigin = e;
+        }
+        set = B(["key", "value", "expireAt"], "puter-kvstore", void 0, "set", {
+            preprocess: (e) => {
+                if (void 0 === e.key || null === e.key)
+                    throw { message: "Key cannot be undefined", code: "key_undefined" };
+                if (e.key.length > this.MAX_KEY_SIZE)
+                    throw { message: `Key size cannot be larger than ${this.MAX_KEY_SIZE}`, code: "key_too_large" };
+                if (e.value && e.value.length > this.MAX_VALUE_SIZE)
+                    throw {
+                        message: `Value size cannot be larger than ${this.MAX_VALUE_SIZE}`,
+                        code: "value_too_large",
+                    };
+                return e;
+            },
+        });
+        async get(...e) {
+            return "string" == typeof e[0] && Bt.includes(e[0]) && null !== this.gui_cached
+                ? (this.gui_cache_init && this.gui_cache_init.resolve(), (await this.gui_cached.promise)[e[0]])
+                : await this.get_(...e);
+        }
+        get_ = B(["key"], "puter-kvstore", void 0, "get", {
+            preprocess: (e) => {
+                if (e.key.length > this.MAX_KEY_SIZE)
+                    throw { message: `Key size cannot be larger than ${this.MAX_KEY_SIZE}`, code: "key_too_large" };
+                return e;
+            },
+            transform: (e) => e,
+        });
+        incr = async (...e) => {
+            let t = {};
+            if (!e || 0 === e.length) throw { message: "Arguments are required", code: "arguments_required" };
+            if (
+                ((t.key = e[0]),
+                (t.pathAndAmountMap = e[1] ? ("number" == typeof e[1] ? { "": e[1] } : e[1]) : { "": 1 }),
+                t.key.length > this.MAX_KEY_SIZE)
+            )
+                throw { message: `Key size cannot be larger than ${this.MAX_KEY_SIZE}`, code: "key_too_large" };
+            return B(["key"], "puter-kvstore", void 0, "incr").call(this, t);
+        };
+        decr = async (...e) => {
+            let t = {};
+            if (!e || 0 === e.length) throw { message: "Arguments are required", code: "arguments_required" };
+            if (
+                ((t.key = e[0]),
+                (t.pathAndAmountMap = e[1] ? ("number" == typeof e[1] ? { "": e[1] } : e[1]) : { "": 1 }),
+                t.key.length > this.MAX_KEY_SIZE)
+            )
+                throw { message: `Key size cannot be larger than ${this.MAX_KEY_SIZE}`, code: "key_too_large" };
+            return B(["key"], "puter-kvstore", void 0, "decr").call(this, t);
+        };
+        expire = async (e, t) => {
+            let s = {};
+            if (((s.key = e), (s.ttl = t), s.key.length > this.MAX_KEY_SIZE))
+                throw { message: `Key size cannot be larger than ${this.MAX_KEY_SIZE}`, code: "key_too_large" };
+            return B(["key", "ttl"], "puter-kvstore", void 0, "expire").call(this, s);
+        };
+        expireAt = async (e, t) => {
+            let s = {};
+            if (((s.key = e), (s.timestamp = t), s.key.length > this.MAX_KEY_SIZE))
+                throw { message: `Key size cannot be larger than ${this.MAX_KEY_SIZE}`, code: "key_too_large" };
+            return B(["key", "timestamp"], "puter-kvstore", void 0, "expireAt").call(this, s);
+        };
+        del = B(["key"], "puter-kvstore", void 0, "del", {
+            preprocess: (e) => {
+                if (e.key.length > this.MAX_KEY_SIZE)
+                    throw { message: `Key size cannot be larger than ${this.MAX_KEY_SIZE}`, code: "key_too_large" };
+                return e;
+            },
+        });
+        list = async (...e) => {
+            let t,
+                s = {},
+                r = !1;
+            return (
+                (e && 1 === e.length && !0 === e[0]) || (e && 2 === e.length && !0 === e[1])
+                    ? ((s = {}), (r = !0))
+                    : (s = { as: "keys" }),
+                ((e && 1 === e.length && "string" == typeof e[0]) ||
+                    (e && 2 === e.length && "string" == typeof e[0] && !0 === e[1])) &&
+                    (t = e[0]),
+                B([], "puter-kvstore", void 0, "list", {
+                    transform: (e) => (t ? (r ? e.filter((e) => zt(t, e.key)) : e.filter((e) => zt(t, e))) : e),
+                }).call(this, s)
+            );
+        };
+        flush = B([], "puter-kvstore", void 0, "flush");
+        clear = this.flush;
+    };
+    class Ft {
+        #n;
+        #i;
+        constructor(e) {
+            (this.#n = e),
+                (this.#i = (() => {
+                    const e = new Map();
+                    for (let t of this.#n) e[t] = [];
+                    return e;
+                })());
+        }
+        emit(e, t) {
+            this.#n.includes(e)
+                ? this.#i[e].forEach((e) => {
+                      e(t);
+                  })
+                : console.error(`Event name '${e}' not supported`);
+        }
+        on(e, t) {
+            if (this.#n.includes(e)) return this.#i[e].push(t), this;
+            console.error(`Event name '${e}' not supported`);
+        }
+        off(e, t) {
+            if (!this.#n.includes(e)) return void console.error(`Event name '${e}' not supported`);
+            const s = this.#i[e],
+                r = s.indexOf(t);
+            return -1 !== r && s.splice(r, 1), this;
+        }
+    }
+    const Nt = new TextDecoder(),
+        Wt = new TextEncoder(),
+        Xt = {
+            1: "Reason unspecified or unknown. Returning a more specific reason should be preferred.",
+            3: "Unexpected stream closure due to a network error.",
+            65: "Stream creation failed due to invalid information. This could be sent if the destination was a reserved address or the port is invalid.",
+            66: "Stream creation failed due to an unreachable destination host. This could be sent if the destination is an domain which does not resolve to anything.",
+            67: "Stream creation timed out due to the destination server not responding.",
+            68: "Stream creation failed due to the destination server refusing the connection.",
+            71: "TCP data transfer timed out.",
+            72: "Stream destination address/domain is intentionally blocked by the proxy server.",
+            73: "Connection throttled by the server.",
+        };
+    function Vt(e) {
+        let t = 5;
+        switch (e.packetType) {
+            case 1:
+                (e.hostEncoded = Wt.encode(e.hostname)), (t += 3 + e.hostEncoded.length);
+                break;
+            case 2:
+                t += e.payload.byteLength;
+                break;
+            case 3:
+                t += 4;
+                break;
+            case 4:
+                t += 1;
+                break;
+            case 5:
+                (t += 2),
+                    e.password && (t += 6),
+                    e.puterAuth && ((e.passwordEncoded = Wt.encode(e.puterAuth)), (t += 8 + e.passwordEncoded.length));
+                break;
+            default:
+                throw new Error("Not supported");
+        }
+        let s = new Uint8Array(t);
+        const r = new DataView(s.buffer);
+        switch ((r.setUint8(0, e.packetType), r.setUint32(1, e.streamID, !0), e.packetType)) {
+            case 1:
+                r.setUint8(5, e.streamType), r.setUint16(6, e.port, !0), s.set(e.hostEncoded, 8);
+                break;
+            case 2:
+                s.set(e.payload, 5);
+                break;
+            case 3:
+                r.setUint32(5, e.remainingBuffer, !0);
+                break;
+            case 4:
+                r.setUint8(5, e.reason);
+                break;
+            case 5:
+                r.setUint8(5, 2),
+                    r.setUint8(6, 0),
+                    e.password && (r.setUint8(7, 2), r.setUint32(8, 1, !0), r.setUint8(12, 0)),
+                    e.puterAuth &&
+                        (r.setUint8(7, 2),
+                        r.setUint32(8, 5 + e.passwordEncoded.length, !0),
+                        r.setUint8(12, 0),
+                        r.setUint16(13, e.passwordEncoded.length, !0),
+                        s.set(e.passwordEncoded, 15));
+        }
+        return s;
+    }
+    class Kt {
+        _ws;
+        _nextStreamID = 1;
+        _bufferMax;
+        onReady = void 0;
+        streamMap = new Map();
+        constructor(e, t) {
+            const s = () => {
+                (this._ws = new WebSocket(e)),
+                    (this._ws.binaryType = "arraybuffer"),
+                    (this._ws.onmessage = (e) => {
+                        const r = (function (e) {
+                            const t = new DataView(e.buffer, e.byteOffset),
+                                s = t.getUint8(0),
+                                r = t.getUint32(1, !0);
+                            switch (s) {
+                                case 1:
+                                    return {
+                                        packetType: s,
+                                        streamID: r,
+                                        streamType: t.getUint8(5),
+                                        port: t.getUint16(6, !0),
+                                        hostname: Nt.decode(e.subarray(8, e.length)),
+                                    };
+                                case 2:
+                                    return { packetType: s, streamID: r, payload: e.subarray(5, e.length) };
+                                case 3:
+                                    return { packetType: s, streamID: r, remainingBuffer: t.getUint32(5, !0) };
+                                case 4:
+                                    return { packetType: s, streamID: r, reason: t.getUint8(5) };
+                                case 5:
+                                    const n = {};
+                                    (n.version_major = t.getUint8(5)), (n.version_minor = t.getUint8(6));
+                                    let i = 7;
+                                    for (; i < e.length; ) {
+                                        const s = t.getUint8(i),
+                                            r = t.getUint32(i + 1, !0),
+                                            o = e.subarray(i + 5, i + 5 + r);
+                                        (n[s] = o), (i += 5 + r);
+                                    }
+                                    return { packetType: s, streamID: r, infoObj: n };
+                            }
+                        })(new Uint8Array(e.data));
+                        switch (r.packetType) {
+                            case 2:
+                                this.streamMap.get(r.streamID).dataCallBack(r.payload.slice(0));
+                                break;
+                            case 3:
+                                if (0 === r.streamID)
+                                    return (
+                                        (this._bufferMax = r.remainingBuffer),
+                                        (this._ws.onclose = () => {
+                                            setTimeout(s(), 1e3);
+                                        }),
+                                        void (this.onReady && this.onReady())
+                                    );
+                                (this.streamMap.get(r.streamID).buffer = r.remainingBuffer), this._continue();
+                                break;
+                            case 4:
+                                0 !== r.streamID && this.streamMap.get(r.streamID).closeCallBack(r.reason);
+                                break;
+                            case 5:
+                                t && this._ws.send(Vt({ packetType: 5, streamID: 0, puterAuth: t }));
+                        }
+                    });
+            };
+            s();
+        }
+        _continue(e) {
+            const t = this.streamMap.get(e).queue;
+            for (let s = 0; s < t.length; s++) this.write(e, t.shift());
+        }
+        register(e, t, s) {
+            const r = this._nextStreamID++;
+            return (
+                this.streamMap.set(r, {
+                    queue: [],
+                    streamID: r,
+                    buffer: this._bufferMax,
+                    dataCallBack: s.dataCallBack,
+                    closeCallBack: s.closeCallBack,
+                }),
+                this._ws.send(Vt({ packetType: 1, streamType: 1, streamID: r, hostname: e, port: t })),
+                r
+            );
+        }
+        write(e, t) {
+            const s = this.streamMap.get(e);
+            s.buffer > 0
+                ? (s.buffer--, this._ws.send(Vt({ packetType: 2, streamID: e, payload: t })))
+                : s.queue.push(t);
+        }
+        close(e) {
+            this._ws.send(Vt({ packetType: 4, streamID: e, reason: 2 }));
+        }
+    }
+    const Gt = new TextEncoder();
+    let Ht,
+        Yt = { server: "wss://puter.cafe/", handler: void 0 };
+    class Qt extends Ft {
+        _events = new Map();
+        _streamID;
+        constructor(e, t) {
+            super(["data", "drain", "open", "error", "close", "tlsdata", "tlsopen", "tlsclose"]),
+                (async () => {
+                    if ((!puter.authToken && puter.env, !Yt.handler)) {
+                        const { token: e, server: t } = await (
+                            await fetch(`${puter.APIOrigin}/wisp/relay-token/create`, {
+                                method: "POST",
+                                headers: {
+                                    Authorization: puter.authToken ? `Bearer ${puter.authToken}` : "",
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({}),
+                            })
+                        ).json();
+                        (Yt.handler = new Kt(t, e)),
+                            await new Promise((e, t) => {
+                                Yt.handler.onReady = e;
+                            });
+                    }
+                    const s = {
+                        dataCallBack: (e) => {
+                            this.emit("data", e);
+                        },
+                        closeCallBack: (e) => {
+                            if (2 !== e) return this.emit("error", new Error(Xt[e])), void this.emit("close", !0);
+                            this.emit("close", !1);
+                        },
+                    };
+                    (this._streamID = Yt.handler.register(e, t, s)),
+                        setTimeout(() => {
+                            this.emit("open", void 0);
+                        }, 0);
+                })();
+        }
+        addListener(...e) {
+            this.on(...e);
+        }
+        write(e, t) {
+            if (e.buffer) Yt.handler.write(this._streamID, e), t && t();
+            else if (e.resize) e.write(this._streamID, new Uint8Array(e)), t && t();
+            else {
+                if ("string" != typeof e)
+                    throw new Error("Invalid data type (not TypedArray, ArrayBuffer or String!!)");
+                Yt.handler.write(this._streamID, Gt.encode(e)), t && t();
+            }
+        }
+        close() {
+            Yt.handler.close(this._streamID);
+        }
+    }
+    class Zt extends Qt {
+        constructor(...e) {
+            super(...e),
+                super.on("open", async () => {
+                    Ht ||
+                        (globalThis.ReadableByteStreamController ||
+                            (await import("./polyfill.js")),
+                        (Ht = await import("./rustls.js")),
+                        await Ht.default("https://puter-net.b-cdn.net/rustls.wasm"));
+                    let t = !1;
+                    const s = new ReadableStream({
+                            start: (e) => {
+                                super.on("data", (t) => {
+                                    e.enqueue(t.buffer);
+                                }),
+                                    super.on("close", () => {
+                                        t || e.close();
+                                    });
+                            },
+                            pull: (e) => {},
+                            cancel: () => {
+                                t = !0;
+                            },
+                        }),
+                        r = new WritableStream({
+                            write: (e) => {
+                                super.write(e);
+                            },
+                            abort: () => {
+                                super.close();
+                            },
+                            close: () => {
+                                super.close();
+                            },
+                        });
+                    let n, i;
+                    try {
+                        const t = await Ht.connect_tls(s, r, e[0]);
+                        (n = t.read), (i = t.write);
+                    } catch (e) {
+                        return void this.emit("error", new Error(`TLS Handshake failed: ${e}`));
+                    }
+                    this.writer = i.getWriter();
+                    let o = n.getReader(),
+                        a = !1;
+                    this.emit("tlsopen", void 0);
+                    try {
+                        for (; !a; ) {
+                            const { done: e, value: t } = await o.read();
+                            (a = e), a || this.emit("tlsdata", t);
+                        }
+                        this.emit("tlsclose", !1);
+                    } catch (e) {
+                        this.emit("error", e), this.emit("tlsclose", !0);
+                    }
+                });
+        }
+        on(e, t) {
+            return "data" === e || "open" === e || "close" === e ? super.on(`tls${e}`, t) : super.on(e, t);
+        }
+        write(e, t) {
+            if (e.buffer) this.writer.write(e.slice(0).buffer).then(t);
+            else if (e.resize) this.writer.write(e).then(t);
+            else {
+                if ("string" != typeof e)
+                    throw new Error("Invalid data type (not TypedArray, ArrayBuffer or String!!)");
+                this.writer.write(e).then(t);
+            }
+        }
+    }
+    function Jt(...e) {
+        return new Promise(async (t, s) => {
+            try {
+                const r = new Request(...e),
+                    n = new URL(r.url);
+                let i,
+                    o = new Headers(r.headers);
+                if ("http:" === n.protocol) i = new puter.net.Socket(n.hostname, n.port || 80);
+                else {
+                    if ("https:" !== n.protocol) {
+                        const e = `Failed to fetch. URL scheme "${n.protocol}" is not supported.`;
+                        return (
+                            globalThis.puter?.apiCallLogger?.isEnabled() &&
+                                globalThis.puter.apiCallLogger.logRequest({
+                                    service: "network",
+                                    operation: "pFetch",
+                                    params: { url: r.url, method: r.method },
+                                    error: { message: e },
+                                }),
+                            void s(e)
+                        );
+                    }
+                    i = new puter.net.tls.TLSSocket(n.hostname, n.port || 443);
+                }
+                o.get("user-agent") || o.set("user-agent", navigator.userAgent);
+                let a,
+                    c = `${r.method} ${n.pathname}${n.search} HTTP/1.1\r\nHost: ${n.host}\r\nConnection: close\r\n`;
+                for (const [e, t] of o) c += `${e}: ${t}\r\n`;
+                if (r.body) {
+                    if (((a = new Uint8Array(await r.arrayBuffer())), o.has("content-length"))) {
+                        if (o.get("content-length") !== String(a.length))
+                            return s(
+                                "Content-Length header does not match the body length. Please check your request."
+                            );
+                    } else o.set("content-length", a.length);
+                    c += `Content-Length: ${a.length}\r\n`;
+                }
+                (c += "\r\n"),
+                    i.on("open", async () => {
+                        i.write(c), a && i.write(a);
+                    });
+                const l = new TextDecoder();
+                let h = "",
+                    u = -1;
+                const p = [];
+                let d = !1,
+                    g = -1,
+                    f = 0,
+                    m = !1,
+                    y = -1,
+                    b = new Uint8Array(0);
+                const w = new ReadableStream({
+                    start(e) {
+                        function n(t) {
+                            const s = new Uint8Array(b.length + t.length);
+                            for (s.set(b, 0), s.set(t, b.length), b = s; ; )
+                                if (y > 0) {
+                                    if (!(b.length >= y + 2)) {
+                                        e.enqueue(b), (y -= b.length), (b = new Uint8Array(0));
+                                        break;
+                                    }
+                                    {
+                                        const t = b.slice(0, y);
+                                        e.enqueue(t), (b = b.slice(y + 2)), (y = 0);
+                                    }
+                                } else {
+                                    let t = -1;
+                                    for (let e = 0; e + 1 < b.length; e++)
+                                        if (13 === b[e] && 10 === b[e + 1]) {
+                                            t = e;
+                                            break;
+                                        }
+                                    if (t < 0) break;
+                                    const s = l.decode(b.slice(0, t)).trim();
+                                    if (
+                                        ((y = parseInt(s, 16)),
+                                        isNaN(y) && e.error("Invalid chunk length from server"),
+                                        (b = b.slice(t + 2)),
+                                        0 === y)
+                                    )
+                                        return (d = !0), void e.close();
+                                }
+                        }
+                        i.on("data", (s) => {
+                            if (
+                                (-1 === u || m || (e.enqueue(s), (f += s.length)),
+                                -1 === u && (p.push(s), (h += l.decode(s, { stream: !0 }))),
+                                m && n(s),
+                                -1 !== h.indexOf("\r\n\r\n"))
+                            ) {
+                                (u = h.indexOf("\r\n\r\n")), (h = h.slice(0, u));
+                                const s = (function (e) {
+                                    const t = e.split("\r\n"),
+                                        s = t.shift().split(" "),
+                                        r = Number(s[1]),
+                                        n = s.slice(2).join(" ") || "",
+                                        i = [];
+                                    for (const e of t) {
+                                        const t = e.split(": "),
+                                            s = t[0],
+                                            r = t.slice(1).join(": ");
+                                        i.push([s, r]);
+                                    }
+                                    return new Headers(i), { headers: new Headers(i), statusText: n, status: r };
+                                })(h);
+                                (g = Number(s.headers.get("content-length"))),
+                                    (m = "chunked" === s.headers.get("transfer-encoding")),
+                                    globalThis.puter?.apiCallLogger?.isEnabled() &&
+                                        globalThis.puter.apiCallLogger.logRequest({
+                                            service: "network",
+                                            operation: "pFetch",
+                                            params: { url: r.url, method: r.method },
+                                            result: { status: s.status, statusText: s.statusText },
+                                        }),
+                                    t(new Response(w, s));
+                                const i = (function (...e) {
+                                    const t = e.reduce((e, t) => e + t.length, 0),
+                                        s = new Uint8Array(t);
+                                    return (
+                                        e.forEach((e, t, r) => {
+                                            const n = r.slice(0, t).reduce((e, t) => e + t.length, 0);
+                                            s.set(e, n);
+                                        }),
+                                        s
+                                    );
+                                })(...p).slice(u + 4);
+                                m ? n(i) : ((f += i.length), e.enqueue(i));
+                            }
+                            -1 === g || f !== g || m || d || ((d = !0), e.close());
+                        }),
+                            i.on("close", () => {
+                                d || ((d = !0), e.close());
+                            }),
+                            i.on("error", (e) => {
+                                globalThis.puter?.apiCallLogger?.isEnabled() &&
+                                    globalThis.puter.apiCallLogger.logRequest({
+                                        service: "network",
+                                        operation: "pFetch",
+                                        params: { url: r.url, method: r.method },
+                                        error: { message: `Socket errored with the following reason: ${e}` },
+                                    }),
+                                    s(`Socket errored with the following reason: ${e}`);
+                            });
+                    },
+                });
+            } catch (e) {
+                globalThis.puter?.apiCallLogger?.isEnabled() &&
+                    globalThis.puter.apiCallLogger.logRequest({
+                        service: "network",
+                        operation: "pFetch",
+                        params: { url: reqObj.url, method: reqObj.method },
+                        error: { message: e.message || e.toString(), stack: e.stack },
+                    }),
+                    s(e);
+            }
+        });
+    }
+    const $t = class {
+        constructor(e) {
+            (this.puter = e), (this.authToken = e.authToken), (this.APIOrigin = e.APIOrigin), (this.appID = e.appID);
+        }
+        setAuthToken(e) {
+            this.authToken = e;
+        }
+        setAPIOrigin(e) {
+            this.APIOrigin = e;
+        }
+        user = function (...e) {
+            let t;
+            t = "object" == typeof e[0] && null !== e[0] ? e[0] : { success: e[0], error: e[1] };
+            let s = "";
+            return (
+                t?.query && (s = `?${new URLSearchParams(t.query).toString()}`),
+                new Promise((e, r) => {
+                    const n = L(`/whoami${s}`, this.APIOrigin, this.authToken, "get");
+                    q(n, t.success, t.error, e, r), n.send();
+                })
+            );
+        };
+        version = function (...e) {
+            let t;
+            return (
+                (t = "object" == typeof e[0] && null !== e[0] ? e[0] : { success: e[0], error: e[1] }),
+                new Promise((e, s) => {
+                    const r = L("/version", this.APIOrigin, this.authToken, "get");
+                    q(r, t.success, t.error, e, s), r.send();
+                })
+            );
+        };
+    };
+    class es {
+        constructor(e) {
+            (this.puter = e), (this.authToken = e.authToken), (this.APIOrigin = e.APIOrigin);
+        }
+        setAuthToken(e) {
+            this.authToken = e;
+        }
+        setAPIOrigin(e) {
+            this.APIOrigin = e;
+        }
+        async req_(e, t) {
+            try {
+                const s = await fetch(this.APIOrigin + e, {
+                    method: t ? "POST" : "GET",
+                    headers: { Authorization: `Bearer ${this.authToken}`, "Content-Type": "application/json" },
+                    ...(t ? { body: JSON.stringify(t) } : {}),
+                });
+                return s.headers.get("content-type")?.includes("application/json")
+                    ? await s.json()
+                    : { message: await s.text(), code: "unknown_error" };
+            } catch (e) {
+                return { message: e.message, code: "internal_error" };
+            }
+        }
+        async grantUser(e, t) {
+            return await this.req_("/auth/grant-user-user", { target_username: e, permission: t });
+        }
+        async grantGroup(e, t) {
+            return await this.req_("/auth/grant-user-group", { group_uid: e, permission: t });
+        }
+        async grantApp(e, t) {
+            return await this.req_("/auth/grant-user-app", { app_uid: e, permission: t });
+        }
+        async grantAppAnyUser(e, t) {
+            return await this.req_("/auth/grant-dev-app", { app_uid: e, permission: t });
+        }
+        async grantOrigin(e, t) {
+            return await this.req_("/auth/grant-user-app", { origin: e, permission: t });
+        }
+        async revokeUser(e, t) {
+            return await this.req_("/auth/revoke-user-user", { target_username: e, permission: t });
+        }
+        async revokeGroup(e, t) {
+            return await this.req_("/auth/revoke-user-group", { group_uid: e, permission: t });
+        }
+        async revokeApp(e, t) {
+            return await this.req_("/auth/revoke-user-app", { app_uid: e, permission: t });
+        }
+        async revokeAppAnyUser(e, t) {
+            return await this.req_("/auth/revoke-dev-app", { app_uid: e, permission: t });
+        }
+        async revokeOrigin(e, t) {
+            return await this.req_("/auth/revoke-user-app", { origin: e, permission: t });
+        }
+        async createGroup(e = {}, t = {}) {
+            return await this.req_("/group/create", { metadata: e, extra: t });
+        }
+        async addUsersToGroup(e, t) {
+            return await this.req_("/group/add-users", { uid: e, users: t ?? [] });
+        }
+        async removeUsersFromGroup(e, t) {
+            return await this.req_("/group/remove-users", { uid: e, users: t ?? [] });
+        }
+        async listGroups() {
+            return await this.req_("/group/list");
+        }
+        requestPermission(...e) {
+            return this.request(...e);
+        }
+        async request(e) {
+            return await this.puter.ui.requestPermission({ permission: e });
+        }
+        async requestEmail() {
+            let e;
+            return (
+                (e = await this.puter.auth.whoami()),
+                void 0 !== e.email ||
+                    ((await this.puter.ui.requestPermission({ permission: `user:${e.uuid}:email:read` })) &&
+                        (e = await this.puter.auth.whoami())),
+                e.email
+            );
+        }
+        async requestReadDesktop() {
+            return this.requestFolder_("Desktop", "read");
+        }
+        async requestWriteDesktop() {
+            return this.requestFolder_("Desktop", "write");
+        }
+        async requestReadDocuments() {
+            return this.requestFolder_("Documents", "read");
+        }
+        async requestWriteDocuments() {
+            return this.requestFolder_("Documents", "write");
+        }
+        async requestReadPictures() {
+            return this.requestFolder_("Pictures", "read");
+        }
+        async requestWritePictures() {
+            return this.requestFolder_("Pictures", "write");
+        }
+        async requestReadVideos() {
+            return this.requestFolder_("Videos", "read");
+        }
+        async requestWriteVideos() {
+            return this.requestFolder_("Videos", "write");
+        }
+        async requestReadApps() {
+            const e = await this.puter.auth.whoami();
+            return await this.puter.ui.requestPermission({ permission: `apps-of-user:${e.uuid}:read` });
+        }
+        async requestManageApps() {
+            const e = await this.puter.auth.whoami();
+            return await this.puter.ui.requestPermission({ permission: `apps-of-user:${e.uuid}:write` });
+        }
+        async requestReadSubdomains() {
+            const e = await this.puter.auth.whoami();
+            return await this.puter.ui.requestPermission({ permission: `subdomains-of-user:${e.uuid}:read` });
+        }
+        async requestManageSubdomains() {
+            const e = await this.puter.auth.whoami();
+            return await this.puter.ui.requestPermission({ permission: `subdomains-of-user:${e.uuid}:write` });
+        }
+        async requestFolder_(e, t) {
+            const s = `/${(await this.puter.auth.whoami()).username}/${e}`;
+            try {
+                if ((await this.puter.fs.stat({ path: s }), "write" !== t)) return s;
+            } catch (e) {}
+            if (await this.puter.ui.requestPermission({ permission: `fs:${s}:${t}` })) return s;
+        }
+    }
+    class ts extends (globalThis.HTMLElement || Object) {
+        isUsingFileProtocol = () => "file:" === window.location.protocol;
+        constructor(e, t) {
+            let s;
+            super(),
+                (this.reject = t),
+                (this.resolve = e),
+                (this.popupLaunched = !1),
+                (this.hasUserActivation = () => {
+                    if (navigator.userActivation)
+                        return navigator.userActivation.hasBeenActive && navigator.userActivation.isActive;
+                    try {
+                        const e = window.open("", "_blank", "width=1,height=1,left=-1000,top=-1000");
+                        return !!e && (e.close(), !0);
+                    } catch (e) {
+                        return !1;
+                    }
+                }),
+                (this.launchPopup = () => {
+                    try {
+                        let s = 600,
+                            r = 400,
+                            n = "Puter";
+                        var e = screen.width / 2 - s / 2,
+                            t = screen.height / 2 - r / 2;
+                        return window.open(
+                            `${puter.defaultGUIOrigin}/?embedded_in_popup=true&request_auth=true${window.crossOriginIsolated ? "&cross_origin_isolated=true" : ""}`,
+                            n,
+                            `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${s}, height=${r}, top=${t}, left=${e}`
+                        );
+                    } catch (e) {
+                        return console.error("Failed to open popup:", e), null;
+                    }
+                }),
+                this.attachShadow({ mode: "open" }),
+                (s =
+                    "\n        <style>\n        dialog{\n            background: transparent; \n            border: none; \n            box-shadow: none; \n            outline: none;\n        }\n        .puter-dialog-content {\n            border: 1px solid #e8e8e8;\n            border-radius: 8px;\n            padding: 20px;\n            background: white;\n            box-shadow: 0 0 9px 1px rgb(0 0 0 / 21%);\n            padding: 80px 20px;\n            -webkit-font-smoothing: antialiased;\n            color: #575762;\n            position: relative;\n            background-image: url('data:image/webp;base64,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');\n            background-repeat: no-repeat;\n            background-position: center center;\n            background-size: 100% 100%;\n            background-color: #fff;\n        }\n        \n        dialog * {\n            max-width: 500px;\n            font-family: \"Helvetica Neue\", HelveticaNeue, Helvetica, Arial, sans-serif;\n        }\n        \n        dialog p.about{\n            text-align: center;\n            font-size: 17px;\n            padding: 10px 30px;\n            font-weight: 400;\n            -webkit-font-smoothing: antialiased;\n            color: #404048;\n            box-sizing: border-box;\n        }\n        \n        dialog .buttons{\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            flex-wrap: wrap;\n            margin-top: 20px;\n            text-align: center;\n            margin-bottom: 20px;\n        }\n        \n        .launch-auth-popup-footnote{\n            font-size: 11px;\n            color: #666;\n            margin-top: 10px;\n            /* footer at the bottom */\n            position: absolute;\n            left: 0;\n            right: 0;\n            bottom: 10px;\n            text-align: center;\n            margin: 0 10px;\n        }\n        \n        dialog .close-btn{\n            position: absolute;\n            right: 15px;\n            top: 10px;\n            font-size: 17px;\n            color: #8a8a8a;\n            cursor: pointer;\n        }\n        \n        dialog .close-btn:hover{\n            color: #000;\n        }\n        \n        /* ------------------------------------\n        Button\n        ------------------------------------*/\n        \n        dialog .button {\n            color: #666666;\n            background-color: #eeeeee;\n            border-color: #eeeeee;\n            font-size: 14px;\n            text-decoration: none;\n            text-align: center;\n            line-height: 40px;\n            height: 35px;\n            padding: 0 30px;\n            margin: 0;\n            display: inline-block;\n            appearance: none;\n            cursor: pointer;\n            border: none;\n            -webkit-box-sizing: border-box;\n            -moz-box-sizing: border-box;\n            box-sizing: border-box;\n            border-color: #b9b9b9;\n            border-style: solid;\n            border-width: 1px;\n            line-height: 35px;\n            background: -webkit-gradient(linear, left top, left bottom, from(#f6f6f6), to(#e1e1e1));\n            background: linear-gradient(#f6f6f6, #e1e1e1);\n            -webkit-box-shadow: inset 0px 1px 0px rgb(255 255 255 / 30%), 0 1px 2px rgb(0 0 0 / 15%);\n            box-shadow: inset 0px 1px 0px rgb(255 255 255 / 30%), 0 1px 2px rgb(0 0 0 / 15%);\n            border-radius: 4px;\n            outline: none;\n            -webkit-font-smoothing: antialiased;\n        }\n        \n        dialog .button:focus-visible {\n            border-color: rgb(118 118 118);\n        }\n        \n        dialog .button:active, dialog .button.active, dialog .button.is-active, dialog .button.has-open-contextmenu {\n            text-decoration: none;\n            background-color: #eeeeee;\n            border-color: #cfcfcf;\n            color: #a9a9a9;\n            -webkit-transition-duration: 0s;\n            transition-duration: 0s;\n            -webkit-box-shadow: inset 0 1px 3px rgb(0 0 0 / 20%);\n            box-shadow: inset 0px 2px 3px rgb(0 0 0 / 36%), 0px 1px 0px white;\n        }\n        \n        dialog .button.disabled, dialog .button.is-disabled, dialog .button:disabled {\n            top: 0 !important;\n            background: #EEE !important;\n            border: 1px solid #DDD !important;\n            text-shadow: 0 1px 1px white !important;\n            color: #CCC !important;\n            cursor: default !important;\n            appearance: none !important;\n            pointer-events: none;\n        }\n        \n        dialog .button-action.disabled, dialog .button-action.is-disabled, dialog .button-action:disabled {\n            background: #55a975 !important;\n            border: 1px solid #60ab7d !important;\n            text-shadow: none !important;\n            color: #CCC !important;\n        }\n        \n        dialog .button-primary.disabled, dialog .button-primary.is-disabled, dialog .button-primary:disabled {\n            background: #8fc2e7 !important;\n            border: 1px solid #98adbd !important;\n            text-shadow: none !important;\n            color: #f5f5f5 !important;\n        }\n        \n        dialog .button-block {\n            width: 100%;\n        }\n        \n        dialog .button-primary {\n            border-color: #088ef0;\n            background: -webkit-gradient(linear, left top, left bottom, from(#34a5f8), to(#088ef0));\n            background: linear-gradient(#34a5f8, #088ef0);\n            color: white;\n        }\n        \n        dialog .button-danger {\n            border-color: #f00808;\n            background: -webkit-gradient(linear, left top, left bottom, from(#f83434), to(#f00808));\n            background: linear-gradient(#f83434, #f00808);\n            color: white;\n        }\n        \n        dialog .button-primary:active, dialog .button-primary.active, dialog .button-primary.is-active, dialog .button-primary-flat:active, dialog .button-primary-flat.active, dialog .button-primary-flat.is-active {\n            background-color: #2798eb;\n            border-color: #2798eb;\n            color: #bedef5;\n        }\n        \n        dialog .button-action {\n            border-color: #08bf4e;\n            background: -webkit-gradient(linear, left top, left bottom, from(#29d55d), to(#1ccd60));\n            background: linear-gradient(#29d55d, #1ccd60);\n            color: white;\n        }\n        \n        dialog .button-action:active, dialog .button-action.active, dialog .button-action.is-active, dialog .button-action-flat:active, dialog .button-action-flat.active, dialog .button-action-flat.is-active {\n            background-color: #27eb41;\n            border-color: #27eb41;\n            color: #bef5ca;\n        }\n        \n        dialog .button-giant {\n            font-size: 28px;\n            height: 70px;\n            line-height: 70px;\n            padding: 0 70px;\n        }\n        \n        dialog .button-jumbo {\n            font-size: 24px;\n            height: 60px;\n            line-height: 60px;\n            padding: 0 60px;\n        }\n        \n        dialog .button-large {\n            font-size: 20px;\n            height: 50px;\n            line-height: 50px;\n            padding: 0 50px;\n        }\n        \n        dialog .button-normal {\n            font-size: 16px;\n            height: 40px;\n            line-height: 38px;\n            padding: 0 40px;\n        }\n        \n        dialog .button-small {\n            height: 30px;\n            line-height: 29px;\n            padding: 0 30px;\n        }\n        \n        dialog .button-tiny {\n            font-size: 9.6px;\n            height: 24px;\n            line-height: 24px;\n            padding: 0 24px;\n        }\n        \n        #launch-auth-popup{\n            margin-left: 10px; \n            width: 200px; \n            font-weight: 500; \n            font-size: 15px;\n        }\n        dialog .button-auth{\n            margin-bottom: 10px;\n        }\n        dialog a, dialog a:visited{\n            color: rgb(0 69 238);\n            text-decoration: none;\n        }\n        dialog a:hover{\n            text-decoration: underline;\n        }\n        \n        @media (max-width:480px)  { \n            .puter-dialog-content{\n                padding: 50px 20px;\n            }\n            dialog .buttons{\n                flex-direction: column-reverse;\n            }\n            dialog p.about{\n                padding: 10px 0;\n            }\n            dialog .button-auth{\n                width: 100% !important;\n                margin:0 !important;\n                margin-bottom: 10px !important;\n            }\n        }\n        .error-container h1 {\n            color: #e74c3c;\n            font-size: 20px;\n            text-align: center;\n        }\n\n        .puter-dialog-content a:focus{\n            outline: none;\n        }\n        </style>"),
+                "file:" === window.location.protocol
+                    ? (s +=
+                          '<dialog>\n                    <div class="puter-dialog-content" style="padding: 20px 40px; background:white !important; font-size: 15px;">\n                        <span class="close-btn">&#x2715</span>\n                        <div class="error-container">\n                            <h1>Puter.js Error: Unsupported Protocol</h1>\n                            <p>It looks like you\'ve opened this file directly in your browser (using the <code style="font-family: monospace;">file:///</code> protocol) which is not supported by Puter.js for security reasons.</p>\n                            <p>To view this content properly, you need to serve it through a web server. Here are some options:</p>\n                            <ul>\n                                <li>Use a local development server (e.g., Python\'s built-in server or Node.js http-server)</li>\n                                <li>Upload the files to a web hosting service</li>\n                                <li>Use a local server application like XAMPP or MAMP</li>\n                            </ul>\n                            <p class="help-text">If you\'re not familiar with these options, consider reaching out to your development team or IT support for assistance.</p>\n                        </div>\n                        <p style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px; text-align: center; font-size:13px;">\n                            <a href="https://docs.puter.com" target="_blank">Docs</a><span style="margin:10px; color: #CCC;">|</span>\n                            <a href="https://github.com/heyPuter/puter/" target="_blank">Github</a><span style="margin:10px; color: #CCC;">|</span>\n                            <a href="https://discord.com/invite/PQcx7Teh8u" target="_blank">Discord</a>\n                        </p>\n                    </div>\n                </dialog>')
+                    : (s +=
+                          '<dialog>\n                <div class="puter-dialog-content">\n                    <span class="close-btn">&#x2715</span>\n                    <a href="https://puter.com" target="_blank" style="border:none; outline:none; display: block; width: 70px; height: 70px; margin: 0 auto; border-radius: 4px;"><img style="display: block; width: 70px; height: 70px; margin: 0 auto; border-radius: 4px;" src="data:image/png;base64,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"/></a>\n                    <p class="about">This website uses Puter to bring you safe, secure, and private AI and Cloud features.</p>\n                    <div class="buttons">\n                        <button class="button button-auth" id="launch-auth-popup-cancel">Cancel</button>\n                        <button class="button button-primary button-auth" id="launch-auth-popup" style="margin-left:10px;">Continue</button>\n                    </div>\n                    <p style="text-align: center; margin-top: -15px; font-size: 14px;">Powered by <a href="https://developer.puter.com/?utm_source=sdk-splash" target="_blank">Puter</a></p>\n                    <p class="launch-auth-popup-footnote">By clicking \'Continue\' you agree to Puter\'s <a href="https://puter.com/terms" target="_blank">Terms of Service</a> and <a href="https://puter.com/privacy" target="_blank">Privacy Policy</a>.</p>\n                </div>\n            </dialog>'),
+                (this.shadowRoot.innerHTML = s),
+                (this.messageListener = async (e) => {
+                    "puter.token" === e.data.msg &&
+                        (this.close(),
+                        puter.setAuthToken(e.data.token),
+                        puter.setAppID(e.data.app_uid),
+                        window.removeEventListener("message", this.messageListener),
+                        (puter.puterAuthState.authGranted = !0),
+                        this.resolve(),
+                        puter.onAuth &&
+                            "function" == typeof puter.onAuth &&
+                            puter.getUser().then((e) => {
+                                puter.onAuth(e);
+                            }),
+                        (puter.puterAuthState.isPromptOpen = !1),
+                        puter.puterAuthState.resolver &&
+                            (puter.puterAuthState.authGranted
+                                ? puter.puterAuthState.resolver.resolve()
+                                : puter.puterAuthState.resolver.reject(),
+                            (puter.puterAuthState.resolver = null)));
+                });
+        }
+        cancelListener = () => {
+            this.close(),
+                window.removeEventListener("message", this.messageListener),
+                (puter.puterAuthState.authGranted = !1),
+                (puter.puterAuthState.isPromptOpen = !1),
+                this.reject(new Error("User cancelled the authentication")),
+                puter.puterAuthState.resolver &&
+                    (puter.puterAuthState.resolver.reject(new Error("User cancelled the authentication")),
+                    (puter.puterAuthState.resolver = null));
+        };
+        connectedCallback() {
+            this.shadowRoot.querySelector("#launch-auth-popup")?.addEventListener("click", () => {
+                var e = screen.width / 2 - 300,
+                    t = screen.height / 2 - 200;
+                window.open(
+                    `${puter.defaultGUIOrigin}/?embedded_in_popup=true&request_auth=true${window.crossOriginIsolated ? "&cross_origin_isolated=true" : ""}`,
+                    "Puter",
+                    `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=600, height=400, top=${t}, left=${e}`
+                );
+            }),
+                window.addEventListener("message", this.messageListener),
+                this.shadowRoot
+                    .querySelector("#launch-auth-popup-cancel")
+                    ?.addEventListener("click", this.cancelListener),
+                this.shadowRoot.querySelector(".close-btn")?.addEventListener("click", this.cancelListener);
+        }
+        open() {
+            if (this.hasUserActivation()) {
+                let s = 600,
+                    r = 400,
+                    n = "Puter";
+                var e = screen.width / 2 - s / 2,
+                    t = screen.height / 2 - r / 2;
+                window.open(
+                    `${puter.defaultGUIOrigin}/?embedded_in_popup=true&request_auth=true${window.crossOriginIsolated ? "&cross_origin_isolated=true" : ""}`,
+                    n,
+                    `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${s}, height=${r}, top=${t}, left=${e}`
+                );
+            } else this.shadowRoot.querySelector("dialog").showModal();
+        }
+        close() {
+            this.shadowRoot.querySelector("dialog").close();
+        }
+    }
+    ts.__proto__ === globalThis.HTMLElement && customElements.define("puter-dialog", ts);
+    const ss = ts,
+        rs = () => {
+            let e, t;
+            return {
+                promise: new Promise((s, r) => {
+                    (e = s), (t = r);
+                }),
+                resolve: e,
+                reject: t,
+            };
+        },
+        ns = Symbol("FILE_SAVE_CANCELLED"),
+        is = Symbol("FILE_OPEN_CANCELLED");
+    class os extends Ft {
+        #o = "*";
+        #a;
+        #c;
+        static from(e, t, { messageTarget: s, appInstanceID: r }) {
+            const n = new os(t, { target: e.appInstanceID, usesSDK: e.usesSDK, messageTarget: s, appInstanceID: r });
+            return (n.response = e.response), n;
+        }
+        constructor(e, { target: t, usesSDK: s, messageTarget: r, appInstanceID: n }) {
+            super(["message", "close"]),
+                (this.messageTarget = r),
+                (this.appInstanceID = n),
+                (this.targetAppInstanceID = t),
+                (this.#a = !0),
+                (this.#c = s),
+                (this.log = e.logger.fields({ category: "ipc" })),
+                this.log
+                    .fields({ cons_source: n, source: e.appInstanceID, target: t })
+                    .info(`AppConnection created to ${t}`, this),
+                globalThis.document &&
+                    window.addEventListener("message", (e) => {
+                        if ("messageToApp" === e.data.msg) {
+                            if (e.data.appInstanceID !== this.targetAppInstanceID) return;
+                            return e.data.targetAppInstanceID !== this.appInstanceID
+                                ? void console.error(
+                                      `AppConnection received message intended for wrong app! appInstanceID=${this.appInstanceID}, target=${e.data.targetAppInstanceID}`
+                                  )
+                                : void this.emit("message", e.data.contents);
+                        }
+                        if ("appClosed" === e.data.msg) {
+                            if (e.data.appInstanceID !== this.targetAppInstanceID) return;
+                            (this.#a = !1),
+                                this.emit("close", {
+                                    appInstanceID: this.targetAppInstanceID,
+                                    statusCode: e.data.statusCode,
+                                });
+                        }
+                    });
+        }
+        get usesSDK() {
+            return this.#c;
+        }
+        postMessage(e) {
+            this.#a
+                ? this.#c
+                    ? this.messageTarget.postMessage(
+                          {
+                              msg: "messageToApp",
+                              appInstanceID: this.appInstanceID,
+                              targetAppInstanceID: this.targetAppInstanceID,
+                              targetAppOrigin: "*",
+                              contents: e,
+                          },
+                          this.#o
+                      )
+                    : console.warn("Trying to post message to a non-SDK app")
+                : console.warn("Trying to post message on a closed AppConnection");
+        }
+        close() {
+            this.#a
+                ? this.messageTarget.postMessage(
+                      {
+                          msg: "closeApp",
+                          appInstanceID: this.appInstanceID,
+                          targetAppInstanceID: this.targetAppInstanceID,
+                      },
+                      this.#o
+                  )
+                : console.warn("Trying to close an app on a closed AppConnection");
+        }
+    }
+    const as = class extends Ft {
+            #r = 1;
+            itemWatchCallbackFunctions = [];
+            appInstanceID;
+            parentInstanceID;
+            #l = null;
+            #h = [];
+            #u;
+            #p;
+            #d;
+            #n;
+            #g = new Map();
+            #f = !1;
+            #m = null;
+            #y(e, t, s = {}) {
+                const r = this.#r++;
+                this.messageTarget?.postMessage(
+                    { msg: e, env: this.env, appInstanceID: this.appInstanceID, uuid: r, ...s },
+                    "*"
+                ),
+                    (this.#h[r] = (...e) => {
+                        t(...e);
+                    });
+            }
+            #b(e, t = {}) {
+                return new Promise((s) => {
+                    this.#y(e, s, t);
+                });
+            }
+            #w(e, t) {
+                const s = this.util.rpc.getDehydrator({ target: this.messageTarget });
+                this.messageTarget?.postMessage(
+                    { msg: e, env: this.env, appInstanceID: this.appInstanceID, value: s.dehydrate(t) },
+                    "*"
+                );
+            }
+            async #v({ callback: e, method: t, parameters: s }) {
+                let r, n;
+                await new Promise((e) => {
+                    r = new Promise((t) => {
+                        (n = t), e();
+                    });
+                });
+                const i = this.util.rpc.registerCallback(n);
+                this.messageTarget?.postMessage(
+                    {
+                        $: "puter-ipc",
+                        v: 2,
+                        appInstanceID: this.appInstanceID,
+                        env: this.env,
+                        msg: t,
+                        parameters: s,
+                        uuid: i,
+                    },
+                    "*"
+                );
+                const o = await r;
+                return e && e(o), o;
+            }
+            constructor(e, { appInstanceID: t, parentInstanceID: s }) {
+                const r = ["localeChanged", "themeChanged", "connection"];
+                if (
+                    (super(r),
+                    (this.#n = r),
+                    (this.puter = e),
+                    (this.appInstanceID = t),
+                    (this.parentInstanceID = s),
+                    (this.appID = e.appID),
+                    (this.env = e.env),
+                    (this.util = e.util),
+                    "app" === this.env)
+                )
+                    this.messageTarget = window.parent;
+                else if ("gui" === this.env) return;
+                this.parentInstanceID &&
+                    (this.#l = new os(this.puter, {
+                        target: this.parentInstanceID,
+                        usesSDK: !0,
+                        messageTarget: this.messageTarget,
+                        appInstanceID: this.appInstanceID,
+                    })),
+                    this.messageTarget?.postMessage({ msg: "READY", appInstanceID: this.appInstanceID }, "*"),
+                    globalThis.document &&
+                        window.addEventListener("focus", (e) => {
+                            this.messageTarget?.postMessage(
+                                { msg: "windowFocused", appInstanceID: this.appInstanceID },
+                                "*"
+                            );
+                        });
+                let n = null;
+                globalThis.document &&
+                    window.addEventListener("message", async (e) => {
+                        if (e.data) {
+                            if (e.data.error) throw e.data.error;
+                            if (e.data.msg && "focus" === e.data.msg) window.focus();
+                            else if (e.data.msg && "click" === e.data.msg) {
+                                const t = document.elementFromPoint(e.data.x, e.data.y);
+                                null !== t && t.click();
+                            } else if (e.data.msg && "drag" === e.data.msg) {
+                                const t = document.elementFromPoint(e.data.x, e.data.y);
+                                if (t !== n) {
+                                    if (n) {
+                                        const t = new Event("dragleave", {
+                                            bubbles: !0,
+                                            cancelable: !0,
+                                            clientX: e.data.x,
+                                            clientY: e.data.y,
+                                        });
+                                        n.dispatchEvent(t);
+                                    }
+                                    if (t) {
+                                        const s = new Event("dragenter", {
+                                            bubbles: !0,
+                                            cancelable: !0,
+                                            clientX: e.data.x,
+                                            clientY: e.data.y,
+                                        });
+                                        t.dispatchEvent(s);
+                                    }
+                                    n = t;
+                                }
+                            } else if (e.data.msg && "drop" === e.data.msg) {
+                                if (n) {
+                                    const t = new CustomEvent("drop", {
+                                        bubbles: !0,
+                                        cancelable: !0,
+                                        detail: { clientX: e.data.x, clientY: e.data.y, items: e.data.items },
+                                    });
+                                    n.dispatchEvent(t), (n = null);
+                                }
+                            } else if ("windowWillClose" === e.data.msg)
+                                void 0 === this.#u
+                                    ? this.messageTarget?.postMessage(
+                                          {
+                                              msg: !0,
+                                              appInstanceID: this.appInstanceID,
+                                              original_msg_id: e.data.msg_id,
+                                          },
+                                          "*"
+                                      )
+                                    : (this.messageTarget?.postMessage(
+                                          {
+                                              msg: !1,
+                                              appInstanceID: this.appInstanceID,
+                                              original_msg_id: e.data.msg_id,
+                                          },
+                                          "*"
+                                      ),
+                                      this.#u());
+                            else if ("itemsOpened" === e.data.msg)
+                                if (void 0 === this.#p)
+                                    this.messageTarget?.postMessage(
+                                        { msg: !0, appInstanceID: this.appInstanceID, original_msg_id: e.data.msg_id },
+                                        "*"
+                                    );
+                                else {
+                                    this.messageTarget?.postMessage(
+                                        { msg: !1, appInstanceID: this.appInstanceID, original_msg_id: e.data.msg_id },
+                                        "*"
+                                    );
+                                    let t = [];
+                                    if (e.data.items.length > 0)
+                                        for (let s = 0; s < e.data.items.length; s++) t.push(new Dt(e.data.items[s]));
+                                    this.#p(t);
+                                }
+                            else if ("getAppDataSucceeded" === e.data.msg) {
+                                let t = new Dt(e.data.item);
+                                e.data.original_msg_id &&
+                                    this.#h[e.data.original_msg_id] &&
+                                    this.#h[e.data.original_msg_id](t);
+                            } else if ("instancesOpenSucceeded" === e.data.msg)
+                                e.data.original_msg_id &&
+                                    this.#h[e.data.original_msg_id] &&
+                                    this.#h[e.data.original_msg_id](e.data.instancesOpen);
+                            else if ("readAppDataFileSucceeded" === e.data.msg) {
+                                let t = new Dt(e.data.item);
+                                e.data.original_msg_id &&
+                                    this.#h[e.data.original_msg_id] &&
+                                    this.#h[e.data.original_msg_id](t);
+                            } else if ("readAppDataFileFailed" === e.data.msg)
+                                e.data.original_msg_id &&
+                                    this.#h[e.data.original_msg_id] &&
+                                    this.#h[e.data.original_msg_id](null);
+                            else if (void 0 !== e.data.original_msg_id && this.#h[e.data.original_msg_id]) {
+                                if ("fileOpenPicked" === e.data.msg) {
+                                    if (1 === e.data.items.length)
+                                        this.#h[e.data.original_msg_id](new Dt(e.data.items[0]));
+                                    else if (e.data.items.length > 1) {
+                                        let t = [];
+                                        for (let s = 0; s < e.data.items.length; s++) t.push(new Dt(e.data.items[s]));
+                                        this.#h[e.data.original_msg_id](t);
+                                    }
+                                } else if ("directoryPicked" === e.data.msg) {
+                                    if (1 === e.data.items.length)
+                                        this.#h[e.data.original_msg_id](
+                                            new Dt({
+                                                uid: e.data.items[0].uid,
+                                                name: e.data.items[0].fsentry_name,
+                                                path: e.data.items[0].path,
+                                                readURL: e.data.items[0].read_url,
+                                                writeURL: e.data.items[0].write_url,
+                                                metadataURL: e.data.items[0].metadata_url,
+                                                isDirectory: !0,
+                                                size: e.data.items[0].fsentry_size,
+                                                accessed: e.data.items[0].fsentry_accessed,
+                                                modified: e.data.items[0].fsentry_modified,
+                                                created: e.data.items[0].fsentry_created,
+                                            })
+                                        );
+                                    else if (e.data.items.length > 1) {
+                                        let t = [];
+                                        for (let s = 0; s < e.data.items.length; s++) t.push(new Dt(e.data.items[s]));
+                                        this.#h[e.data.original_msg_id](t);
+                                    }
+                                } else
+                                    "colorPicked" === e.data.msg
+                                        ? this.#h[e.data.original_msg_id](e.data.color)
+                                        : "fontPicked" === e.data.msg
+                                          ? this.#h[e.data.original_msg_id](e.data.font)
+                                          : "alertResponded" === e.data.msg || "promptResponded" === e.data.msg
+                                            ? this.#h[e.data.original_msg_id](e.data.response)
+                                            : "languageReceived" === e.data.msg
+                                              ? this.#h[e.data.original_msg_id](e.data.language)
+                                              : "fileSaved" === e.data.msg
+                                                ? this.#h[e.data.original_msg_id](new Dt(e.data.saved_file))
+                                                : "fileSaveCancelled" === e.data.msg
+                                                  ? this.#h[e.data.original_msg_id](ns)
+                                                  : "fileOpenCancelled" === e.data.msg
+                                                    ? this.#h[e.data.original_msg_id](is)
+                                                    : this.#h[e.data.original_msg_id](e.data);
+                                delete this.#h[e.data.original_msg_id];
+                            } else if ("itemChanged" === e.data.msg && e.data.data && e.data.data.uid)
+                                this.itemWatchCallbackFunctions[e.data.data.uid] &&
+                                    "function" == typeof this.itemWatchCallbackFunctions[e.data.data.uid] &&
+                                    this.itemWatchCallbackFunctions[e.data.data.uid](e.data.data);
+                            else if ("broadcast" === e.data.msg) {
+                                const { name: t, data: s } = e.data;
+                                if (!this.#n.includes(t)) return;
+                                this.emit(t, s), this.#g.set(t, s);
+                            } else if ("connection" === e.data.msg) {
+                                e.data.usesSDK = !0;
+                                const t = os.from(e.data, this.puter, {
+                                        messageTarget: this.messageTarget,
+                                        appInstanceID: this.appInstanceID,
+                                    }),
+                                    s = (t) => {
+                                        this.messageTarget?.postMessage(
+                                            {
+                                                $: "connection-resp",
+                                                connection: e.data.appInstanceID,
+                                                accept: !0,
+                                                value: t,
+                                            },
+                                            "*"
+                                        );
+                                    },
+                                    r = (t) => {
+                                        this.messageTarget?.postMessage(
+                                            {
+                                                $: "connection-resp",
+                                                connection: e.data.appInstanceID,
+                                                accept: !1,
+                                                value: t,
+                                            },
+                                            "*"
+                                        );
+                                    };
+                                this.emit("connection", { conn: t, accept: s, reject: r });
+                            }
+                        }
+                    }),
+                    globalThis.document?.addEventListener("mousemove", async (e) => {
+                        (this.mouseX = e.clientX),
+                            (this.mouseY = e.clientY),
+                            this.messageTarget?.postMessage(
+                                {
+                                    msg: "mouseMoved",
+                                    appInstanceID: this.appInstanceID,
+                                    x: this.mouseX,
+                                    y: this.mouseY,
+                                },
+                                "*"
+                            );
+                    }),
+                    globalThis.document?.addEventListener("click", async (e) => {
+                        (this.mouseX = e.clientX),
+                            (this.mouseY = e.clientY),
+                            this.messageTarget?.postMessage(
+                                {
+                                    msg: "mouseClicked",
+                                    appInstanceID: this.appInstanceID,
+                                    x: this.mouseX,
+                                    y: this.mouseY,
+                                },
+                                "*"
+                            );
+                    });
+            }
+            onWindowClose(e) {
+                this.#u = e;
+            }
+            onItemsOpened(e) {
+                if (!this.#p) {
+                    let t = new URLSearchParams(globalThis.location.search);
+                    if (t.has("puter.item.name") && t.has("puter.item.uid") && t.has("puter.item.read_url")) {
+                        let s = t.get("puter.item.path");
+                        s.startsWith("~/") || s.startsWith("/") || (s = `~/${s}`),
+                            e([
+                                new Dt({
+                                    name: t.get("puter.item.name"),
+                                    path: s,
+                                    uid: t.get("puter.item.uid"),
+                                    readURL: t.get("puter.item.read_url"),
+                                    writeURL: t.get("puter.item.write_url"),
+                                    metadataURL: t.get("puter.item.metadata_url"),
+                                    size: t.get("puter.item.size"),
+                                    accessed: t.get("puter.item.accessed"),
+                                    modified: t.get("puter.item.modified"),
+                                    created: t.get("puter.item.created"),
+                                }),
+                            ]);
+                    }
+                }
+                this.#p = e;
+            }
+            wasLaunchedWithItems() {
+                const e = new URLSearchParams(globalThis.location.search);
+                return e.has("puter.item.name") && e.has("puter.item.uid") && e.has("puter.item.read_url");
+            }
+            onLaunchedWithItems(e) {
+                if (!this.#d) {
+                    let t = new URLSearchParams(globalThis.location.search);
+                    if (t.has("puter.item.name") && t.has("puter.item.uid") && t.has("puter.item.read_url")) {
+                        let s = t.get("puter.item.path");
+                        s.startsWith("~/") || s.startsWith("/") || (s = `~/${s}`),
+                            e([
+                                new Dt({
+                                    name: t.get("puter.item.name"),
+                                    path: s,
+                                    uid: t.get("puter.item.uid"),
+                                    readURL: t.get("puter.item.read_url"),
+                                    writeURL: t.get("puter.item.write_url"),
+                                    metadataURL: t.get("puter.item.metadata_url"),
+                                    size: t.get("puter.item.size"),
+                                    accessed: t.get("puter.item.accessed"),
+                                    modified: t.get("puter.item.modified"),
+                                    created: t.get("puter.item.created"),
+                                }),
+                            ]);
+                    }
+                }
+                this.#d = e;
+            }
+            requestEmailConfirmation() {
+                return new Promise((e, t) => {
+                    this.#y("requestEmailConfirmation", e, {});
+                });
+            }
+            alert(e, t, s, r) {
+                return new Promise((r) => {
+                    this.#y("ALERT", r, { message: e, buttons: t, options: s });
+                });
+            }
+            openDevPaymentsAccount() {
+                return new Promise((e) => {
+                    this.#y("openDevPaymentsAccount", e, {});
+                });
+            }
+            instancesOpen(e) {
+                return new Promise((e) => {
+                    this.#y("getInstancesOpen", e, {});
+                });
+            }
+            socialShare(e, t, s, r) {
+                return new Promise((r) => {
+                    this.#y("socialShare", r, { url: e, message: t, options: s });
+                });
+            }
+            prompt(e, t, s, r) {
+                return new Promise((r) => {
+                    this.#y("PROMPT", r, { message: e, placeholder: t, options: s });
+                });
+            }
+            showDirectoryPicker(e, t) {
+                return new Promise((t, s) => {
+                    if (!globalThis.open) return s("This API is not compatible in Web Workers.");
+                    const r = this.#r++;
+                    if ("app" === this.env)
+                        this.messageTarget?.postMessage(
+                            {
+                                msg: "showDirectoryPicker",
+                                appInstanceID: this.appInstanceID,
+                                uuid: r,
+                                options: e,
+                                env: this.env,
+                            },
+                            "*"
+                        );
+                    else {
+                        let t = 700,
+                            s = 400,
+                            o = "Puter: Open Directory";
+                        var n = screen.width / 2 - t / 2,
+                            i = screen.height / 2 - s / 2;
+                        window.open(
+                            `${puter.defaultGUIOrigin}/action/show-directory-picker?embedded_in_popup=true&msg_id=${r}&appInstanceID=${this.appInstanceID}&env=${this.env}&options=${JSON.stringify(e)}`,
+                            o,
+                            `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${t}, height=${s}, top=${i}, left=${n}`
+                        );
+                    }
+                    this.#h[r] = t;
+                });
+            }
+            showOpenFilePicker(e, t) {
+                const s = rs(),
+                    r = new Promise((t, r) => {
+                        if (!globalThis.open) return r("This API is not compatible in Web Workers.");
+                        const n = this.#r++;
+                        if ("app" === this.env)
+                            this.messageTarget?.postMessage(
+                                {
+                                    msg: "showOpenFilePicker",
+                                    appInstanceID: this.appInstanceID,
+                                    uuid: n,
+                                    options: e ?? {},
+                                    env: this.env,
+                                },
+                                "*"
+                            );
+                        else {
+                            let t = 700,
+                                s = 400,
+                                r = "Puter: Open File";
+                            var i = screen.width / 2 - t / 2,
+                                o = screen.height / 2 - s / 2;
+                            window.open(
+                                `${puter.defaultGUIOrigin}/action/show-open-file-picker?embedded_in_popup=true&msg_id=${n}&appInstanceID=${this.appInstanceID}&env=${this.env}&options=${JSON.stringify(e ?? {})}`,
+                                r,
+                                `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${t}, height=${s}, top=${o}, left=${i}`
+                            );
+                        }
+                        this.#h[n] = (e) => {
+                            e !== is ? (s.resolve(e), t(e)) : s.resolve(void 0);
+                        };
+                    });
+                return (r.undefinedOnCancel = s.promise), r;
+            }
+            showFontPicker(e) {
+                return new Promise((t) => {
+                    this.#y("showFontPicker", t, { options: e ?? {} });
+                });
+            }
+            showColorPicker(e) {
+                return new Promise((t) => {
+                    this.#y("showColorPicker", t, { options: e ?? {} });
+                });
+            }
+            requestUpgrade() {
+                return new Promise((e) => {
+                    this.#y("requestUpgrade", e, {});
+                });
+            }
+            showSaveFilePicker(e, t, s) {
+                const r = rs(),
+                    n = new Promise((n, i) => {
+                        if (!globalThis.open) return i("This API is not compatible in Web Workers.");
+                        const o = this.#r++;
+                        s || "[object URL]" !== Object.prototype.toString.call(e) || (s = "url");
+                        const a = "url" === s ? e.toString() : void 0,
+                            c = ["move", "copy"].includes(s) ? e : void 0;
+                        if ("app" === this.env)
+                            this.messageTarget?.postMessage(
+                                {
+                                    msg: "showSaveFilePicker",
+                                    appInstanceID: this.appInstanceID,
+                                    content: a ? void 0 : e,
+                                    save_type: s,
+                                    url: a,
+                                    source_path: c,
+                                    suggestedName: t ?? "",
+                                    env: this.env,
+                                    uuid: o,
+                                },
+                                "*"
+                            );
+                        else {
+                            window.addEventListener("message", async (s) => {
+                                "sendMeFileData" === s.data?.msg &&
+                                    (s.source.postMessage(
+                                        {
+                                            msg: "showSaveFilePickerPopup",
+                                            content: a ? void 0 : e,
+                                            url: a ? a.toString() : void 0,
+                                            suggestedName: t ?? "",
+                                            env: this.env,
+                                            uuid: o,
+                                        },
+                                        "*"
+                                    ),
+                                    window.removeEventListener("message", this));
+                            });
+                            let s = new Blob([e], { type: "application/octet-stream" }),
+                                r = URL.createObjectURL(s),
+                                n = 700,
+                                i = 400,
+                                c = "Puter: Save File";
+                            var l = screen.width / 2 - n / 2,
+                                h = screen.height / 2 - i / 2;
+                            window.open(
+                                `${puter.defaultGUIOrigin}/action/show-save-file-picker?embedded_in_popup=true&msg_id=${o}&appInstanceID=${this.appInstanceID}&env=${this.env}&blobUrl=${encodeURIComponent(r)}`,
+                                c,
+                                `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=${n}, height=${i}, top=${h}, left=${l}`
+                            );
+                        }
+                        this.#h[o] = (e) => {
+                            e !== ns ? (r.resolve(e), n(e)) : r.resolve(void 0);
+                        };
+                    });
+                return (n.undefinedOnCancel = r.promise), n;
+            }
+            setWindowTitle(e, t, s) {
+                return (
+                    "function" == typeof t ? (t = void 0) : "object" == typeof t && null !== t && (t = t.id),
+                    new Promise((s) => {
+                        this.#y("setWindowTitle", s, { new_title: e, window_id: t });
+                    })
+                );
+            }
+            setWindowWidth(e, t, s) {
+                return (
+                    "function" == typeof t ? (t = void 0) : "object" == typeof t && null !== t && (t = t.id),
+                    new Promise((s) => {
+                        this.#y("setWindowWidth", s, { width: e, window_id: t });
+                    })
+                );
+            }
+            setWindowHeight(e, t, s) {
+                return (
+                    "function" == typeof t ? (t = void 0) : "object" == typeof t && null !== t && (t = t.id),
+                    new Promise((s) => {
+                        this.#y("setWindowHeight", s, { height: e, window_id: t });
+                    })
+                );
+            }
+            setWindowSize(e, t, s, r) {
+                return (
+                    "function" == typeof s ? (s = void 0) : "object" == typeof s && null !== s && (s = s.id),
+                    new Promise((r) => {
+                        this.#y("setWindowSize", r, { width: e, height: t, window_id: s });
+                    })
+                );
+            }
+            setWindowPosition(e, t, s, r) {
+                return (
+                    "function" == typeof s ? (s = void 0) : "object" == typeof s && null !== s && (s = s.id),
+                    new Promise((r) => {
+                        this.#y("setWindowPosition", r, { x: e, y: t, window_id: s });
+                    })
+                );
+            }
+            setWindowY(e, t, s) {
+                return (
+                    "function" == typeof t ? (t = void 0) : "object" == typeof t && null !== t && (t = t.id),
+                    new Promise((s) => {
+                        this.#y("setWindowY", s, { y: e, window_id: t });
+                    })
+                );
+            }
+            setWindowX(e, t, s) {
+                return (
+                    "function" == typeof t ? (t = void 0) : "object" == typeof t && null !== t && (t = t.id),
+                    new Promise((s) => {
+                        this.#y("setWindowX", s, { x: e, window_id: t });
+                    })
+                );
+            }
+            showWindow() {
+                this.#w("showWindow");
+            }
+            hideWindow() {
+                this.#w("hideWindow");
+            }
+            toggleWindow() {
+                this.#w("toggleWindow");
+            }
+            setMenubar(e) {
+                this.#w("setMenubar", e);
+            }
+            async requestPermission(e) {
+                return "app" === this.env && (await this.#b("requestPermission", { options: e })).granted;
+            }
+            disableMenuItem(e) {
+                this.#w("disableMenuItem", { id: e });
+            }
+            enableMenuItem(e) {
+                this.#w("enableMenuItem", { id: e });
+            }
+            setMenuItemIcon(e, t) {
+                this.#w("setMenuItemIcon", { id: e, icon: t });
+            }
+            setMenuItemIconActive(e, t) {
+                this.#w("setMenuItemIconActive", { id: e, icon: t });
+            }
+            setMenuItemChecked(e, t) {
+                this.#w("setMenuItemChecked", { id: e, checked: t });
+            }
+            contextMenu(e) {
+                this.#w("contextMenu", e);
+            }
+            getEntriesFromDataTransferItems = async function (e, t = { raw: !1 }) {
+                const s = (e) => {
+                        if (this.getEntriesFromDataTransferItems.didShowInfo) return;
+                        if ("EncodingError" !== e.name) return;
+                        this.getEntriesFromDataTransferItems.didShowInfo = !0;
+                        const t = `${e.name} occurred within datatransfer-files-promise module\nError message: "${e.message}"\nTry serving html over http if currently you are running it from the filesystem.`;
+                        console.warn(t);
+                    },
+                    r = (e, t) =>
+                        new Promise((r, i) => {
+                            e.readEntries(
+                                async (e) => {
+                                    let s = [];
+                                    for (let r of e) {
+                                        const e = await n(r, t);
+                                        s = s.concat(e);
+                                    }
+                                    r(s);
+                                },
+                                (e) => {
+                                    s(e), i(e);
+                                }
+                            );
+                        }),
+                    n = async (e, n = "") => {
+                        if (null !== e) {
+                            if (e.isFile) {
+                                const r = await ((e, r = "") =>
+                                    new Promise((n, i) => {
+                                        e.file(
+                                            (e) => {
+                                                t.raw || (e.filepath = r + e.name), n(e);
+                                            },
+                                            (e) => {
+                                                s(e), i(e);
+                                            }
+                                        );
+                                    }))(e, n);
+                                return [r];
+                            }
+                            if (e.isDirectory) {
+                                const t = await (async (e, t) => {
+                                    const s = e.createReader(),
+                                        n = `${t + e.name}/`;
+                                    let i,
+                                        o = [];
+                                    do {
+                                        (i = await r(s, n)), (o = o.concat(i));
+                                    } while (i.length > 0);
+                                    return o;
+                                })(e, n);
+                                return t.push(e), t;
+                            }
+                        }
+                    };
+                let i = [],
+                    o = [];
+                for (let t = 0, s = e.length; t < s; t++) o.push(e[t].webkitGetAsEntry());
+                for (let e of o) {
+                    const t = await n(e);
+                    i = i.concat(t);
+                }
+                return i;
+            };
+            authenticateWithPuter() {
+                if ("web" === this.env)
+                    return this.authToken
+                        ? new Promise((e) => {
+                              e();
+                          })
+                        : puter.puterAuthState.isPromptOpen
+                          ? new Promise((e, t) => {
+                                puter.puterAuthState.resolver = { resolve: e, reject: t };
+                            })
+                          : ((puter.puterAuthState.isPromptOpen = !0),
+                            (puter.puterAuthState.authGranted = null),
+                            new Promise((e, t) => {
+                                if (puter.authToken) e();
+                                else {
+                                    const s = new ss(e, t);
+                                    document.body.appendChild(s), s.open();
+                                }
+                            }));
+            }
+            launchApp = async function (e, t, s) {
+                let r,
+                    n,
+                    i,
+                    o = e;
+                if ("object" == typeof o && null !== o) {
+                    const e = o;
+                    (o = e.name || e.app_name),
+                        (n = e.file_paths),
+                        (t = t || e.args),
+                        (s = s || e.callback),
+                        (r = e.pseudonym),
+                        (i = e.items);
+                }
+                if (i) {
+                    Array.isArray(i) || (i = []);
+                    for (let e = 0; e < i.length; e++)
+                        i[e] instanceof Dt && (i[e] = i[e]._internalProperties.file_signature);
+                }
+                o && o.includes("#(as)") && ([o, r] = o.split("#(as)")), o || (o = puter.appName);
+                const a = await this.#v({
+                    method: "launchApp",
+                    callback: s,
+                    parameters: { app_name: o, file_paths: n, items: i, pseudonym: r, args: t },
+                });
+                return os.from(a, this.puter, { messageTarget: this.messageTarget, appInstanceID: this.appInstanceID });
+            };
+            connectToInstance = async function (e) {
+                const t = await this.#v({ method: "connectToInstance", parameters: { app_name: e } });
+                return os.from(t, this.puter, { messageTarget: this.messageTarget, appInstanceID: this.appInstanceID });
+            };
+            parentApp() {
+                return this.#l;
+            }
+            createWindow(e, t) {
+                return new Promise((t) => {
+                    this.#y(
+                        "createWindow",
+                        (e) => {
+                            t(e.window);
+                        },
+                        { options: e ?? {} }
+                    );
+                });
+            }
+            menubar() {
+                document.querySelectorAll("style.puter-stylesheet").forEach(function (e) {
+                    e.remove();
+                });
+                const e = document.createElement("style");
+                e.classList.add("puter-stylesheet"),
+                    (e.innerHTML =
+                        "\n        .--puter-menubar {\n            border-bottom: 1px solid #e9e9e9;\n            background-color: #fbf9f9;\n            padding-top: 3px;\n            padding-bottom: 2px;\n            display: inline-block;\n            position: fixed;\n            top: 0;\n            width: 100%;\n            margin: 0;\n            padding: 0;\n            height: 31px;\n            font-family: Arial, Helvetica, sans-serif;\n            font-size: 13px;\n            z-index: 9999;\n        }\n        \n        .--puter-menubar, .--puter-menubar * {\n            user-select: none;\n            -webkit-user-select: none;\n            cursor: default;\n        }\n        \n        .--puter-menubar .dropdown-item-divider>hr {\n            margin-top: 5px;\n            margin-bottom: 5px;\n            border-bottom: none;\n            border-top: 1px solid #00000033;\n        }\n        \n        .--puter-menubar>li {\n            display: inline-block;\n            padding: 10px 5px;\n        }\n        \n        .--puter-menubar>li>ul {\n            display: none;\n            z-index: 999999999999;\n            list-style: none;\n            background-color: rgb(233, 233, 233);\n            width: 200px;\n            border: 1px solid #e4ebf3de;\n            box-shadow: 0px 0px 5px #00000066;\n            padding-left: 6px;\n            padding-right: 6px;\n            padding-top: 4px;\n            padding-bottom: 4px;\n            color: #333;\n            border-radius: 4px;\n            padding: 2px;\n            min-width: 200px;\n            margin-top: 5px;\n            position: absolute;\n        }\n        \n        .--puter-menubar .menubar-item {\n            display: block;\n            line-height: 24px;\n            margin-top: -7px;\n            text-align: center;\n            border-radius: 3px;\n            padding: 0 5px;\n        }\n        \n        .--puter-menubar .menubar-item-open {\n            background-color: rgb(216, 216, 216);\n        }\n        \n        .--puter-menubar .dropdown-item {\n            padding: 5px;\n            padding: 5px 30px;\n            list-style-type: none;\n            user-select: none;\n            font-size: 13px;\n        }\n        \n        .--puter-menubar .dropdown-item-icon, .--puter-menubar .dropdown-item-icon-active {\n            pointer-events: none;\n            width: 18px;\n            height: 18px;\n            margin-left: -23px;\n            margin-bottom: -4px;\n            margin-right: 5px;\n        }\n        .--puter-menubar .dropdown-item-disabled .dropdown-item-icon{\n            display: inline-block !important;\n        }\n        .--puter-menubar .dropdown-item-disabled .dropdown-item-icon-active{\n            display: none !important;\n        }\n        .--puter-menubar .dropdown-item-icon-active {\n            display:none;\n        }\n        .--puter-menubar .dropdown-item:hover .dropdown-item-icon{\n            display: none;\n        }\n        .--puter-menubar .dropdown-item:hover .dropdown-item-icon-active{\n            display: inline-block;\n        }\n        .--puter-menubar .dropdown-item-hide-icon .dropdown-item-icon, .--puter-menubar .dropdown-item-hide-icon .dropdown-item-icon-active{\n            display: none !important;\n        }\n        .--puter-menubar .dropdown-item a {\n            color: #333;\n            text-decoration: none;\n        }\n        \n        .--puter-menubar .dropdown-item:hover, .--puter-menubar .dropdown-item:hover a {\n            background-color: rgb(59 134 226);\n            color: white;\n            border-radius: 4px;\n        }\n        \n        .--puter-menubar .dropdown-item-disabled, .--puter-menubar .dropdown-item-disabled:hover {\n            opacity: 0.5;\n            background-color: transparent;\n            color: initial;\n            cursor: initial;\n            pointer-events: none;\n        }\n        \n        .--puter-menubar .menubar * {\n            user-select: none;\n        }                \n        "),
+                    (document.head || document.getElementsByTagName("head")[0]).appendChild(e),
+                    document.addEventListener("click", function (e) {
+                        if (e.target.classList.contains("dropdown-item-disabled")) return !1;
+                        e.target.classList.contains("menubar-item") ||
+                            (document.querySelectorAll(".menubar-item.menubar-item-open").forEach(function (e) {
+                                e.classList.remove("menubar-item-open");
+                            }),
+                            document.querySelectorAll(".dropdown").forEach((e) => (e.style.display = "none")));
+                    }),
+                    window.addEventListener("blur", function (e) {
+                        document.querySelectorAll(".dropdown").forEach(function (e) {
+                            e.style.display = "none";
+                        }),
+                            document
+                                .querySelectorAll(".menubar-item.menubar-item-open")
+                                .forEach((e) => e.classList.remove("menubar-item-open"));
+                    }),
+                    document.querySelectorAll(".menubar-item").forEach((e) =>
+                        e.addEventListener("mousedown", function (e) {
+                            document.querySelectorAll(".dropdown").forEach(function (e) {
+                                e.style.display = "none";
+                            }),
+                                document.querySelectorAll(".menubar-item.menubar-item-open").forEach(function (t) {
+                                    t != e.target && t.classList.remove("menubar-item-open");
+                                }),
+                                this.classList.contains("menubar-item-open")
+                                    ? document
+                                          .querySelectorAll(".menubar-item.menubar-item-open")
+                                          .forEach(function (e) {
+                                              e.classList.remove("menubar-item-open");
+                                          })
+                                    : e.target.classList.contains("dropdown-item") ||
+                                      (this.classList.add("menubar-item-open"),
+                                      (function (e) {
+                                          const t = [];
+                                          if (!e.parentNode) return t;
+                                          let s = e.parentNode.firstChild;
+                                          for (; s; ) 1 === s.nodeType && s !== e && t.push(s), (s = s.nextSibling);
+                                          return t;
+                                      })(this).forEach(function (e) {
+                                          e.style.display = "block";
+                                      }));
+                        })
+                    ),
+                    document.querySelectorAll(".--puter-menubar .menubar-item").forEach((e) =>
+                        e.addEventListener("mouseover", function (e) {
+                            const t = document.querySelectorAll(".menubar-item.menubar-item-open");
+                            t.length > 0 && t[0] !== e.target && e.target.dispatchEvent(new Event("mousedown"));
+                        })
+                    );
+            }
+            on(e, t) {
+                super.on(e, t), this.#n.includes(e) && this.#g.has(e) && t(this.#g.get(e));
+            }
+            #k = null;
+            #A = null;
+            showSpinner(e) {
+                if (this.#f) return;
+                if (!document.getElementById("puter-spinner-styles")) {
+                    const e = document.createElement("style");
+                    (e.id = "puter-spinner-styles"),
+                        (e.textContent =
+                            "\n                .puter-loading-spinner {\n                    width: 50px;\n                    height: 50px;\n                    border: 5px solid #f3f3f3;\n                    border-top: 5px solid #3498db;\n                    border-radius: 50%;\n                    animation: spin 1s linear infinite;\n                    margin-bottom: 10px;\n                }\n    \n                .puter-loading-text {\n                    font-family: Arial, sans-serif;\n                    font-size: 16px;\n                    margin-top: 10px;\n                    text-align: center;\n                    width: 100%;\n                }\n    \n                @keyframes spin {\n                    0% { transform: rotate(0deg); }\n                    100% { transform: rotate(360deg); }\n                }\n    \n                .puter-loading-container {\n                    display: flex;\n                    flex-direction: column;\n                    align-items: center;\n                    justify-content: center;\n                    min-height: 120px; \n                    background: #ffffff; \n                    border-radius: 10px;\n                    padding: 20px;\n                    min-width: 120px;\n                }\n            "),
+                        document.head.appendChild(e);
+                }
+                const t = document.createElement("div");
+                t.classList.add("puter-loading-overlay"),
+                    Object.assign(t.style, {
+                        position: "fixed",
+                        top: "0",
+                        left: "0",
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "rgba(255, 255, 255, 0.8)",
+                        zIndex: "2147483647",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        pointerEvents: "all",
+                    });
+                const s = document.createElement("div");
+                s.classList.add("puter-loading-container"),
+                    (s.innerHTML = `\n            <div class="puter-loading-spinner"></div>\n            <div class="puter-loading-text">${e ?? "Working..."}</div>\n        `),
+                    t.appendChild(s),
+                    document.body.appendChild(t),
+                    (this.#f = !0),
+                    (this.#k = Date.now()),
+                    (this.#m = setTimeout(() => {
+                        this.#m = null;
+                    }, 1e3));
+            }
+            hideSpinner() {
+                if (!this.#f) return;
+                this.#m && (clearTimeout(this.#m), (this.#m = null));
+                const e = Date.now() - this.#k,
+                    t = Math.max(0, 1200 - e);
+                t > 0
+                    ? (this.#A && clearTimeout(this.#A),
+                      (this.#A = setTimeout(() => {
+                          this.#I();
+                      }, t)))
+                    : this.#I();
+            }
+            #I() {
+                const e = document.querySelector(".puter-loading-overlay");
+                e && e.parentNode?.removeChild(e), (this.#f = !1), (this.#k = null), (this.#A = null);
+            }
+            isWorkingActive() {
+                return this.#f;
+            }
+            getLanguage() {
+                return "gui" === this.env
+                    ? new Promise((e) => {
+                          e(window.locale);
+                      })
+                    : new Promise((e) => {
+                          this.#y("getLanguage", e, {});
+                      });
+            }
+        },
+        cs = "9a9c83a4-7897-43a0-93b9-53217b84fde6";
+    class ls {
+        #_ = 1;
+        constructor() {
+            this.callbacks = new Map();
+        }
+        register_callback(e) {
+            const t = this.#_++;
+            return this.callbacks.set(t, e), t;
+        }
+        attach_to_source(e) {
+            e.addEventListener("message", (e) => {
+                const { data: t } = e;
+                if (t && "object" == typeof t && t.$SCOPE === cs) {
+                    const { id: e, args: s } = t,
+                        r = this.callbacks.get(e);
+                    r && r(...s);
+                }
+            });
+        }
+    }
+    class hs {
+        constructor({ callbackManager: e }) {
+            this.callbackManager = e;
+        }
+        dehydrate(e) {
+            return this.dehydrate_value_(e);
+        }
+        dehydrate_value_(e) {
+            if ("function" == typeof e) {
+                const t = this.callbackManager.register_callback(e);
+                return { $SCOPE: cs, id: t };
+            }
+            if (Array.isArray(e)) return e.map(this.dehydrate_value_.bind(this));
+            if ("object" == typeof e && null !== e) {
+                const t = {};
+                for (const s in e) t[s] = this.dehydrate_value_(e[s]);
+                return t;
+            }
+            return e;
+        }
+    }
+    class us {
+        constructor({ target: e }) {
+            this.target = e;
+        }
+        hydrate(e) {
+            return this.hydrate_value_(e);
+        }
+        hydrate_value_(e) {
+            if (e && "object" == typeof e && e.$SCOPE === cs) {
+                const { id: t } = e;
+                return (...e) => {
+                    this.target.postMessage({ $SCOPE: cs, id: t, args: e }, "*");
+                };
+            }
+            if (Array.isArray(e)) return e.map(this.hydrate_value_.bind(this));
+            if ("object" == typeof e && null !== e) {
+                const t = {};
+                for (const s in e) t[s] = this.hydrate_value_(e[s]);
+                return t;
+            }
+            return e;
+        }
+    }
+    class ps {
+        constructor() {
+            this.rpc = new ds();
+        }
+    }
+    class ds {
+        constructor() {
+            (this.callbackManager = new ls()), this.callbackManager.attach_to_source(globalThis);
+        }
+        getDehydrator() {
+            return new hs({ callbackManager: this.callbackManager });
+        }
+        getHydrator({ target: e }) {
+            return new us({ target: e });
+        }
+        registerCallback(e) {
+            return this.callbackManager.register_callback(e);
+        }
+        send(e, t, ...s) {
+            e.postMessage({ $SCOPE: cs, id: t, args: s }, "*");
+        }
+    }
+    class gs {
+        constructor(e) {
+            this.authToken = e;
+        }
+        async create(e, t, s) {
+            if (!puter.authToken && "web" === puter.env)
+                try {
+                    await puter.ui.authenticateWithPuter();
+                } catch (e) {
+                    throw "Authentication failed.";
+                }
+            let r;
+            "string" == typeof s && (r = (await puter.apps.list()).find((e) => e.name === s).uid),
+                (e = e.toLocaleLowerCase());
+            let n = await puter.kv.get("user-workers");
+            n || (n = {}), (t = mt(t));
+            const i = await B(
+                ["authorization", "filePath", "workerName", "appId"],
+                "workers",
+                "worker-service",
+                "create"
+            )(puter.authToken, t, e, r);
+            if (!i.success)
+                throw new Error(i?.errors || "Driver failed to execute, do you have the necessary permissions?");
+            return (
+                (n[e] = { filePath: t, url: i.url, deployTime: Date.now(), createTime: Date.now() }),
+                await puter.kv.set("user-workers", n),
+                i
+            );
+        }
+        async exec(...e) {
+            if (!puter.authToken && "web" === puter.env)
+                try {
+                    await puter.ui.authenticateWithPuter();
+                } catch (e) {
+                    throw "Authentication failed.";
+                }
+            const t = new Request(...e);
+            return t.headers.get("puter-auth") || t.headers.set("puter-auth", puter.authToken), fetch(t);
+        }
+        async list() {
+            if (!puter.authToken && "web" === puter.env)
+                try {
+                    await puter.ui.authenticateWithPuter();
+                } catch (e) {
+                    throw "Authentication failed.";
+                }
+            return await B([], "workers", "worker-service", "getFilePaths")();
+        }
+        async get(e) {
+            if (!puter.authToken && "web" === puter.env)
+                try {
+                    await puter.ui.authenticateWithPuter();
+                } catch (e) {
+                    throw "Authentication failed.";
+                }
+            return (
+                (e = e.toLocaleLowerCase()),
+                (await B(["workerName"], "workers", "worker-service", "getFilePaths")(e))[0]
+            );
+        }
+        async delete(e) {
+            if (!puter.authToken && "web" === puter.env)
+                try {
+                    await puter.ui.authenticateWithPuter();
+                } catch (e) {
+                    throw "Authentication failed.";
+                }
+            e = e.toLocaleLowerCase();
+            const t = await B(
+                ["authorization", "workerName"],
+                "workers",
+                "worker-service",
+                "destroy"
+            )(puter.authToken, e);
+            if (t.result) {
+                let t = await puter.kv.get("user-workers");
+                return t || (t = {}), delete t[e], await puter.kv.set("user-workers", t), !0;
+            }
+            throw (
+                (t.result || new Error("Worker doesn't exist"),
+                new Error(t?.errors || "Driver failed to execute, do you have the necessary permissions?"))
+            );
+        }
+        async getLoggingHandle(e) {
+            const t = await B([], "workers", "worker-service", "getLoggingUrl")(puter.authToken, e),
+                s = new WebSocket(`${t}/${puter.authToken}/${e}`),
+                r = new EventTarget();
+            return (
+                (r.onLog = (e) => {}),
+                Object.defineProperty(r, "start", {
+                    enumerable: !1,
+                    value: async (e) => {
+                        s.addEventListener("message", (t) => {
+                            e.enqueue(JSON.parse(t.data));
+                        }),
+                            s.addEventListener("close", (t) => {
+                                try {
+                                    e.close();
+                                } catch (e) {}
+                            });
+                    },
+                }),
+                Object.defineProperty(r, "cancel", {
+                    enumerable: !1,
+                    value: async () => {
+                        s.close();
+                    },
+                }),
+                s.addEventListener("message", (e) => {
+                    const t = new MessageEvent("log", { data: JSON.parse(e.data) });
+                    r.dispatchEvent(t), r.onLog(t);
+                }),
+                (r.close = s.close),
+                new Promise((e, t) => {
+                    let n = !1;
+                    (s.onopen = () => {
+                        (n = !0), e(r);
+                    }),
+                        (s.onerror = () => {
+                            n || t("Failed to open logging connection");
+                        });
+                })
+            );
+        }
+    }
+    class fs {
+        constructor(e = {}) {
+            (this.fieldsObj = e), (this.enabled = new Set());
+        }
+        on(e) {
+            this.enabled.add(e);
+        }
+        fields(e = {}) {
+            return new fs({ ...this.fieldsObj, ...e });
+        }
+        info(...e) {
+            console.log(...this._prefix(), ...e);
+        }
+        warn(...e) {
+            console.warn(...this._prefix(), ...e);
+        }
+        error(...e) {
+            console.error(...this._prefix(), ...e);
+        }
+        debug(...e) {
+            console.debug(...this._prefix(), ...e);
+        }
+        _prefix() {
+            const e = Object.entries(this.fieldsObj);
+            return e.length ? [`[${e.map(([e, t]) => `${e}=${t}`).join(" ")}]`] : [];
+        }
+    }
+    class ms {
+        constructor() {
+            (this.locked = !1), (this.queue = []);
+        }
+        async acquire() {
+            this.locked ? (await new Promise((e) => this.queue.push(e)), (this.locked = !0)) : (this.locked = !0);
+        }
+        release() {
+            const e = this.queue.shift();
+            e ? e() : (this.locked = !1);
+        }
+    }
+    const ys = (function () {
+        const e = new (class {
+            env;
+            #x = "https://api.puter.com";
+            #T = "https://puter.com";
+            get defaultAPIOrigin() {
+                return globalThis.PUTER_API_ORIGIN || "https://api.puter.com";
+            }
+            set defaultAPIOrigin(e) {
+                this.#x = e;
+            }
+            get defaultGUIOrigin() {
+                return globalThis.PUTER_ORIGIN || "https://puter.com";
+            }
+            set defaultGUIOrigin(e) {
+                this.#T = e;
+            }
+            onAuth;
+            puterAuthState = { isPromptOpen: !1, authGranted: null, resolver: null };
+            appInstanceID;
+            parentInstanceID;
+            static FSItem = Dt;
+            eventHandlers = {};
+            debugMode = !1;
+            initSubmodules = function () {
+                (this.util = new ps()),
+                    this.registerModule("auth", K),
+                    this.registerModule("os", $t),
+                    this.registerModule("fs", qt),
+                    this.registerModule("ui", as, {
+                        appInstanceID: this.appInstanceID,
+                        parentInstanceID: this.parentInstanceID,
+                    }),
+                    this.registerModule("hosting", Ut),
+                    this.registerModule("apps", V),
+                    this.registerModule("ai", X),
+                    this.registerModule("kv", jt),
+                    this.registerModule("perms", es),
+                    this.registerModule("drivers", Q),
+                    this.registerModule("debug", G),
+                    (this.path = c);
+            };
+            constructor() {
+                (this._cache = new s({ dbName: "puter_cache" })), (this._opscache = new s()), (this.modules_ = []);
+                let e = new URLSearchParams(globalThis.location?.search);
+                e.has("puter.app_instance_id")
+                    ? (this.env = "app")
+                    : !0 === globalThis.puter_gui_enabled
+                      ? (this.env = "gui")
+                      : globalThis.WorkerGlobalScope
+                        ? (globalThis.ServiceWorkerGlobalScope
+                              ? ((this.env = "service-worker"),
+                                globalThis.XMLHttpRequest || (globalThis.XMLHttpRequest = E),
+                                globalThis.location || (globalThis.location = new URL("https://puter.site/")))
+                              : (this.env = "web-worker"),
+                          globalThis.localStorage || (globalThis.localStorage = u))
+                        : globalThis.process
+                          ? ((this.env = "nodejs"),
+                            globalThis.localStorage || (globalThis.localStorage = u),
+                            globalThis.XMLHttpRequest || (globalThis.XMLHttpRequest = E),
+                            globalThis.location || (globalThis.location = new URL("https://nodejs.puter.site/")),
+                            globalThis.addEventListener || (globalThis.addEventListener = () => {}))
+                          : (this.env = "web"),
+                    "gui" !== this.env &&
+                        location.hostname.replace(/\.$/, "") === new URL("https://puter.com").hostname &&
+                        (this.env = "gui"),
+                    e.has("puter.args")
+                        ? (this.args = JSON.parse(decodeURIComponent(e.get("puter.args"))))
+                        : (this.args = {}),
+                    e.has("puter.app_instance_id") &&
+                        (this.appInstanceID = decodeURIComponent(e.get("puter.app_instance_id"))),
+                    e.has("puter.parent_instance_id") &&
+                        (this.parentInstanceID = decodeURIComponent(e.get("puter.parent_instance_id"))),
+                    e.has("puter.app.id") && (this.appID = decodeURIComponent(e.get("puter.app.id"))),
+                    e.has("puter.app.name") && (this.appName = decodeURIComponent(e.get("puter.app.name"))),
+                    this.appID && (this.appDataPath = `~/AppData/${this.appID}`),
+                    (this.APIOrigin = this.defaultAPIOrigin),
+                    e.has("puter.api_origin") && "app" === this.env
+                        ? (this.APIOrigin = decodeURIComponent(e.get("puter.api_origin")))
+                        : e.has("puter.domain") &&
+                          "app" === this.env &&
+                          (this.APIOrigin = `https://api.${e.get("puter.domain")}`);
+                let t = new fs();
+                if (((this.logger = t), (this.apiCallLogger = new r({ enabled: !1 })), "gui" === this.env))
+                    (this.authToken = window.auth_token), this.initSubmodules();
+                else if ("app" === this.env) {
+                    (this.authToken = decodeURIComponent(e.get("puter.auth.token"))), this.initSubmodules();
+                    try {
+                        localStorage.getItem("puter.auth.token") &&
+                            this.setAuthToken(localStorage.getItem("puter.auth.token")),
+                            localStorage.getItem("puter.app.id") && this.setAppID(localStorage.getItem("puter.app.id"));
+                    } catch (e) {
+                        console.error("Error accessing localStorage:", e);
+                    }
+                } else if ("web" === this.env) {
+                    this.initSubmodules();
+                    try {
+                        localStorage.getItem("puter.auth.token") &&
+                            this.setAuthToken(localStorage.getItem("puter.auth.token")),
+                            localStorage.getItem("puter.app.id") && this.setAppID(localStorage.getItem("puter.app.id"));
+                    } catch (e) {
+                        console.error("Error accessing localStorage:", e);
+                    }
+                } else
+                    ("web-worker" !== this.env && "service-worker" !== this.env && "nodejs" !== this.env) ||
+                        this.initSubmodules();
+                (async () => {
+                    try {
+                        const e = await this.auth.whoami(),
+                            s = `[${e?.app_name ?? this.appInstanceID ?? "HOST"}]`;
+                        (t = t.fields({ prefix: s })), (this.logger = t);
+                    } catch (e) {
+                        this.debugMode && console.error("Failed to initialize prefix logger", e);
+                    }
+                })(),
+                    (this.lock_rao_ = new ms()),
+                    (this.p_can_request_rao_ = Promise.resolve()),
+                    (this.rao_requested_ = !1),
+                    (this.net = {
+                        generateWispV1URL: async () => {
+                            const { token: e, server: t } = await (
+                                await fetch(`${this.APIOrigin}/wisp/relay-token/create`, {
+                                    method: "POST",
+                                    headers: {
+                                        Authorization: `Bearer ${this.authToken}`,
+                                        "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify({}),
+                                })
+                            ).json();
+                            return `${t}/${e}/`;
+                        },
+                        Socket: Qt,
+                        tls: { TLSSocket: Zt },
+                        fetch: Jt,
+                    }),
+                    (this.workers = new gs(this.authToken)),
+                    this.initNetworkMonitoring();
+            }
+            async request_rao_() {
+                if ((await this.p_can_request_rao_, "gui" === this.env)) return;
+                if ((await this.lock_rao_.acquire(), this.rao_requested_)) return void this.lock_rao_.release();
+                let e = !1;
+                try {
+                    const e = await fetch(`${this.APIOrigin}/rao`, {
+                        method: "POST",
+                        headers: { Authorization: `Bearer ${this.authToken}`, Origin: location.origin },
+                    });
+                    return await e.json();
+                } catch (t) {
+                    (e = !0), console.error(t);
+                } finally {
+                    this.lock_rao_.release();
+                }
+                e || (this.rao_requested_ = !0);
+            }
+            registerModule(e, t, s = {}) {
+                const r = new t(this, s);
+                (r.puter = this), this.modules_.push(e), (this[e] = r), r._init && r._init({ puter: this });
+            }
+            updateSubmodules() {
+                for (const e of this.modules_)
+                    this[e] && (this[e]?.setAuthToken?.(this.authToken), this[e]?.setAPIOrigin?.(this.APIOrigin));
+            }
+            setAppID = function (e) {
+                try {
+                    localStorage.setItem("puter.app.id", e);
+                } catch (e) {
+                    console.error("Error accessing localStorage:", e);
+                }
+                this.appID = e;
+            };
+            setAuthToken = function (e) {
+                if (((this.authToken = e), "web" === this.env || "app" === this.env))
+                    try {
+                        localStorage.setItem("puter.auth.token", e);
+                    } catch (e) {
+                        console.error("Error accessing localStorage:", e);
+                    }
+                "gui" === this.env && setInterval(ys.checkAndUpdateGUIFScache, 1e4),
+                    this.updateSubmodules(),
+                    this.request_rao_(),
+                    this.getUser().then((e) => {
+                        this.whoami = e;
+                    });
+            };
+            setAPIOrigin = function (e) {
+                (this.APIOrigin = e), this.updateSubmodules();
+            };
+            runWhenPuterHappensCallbacks = function () {
+                if ("gui" !== this.env) return;
+                if (!globalThis.when_puter_happens) return;
+                const e = Array.isArray(globalThis.when_puter_happens)
+                    ? globalThis.when_puter_happens
+                    : [globalThis.when_puter_happens];
+                for (const t of e)
+                    try {
+                        t({ puter: this });
+                    } catch (e) {
+                        this.debugMode && console.error("when_puter_happens callback failed", e);
+                    }
+            };
+            resetAuthToken = function () {
+                if (((this.authToken = null), "web" === this.env || "app" === this.env))
+                    try {
+                        localStorage.removeItem("puter.auth.token");
+                    } catch (e) {
+                        console.error("Error accessing localStorage:", e);
+                    }
+                this.updateSubmodules();
+            };
+            exit = function (e = 0) {
+                e &&
+                    "number" != typeof e &&
+                    (console.warn("puter.exit() requires status code to be a number. Treating it as 1"), (e = 1)),
+                    globalThis.parent.postMessage(
+                        { msg: "exit", appInstanceID: this.appInstanceID, statusCode: e },
+                        "*"
+                    );
+            };
+            randName = function (e = "-") {
+                const t = [
+                        "helpful",
+                        "sensible",
+                        "loyal",
+                        "honest",
+                        "clever",
+                        "capable",
+                        "calm",
+                        "smart",
+                        "genius",
+                        "bright",
+                        "charming",
+                        "creative",
+                        "diligent",
+                        "elegant",
+                        "fancy",
+                        "colorful",
+                        "avid",
+                        "active",
+                        "gentle",
+                        "happy",
+                        "intelligent",
+                        "jolly",
+                        "kind",
+                        "lively",
+                        "merry",
+                        "nice",
+                        "optimistic",
+                        "polite",
+                        "quiet",
+                        "relaxed",
+                        "silly",
+                        "victorious",
+                        "witty",
+                        "young",
+                        "zealous",
+                        "strong",
+                        "brave",
+                        "agile",
+                        "bold",
+                    ],
+                    s = [
+                        "street",
+                        "roof",
+                        "floor",
+                        "tv",
+                        "idea",
+                        "morning",
+                        "game",
+                        "wheel",
+                        "shoe",
+                        "bag",
+                        "clock",
+                        "pencil",
+                        "pen",
+                        "magnet",
+                        "chair",
+                        "table",
+                        "house",
+                        "dog",
+                        "room",
+                        "book",
+                        "car",
+                        "cat",
+                        "tree",
+                        "flower",
+                        "bird",
+                        "fish",
+                        "sun",
+                        "moon",
+                        "star",
+                        "cloud",
+                        "rain",
+                        "snow",
+                        "wind",
+                        "mountain",
+                        "river",
+                        "lake",
+                        "sea",
+                        "ocean",
+                        "island",
+                        "bridge",
+                        "road",
+                        "train",
+                        "plane",
+                        "ship",
+                        "bicycle",
+                        "horse",
+                        "elephant",
+                        "lion",
+                        "tiger",
+                        "bear",
+                        "zebra",
+                        "giraffe",
+                        "monkey",
+                        "snake",
+                        "rabbit",
+                        "duck",
+                        "goose",
+                        "penguin",
+                        "frog",
+                        "crab",
+                        "shrimp",
+                        "whale",
+                        "octopus",
+                        "spider",
+                        "ant",
+                        "bee",
+                        "butterfly",
+                        "dragonfly",
+                        "ladybug",
+                        "snail",
+                        "camel",
+                        "kangaroo",
+                        "koala",
+                        "panda",
+                        "piglet",
+                        "sheep",
+                        "wolf",
+                        "fox",
+                        "deer",
+                        "mouse",
+                        "seal",
+                        "chicken",
+                        "cow",
+                        "dinosaur",
+                        "puppy",
+                        "kitten",
+                        "circle",
+                        "square",
+                        "garden",
+                        "otter",
+                        "bunny",
+                        "meerkat",
+                        "harp",
+                    ];
+                return (
+                    t[Math.floor(Math.random() * t.length)] +
+                    e +
+                    s[Math.floor(Math.random() * s.length)] +
+                    e +
+                    Math.floor(1e4 * Math.random())
+                );
+            };
+            getUser = function (...e) {
+                let t;
+                return (
+                    (t = "object" == typeof e[0] && null !== e[0] ? e[0] : { success: e[0], error: e[1] }),
+                    new Promise((e, s) => {
+                        const r = L("/whoami", this.APIOrigin, this.authToken, "get");
+                        q(r, t.success, t.error, e, s), r.send();
+                    })
+                );
+            };
+            print = function (...e) {
+                let t = {};
+                e.length > 0 &&
+                    "object" == typeof e[e.length - 1] &&
+                    null !== e[e.length - 1] &&
+                    ("escapeHTML" in e[e.length - 1] || "code" in e[e.length - 1]) &&
+                    (t = e.pop());
+                for (let s of e)
+                    (!0 !== t.escapeHTML && !0 !== t.code) ||
+                        "string" != typeof s ||
+                        (s = s
+                            .replace(/&/g, "&amp;")
+                            .replace(/</g, "&lt;")
+                            .replace(/>/g, "&gt;")
+                            .replace(/"/g, "&quot;")
+                            .replace(/'/g, "&#039;")),
+                        !0 === t.code && (s = `<code><pre>${s}</pre></code>`),
+                        (document.body.innerHTML += s);
+            };
+            configureAPILogging = function (e = {}) {
+                return this.apiCallLogger && this.apiCallLogger.updateConfig(e), this;
+            };
+            enableAPILogging = function (e = {}) {
+                return this.apiCallLogger && this.apiCallLogger.updateConfig({ ...e, enabled: !0 }), this;
+            };
+            disableAPILogging = function () {
+                return this.apiCallLogger && this.apiCallLogger.disable(), this;
+            };
+            initNetworkMonitoring = function () {
+                if (void 0 === globalThis.navigator || "function" != typeof globalThis.addEventListener) return;
+                let e = navigator.onLine;
+                const t = () => {
+                    const t = navigator.onLine;
+                    if (e && !t) {
+                        console.log("Network connection lost - purging cache");
+                        try {
+                            this._cache.flushall(), console.log("Cache purged successfully");
+                        } catch (e) {
+                            console.error("Error purging cache:", e);
+                        }
+                    }
+                    e = t;
+                };
+                globalThis.addEventListener("online", t),
+                    globalThis.addEventListener("offline", t),
+                    "undefined" != typeof document &&
+                        document.addEventListener("visibilitychange", () => {
+                            setTimeout(t, 100);
+                        });
+            };
+            checkAndUpdateGUIFScache = function () {
+                if ("gui" !== ys.env) return;
+                if (!ys.whoami) return;
+                let e = ys.whoami.username,
+                    t = `/${e}`,
+                    s = `/${e}/Desktop`,
+                    r = `/${e}/Documents`,
+                    n = `/${e}/Public`;
+                ys._cache.get(`item:${t}`) ||
+                    (console.log(`/${e} item is not cached, refetching cache`), ys.fs.stat(t)),
+                    ys._cache.get(`item:${s}`) ||
+                        (console.log(`/${e}/Desktop item is not cached, refetching cache`), ys.fs.stat(s)),
+                    ys._cache.get(`item:${r}`) ||
+                        (console.log(`/${e}/Documents item is not cached, refetching cache`), ys.fs.stat(r)),
+                    ys._cache.get(`item:${n}`) ||
+                        (console.log(`/${e}/Public item is not cached, refetching cache`), ys.fs.stat(n)),
+                    ys._cache.get(`readdir:${t}`) ||
+                        (console.log(`/${e} is not cached, refetching cache`), ys.fs.readdir(t)),
+                    ys._cache.get(`readdir:${s}`) ||
+                        (console.log(`/${e}/Desktop is not cached, refetching cache`), ys.fs.readdir(s)),
+                    ys._cache.get(`readdir:${r}`) ||
+                        (console.log(`/${e}/Documents is not cached, refetching cache`), ys.fs.readdir(r)),
+                    ys._cache.get(`readdir:${n}`) ||
+                        (console.log(`/${e}/Public is not cached, refetching cache`), ys.fs.readdir(n));
+            };
+        })();
+        return e;
+    })();
+    (globalThis.puter = ys), ys.runWhenPuterHappensCallbacks(), (ys.tools = []);
+    const bs = ys.ui.parentApp();
+    (globalThis.puterParent = bs),
+        bs &&
+            (console.log("I have a parent, registering tools"),
+            bs.on("message", async (e) => {
+                if (
+                    (console.log("Got tool req ", e),
+                    "requestTools" === e.$ &&
+                        (console.log("Responding with tools"),
+                        bs.postMessage({ $: "providedTools", tools: JSON.parse(JSON.stringify(ys.tools)) })),
+                    "executeTool" === e.$)
+                ) {
+                    console.log("xecuting tools");
+                    const [t] = ys.tools.filter((t) => t.function.name === e.toolName),
+                        s = await t.exec(e.parameters);
+                    bs.postMessage({ $: "toolResponse", response: s, tag: e.tag });
+                }
+            }),
+            bs.postMessage({ $: "ready" })),
+        globalThis.addEventListener &&
+            globalThis.addEventListener("message", async (e) => {
+                e.origin === ys.defaultGUIOrigin &&
+                    (e.data.msg && "requestOrigin" === e.data.msg
+                        ? e.source.postMessage({ msg: "originResponse" }, "*")
+                        : "puter.token" === e.data.msg &&
+                          (ys.setAuthToken(e.data.token),
+                          ys.setAppID(e.data.app_uid),
+                          (ys.puterAuthState.authGranted = !0),
+                          ys.onAuth &&
+                              "function" == typeof ys.onAuth &&
+                              ys.getUser().then((e) => {
+                                  ys.onAuth(e);
+                              }),
+                          (ys.puterAuthState.isPromptOpen = !1),
+                          ys.puterAuthState.resolver &&
+                              (ys.puterAuthState.authGranted
+                                  ? ys.puterAuthState.resolver.resolve()
+                                  : ys.puterAuthState.resolver.reject(),
+                              (ys.puterAuthState.resolver = null))));
+            });
+})();
