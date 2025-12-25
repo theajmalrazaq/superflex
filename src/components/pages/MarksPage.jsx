@@ -667,7 +667,7 @@ const recalculateCourse = (course) => {
       return sum + (isNaN(val) ? 0 : val);
     }, 0);
 
-    rows = rows.map((r) => {
+    rows = rows.map((r, i) => {
       const rawObt = parseFloat(r.obtained);
       const obt = isNaN(rawObt) ? 0 : rawObt;
 
@@ -682,22 +682,25 @@ const recalculateCourse = (course) => {
     });
 
     const sorted = rows.map((r, i) => ({ ...r, originalIdx: i }));
+    // Sort by weighted score to maximize grade
     sorted.sort((a, b) => b._weightedScore - a._weightedScore);
 
     let currentAccWeight = 0;
     const includedIndices = new Set();
+    const EPSILON = 0.001;
 
     for (let item of sorted) {
       const rawW = parseFloat(item.weight);
       const w = isNaN(rawW) ? 0 : rawW;
 
-      if (currentAccWeight < secWeight - 0.001) {
+      if (currentAccWeight < secWeight - EPSILON) {
         currentAccWeight += w;
         includedIndices.add(item.originalIdx);
       }
     }
 
     rows = rows.map((r, i) => {
+      // Clean up temp property
       const { _weightedScore, ...rest } = r;
       return { ...rest, included: includedIndices.has(i) };
     });
@@ -999,16 +1002,25 @@ function MarksPage() {
 
             if (includeInStats) {
               let currentAccWeight = 0;
+              const EPSILON = 0.001;
 
-              const sorted = [...rowsData].map((r, i) => ({
-                ...r,
-                originalIdx: i,
-              }));
-              sorted.sort((a, b) => b.obtained - a.obtained);
+              const sorted = [...rowsData].map((r, i) => {
+                const ratio = r.total > 0 ? r.obtained / r.total : 0;
+                // We sort by the contribution to the total weight (ratio * weight)
+                // This handles cases where weights might differ, or simply prioritizes the best percentage if weights are equal.
+                const score = ratio * r.weight;
+                return {
+                  ...r,
+                  originalIdx: i,
+                  _sortScore: score
+                };
+              });
+
+              sorted.sort((a, b) => b._sortScore - a._sortScore);
 
               const includedIndices = new Set();
               for (let item of sorted) {
-                if (currentAccWeight < secWeight) {
+                if (currentAccWeight < secWeight - EPSILON) {
                   currentAccWeight += item.weight;
                   includedIndices.add(item.originalIdx);
                 }

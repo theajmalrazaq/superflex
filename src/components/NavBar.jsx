@@ -124,8 +124,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
       return links.filter(
         (link) =>
-          link.text.trim() !== "Grade Report" &&
-          link.text.trim() !== "Transcript",
+          link.text.trim() !== "Grade Report"
       );
     };
 

@@ -171,8 +171,16 @@ function HomePage() {
   const [links, setLinks] = useState({});
   const [chartPattern, setChartPattern] = useState(null);
 
-  const [loadingMarks, setLoadingMarks] = useState(false);
-  const [loadingAttendance, setLoadingAttendance] = useState(false);
+  const [loadingMarks, setLoadingMarks] = useState(true);
+  const [loadingAttendance, setLoadingAttendance] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoadingMarks(false);
+      setLoadingAttendance(false);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const canvas = document.createElement("canvas");
@@ -325,10 +333,13 @@ function HomePage() {
   useEffect(() => {
     const handleGlobalUpdate = (e) => {
       const data = e.detail;
-      if (data.attendance) setAttendanceData(data.attendance);
+      if (data.attendance) {
+        setAttendanceData(data.attendance);
+        setLoadingAttendance(false);
+      }
       if (data.marks) {
         setCoursesData(data.marks);
-
+        setLoadingMarks(false);
         updateMarksHistory(data.marks);
       }
       if (data.studyPlan) setStudyPlanData(data.studyPlan);
@@ -338,9 +349,13 @@ function HomePage() {
 
     if (window.superflex_ai_context) {
       const ctx = window.superflex_ai_context;
-      if (ctx.attendance) setAttendanceData(ctx.attendance);
+      if (ctx.attendance) {
+        setAttendanceData(ctx.attendance);
+        setLoadingAttendance(false);
+      }
       if (ctx.marks) {
         setCoursesData(ctx.marks);
+        setLoadingMarks(false);
         updateMarksHistory(ctx.marks);
       }
       if (ctx.studyPlan) setStudyPlanData(ctx.studyPlan);
