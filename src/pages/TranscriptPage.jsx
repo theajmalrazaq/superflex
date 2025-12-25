@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import LoadingOverlay, {
+  LoadingSpinner,
+} from "../components/ui/LoadingOverlay";
 import {
   TrendingUp,
   Award,
@@ -215,7 +217,9 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
 
     const data = MCA_DATA[mcaVal];
     if (!data) {
-      setResult({ error: "MCA data not available for this value (30-91 only)" });
+      setResult({
+        error: "MCA data not available for this value (30-91 only)",
+      });
       return;
     }
 
@@ -366,7 +370,9 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
                           </p>
                           <p
                             className={`text-xs font-bold ${
-                              g === result.grade ? "text-white" : "text-zinc-400"
+                              g === result.grade
+                                ? "text-white"
+                                : "text-zinc-400"
                             }`}
                           >
                             {val}
@@ -478,7 +484,6 @@ function TranscriptPage() {
               let gradingScheme = null;
               let schemeDetailId = null;
 
-              // Check for MCA and Grading Scheme in the row or associated modal
               const link = codeCell.querySelector("a");
               if (link) {
                 const title =
@@ -491,11 +496,12 @@ function TranscriptPage() {
 
                 const onclick = link.getAttribute("onclick");
                 if (onclick) {
-                  const match = onclick.match(/fn_StdGradeSchemeDetail\((\d+)\)/);
+                  const match = onclick.match(
+                    /fn_StdGradeSchemeDetail\((\d+)\)/,
+                  );
                   if (match) schemeDetailId = match[1];
                 }
 
-                // If not in title, check if there's a modal ID we can look up
                 const target = link.getAttribute("data-target");
                 if (target) {
                   const modal = document.querySelector(target);
@@ -542,7 +548,6 @@ function TranscriptPage() {
           setActiveSemIdx(semesterData.length - 1);
         }
 
-        // Relocate grade policy modal if it's inside the hidden root
         const gModal = document.querySelector("#GradePolicyDetail");
         if (gModal && root.contains(gModal)) {
           document.body.appendChild(gModal);
@@ -591,7 +596,9 @@ function TranscriptPage() {
       window.superflex_ai_context = newContext;
 
       window.dispatchEvent(
-        new CustomEvent("superflex-data-updated", { detail: { ...newContext, isTranscriptSync: true } }),
+        new CustomEvent("superflex-data-updated", {
+          detail: { ...newContext, isTranscriptSync: true },
+        }),
       );
     } catch (e) {
       console.error("AI Sync Error (Transcript):", e);
@@ -1026,7 +1033,6 @@ function TranscriptPage() {
                                 <button
                                   onClick={async () => {
                                     if (course.schemeDetailId) {
-                                      // Try to fetch grading factor (MCA) directly
                                       try {
                                         const response = await fetch(
                                           "/Student/Populate_GradeSchemeDetails",
@@ -1066,9 +1072,10 @@ function TranscriptPage() {
                                         );
                                       }
 
-                                      const modal = document.querySelector(
-                                        "#GradePolicyDetail",
-                                      );
+                                      const modal =
+                                        document.querySelector(
+                                          "#GradePolicyDetail",
+                                        );
                                       if (modal) {
                                         modal.style.zIndex = "9999";
                                         const $ = window.jQuery || window.$;

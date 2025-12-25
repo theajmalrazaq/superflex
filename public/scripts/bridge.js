@@ -16,7 +16,7 @@
   document.addEventListener("superflex-ai-interrupt", (e) => {
     const { id } = e.detail;
     if (activeRequestId === id) {
-      activeRequestId = null; // Signal stop
+      activeRequestId = null;
     }
   });
 
@@ -50,7 +50,6 @@
       });
 
       for await (const part of response) {
-        // If the request was interrupted, break the loop
         if (activeRequestId !== id) {
           break;
         }

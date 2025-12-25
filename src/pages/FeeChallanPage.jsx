@@ -367,7 +367,7 @@ function FeeChallanPage() {
                 </div>
               </div>
 
-              {/* Desktop View */}
+              {}
               <div className="hidden md:block overflow-x-auto scrollbar-hide">
                 <table className="w-full text-left border-collapse border-spacing-0">
                   <thead>
@@ -410,13 +410,22 @@ function FeeChallanPage() {
                                 <div className="p-1 bg-zinc-800/50 rounded-md">
                                   <Clock size={10} className="text-[#a098ff]" />
                                 </div>
-                                Issued: <span className="text-zinc-400">{c.issueDate}</span>
+                                Issued:{" "}
+                                <span className="text-zinc-400">
+                                  {c.issueDate}
+                                </span>
                               </span>
                               <span className="flex items-center gap-1.5 text-[10px] text-zinc-500 font-bold uppercase tracking-tight font-sans whitespace-nowrap">
                                 <div className="p-1 bg-zinc-800/50 rounded-md">
-                                  <Calendar size={10} className="text-emerald-400" />
+                                  <Calendar
+                                    size={10}
+                                    className="text-emerald-400"
+                                  />
                                 </div>
-                                Due: <span className="text-zinc-400">{c.dueDate}</span>
+                                Due:{" "}
+                                <span className="text-zinc-400">
+                                  {c.dueDate}
+                                </span>
                               </span>
                             </div>
                           </div>
@@ -472,14 +481,21 @@ function FeeChallanPage() {
                 </table>
               </div>
 
-              {/* Mobile View */}
+              {}
               <div className="md:hidden space-y-4">
                 {challans.map((c, idx) => (
-                  <div key={idx} className="p-6 rounded-[2rem] bg-zinc-900/50 border border-white/5 space-y-6">
+                  <div
+                    key={idx}
+                    className="p-6 rounded-[2rem] bg-zinc-900/50 border border-white/5 space-y-6"
+                  >
                     <div className="flex justify-between items-start">
                       <div className="space-y-1">
-                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">DESCRIPTION</p>
-                        <h4 className="text-lg font-black text-[#a098ff] leading-tight">{c.description}</h4>
+                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">
+                          DESCRIPTION
+                        </p>
+                        <h4 className="text-lg font-black text-[#a098ff] leading-tight">
+                          {c.description}
+                        </h4>
                       </div>
                       <span
                         className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest font-sans ${
@@ -498,21 +514,29 @@ function FeeChallanPage() {
                           <Clock size={10} className="text-[#a098ff]" />
                           ISSUED
                         </div>
-                        <p className="text-xs font-bold text-white ml-4">{c.issueDate}</p>
+                        <p className="text-xs font-bold text-white ml-4">
+                          {c.issueDate}
+                        </p>
                       </div>
                       <div className="space-y-1.5 text-right">
                         <div className="flex items-center justify-end gap-1.5 text-[9px] text-zinc-500 font-black uppercase tracking-widest">
                           <Calendar size={10} className="text-emerald-400" />
                           DUE
                         </div>
-                        <p className="text-xs font-bold text-white mr-4">{c.dueDate}</p>
+                        <p className="text-xs font-bold text-white mr-4">
+                          {c.dueDate}
+                        </p>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between pt-4 border-t border-white/5">
                       <div className="space-y-0.5">
-                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Total Amount</p>
-                        <p className="text-xl font-black text-white">Rs. {c.amount}</p>
+                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+                          Total Amount
+                        </p>
+                        <p className="text-xl font-black text-white">
+                          Rs. {c.amount}
+                        </p>
                       </div>
                       <div className="flex items-center gap-2">
                         {c.status.toLowerCase().includes("unpaid") && (

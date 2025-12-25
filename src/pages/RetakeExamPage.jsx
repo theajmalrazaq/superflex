@@ -230,7 +230,7 @@ const RetakeCourseCard = ({ course, isSelected, onToggle, index }) => {
       onClick={onToggle}
       className={`group cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border transition-all duration-300 gap-4 ${
         isSelected
-          ? "bg-[#a098ff]/10 border-[#a098ff]/50 shadow-[0_0_20px_rgba(160,152,255,0.05)]"
+          ? "bg-[#a098ff]/10 border-[#a098ff]/50"
           : "bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5"
       }`}
     >
@@ -309,7 +309,7 @@ const ExamTypeSelector = ({ types, selectedValue, onSelect }) => {
     <div className="relative w-full md:w-auto z-50" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full md:w-[280px] flex items-center justify-between px-4 py-2.5 rounded-full bg-zinc-900/50 border border-white/5 text-white hover:bg-white/5 transition-all group backdrop-blur-sm"
+        className="w-full md:w-[280px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-zinc-900/50 border border-white/5 text-white hover:bg-white/5 transition-all group"
       >
         <div className="flex items-center gap-3 overflow-hidden">
           <div className="p-2 rounded-xl bg-[#a098ff]/10 text-[#a098ff]">
@@ -326,8 +326,8 @@ const ExamTypeSelector = ({ types, selectedValue, onSelect }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-[2rem] bg-black/50 backdrop-blur-2xl border border-white/10 max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200">
-          <div className="flex flex-col gap-2">
+        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10 max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200">
+          <div className="flex flex-col gap-3">
             {types.map((type, idx) => (
               <button
                 key={idx}
@@ -335,18 +335,17 @@ const ExamTypeSelector = ({ types, selectedValue, onSelect }) => {
                   onSelect(type.value);
                   setIsOpen(false);
                 }}
-                className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${
+                className={`w-full flex bg-zinc-900 items-center justify-between p-3 rounded-xl transition-all ${
                   selectedValue === type.value
-                    ? "bg-[#a098ff]/10 border border-[#a098ff]/20 text-white"
-                    : "hover:bg-white/5 border border-transparent text-zinc-400"
+                    ? "bg-[#a098ff]/10 border border-[#a098ff]/20"
+                    : "hover:bg-white/5 border border-transparent"
                 }`}
               >
-                <span className="text-xs font-bold uppercase tracking-widest">
+                <span
+                  className={`text-sm font-medium truncate ${selectedValue === type.value ? "text-white" : "text-zinc-400"}`}
+                >
                   {type.label}
                 </span>
-                {selectedValue === type.value && (
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#a098ff]"></div>
-                )}
               </button>
             ))}
           </div>

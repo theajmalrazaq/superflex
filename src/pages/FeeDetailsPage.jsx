@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import LoadingOverlay from "../components/ui/LoadingOverlay";
 import {
   DollarSign,
   ChevronDown,
@@ -373,8 +373,6 @@ function FeeDetailsPage() {
       );
       setTotalPaid(totalAmount.toLocaleString());
 
-
-
       root.style.display = "none";
       setLoading(false);
       window.dispatchEvent(
@@ -388,15 +386,7 @@ function FeeDetailsPage() {
   if (loading)
     return (
       <PageLayout currentPage={window.location.pathname}>
-        <div className="flex flex-col items-center justify-center py-40 space-y-8">
-          <div className="relative">
-            <div className="absolute inset-0 bg-[#a098ff]/10 blur-3xl rounded-full scale-150 animate-pulse"></div>
-            <LoadingSpinner />
-          </div>
-          <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.4em] animate-pulse">
-            Hydrating Financial Ledger...
-          </p>
-        </div>
+        <LoadingOverlay show={loading} isFullScreen={false} />
       </PageLayout>
     );
 

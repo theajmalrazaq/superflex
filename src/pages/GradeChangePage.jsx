@@ -390,7 +390,7 @@ function GradeChangePage() {
           <StatsCard
             icon={AlertTriangle}
             label="Status"
-            value="ACTIVE"
+            value={requests.length > 0 ? "ACTIVE" : "CLOSED"}
             delay={400}
           />
         </div>
@@ -528,7 +528,7 @@ function GradeChangePage() {
                   }
                   className={`p-5 rounded-[2rem] border transition-all duration-300 ${
                     selectedIds.includes(req.checkboxId)
-                      ? "bg-[#a098ff]/10 border-[#a098ff]/30 shadow-[0_0_20px_rgba(160,152,255,0.05)]"
+                      ? "bg-[#a098ff]/10 border-[#a098ff]/30"
                       : "bg-white/[0.02] border-white/5 hover:border-white/10"
                   }`}
                 >
@@ -601,7 +601,7 @@ function GradeChangePage() {
                       <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">
                         Initial Grade
                       </span>
-                      <span className="px-4 py-1.5 rounded-xl bg-[#a098ff]/10 text-[#a098ff] font-black text-sm shadow-[0_0_15px_rgba(160,152,255,0.1)]">
+                      <span className="px-4 py-1.5 rounded-xl bg-[#a098ff]/10 text-[#a098ff] font-black text-sm">
                         {req.grade}
                       </span>
                     </div>

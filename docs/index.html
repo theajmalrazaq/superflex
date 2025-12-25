@@ -123,6 +123,10 @@
         }
       }
 
+      .animate-splash {
+        animation: splash 1.5s cubic-bezier(0.165, 0.84, 0.44, 1) infinite both;
+      }
+
       /* Feature Marquee */
       @keyframes featureMarquee {
         0% {
@@ -279,7 +283,6 @@
       .btn-primary:hover {
         background: #8f86ff;
         transform: translateY(-2px);
-        box-shadow: 0 20px 40px rgba(160, 152, 255, 0.3);
       }
 
       .btn-secondary {
@@ -327,6 +330,36 @@
       ></div>
     </div>
 
+    <!-- Navigation Bar -->
+    <nav
+      class="sticky top-5 w-fit mt-10 mx-auto z-50 bg-black/80 backdrop-blur-xl border border-white/10 rounded-full"
+    >
+      <div class="flex items-center justify-between px-4 lg:px-6 py-3">
+        <div class="flex items-center gap-8">
+          <a href="index.html" class="flex items-center shrink-0">
+            <img src="res/logo_sec.svg" alt="Logo" class="h-7 lg:h-8 w-auto" />
+          </a>
+          <div class="hidden lg:flex items-center gap-1">
+            <a
+              href="index.html"
+              class="flex items-center gap-2 px-4 py-2 rounded-full bg-[#a098ff]/10 text-[#a098ff] border border-white/10 text-[13px] font-medium transition-all duration-300"
+              >Home</a
+            >
+            <a
+              href="docs.html?page=guide"
+              class="flex items-center gap-2 px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 text-[13px] font-medium transition-all duration-300"
+              >AI Guide</a
+            >
+            <a
+              href="docs.html?page=technical"
+              class="flex items-center gap-2 px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 text-[13px] font-medium transition-all duration-300"
+              >Behind the Scenes</a
+            >
+          </div>
+        </div>
+      </div>
+    </nav>
+
     <!-- Hero Section -->
     <section
       class="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 relative z-20"
@@ -372,7 +405,7 @@
                 id="version-text"
                 class="bg-gradient-to-b ml-1.5 from-white to-white/50 bg-clip-text text-xs text-transparent uppercase font-bold"
               >
-                SuperFlex V1.0.0
+                SuperFlex V2.0.0
               </span>
             </span>
           </button>
@@ -463,7 +496,6 @@
           id="hero-buttons-container"
           class="flex flex-col sm:flex-row gap-4 justify-center mt-8 hero-buttons px-4 sm:px-6 w-full sm:w-auto"
         >
-          <!--
           <a
             id="add-to-chrome-btn"
             href="#"
@@ -510,32 +542,7 @@
               <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" />
             </svg>
           </button>
-          -->
-
-          <!-- Coming Soon Message -->
-          <div
-            class="group relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-8 py-4 flex items-center gap-3 transition-all duration-500 hover:bg-white/10 hover:border-[#a098ff]/30"
-          >
-            <div class="relative">
-              <div
-                class="w-2.5 h-2.5 rounded-full bg-[#a098ff] animate-ping absolute inset-0"
-              ></div>
-              <div class="w-2.5 h-2.5 rounded-full bg-[#a098ff] relative"></div>
-            </div>
-            <span
-              class="text-sm font-bold tracking-[0.2em] uppercase text-white/90"
-              >V2.0.0 Coming Soon</span
-            >
-          </div>
         </div>
-        <a
-          id="download-v1-link"
-          href="https://github.com/theajmalrazaq/superflex/releases/latest"
-          target="_blank"
-          class="text-[#a098ff] hover:text-[#8f86ff] text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300 decoration-[#a098ff]/30 underline-offset-8 underline flex items-center justify-center h-[52px]"
-        >
-          Download V1.0.0 (Latest)
-        </a>
 
         <!-- Video Modal -->
         <div
@@ -631,8 +638,58 @@
           </p>
         </div>
 
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <!-- Feature 1 -->
+        <!-- Bento Grid Layout -->
+        <div class="grid md:grid-cols-4 gap-4">
+          <!-- AI Assistant - Large Feature (2x2) -->
+          <div
+            class="feature-card group md:col-span-2 md:row-span-2 flex flex-col"
+          >
+            <div
+              class="w-14 h-14 rounded-2xl bg-[#a098ff]/10 flex items-center justify-center mb-6 border border-[#a098ff]/20 relative z-10"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                fill="none"
+              >
+                <path
+                  fill="#a098ff"
+                  d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold mb-3 text-white">
+              AI-Powered Academic Assistant
+            </h3>
+            <p class="text-zinc-400 font-medium text-sm leading-relaxed mb-4">
+              Chat with multiple AI models (Gemini, GPT-4o, DeepSeek, Grok) that
+              understand your academic data. Get instant answers about your
+              CGPA, attendance predictions, grade forecasts, and personalized
+              study advice.
+            </p>
+            <div class="flex flex-wrap gap-2 mt-auto">
+              <span
+                class="text-xs px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-zinc-300 font-medium"
+                >Gemini 2.0 Flash</span
+              >
+              <span
+                class="text-xs px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-zinc-300 font-medium"
+                >GPT-4o Mini</span
+              >
+              <span
+                class="text-xs px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-zinc-300 font-medium"
+                >DeepSeek</span
+              >
+              <span
+                class="text-xs px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-zinc-300 font-medium"
+                >Grok 2</span
+              >
+            </div>
+          </div>
+
+          <!-- Feature 1 - Modern Dashboard -->
           <div class="feature-card group">
             <div
               class="w-14 h-14 rounded-2xl bg-[#a098ff]/10 flex items-center justify-center mb-6 group-hover:bg-[#a098ff]/20 transition-all"
@@ -686,34 +743,6 @@
             </p>
           </div>
 
-          <!-- Feature 3 -->
-          <div class="feature-card group">
-            <div
-              class="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-6 group-hover:bg-blue-500/20 transition-all"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#3b82f6"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-              </svg>
-            </div>
-            <h3 class="text-xl font-bold mb-3 text-white">Grade Calculator</h3>
-            <p class="text-zinc-400 font-medium text-sm leading-relaxed">
-              What-if scenarios, CGPA target planning, and best-of calculations
-              to predict and plan your academic future.
-            </p>
-          </div>
-
-          <!-- Feature 4 -->
           <div class="feature-card group">
             <div
               class="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-6 group-hover:bg-purple-500/20 transition-all"
@@ -741,11 +770,10 @@
               miss an important deadline again.
             </p>
           </div>
-
-          <!-- Feature 5 -->
+          <!-- Feature 3 -->
           <div class="feature-card group">
             <div
-              class="w-14 h-14 rounded-2xl bg-orange-500/10 flex items-center justify-center mb-6 group-hover:bg-orange-500/20 transition-all"
+              class="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-6 group-hover:bg-blue-500/20 transition-all"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -753,49 +781,19 @@
                 height="28"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#f97316"
+                stroke="#3b82f6"
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
-                <path
-                  d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
-                />
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
               </svg>
             </div>
-            <h3 class="text-xl font-bold mb-3 text-white">Fee Management</h3>
+            <h3 class="text-xl font-bold mb-3 text-white">Grade Calculator</h3>
             <p class="text-zinc-400 font-medium text-sm leading-relaxed">
-              View fee structures, payment history, and upcoming dues in a
-              clean, organized interface.
-            </p>
-          </div>
-
-          <!-- Feature 6 -->
-          <div class="feature-card group">
-            <div
-              class="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center mb-6 group-hover:bg-pink-500/20 transition-all"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#ec4899"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
-                />
-                <line x1="7" y1="7" x2="7.01" y2="7" />
-              </svg>
-            </div>
-            <h3 class="text-xl font-bold mb-3 text-white">Quick Actions</h3>
-            <p class="text-zinc-400 font-medium text-sm leading-relaxed">
-              One-click access to course registration, withdrawals, transcript
-              downloads, and other common tasks.
+              What-if scenarios, CGPA target planning, and best-of calculations
+              to predict and plan your academic future.
             </p>
           </div>
         </div>

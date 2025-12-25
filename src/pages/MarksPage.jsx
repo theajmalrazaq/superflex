@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from "react";
-import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import LoadingOverlay, {
+  LoadingSpinner,
+} from "../components/ui/LoadingOverlay";
 import PageLayout from "../components/layouts/PageLayout";
 import {
   ChevronDown,
@@ -304,7 +306,7 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount }) => {
 
   return (
     <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-[#161616] border border-white/10 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl">
+      <div className="bg-[#161616] border border-white/10 rounded-[2.5rem] w-full max-w-md overflow-hidden">
         <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-[#a098ff]/10 text-[#a098ff]">
@@ -682,7 +684,7 @@ const recalculateCourse = (course) => {
     });
 
     const sorted = rows.map((r, i) => ({ ...r, originalIdx: i }));
-    // Sort by weighted score to maximize grade
+
     sorted.sort((a, b) => b._weightedScore - a._weightedScore);
 
     let currentAccWeight = 0;
@@ -700,7 +702,6 @@ const recalculateCourse = (course) => {
     }
 
     rows = rows.map((r, i) => {
-      // Clean up temp property
       const { _weightedScore, ...rest } = r;
       return { ...rest, included: includedIndices.has(i) };
     });
@@ -1006,13 +1007,12 @@ function MarksPage() {
 
               const sorted = [...rowsData].map((r, i) => {
                 const ratio = r.total > 0 ? r.obtained / r.total : 0;
-                // We sort by the contribution to the total weight (ratio * weight)
-                // This handles cases where weights might differ, or simply prioritizes the best percentage if weights are equal.
+
                 const score = ratio * r.weight;
                 return {
                   ...r,
                   originalIdx: i,
-                  _sortScore: score
+                  _sortScore: score,
                 };
               });
 
@@ -1111,8 +1111,6 @@ function MarksPage() {
             setActiveSectionId(parsedCourses[0].sections[0].id);
           }
         }
-
-
 
         root.style.display = "none";
         setLoading(false);

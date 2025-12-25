@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "SuperFlex",
-  "version": "1.0.0",
-  "description": "Custom styled extension",
+  "version": "2.0.0",
+  "description": "Time to Flex on 'Em",
   "icons": {
     "16": "assets/favicon.png",
     "32": "assets/favicon.png",

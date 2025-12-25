@@ -1,13 +1,45 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Send, X, User, Trash2, Shield, Zap, TrendingUp, Search, Sparkles, ChevronDown, Square } from "lucide-react";
+import {
+  Send,
+  X,
+  User,
+  Trash2,
+  Shield,
+  Zap,
+  TrendingUp,
+  Search,
+  Sparkles,
+  ChevronDown,
+  Square,
+} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 const AVAILABLE_MODELS = [
-  { id: "gpt-4o-mini", name: "GPT-4o Mini", short: "GPT-4o Mini", provider: "OpenAI" },
-  { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash", short: "Gemini 2.0", provider: "Google" },
-  { id: "google/gemini-3-pro-preview", name: "Gemini 3 Pro", short: "Gemini 3", provider: "Google" },
-  { id: "deepseek-chat", name: "DeepSeek Chat", short: "DeepSeek", provider: "DeepSeek" },
+  {
+    id: "gpt-4o-mini",
+    name: "GPT-4o Mini",
+    short: "GPT-4o Mini",
+    provider: "OpenAI",
+  },
+  {
+    id: "gemini-2.0-flash",
+    name: "Gemini 2.0 Flash",
+    short: "Gemini 2.0",
+    provider: "Google",
+  },
+  {
+    id: "google/gemini-3-pro-preview",
+    name: "Gemini 3 Pro",
+    short: "Gemini 3",
+    provider: "Google",
+  },
+  {
+    id: "deepseek-chat",
+    name: "DeepSeek Chat",
+    short: "DeepSeek",
+    provider: "DeepSeek",
+  },
   { id: "grok-2", name: "Grok 2", short: "Grok 2", provider: "xAI" },
 ];
 
@@ -69,7 +101,9 @@ const SuperFlexAI = () => {
   const [permissionStatus, setPermissionStatus] = useState(
     () => localStorage.getItem("superflex_ai_data_permission") || "pending",
   );
-  const [selectedModel, setSelectedModel] = useState(() => localStorage.getItem("superflex_ai_model") || "gemini-2.0-flash");
+  const [selectedModel, setSelectedModel] = useState(
+    () => localStorage.getItem("superflex_ai_model") || "gemini-2.0-flash",
+  );
   const [showModelPicker, setShowModelPicker] = useState(false);
   const scrollRef = useRef(null);
   const activeRequestIdRef = useRef(null);
@@ -93,19 +127,18 @@ const SuperFlexAI = () => {
     const handleTranscriptSync = (e) => {
       const data = e.detail;
       if (data.isTranscriptSync) {
-        console.log("SuperFlexAI: Transcript sync detected, opening assistant...");
-        setIsOpen(true);
         setIsScanning(false);
         setScanProgress(100);
-        
+
         setMessages((prev) => {
-          // Check if we already have a sync success message
-          if (prev.some(m => m.content.includes("✅ **Sync Complete!**"))) return prev;
+          if (prev.some((m) => m.content.includes("✅ **Sync Complete!**")))
+            return prev;
           return [
             ...prev,
             {
               role: "assistant",
-              content: "✅ **Transcript Sync Complete!** I've parsed your entire academic history and the grading curves (MCA). I'm ready to predict your GPA or simulate your 'What-If' scenarios. What's on your mind?",
+              content:
+                "✅ **Transcript Sync Complete!** I've parsed your entire academic history and the grading curves (MCA). I'm ready to predict your GPA or simulate your 'What-If' scenarios. What's on your mind?",
             },
           ];
         });
@@ -140,7 +173,8 @@ const SuperFlexAI = () => {
         ...prev,
         {
           role: "assistant",
-          content: "✅ **Auto-Sync Complete!** I've refreshed your academic records. How can I help you with your subjects?",
+          content:
+            "✅ **Auto-Sync Complete!** I've refreshed your academic records. How can I help you with your subjects?",
         },
       ]);
     };
@@ -149,7 +183,10 @@ const SuperFlexAI = () => {
 
     return () => {
       window.removeEventListener("superflex-data-updated", handleDataUpdate);
-      window.removeEventListener("superflex-data-updated", handleTranscriptSync);
+      window.removeEventListener(
+        "superflex-data-updated",
+        handleTranscriptSync,
+      );
       window.removeEventListener("superflex-scan-complete", handleScanComplete);
     };
   }, [permissionStatus]);
@@ -223,7 +260,7 @@ const SuperFlexAI = () => {
         responseText += text;
         setMessages((prev) => {
           const last = prev[prev.length - 1];
-          // ONLY update if the last message is an assistant message
+
           if (last && last.role === "assistant") {
             const others = prev.slice(0, -1);
             return [...others, { ...last, content: responseText }];
@@ -237,7 +274,7 @@ const SuperFlexAI = () => {
         setIsLoading(false);
         activeRequestIdRef.current = null;
         if (!responseText) {
-          setMessages(prev => {
+          setMessages((prev) => {
             const last = prev[prev.length - 1];
             if (last && last.role === "assistant" && !last.content) {
               return prev.slice(0, -1);
@@ -258,8 +295,8 @@ const SuperFlexAI = () => {
       const academicData = {
         student: {
           name: dataContext.studentName || "Student",
-          cmsId: "REDACTED", // Explicit removal as requested
-          program: "Unknown", 
+          cmsId: "REDACTED",
+          program: "Unknown",
           section: "Unknown",
         },
         currentPerformance: {
@@ -275,12 +312,10 @@ const SuperFlexAI = () => {
         academicHistory: {
           transcript:
             dataContext.transcript || "Missing (Visit Transcript Page)",
-          mcaData:
-            dataContext.mcaData || "Missing (Visit Transcript Page)",
-          studyPlan:
-            dataContext.studyPlan || "Missing (Visit Transcript Page)",
+          mcaData: dataContext.mcaData || "Missing (Visit Transcript Page)",
+          studyPlan: dataContext.studyPlan || "Missing (Visit Transcript Page)",
         },
-        systemAlerts: [], // Explicit removal
+        systemAlerts: [],
       };
 
       if (permissionStatus !== "granted") {
@@ -374,56 +409,59 @@ const SuperFlexAI = () => {
       setIsLoading(false);
     }
   };
-  
+
   const handleInterrupt = () => {
     if (activeRequestIdRef.current) {
-        document.dispatchEvent(
-            new CustomEvent("superflex-ai-interrupt", {
-                detail: { id: activeRequestIdRef.current }
-            })
-        );
-        activeRequestIdRef.current = null;
-        setIsLoading(false);
+      document.dispatchEvent(
+        new CustomEvent("superflex-ai-interrupt", {
+          detail: { id: activeRequestIdRef.current },
+        }),
+      );
+      activeRequestIdRef.current = null;
+      setIsLoading(false);
 
-        // Immediately remove the empty thinking message if it's still empty
-        setMessages(prev => {
-            const lastMessage = prev[prev.length - 1];
-            if (lastMessage && lastMessage.role === "assistant" && !lastMessage.content) {
-                return prev.slice(0, -1);
-            }
-            return prev;
-        });
+      setMessages((prev) => {
+        const lastMessage = prev[prev.length - 1];
+        if (
+          lastMessage &&
+          lastMessage.role === "assistant" &&
+          !lastMessage.content
+        ) {
+          return prev.slice(0, -1);
+        }
+        return prev;
+      });
     }
   };
 
   const runSmartScan = async () => {
     if (isScanning) return;
     setIsScanning(true);
-    setScanProgress(10); // Start progress
+    setScanProgress(10);
 
     setMessages((prev) => [
       ...prev,
       {
         role: "assistant",
-        content: "Initiating **Smart Scan**. I'm silently vacuuming your academic records into my memory... 🚀",
+        content:
+          "Initiating **Smart Scan**. I'm silently vacuuming your academic records into my memory... 🚀",
       },
     ]);
 
-    // Dispatch event to AiDataPrepare
     window.dispatchEvent(new CustomEvent("superflex-trigger-scan"));
-    
-    // Fallback timeout in case event handling fails or is instant
+
     setTimeout(() => {
-        if(isScanning) setScanProgress(50);
+      if (isScanning) setScanProgress(50);
     }, 1000);
   };
 
   const handlePermission = (status) => {
     setPermissionStatus(status);
     localStorage.setItem("superflex_ai_data_permission", status);
-    
-    // Notify AiDataPrepare
-    window.dispatchEvent(new CustomEvent("superflex-permission-updated", { detail: status }));
+
+    window.dispatchEvent(
+      new CustomEvent("superflex-permission-updated", { detail: status }),
+    );
 
     const welcomeMsg =
       status === "granted"
@@ -513,7 +551,7 @@ const SuperFlexAI = () => {
       </div>
 
       {isOpen && (
-        <div className="fixed bottom-20 left-4 right-4 md:left-auto md:right-6 md:bottom-24 md:w-[420px] h-[65vh] md:h-[650px] md:max-h-[80vh] bg-[#0c0c0c]/90 backdrop-blur-2xl border border-white/10 rounded-3xl md:rounded-[2rem] flex flex-col z-[9999] overflow-hidden animate-in slide-in-from-bottom-8 zoom-in-95 duration-500 ease-out shadow-2xl shadow-black/50">
+        <div className="fixed bottom-20 left-4 right-4 md:left-auto md:right-6 md:bottom-24 md:w-[420px] h-[65vh] md:h-[650px] md:max-h-[80vh] bg-[#0c0c0c]/90 backdrop-blur-2xl border border-white/10 rounded-3xl md:rounded-[2rem] flex flex-col z-[9999] overflow-hidden animate-in slide-in-from-bottom-8 zoom-in-95 duration-500 ease-out">
           <div className="p-6 border-b border-white/5 bg-white/5 flex items-center justify-between relative">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#a098ff] to-transparent opacity-50"></div>
             <div className="flex items-center gap-3">
@@ -531,23 +569,29 @@ const SuperFlexAI = () => {
                 <button
                   onClick={() => setShowModelPicker(!showModelPicker)}
                   className={`p-2.5 rounded-xl border transition-all flex items-center gap-2 active:scale-95 ${
-                    showModelPicker 
-                      ? "bg-[#a098ff]/20 text-[#a098ff] border-[#a098ff]/20" 
+                    showModelPicker
+                      ? "bg-[#a098ff]/20 text-[#a098ff] border-[#a098ff]/20"
                       : "bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
                   }`}
                   title="Change AI Model"
                 >
                   <Sparkles size={18} />
                   <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline-block">
-                    {AVAILABLE_MODELS.find(m => m.id === selectedModel)?.short || selectedModel}
+                    {AVAILABLE_MODELS.find((m) => m.id === selectedModel)
+                      ?.short || selectedModel}
                   </span>
-                  <ChevronDown size={14} className={`transition-transform duration-300 ${showModelPicker ? "rotate-180" : ""}`} />
+                  <ChevronDown
+                    size={14}
+                    className={`transition-transform duration-300 ${showModelPicker ? "rotate-180" : ""}`}
+                  />
                 </button>
 
                 {showModelPicker && (
-                  <div className="absolute top-full right-0 mt-3 w-64 bg-[#0c0c0c] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-[1000] animate-in fade-in zoom-in-95 duration-200">
+                  <div className="absolute top-full right-0 mt-3 w-64 bg-[#0c0c0c] border border-white/10 rounded-2xl overflow-hidden z-[1000] animate-in fade-in zoom-in-95 duration-200">
                     <div className="p-3 border-b border-white/5 bg-white/5">
-                      <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Select Model</h4>
+                      <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+                        Select Model
+                      </h4>
                     </div>
                     <div className="max-h-60 overflow-y-auto p-1.5 space-y-1 custom-scrollbar">
                       {AVAILABLE_MODELS.map((m, idx) => (
@@ -558,12 +602,14 @@ const SuperFlexAI = () => {
                             setShowModelPicker(false);
                           }}
                           className={`w-full text-left p-3 rounded-xl transition-all flex flex-col gap-0.5 group ${
-                            selectedModel === m.id 
-                              ? "bg-[#a098ff]/10 border border-[#a098ff]/20" 
+                            selectedModel === m.id
+                              ? "bg-[#a098ff]/10 border border-[#a098ff]/20"
                               : "hover:bg-white/5 border border-transparent"
                           }`}
                         >
-                          <span className={`text-xs font-bold leading-none ${selectedModel === m.id ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"}`}>
+                          <span
+                            className={`text-xs font-bold leading-none ${selectedModel === m.id ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"}`}
+                          >
                             {m.name}
                           </span>
                           <span className="text-[8px] font-black text-zinc-600 uppercase tracking-tighter">
@@ -588,8 +634,8 @@ const SuperFlexAI = () => {
 
           {isScanning && (
             <div className="h-1 bg-zinc-900 w-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-[#a098ff] to-[#ec4899] transition-all duration-500 shadow-[0_0_10px_#a098ff]"
+              <div
+                className="h-full bg-gradient-to-r from-[#a098ff] to-[#ec4899] transition-all duration-500"
                 style={{ width: `${scanProgress}%` }}
               ></div>
             </div>
@@ -716,11 +762,11 @@ const SuperFlexAI = () => {
                 </button>
               ) : (
                 <button
-                    onClick={handleSend}
-                    disabled={!input.trim()}
-                    className="absolute right-2.5 p-2.5 text-white bg-[#a098ff] hover:bg-[#a098ff]/80 rounded-xl disabled:opacity-30 disabled:grayscale transition-all active:scale-95 flex items-center justify-center outline-none ring-offset-2 ring-offset-black focus:ring-2 focus:ring-[#a098ff]/50"
+                  onClick={handleSend}
+                  disabled={!input.trim()}
+                  className="absolute right-2.5 p-2.5 text-white bg-[#a098ff] hover:bg-[#a098ff]/80 rounded-xl disabled:opacity-30 disabled:grayscale transition-all active:scale-95 flex items-center justify-center outline-none ring-offset-2 ring-offset-black focus:ring-2 focus:ring-[#a098ff]/50"
                 >
-                    <Send size={18} />
+                  <Send size={18} />
                 </button>
               )}
             </div>

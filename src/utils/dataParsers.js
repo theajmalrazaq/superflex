@@ -12,13 +12,20 @@ export const parseProfile = (doc) => {
 
     const rows = doc.querySelectorAll(".row");
     rows.forEach((row) => {
-      const portletTitle = row.querySelector(".m-portlet__head-text")?.textContent.trim();
+      const portletTitle = row
+        .querySelector(".m-portlet__head-text")
+        ?.textContent.trim();
 
       if (portletTitle) {
         const sectionData = {};
         row.querySelectorAll(".col-md-4 p").forEach((p) => {
-          const label = p.querySelector(".m--font-boldest")?.textContent.trim().replace(":", "");
-          const value = p.querySelector("span:not(.m--font-boldest)")?.textContent.trim();
+          const label = p
+            .querySelector(".m--font-boldest")
+            ?.textContent.trim()
+            .replace(":", "");
+          const value = p
+            .querySelector("span:not(.m--font-boldest)")
+            ?.textContent.trim();
           if (label && value) sectionData[label] = value;
         });
 
@@ -32,7 +39,11 @@ export const parseProfile = (doc) => {
       }
     });
 
-    return { studentName, universityInfo: uniInfo, profileSections: allSections };
+    return {
+      studentName,
+      universityInfo: uniInfo,
+      profileSections: allSections,
+    };
   } catch (e) {
     console.error("Parse Profile Failed", e);
     return null;
@@ -42,7 +53,9 @@ export const parseProfile = (doc) => {
 export const parseAttendance = (doc) => {
   try {
     const summaryData = [];
-    const tables = doc.querySelectorAll(".table.table-bordered.table-responsive");
+    const tables = doc.querySelectorAll(
+      ".table.table-bordered.table-responsive",
+    );
 
     tables.forEach((table) => {
       const tabPane = table.closest(".tab-pane");
@@ -50,7 +63,8 @@ export const parseAttendance = (doc) => {
       title = title.replace(/\(.*\)/, "").trim();
 
       const rows = table.querySelectorAll("tbody tr");
-      let present = 0, absent = 0;
+      let present = 0,
+        absent = 0;
       const logs = [];
 
       rows.forEach((r) => {
@@ -65,7 +79,8 @@ export const parseAttendance = (doc) => {
             const parts = date.split("-");
             if (parts.length === 3) {
               const d = new Date(`${parts[1]} ${parts[0]}, ${parts[2]}`);
-              if (!isNaN(d)) day = d.toLocaleDateString("en-US", { weekday: "short" });
+              if (!isNaN(d))
+                day = d.toLocaleDateString("en-US", { weekday: "short" });
             }
           } catch (e) {}
 
@@ -77,7 +92,8 @@ export const parseAttendance = (doc) => {
 
       let percentage = 0;
       const progress = tabPane?.querySelector(".progress-bar");
-      if (progress) percentage = parseFloat(progress.getAttribute("aria-valuenow") || 0);
+      if (progress)
+        percentage = parseFloat(progress.getAttribute("aria-valuenow") || 0);
 
       summaryData.push({
         title,
@@ -102,7 +118,8 @@ export const parseMarks = (doc) => {
 
     tabPanes.forEach((pane) => {
       const courseId = pane.id;
-      let courseTitle = pane.querySelector("h5")?.textContent.trim() || courseId;
+      let courseTitle =
+        pane.querySelector("h5")?.textContent.trim() || courseId;
       courseTitle = courseTitle.replace(/\(.*\)/, "").trim();
 
       const sections = [];
@@ -208,7 +225,7 @@ export const parseMarks = (doc) => {
             return {
               ...r,
               originalIdx: i,
-              _sortScore: score
+              _sortScore: score,
             };
           });
 
@@ -262,8 +279,8 @@ export const parseMarks = (doc) => {
             weightedStdDev: secWeightedStd,
             weightedMin: secWeightedMin,
             weightedMax: secWeightedMax,
-            percentage: secWeight > 0 ? (secObtained / secWeight) * 100 : 0
-          }
+            percentage: secWeight > 0 ? (secObtained / secWeight) * 100 : 0,
+          },
         });
       });
 
@@ -273,15 +290,16 @@ export const parseMarks = (doc) => {
         categories: sections,
         obtained: globalObtained,
         total: globalWeightage,
-        percentage: globalWeightage > 0 ? (globalObtained / globalWeightage) * 100 : 0,
+        percentage:
+          globalWeightage > 0 ? (globalObtained / globalWeightage) * 100 : 0,
         grandTotalStats: {
           weight: globalWeightage,
           obtained: globalObtained,
           weightedAvg: globalAverage,
           weightedStdDev: globalStdDev,
           weightedMin: globalMinimum,
-          weightedMax: globalMaximum
-        }
+          weightedMax: globalMaximum,
+        },
       });
     });
     return parsedCourses;
@@ -299,8 +317,12 @@ export const parseStudyPlan = (doc) => {
     semesterCols.forEach((col) => {
       const h4 = col.querySelector("h4");
       if (!h4) return;
-      const title = h4.textContent.replace(h4.querySelector("small")?.textContent || "", "").trim();
-      const crHrs = parseInt((h4.querySelector("small")?.textContent || "").match(/\d+/)?.[0] || "0");
+      const title = h4.textContent
+        .replace(h4.querySelector("small")?.textContent || "", "")
+        .trim();
+      const crHrs = parseInt(
+        (h4.querySelector("small")?.textContent || "").match(/\d+/)?.[0] || "0",
+      );
       const courses = [];
 
       const table = col.querySelector("table");

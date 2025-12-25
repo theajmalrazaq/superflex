@@ -132,9 +132,6 @@ function LoginPageStyles() {
     if (loginBtn) {
       loginBtn.addEventListener("click", () => {
         localStorage.removeItem("superflex_last_scan_time");
-        console.log(
-          "LoginPageStyles: Sign In clicked, clearing scan timestamp for fresh sync.",
-        );
       });
     }
 
@@ -329,17 +326,17 @@ function LoginPageStyles() {
       );
       if (cancelButton) {
         cancelButton.classList.add(
-           "!bg-zinc-800/50",
-           "!text-zinc-400",
-           "hover:!bg-zinc-800",
-           "hover:!text-white",
-           "!border",
-           "!border-white/5",
-           "!rounded-2xl",
-           "!py-3",
-           "!px-6",
-           "!transition-all",
-           "!w-full"
+          "!bg-zinc-800/50",
+          "!text-zinc-400",
+          "hover:!bg-zinc-800",
+          "hover:!text-white",
+          "!border",
+          "!border-white/5",
+          "!rounded-2xl",
+          "!py-3",
+          "!px-6",
+          "!transition-all",
+          "!w-full",
         );
         cancelButton.addEventListener("click", (e) => {
           e.preventDefault();
@@ -362,35 +359,46 @@ function LoginPageStyles() {
         });
       }
 
-      const requestButton = forgotPasswordSection.querySelector("#m_login_forget_password_submit") || forgotPasswordSection.querySelector("button[type='submit']");
+      const requestButton =
+        forgotPasswordSection.querySelector(
+          "#m_login_forget_password_submit",
+        ) || forgotPasswordSection.querySelector("button[type='submit']");
       if (requestButton) {
         requestButton.classList.add(
-            "!bg-[#a098ff]",
-            "!text-white",
-            "!font-bold",
-            "!rounded-2xl",
-            "!py-4",
-            "!px-6",
-            "hover:!bg-[#8f86ff]",
-            "!transition-all",
-            "!border-none",
-            "!w-full",
-            "!mb-2"
+          "!bg-[#a098ff]",
+          "!text-white",
+          "!font-bold",
+          "!rounded-2xl",
+          "!py-4",
+          "!px-6",
+          "hover:!bg-[#8f86ff]",
+          "!transition-all",
+          "!border-none",
+          "!w-full",
+          "!mb-2",
         );
       }
 
       const showToast = (message, type = "success") => {
         const toast = document.createElement("div");
-        toast.className = `fixed bottom-10 left-1/2 -translate-x-1/2 z-[99999] px-6 py-3 rounded-2xl backdrop-blur-xl border flex items-center gap-3 animate-in slide-in-from-bottom-10 duration-500 ease-out transition-all shadow-2xl shadow-black/50`;
-        
+        toast.className = `fixed bottom-10 left-1/2 -translate-x-1/2 z-[99999] px-6 py-3 rounded-2xl backdrop-blur-xl border flex items-center gap-3 animate-in slide-in-from-bottom-10 duration-500 ease-out transition-all`;
+
         if (type === "success") {
-          toast.classList.add("bg-emerald-500/10", "border-emerald-500/20", "text-emerald-400");
+          toast.classList.add(
+            "bg-emerald-500/10",
+            "border-emerald-500/20",
+            "text-emerald-400",
+          );
           toast.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             <span class="text-[10px] font-black uppercase tracking-widest">${message}</span>
           `;
         } else {
-          toast.classList.add("bg-rose-500/10", "border-rose-500/20", "text-rose-400");
+          toast.classList.add(
+            "bg-rose-500/10",
+            "border-rose-500/20",
+            "text-rose-400",
+          );
           toast.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <span class="text-[10px] font-black uppercase tracking-widest">${message}</span>
@@ -407,14 +415,16 @@ function LoginPageStyles() {
 
       if (requestButton) {
         requestButton.addEventListener("click", () => {
-          const emailInput = forgotPasswordSection.querySelector("input[type='email']") || forgotPasswordSection.querySelector("input[name='Email']");
+          const emailInput =
+            forgotPasswordSection.querySelector("input[type='email']") ||
+            forgotPasswordSection.querySelector("input[name='Email']");
           if (emailInput && emailInput.value.trim().length > 0) {
+            setTimeout(() => {
+              showToast("Password reset link sent to your email!");
               setTimeout(() => {
-                showToast("Password reset link sent to your email!");
-                setTimeout(() => {
-                   if(cancelButton) cancelButton.click();
-                }, 1500);
-              }, 1000);
+                if (cancelButton) cancelButton.click();
+              }, 1500);
+            }, 1000);
           }
         });
       }
@@ -680,10 +690,7 @@ function LoginPageStyles() {
         }
         .feature-marquee-track:hover {
           animation-play-state: paused;
-        }
-        .hero-logo.filter {
-          filter: brightness(0) invert(1);
-        }
+  }
       `;
 
     const generateReviewCards = (items) => {
@@ -722,7 +729,7 @@ function LoginPageStyles() {
       })
       .catch((err) => console.error("Failed to load reviews:", err));
 
-    const CURRENT_VERSION = "1.0.0";
+    const CURRENT_VERSION = "2.0.0";
 
     heroDiv.innerHTML = `
     <!-- Version Display Button -->
@@ -755,7 +762,7 @@ function LoginPageStyles() {
         </div>
         
         <div class="space-y-4 flex items-center flex-col gap-2 w-full px-4 sm:px-6">
-          <img src="https://theajmalrazaq.github.io/superflex/res/logo.svg" alt="SuperFlex" class="w-full max-w-[280px] sm:max-w-md hero-logo filter" />
+          <img src="https://theajmalrazaq.github.io/superflex/res/logo.svg" alt="SuperFlex" class="w-full max-w-[280px] sm:max-w-md hero-logo" />
           <div class="flex items-center justify-center gap-3 w-full">
             <span class="w-8 sm:w-12 h-px bg-gradient-to-r from-transparent to-white/20"></span>
             <span class="font-black text-[8px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.4em] text-[#a098ff]/80 text-center">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span>

@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
-import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import LoadingOverlay, {
+  LoadingSpinner,
+} from "../components/ui/LoadingOverlay";
 import PageLayout from "../components/layouts/PageLayout";
 import {
   CheckCircle2,
@@ -398,8 +400,6 @@ function AttendancePage() {
           });
         });
 
-
-
         setCourses(parsedCourses);
         if (parsedCourses.length > 0) setSelectedCourseId(parsedCourses[0].id);
 
@@ -462,9 +462,6 @@ function AttendancePage() {
             </div>
           </div>
         </PageHeader>
-
-        {}
-        <NotificationBanner alerts={alerts} />
 
         {loading ? (
           <LoadingSpinner />

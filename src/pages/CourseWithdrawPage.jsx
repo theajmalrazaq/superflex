@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import LoadingOverlay, {
+  LoadingSpinner,
+} from "../components/ui/LoadingOverlay";
 import {
   FileText,
   AlertCircle,
@@ -625,14 +627,12 @@ function CourseWithdrawPage() {
             label="Selected"
             value={selectedCount}
             delay={200}
-            
           />
           <StatsCard
             icon={ShieldCheck}
             label="Withdrawal Status"
             value={isWithdrawActive ? "WINDOW OPEN" : "LOCKED"}
             delay={300}
-            
           />
           <StatsCard
             icon={Clock}

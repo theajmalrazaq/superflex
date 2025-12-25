@@ -220,10 +220,28 @@ function processContent(code) {
   return out;
 }
 
+function isIgnored(filePath, ignorePatterns) {
+  if (!ignorePatterns || ignorePatterns.length === 0) return false;
+
+  const normalizedPath = filePath.replace(/\\/g, "/");
+  return ignorePatterns.some((pattern) => {
+    const normalizedPattern = pattern.replace(/\\/g, "/");
+    return (
+      normalizedPath.includes(normalizedPattern) ||
+      normalizedPath.endsWith(normalizedPattern)
+    );
+  });
+}
+
 function clean(dir, options = {}) {
   for (const file of fs.readdirSync(dir)) {
     const filePath = path.join(dir, file);
     const stat = fs.statSync(filePath);
+
+    if (isIgnored(filePath, options.ignore)) {
+      continue;
+    }
+
     if (stat.isDirectory()) {
       if (!["node_modules", "build"].includes(file)) {
         clean(filePath, options);
@@ -260,6 +278,7 @@ function showHelp() {}
 const args = process.argv.slice(2);
 let target = ".";
 let removeEmptyFolders = false;
+let ignorePatterns = [];
 
 for (let i = 0; i < args.length; i++) {
   const arg = args[i];
@@ -269,6 +288,11 @@ for (let i = 0; i < args.length; i++) {
     process.exit(0);
   } else if (arg === "--remove-empty-folders") {
     removeEmptyFolders = true;
+  } else if (arg === "--ignore") {
+    if (i + 1 < args.length) {
+      ignorePatterns.push(args[i + 1]);
+      i++;
+    }
   } else if (!arg.startsWith("--")) {
     target = arg;
   }
@@ -280,7 +304,7 @@ if (!stat) {
   process.exit(1);
 }
 
-const options = { removeEmptyFolders };
+const options = { removeEmptyFolders, ignore: ignorePatterns };
 
 if (stat.isDirectory()) {
   if (removeEmptyFolders) {

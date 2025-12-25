@@ -80,7 +80,6 @@ function ChangePasswordPage() {
         "!border-white/5",
         "!rounded-[2.5rem]",
         "!p-8",
-        "!shadow-xl",
       );
 
       portlet.classList.remove(
@@ -254,9 +253,6 @@ function ChangePasswordPage() {
             "!px-8",
             "!rounded-xl",
             "!transition-all",
-            "!shadow-lg",
-            "!shadow-[#a098ff]/20",
-            "!hover:shadow-[#a098ff]/40",
             "!border-0",
             "!w-full",
             "!flex",

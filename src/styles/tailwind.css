@@ -27,7 +27,6 @@ html {
   display: none;
 }
 
-
 body {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -42,16 +41,13 @@ html {
 html::-webkit-scrollbar {
   display: none;
 }
-*{
+* {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 *::-webkit-scrollbar {
   display: none;
 }
-
-
-
 
 button:focus {
   outline: none !important;
@@ -80,9 +76,7 @@ h6 {
 
 #toast-container > div {
   opacity: 1 !important;
-  box-shadow:
-    0 20px 25px -5px rgb(0 0 0 / 0.5),
-    0 8px 10px -6px rgb(0 0 0 / 0.5) !important;
+  box-shadow: none !important;
   width: 350px !important;
   border-radius: 20px !important;
   padding: 16px 20px !important;
@@ -100,7 +94,7 @@ h6 {
 }
 
 #toast-container > div:hover {
-  box-shadow: 0 0 20px rgba(160, 152, 255, 0.2) !important; /* Glow effect on hover */
+  box-shadow: none !important; /* Glow effect on hover */
   border-color: rgba(160, 152, 255, 0.3) !important;
   transform: translateY(-2px);
 }

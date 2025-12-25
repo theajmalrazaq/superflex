@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import LoadingOverlay, {
+  LoadingSpinner,
+} from "../components/ui/LoadingOverlay";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -28,7 +30,10 @@ import {
 } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import StatsCard from "../components/ui/StatsCard";
-import Skeleton, { MarksSkeleton, AttendanceSkeleton } from "../components/ui/Skeleton";
+import Skeleton, {
+  MarksSkeleton,
+  AttendanceSkeleton,
+} from "../components/ui/Skeleton";
 
 ChartJS.register(
   CategoryScale,
@@ -195,7 +200,6 @@ function HomePage() {
     const styleElement = document.createElement("style");
     styleElement.textContent = scrollbarStyle;
     document.head.appendChild(styleElement);
-
 
     const targetElement = document.querySelector(
       ".m-grid.m-grid--hor.m-grid--root.m-page",
@@ -478,12 +482,10 @@ function HomePage() {
         total: semesterTotalWeight,
         percentage: currentPerc,
       });
-
     } catch (e) {
       console.error("Marks fetch error", e);
     }
   };
-
 
   const activeCourseData = useMemo(() => {
     return coursesData.find((c) => c.id === activeCourse);
@@ -538,7 +540,9 @@ function HomePage() {
                         "Wait, you're here?",
                         "Manifesting 4.0,",
                       ];
-                      return greetings[Math.floor(Math.random() * greetings.length)];
+                      return greetings[
+                        Math.floor(Math.random() * greetings.length)
+                      ];
                     }, [])}{" "}
                     <span className="text-[#a098ff]">
                       {personalInfo?.Name?.split(" ")[0] || "Student"}
@@ -558,15 +562,14 @@ function HomePage() {
                         "Your aggregate is looking real quiet...",
                         "Academic comeback starts... never?",
                       ];
-                      
-                      // Contextual roasts
+
                       if (mostAbsentSubject && mostAbsentSubject.absent > 3) {
-                        return `Bestie, ${mostAbsentSubject.absent} absents in ${mostAbsentSubject.title.split(' ')[0]}? You're cooked.`;
+                        return `Bestie, ${mostAbsentSubject.absent} absents in ${mostAbsentSubject.title.split(" ")[0]}? You're cooked.`;
                       }
                       if (currentAggregate.percentage > 85) {
                         return "Okay nerd, we get it, you're smart.";
                       }
-                      
+
                       return roasts[Math.floor(Math.random() * roasts.length)];
                     }, [mostAbsentSubject, currentAggregate])}
                   </p>

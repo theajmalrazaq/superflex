@@ -67,6 +67,8 @@ if (!favicon) {
 }
 
 favicon.href = `${chrome.runtime.getURL("assets/favicon.svg")}`;
+document.title = "Superflex";
+
 if (document.querySelector(".m-grid__item.m-footer")) {
   document.querySelector(".m-grid__item.m-footer").remove();
 }
@@ -110,4 +112,5 @@ root.render(
 
 setTimeout(() => {
   document.body.classList.add("!visible");
+  document.body.style.setProperty("overflow-y", "scroll", "important");
 }, 500);

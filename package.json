@@ -1,13 +1,13 @@
 {
   "name": "superflex",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "clean": "node scripts/clean.js && npx prettier --write ."
+    "clean": "node scripts/clean.js --ignore public/scripts/puter.js && npx prettier --write . --ignore-path .prettierignore"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.13",

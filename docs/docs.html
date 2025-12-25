@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="page-title">SuperFlex Documentation</title>
+    <link rel="icon" type="image/svg+xml" href="res/favicon.svg" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap");
+
+      :root {
+        --accent: #a098ff;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Google Sans Flex", sans-serif;
+        font-size: 90%;
+      }
+
+      body {
+        background: #050505;
+        color: #e5e5e5;
+        overflow-x: hidden;
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      /* Markdown Content Styling */
+      .prose {
+        color: #d4d4d4;
+        font-size: 1rem;
+        line-height: 1.8;
+      }
+
+      .prose h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #a098ff;
+        margin-top: 3rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .prose h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #a098ff;
+        margin-top: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      .prose h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: white;
+        margin-top: 2rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .prose p {
+        margin-bottom: 1.5rem;
+        font-size: 14px;
+        color: #a1a1aa;
+      }
+
+      .prose ul,
+      .prose ol {
+        margin-bottom: 1.5rem;
+        padding-left: 1.5rem;
+        list-style: auto;
+        color: #a1a1aa;
+      }
+
+      .prose li {
+        margin-bottom: 0.5rem;
+        font-size: 14px;
+      }
+
+      .prose pre {
+        background: #111;
+        border: 1px solid #222;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1.5rem 0;
+        overflow-x: auto;
+        font-size: 14px;
+      }
+
+      .prose code {
+        background: rgba(160, 152, 255, 0.1);
+        color: #a098ff;
+        padding: 2px 5px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-family: monospace;
+      }
+
+      .prose pre code {
+        background: transparent;
+        color: inherit;
+        padding: 0;
+      }
+
+      .prose blockquote {
+        border-left: 3px solid #333;
+        padding-left: 1rem;
+        font-style: italic;
+        color: #71717a;
+        margin: 1.5rem 0;
+      }
+
+      .prose a {
+        color: #a098ff;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(160, 152, 255, 0.3);
+        transition: all 0.2s;
+      }
+
+      .prose a:hover {
+        border-bottom-color: #a098ff;
+      }
+
+      .prose hr {
+        border: 0;
+        height: 1px;
+        background: transparent;
+        margin: 0;
+      }
+
+      .prose table {
+        width: 100%;
+        margin: 2rem 0;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+
+      .prose th {
+        text-align: left;
+        padding: 0.75rem;
+        border-bottom: 1px solid #333;
+        color: white;
+        font-size: 16px;
+      }
+
+      .prose td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #222;
+        color: #a1a1aa;
+        font-size: 14px;
+      }
+
+      /* Sidebar TOC Logic */
+      .toc-link {
+        display: block;
+        padding: 4px 0;
+        color: #52525b;
+        font-size: 0.9rem;
+        transition: color 0.2s;
+        text-decoration: none;
+        line-height: 1.4;
+      }
+
+      .toc-link:hover,
+      .toc-link.active {
+        color: white;
+      }
+
+      .toc-sub {
+        padding-left: 1rem;
+      }
+
+      /* Hero Image Gradient Mask */
+      .hero-mask {
+        mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+        -webkit-mask-image: linear-gradient(
+          to bottom,
+          black 50%,
+          transparent 100%
+        );
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Standard Navbar from Index -->
+    <nav
+      class="sticky top-5 w-fit mt-10 mx-auto z-50 bg-black/80 backdrop-blur-xl border border-white/10 rounded-full"
+    >
+      <div class="flex items-center justify-between px-4 lg:px-6 py-3">
+        <div class="flex items-center gap-8">
+          <a href="index.html" class="flex items-center shrink-0">
+            <img src="res/logo_sec.svg" alt="Logo" class="h-7 lg:h-8 w-auto" />
+          </a>
+          <div class="hidden lg:flex items-center gap-1">
+            <a
+              href="index.html"
+              class="flex items-center gap-2 px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 text-[13px] font-medium transition-all duration-300"
+              >Home</a
+            >
+            <a
+              href="docs.html?page=guide"
+              id="nav-guide"
+              class="flex items-center gap-2 px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 text-[13px] font-medium transition-all duration-300"
+              >AI Guide</a
+            >
+            <a
+              href="docs.html?page=technical"
+              id="nav-technical"
+              class="flex items-center gap-2 px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 text-[13px] font-medium transition-all duration-300"
+              >Behind the Scenes</a
+            >
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="max-w-[800px] mx-auto px-6 mt-5 pb-24">
+      <!-- Meta Header -->
+      <div class="mb-16 pt-32 text-center">
+        <span
+          id="page-tag"
+          class="inline-block px-3 py-1 bg-white/5 border border-white/10 rounded-md text-[10px] uppercase tracking-wider font-bold text-zinc-400 mb-6"
+          >Guide</span
+        >
+
+        <h1
+          id="hero-title"
+          class="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#a098ff] via-[#a098ff] to-white mb-6 tracking-tight leading-tight"
+        >
+          Loading...
+        </h1>
+
+        <p
+          id="hero-subtitle"
+          class="text-xl text-zinc-400 mb-8 max-w-2xl mx-auto font-normal leading-relaxed"
+        >
+          Please wait...
+        </p>
+      </div>
+
+      <!-- Content Container (Centered, No Sidebar) -->
+      <article id="markdown-content" class="prose min-w-0 mx-auto">
+        <div class="animate-pulse space-y-4">
+          <div class="h-4 bg-white/5 rounded w-3/4"></div>
+          <div class="h-4 bg-white/5 rounded w-full"></div>
+          <div class="h-4 bg-white/5 rounded w-5/6"></div>
+        </div>
+      </article>
+    </main>
+
+    <!-- Footer from Index -->
+    <footer
+      class="py-24 px-4 sm:px-6 relative z-20 border-t border-white/10 overflow-hidden"
+    >
+      <!-- Large Gradient Text Background -->
+      <div
+        class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden"
+      >
+        <h1
+          class="text-[8rem] sm:text-[12rem] md:text-[18rem] lg:text-[24rem] font-black bg-gradient-to-b from-white/5 to-transparent bg-clip-text text-transparent select-none whitespace-nowrap"
+        >
+          SUPERFLEX
+        </h1>
+      </div>
+
+      <div class="max-w-7xl mx-auto relative z-10">
+        <div class="flex flex-col items-center gap-12">
+          <!-- Logo Section -->
+          <div class="flex flex-col items-center gap-6">
+            <div class="group relative">
+              <div
+                class="absolute -inset-4 bg-[#a098ff]/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition duration-700"
+              ></div>
+              <div
+                class="h-20 w-20 bg-black border-8 border-white/5 rounded-[28px] flex items-center justify-center relative z-10"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="80"
+                  height="80"
+                  fill="none"
+                >
+                  <path
+                    fill="#a098ff"
+                    d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
+                    style="
+                      animation: splash 1.5s cubic-bezier(0.165, 0.84, 0.44, 1)
+                        infinite both;
+                      transform-origin: center center;
+                    "
+                  />
+                </svg>
+              </div>
+            </div>
+            <img
+              src="https://theajmalrazaq.github.io/superflex/res/logo.svg"
+              alt="SuperFlex"
+              class="w-64 filter opacity-90"
+            />
+          </div>
+
+          <!-- Tagline -->
+          <p class="text-zinc-400 text-sm font-medium text-center max-w-md">
+            pov: you're tired of flex portal being mid 🗿 (we gotchu fam) 💯
+          </p>
+
+          <!-- Social Links -->
+          <div class="flex gap-4">
+            <a
+              href="https://github.com/theajmalrazaq/superflex"
+              target="_blank"
+              class="p-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#a098ff]/30 text-zinc-400 hover:text-[#a098ff] transition-all"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+                />
+              </svg>
+            </a>
+            <a
+              href="https://superflex.fr"
+              target="_blank"
+              class="p-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#a098ff]/30 text-zinc-400 hover:text-[#a098ff] transition-all"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+              </svg>
+            </a>
+          </div>
+
+          <!-- Copyright -->
+          <div class="text-center pt-8 border-t border-white/5 w-full">
+            <p class="text-zinc-600 text-xs font-medium">
+              © 2024 superflex • free forever fr fr ✨
+            </p>
+            <p class="text-zinc-700 text-xs mt-2">
+              coded with ☕ + 🎧 by
+              <a
+                href="https://github.com/theajmalrazaq"
+                target="_blank"
+                class="text-zinc-500 hover:text-[#a098ff] transition-colors"
+                >ajmal</a
+              >
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Page Config
+      const urlParams = new URLSearchParams(window.location.search);
+      const page = urlParams.get("page") || "guide";
+
+      const pages = {
+        guide: {
+          file: "articles/superflexai.md",
+          tag: "Guide",
+          title: "SuperFlex AI Guide",
+          subtitle:
+            "A comprehensive guide to unlocking the full potential of SuperFlex AI models with advanced prompting techniques.",
+          image: "res/prompt.png",
+        },
+        technical: {
+          file: "articles/bts.md",
+          tag: "Technical",
+          title: "Behind the Scenes",
+          subtitle:
+            'A deep dive into the engineering decisions, "Parasitic Overlay" pattern, and security implementations.',
+          image: "res/bts.png",
+        },
+      };
+
+      const currentPage = pages[page] || pages.guide;
+
+      // Update Nav State
+      const setActiveNav = (id) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.classList.remove(
+            "text-zinc-400",
+            "hover:text-white",
+            "hover:bg-white/5",
+          );
+          el.classList.add(
+            "bg-[#a098ff]/10",
+            "text-[#a098ff]",
+            "border",
+            "border-white/10",
+          );
+        }
+      };
+
+      if (page === "guide") setActiveNav("nav-guide");
+      if (page === "technical") setActiveNav("nav-technical");
+
+      // Init UI
+      document.getElementById("page-tag").textContent = currentPage.tag;
+      document.getElementById("hero-title").textContent = currentPage.title;
+      document.getElementById("hero-subtitle").textContent =
+        currentPage.subtitle;
+
+      // Set Header Background
+      if (currentPage.image) {
+        const bgContainer = document.createElement("div");
+        bgContainer.className =
+          "absolute top-0 left-0 w-full h-[800px] z-0 overflow-hidden pointer-events-none select-none";
+
+        // The image element
+        const bgImage = document.createElement("div");
+        bgImage.className = "w-full h-full opacity-10";
+        bgImage.style.backgroundImage = `url(${currentPage.image})`;
+        bgImage.style.backgroundSize = "cover";
+        bgImage.style.backgroundPosition = "center top";
+        bgImage.style.backgroundRepeat = "no-repeat";
+
+        // The mask (fade to black at bottom and sides)
+        bgImage.style.maskImage =
+          "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0) 100%)";
+        bgImage.style.webkitMaskImage =
+          "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0) 100%)";
+
+        bgContainer.appendChild(bgImage);
+
+        // Append to body as first child to be behind everything
+        document.body.prepend(bgContainer);
+      }
+
+      // Feature: Generate TOC (Disabled: Sidebar removed)
+      const generateTOC = () => {
+        // Sidebar removed.
+        const content = document.getElementById("markdown-content");
+
+        // Calculate read time based on word count
+        if (content) {
+          const wordCount = content.innerText.split(/\s+/).length;
+          const readTime = Math.ceil(wordCount / 200);
+          const rtEl = document.getElementById("read-time");
+          if (rtEl) rtEl.textContent = `${readTime} min read`;
+        }
+      };
+
+      // Load Content
+      async function loadContent() {
+        try {
+          const response = await fetch(currentPage.file);
+          if (!response.ok) throw new Error("File not found");
+          const text = await response.text();
+
+          // Clean up frontmatter if exists
+          const cleanText = text.replace(/^---[\s\S]*?---\n/, "");
+
+          document.getElementById("markdown-content").innerHTML =
+            marked.parse(cleanText);
+
+          requestAnimationFrame(() => {
+            generateTOC();
+          });
+        } catch (e) {
+          console.error(e);
+          document.getElementById("markdown-content").innerHTML = `
+               <div class="p-4 border border-red-500/20 bg-red-500/10 rounded-lg text-red-400">
+                  Failed to load content: ${e.message}
+               </div>
+            `;
+        }
+      }
+
+      loadContent();
+    </script>
+  </body>
+</html>
