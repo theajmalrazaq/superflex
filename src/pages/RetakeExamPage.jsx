@@ -41,7 +41,7 @@ const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
             <h2 className="text-xl font-black text-white tracking-tight">
               Request Details
             </h2>
-            <p className="text-[#a098ff] text-[9px] font-black uppercase tracking-widest">
+            <p className="text-x text-[9px] font-black uppercase tracking-widest">
               Retake Exam Submission
             </p>
           </div>
@@ -69,7 +69,7 @@ const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
             </label>
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="group relative border-2 border-dashed border-white/5 hover:border-[#a098ff]/30 rounded-2xl p-4 transition-all cursor-pointer bg-white/[0.02] hover:bg-white/[0.04]"
+              className="group relative border-2 border-dashed border-white/5 hover:border-x/30 rounded-2xl p-4 transition-all cursor-pointer bg-white/[0.02] hover:bg-white/[0.04]"
             >
               <input
                 type="file"
@@ -79,7 +79,7 @@ const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
                 className="hidden"
               />
               <div className="flex flex-col items-center gap-2 text-center">
-                <div className="p-3 bg-[#a098ff]/10 rounded-xl text-[#a098ff] group-hover:scale-110 transition-transform">
+                <div className="p-3 bg-x/10 rounded-xl text-x group-hover:scale-110 transition-transform">
                   <Upload size={18} />
                 </div>
                 <div className="space-y-0.5">
@@ -104,7 +104,7 @@ const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               placeholder="Provide details..."
-              className="w-full bg-white/[0.02] border border-white/5 text-white p-4 rounded-2xl text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#a098ff]/30 transition-all min-h-[80px] resize-none"
+              className="w-full bg-white/[0.02] border border-white/5 text-white p-4 rounded-2xl text-xs font-medium focus:outline-none focus:ring-1 focus:ring-x/30 transition-all min-h-[80px] resize-none"
             />
           </div>
         </div>
@@ -112,7 +112,7 @@ const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
         <button
           onClick={() => onSubmit(file, remarks)}
           disabled={!file || !remarks}
-          className="w-full bg-[#a098ff] hover:bg-[#b0a8ff] disabled:bg-zinc-800 disabled:text-zinc-600 text-white px-6 py-4 rounded-xl font-bold uppercase"
+          className="w-full bg-x hover:bg-[#b0a8ff] disabled:bg-zinc-800 disabled:text-zinc-600 text-white px-6 py-4 rounded-xl font-bold uppercase"
         >
           Confirm & Submit Request
         </button>
@@ -136,7 +136,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
             <h2 className="text-lg font-black text-white tracking-tight">
               Rules & Procedures
             </h2>
-            <p className="text-[#a098ff] text-[9px] font-black uppercase tracking-[0.2em]">
+            <p className="text-x text-[9px] font-black uppercase tracking-[0.2em]">
               Exam Framework
             </p>
           </div>
@@ -151,7 +151,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
         <div className="p-5 overflow-y-auto scrollbar-hide flex-1 space-y-6 text-left">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-1 h-4 bg-[#a098ff] rounded-full"></div>
+              <div className="w-1 h-4 bg-x rounded-full"></div>
               <h3 className="text-sm font-black text-white uppercase tracking-wider">
                 Eligible Situations
               </h3>
@@ -183,7 +183,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
 
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-1 h-4 bg-[#a098ff] rounded-full"></div>
+              <div className="w-1 h-4 bg-x rounded-full"></div>
               <h3 className="text-sm font-black text-white uppercase tracking-wider">
                 Submission Protocol
               </h3>
@@ -199,7 +199,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
                   key={i}
                   className="flex gap-3 p-2 rounded-lg hover:bg-white/[0.02] transition-colors group"
                 >
-                  <div className="w-5 h-5 rounded-full bg-[#a098ff]/10 border border-[#a098ff]/20 flex items-center justify-center text-[#a098ff] text-[9px] font-black shrink-0">
+                  <div className="w-5 h-5 rounded-full bg-x/10 border border-x/20 flex items-center justify-center text-x text-[9px] font-black shrink-0">
                     {i + 1}
                   </div>
                   <p className="text-[11px] text-zinc-400 font-medium leading-relaxed">
@@ -230,13 +230,13 @@ const RetakeCourseCard = ({ course, isSelected, onToggle, index }) => {
       onClick={onToggle}
       className={`group cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border transition-all duration-300 gap-4 ${
         isSelected
-          ? "bg-[#a098ff]/10 border-[#a098ff]/50"
+          ? "bg-x/10 border-x/50"
           : "bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5"
       }`}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">
         <span
-          className={`font-bold text-xs min-w-[1.2rem] ${isSelected ? "text-[#a098ff]" : "text-zinc-600"}`}
+          className={`font-bold text-xs min-w-[1.2rem] ${isSelected ? "text-x" : "text-zinc-600"}`}
         >
           {index}.
         </span>
@@ -244,7 +244,7 @@ const RetakeCourseCard = ({ course, isSelected, onToggle, index }) => {
         <div
           className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 transition-all duration-300 ${
             isSelected
-              ? "bg-[#a098ff]/20 border-[#a098ff]/30 text-[#a098ff] scale-105"
+              ? "bg-x/20 border-x/30 text-x scale-105"
               : "bg-zinc-800/50 border-white/5 text-zinc-500"
           }`}
         >
@@ -253,7 +253,7 @@ const RetakeCourseCard = ({ course, isSelected, onToggle, index }) => {
 
         <div className="flex flex-col gap-0.5 min-w-0 flex-1">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-[10px] font-black text-[#a098ff] uppercase tracking-tighter opacity-80 shrink-0">
+            <span className="text-[10px] font-black text-x uppercase tracking-tighter opacity-80 shrink-0">
               {course.code}
             </span>
             <h4 className="text-white font-bold text-sm leading-tight truncate">
@@ -278,7 +278,7 @@ const RetakeCourseCard = ({ course, isSelected, onToggle, index }) => {
         <div
           className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
             isSelected
-              ? "bg-[#a098ff] border-[#a098ff] text-zinc-950 scale-110"
+              ? "bg-x border-x text-zinc-950 scale-110"
               : "border-zinc-700 bg-transparent"
           }`}
         >
@@ -312,7 +312,7 @@ const ExamTypeSelector = ({ types, selectedValue, onSelect }) => {
         className="w-full md:w-[280px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-zinc-900/50 border border-white/5 text-white hover:bg-white/5 transition-all group"
       >
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="p-2 rounded-xl bg-[#a098ff]/10 text-[#a098ff]">
+          <div className="p-2 rounded-xl bg-x/10 text-x">
             <Layout size={16} />
           </div>
           <span className="text-sm font-bold truncate">
@@ -337,7 +337,7 @@ const ExamTypeSelector = ({ types, selectedValue, onSelect }) => {
                 }}
                 className={`w-full flex bg-zinc-900 items-center justify-between p-3 rounded-xl transition-all ${
                   selectedValue === type.value
-                    ? "bg-[#a098ff]/10 border border-[#a098ff]/20"
+                    ? "bg-x/10 border border-x/20"
                     : "hover:bg-white/5 border border-transparent"
                 }`}
               >
@@ -660,7 +660,7 @@ function RetakeExamPage() {
         />
 
         {}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
 
         <PageHeader
           title="Retake Exam"
@@ -696,11 +696,7 @@ function RetakeExamPage() {
             label="Selected"
             value={selectedCourses.size}
             delay={200}
-            className={
-              selectedCourses.size > 0
-                ? "!bg-[#a098ff]/10 !border-[#a098ff]/20"
-                : ""
-            }
+            className={selectedCourses.size > 0 ? "!bg-x/10 !border-x/20" : ""}
           />
           <StatsCard
             icon={ShieldCheck}
@@ -780,7 +776,7 @@ function RetakeExamPage() {
                     <select
                       value={selectedReason}
                       onChange={(e) => handleReasonChange(e.target.value)}
-                      className="w-full appearance-none bg-zinc-800/50 border border-white/5 text-white px-5 py-4 rounded-2xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#a098ff]/50 transition-all cursor-pointer pr-12"
+                      className="w-full appearance-none bg-zinc-800/50 border border-white/5 text-white px-5 py-4 rounded-2xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-x/50 transition-all cursor-pointer pr-12"
                     >
                       {reasons.map((reason, idx) => (
                         <option key={idx} value={reason.value}>
@@ -795,9 +791,9 @@ function RetakeExamPage() {
                   </div>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-[#a098ff]/5 border border-[#a098ff]/10 space-y-4">
+                <div className="p-5 rounded-2xl bg-x/5 border border-x/10 space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-[#a098ff]/10 rounded-lg text-[#a098ff]">
+                    <div className="p-2 bg-x/10 rounded-lg text-x">
                       <ShieldCheck size={18} />
                     </div>
                     <h4 className="text-sm font-bold text-white">
@@ -831,7 +827,7 @@ function RetakeExamPage() {
                   onClick={handleInitiateRequest}
                   className={`w-full group flex items-center justify-between px-6 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all duration-300 ${
                     selectedCourses.size > 0
-                      ? "bg-[#a098ff] text-zinc-950 hover:bg-[#b0a8ff]"
+                      ? "bg-x text-zinc-950 hover:bg-[#b0a8ff]"
                       : "bg-zinc-800 text-zinc-600 cursor-not-allowed"
                   }`}
                 >
@@ -847,7 +843,7 @@ function RetakeExamPage() {
                   onClick={handleDownloadForm}
                   className={`w-full group flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all duration-300 border ${
                     selectedCourses.size > 0
-                      ? "border-[#a098ff]/30 text-[#a098ff] hover:bg-[#a098ff]/5"
+                      ? "border-x/30 text-x hover:bg-x/5"
                       : "border-white/5 text-zinc-600 cursor-not-allowed"
                   }`}
                 >

@@ -173,8 +173,8 @@ function FeeChallanPage() {
             text: (
               <>
                 Select Bill Payment / Payments and then select{" "}
-                <span className="text-[#a098ff] font-bold">'kuickpay'</span>{" "}
-                from given categories
+                <span className="text-x font-bold">'kuickpay'</span> from given
+                categories
               </>
             ),
           },
@@ -198,8 +198,8 @@ function FeeChallanPage() {
         ].map((item, idx) => (
           <div key={idx} className="flex gap-4">
             <div className="mt-1">
-              <div className="w-5 h-5 rounded-full border border-[#a098ff]/50 flex items-center justify-center shrink-0">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#a098ff]/20"></div>
+              <div className="w-5 h-5 rounded-full border border-x/50 flex items-center justify-center shrink-0">
+                <div className="w-1.5 h-1.5 rounded-full bg-x/20"></div>
               </div>
             </div>
             <div className="space-y-1">
@@ -214,7 +214,7 @@ function FeeChallanPage() {
 
       <div className="space-y-6 pt-2">
         <div className="space-y-4">
-          <p className="text-[10px] text-[#a098ff] font-black uppercase tracking-[0.2em]">
+          <p className="text-[10px] text-x font-black uppercase tracking-[0.2em]">
             * Supported Banks
           </p>
           <p className="text-[11px] text-zinc-500 leading-relaxed font-medium">
@@ -282,7 +282,7 @@ function FeeChallanPage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-4 md:p-8 space-y-10 relative z-10">
         {}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
         <PageHeader
@@ -301,7 +301,7 @@ function FeeChallanPage() {
               </h4>
             </div>
             <div className="w-px h-8 bg-white/10 mx-2"></div>
-            <Receipt className="text-[#a098ff]" size={24} />
+            <Receipt className="text-x" size={24} />
           </div>
         </PageHeader>
 
@@ -402,13 +402,13 @@ function FeeChallanPage() {
                         </td>
                         <td className="px-6 py-5">
                           <div className="flex flex-col">
-                            <span className="text-white font-bold group-hover:text-[#a098ff] transition-colors font-sans">
+                            <span className="text-white font-bold group-hover:text-x transition-colors font-sans">
                               {c.description}
                             </span>
                             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
                               <span className="flex items-center gap-1.5 text-[10px] text-zinc-500 font-bold uppercase tracking-tight font-sans whitespace-nowrap">
                                 <div className="p-1 bg-zinc-800/50 rounded-md">
-                                  <Clock size={10} className="text-[#a098ff]" />
+                                  <Clock size={10} className="text-x" />
                                 </div>
                                 Issued:{" "}
                                 <span className="text-zinc-400">
@@ -464,7 +464,7 @@ function FeeChallanPage() {
                             )}
                             <button
                               onClick={() => handlePrint(c.challanNo)}
-                              className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:bg-[#a098ff] hover:border-[#a098ff] transition-all group/btn disabled:opacity-30 disabled:cursor-not-allowed"
+                              className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:bg-x hover:border-x transition-all group/btn disabled:opacity-30 disabled:cursor-not-allowed"
                               title="Download/Print Challan"
                               disabled={!c.challanNo}
                             >
@@ -493,7 +493,7 @@ function FeeChallanPage() {
                         <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">
                           DESCRIPTION
                         </p>
-                        <h4 className="text-lg font-black text-[#a098ff] leading-tight">
+                        <h4 className="text-lg font-black text-x leading-tight">
                           {c.description}
                         </h4>
                       </div>
@@ -511,7 +511,7 @@ function FeeChallanPage() {
                     <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
                       <div className="space-y-1.5">
                         <div className="flex items-center gap-1.5 text-[9px] text-zinc-500 font-black uppercase tracking-widest">
-                          <Clock size={10} className="text-[#a098ff]" />
+                          <Clock size={10} className="text-x" />
                           ISSUED
                         </div>
                         <p className="text-xs font-bold text-white ml-4">
@@ -549,7 +549,7 @@ function FeeChallanPage() {
                         )}
                         <button
                           onClick={() => handlePrint(c.challanNo)}
-                          className="p-3.5 rounded-2xl bg-[#a098ff]/10 border border-[#a098ff]/20 text-[#a098ff] active:scale-95 transition-all disabled:opacity-30"
+                          className="p-3.5 rounded-2xl bg-x/10 border border-x/20 text-x active:scale-95 transition-all disabled:opacity-30"
                           disabled={!c.challanNo}
                         >
                           <Printer size={20} />
@@ -575,16 +575,16 @@ function FeeChallanPage() {
 
           {}
           <div className="space-y-6">
-            <div className="bg-[#a098ff]/5 border border-[#a098ff]/10 backdrop-blur-2xl rounded-[2.5rem] p-8">
+            <div className="bg-x/5 border border-x/10 backdrop-blur-2xl rounded-[2.5rem] p-8">
               <div className="flex items-center gap-3 mb-8 border-b border-white/5 pb-6">
-                <div className="p-3 bg-[#a098ff]/10 rounded-xl text-[#a098ff]">
+                <div className="p-3 bg-x/10 rounded-xl text-x">
                   <Printer size={20} />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-white tracking-tight font-sans">
                     Payment Portal
                   </h3>
-                  <p className="text-[10px] text-[#a098ff] font-bold uppercase tracking-widest font-sans underline decoration-[#a098ff]/30 underline-offset-4">
+                  <p className="text-[10px] text-x font-bold uppercase tracking-widest font-sans underline decoration-x/30 underline-offset-4">
                     Legal Roadmap
                   </p>
                 </div>

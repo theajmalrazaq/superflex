@@ -325,7 +325,7 @@ function GradeChangePage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-4 md:p-8 space-y-8 relative z-10">
         {}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
         <PageHeader
@@ -346,7 +346,7 @@ function GradeChangePage() {
                 onClick={handleOpenRequestModal}
                 className={`flex items-center gap-2 px-6 py-3 rounded-full font-black uppercase text-[10px] tracking-widest transition-all  ${
                   selectedIds.length > 0
-                    ? "bg-[#a098ff] hover:bg-[#a098ff]/90 text-zinc-950 animate-pulse"
+                    ? "bg-x hover:bg-x/90 text-zinc-950 animate-pulse"
                     : "bg-zinc-800 text-zinc-500 border border-white/5 opacity-50 cursor-not-allowed"
                 }`}
               >
@@ -401,7 +401,7 @@ function GradeChangePage() {
           <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-4 md:p-8 overflow-hidden">
             <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/5">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-[#a098ff]/10 rounded-xl text-[#a098ff]">
+                <div className="p-3 bg-x/10 rounded-xl text-x">
                   <Layout size={20} />
                 </div>
                 <h3 className="text-xl font-bold text-white tracking-tight">
@@ -419,7 +419,7 @@ function GradeChangePage() {
                         <input
                           type="checkbox"
                           onChange={(e) => handleSelectAll(e.target.checked)}
-                          className="w-4 h-4 rounded border-white/10 bg-white/5 checked:bg-[#a098ff] transition-all cursor-pointer"
+                          className="w-4 h-4 rounded border-white/10 bg-white/5 checked:bg-x transition-all cursor-pointer"
                         />
                       )}
                     </th>
@@ -447,7 +447,7 @@ function GradeChangePage() {
                   {requests.map((req, idx) => (
                     <tr
                       key={idx}
-                      className={`group hover:bg-white/[0.02] transition-colors ${selectedIds.includes(req.checkboxId) ? "bg-[#a098ff]/5" : ""}`}
+                      className={`group hover:bg-white/[0.02] transition-colors ${selectedIds.includes(req.checkboxId) ? "bg-x/5" : ""}`}
                     >
                       <td className="py-4 px-4 text-center">
                         {req.checkboxId && (
@@ -457,7 +457,7 @@ function GradeChangePage() {
                             onChange={() =>
                               handleCheckboxToggle(req.checkboxId)
                             }
-                            className="w-4 h-4 rounded border-white/10 bg-white/5 checked:bg-[#a098ff] transition-all cursor-pointer"
+                            className="w-4 h-4 rounded border-white/10 bg-white/5 checked:bg-x transition-all cursor-pointer"
                           />
                         )}
                       </td>
@@ -480,7 +480,7 @@ function GradeChangePage() {
                         </span>
                       </td>
                       <td className="py-4 px-4 text-center">
-                        <span className="px-3 py-1.5 rounded-lg bg-[#a098ff]/10 text-[#a098ff] font-black text-xs">
+                        <span className="px-3 py-1.5 rounded-lg bg-x/10 text-x font-black text-xs">
                           {req.grade}
                         </span>
                       </td>
@@ -513,7 +513,7 @@ function GradeChangePage() {
                   <input
                     type="checkbox"
                     onChange={(e) => handleSelectAll(e.target.checked)}
-                    className="w-5 h-5 rounded-lg border-white/10 bg-white/5 checked:bg-[#a098ff] transition-all cursor-pointer"
+                    className="w-5 h-5 rounded-lg border-white/10 bg-white/5 checked:bg-x transition-all cursor-pointer"
                   />
                   <span className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.15em]">
                     Select All Courses
@@ -528,7 +528,7 @@ function GradeChangePage() {
                   }
                   className={`p-5 rounded-[2rem] border transition-all duration-300 ${
                     selectedIds.includes(req.checkboxId)
-                      ? "bg-[#a098ff]/10 border-[#a098ff]/30"
+                      ? "bg-x/10 border-x/30"
                       : "bg-white/[0.02] border-white/5 hover:border-white/10"
                   }`}
                 >
@@ -539,7 +539,7 @@ function GradeChangePage() {
                           type="checkbox"
                           checked={selectedIds.includes(req.checkboxId)}
                           readOnly
-                          className="w-5 h-5 rounded-lg border-white/10 bg-white/5 checked:bg-[#a098ff] transition-all cursor-pointer"
+                          className="w-5 h-5 rounded-lg border-white/10 bg-white/5 checked:bg-x transition-all cursor-pointer"
                         />
                       ) : (
                         <div className="w-5 h-5 rounded-lg bg-zinc-800/50 flex items-center justify-center">
@@ -601,7 +601,7 @@ function GradeChangePage() {
                       <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">
                         Initial Grade
                       </span>
-                      <span className="px-4 py-1.5 rounded-xl bg-[#a098ff]/10 text-[#a098ff] font-black text-sm">
+                      <span className="px-4 py-1.5 rounded-xl bg-x/10 text-x font-black text-sm">
                         {req.grade}
                       </span>
                     </div>

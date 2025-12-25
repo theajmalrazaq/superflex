@@ -117,7 +117,7 @@ function ChangePasswordPage() {
       headerDiv.className = "space-y-2";
       headerDiv.innerHTML = `
           <h3 class="text-xl font-bold text-white flex items-center gap-3">
-              <div class="p-2 rounded-lg bg-[#a098ff]/10 text-[#a098ff]">
+              <div class="p-2 rounded-lg bg-x/10 text-x">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
               </div>
               Update Password
@@ -156,9 +156,9 @@ function ChangePasswordPage() {
               "!px-4",
               "!transition-all",
               "!duration-300",
-              "!focus:border-[#a098ff]/50",
+              "!focus:border-x/50",
               "!focus:ring-4",
-              "!focus:ring-[#a098ff]/10",
+              "!focus:ring-x/10",
               "!focus:outline-none",
               "!w-full",
               "!h-[50px]",
@@ -245,7 +245,7 @@ function ChangePasswordPage() {
           submitButton.appendChild(buttonContent);
 
           submitButton.classList.add(
-            "!bg-[#a098ff]",
+            "!bg-x",
             "hover:!bg-[#8f86ff]",
             "!text-white",
             "!font-bold",
@@ -307,8 +307,8 @@ function ChangePasswordPage() {
             </ul>
         </div>
 
-         <div class="p-6 rounded-2xl bg-[#a098ff]/5 border border-[#a098ff]/10 space-y-3">
-            <h4 class="text-[#a098ff] font-bold flex items-center gap-2 text-sm uppercase tracking-wide">
+         <div class="p-6 rounded-2xl bg-x/5 border border-x/10 space-y-3">
+            <h4 class="text-x font-bold flex items-center gap-2 text-sm uppercase tracking-wide">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
                 Security Tip
             </h4>
@@ -339,7 +339,7 @@ function ChangePasswordPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
       <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
       <div className="w-full p-4 md:p-8 space-y-10 relative z-10">
@@ -355,7 +355,7 @@ function ChangePasswordPage() {
           />
         ) : (
           <div className="flex items-center justify-center p-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#a098ff]"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-x"></div>
           </div>
         )}
       </div>

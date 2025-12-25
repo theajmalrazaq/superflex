@@ -66,7 +66,7 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
             <h2 className="text-xl font-black text-white tracking-tight">
               Withdrawal Intake
             </h2>
-            <p className="text-[#a098ff] text-[9px] font-black uppercase tracking-widest">
+            <p className="text-x text-[9px] font-black uppercase tracking-widest">
               Complete Documentation Required
             </p>
           </div>
@@ -78,11 +78,11 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
           </button>
         </div>
 
-        <div className="p-3 rounded-xl bg-[#a098ff]/5 border border-[#a098ff]/10 flex items-center gap-3">
-          <div className="p-1.5 bg-[#a098ff]/20 rounded-lg text-[#a098ff]">
+        <div className="p-3 rounded-xl bg-x/5 border border-x/10 flex items-center gap-3">
+          <div className="p-1.5 bg-x/20 rounded-lg text-x">
             <Info size={14} />
           </div>
-          <p className="text-[10px] font-bold text-[#a098ff]/90 leading-tight">
+          <p className="text-[10px] font-bold text-x/90 leading-tight">
             Important: Uploaded images must be under 650KB each.
           </p>
         </div>
@@ -99,7 +99,7 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
                   {input.label}
                 </label>
                 <div
-                  className="group relative border-2 border-dashed border-white/5 hover:border-[#a098ff]/30 rounded-2xl p-4 transition-all cursor-pointer bg-white/[0.02] hover:bg-white/[0.04] overflow-hidden"
+                  className="group relative border-2 border-dashed border-white/5 hover:border-x/30 rounded-2xl p-4 transition-all cursor-pointer bg-white/[0.02] hover:bg-white/[0.04] overflow-hidden"
                   onClick={() =>
                     document.getElementById(`file-${input.key}`).click()
                   }
@@ -114,7 +114,7 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
                     }
                   />
                   <div className="flex items-center gap-4">
-                    <div className="p-3 bg-white/5 rounded-xl text-zinc-400 group-hover:text-[#a098ff] group-hover:bg-[#a098ff]/10 transition-all">
+                    <div className="p-3 bg-white/5 rounded-xl text-zinc-400 group-hover:text-x group-hover:bg-x/10 transition-all">
                       <input.icon size={18} />
                     </div>
                     <div className="space-y-0.5 flex-1 min-w-0">
@@ -143,7 +143,7 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
               placeholder="Provide a detailed reason..."
-              className="w-full bg-white/[0.02] border border-white/5 text-white p-4 rounded-2xl text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#a098ff]/30 transition-all min-h-[100px] resize-none"
+              className="w-full bg-white/[0.02] border border-white/5 text-white p-4 rounded-2xl text-xs font-medium focus:outline-none focus:ring-1 focus:ring-x/30 transition-all min-h-[100px] resize-none"
             />
           </div>
         </div>
@@ -151,7 +151,7 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
         <button
           onClick={() => onSubmit({ remarks, files })}
           disabled={!isFormValid}
-          className="w-full bg-[#a098ff] hover:bg-[#8f86ff] disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-950 px-6 py-4 rounded-xl font-white uppercase text-[10px] flex items-center justify-center gap-2"
+          className="w-full bg-x hover:bg-[#8f86ff] disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-950 px-6 py-4 rounded-xl font-white uppercase text-[10px] flex items-center justify-center gap-2"
         >
           <Send size={16} />
           Confirm & Submit Request
@@ -176,7 +176,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
             <h2 className="text-lg font-black text-white tracking-tight">
               Rules & Procedures
             </h2>
-            <p className="text-[#a098ff] text-[9px] font-black uppercase tracking-[0.2em]">
+            <p className="text-x text-[9px] font-black uppercase tracking-[0.2em]">
               Withdrawal Framework
             </p>
           </div>
@@ -191,7 +191,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
         <div className="p-5 overflow-y-auto scrollbar-hide flex-1 space-y-6 text-left scrollbar-hide">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-1 h-4 bg-[#a098ff] rounded-full"></div>
+              <div className="w-1 h-4 bg-x rounded-full"></div>
               <h3 className="text-sm font-black text-white uppercase tracking-wider">
                 Mandatory Documents
               </h3>
@@ -220,7 +220,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
 
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-1 h-4 bg-[#a098ff] rounded-full"></div>
+              <div className="w-1 h-4 bg-x rounded-full"></div>
               <h3 className="text-sm font-black text-white uppercase tracking-wider">
                 Submission Protocol
               </h3>
@@ -236,7 +236,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
                   key={i}
                   className="flex gap-3 p-2 rounded-lg hover:bg-white/[0.02] transition-colors group"
                 >
-                  <div className="w-5 h-5 rounded-full bg-[#a098ff]/10 border border-[#a098ff]/20 flex items-center justify-center text-[#a098ff] text-[9px] font-black shrink-0">
+                  <div className="w-5 h-5 rounded-full bg-x/10 border border-x/20 flex items-center justify-center text-x text-[9px] font-black shrink-0">
                     {i + 1}
                   </div>
                   <p className="text-[11px] text-zinc-400 font-medium leading-relaxed">
@@ -269,13 +269,13 @@ const WithdrawalCourseCard = ({ course, isSelected, onToggle, index }) => {
         course.canSelect ? "cursor-pointer" : "cursor-not-allowed opacity-60"
       } ${
         isSelected
-          ? "bg-[#a098ff]/10 border-[#a098ff]/50"
+          ? "bg-x/10 border-x/50"
           : "bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5"
       }`}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">
         <span
-          className={`font-bold text-xs min-w-[1.2rem] ${isSelected ? "text-[#a098ff]" : "text-zinc-600"}`}
+          className={`font-bold text-xs min-w-[1.2rem] ${isSelected ? "text-x" : "text-zinc-600"}`}
         >
           {index}.
         </span>
@@ -283,7 +283,7 @@ const WithdrawalCourseCard = ({ course, isSelected, onToggle, index }) => {
         <div
           className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 transition-all duration-300 ${
             isSelected
-              ? "bg-[#a098ff]/20 border-[#a098ff]/30 text-[#a098ff] scale-105"
+              ? "bg-x/20 border-x/30 text-x scale-105"
               : "bg-zinc-800/50 border-white/5 text-zinc-500"
           }`}
         >
@@ -292,7 +292,7 @@ const WithdrawalCourseCard = ({ course, isSelected, onToggle, index }) => {
 
         <div className="flex flex-col gap-0.5 min-w-0 flex-1">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-[10px] font-black text-[#a098ff] uppercase tracking-tighter opacity-80 shrink-0">
+            <span className="text-[10px] font-black text-x uppercase tracking-tighter opacity-80 shrink-0">
               {course.code}
             </span>
             <h4 className="text-white font-bold text-sm leading-tight truncate">
@@ -325,7 +325,7 @@ const WithdrawalCourseCard = ({ course, isSelected, onToggle, index }) => {
         <div
           className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
             isSelected
-              ? "bg-[#a098ff] border-[#a098ff] text-zinc-950 scale-110"
+              ? "bg-x border-x text-zinc-950 scale-110"
               : "border-zinc-700 bg-transparent"
           }`}
         >
@@ -598,7 +598,7 @@ function CourseWithdrawPage() {
         />
 
         {}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
 
         <PageHeader
           title="Course Withdraw"
@@ -693,9 +693,9 @@ function CourseWithdrawPage() {
           <div className="space-y-6">
             <div className="bg-zinc-900/50 border border-white/5 backdrop-blur-xl rounded-[2.5rem] p-8 space-y-8 sticky top-8">
               <div className="space-y-6">
-                <div className="p-5 rounded-2xl bg-[#a098ff]/5 border border-[#a098ff]/10 space-y-4">
+                <div className="p-5 rounded-2xl bg-x/5 border border-x/10 space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-[#a098ff]/10 rounded-lg text-[#a098ff]">
+                    <div className="p-2 bg-x/10 rounded-lg text-x">
                       <ShieldCheck size={18} />
                     </div>
                     <h4 className="text-sm font-bold text-white tracking-tight">
@@ -721,7 +721,7 @@ function CourseWithdrawPage() {
                       <span className="text-zinc-400 text-[10px] font-black uppercase tracking-widest">
                         Permanent Impact
                       </span>
-                      <span className="text-[#a098ff] font-black text-xs uppercase tracking-widest">
+                      <span className="text-x font-black text-xs uppercase tracking-widest">
                         Yes
                       </span>
                     </div>
@@ -755,7 +755,7 @@ function CourseWithdrawPage() {
               </div>
 
               <div className="pt-4 border-t border-white/5 space-y-4">
-                <div className="flex items-center gap-3 px-1 text-[#a098ff]">
+                <div className="flex items-center gap-3 px-1 text-x">
                   <Zap size={14} />
                   <span className="text-[10px] font-black uppercase tracking-widest">
                     Quick Tool

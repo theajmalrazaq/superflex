@@ -145,7 +145,7 @@ function CourseRegistrationPage() {
                     className="bg-zinc-900/40 rounded-[2.5rem] p-8 backdrop-blur-xl border border-white/5"
                   >
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="p-3 bg-[#a098ff]/10 rounded-xl text-[#a098ff]">
+                      <div className="p-3 bg-x/10 rounded-xl text-x">
                         <Layers size={24} />
                       </div>
                       <h3 className="text-xl font-bold text-white">
@@ -181,7 +181,7 @@ function CourseRegistrationPage() {
                                   {}
                                   <div
                                     dangerouslySetInnerHTML={{ __html: cell }}
-                                    className="[&>a]:text-[#a098ff] [&>a]:hover:underline [&>button]:bg-[#a098ff] [&>button]:text-white [&>button]:px-3 [&>button]:py-1 [&>button]:rounded-lg [&>button]:text-xs [&>button]:font-bold"
+                                    className="[&>a]:text-x [&>a]:hover:underline [&>button]:bg-x [&>button]:text-white [&>button]:px-3 [&>button]:py-1 [&>button]:rounded-lg [&>button]:text-xs [&>button]:font-bold"
                                   />
                                 </td>
                               ))}

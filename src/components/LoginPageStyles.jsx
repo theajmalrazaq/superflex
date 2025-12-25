@@ -91,7 +91,7 @@ function LoginPageStyles() {
         "!h-[48px]",
         "!px-5",
         "!w-full",
-        "focus:!border-[#a098ff]/30",
+        "focus:!border-x/30",
         "focus:!bg-white/[0.08]",
         "!transition-all",
         "!duration-300",
@@ -108,7 +108,7 @@ function LoginPageStyles() {
 
     document.querySelectorAll(".btn-primary").forEach((button) => {
       button.classList.add(
-        "!bg-[#a098ff]",
+        "!bg-x",
         "!text-white",
         "!uppercase",
         "!border-none",
@@ -179,7 +179,7 @@ function LoginPageStyles() {
         header.className = "login-header w-full text-left mb-8 space-y-1";
         header.innerHTML = `
           <h2 class="text-2xl font-black text-white tracking-tight">Welcome Back</h2>
-          <p class="text-[#a098ff] text-[10px] font-black uppercase tracking-widest">Access your portal with style</p>
+          <p class="text-x text-[10px] font-black uppercase tracking-widest">Access your portal with style</p>
         `;
         bglogin.insertBefore(header, bglogin.firstChild);
       }
@@ -279,7 +279,7 @@ function LoginPageStyles() {
       forgotPasswordLink.href = "#";
       forgotPasswordLink.textContent = "Forgot Password?";
       forgotPasswordLink.classList.add(
-        "!text-[#a098ff]",
+        "!text-x",
         "hover:!text-[#8f86ff]",
         "!text-sm",
         "!cursor-pointer",
@@ -295,7 +295,7 @@ function LoginPageStyles() {
       }
     } else {
       forgotPasswordLink.classList.add(
-        "!text-[#a098ff]",
+        "!text-x",
         "hover:!text-[#8f86ff]",
         "!text-sm",
         "!mt-4",
@@ -365,7 +365,7 @@ function LoginPageStyles() {
         ) || forgotPasswordSection.querySelector("button[type='submit']");
       if (requestButton) {
         requestButton.classList.add(
-          "!bg-[#a098ff]",
+          "!bg-x",
           "!text-white",
           "!font-bold",
           "!rounded-2xl",
@@ -433,7 +433,7 @@ function LoginPageStyles() {
     const signInButton = document.createElement("button");
     signInButton.id = "show-login-btn";
     signInButton.className = `
-      !bg-[#a098ff] 
+      !bg-x 
       !text-white
       !border-none 
       !rounded-2xl 
@@ -469,7 +469,7 @@ function LoginPageStyles() {
     suggestionButton.style.fontFamily = "'Google Sans Flex', sans-serif";
     suggestionButton.innerHTML = `
       <span class="text-sm font-medium">Star on Github (<span id="starCount">...</span>)</span>
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[#a098ff]">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-x">
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
       </svg>
     `;
@@ -549,7 +549,7 @@ function LoginPageStyles() {
 
       const glow1 = document.createElement("div");
       glow1.className =
-        "fixed top-0 right-0 w-[800px] h-[800px] bg-[#a098ff]/10 blur-[150px] rounded-full -mr-96 -mt-96 pointer-events-none z-10 animate-pulse";
+        "fixed top-0 right-0 w-[800px] h-[800px] bg-x/10 blur-[150px] rounded-full -mr-96 -mt-96 pointer-events-none z-10 animate-pulse";
       glow1.style.animationDuration = "10s";
 
       const glow2 = document.createElement("div");
@@ -752,7 +752,7 @@ function LoginPageStyles() {
     <!-- Logo & Text Section -->
     <div class="flex flex-col gap-6 justify-center items-center text-center relative z-10">
         <div class="group relative">
-          <div class="absolute -inset-4 bg-[#a098ff]/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition duration-700"></div>
+          <div class="absolute -inset-4 bg-x/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition duration-700"></div>
           <div class="h-24 w-24 bg-black border-8 border-white/5 bg-cover rounded-[32px] flex items-center justify-center relative z-10 " style="background-image: url('${bgUrl}');">
                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="96" height="96" fill="none">
                   <style>@keyframes splash{0%{transform:scale(.2);opacity:.8}80%{transform:scale(1.2);opacity:0}to{transform:scale(2.2);opacity:0}}</style>
@@ -765,13 +765,13 @@ function LoginPageStyles() {
           <img src="https://theajmalrazaq.github.io/superflex/res/logo.svg" alt="SuperFlex" class="w-full max-w-[280px] sm:max-w-md hero-logo" />
           <div class="flex items-center justify-center gap-3 w-full">
             <span class="w-8 sm:w-12 h-px bg-gradient-to-r from-transparent to-white/20"></span>
-            <span class="font-black text-[8px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.4em] text-[#a098ff]/80 text-center">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span>
+            <span class="font-black text-[8px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.4em] text-x/80 text-center">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span>
             <span class="w-8 sm:w-12 h-px bg-gradient-to-l from-transparent to-white/20"></span>
           </div>
         </div>
         
         <p class="text-zinc-400 text-sm font-medium">
-          Crafted with obsession by <a href="https://github.com/theajmalrazaq" target="_blank" class="text-white hover:text-[#a098ff] transition-colors decoration-[#a098ff]/30 underline-offset-4 underline">Ajmal Razaq Bhatti</a>
+          Crafted with obsession by <a href="https://github.com/theajmalrazaq" target="_blank" class="text-white hover:text-x transition-colors decoration-x/30 underline-offset-4 underline">Ajmal Razaq Bhatti</a>
         </p>
     </div>
 
@@ -871,6 +871,116 @@ function LoginPageStyles() {
         buttonsContainer.appendChild(signInButton);
         buttonsContainer.appendChild(suggestionButton);
       }
+    }
+
+    const hasAcceptedTerms = localStorage.getItem("superflex_terms_accepted");
+
+    if (!hasAcceptedTerms) {
+      const termsModal = document.createElement("div");
+      termsModal.id = "terms-modal";
+      termsModal.className =
+        "fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md";
+
+      termsModal.innerHTML = `
+        <div class="bg-zinc-900/95 backdrop-blur-2xl border border-white/10 rounded-[2rem] w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-500">
+          <!-- Header -->
+          <div class="p-4 sm:p-5 border-b border-white/5 bg-white/5">
+            <div class="flex items-center gap-3">
+              <div class="p-2 rounded-xl bg-x/10 border border-x/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a098ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-lg font-black text-white tracking-tight">Terms & Conditions</h2>
+                <p class="text-[9px] text-x font-black uppercase tracking-widest">First Time Setup</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
+            <div class="space-y-2.5">
+              <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                <h3 class="text-xs font-black text-white mb-1.5 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="16" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                  </svg>
+                  Independent Project
+                </h3>
+                <p class="text-[11px] text-zinc-400 leading-relaxed">
+                  SuperFlex is an independent project that redesigns the Flex portal of NUCES university. This extension is <strong class="text-white">not affiliated with, endorsed by, or sponsored by</strong> NUCES university.
+                </p>
+              </div>
+
+              <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                <h3 class="text-xs font-black text-white mb-1.5 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                  Security & Privacy
+                </h3>
+                <p class="text-[11px] text-zinc-400 leading-relaxed">
+                  This is a personal project intended to enhance the learning experience. SuperFlex <strong class="text-white">only applies cosmetic changes</strong> to the user interface without compromising any security measures or accessing unauthorized data. No hacking involved.
+                </p>
+              </div>
+
+              <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                <h3 class="text-xs font-black text-white mb-1.5 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                  User Responsibility
+                </h3>
+                <p class="text-[11px] text-zinc-400 leading-relaxed">
+                  You are using this extension at <strong class="text-white">your own consent and responsibility</strong>. The creator of SuperFlex is not responsible for any issues that may arise, including but not limited to academic discrepancies, data inaccuracies, or system incompatibilities.
+                </p>
+              </div>
+
+              <div class="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                <h3 class="text-xs font-black text-emerald-400 mb-1.5 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 3h18v18H3zM21 9H3M9 21V9"/>
+                  </svg>
+                  Analytics
+                </h3>
+                <p class="text-[11px] text-zinc-400 leading-relaxed">
+                  We use <strong class="text-emerald-400">Umami Analytics</strong> to track usage patterns and improve the extension. No personal information, grades, or attendance data is collected. Only anonymous usage statistics.
+                </p>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-xl bg-x/5 border border-x/10">
+              <p class="text-[11px] text-zinc-300 leading-relaxed">
+                By clicking <strong class="text-white">"Accept & Continue"</strong>, you acknowledge that you are using a third-party modification to the university's official system and do so at your own risk.
+              </p>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="p-4 sm:p-5 border-t border-white/5 bg-white/5">
+            <button id="terms-accept-btn" class="w-full bg-x text-white border-none rounded-xl py-3 px-6 font-bold text-sm hover:bg-[#8f86ff] transition-all">
+              Accept & Continue
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(termsModal);
+
+      document
+        .getElementById("terms-accept-btn")
+        .addEventListener("click", () => {
+          localStorage.setItem("superflex_terms_accepted", "true");
+          termsModal.classList.add("opacity-0", "scale-95");
+          setTimeout(() => termsModal.remove(), 300);
+        });
     }
 
     document.body.appendChild(backdrop);

@@ -180,7 +180,7 @@ function StudyPlanPage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-4 md:p-8 space-y-10 relative z-10">
         {}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
         <PageHeader
@@ -195,7 +195,7 @@ function StudyPlanPage() {
               <h4 className="text-lg font-bold text-white">4 Year Degree</h4>
             </div>
             <div className="w-px h-8 bg-white/10 mx-2"></div>
-            <GraduationCap className="text-[#a098ff]" size={24} />
+            <GraduationCap className="text-x" size={24} />
           </div>
         </PageHeader>
 
@@ -253,7 +253,7 @@ function StudyPlanPage() {
                     <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">
                       Year
                     </p>
-                    <span className="text-xl font-bold text-[#a098ff] font-sans">
+                    <span className="text-xl font-bold text-x font-sans">
                       {activeSemData.crHrs}{" "}
                       <span className="text-xs text-zinc-500 uppercase ml-1">
                         Courses
@@ -312,7 +312,7 @@ function StudyPlanPage() {
                           </span>
                         </td>
                         <td className="px-6 py-5">
-                          <span className="text-white font-medium group-hover:text-[#a098ff] transition-colors">
+                          <span className="text-white font-medium group-hover:text-x transition-colors">
                             {course.title}
                           </span>
                         </td>

@@ -6,7 +6,7 @@ const ActionBtn = ({ onClick, primary, children, icon: Icon }) => (
     onClick={onClick}
     className={`w-full flex items-center justify-center gap-3 py-4 px-8 rounded-2xl font-bold transition-all duration-300 ${
       primary
-        ? "bg-[#a098ff] hover:bg-[#8f86ff] !text-white"
+        ? "bg-x hover:bg-[#8f86ff] !text-white"
         : "bg-white/5 hover:bg-white/10 !text-white border border-white/5"
     }`}
   >

@@ -101,11 +101,11 @@ const CGPAPlannerModal = ({
         className="bg-black/20 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 w-full max-w-[420px] animate-in zoom-in-95 fade-in duration-300 relative overflow-hidden "
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[#a098ff]/5 blur-[80px] rounded-full -mr-32 -mt-32 pointer-events-none"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-x/5 blur-[80px] rounded-full -mr-32 -mt-32 pointer-events-none"></div>
 
         <div className="relative">
           <div className="flex flex-col items-center text-center mb-8">
-            <div className="p-4 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] mb-4">
+            <div className="p-4 bg-x/10 rounded-2xl text-x mb-4">
               <Target size={32} />
             </div>
             <h2 className="text-2xl font-bold text-white tracking-tight">
@@ -130,7 +130,7 @@ const CGPAPlannerModal = ({
                   value={targetCGPA}
                   onChange={(e) => setTargetCGPA(e.target.value)}
                   placeholder="e.g. 3.70"
-                  className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-[#a098ff]/50 focus:ring-4 focus:ring-[#a098ff]/5 transition-all font-medium placeholder:text-white/20"
+                  className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-x/50 focus:ring-4 focus:ring-x/5 transition-all font-medium placeholder:text-white/20"
                 />
               </div>
               <div className="space-y-2">
@@ -142,14 +142,14 @@ const CGPAPlannerModal = ({
                   value={nextCH}
                   onChange={(e) => setNextCH(e.target.value)}
                   placeholder="e.g. 18"
-                  className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-[#a098ff]/50 focus:ring-4 focus:ring-[#a098ff]/5 transition-all font-medium placeholder:text-white/20"
+                  className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-x/50 focus:ring-4 focus:ring-x/5 transition-all font-medium placeholder:text-white/20"
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full h-[48px] bg-[#a098ff] hover:bg-[#8f86ff] text-white rounded-xl font-bold text-sm"
+              className="w-full h-[48px] bg-x hover:bg-[#8f86ff] text-white rounded-xl font-bold text-sm"
             >
               Generate Strategy
             </button>
@@ -171,15 +171,15 @@ const CGPAPlannerModal = ({
                   </div>
                 </div>
               ) : result < 0 ? (
-                <div className="text-emerald-400">
+                <div className="text-x">
                   <p className="text-3xl font-bold tracking-tight mb-2">0.00</p>
-                  <div className="flex items-center gap-2 text-xs font-medium bg-emerald-500/10 p-2 rounded-lg">
+                  <div className="flex items-center gap-2 text-xs font-medium bg-x/10 p-2 rounded-lg">
                     <Zap size={14} />
                     Target already achieved!
                   </div>
                 </div>
               ) : (
-                <div className="text-[#a098ff]">
+                <div className="text-x">
                   <p className="text-4xl font-bold tracking-tight mb-3">
                     {result.toFixed(2)}
                   </p>
@@ -259,11 +259,11 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
         className="bg-zinc-900/90 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 w-full max-w-[500px] animate-in zoom-in-95 fade-in duration-300 relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[80px] rounded-full -mr-32 -mt-32 pointer-events-none"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-x/5 blur-[80px] rounded-full -mr-32 -mt-32 pointer-events-none"></div>
 
         <div className="relative">
           <div className="flex flex-col items-center text-center mb-8">
-            <div className="p-4 bg-emerald-500/10 rounded-2xl text-emerald-400 mb-4">
+            <div className="p-4 bg-x/10 rounded-2xl text-x mb-4">
               <Scale size={32} />
             </div>
             <h2 className="text-2xl font-bold text-white tracking-tight">
@@ -285,7 +285,7 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
                   value={mca}
                   onChange={(e) => setMca(e.target.value)}
                   placeholder="30-91"
-                  className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/5 transition-all font-medium placeholder:text-white/20"
+                  className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-x/50 focus:ring-4 focus:ring-x/5 transition-all font-medium placeholder:text-white/20"
                 />
               </div>
               <div className="space-y-2">
@@ -297,14 +297,14 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
                   value={marks}
                   onChange={(e) => setMarks(e.target.value)}
                   placeholder="e.g. 65"
-                  className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/5 transition-all font-medium placeholder:text-white/20"
+                  className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-x/50 focus:ring-4 focus:ring-x/5 transition-all font-medium placeholder:text-white/20"
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full h-[48px] bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold text-sm transition-all"
+              className="w-full h-[48px] bg-x hover:bg-[#8f86ff] text-white rounded-xl font-bold text-sm transition-all"
             >
               Lookup Grade
             </button>
@@ -342,7 +342,7 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
                               key={g}
                               className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
                                 g === result.grade
-                                  ? "bg-emerald-500 text-white"
+                                  ? "bg-[#a098ff] text-white"
                                   : "bg-white/5 text-zinc-500"
                               }`}
                             >
@@ -361,7 +361,7 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
                           key={g}
                           className={`p-2 rounded-lg border text-center transition-all ${
                             g === result.grade
-                              ? "bg-emerald-500/10 border-emerald-500/50"
+                              ? "bg-x/10 border-x/50"
                               : "bg-white/5 border-white/5"
                           }`}
                         >
@@ -747,10 +747,10 @@ function TranscriptPage() {
         {
           label: "CGPA",
           data: calculatedStats.history.map((h) => h.cgpa),
-          borderColor: "#10b981",
+          borderColor: "#a098ff",
           tension: 0.45,
           fill: false,
-          pointBackgroundColor: "#10b981",
+          pointBackgroundColor: "#a098ff",
           pointBorderWidth: 4,
           pointBorderColor: "#111",
           pointRadius: 4,
@@ -808,7 +808,7 @@ function TranscriptPage() {
   return (
     <PageLayout currentPage={window.location.pathname}>
       {}
-      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
       <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
       <div className="w-full p-4 md:p-8 space-y-10 relative z-10">
@@ -845,7 +845,7 @@ function TranscriptPage() {
             }
             className={`flex items-center gap-2 px-5 py-2.5 rounded-full border transition-all duration-300 text-xs font-bold ${
               whatIfMode
-                ? "bg-[#a098ff]/10 text-[#a098ff] border-[#a098ff]/20"
+                ? "bg-x/10 text-x border-x/20"
                 : "bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
             }`}
           >
@@ -895,7 +895,7 @@ function TranscriptPage() {
           {}
           <div className="xl:col-span-2 space-y-8">
             <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 flex flex-col gap-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-[#a098ff]/5 blur-[100px] rounded-full -mr-48 -mt-48 pointer-events-none"></div>
+              <div className="absolute top-0 right-0 w-96 h-96 bg-x/5 blur-[100px] rounded-full -mr-48 -mt-48 pointer-events-none"></div>
 
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
                 <SuperTabs
@@ -942,7 +942,7 @@ function TranscriptPage() {
                         <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">
                           Earned
                         </span>
-                        <span className="text-3xl font-bold font-sans text-emerald-400 tracking-tighter">
+                        <span className="text-3xl font-bold font-sans text-x tracking-tighter">
                           {activeSemIdx === semesters.length - 1 &&
                           !overriddenGrades[
                             Object.keys(overriddenGrades).find((k) =>
@@ -959,7 +959,7 @@ function TranscriptPage() {
                         <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">
                           SGPA
                         </span>
-                        <span className="text-3xl font-bold font-sans text-[#a098ff] tracking-tighter">
+                        <span className="text-3xl font-bold font-sans text-x tracking-tighter">
                           {activeSemIdx === semesters.length - 1 &&
                           !overriddenGrades[
                             Object.keys(overriddenGrades).find((k) =>
@@ -1101,7 +1101,7 @@ function TranscriptPage() {
                                   }}
                                   className={`text-xs font-bold px-2.5 py-1 bg-white/5 rounded-lg transition-all ${
                                     course.schemeDetailId
-                                      ? "text-[#a098ff] hover:bg-[#a098ff]/20 cursor-pointer"
+                                      ? "text-x hover:bg-x/20 cursor-pointer"
                                       : "text-white group-hover:bg-white/10"
                                   }`}
                                 >
@@ -1123,7 +1123,7 @@ function TranscriptPage() {
                                           setSelectedMCA(course.mca);
                                           setIsMCALookupOpen(true);
                                         }}
-                                        className="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded flex items-center gap-1 hover:bg-emerald-400/20 transition-colors"
+                                        className="text-[10px] font-bold text-x bg-x/10 px-1.5 py-0.5 rounded flex items-center gap-1 hover:bg-x/20 transition-colors"
                                       >
                                         <TrendingUp size={10} />
                                         MCA: {course.mca}
@@ -1153,9 +1153,9 @@ function TranscriptPage() {
                                         e.target.value,
                                       )
                                     }
-                                    className={`text-xs font-bold px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/10 text-center cursor-pointer hover:border-[#a098ff]/50 transition-all outline-none appearance-none ${
+                                    className={`text-xs font-bold px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/10 text-center cursor-pointer hover:border-x/50 transition-all outline-none appearance-none ${
                                       currentGrade.startsWith("A")
-                                        ? "text-emerald-400"
+                                        ? "text-x"
                                         : currentGrade.startsWith("B")
                                           ? "text-blue-400"
                                           : currentGrade.startsWith("C")
@@ -1178,7 +1178,7 @@ function TranscriptPage() {
                                     <span
                                       className={`text-[10px] font-bold px-3 py-1 rounded-full border ${
                                         currentGrade.startsWith("A")
-                                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                          ? "bg-x/10 text-x border-x/20"
                                           : currentGrade.startsWith("B")
                                             ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
                                             : currentGrade.startsWith("C")
@@ -1195,7 +1195,7 @@ function TranscriptPage() {
                               </td>
                               <td className="px-8 py-4 text-right">
                                 <span
-                                  className={`text-sm font-bold font-sans ${isSimulated ? "text-[#a098ff]" : "text-zinc-300"}`}
+                                  className={`text-sm font-bold font-sans ${isSimulated ? "text-x" : "text-zinc-300"}`}
                                 >
                                   {(
                                     (GRADE_POINTS[currentGrade] || 0) *
@@ -1227,7 +1227,7 @@ function TranscriptPage() {
                     Historical GPA Trend
                   </p>
                 </div>
-                <div className="p-3 bg-[#a098ff]/10 rounded-2xl text-[#a098ff]">
+                <div className="p-3 bg-x/10 rounded-2xl text-x">
                   <TrendingUp size={18} />
                 </div>
               </div>
@@ -1237,12 +1237,12 @@ function TranscriptPage() {
             </div>
 
             {}
-            <div className="bg-[#111] border border-[#a098ff]/20 rounded-[2.5rem] p-7 relative overflow-hidden ">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[#a098ff]/5 blur-[80px] rounded-full -mr-32 -mt-32"></div>
+            <div className="bg-[#111] border border-x/20 rounded-[2.5rem] p-7 relative overflow-hidden ">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-x/5 blur-[80px] rounded-full -mr-32 -mt-32"></div>
 
               <div className="relative z-10 flex flex-col h-full">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="p-3 bg-[#a098ff]/10 rounded-xl text-[#a098ff]">
+                  <div className="p-3 bg-x/10 rounded-xl text-x">
                     <Zap size={20} />
                   </div>
                   <h3 className="text-lg font-bold text-white tracking-tight">
@@ -1261,7 +1261,7 @@ function TranscriptPage() {
                       </span>
                       {whatIfMode && (
                         <div
-                          className={`flex items-center gap-1 text-xs font-medium font-sans ${calculatedStats.currentCGPA >= originalCGPA ? "text-emerald-400" : "text-rose-400"}`}
+                          className={`flex items-center gap-1 text-xs font-medium font-sans ${calculatedStats.currentCGPA >= originalCGPA ? "text-x" : "text-rose-400"}`}
                         >
                           {calculatedStats.currentCGPA >= originalCGPA
                             ? "+"

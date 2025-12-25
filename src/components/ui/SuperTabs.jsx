@@ -35,7 +35,7 @@ const SuperTabs = ({
           >
             {}
             {isActive && (
-              <div className="absolute inset-0 bg-[#a098ff] rounded-full -z-10 animate-in fade-in zoom-in-95 duration-300" />
+              <div className="absolute inset-0 bg-x rounded-full -z-10 animate-in fade-in zoom-in-95 duration-300" />
             )}
             <span className="relative z-10">{tab.label}</span>
           </button>

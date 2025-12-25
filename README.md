@@ -63,12 +63,12 @@ This bad boy works by sneaking React components into the boring old LMS pages, b
 
 ### 📊 Enhanced Dashboards
 
-- **Attendance Visualization**: 
+- **Attendance Visualization**:
   - Color-coded progress bars (green/yellow/red based on percentage)
   - Real-time attendance tracking with warnings
   - Detailed course-wise breakdown
   - Bookmark important courses
-- **Advanced Grade Calculator**: 
+- **Advanced Grade Calculator**:
   - What-if scenario planning
   - Target CGPA calculator
   - Best-of score calculations
@@ -79,7 +79,7 @@ This bad boy works by sneaking React components into the boring old LMS pages, b
 
 ### 🛠️ Improved Functionality
 
-- **Smart Tables**: 
+- **Smart Tables**:
   - Sortable columns
   - Filterable data
   - Responsive design
@@ -185,16 +185,62 @@ yarn dev
 
 ```
 superflex/
-├── public/             # Static assets
+├── docs/                      # Documentation website
+│   ├── articles/              # Markdown articles
+│   │   ├── bts.md            # Behind the Scenes technical guide
+│   │   └── superflexai.md    # AI prompting guide
+│   ├── res/                   # Documentation assets
+│   ├── index.html             # Landing page
+│   └── docs.html              # Documentation viewer
+├── public/                    # Static assets
+│   ├── assets/                # Images, logos, icons
+│   │   ├── favicon.svg
+│   │   ├── favicon.png
+│   │   ├── logo.svg
+│   │   └── overlay.png
+│   ├── scripts/               # Injected scripts
+│   │   ├── bridge.js         # Main/Isolated world communication
+│   │   ├── puter.js          # AI library
+│   │   ├── umami.js          # Analytics
+│   │   ├── polyfill.js       # Web streams polyfill
+│   │   └── rustls.js         # Security polyfill
+│   └── reviews.json           # User reviews data
 ├── src/
-│   ├── components/     # React components
-│   │   ├── layouts/    # Layout components
-│   │   └── pages/      # Page-specific components
-│   ├── styles/         # CSS and Tailwind configuration
-│   ├── content.jsx     # Content script entry point
-│   └── index.jsx       # Extension entry point
-├── manifest.json       # Extension manifest
-└── vite.config.js      # Vite configuration
+│   ├── components/            # React components
+│   │   ├── layouts/          # Layout components
+│   │   │   └── PageLayout.jsx
+│   │   ├── ui/               # Reusable UI components
+│   │   │   ├── LoadingOverlay.jsx
+│   │   │   ├── NotificationBanner.jsx
+│   │   │   ├── PageHeader.jsx
+│   │   │   ├── StatsCard.jsx
+│   │   │   └── ...
+│   │   ├── AiDataPrepare.jsx  # AI context preparation
+│   │   ├── LoginPageStyles.jsx # Login page styling
+│   │   ├── NavBar.jsx         # Navigation component
+│   │   ├── PathRouter.jsx     # Client-side router
+│   │   └── SuperFlexAI.jsx    # AI chat interface
+│   ├── pages/                 # Page-specific components
+│   │   ├── HomePage.jsx
+│   │   ├── MarksPage.jsx
+│   │   ├── AttendancePage.jsx
+│   │   ├── TranscriptPage.jsx
+│   │   ├── StudyPlanPage.jsx
+│   │   ├── FeeDetailsPage.jsx
+│   │   ├── GradeChangePage.jsx
+│   │   ├── RetakeExamPage.jsx
+│   │   ├── ChangePasswordPage.jsx
+│   │   └── ...
+│   ├── styles/                # CSS and Tailwind
+│   │   ├── tailwind.css      # Main styles
+│   │   └── loading.css       # Loading state styles
+│   ├── constants/             # App constants
+│   ├── utils/                 # Utility functions
+│   └── content.jsx            # Content script entry point
+├── manifest.json              # Chrome extension manifest
+├── vite.config.js             # Vite build configuration
+├── package.json               # Dependencies
+└── pnpm-lock.yaml             # Lock file
 ```
 
 ## Building for Production

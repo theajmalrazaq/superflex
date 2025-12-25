@@ -553,7 +553,7 @@ const SuperFlexAI = () => {
       {isOpen && (
         <div className="fixed bottom-20 left-4 right-4 md:left-auto md:right-6 md:bottom-24 md:w-[420px] h-[65vh] md:h-[650px] md:max-h-[80vh] bg-[#0c0c0c]/90 backdrop-blur-2xl border border-white/10 rounded-3xl md:rounded-[2rem] flex flex-col z-[9999] overflow-hidden animate-in slide-in-from-bottom-8 zoom-in-95 duration-500 ease-out">
           <div className="p-6 border-b border-white/5 bg-white/5 flex items-center justify-between relative">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#a098ff] to-transparent opacity-50"></div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-x to-transparent opacity-50"></div>
             <div className="flex items-center gap-3">
               <div className="w-14 h-14 rounded-2xl bg-zinc-900/50 border border-white/10 flex items-center justify-center relative group overflow-hidden">
                 <AnimatedLogo size={32} className="animate-pulse" />
@@ -570,7 +570,7 @@ const SuperFlexAI = () => {
                   onClick={() => setShowModelPicker(!showModelPicker)}
                   className={`p-2.5 rounded-xl border transition-all flex items-center gap-2 active:scale-95 ${
                     showModelPicker
-                      ? "bg-[#a098ff]/20 text-[#a098ff] border-[#a098ff]/20"
+                      ? "bg-x/20 text-x border-x/20"
                       : "bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
                   }`}
                   title="Change AI Model"
@@ -603,7 +603,7 @@ const SuperFlexAI = () => {
                           }}
                           className={`w-full text-left p-3 rounded-xl transition-all flex flex-col gap-0.5 group ${
                             selectedModel === m.id
-                              ? "bg-[#a098ff]/10 border border-[#a098ff]/20"
+                              ? "bg-x/10 border border-x/20"
                               : "hover:bg-white/5 border border-transparent"
                           }`}
                         >
@@ -635,7 +635,7 @@ const SuperFlexAI = () => {
           {isScanning && (
             <div className="h-1 bg-zinc-900 w-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-[#a098ff] to-[#ec4899] transition-all duration-500"
+                className="h-full bg-gradient-to-r from-x to-[#ec4899] transition-all duration-500"
                 style={{ width: `${scanProgress}%` }}
               ></div>
             </div>
@@ -653,12 +653,12 @@ const SuperFlexAI = () => {
                 <div
                   className={`max-w-fit px-4 py-3 rounded-2xl text-sm relative ${
                     m.role === "user"
-                      ? "bg-[#a098ff] text-white rounded-tr-none"
+                      ? "bg-x text-white rounded-tr-none"
                       : "bg-zinc-900/50 backdrop-blur-md text-zinc-200 border border-white/10 rounded-tl-none"
                   }`}
                 >
                   <div
-                    className={`flex items-center gap-1.5 mb-2 opacity-80 text-[9px] font-black uppercase tracking-widest ${m.role === "user" ? "justify-end text-white" : "text-[#a098ff]"}`}
+                    className={`flex items-center gap-1.5 mb-2 opacity-80 text-[9px] font-black uppercase tracking-widest ${m.role === "user" ? "justify-end text-white" : "text-x"}`}
                   >
                     {m.role === "user" ? (
                       <img
@@ -686,9 +686,9 @@ const SuperFlexAI = () => {
                       ) : (
                         <div className="flex items-center gap-3 py-2 px-1">
                           <div className="flex gap-1">
-                            <div className="w-1.5 h-1.5 bg-[#a098ff] rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                            <div className="w-1.5 h-1.5 bg-[#a098ff] rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                            <div className="w-1.5 h-1.5 bg-[#a098ff] rounded-full animate-bounce"></div>
+                            <div className="w-1.5 h-1.5 bg-x rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                            <div className="w-1.5 h-1.5 bg-x rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                            <div className="w-1.5 h-1.5 bg-x rounded-full animate-bounce"></div>
                           </div>
                           <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
                             Thinking...
@@ -708,7 +708,7 @@ const SuperFlexAI = () => {
           {permissionStatus === "pending" && (
             <div className="flex flex-col gap-3 p-5 bg-zinc-900/50 border border-white/10 rounded-2xl mx-2 my-4 animate-in fade-in slide-in-from-bottom-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#a098ff]/10 flex items-center justify-center text-[#a098ff]">
+                <div className="w-10 h-10 rounded-full bg-x/10 flex items-center justify-center text-x">
                   <Shield size={20} />
                 </div>
                 <h3 className="text-white font-bold text-sm">
@@ -723,7 +723,7 @@ const SuperFlexAI = () => {
               <div className="flex gap-2 mt-2">
                 <button
                   onClick={() => handlePermission("granted")}
-                  className="flex-1 bg-[#a098ff] hover:bg-[#a098ff]/90 text-white text-xs font-bold py-2.5 rounded-xl transition-colors"
+                  className="flex-1 bg-x hover:bg-x/90 text-white text-xs font-bold py-2.5 rounded-xl transition-colors"
                 >
                   Allow Access
                 </button>
@@ -750,7 +750,7 @@ const SuperFlexAI = () => {
                     : "Ask your SuperFlex advisor..."
                 }
                 disabled={permissionStatus === "pending"}
-                className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#a098ff]/50 focus:ring-4 focus:ring-[#a098ff]/5 transition-all pr-14 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-x/50 focus:ring-4 focus:ring-x/5 transition-all pr-14 disabled:opacity-50 disabled:cursor-not-allowed"
               />
               {isLoading ? (
                 <button
@@ -764,7 +764,7 @@ const SuperFlexAI = () => {
                 <button
                   onClick={handleSend}
                   disabled={!input.trim()}
-                  className="absolute right-2.5 p-2.5 text-white bg-[#a098ff] hover:bg-[#a098ff]/80 rounded-xl disabled:opacity-30 disabled:grayscale transition-all active:scale-95 flex items-center justify-center outline-none ring-offset-2 ring-offset-black focus:ring-2 focus:ring-[#a098ff]/50"
+                  className="absolute right-2.5 p-2.5 text-white bg-x hover:bg-x/80 rounded-xl disabled:opacity-30 disabled:grayscale transition-all active:scale-95 flex items-center justify-center outline-none ring-offset-2 ring-offset-black focus:ring-2 focus:ring-x/50"
                 >
                   <Send size={18} />
                 </button>

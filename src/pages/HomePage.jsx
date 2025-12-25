@@ -57,7 +57,7 @@ const CategoryAccordion = ({ category, isOpen, onToggle }) => {
       >
         <div className="flex items-center gap-3">
           <span
-            className={`p-1.5 rounded-lg ${isOpen ? "bg-[#a098ff]/20 text-[#a098ff]" : "bg-zinc-800 text-zinc-500"}`}
+            className={`p-1.5 rounded-lg ${isOpen ? "bg-x/20 text-x" : "bg-zinc-800 text-zinc-500"}`}
           >
             {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </span>
@@ -125,7 +125,7 @@ const CategoryAccordion = ({ category, isOpen, onToggle }) => {
                         asm.percentage >= 80
                           ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                           : asm.percentage >= 60
-                            ? "bg-[#a098ff]/10 text-[#a098ff] border-[#a098ff]/20"
+                            ? "bg-x/10 text-x border-x/20"
                             : asm.percentage >= 40
                               ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
                               : "bg-rose-500/10 text-rose-400 border-rose-500/20"
@@ -508,7 +508,7 @@ function HomePage() {
         {}
         <div className="relative rounded-[2rem] bg-black p-6 overflow-hidden group">
           {}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-[#a098ff]/5 blur-[80px] rounded-full pointer-events-none -mr-20 -mt-20 opacity-40"></div>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-x/5 blur-[80px] rounded-full pointer-events-none -mr-20 -mt-20 opacity-40"></div>
 
           <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
             {}
@@ -544,7 +544,7 @@ function HomePage() {
                         Math.floor(Math.random() * greetings.length)
                       ];
                     }, [])}{" "}
-                    <span className="text-[#a098ff]">
+                    <span className="text-x">
                       {personalInfo?.Name?.split(" ")[0] || "Student"}
                     </span>
                   </h1>
@@ -583,7 +583,7 @@ function HomePage() {
                 onClick={() => setActiveMainTab("stats")}
                 className={`px-5 py-2 border border-white/5  rounded-full text-xs font-bold flex items-center gap-2 transition-all duration-300 ${
                   activeMainTab === "stats"
-                    ? "bg-[#a098ff]/10 text-[#a098ff]"
+                    ? "bg-x/10 text-x"
                     : "text-zinc-500 hover:text-white hover:bg-white/5"
                 }`}
               >
@@ -594,7 +594,7 @@ function HomePage() {
                 onClick={() => setActiveMainTab("info")}
                 className={`px-5 py-2 border border-white/5  rounded-full text-xs font-bold flex items-center gap-2 transition-all duration-300 ${
                   activeMainTab === "info"
-                    ? "bg-[#a098ff]/10 text-[#a098ff]"
+                    ? "bg-x/10 text-x"
                     : "text-zinc-500 hover:text-white hover:bg-white/5"
                 }`}
               >
@@ -691,7 +691,7 @@ function HomePage() {
                           onClick={() => setActiveCourse(course.id)}
                           className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
                             activeCourse === course.id
-                              ? "bg-[#a098ff] text-white"
+                              ? "bg-x text-white"
                               : "text-zinc-500 hover:text-white"
                           }`}
                         >
@@ -893,7 +893,7 @@ const ProfileInfoTabs = ({ profileSections }) => {
         >
           {}
           <div className="flex items-center gap-4 mb-8">
-            <div className="p-3 bg-[#a098ff]/10 rounded-2xl text-[#a098ff]">
+            <div className="p-3 bg-x/10 rounded-2xl text-x">
               {section.title.toLowerCase().includes("personal") ? (
                 <User size={24} />
               ) : section.title.toLowerCase().includes("university") ? (

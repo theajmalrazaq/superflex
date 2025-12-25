@@ -35,7 +35,7 @@ const FeedbackCard = ({ course, onAction, index }) => {
 
         <div className="flex flex-col gap-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] font-black text-[#a098ff] uppercase tracking-tighter opacity-80 shrink-0">
+            <span className="text-[10px] font-black text-x uppercase tracking-tighter opacity-80 shrink-0">
               {course.code}
             </span>
             <span className="text-white font-medium text-sm leading-tight truncate">
@@ -69,7 +69,7 @@ const FeedbackCard = ({ course, onAction, index }) => {
         {isPending && (
           <button
             onClick={() => onAction(course)}
-            className="text-[#a098ff] text-[9px] font-black uppercase tracking-[0.2em] hover:text-white transition-colors"
+            className="text-x text-[9px] font-black uppercase tracking-[0.2em] hover:text-white transition-colors"
           >
             Review Now
           </button>
@@ -228,7 +228,7 @@ function CourseFeedbackPage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-4 md:p-8 space-y-8">
         {}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
         <PageHeader

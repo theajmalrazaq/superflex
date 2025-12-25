@@ -226,7 +226,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       onClick={() => {
         window.location.href = link.href;
       }}
-      className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 text-[13px] font-medium whitespace-nowrap cursor-pointer ${isActive ? "bg-[#a098ff]/10 text-[#a098ff] border  border-white/10" : "text-zinc-400 border-transparent hover:text-white hover:bg-white/5"}`}
+      className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 text-[13px] font-medium whitespace-nowrap cursor-pointer ${isActive ? "bg-x/10 text-x border  border-white/10" : "text-zinc-400 border-transparent hover:text-white hover:bg-white/5"}`}
     >
       <span className={isActive ? "text-inherit" : "text-current"}>
         {React.cloneElement(getIcon(link), { size: 16 })}
@@ -249,7 +249,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       `}
     >
       <div
-        className={`p-2.5 rounded-full shrink-0 ${isActive ? "bg-[#a098ff] text-white" : "bg-black/40 text-[#a098ff] group-hover:bg-[#a098ff] group-hover:text-white transition-colors duration-300"}`}
+        className={`p-2.5 rounded-full shrink-0 ${isActive ? "bg-x text-white" : "bg-black/40 text-x group-hover:bg-x group-hover:text-white transition-colors duration-300"}`}
       >
         {React.cloneElement(getIcon(link), { size: 20 })}
       </div>
@@ -339,7 +339,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         setOpenDropdown(isOpen ? null : category);
                       }}
                       className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-white/5
-                        ${isActive ? "bg-[#a098ff]/10 text-[#a098ff] border border-white/10" : "!text-zinc-400 hover:!text-white"}
+                        ${isActive ? "bg-x/10 text-x border border-white/10" : "!text-zinc-400 hover:!text-white"}
                       `}
                     >
                       {category}
@@ -408,7 +408,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                 </span>
                 <a
                   href="/Student/ChangePassword"
-                  className="text-xs text-[#a098ff] font-medium hover:underline"
+                  className="text-xs text-x font-medium hover:underline"
                 >
                   Settings
                 </a>
@@ -432,13 +432,11 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         : "flex-col aspect-[4/3]"
                     } ${
                       isActive
-                        ? "bg-[#a098ff]/10 text-[#a098ff] border border-[#a098ff]/20"
+                        ? "bg-x/10 text-x border border-x/20"
                         : "bg-zinc-900/50 text-zinc-400 hover:bg-white/10 hover:text-white border border-white/5"
                     }`}
                   >
-                    <div
-                      className={isActive ? "text-[#a098ff]" : "text-zinc-500"}
-                    >
+                    <div className={isActive ? "text-x" : "text-zinc-500"}>
                       {React.cloneElement(getIcon(link), { size: 24 })}
                     </div>
                     <span className="font-bold text-xs">{link.text}</span>
@@ -503,13 +501,13 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                               }}
                               className={`flex flex-col items-center justify-center gap-2 px-3 py-3 rounded-xl transition-all h-24 ${
                                 isActive
-                                  ? "bg-[#a098ff]/10 text-[#a098ff] border border-[#a098ff]/20"
+                                  ? "bg-x/10 text-x border border-x/20"
                                   : "text-zinc-400 bg-black/20 hover:text-white hover:bg-white/5 border border-white/5"
                               }`}
                             >
                               <div
                                 className={
-                                  isActive ? "text-[#a098ff]" : "text-zinc-500"
+                                  isActive ? "text-x" : "text-zinc-500"
                                 }
                               >
                                 {React.cloneElement(getIcon(link), {

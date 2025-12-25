@@ -43,7 +43,7 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
         className="w-full md:w-[350px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-zinc-900/50 border border-white/5 text-white hover:bg-white/5 transition-all group"
       >
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="p-2 rounded-xl bg-[#a098ff]/10 text-[#a098ff]">
+          <div className="p-2 rounded-xl bg-x/10 text-x">
             <BookOpen size={16} />
           </div>
           <div className="flex flex-col items-start truncate">
@@ -70,7 +70,7 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
                 }}
                 className={`w-full flex bg-zinc-900 items-center justify-between p-3 rounded-xl transition-all ${
                   selectedId === course.id
-                    ? "bg-[#a098ff]/10 border border-[#a098ff]/20"
+                    ? "bg-x/10 border border-x/20"
                     : "hover:bg-white/5 border border-transparent"
                 }`}
               >
@@ -107,13 +107,13 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
       onClick={onToggleMark}
       className={`group cursor-pointer flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${
         isMarked
-          ? "bg-[#a098ff]/10 border-[#a098ff]/50"
+          ? "bg-x/10 border-x/50"
           : "bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5"
       }`}
     >
       <div className="flex items-center gap-4">
         <span
-          className={`font-bold text-sm min-w-[1.5rem] ${isMarked ? "text-[#a098ff]" : "text-zinc-600"}`}
+          className={`font-bold text-sm min-w-[1.5rem] ${isMarked ? "text-x" : "text-zinc-600"}`}
         >
           {index}.
         </span>
@@ -158,7 +158,7 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
         <div
           className={`p-2 rounded-full shrink-0 transition-all duration-300 border ${
             isMarked
-              ? "text-[#a098ff] bg-[#a098ff]/10 border-[#a098ff]/30"
+              ? "text-x bg-x/10 border-x/30"
               : "text-zinc-700 bg-zinc-900/50 border-white/5 group-hover:text-zinc-500 hover:bg-white/10"
           }`}
         >
@@ -208,7 +208,7 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
         onClick={() => setIsOpen(!isOpen)}
         className={`p-3 rounded-full border transition-all ${
           isOpen
-            ? "bg-[#a098ff]/20 text-[#a098ff] border-[#a098ff]/20"
+            ? "bg-x/20 text-x border-x/20"
             : "bg-zinc-900/50 text-zinc-400 border-white/5 hover:text-white hover:bg-white/10"
         }`}
         title="View Bookmarks"
@@ -247,7 +247,7 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
                   className="w-full text-left p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all group"
                 >
                   <div className="flex justify-between items-start mb-1">
-                    <div className="font-bold text-sm text-white group-hover:text-[#a098ff] transition-colors truncate w-full pr-2">
+                    <div className="font-bold text-sm text-white group-hover:text-x transition-colors truncate w-full pr-2">
                       {item.date}
                     </div>
                     <span

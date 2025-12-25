@@ -29,7 +29,7 @@ const SemesterAccordion = ({ semester }) => {
       >
         <div className="flex items-center gap-5">
           <div
-            className={`p-4 rounded-2xl bg-white/5 transition-all duration-500 ${isOpen ? "bg-[#a098ff]/20 text-[#a098ff]" : "text-zinc-400 group-hover:text-white"}`}
+            className={`p-4 rounded-2xl bg-white/5 transition-all duration-500 ${isOpen ? "bg-x/20 text-x" : "text-zinc-400 group-hover:text-white"}`}
           >
             <Layers size={22} />
           </div>
@@ -71,7 +71,7 @@ const SemesterAccordion = ({ semester }) => {
           <div className="flex flex-col gap-10">
             <div className="lg:col-span-5 space-y-8">
               <div className="space-y-4">
-                <h5 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#a098ff]">
+                <h5 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-x">
                   <DollarSign size={12} /> Fee Breakdown
                 </h5>
                 <div className="space-y-3">
@@ -99,8 +99,8 @@ const SemesterAccordion = ({ semester }) => {
                         Rs. {semester.summary.due}
                       </p>
                     </div>
-                    <div className="p-5 rounded-2xl bg-[#a098ff]/5 border border-[#a098ff]/10">
-                      <p className="text-[8px] text-[#a098ff]/70 font-black uppercase tracking-widest mb-1.5">
+                    <div className="p-5 rounded-2xl bg-x/5 border border-x/10">
+                      <p className="text-[8px] text-x/70 font-black uppercase tracking-widest mb-1.5">
                         Balance
                       </p>
                       <p
@@ -393,7 +393,7 @@ function FeeDetailsPage() {
   return (
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-4 md:p-8 space-y-12 relative z-10 font-sans">
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-[#a098ff]/5 blur-[120px] rounded-full pointer-events-none -mr-64 -mt-64 z-0"></div>
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full pointer-events-none -mr-64 -mt-64 z-0"></div>
 
         <PageHeader title="Fee Vault" subtitle="Academic Portfolio & Accounts">
           <div className="flex items-center gap-6 bg-zinc-900/50 p-6 rounded-[2rem] border border-white/5 backdrop-blur-xl group hover:bg-zinc-900/70 transition-all">
@@ -405,7 +405,7 @@ function FeeDetailsPage() {
                 Rs. {totalPaid}
               </h4>
             </div>
-            <div className="p-4 rounded-2xl bg-[#a098ff]/10 text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
+            <div className="p-4 rounded-2xl bg-x/10 text-x group-hover:scale-110 transition-transform duration-300">
               <CreditCard size={24} />
             </div>
           </div>
@@ -493,7 +493,7 @@ function FeeDetailsPage() {
                       <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">
                         Instrument No
                       </th>
-                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-[#a098ff] font-sans">
+                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-x font-sans">
                         Amount
                       </th>
                       <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">

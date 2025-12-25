@@ -13,7 +13,7 @@ const StatsCard = ({
       className={`flex-1 min-w-[200px] p-6 rounded-[2rem] border border-white/5 bg-zinc-900/50 backdrop-blur-xl hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group ${className}`}
     >
       <div className="flex justify-between items-start mb-6">
-        <div className="p-3.5 bg-[#a098ff]/10 rounded-2xl text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
+        <div className="p-3.5 bg-x/10 rounded-2xl text-x group-hover:scale-110 transition-transform duration-300">
           <Icon size={24} />
         </div>
       </div>

@@ -317,7 +317,7 @@ function MarksPloReportPage() {
                 {}
                 <div className="flex-1 min-w-[140px] p-6 rounded-[2rem] border bg-zinc-900/50 backdrop-blur-xl hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group print:border-gray-200 print:bg-white">
                   <div className="flex justify-between items-start mb-6">
-                    <div className="p-3.5 rounded-2xl bg-[#a098ff]/10 text-[#a098ff] group-hover:scale-110 transition-transform duration-300">
+                    <div className="p-3.5 rounded-2xl bg-x/10 text-x group-hover:scale-110 transition-transform duration-300">
                       <FileBarChart size={24} />
                     </div>
                   </div>
@@ -335,7 +335,7 @@ function MarksPloReportPage() {
                             PLO{plo.id}
                           </span>
                           <span
-                            className={`text-[11px] font-black text-[#a098ff] print:text-black`}
+                            className={`text-[11px] font-black text-x print:text-black`}
                           >
                             {plo.value}%
                           </span>
@@ -353,7 +353,7 @@ function MarksPloReportPage() {
             {reportHtml ? (
               <div className="bg-zinc-900/50 border border-white/5 rounded-3xl overflow-hidden">
                 <div className="p-6 border-b border-white/5 flex items-center gap-3 bg-white/5">
-                  <div className="p-2 bg-[#a098ff]/10 rounded-lg text-[#a098ff]">
+                  <div className="p-2 bg-x/10 rounded-lg text-x">
                     <Layout size={20} />
                   </div>
                   <h3 className="font-bold text-lg text-white">

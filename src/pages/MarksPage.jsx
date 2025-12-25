@@ -55,7 +55,7 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
         className="w-full md:w-[350px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-zinc-900/50 border border-white/5 text-white hover:bg-white/5 transition-all group"
       >
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="p-2 rounded-xl bg-[#a098ff]/10 text-[#a098ff]">
+          <div className="p-2 rounded-xl bg-x/10 text-x">
             <BookOpen size={16} />
           </div>
           <div className="flex flex-col items-start truncate">
@@ -82,7 +82,7 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
                 }}
                 className={`w-full flex bg-zinc-900 items-center justify-between p-3 rounded-xl transition-all ${
                   selectedId === course.id
-                    ? "bg-[#a098ff]/10 border border-[#a098ff]/20"
+                    ? "bg-x/10 border border-x/20"
                     : "hover:bg-white/5 border border-transparent"
                 }`}
               >
@@ -141,7 +141,7 @@ const SectionSelector = ({ sections, selectedId, onSelect }) => {
         className="w-full md:w-[280px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-zinc-900/50 border border-white/5 text-white hover:bg-white/5 transition-all group"
       >
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="p-2 rounded-xl bg-[#a098ff]/10 text-[#a098ff]">
+          <div className="p-2 rounded-xl bg-x/10 text-x">
             <Layers size={16} />
           </div>
           <div className="flex flex-col items-start truncate">
@@ -168,7 +168,7 @@ const SectionSelector = ({ sections, selectedId, onSelect }) => {
                 }}
                 className={`w-full flex bg-zinc-900 items-center justify-between p-3 rounded-xl transition-all ${
                   selectedId === section.id
-                    ? "bg-[#a098ff]/10 text-white border border-[#a098ff]/20"
+                    ? "bg-x/10 text-white border border-x/20"
                     : "text-zinc-400 hover:bg-white/5 border border-transparent hover:text-white"
                 }`}
               >
@@ -227,7 +227,7 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
         onClick={() => setIsOpen(!isOpen)}
         className={`p-3 rounded-full border transition-all ${
           isOpen
-            ? "bg-[#a098ff]/20 text-[#a098ff] border-[#a098ff]/20"
+            ? "bg-x/20 text-x border-x/20"
             : "bg-zinc-900/50 text-zinc-400 border-white/5 hover:text-white hover:bg-white/10"
         }`}
         title="View Bookmarks"
@@ -266,7 +266,7 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
                   className="w-full text-left p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all group"
                 >
                   <div className="flex justify-between items-start mb-1">
-                    <div className="font-bold text-sm text-white group-hover:text-[#a098ff] transition-colors truncate w-full pr-2">
+                    <div className="font-bold text-sm text-white group-hover:text-x transition-colors truncate w-full pr-2">
                       {item.rowTitle}
                     </div>
                     <span
@@ -309,7 +309,7 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount }) => {
       <div className="bg-[#161616] border border-white/10 rounded-[2.5rem] w-full max-w-md overflow-hidden">
         <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-[#a098ff]/10 text-[#a098ff]">
+            <div className="p-2 rounded-xl bg-x/10 text-x">
               <Settings size={20} />
             </div>
             <h3 className="text-xl font-bold text-white">Best Of Calculator</h3>
@@ -334,7 +334,7 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount }) => {
                 onChange={(e) => setCount(parseInt(e.target.value) || 0)}
                 max={itemCount}
                 min={1}
-                className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-[#a098ff] transition-all text-xl font-bold"
+                className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-x transition-all text-xl font-bold"
                 placeholder="e.g. 4"
               />
               <span className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">
@@ -351,7 +351,7 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount }) => {
               type="number"
               value={totalWeight}
               onChange={(e) => setTotalWeight(parseFloat(e.target.value) || 0)}
-              className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-[#a098ff] transition-all text-xl font-bold"
+              className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-x transition-all text-xl font-bold"
               placeholder="e.g. 20"
             />
           </div>
@@ -367,7 +367,7 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount }) => {
 
           <button
             onClick={() => onApply(count, totalWeight)}
-            className="w-full bg-[#a098ff] hover:bg-[#a098ff]/90 text-white font-bold py-4 rounded-2xl transition-all"
+            className="w-full bg-x hover:bg-x/90 text-white font-bold py-4 rounded-2xl transition-all"
           >
             Apply Calculation
           </button>
@@ -420,9 +420,7 @@ const AssessmentView = ({
   return (
     <div
       className={`group rounded-[2rem] border transition-all duration-300 overflow-hidden ${
-        isGrandTotal
-          ? "bg-[#111] border-[#a098ff]/30 "
-          : "bg-[#161616] border-white/5"
+        isGrandTotal ? "bg-[#111] border-x/30 " : "bg-[#161616] border-white/5"
       }`}
     >
       <div className="w-full">
@@ -434,7 +432,7 @@ const AssessmentView = ({
                 {section.title}
               </h3>
               {isGrandTotal && (
-                <span className="px-2 py-0.5 rounded-md bg-[#a098ff]/20 text-[#a098ff] text-[10px] font-bold uppercase tracking-wider">
+                <span className="px-2 py-0.5 rounded-md bg-x/20 text-x text-[10px] font-bold uppercase tracking-wider">
                   Final
                 </span>
               )}
@@ -448,7 +446,7 @@ const AssessmentView = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsBestOfOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#a098ff]/10 text-[#a098ff] border border-[#a098ff]/20 hover:bg-[#a098ff]/20 transition-all font-bold text-sm"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-x/10 text-x border border-x/20 hover:bg-x/20 transition-all font-bold text-sm"
               >
                 <Settings size={16} />
                 Best Of
@@ -537,7 +535,7 @@ const AssessmentView = ({
                           !row.included ? "opacity-40 grayscale-[0.8]" : ""
                         } ${
                           isMarked
-                            ? "bg-[#a098ff]/10"
+                            ? "bg-x/10"
                             : "hover:bg-white/5 border-white/5"
                         }`}
                       >
@@ -547,7 +545,7 @@ const AssessmentView = ({
                               onClick={() => onToggleMark?.(uniqueId)}
                               className={`p-1.5 rounded-full shrink-0 transition-all border ${
                                 isMarked
-                                  ? "bg-[#a098ff]/20 text-[#a098ff] border-[#a098ff]/30"
+                                  ? "bg-x/20 text-x border-x/30"
                                   : "bg-zinc-900/50 text-zinc-600 border-white/5 hover:text-zinc-400 hover:bg-white/10"
                               }`}
                             >
@@ -558,7 +556,7 @@ const AssessmentView = ({
                             </button>
                             <div className="flex items-center gap-2">
                               {row.included ? (
-                                <div className="w-1.5 h-1.5 rounded-full bg-[#a098ff]"></div>
+                                <div className="w-1.5 h-1.5 rounded-full bg-x"></div>
                               ) : (
                                 <div className="w-1.5 h-1.5 rounded-full bg-zinc-600"></div>
                               )}
@@ -578,7 +576,7 @@ const AssessmentView = ({
                             onChange={(e) =>
                               onUpdate(idx, "weight", e.target.value)
                             }
-                            className="bg-transparent text-center w-16 focus:outline-none focus:border focus:border-[#a098ff] hover:bg-white/5 rounded transition-colors"
+                            className="bg-transparent text-center w-16 focus:outline-none focus:border focus:border-x hover:bg-white/5 rounded transition-colors"
                           />
                         </td>
                         <td className="px-6 py-4 text-center text-zinc-400">
@@ -591,7 +589,7 @@ const AssessmentView = ({
                             onChange={(e) =>
                               onUpdate(idx, "obtained", e.target.value)
                             }
-                            className={`font-bold text-base text-center w-16 bg-transparent focus:outline-none focus:border focus:border-[#a098ff] hover:bg-white/5 rounded transition-colors ${
+                            className={`font-bold text-base text-center w-16 bg-transparent focus:outline-none focus:border focus:border-x hover:bg-white/5 rounded transition-colors ${
                               (row.obtained / row.total) * 100 >= 80
                                 ? "text-emerald-400"
                                 : (row.obtained / row.total) * 100 >= 60
@@ -623,7 +621,7 @@ const AssessmentView = ({
                     {weight.toFixed(2)}
                   </td>
                   <td className="px-6 py-5 text-center">-</td>
-                  <td className="px-6 py-5 text-center text-[#a098ff] text-lg">
+                  <td className="px-6 py-5 text-center text-x text-lg">
                     {obtained.toFixed(2)}
                   </td>
                   <td className="px-6 py-5 text-center text-zinc-400">

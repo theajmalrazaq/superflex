@@ -67,7 +67,7 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
       }`}
     >
       <div className="bg-[url('res/bg.png')] bg-black border-[1px] border-white/10 bg-cover flex items-center justify-center h-24 w-24 rounded-[32px]  relative overflow-hidden">
-        <div className="absolute inset-0 bg-[#a098ff]/10 blur-xl"></div>
+        <div className="absolute inset-0 bg-x/10 blur-xl"></div>
         <svg
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
@@ -91,7 +91,7 @@ export const LoadingSpinner = () => {
   return (
     <div className="flex items-center justify-center w-full h-full min-h-[200px]">
       <div className="bg-black/50 border border-white/5 flex items-center justify-center h-16 w-16 rounded-[20px] relative overflow-hidden">
-        <div className="absolute inset-0 bg-[#a098ff]/5 blur-md"></div>
+        <div className="absolute inset-0 bg-x/5 blur-md"></div>
         <svg
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
