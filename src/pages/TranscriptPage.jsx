@@ -591,7 +591,7 @@ function TranscriptPage() {
       window.superflex_ai_context = newContext;
 
       window.dispatchEvent(
-        new CustomEvent("superflex-data-updated", { detail: newContext }),
+        new CustomEvent("superflex-data-updated", { detail: { ...newContext, isTranscriptSync: true } }),
       );
     } catch (e) {
       console.error("AI Sync Error (Transcript):", e);

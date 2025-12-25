@@ -49,14 +49,9 @@ const SuperFlexAI = () => {
     attendance: null,
     marks: null,
     studentName: null,
-    studentCms: null,
-    universityInfo: null,
-    personalInfo: null,
-    alerts: [],
     transcript: null,
     mcaData: null,
     studyPlan: null,
-    feeHistory: null,
     lastScanned: null,
   });
 
@@ -84,6 +79,30 @@ const SuperFlexAI = () => {
 
     window.addEventListener("superflex-data-updated", handleDataUpdate);
 
+    const handleTranscriptSync = (e) => {
+      const data = e.detail;
+      if (data.isTranscriptSync) {
+        console.log("SuperFlexAI: Transcript sync detected, opening assistant...");
+        setIsOpen(true);
+        setIsScanning(false);
+        setScanProgress(100);
+        
+        setMessages((prev) => {
+          // Check if we already have a sync success message
+          if (prev.some(m => m.content.includes("✅ **Sync Complete!**"))) return prev;
+          return [
+            ...prev,
+            {
+              role: "assistant",
+              content: "✅ **Transcript Sync Complete!** I've parsed your entire academic history and the grading curves (MCA). I'm ready to predict your GPA or simulate your 'What-If' scenarios. What's on your mind?",
+            },
+          ];
+        });
+      }
+    };
+
+    window.addEventListener("superflex-data-updated", handleTranscriptSync);
+
     const savedMessages = localStorage.getItem("superflex_ai_messages");
     if (savedMessages) {
       try {
@@ -97,14 +116,30 @@ const SuperFlexAI = () => {
           {
             role: "assistant",
             content:
-              "Hi! I'm your SuperFlex AI assistant. I have fresh access to your marks, attendance, academic history, and degree roadmap. How can I help you today?",
+              "Hi! I'm your SuperFlex AI assistant. I've automatically synced your marks, attendance, and degree roadmap in the background. How can I help you today?",
           },
         ]);
       }
     }
 
+    const handleScanComplete = () => {
+      setIsScanning(false);
+      setScanProgress(100);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "✅ **Auto-Sync Complete!** I've refreshed your academic records. How can I help you with your subjects?",
+        },
+      ]);
+    };
+
+    window.addEventListener("superflex-scan-complete", handleScanComplete);
+
     return () => {
       window.removeEventListener("superflex-data-updated", handleDataUpdate);
+      window.removeEventListener("superflex-data-updated", handleTranscriptSync);
+      window.removeEventListener("superflex-scan-complete", handleScanComplete);
     };
   }, [permissionStatus]);
 
@@ -184,30 +219,30 @@ const SuperFlexAI = () => {
 
       const academicData = {
         student: {
-          name: dataContext.studentName,
-          cmsId: dataContext.studentCms,
-          program: dataContext.universityInfo?.Degree,
-          section: dataContext.universityInfo?.Section,
+          name: dataContext.studentName || "Student",
+          cmsId: "REDACTED", // Explicit removal as requested
+          program: "Unknown", 
+          section: "Unknown",
         },
         currentPerformance: {
           marks:
             dataContext.marks && dataContext.marks.length > 0
               ? dataContext.marks
-              : "Not scanned yet (Visit Home)",
+              : "Syncing in background...",
           attendance:
             dataContext.attendance && dataContext.attendance.length > 0
               ? dataContext.attendance
-              : "Not scanned yet (Visit Home)",
+              : "Syncing in background...",
         },
         academicHistory: {
           transcript:
-            dataContext.transcript || "Not scanned yet (Visit Transcript)",
+            dataContext.transcript || "Missing (Visit Transcript Page)",
           mcaData:
-            dataContext.mcaData || "Not scanned yet (Visit Transcript)",
+            dataContext.mcaData || "Missing (Visit Transcript Page)",
           studyPlan:
-            dataContext.studyPlan || "Not scanned yet (Visit Study Plan)",
+            dataContext.studyPlan || "Missing (Visit Transcript Page)",
         },
-        systemAlerts: dataContext.alerts || [],
+        systemAlerts: [], // Explicit removal
       };
 
       if (permissionStatus !== "granted") {
@@ -220,13 +255,14 @@ const SuperFlexAI = () => {
           transcript: "Permission denied",
           studyPlan: "Permission denied",
         };
+        academicData.systemAlerts = ["Permission denied"];
       }
 
       const prompt = `
         You are "SuperFlex AI", the intelligent academic advisor for SuperFlex (a premium student portal).
         
         ### STUDENT PROFILE
-        - Name: ${academicData.student.name || "Student"}
+        - Name: ${academicData.student.name}
         - CMS: ${academicData.student.cmsId || "N/A"}
         - Program: ${academicData.student.program || "Unknown"}
         - Section: ${academicData.student.section || "N/A"}
@@ -256,16 +292,16 @@ const SuperFlexAI = () => {
         
         ### OPERATIONAL GUIDELINES:
         1. Analyze "CURRENT SEMESTER MARKS" for assessment-level queries (quizzes, assignments, mids).
-        2. Use "ATTENDANCE ANALYTICS" (including detailed day-by-day logs) to warn about the 80% threshold and help identify exactly which dates the student was away.
-        3. Use "ACADEMIC TRANSCRIPT" for CGPA/SGPA and history questions.
-        4. Use "DEGREE ROADMAP" for graduation, core courses, and remaining credits.
-        5. If marks or attendance are missing, ask them to visit Home or use the "Smart Scan" tool.
-        6. If transcript or MCA data is missing, explicitly tell them: "Could you please visit the Transcript page for a moment? I need to sync your academic history and grading curves from there to ensure accurate data without risking a session timeout."
-        7. If study plan is missing, ask them to visit the Tentative Study Plan page or hit "Smart Scan".
-        8. RELATIVE GRADING LOGIC: Use "RELATIVE GRADING THRESHOLDS" (MCA Data) to predict grades. For example, if a course has MCA 55, look up the "55" key in MCA data to see the marks required for each grade.
-        9. GPA PREDICTOR / SANDBOX MODE: You have the ability to simulate future CGPA. When a user asks about their future CGPA, use their current Transcript (CGPA/Total Credits) and their Study Plan (future courses/credits) to calculate projected outcomes. Assume standard grades (e.g., A, B) if they don't specify.
-        10. Be concise, friendly, and casually professional. Speak naturally but avoid excessive slang or overly formal language.
-        11. Format performance data in clean Markdown tables when answering.
+        2. **CRITICAL FOR MARKS**: Each category (Assignment, Quiz, etc.) has a "stats" object containing sophisticated metrics: properties like \`weightedAvg\`, \`weightedMin\`, \`weightedMax\`, and \`weightedStdDev\`. Use these to compare the student's performance against the class. Use \`stats.totalObtainedWeighted\` and \`stats.totalWeight\` for grade calculations. DO NOT sum raw marks yourself. 
+        3. Use "ATTENDANCE ANALYTICS" (including detailed day-by-day logs) to warn about the 80% threshold and help identify exactly which dates the student was away.
+        4. Use "ACADEMIC TRANSCRIPT" for CGPA/SGPA and history questions.
+        5. Use "DEGREE ROADMAP" for graduation, core courses, and remaining credits.
+        6. If transcript, MCA, or study plan data is missing, explicitly tell them: "Could you please head over to the Transcript page for a split second? I need to grab your academic history and the current grading curves from there to give you accurate predictions."
+        7. You no longer need to ask them to visit 'Home' or 'Attendance' pages as those are synced automatically in the stealth background.
+        9. RELATIVE GRADING LOGIC: Use "RELATIVE GRADING THRESHOLDS" (MCA Data) to predict grades. For example, if a course has MCA 55, look up the "55" key in MCA data to see the marks required for each grade.
+        10. GPA PREDICTOR / SANDBOX MODE: You have the ability to simulate future CGPA. When a user asks about their future CGPA, use their current Transcript (CGPA/Total Credits) and their Study Plan (future courses/credits) to calculate projected outcomes. Assume standard grades (e.g., A, B) if they don't specify.
+        11. Be concise, friendly, and casually professional. Speak naturally but avoid excessive slang or overly formal language.
+        12. Format performance data in clean Markdown tables when answering.
       `;
 
       document.dispatchEvent(
@@ -294,14 +330,7 @@ const SuperFlexAI = () => {
   const runSmartScan = async () => {
     if (isScanning) return;
     setIsScanning(true);
-    setScanProgress(0);
-
-    const paths = [
-      { name: "Attendance", url: "/Student/StudentAttendance" },
-      { name: "Marks", url: "/Student/StudentMarks" },
-      { name: "Study Plan", url: "/Student/TentativeStudyPlan" },
-      { name: "Fees", url: "/ConsolidatedFeeReport" },
-    ];
+    setScanProgress(10); // Start progress
 
     setMessages((prev) => [
       ...prev,
@@ -311,76 +340,21 @@ const SuperFlexAI = () => {
       },
     ]);
 
-    const newCtx = { ...window.superflex_ai_context };
-
-    for (let i = 0; i < paths.length; i++) {
-        const path = paths[i];
-        setScanProgress(((i + 1) / paths.length) * 100);
-        try {
-            const res = await fetch(path.url);
-            const html = await res.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, "text/html");
-
-            if (path.name === "Attendance") {
-                const courses = [];
-                doc.querySelectorAll(".tab-pane").forEach(pane => {
-                    const title = pane.querySelector("h5")?.textContent.trim().replace(/\(.*\)/, "").trim();
-                    const records = [];
-                    pane.querySelectorAll("tbody tr").forEach(row => {
-                        const cols = row.querySelectorAll("td");
-                        if (cols.length >= 4) records.push({ status: cols[3]?.textContent.trim() });
-                    });
-                    courses.push({ title, records, absent: records.filter(r => r.status.includes("A")).length });
-                });
-                newCtx.attendance = courses;
-            } else if (path.name === "Marks") {
-                const courses = [];
-                doc.querySelectorAll(".tab-pane").forEach(pane => {
-                    const title = pane.querySelector("h5")?.textContent.trim().replace(/\(.*\)/, "").trim();
-                    courses.push({ id: pane.id, title });
-                });
-                newCtx.marks = courses;
-            } else if (path.name === "Study Plan") {
-                const sems = [];
-                doc.querySelectorAll(".col-md-6").forEach(col => {
-                    const title = col.querySelector("h4")?.textContent.trim();
-                    if (title) sems.push({ title });
-                });
-                newCtx.studyPlan = sems;
-            } else if (path.name === "Fees") {
-                const txs = [];
-                doc.querySelectorAll("#FeeReport tbody tr").forEach(tr => {
-                    const td = tr.querySelectorAll("td");
-                    if (td.length >= 10) txs.push({ amount: td[5].textContent.trim() });
-                });
-                newCtx.feeHistory = txs;
-            }
-        } catch (e) {
-            console.error(`Sync failed for ${path.name}`, e);
-        }
-        await new Promise(r => setTimeout(r, 600));
-    }
-
-    newCtx.lastScanned = new Date().toISOString();
-    window.superflex_ai_context = newCtx;
-    setDataContext(newCtx);
-    window.dispatchEvent(new CustomEvent("superflex-data-updated", { detail: newCtx }));
-
-    setIsScanning(false);
-    setScanProgress(100);
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: "assistant",
-        content: "✅ **Scan Complete!** I now have a full cache of your marks, attendance, and plans. How can I help you achieve that 4.0?",
-      },
-    ]);
+    // Dispatch event to AiDataPrepare
+    window.dispatchEvent(new CustomEvent("superflex-trigger-scan"));
+    
+    // Fallback timeout in case event handling fails or is instant
+    setTimeout(() => {
+        if(isScanning) setScanProgress(50);
+    }, 1000);
   };
 
   const handlePermission = (status) => {
     setPermissionStatus(status);
     localStorage.setItem("superflex_ai_data_permission", status);
+    
+    // Notify AiDataPrepare
+    window.dispatchEvent(new CustomEvent("superflex-permission-updated", { detail: status }));
 
     const welcomeMsg =
       status === "granted"
@@ -490,14 +464,6 @@ const SuperFlexAI = () => {
                 className="p-2.5 hover:bg-rose-500/20 rounded-xl text-zinc-400 hover:text-rose-400 transition-all bg-white/5 border border-white/5 active:scale-95"
               >
                 <Trash2 size={18} />
-              </button>
-              <button
-                onClick={runSmartScan}
-                disabled={isScanning}
-                title="Smart Scan Entire Portal"
-                className={`p-2.5 rounded-xl text-zinc-400 hover:text-[#a098ff] transition-all bg-white/5 border border-white/5 active:scale-95 ${isScanning ? "animate-pulse" : ""}`}
-              >
-                <Zap size={18} fill={isScanning ? "#a098ff" : "none"} />
               </button>
             </div>
           </div>

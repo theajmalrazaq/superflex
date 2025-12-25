@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageLayout from "../components/layouts/PageLayout";
+import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,22 +14,21 @@ import {
   ArcElement,
   Filler,
 } from "chart.js";
-import { Line, Bar } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import {
   User,
   Users,
   Building,
-  Calendar,
   Award,
   Activity,
   GraduationCap,
   ChevronDown,
   ChevronUp,
   ArrowRight,
-  AlertTriangle,
 } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import StatsCard from "../components/ui/StatsCard";
+import Skeleton, { MarksSkeleton, AttendanceSkeleton } from "../components/ui/Skeleton";
 
 ChartJS.register(
   CategoryScale,
@@ -41,10 +41,6 @@ ChartJS.register(
   Legend,
   ArcElement,
   Filler,
-);
-
-const Skeleton = ({ className }) => (
-  <div className={`animate-pulse bg-white/5 ${className}`} />
 );
 
 const CategoryAccordion = ({ category, isOpen, onToggle }) => {
@@ -151,8 +147,6 @@ function HomePage() {
   const [alerts, setAlerts] = useState([]);
 
   const [attendanceData, setAttendanceData] = useState(null);
-  const [studyPlanData, setStudyPlanData] = useState(null);
-  const [marksHistory, setMarksHistory] = useState([]);
   const [currentAggregate, setCurrentAggregate] = useState({
     obtained: 0,
     total: 0,
@@ -162,18 +156,11 @@ function HomePage() {
   const [activeCourse, setActiveCourse] = useState(null);
   const [openCategoryIdx, setOpenCategoryIdx] = useState(null);
 
-  useEffect(() => {
-    if (coursesData.length > 0 && !activeCourse) {
-      setActiveCourse(coursesData[0].id);
-    }
-  }, [coursesData, activeCourse]);
-
   const [links, setLinks] = useState({});
   const [chartPattern, setChartPattern] = useState(null);
 
-  const [loadingMarks, setLoadingMarks] = useState(true);
-  const [loadingAttendance, setLoadingAttendance] = useState(true);
-
+  const [loadingMarks, setLoadingMarks] = useState(false);
+  const [loadingAttendance, setLoadingAttendance] = useState(false);
 
   useEffect(() => {
     const canvas = document.createElement("canvas");
@@ -209,14 +196,6 @@ function HomePage() {
     styleElement.textContent = scrollbarStyle;
     document.head.appendChild(styleElement);
 
-    const savedHistory = localStorage.getItem("superflex_marks_history");
-    if (savedHistory) {
-      try {
-        setMarksHistory(JSON.parse(savedHistory));
-      } catch (e) {
-        console.error("History parse fail", e);
-      }
-    }
 
     const targetElement = document.querySelector(
       ".m-grid.m-grid--hor.m-grid--root.m-page",
@@ -318,157 +297,193 @@ function HomePage() {
       if (l.text.includes("Attendance")) linkMap.attendance = l.href;
       if (l.text.includes("Marks") && !l.text.includes("PLO"))
         linkMap.marks = l.href;
-      if (l.text.includes("Tentative Study Plan")) linkMap.studyPlan = l.href;
     });
     setLinks(linkMap);
   };
 
   useEffect(() => {
-    const handleGlobalUpdate = (e) => {
-      const data = e.detail;
-      if (data.attendance) {
-        setAttendanceData(data.attendance);
-        setLoadingAttendance(false);
-      }
-      if (data.marks) {
-        setCoursesData(data.marks);
-        setLoadingMarks(false);
-        updateMarksHistory(data.marks);
-      }
-      if (data.studyPlan) setStudyPlanData(data.studyPlan);
-    };
-
-    window.addEventListener("superflex-data-updated", handleGlobalUpdate);
-
-    if (window.superflex_ai_context) {
-      const ctx = window.superflex_ai_context;
-      if (ctx.attendance) {
-        setAttendanceData(ctx.attendance);
-        setLoadingAttendance(false);
-      }
-      if (ctx.marks) {
-        setCoursesData(ctx.marks);
-        setLoadingMarks(false);
-        updateMarksHistory(ctx.marks);
-      }
-      if (ctx.studyPlan) setStudyPlanData(ctx.studyPlan);
-    }
-
-    return () =>
-      window.removeEventListener("superflex-data-updated", handleGlobalUpdate);
-  }, []);
-
-  const updateMarksHistory = (courses) => {
-    if (!courses || courses.length === 0) return;
-
-    let totalObt = 0;
-    let totalW = 0;
-    courses.forEach((c) => {
-      totalObt += c.obtained;
-      totalW += c.total;
-    });
-
-    const currentPerc = totalW > 0 ? (totalObt / totalW) * 100 : 0;
-    setCurrentAggregate({
-      obtained: totalObt,
-      total: totalW,
-      percentage: currentPerc,
-    });
-  };
-
-  useEffect(() => {
-    if (!universityInfo && !personalInfo) return;
-
-    const existingContext = window.superflex_ai_context || {};
-
-    let studentName = existingContext.studentName;
-    if (personalInfo && personalInfo["Name"])
-      studentName = personalInfo["Name"];
-
-    let studentCms = existingContext.studentCms;
-    if (
-      universityInfo &&
-      (universityInfo["Student ID"] || universityInfo["CMS ID"])
-    ) {
-      studentCms = universityInfo["Student ID"] || universityInfo["CMS ID"];
-    }
-
-    if (
-      studentName !== existingContext.studentName ||
-      studentCms !== existingContext.studentCms
-    ) {
-      const newContext = {
-        ...existingContext,
-        studentName,
-        studentCms,
-        universityInfo: universityInfo
-          ? { ...existingContext.universityInfo, ...universityInfo }
-          : existingContext.universityInfo,
-      };
-
-      window.superflex_ai_context = newContext;
-
-      window.dispatchEvent(
-        new CustomEvent("superflex-data-updated", { detail: newContext }),
+    if (links.attendance) {
+      setLoadingAttendance(true);
+      fetchAttendance(links.attendance).finally(() =>
+        setLoadingAttendance(false),
       );
     }
-
-    if (universityInfo?.Session && currentAggregate.total > 0) {
-      const currentSession = universityInfo.Session;
-      const newHistoryItem = {
-        semester: currentSession,
-        percentage: currentAggregate.percentage,
-        timestamp: new Date().toISOString(),
-      };
-
-      setMarksHistory((prev) => {
-        if (
-          prev.some(
-            (item) =>
-              item.semester === currentSession &&
-              Math.abs(item.percentage - currentAggregate.percentage) < 0.01,
-          )
-        ) {
-          return prev;
-        }
-
-        const existingIndex = prev.findIndex(
-          (item) => item.semester === currentSession,
-        );
-        let updated;
-        if (existingIndex >= 0) {
-          updated = [...prev];
-          updated[existingIndex] = newHistoryItem;
-        } else {
-          updated = [...prev, newHistoryItem];
-        }
-        localStorage.setItem(
-          "superflex_marks_history",
-          JSON.stringify(updated),
-        );
-        return updated;
-      });
+    if (links.marks) {
+      setLoadingMarks(true);
+      fetchMarks(links.marks).finally(() => setLoadingMarks(false));
     }
-  }, [universityInfo, personalInfo, currentAggregate]);
+  }, [links]);
 
-  const performanceChartData = useMemo(() => {
-    if (!marksHistory || marksHistory.length === 0) return null;
-    return {
-      labels: marksHistory.map((s) => s.semester),
-      datasets: [
-        {
-          label: "Aggregate %",
-          data: marksHistory.map((s) => s.percentage),
-          borderColor: "#a098ff",
-          backgroundColor: "rgba(160, 152, 255, 0.1)",
-          tension: 0.4,
-          fill: true,
-          pointBackgroundColor: "#a098ff",
-          pointBorderColor: "#000",
-        },
-      ],
-    };
-  }, [marksHistory]);
+  const fetchAttendance = async (url) => {
+    try {
+      const res = await fetch(url);
+      const html = await res.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+
+      const summaryData = [];
+      const tables = doc.querySelectorAll(
+        ".table.table-bordered.table-responsive",
+      );
+
+      tables.forEach((table) => {
+        const tabPane = table.closest(".tab-pane");
+        let title =
+          tabPane?.querySelector("h5")?.textContent.trim() || "Course";
+        const titleParts = title.split("-");
+        if (titleParts.length > 1) {
+          const rawTitle = titleParts.slice(1).join("-").trim();
+          title = rawTitle.replace(/\(.*\)/, "").trim();
+        }
+        const rows = table.querySelectorAll("tbody tr");
+        let present = 0,
+          absent = 0;
+        rows.forEach((r) => {
+          const marker = r.querySelector("td:nth-child(4)")?.textContent.trim();
+          if (marker?.includes("P")) present++;
+          if (marker?.includes("A")) absent++;
+        });
+
+        let percentage = 0;
+        const progress = tabPane?.querySelector(".progress-bar");
+        if (progress) {
+          percentage = parseFloat(progress.getAttribute("aria-valuenow") || 0);
+        }
+
+        summaryData.push({
+          title,
+          present,
+          absent,
+          total: rows.length,
+          percentage,
+        });
+      });
+      setAttendanceData(summaryData);
+    } catch (e) {
+      console.error("Attendance fetch error", e);
+    }
+  };
+
+  const fetchMarks = async (url) => {
+    try {
+      const res = await fetch(url);
+      const html = await res.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+
+      let semesterTotalObtained = 0;
+      let semesterTotalWeight = 0;
+      const parsedCourses = [];
+
+      const tabPanes = doc.querySelectorAll(".tab-pane");
+
+      tabPanes.forEach((pane) => {
+        const courseId = pane.id;
+        let courseTitle =
+          pane.querySelector("h5")?.textContent.trim() || courseId;
+        const titleParts = courseTitle.split("-");
+        if (titleParts.length > 1) {
+          const rawTitle = titleParts.slice(1).join("-").trim();
+          courseTitle = rawTitle.replace(/\(.*\)/, "").trim();
+        }
+
+        let courseTotalObtained = 0;
+        let courseTotalWeight = 0;
+        const categories = [];
+
+        const cards = pane.querySelectorAll(".card");
+        cards.forEach((card) => {
+          const header = card
+            .querySelector(".card-header button")
+            ?.textContent.trim();
+          if (!header || header.includes("Grand Total")) return;
+
+          const categoryAssessments = [];
+          const rows = card.querySelectorAll("tbody tr");
+          rows.forEach((tr) => {
+            if (tr.classList.contains("totalColumn_1471")) return;
+
+            const tds = tr.querySelectorAll("td");
+            if (tds.length < 4) return;
+
+            const name = tds[0]?.textContent.trim();
+            const obtainedStr = tds[2]?.textContent.trim();
+            const totalStr = tds[3]?.textContent.trim();
+
+            if (name === "Total" || name === "Grand Total") return;
+
+            if (obtainedStr && obtainedStr !== "-" && obtainedStr !== "") {
+              const obtained = parseFloat(obtainedStr);
+              const total = parseFloat(totalStr);
+
+              if (!isNaN(obtained)) {
+                categoryAssessments.push({
+                  name: name,
+                  obtained,
+                  total: isNaN(total) ? 0 : total,
+                  percentage:
+                    total > 0 && !isNaN(total) ? (obtained / total) * 100 : 0,
+                });
+              }
+            }
+          });
+
+          if (categoryAssessments.length > 0) {
+            categories.push({
+              name: header,
+              assessments: categoryAssessments,
+            });
+          }
+        });
+
+        const calcRows = pane.querySelectorAll(".sum_table .calculationrow");
+        calcRows.forEach((row) => {
+          const weightText = row.querySelector(".weightage")?.textContent;
+          const obtMarksText = row.querySelector(".ObtMarks")?.textContent;
+          const w = parseFloat(weightText || "0");
+          const o = parseFloat(obtMarksText || "0");
+          if (!isNaN(w) && !isNaN(o)) {
+            courseTotalObtained += o;
+            courseTotalWeight += w;
+          }
+        });
+
+        semesterTotalObtained += courseTotalObtained;
+        semesterTotalWeight += courseTotalWeight;
+
+        parsedCourses.push({
+          id: courseId,
+          title: courseTitle,
+          categories: categories,
+          obtained: courseTotalObtained,
+          total: courseTotalWeight,
+          percentage:
+            courseTotalWeight > 0
+              ? (courseTotalObtained / courseTotalWeight) * 100
+              : 0,
+        });
+      });
+
+      setCoursesData(parsedCourses);
+      if (parsedCourses.length > 0) {
+        setActiveCourse(parsedCourses[0].id);
+      }
+
+      const currentPerc =
+        semesterTotalWeight > 0
+          ? (semesterTotalObtained / semesterTotalWeight) * 100
+          : 0;
+      setCurrentAggregate({
+        obtained: semesterTotalObtained,
+        total: semesterTotalWeight,
+        percentage: currentPerc,
+      });
+
+    } catch (e) {
+      console.error("Marks fetch error", e);
+    }
+  };
+
 
   const activeCourseData = useMemo(() => {
     return coursesData.find((c) => c.id === activeCourse);
@@ -523,9 +538,7 @@ function HomePage() {
                         "Wait, you're here?",
                         "Manifesting 4.0,",
                       ];
-                      return greetings[
-                        Math.floor(Math.random() * greetings.length)
-                      ];
+                      return greetings[Math.floor(Math.random() * greetings.length)];
                     }, [])}{" "}
                     <span className="text-[#a098ff]">
                       {personalInfo?.Name?.split(" ")[0] || "Student"}
@@ -545,14 +558,15 @@ function HomePage() {
                         "Your aggregate is looking real quiet...",
                         "Academic comeback starts... never?",
                       ];
-
+                      
+                      // Contextual roasts
                       if (mostAbsentSubject && mostAbsentSubject.absent > 3) {
-                        return `Bestie, ${mostAbsentSubject.absent} absents in ${mostAbsentSubject.title.split(" ")[0]}? You're cooked.`;
+                        return `Bestie, ${mostAbsentSubject.absent} absents in ${mostAbsentSubject.title.split(' ')[0]}? You're cooked.`;
                       }
                       if (currentAggregate.percentage > 85) {
                         return "Okay nerd, we get it, you're smart.";
                       }
-
+                      
                       return roasts[Math.floor(Math.random() * roasts.length)];
                     }, [mostAbsentSubject, currentAggregate])}
                   </p>
@@ -617,14 +631,22 @@ function HomePage() {
                 icon={Activity}
                 label="Critical Attendance"
                 value={
-                  loadingAttendance
-                    ? "..."
-                    : mostAbsentSubject
-                      ? mostAbsentSubject.title
-                      : "None"
+                  loadingAttendance ? (
+                    <Skeleton className="h-6 w-24 my-1" />
+                  ) : mostAbsentSubject ? (
+                    mostAbsentSubject.title
+                  ) : (
+                    "None"
+                  )
                 }
                 subValue={
-                  mostAbsentSubject ? `${mostAbsentSubject.absent} Absents` : ""
+                  loadingAttendance ? (
+                    <Skeleton className="h-3 w-16" />
+                  ) : mostAbsentSubject ? (
+                    `${mostAbsentSubject.absent} Absents`
+                  ) : (
+                    ""
+                  )
                 }
                 delay={300}
               />
@@ -634,33 +656,7 @@ function HomePage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               {}
               {loadingMarks ? (
-                <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 h-full flex flex-col gap-6 min-h-[500px]">
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-2">
-                      <Skeleton className="h-7 w-48 rounded-lg" />
-                      <Skeleton className="h-3 w-32 rounded-md" />
-                    </div>
-                    <Skeleton className="h-8 w-24 rounded-lg" />
-                  </div>
-
-                  <div className="flex gap-3 overflow-hidden">
-                    <Skeleton className="h-9 w-24 rounded-full" />
-                    <Skeleton className="h-9 w-24 rounded-full" />
-                    <Skeleton className="h-9 w-24 rounded-full" />
-                  </div>
-
-                  <div className="space-y-4 mt-2">
-                    <div className="space-y-2">
-                      <Skeleton className="h-8 w-64 rounded-lg" />
-                      <Skeleton className="h-4 w-32 rounded-md" />
-                    </div>
-                    <div className="space-y-3">
-                      <Skeleton className="h-16 w-full rounded-xl" />
-                      <Skeleton className="h-16 w-full rounded-xl" />
-                      <Skeleton className="h-16 w-full rounded-xl" />
-                    </div>
-                  </div>
-                </div>
+                <MarksSkeleton />
               ) : coursesData.length > 0 ? (
                 <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden flex flex-col gap-8 h-full">
                   <div className="flex flex-col md:flex-row justify-between items-start gap-6">
@@ -751,129 +747,122 @@ function HomePage() {
                   No marks data available
                 </div>
               )}
-              {}
-              <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 h-full flex flex-col">
-                <div className="flex justify-between items-start mb-8">
-                  <div className="space-y-1">
-                    <h3 className="text-xl font-bold text-white tracking-tight">
-                      Attendance Overview
-                    </h3>
-                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
-                      Presence and Absence Analytics
-                    </p>
+              {loadingAttendance ? (
+                <AttendanceSkeleton />
+              ) : (
+                <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 h-full flex flex-col">
+                  <div className="flex justify-between items-start mb-8">
+                    <div className="space-y-1">
+                      <h3 className="text-xl font-bold text-white tracking-tight">
+                        Attendance Overview
+                      </h3>
+                      <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+                        Presence and Absence Analytics
+                      </p>
+                    </div>
+                    {links.attendance && (
+                      <a
+                        href={links.attendance}
+                        className="bg-white/5 hover:bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-lg  transition-colors flex items-center gap-1.5"
+                      >
+                        View Details
+                        <ArrowRight size={12} />
+                      </a>
+                    )}
                   </div>
-                  {links.attendance && (
-                    <a
-                      href={links.attendance}
-                      className="bg-white/5 hover:bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-lg  transition-colors flex items-center gap-1.5"
-                    >
-                      View Details
-                      <ArrowRight size={12} />
-                    </a>
-                  )}
-                </div>
-                <div className="flex-1 w-full overflow-hidden relative min-h-[400px]">
-                  {attendanceData && chartPattern ? (
-                    <div
-                      style={{
-                        height: `${Math.max(400, attendanceData.length * 60)}px`,
-                        width: "100%",
-                      }}
-                    >
-                      <Bar
-                        data={{
-                          labels: attendanceData.map((d) => {
-                            const t = d.title;
-                            const trunc =
-                              t.length > 15 ? t.substring(0, 15) + "..." : t;
-                            return `${trunc} (P:${d.present} A:${d.absent})`;
-                          }),
-                          datasets: [
-                            {
-                              label: "Attended",
-                              data: attendanceData.map((d) => d.percentage),
-                              backgroundColor: attendanceData.map((d) => {
-                                if (d.percentage >= 75) return "#a098ff";
-                                if (d.percentage >= 60) return "#f59e0b";
-                                return "#f43f5e";
-                              }),
-                              barPercentage: 0.6,
-                              categoryPercentage: 0.8,
-                              borderRadius: { topLeft: 100, bottomLeft: 100 },
-                              borderSkipped: false,
-                            },
-                            {
-                              label: "Remaining",
-                              data: attendanceData.map(
-                                (d) => 100 - d.percentage,
-                              ),
-                              backgroundColor: chartPattern,
-                              barPercentage: 0.6,
-                              categoryPercentage: 0.8,
-                              borderRadius: { topRight: 100, bottomRight: 100 },
-                              borderSkipped: false,
-                            },
-                          ],
+                  <div className="flex-1 w-full overflow-hidden relative min-h-[400px]">
+                    {attendanceData && chartPattern && (
+                      <div
+                        style={{
+                          height: `${Math.max(400, attendanceData.length * 60)}px`,
+                          width: "100%",
                         }}
-                        options={{
-                          indexAxis: "y",
-                          responsive: true,
-                          maintainAspectRatio: false,
-                          plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                              callbacks: {
-                                label: (context) => {
-                                  const idx = context.dataIndex;
-                                  const item = attendanceData[idx];
-                                  if (context.datasetIndex === 0) {
-                                    return `Present: ${item.present} (${item.percentage.toFixed(1)}%)`;
-                                  }
-                                  return `Absent: ${item.absent}`;
+                      >
+                        <Bar
+                          data={{
+                            labels: attendanceData.map((d) => {
+                              const t = d.title;
+                              const trunc =
+                                t.length > 15 ? t.substring(0, 15) + "..." : t;
+                              return `${trunc} (P:${d.present} A:${d.absent})`;
+                            }),
+                            datasets: [
+                              {
+                                label: "Attended",
+                                data: attendanceData.map((d) => d.percentage),
+                                backgroundColor: attendanceData.map((d) => {
+                                  if (d.percentage >= 75) return "#a098ff";
+                                  if (d.percentage >= 60) return "#f59e0b";
+                                  return "#f43f5e";
+                                }),
+                                barPercentage: 0.6,
+                                categoryPercentage: 0.8,
+                                borderRadius: { topLeft: 100, bottomLeft: 100 },
+                                borderSkipped: false,
+                              },
+                              {
+                                label: "Remaining",
+                                data: attendanceData.map(
+                                  (d) => 100 - d.percentage,
+                                ),
+                                backgroundColor: chartPattern,
+                                barPercentage: 0.6,
+                                categoryPercentage: 0.8,
+                                borderRadius: {
+                                  topRight: 100,
+                                  bottomRight: 100,
+                                },
+                                borderSkipped: false,
+                              },
+                            ],
+                          }}
+                          options={{
+                            indexAxis: "y",
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                              legend: { display: false },
+                              tooltip: {
+                                callbacks: {
+                                  label: (context) => {
+                                    const idx = context.dataIndex;
+                                    const item = attendanceData[idx];
+                                    if (context.datasetIndex === 0) {
+                                      return `Present: ${item.present} (${item.percentage.toFixed(1)}%)`;
+                                    }
+                                    return `Absent: ${item.absent}`;
+                                  },
                                 },
                               },
                             },
-                          },
-                          scales: {
-                            x: {
-                              stacked: true,
-                              display: false,
-                              max: 100,
-                              grid: { display: false },
-                            },
-                            y: {
-                              stacked: true,
-                              grid: { display: false },
-                              ticks: {
-                                color: "#a1a1aa",
-                                font: {
-                                  size: 11,
-                                  family: "'Google Sans Flex', sans-serif",
-                                },
-                                autoSkip: false,
+                            scales: {
+                              x: {
+                                stacked: true,
+                                display: false,
+                                max: 100,
+                                grid: { display: false },
                               },
-                              border: { display: false },
+                              y: {
+                                stacked: true,
+                                grid: { display: false },
+                                ticks: {
+                                  color: "#a1a1aa",
+                                  font: {
+                                    size: 11,
+                                    family: "'Google Sans Flex', sans-serif",
+                                  },
+                                  autoSkip: false,
+                                },
+                                border: { display: false },
+                              },
                             },
-                          },
-                        }}
-                      />
-                    </div>
-                  ) : loadingAttendance ? (
-                    <div className="space-y-6 mt-4">
-                      {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <div key={i} className="flex items-center gap-4">
-                          <div className="w-24">
-                            <Skeleton className="h-3 w-full rounded" />
-                          </div>
-                          <div className="flex-1">
-                            <Skeleton className="h-6 w-full rounded-full" />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : null}
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         )}

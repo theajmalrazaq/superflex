@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import NavBar from "../NavBar";
+import AiDataPrepare from "../AiDataPrepare";
 
 function PageLayout({
   children,
@@ -7,15 +8,22 @@ function PageLayout({
   onAttendanceLinkFound,
   onLinksFound,
 }) {
+  const [navLinks, setNavLinks] = useState([]);
+
   return (
     <div className="min-h-screen bg-black flex flex-col font-sans transition-colors duration-300">
-      {}
+      <AiDataPrepare rawLinks={navLinks} />
+
+      {/* Navbar Container */}
       <div className="sticky flex justify-center top-4 z-[100] px-6 mb-2">
         <div className="w-full md:w-fit lg:w-fit rounded-full flex justify-center items-center border border-white/10 bg-black/20 backdrop-blur-2xl transition-all duration-300">
           <NavBar
             currentPage={currentPage}
             onAttendanceLinkFound={onAttendanceLinkFound}
-            onLinksFound={onLinksFound}
+            onLinksFound={(links) => {
+              setNavLinks(links);
+              if (onLinksFound) onLinksFound(links);
+            }}
           />
         </div>
       </div>

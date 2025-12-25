@@ -373,17 +373,7 @@ function FeeDetailsPage() {
       );
       setTotalPaid(totalAmount.toLocaleString());
 
-      // Sync with AI
-      const existingContext = window.superflex_ai_context || {};
-      const newContext = {
-        ...existingContext,
-        feeHistory: txHistory,
-        lastScanned: new Date().toISOString(),
-      };
-      window.superflex_ai_context = newContext;
-      window.dispatchEvent(
-        new CustomEvent("superflex-data-updated", { detail: newContext }),
-      );
+
 
       root.style.display = "none";
       setLoading(false);

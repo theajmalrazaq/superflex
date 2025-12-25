@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import reviews from "../../public/reviews.json";
+import reviews from "../../../public/reviews.json";
 
 const ReviewCarousel = () => {
   const [index, setIndex] = useState(0);

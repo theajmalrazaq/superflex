@@ -108,6 +108,18 @@ function StudyPlanPage() {
         });
 
         setSemesters(parsedSemesters);
+        
+        // Feed to AI context
+        if (parsedSemesters.length > 0) {
+            const existingContext = window.superflex_ai_context || {};
+            const newContext = {
+                ...existingContext,
+                studyPlan: parsedSemesters,
+                lastScanned: new Date().toISOString()
+            };
+            window.superflex_ai_context = newContext;
+            window.dispatchEvent(new CustomEvent("superflex-data-updated", { detail: newContext }));
+        }
 
         root.style.display = "none";
 
@@ -127,27 +139,7 @@ function StudyPlanPage() {
     parseData();
   }, []);
 
-  useEffect(() => {
-    if (semesters.length === 0) return;
 
-    try {
-      const existing = JSON.parse(
-        localStorage.getItem("superflex_ai_context") || "{}",
-      );
-      localStorage.setItem(
-        "superflex_ai_context",
-        JSON.stringify({
-          ...existing,
-          studyPlan: semesters,
-          lastScanned: new Date().toISOString(),
-        }),
-      );
-
-      window.dispatchEvent(new Event("storage"));
-    } catch (e) {
-      console.error("AI Sync Error (Study Plan):", e);
-    }
-  }, [semesters]);
 
   const stats = useMemo(() => {
     let totalCredits = 0;

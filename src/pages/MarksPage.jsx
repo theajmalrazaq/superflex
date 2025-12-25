@@ -1112,26 +1112,7 @@ function MarksPage() {
           }
         }
 
-        if (typeof window !== "undefined") {
-          const compatibleCourses = parsedCourses.map(c => ({
-            ...c,
-            categories: c.sections.map(s => ({
-              ...s,
-              assessments: s.rows
-            })) 
-          }));
 
-          const existingContext = window.superflex_ai_context || {};
-          const newContext = {
-            ...existingContext,
-            marks: compatibleCourses
-          };
-          
-          window.superflex_ai_context = newContext;
-          window.dispatchEvent(
-            new CustomEvent("superflex-data-updated", { detail: newContext })
-          );
-        }
 
         root.style.display = "none";
         setLoading(false);

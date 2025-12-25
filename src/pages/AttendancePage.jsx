@@ -398,17 +398,7 @@ function AttendancePage() {
           });
         });
 
-        // Sync with AI
-        const existingContext = window.superflex_ai_context || {};
-        const newContext = {
-          ...existingContext,
-          attendance: parsedCourses,
-          lastScanned: new Date().toISOString(),
-        };
-        window.superflex_ai_context = newContext;
-        window.dispatchEvent(
-          new CustomEvent("superflex-data-updated", { detail: newContext }),
-        );
+
 
         setCourses(parsedCourses);
         if (parsedCourses.length > 0) setSelectedCourseId(parsedCourses[0].id);

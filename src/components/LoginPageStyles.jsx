@@ -124,10 +124,19 @@ function LoginPageStyles() {
         "items-center",
         "hover:!bg-[#8f86ff]",
         "!transition-all",
-        "!duration-300",
       );
       button.style.fontFamily = "'Google Sans Flex', sans-serif";
     });
+
+    const loginBtn = document.querySelector(".m-login__signin .btn-primary");
+    if (loginBtn) {
+      loginBtn.addEventListener("click", () => {
+        localStorage.removeItem("superflex_last_scan_time");
+        console.log(
+          "LoginPageStyles: Sign In clicked, clearing scan timestamp for fresh sync.",
+        );
+      });
+    }
 
     const signInIcon = document.querySelector(".la-sign-in");
     if (signInIcon) signInIcon.remove();
