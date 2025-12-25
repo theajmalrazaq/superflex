@@ -1,7 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Send, X, User, Trash2, Shield, Zap, TrendingUp, Search } from "lucide-react";
+import { Send, X, User, Trash2, Shield, Zap, TrendingUp, Search, Sparkles, ChevronDown, Square } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+
+const AVAILABLE_MODELS = [
+  { id: "gpt-4o-mini", name: "GPT-4o Mini", short: "GPT-4o Mini", provider: "OpenAI" },
+  { id: "gemini-2.0-flash", name: "Gemini 2.0 Flash", short: "Gemini 2.0", provider: "Google" },
+  { id: "google/gemini-3-pro-preview", name: "Gemini 3 Pro", short: "Gemini 3", provider: "Google" },
+  { id: "deepseek-chat", name: "DeepSeek Chat", short: "DeepSeek", provider: "DeepSeek" },
+  { id: "grok-2", name: "Grok 2", short: "Grok 2", provider: "xAI" },
+];
 
 const AnimatedLogo = ({ size = 24, animated = true, className = "" }) => (
   <div
@@ -61,7 +69,10 @@ const SuperFlexAI = () => {
   const [permissionStatus, setPermissionStatus] = useState(
     () => localStorage.getItem("superflex_ai_data_permission") || "pending",
   );
+  const [selectedModel, setSelectedModel] = useState(() => localStorage.getItem("superflex_ai_model") || "gemini-2.0-flash");
+  const [showModelPicker, setShowModelPicker] = useState(false);
   const scrollRef = useRef(null);
+  const activeRequestIdRef = useRef(null);
 
   useEffect(() => {
     if (window.superflex_ai_context) {
@@ -144,6 +155,10 @@ const SuperFlexAI = () => {
   }, [permissionStatus]);
 
   useEffect(() => {
+    localStorage.setItem("superflex_ai_model", selectedModel);
+  }, [selectedModel]);
+
+  useEffect(() => {
     if (messages.length > 0) {
       localStorage.setItem("superflex_ai_messages", JSON.stringify(messages));
     }
@@ -164,17 +179,22 @@ const SuperFlexAI = () => {
     setIsLoading(true);
 
     const requestId = crypto.randomUUID();
+    activeRequestIdRef.current = requestId;
     let responseText = "";
 
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
     const responseHandler = (e) => {
       const { id, text, error, done } = e.detail;
-      if (id !== requestId) return;
+      if (id !== requestId || !activeRequestIdRef.current) {
+        document.removeEventListener("superflex-ai-response", responseHandler);
+        return;
+      }
 
       if (error) {
         document.removeEventListener("superflex-ai-response", responseHandler);
         setIsLoading(false);
+        activeRequestIdRef.current = null;
 
         let errorMsg = "Sorry, I encountered an error.";
         if (error === "auth_required" || error === "auth_canceled") {
@@ -189,8 +209,12 @@ const SuperFlexAI = () => {
         }
 
         setMessages((prev) => {
-          const others = prev.slice(0, -1);
-          return [...others, { role: "assistant", content: errorMsg }];
+          const last = prev[prev.length - 1];
+          if (last && last.role === "assistant") {
+            const others = prev.slice(0, -1);
+            return [...others, { role: "assistant", content: errorMsg }];
+          }
+          return prev;
         });
         return;
       }
@@ -199,14 +223,28 @@ const SuperFlexAI = () => {
         responseText += text;
         setMessages((prev) => {
           const last = prev[prev.length - 1];
-          const others = prev.slice(0, -1);
-          return [...others, { ...last, content: responseText }];
+          // ONLY update if the last message is an assistant message
+          if (last && last.role === "assistant") {
+            const others = prev.slice(0, -1);
+            return [...others, { ...last, content: responseText }];
+          }
+          return prev;
         });
       }
 
       if (done) {
         document.removeEventListener("superflex-ai-response", responseHandler);
         setIsLoading(false);
+        activeRequestIdRef.current = null;
+        if (!responseText) {
+          setMessages(prev => {
+            const last = prev[prev.length - 1];
+            if (last && last.role === "assistant" && !last.content) {
+              return prev.slice(0, -1);
+            }
+            return prev;
+          });
+        }
       }
     };
 
@@ -259,7 +297,14 @@ const SuperFlexAI = () => {
       }
 
       const prompt = `
-        You are "SuperFlex AI", the intelligent academic advisor for SuperFlex (a premium student portal).
+        You are "SuperFlex AI", the intelligent, human-like academic advisor for SuperFlex (a premium student portal). Your goal is to guide students through their academic journey with clarity and empathy.
+        
+        ### PERSONALITY & TONE:
+        - Human-like, empathetic, and encouraging.
+        - Casually professional (natural language, not robotic).
+        - **NEVER** output raw code snippets (like \`print(x)\`), variable names, or technical jargon unless explicitly asked for it.
+        - **NEVER** act like a raw calculator or a command-line interface. 
+        - Always explain your calculations in full sentences.
         
         ### STUDENT PROFILE
         - Name: ${academicData.student.name}
@@ -302,6 +347,8 @@ const SuperFlexAI = () => {
         10. GPA PREDICTOR / SANDBOX MODE: You have the ability to simulate future CGPA. When a user asks about their future CGPA, use their current Transcript (CGPA/Total Credits) and their Study Plan (future courses/credits) to calculate projected outcomes. Assume standard grades (e.g., A, B) if they don't specify.
         11. Be concise, friendly, and casually professional. Speak naturally but avoid excessive slang or overly formal language.
         12. Format performance data in clean Markdown tables when answering.
+        13. **OUT-OF-SCOPE QUERIES**: If a user asks a question that is not related to their academics, the SuperFlex portal, or university life, politely decline by saying something like: "I'm primarily focused on your academic success here! I'm sorry, but I can't help with [topic]. Is there anything else about your grades or attendance you'd like to discuss?"
+        14. **NO RAW CODE**: Never output raw code snippets (e.g., \`print(2.5)\`) as a response to a general question. Always provide a natural, human-like explanation. If you calculate something, explain the result in a friendly way.
       `;
 
       document.dispatchEvent(
@@ -309,6 +356,7 @@ const SuperFlexAI = () => {
           detail: {
             id: requestId,
             prompt: prompt,
+            model: selectedModel,
           },
         }),
       );
@@ -324,6 +372,27 @@ const SuperFlexAI = () => {
         },
       ]);
       setIsLoading(false);
+    }
+  };
+  
+  const handleInterrupt = () => {
+    if (activeRequestIdRef.current) {
+        document.dispatchEvent(
+            new CustomEvent("superflex-ai-interrupt", {
+                detail: { id: activeRequestIdRef.current }
+            })
+        );
+        activeRequestIdRef.current = null;
+        setIsLoading(false);
+
+        // Immediately remove the empty thinking message if it's still empty
+        setMessages(prev => {
+            const lastMessage = prev[prev.length - 1];
+            if (lastMessage && lastMessage.role === "assistant" && !lastMessage.content) {
+                return prev.slice(0, -1);
+            }
+            return prev;
+        });
     }
   };
 
@@ -445,7 +514,7 @@ const SuperFlexAI = () => {
 
       {isOpen && (
         <div className="fixed bottom-20 left-4 right-4 md:left-auto md:right-6 md:bottom-24 md:w-[420px] h-[65vh] md:h-[650px] md:max-h-[80vh] bg-[#0c0c0c]/90 backdrop-blur-2xl border border-white/10 rounded-3xl md:rounded-[2rem] flex flex-col z-[9999] overflow-hidden animate-in slide-in-from-bottom-8 zoom-in-95 duration-500 ease-out shadow-2xl shadow-black/50">
-          <div className="p-6 border-b border-white/5 bg-white/5 flex items-center justify-between relative overflow-hidden">
+          <div className="p-6 border-b border-white/5 bg-white/5 flex items-center justify-between relative">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#a098ff] to-transparent opacity-50"></div>
             <div className="flex items-center gap-3">
               <div className="w-14 h-14 rounded-2xl bg-zinc-900/50 border border-white/10 flex items-center justify-center relative group overflow-hidden">
@@ -458,6 +527,55 @@ const SuperFlexAI = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <div className="relative z-50">
+                <button
+                  onClick={() => setShowModelPicker(!showModelPicker)}
+                  className={`p-2.5 rounded-xl border transition-all flex items-center gap-2 active:scale-95 ${
+                    showModelPicker 
+                      ? "bg-[#a098ff]/20 text-[#a098ff] border-[#a098ff]/20" 
+                      : "bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
+                  }`}
+                  title="Change AI Model"
+                >
+                  <Sparkles size={18} />
+                  <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline-block">
+                    {AVAILABLE_MODELS.find(m => m.id === selectedModel)?.short || selectedModel}
+                  </span>
+                  <ChevronDown size={14} className={`transition-transform duration-300 ${showModelPicker ? "rotate-180" : ""}`} />
+                </button>
+
+                {showModelPicker && (
+                  <div className="absolute top-full right-0 mt-3 w-64 bg-[#0c0c0c] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-[1000] animate-in fade-in zoom-in-95 duration-200">
+                    <div className="p-3 border-b border-white/5 bg-white/5">
+                      <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Select Model</h4>
+                    </div>
+                    <div className="max-h-60 overflow-y-auto p-1.5 space-y-1 custom-scrollbar">
+                      {AVAILABLE_MODELS.map((m, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => {
+                            setSelectedModel(m.id);
+                            setShowModelPicker(false);
+                          }}
+                          className={`w-full text-left p-3 rounded-xl transition-all flex flex-col gap-0.5 group ${
+                            selectedModel === m.id 
+                              ? "bg-[#a098ff]/10 border border-[#a098ff]/20" 
+                              : "hover:bg-white/5 border border-transparent"
+                          }`}
+                        >
+                          <span className={`text-xs font-bold leading-none ${selectedModel === m.id ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"}`}>
+                            {m.name}
+                          </span>
+                          <span className="text-[8px] font-black text-zinc-600 uppercase tracking-tighter">
+                            {m.provider}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <button
                 onClick={clearChat}
                 title="Clear chat"
@@ -588,13 +706,23 @@ const SuperFlexAI = () => {
                 disabled={permissionStatus === "pending"}
                 className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#a098ff]/50 focus:ring-4 focus:ring-[#a098ff]/5 transition-all pr-14 disabled:opacity-50 disabled:cursor-not-allowed"
               />
-              <button
-                onClick={handleSend}
-                disabled={!input.trim() || isLoading}
-                className="absolute right-2.5 p-2.5 text-white bg-[#a098ff] hover:bg-[#a098ff]/80 rounded-xl disabled:opacity-30 disabled:grayscale transition-all  active:scale-95"
-              >
-                <Send size={18} />
-              </button>
+              {isLoading ? (
+                <button
+                  onClick={handleInterrupt}
+                  className="absolute right-2.5 p-2.5 text-white bg-rose-500 hover:bg-rose-600 rounded-xl transition-all active:scale-95 animate-pulse flex items-center justify-center outline-none ring-offset-2 ring-offset-black focus:ring-2 focus:ring-rose-500/50"
+                  title="Interrupt Response"
+                >
+                  <Square size={18} fill="currentColor" />
+                </button>
+              ) : (
+                <button
+                    onClick={handleSend}
+                    disabled={!input.trim()}
+                    className="absolute right-2.5 p-2.5 text-white bg-[#a098ff] hover:bg-[#a098ff]/80 rounded-xl disabled:opacity-30 disabled:grayscale transition-all active:scale-95 flex items-center justify-center outline-none ring-offset-2 ring-offset-black focus:ring-2 focus:ring-[#a098ff]/50"
+                >
+                    <Send size={18} />
+                </button>
+              )}
             </div>
             <div className="mt-2 text-center">
               <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">

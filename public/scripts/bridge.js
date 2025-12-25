@@ -11,8 +11,18 @@
     };
   }
 
+  let activeRequestId = null;
+
+  document.addEventListener("superflex-ai-interrupt", (e) => {
+    const { id } = e.detail;
+    if (activeRequestId === id) {
+      activeRequestId = null; // Signal stop
+    }
+  });
+
   document.addEventListener("superflex-ai-query", async (e) => {
-    const { id, prompt } = e.detail;
+    const { id, prompt, model } = e.detail;
+    activeRequestId = id;
 
     if (!window.puter) {
       document.dispatchEvent(
@@ -35,11 +45,16 @@
       }
 
       const response = await window.puter.ai.chat(prompt, {
-        model: "gemini-2.0-flash",
+        model: model || "gemini",
         stream: true,
       });
 
       for await (const part of response) {
+        // If the request was interrupted, break the loop
+        if (activeRequestId !== id) {
+          break;
+        }
+
         if (part?.text) {
           document.dispatchEvent(
             new CustomEvent("superflex-ai-response", {
