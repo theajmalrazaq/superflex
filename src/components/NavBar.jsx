@@ -338,9 +338,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         e.stopPropagation();
                         setOpenDropdown(isOpen ? null : category);
                       }}
-                      className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-white/5
-                        ${isActive ? "bg-x/10 text-x border border-white/10" : "!text-zinc-400 hover:!text-white"}
-                      `}
+                      className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-white/5 ${isActive ? "bg-x/10 text-x border border-white/10" : "!text-zinc-400 hover:!text-white"}`}
                     >
                       {category}
                       <svg
