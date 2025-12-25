@@ -6,8 +6,8 @@ SuperFlex AI isn't just a chatbot; it's a high-performance academic engine that 
 
 SuperFlex AI operates on a **Stealth Sync** architecture. It reads the actual HTML of your portal to build its memory.
 
-- **Automatic Sync (Continuous)**: Updates silently in the background every time you visit the **Home**, **Marks**, or **Attendance** pages.
-- **Deep Scan (One-Time)**: For the **Transcript** and **Study Plan**, you must visit these pages at least once per session so the AI can learn your comprehensive history.
+- **Automatic Sync (At Login)**: When you log in, SuperFlex automatically syncs data from **Home**, **Marks**, and **Attendance** pages in the background.
+- **On-Demand Sync (Transcript)**: The **Transcript** page syncs only when you visit it. This prevents logout issues that occurred with background syncing. Visit the Transcript page at least once per session for comprehensive AI context.
 
 ## Choosing Your AI Engine
 

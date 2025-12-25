@@ -1,22 +1,22 @@
 <div align="center">
-  <img src="public/logo.svg" alt="SuperFlex Logo" width="300" />
+  <img src="public/assets/logo.svg" alt="SuperFlex Logo" width="300" />
   <p>A modern interface enhancement extension for university learning management systems</p>
   
 <p>
   <a href="https://github.com/theajmalrazaq/superflex/releases">
-    <img src="https://img.shields.io/github/downloads/theajmalrazaq/superflex/total?style=for-the-badge&color=f92b04" alt="GitHub all downloads">
+    <img src="https://img.shields.io/github/downloads/theajmalrazaq/superflex/total?style=for-the-badge&color=a098ff" alt="GitHub all downloads">
   </a>
   
   <a href="https://github.com/theajmalrazaq/superflex">
-    <img src="https://img.shields.io/github/stars/theajmalrazaq/superflex?style=for-the-badge&color=f92b04" alt="GitHub stars">
+    <img src="https://img.shields.io/github/stars/theajmalrazaq/superflex?style=for-the-badge&color=a098ff" alt="GitHub stars">
   </a>
 
   <a href="https://github.com/theajmalrazaq/superflex/issues">
-    <img src="https://img.shields.io/github/issues-raw/theajmalrazaq/superflex?style=for-the-badge&color=f92b04" alt="GitHub issues">
+    <img src="https://img.shields.io/github/issues-raw/theajmalrazaq/superflex?style=for-the-badge&color=a098ff" alt="GitHub issues">
   </a>
 
   <a href="https://github.com/theajmalrazaq/superflex/blob/master/LICENSE">
-    <img src="https://img.shields.io/badge/license-MIT-f92b04?style=for-the-badge" alt="License">
+    <img src="https://img.shields.io/badge/license-MIT-a098ff?style=for-the-badge" alt="License">
   </a>
 </p>
 
@@ -37,24 +37,64 @@ This bad boy works by sneaking React components into the boring old LMS pages, b
 
 ## Features
 
+### 🤖 AI-Powered Academic Assistant
+
+- **Multi-Model Support**: Chat with multiple AI models including:
+  - Google Gemini 2.0 Flash (Thinking & Experimental)
+  - OpenAI GPT-4o & GPT-4o Mini
+  - Anthropic Claude 3.5 Sonnet & Haiku
+  - DeepSeek R1 & V3
+  - xAI Grok 2 & Grok Beta
+  - Llama 3.3 70B & 3.1 405B
+  - And many more advanced models
+- **Context-Aware Responses**: AI understands your academic data (CGPA, attendance, marks, study plan)
+- **Intelligent Predictions**: Get grade forecasts, attendance warnings, and study recommendations
+- **Auto Data Sync**: Automatically fetches and syncs your academic records for AI context
+- **Persistent Chat History**: Your conversations are saved across sessions
+
 ### 🎨 Modern UI/UX
 
-- **Dark Mode**: Easy on the eyes with a sleek dark theme
-- **Custom Typography**: Improved readability with Product Sans font
-- **Animated Components**: Smooth transitions and loading states
+- **Glassmorphic Dark Mode**: Stunning dark theme with frosted glass effects
+- **Google Sans Flex Typography**: Professional and highly readable custom font
+- **Flat Design**: Modern minimalist aesthetic with no shadow bloat
+- **Smooth Animations**: Buttery transitions and micro-interactions
+- **Responsive Layout**: Optimized for all screen sizes
+- **Custom Loading States**: Beautiful animated loading overlays
 
 ### 📊 Enhanced Dashboards
 
-- **Attendance Visualization**: Visual progress bars for attendance tracking
-- **Grade Summaries**: At-a-glance view of course performance
-- **CGPA Calculator**: Plan future semesters and calculate required grades
-- **PLO Attainment Tracking**: Monitor program learning outcomes
+- **Attendance Visualization**: 
+  - Color-coded progress bars (green/yellow/red based on percentage)
+  - Real-time attendance tracking with warnings
+  - Detailed course-wise breakdown
+  - Bookmark important courses
+- **Advanced Grade Calculator**: 
+  - What-if scenario planning
+  - Target CGPA calculator
+  - Best-of score calculations
+  - Grade scheme visualization
+  - Real-time GPA updates
+- **CGPA Tracking**: Monitor semester and cumulative GPA trends
+- **Financial Dashboard**: Clear fee breakdown and transaction history
 
 ### 🛠️ Improved Functionality
 
-- **Smart Tables**: Sortable, filterable academic data
-- **Collapsible Sections**: Better organize content with expandable accordions
-- **Custom Navigation**: Streamlined access to important features
+- **Smart Tables**: 
+  - Sortable columns
+  - Filterable data
+  - Responsive design
+  - Export capabilities
+- **Interactive Accordions**: Collapsible sections for better content organization
+- **Custom Navigation**: Streamlined sidebar with quick access to all features
+- **Bookmark System**: Mark and quick-access important courses
+- **Real-time Calculations**: Instant grade and attendance calculations
+- **Data Persistence**: LocalStorage integration for settings and preferences
+
+### 📈 Analytics Integration
+
+- **Umami Analytics**: Privacy-focused usage tracking
+- **Performance Monitoring**: Track extension performance and user engagement
+- **No Personal Data Collection**: Analytics only track usage patterns, not personal information
 
 ## Supported Pages
 
@@ -70,7 +110,9 @@ SuperFlex enhances the following university LMS pages:
 - **Fee Details Page**: Clearer financial information display
 - **Retake Exam Page**: Simplified exam registration process
 
-### Installation
+## Installation
+
+### Desktop (Chrome/Chromium Browsers)
 
 1. Download the latest release from the [GitHub Releases page](https://github.com/theajmalrazaq/superflex/releases)
 2. Unzip the downloaded file
@@ -78,6 +120,18 @@ SuperFlex enhances the following university LMS pages:
 4. Enable "Developer Mode" in the top right
 5. Click "Load Unpacked" and select the unzipped folder
 6. SuperFlex will now be active when you visit your university LMS
+
+### Mobile (Android)
+
+SuperFlex works on mobile devices using **Quetta Browser** - a Chromium-based browser with extension support:
+
+1. Download **Quetta Browser** from the Play Store or visit [quetta.net](https://www.quetta.net/features/extensions)
+2. Download the latest SuperFlex release from [GitHub Releases](https://github.com/theajmalrazaq/superflex/releases)
+3. Extract the downloaded file to your device
+4. Open Quetta Browser and navigate to the extensions page
+5. Enable "Developer Mode"
+6. Load the unpacked SuperFlex extension folder
+7. Enjoy SuperFlex on your mobile device! 📱
 
 ## Development
 
