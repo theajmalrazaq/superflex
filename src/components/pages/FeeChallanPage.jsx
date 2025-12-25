@@ -336,9 +336,8 @@ function FeeChallanPage() {
         </div>
 
         {}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          {}
-          <div className="xl:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 gap-8">
+          <div className="space-y-6">
             {}
             <NotificationBanner
               alerts={[
@@ -368,14 +367,15 @@ function FeeChallanPage() {
                 </div>
               </div>
 
-              <div className="overflow-x-auto scrollbar-hide">
-                <table className="w-full text-left order-collapse border-spacing-0">
+              {/* Desktop View */}
+              <div className="hidden md:block overflow-x-auto scrollbar-hide">
+                <table className="w-full text-left border-collapse border-spacing-0">
                   <thead>
                     <tr className="border-b border-white/5">
                       <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider font-sans">
                         Sr.
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider font-sans">
+                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider font-sans w-full">
                         Description
                       </th>
                       <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider font-sans">
@@ -405,12 +405,18 @@ function FeeChallanPage() {
                             <span className="text-white font-bold group-hover:text-[#a098ff] transition-colors font-sans">
                               {c.description}
                             </span>
-                            <div className="flex items-center gap-3 mt-1">
-                              <span className="flex items-center gap-1 text-[10px] text-zinc-500 font-bold uppercase tracking-tighter font-sans">
-                                <Clock size={12} /> Issued: {c.issueDate}
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
+                              <span className="flex items-center gap-1.5 text-[10px] text-zinc-500 font-bold uppercase tracking-tight font-sans whitespace-nowrap">
+                                <div className="p-1 bg-zinc-800/50 rounded-md">
+                                  <Clock size={10} className="text-[#a098ff]" />
+                                </div>
+                                Issued: <span className="text-zinc-400">{c.issueDate}</span>
                               </span>
-                              <span className="flex items-center gap-1 text-[10px] text-zinc-500 font-bold uppercase tracking-tighter font-sans">
-                                <Calendar size={12} /> Due: {c.dueDate}
+                              <span className="flex items-center gap-1.5 text-[10px] text-zinc-500 font-bold uppercase tracking-tight font-sans whitespace-nowrap">
+                                <div className="p-1 bg-zinc-800/50 rounded-md">
+                                  <Calendar size={10} className="text-emerald-400" />
+                                </div>
+                                Due: <span className="text-zinc-400">{c.dueDate}</span>
                               </span>
                             </div>
                           </div>
@@ -462,21 +468,84 @@ function FeeChallanPage() {
                         </td>
                       </tr>
                     ))}
-                    {challans.length === 0 && (
-                      <tr>
-                        <td colSpan="5" className="px-6 py-20 text-center">
-                          <div className="flex flex-col items-center gap-4 opacity-50">
-                            <Receipt size={48} className="text-zinc-500" />
-                            <p className="text-zinc-400 font-medium font-sans">
-                              No challans found in the records.
-                            </p>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
                   </tbody>
                 </table>
               </div>
+
+              {/* Mobile View */}
+              <div className="md:hidden space-y-4">
+                {challans.map((c, idx) => (
+                  <div key={idx} className="p-6 rounded-[2rem] bg-zinc-900/50 border border-white/5 space-y-6">
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-1">
+                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">DESCRIPTION</p>
+                        <h4 className="text-lg font-black text-[#a098ff] leading-tight">{c.description}</h4>
+                      </div>
+                      <span
+                        className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest font-sans ${
+                          c.status.toLowerCase().includes("paid")
+                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                            : "bg-rose-500/10 text-rose-400 border border-rose-500/20 animate-pulse"
+                        }`}
+                      >
+                        {c.status}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
+                      <div className="space-y-1.5">
+                        <div className="flex items-center gap-1.5 text-[9px] text-zinc-500 font-black uppercase tracking-widest">
+                          <Clock size={10} className="text-[#a098ff]" />
+                          ISSUED
+                        </div>
+                        <p className="text-xs font-bold text-white ml-4">{c.issueDate}</p>
+                      </div>
+                      <div className="space-y-1.5 text-right">
+                        <div className="flex items-center justify-end gap-1.5 text-[9px] text-zinc-500 font-black uppercase tracking-widest">
+                          <Calendar size={10} className="text-emerald-400" />
+                          DUE
+                        </div>
+                        <p className="text-xs font-bold text-white mr-4">{c.dueDate}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Total Amount</p>
+                        <p className="text-xl font-black text-white">Rs. {c.amount}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {c.status.toLowerCase().includes("unpaid") && (
+                          <button
+                            onClick={() => handleOnlinePayment(c.challanNo)}
+                            className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 active:scale-95 transition-all"
+                          >
+                            <ExternalLink size={20} />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handlePrint(c.challanNo)}
+                          className="p-3.5 rounded-2xl bg-[#a098ff]/10 border border-[#a098ff]/20 text-[#a098ff] active:scale-95 transition-all disabled:opacity-30"
+                          disabled={!c.challanNo}
+                        >
+                          <Printer size={20} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {challans.length === 0 && (
+                <div className="px-6 py-20 text-center">
+                  <div className="flex flex-col items-center gap-4 opacity-50">
+                    <Receipt size={48} className="text-zinc-500" />
+                    <p className="text-zinc-400 font-medium font-sans">
+                      No challans found in the records.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

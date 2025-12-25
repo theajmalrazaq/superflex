@@ -17,7 +17,10 @@ import {
   RefreshCw,
   Zap,
   AlertTriangle,
+  Search,
+  Scale,
 } from "lucide-react";
+import { MCA_DATA } from "../../constants/mcaData";
 import NotificationBanner from "../NotificationBanner";
 import PageHeader from "../PageHeader";
 import StatsCard from "../StatsCard";
@@ -194,11 +197,201 @@ const CGPAPlannerModal = ({
   );
 };
 
+const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
+  const [mca, setMca] = useState(initialMCA);
+  const [marks, setMarks] = useState("");
+  const [result, setResult] = useState(null);
+
+  useEffect(() => {
+    if (initialMCA) setMca(initialMCA);
+  }, [initialMCA]);
+
+  const calculateGrade = (e) => {
+    if (e) e.preventDefault();
+    const mcaVal = Math.round(parseFloat(mca));
+    const marksVal = parseFloat(marks);
+
+    if (isNaN(mcaVal) || isNaN(marksVal)) return;
+
+    const data = MCA_DATA[mcaVal];
+    if (!data) {
+      setResult({ error: "MCA data not available for this value (30-91 only)" });
+      return;
+    }
+
+    let detectedGrade = "F";
+    const thresholds = data.thresholds;
+    const sortedGrades = [
+      "D",
+      "D+",
+      "C-",
+      "C",
+      "C+",
+      "B-",
+      "B",
+      "B+",
+      "A-",
+      "A",
+      "A+",
+    ];
+
+    for (const g of sortedGrades) {
+      if (thresholds[g] !== null && marksVal >= thresholds[g]) {
+        detectedGrade = g;
+      }
+    }
+
+    setResult({ grade: detectedGrade, thresholds: thresholds });
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300"
+      onClick={onClose}
+    >
+      <div
+        className="bg-zinc-900/90 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 w-full max-w-[500px] animate-in zoom-in-95 fade-in duration-300 relative overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[80px] rounded-full -mr-32 -mt-32 pointer-events-none"></div>
+
+        <div className="relative">
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className="p-4 bg-emerald-500/10 rounded-2xl text-emerald-400 mb-4">
+              <Scale size={32} />
+            </div>
+            <h2 className="text-2xl font-bold text-white tracking-tight">
+              Relative Grade Lookup
+            </h2>
+            <p className="text-zinc-400 font-medium text-sm mt-1">
+              Determine grade based on MCA thresholds
+            </p>
+          </div>
+
+          <form onSubmit={calculateGrade} className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-white/50 uppercase tracking-widest ml-1">
+                  Rounded MCA
+                </label>
+                <input
+                  type="number"
+                  value={mca}
+                  onChange={(e) => setMca(e.target.value)}
+                  placeholder="30-91"
+                  className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/5 transition-all font-medium placeholder:text-white/20"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-white/50 uppercase tracking-widest ml-1">
+                  Total Marks
+                </label>
+                <input
+                  type="number"
+                  value={marks}
+                  onChange={(e) => setMarks(e.target.value)}
+                  placeholder="e.g. 65"
+                  className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/5 transition-all font-medium placeholder:text-white/20"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full h-[48px] bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold text-sm transition-all"
+            >
+              Lookup Grade
+            </button>
+          </form>
+
+          {result && (
+            <div className="mt-8 space-y-4">
+              {result.error ? (
+                <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-bold flex items-center gap-2">
+                  <AlertTriangle size={14} />
+                  {result.error}
+                </div>
+              ) : (
+                <>
+                  <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm flex items-center justify-between">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                        Predicted Grade
+                      </p>
+                      <p className="text-4xl font-black text-white tracking-tighter">
+                        {result.grade}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">
+                        At MCA {Math.round(mca)}
+                      </p>
+                      <div className="flex flex-wrap justify-end gap-1 max-w-[200px]">
+                        {Object.entries(result.thresholds)
+                          .filter(([_, val]) => val !== null)
+                          .reverse()
+                          .slice(0, 4)
+                          .map(([g, val]) => (
+                            <span
+                              key={g}
+                              className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
+                                g === result.grade
+                                  ? "bg-emerald-500 text-white"
+                                  : "bg-white/5 text-zinc-500"
+                              }`}
+                            >
+                              {g}: {val}+
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-4 gap-2">
+                    {Object.entries(result.thresholds)
+                      .filter(([_, val]) => val !== null)
+                      .map(([g, val]) => (
+                        <div
+                          key={g}
+                          className={`p-2 rounded-lg border text-center transition-all ${
+                            g === result.grade
+                              ? "bg-emerald-500/10 border-emerald-500/50"
+                              : "bg-white/5 border-white/5"
+                          }`}
+                        >
+                          <p className="text-[9px] font-bold text-zinc-500 uppercase">
+                            {g}
+                          </p>
+                          <p
+                            className={`text-xs font-bold ${
+                              g === result.grade ? "text-white" : "text-zinc-400"
+                            }`}
+                          >
+                            {val}
+                            {g === "F" ? " (max)" : "+"}
+                          </p>
+                        </div>
+                      ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function TranscriptPage() {
   const [loading, setLoading] = useState(true);
   const [semesters, setSemesters] = useState([]);
   const [activeSemIdx, setActiveSemIdx] = useState(0);
   const [isPlannerOpen, setIsPlannerOpen] = useState(false);
+  const [isMCALookupOpen, setIsMCALookupOpen] = useState(false);
+  const [selectedMCA, setSelectedMCA] = useState("");
   const [alerts, setAlerts] = useState([]);
   const [whatIfMode, setWhatIfMode] = useState(false);
   const [overriddenGrades, setOverriddenGrades] = useState({});
@@ -278,13 +471,61 @@ function TranscriptPage() {
             if (cells.length >= 6) {
               const ch = parseFloat(cells[3].textContent.trim()) || 0;
               const pts = parseFloat(cells[5].textContent.trim()) || 0;
+              const codeCell = cells[0];
+              const codeText = codeCell.textContent.trim();
+
+              let mca = null;
+              let gradingScheme = null;
+              let schemeDetailId = null;
+
+              // Check for MCA and Grading Scheme in the row or associated modal
+              const link = codeCell.querySelector("a");
+              if (link) {
+                const title =
+                  link.getAttribute("title") ||
+                  link.getAttribute("data-original-title");
+                if (title && title.includes("MCA")) {
+                  const mMatch = title.match(/MCA[:\s]+(\d+)/i);
+                  if (mMatch) mca = mMatch[1];
+                }
+
+                const onclick = link.getAttribute("onclick");
+                if (onclick) {
+                  const match = onclick.match(/fn_StdGradeSchemeDetail\((\d+)\)/);
+                  if (match) schemeDetailId = match[1];
+                }
+
+                // If not in title, check if there's a modal ID we can look up
+                const target = link.getAttribute("data-target");
+                if (target) {
+                  const modal = document.querySelector(target);
+                  if (modal) {
+                    const table = modal.querySelector("#tblGradeDetailmodal");
+                    if (table) {
+                      const rows = table.querySelectorAll("tr");
+                      if (rows.length > 1) {
+                        const dataRow = rows[1];
+                        const dataCells = dataRow.querySelectorAll("td");
+                        if (dataCells.length >= 2) {
+                          gradingScheme = dataCells[0].textContent.trim();
+                          mca = dataCells[1].textContent.trim();
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+
               courses.push({
-                code: cells[0].textContent.trim(),
+                code: codeText,
                 description: cells[1].textContent.trim(),
                 type: cells[2].textContent.trim(),
                 crHrs: ch,
                 grade: cells[4].textContent.trim(),
                 points: pts,
+                mca: mca,
+                gradingScheme: gradingScheme,
+                schemeDetailId: schemeDetailId,
               });
             }
           });
@@ -299,6 +540,12 @@ function TranscriptPage() {
         if (semesterData.length > 0) {
           setSemesters(semesterData);
           setActiveSemIdx(semesterData.length - 1);
+        }
+
+        // Relocate grade policy modal if it's inside the hidden root
+        const gModal = document.querySelector("#GradePolicyDetail");
+        if (gModal && root.contains(gModal)) {
+          document.body.appendChild(gModal);
         }
 
         root.style.display = "none";
@@ -326,6 +573,9 @@ function TranscriptPage() {
           crHrs: c.crHrs,
           grade: c.grade,
           points: c.points,
+          mca: c.mca,
+          gradingScheme: c.gradingScheme,
+          schemeDetailId: c.schemeDetailId,
         })),
       }));
 
@@ -334,6 +584,7 @@ function TranscriptPage() {
       const newContext = {
         ...existingContext,
         transcript: transContext,
+        mcaData: MCA_DATA,
         lastScanned: new Date().toISOString(),
       };
 
@@ -570,6 +821,16 @@ function TranscriptPage() {
             Strategic Planner
           </button>
           <button
+            onClick={() => setIsMCALookupOpen(true)}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/5 bg-zinc-900/50 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-300 group"
+          >
+            <Scale
+              size={16}
+              className="group-hover:scale-110 transition-transform"
+            />
+            MCA Lookup
+          </button>
+          <button
             onClick={() =>
               whatIfMode
                 ? (setOverriddenGrades({}), setWhatIfMode(false))
@@ -762,9 +1023,83 @@ function TranscriptPage() {
                               className={`group transition-all duration-300 border-b border-white/5 last:border-0 hover:bg-white/[0.03]`}
                             >
                               <td className="px-6 py-4">
-                                <span className="text-xs font-bold text-white px-2.5 py-1 bg-white/5 rounded-lg group-hover:bg-[#a098ff]/20 group-hover:text-[#a098ff] transition-all">
+                                <button
+                                  onClick={async () => {
+                                    if (course.schemeDetailId) {
+                                      // Try to fetch grading factor (MCA) directly
+                                      try {
+                                        const response = await fetch(
+                                          "/Student/Populate_GradeSchemeDetails",
+                                          {
+                                            method: "POST",
+                                            headers: {
+                                              "Content-Type":
+                                                "application/x-www-form-urlencoded; charset=UTF-8",
+                                              "X-Requested-With":
+                                                "XMLHttpRequest",
+                                            },
+                                            body: `OfferId=${course.schemeDetailId}`,
+                                          },
+                                        );
+                                        const data = await response.json();
+                                        if (data && data.length > 0) {
+                                          const factor = data[0].GRADING_FACTOR;
+                                          if (factor) {
+                                            setSelectedMCA(factor.toString());
+                                            setIsMCALookupOpen(true);
+                                            return;
+                                          }
+                                        }
+                                      } catch (e) {
+                                        console.error(
+                                          "Grade Scheme Fetch Error:",
+                                          e,
+                                        );
+                                      }
+
+                                      if (
+                                        typeof window.fn_StdGradeSchemeDetail ===
+                                        "function"
+                                      ) {
+                                        window.fn_StdGradeSchemeDetail(
+                                          course.schemeDetailId,
+                                        );
+                                      }
+
+                                      const modal = document.querySelector(
+                                        "#GradePolicyDetail",
+                                      );
+                                      if (modal) {
+                                        modal.style.zIndex = "9999";
+                                        const $ = window.jQuery || window.$;
+                                        if (
+                                          $ &&
+                                          typeof $.fn.modal === "function"
+                                        ) {
+                                          $(modal).modal("show");
+                                        } else {
+                                          modal.style.display = "block";
+                                          modal.classList.add("show");
+                                          modal.style.backgroundColor =
+                                            "rgba(0,0,0,0.5)";
+                                          modal.onclick = (e) => {
+                                            if (e.target === modal) {
+                                              modal.style.display = "none";
+                                              modal.classList.remove("show");
+                                            }
+                                          };
+                                        }
+                                      }
+                                    }
+                                  }}
+                                  className={`text-xs font-bold px-2.5 py-1 bg-white/5 rounded-lg transition-all ${
+                                    course.schemeDetailId
+                                      ? "text-[#a098ff] hover:bg-[#a098ff]/20 cursor-pointer"
+                                      : "text-white group-hover:bg-white/10"
+                                  }`}
+                                >
                                   {course.code}
-                                </span>
+                                </button>
                               </td>
                               <td className="px-6 py-4">
                                 <div className="space-y-0.5">
@@ -774,6 +1109,25 @@ function TranscriptPage() {
                                   <p className="text-[10px] font-medium text-zinc-600 uppercase tracking-wide">
                                     {course.type}
                                   </p>
+                                  {course.mca && (
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <button
+                                        onClick={() => {
+                                          setSelectedMCA(course.mca);
+                                          setIsMCALookupOpen(true);
+                                        }}
+                                        className="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-1.5 py-0.5 rounded flex items-center gap-1 hover:bg-emerald-400/20 transition-colors"
+                                      >
+                                        <TrendingUp size={10} />
+                                        MCA: {course.mca}
+                                      </button>
+                                      {course.gradingScheme && (
+                                        <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide">
+                                          {course.gradingScheme}
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
                               </td>
                               <td className="px-6 py-4 text-center">
@@ -946,6 +1300,14 @@ function TranscriptPage() {
         onClose={() => setIsPlannerOpen(false)}
         currentCGPA={calculatedStats?.currentCGPA || 0}
         currentCreditHours={calculatedStats?.totalCreditsForGPA || 0}
+      />
+      <MCALookupModal
+        isOpen={isMCALookupOpen}
+        onClose={() => {
+          setIsMCALookupOpen(false);
+          setSelectedMCA("");
+        }}
+        initialMCA={selectedMCA}
       />
     </PageLayout>
   );

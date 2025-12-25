@@ -249,20 +249,12 @@ function CourseFeedbackPage() {
             label="Pending"
             value={stats.pending}
             delay={200}
-            className={
-              stats.pending > 0 ? "!bg-amber-500/10 !border-amber-500/20" : ""
-            }
           />
           <StatsCard
             icon={CheckCircle2}
             label="Completed"
             value={stats.submitted}
             delay={300}
-            className={
-              stats.pending === 0 && stats.total > 0
-                ? "!bg-emerald-500/10 !border-emerald-500/20"
-                : ""
-            }
           />
           <StatsCard
             icon={MessageSquare}

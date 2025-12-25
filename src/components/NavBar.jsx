@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Home,
   BookOpen,
@@ -355,11 +356,15 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                 if (obtainedStr && obtainedStr !== "-" && obtainedStr !== "") {
                   const obtained = parseFloat(obtainedStr);
                   const total = parseFloat(totalStr);
+                  const weightStr = tr.querySelector(".weightage")?.textContent.trim();
+                  const weight = weightStr ? parseFloat(weightStr) : 0;
+
                   if (!isNaN(obtained)) {
                     categoryAssessments.push({
                       name,
                       obtained,
                       total: isNaN(total) ? 0 : total,
+                      weight: isNaN(weight) ? 0 : weight,
                       percentage:
                         total > 0 && !isNaN(total)
                           ? (obtained / total) * 100
@@ -662,95 +667,123 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         </nav>
       </div>
 
-      {}
+      {/* Mobile Menu Sidebar */}
+      {/* Mobile Menu Modern Dropdown */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-x-4 top-20 bg-black/95 backdrop-blur-3xl border border-white/10 rounded-3xl p-4 z-[999] animate-in zoom-in-95 duration-200 overflow-y-auto max-h-[calc(100vh-120px)] scrollbar-hide">
-          <div className="flex flex-col gap-6">
-            {}
-            <div className="flex flex-col gap-1">
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[90vw] max-w-[400px] bg-[#0c0c0c]/90 backdrop-blur-2xl border border-white/10 rounded-3xl p-4 z-[999] animate-in slide-in-from-top-4 fade-in duration-300">
+          <div className="flex flex-col gap-4 max-h-[70vh] backdrop-blur-2xl overflow-y-auto scrollbar-hide">
+            
+            {/* User Profile Snippet */}
+            <div className="flex items-center gap-3 p-3 bg-white/5 rounded-2xl border border-white/5">
+                <div className="w-10 h-10 rounded-full bg-zinc-800 border border-white/5 overflow-hidden shrink-0">
+                    <img src="/Login/GetImage" alt="User" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex flex-col overflow-hidden">
+                    <span className="text-sm font-bold text-white truncate">Student Account</span>
+                    <a href="/Student/ChangePassword" className="text-xs text-[#a098ff] font-medium hover:underline">Settings</a>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
               {groupedLinks.root?.map((link, index) => {
                 const isActive =
                   currentPage === "/" || currentPage.startsWith("/?dump=");
+                const isHome = link.text.trim() === "Home";
                 return (
                   <button
                     key={index}
                     onClick={() => {
                       window.location.href = link.href;
                     }}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive ? "bg-[#a098ff]/10 text-[#a098ff]" : "text-zinc-400"}`}
+                    className={`flex items-center justify-center gap-2 px-4 py-4 rounded-2xl transition-all ${
+                      isHome
+                        ? "col-span-2 flex-row aspect-[3/1]"
+                        : "flex-col aspect-[4/3]"
+                    } ${
+                      isActive
+                        ? "bg-[#a098ff]/10 text-[#a098ff] border border-[#a098ff]/20"
+                        : "bg-zinc-900/50 text-zinc-400 hover:bg-white/10 hover:text-white border border-white/5"
+                    }`}
                   >
-                    {React.cloneElement(getIcon(link), { size: 20 })}
-                    <span className="font-medium">{link.text}</span>
+                    <div className={isActive ? "text-[#a098ff]" : "text-zinc-500"}>
+                      {React.cloneElement(getIcon(link), { size: 24 })}
+                    </div>
+                    <span className="font-bold text-xs">{link.text}</span>
                   </button>
                 );
               })}
             </div>
 
-            {}
-            {["Academics", "Finance", "Services", "More"].map((category) => {
-              const links = groupedLinks[category];
-              if (!links || links.length === 0) return null;
+            <div className="space-y-2">
+                {["Academics", "Finance", "Services", "More"].map((category) => {
+                const links = groupedLinks[category];
+                if (!links || links.length === 0) return null;
 
-              const isExpanded = openMobileCategories[category];
+                const isExpanded = openMobileCategories[category];
 
-              return (
-                <div key={category} className="flex flex-col gap-2">
-                  <button
-                    onClick={() =>
-                      setOpenMobileCategories((prev) => ({
-                        ...prev,
-                        [category]: !prev[category],
-                      }))
-                    }
-                    className="flex items-center justify-between px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-zinc-500 hover:text-white transition-colors"
-                  >
-                    <span>{category}</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </button>
-                  {isExpanded && (
-                    <div className="grid grid-cols-1 gap-1 animate-in slide-in-from-top-2 duration-200">
-                      {links.map((link, idx) => {
-                        const isActive =
-                          link.path &&
-                          currentPage &&
-                          currentPage.includes(link.path);
-                        return (
-                          <button
-                            key={idx}
-                            onClick={() => {
-                              window.location.href = link.href;
-                            }}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive ? "bg-[#a098ff]/10 text-[#a098ff]" : "text-zinc-300 hover:bg-white/5"}`}
-                          >
-                            <div
-                              className={`p-2 rounded-lg ${isActive ? "bg-[#a098ff] text-white" : "bg-zinc-800 text-[#a098ff]"}`}
-                            >
-                              {React.cloneElement(getIcon(link), { size: 18 })}
+                return (
+                    <div key={category} className="rounded-2xl overflow-hidden bg-zinc-900/30 border border-white/5">
+                        <button
+                            onClick={() =>
+                            setOpenMobileCategories((prev) => ({
+                                ...prev,
+                                [category]: !prev[category],
+                            }))
+                            }
+                            className="w-full flex items-center justify-between px-4 py-3 text-xs font-bold uppercase tracking-wider text-zinc-500 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                            <span>{category}</span>
+                            <div className={`p-1 rounded-full bg-white/5 transition-transform duration-300 ${isExpanded ? "rotate-180 bg-white/10 text-white" : ""}`}>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <path d="m6 9 6 6 6-6" />
+                                </svg>
                             </div>
-                            <span className="text-sm font-medium">
-                              {link.text}
-                            </span>
-                          </button>
-                        );
-                      })}
+                        </button>
+                        
+                        {isExpanded && (
+                            <div className="grid grid-cols-2 gap-2 p-2 pt-0 animate-in slide-in-from-top-2 duration-200">
+                            {links.map((link, idx) => {
+                                const isActive =
+                                link.path &&
+                                currentPage &&
+                                currentPage.includes(link.path);
+                                return (
+                                <button
+                                    key={idx}
+                                    onClick={() => {
+                                    window.location.href = link.href;
+                                    }}
+                                    className={`flex flex-col items-center justify-center gap-2 px-3 py-3 rounded-xl transition-all h-24 ${
+                                    isActive
+                                        ? "bg-[#a098ff]/10 text-[#a098ff] border border-[#a098ff]/20"
+                                        : "text-zinc-400 bg-black/20 hover:text-white hover:bg-white/5 border border-white/5"
+                                    }`}
+                                >
+                                    <div className={isActive ? "text-[#a098ff]" : "text-zinc-500"}>
+                                        {React.cloneElement(getIcon(link), { size: 20 })}
+                                    </div>
+                                    <span className="text-[10px] font-bold leading-tight break-words w-full">
+                                    {link.text}
+                                    </span>
+                                </button>
+                                );
+                            })}
+                            </div>
+                        )}
                     </div>
-                  )}
-                </div>
-              );
-            })}
+                );
+                })}
+            </div>
           </div>
         </div>
       )}

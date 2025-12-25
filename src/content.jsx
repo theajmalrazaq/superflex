@@ -110,5 +110,4 @@ root.render(
 
 setTimeout(() => {
   document.body.classList.add("!visible");
-  document.body.classList.add("!overflow-auto");
 }, 500);

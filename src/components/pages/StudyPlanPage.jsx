@@ -223,14 +223,14 @@ function StudyPlanPage() {
             icon={Layers}
             label="Core Courses"
             value={stats.coreCourses}
-            subValue="Required"
+            subValue=""
             delay={200}
           />
           <StatsCard
             icon={TrendingUp}
             label="Electives"
             value={stats.electives}
-            subValue="Available"
+            subValue=""
             delay={300}
           />
           <StatsCard
@@ -260,12 +260,12 @@ function StudyPlanPage() {
                 <div className="flex items-center gap-6 pr-4">
                   <div className="text-right">
                     <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">
-                      Semester Load
+                      Year
                     </p>
                     <span className="text-xl font-bold text-[#a098ff] font-sans">
                       {activeSemData.crHrs}{" "}
                       <span className="text-xs text-zinc-500 uppercase ml-1">
-                        Credits
+                        Courses
                       </span>
                     </span>
                   </div>

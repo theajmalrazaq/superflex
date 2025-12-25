@@ -2,7 +2,7 @@
 /* do not remove */
 body {
   visibility: hidden !important;
-  overflow: hidden;
+  overflow-y: scroll !important;
   background: black;
 }
 /* end here */

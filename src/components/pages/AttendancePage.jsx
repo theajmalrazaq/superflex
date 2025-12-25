@@ -201,7 +201,7 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
   }
 
   return (
-    <div className="relative z-[900]" ref={dropdownRef}>
+    <div className="relative z-30" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`p-3 rounded-full border transition-all ${
@@ -398,6 +398,18 @@ function AttendancePage() {
           });
         });
 
+        // Sync with AI
+        const existingContext = window.superflex_ai_context || {};
+        const newContext = {
+          ...existingContext,
+          attendance: parsedCourses,
+          lastScanned: new Date().toISOString(),
+        };
+        window.superflex_ai_context = newContext;
+        window.dispatchEvent(
+          new CustomEvent("superflex-data-updated", { detail: newContext }),
+        );
+
         setCourses(parsedCourses);
         if (parsedCourses.length > 0) setSelectedCourseId(parsedCourses[0].id);
 
@@ -428,7 +440,7 @@ function AttendancePage() {
           title="Attendance"
           subtitle="Track your presence and schedule"
         >
-          <div className="flex flex-col lg:flex-row items-center gap-4">
+          <div className="flex flex-col lg:flex-row md:items-center gap-4">
             <SuperTabs
               tabs={semesters}
               activeTab={semesters.find((s) => s.selected)?.value}

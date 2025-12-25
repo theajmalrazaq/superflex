@@ -625,20 +625,14 @@ function CourseWithdrawPage() {
             label="Selected"
             value={selectedCount}
             delay={200}
-            className={
-              selectedCount > 0 ? "!bg-rose-500/10 !border-rose-500/20" : ""
-            }
+            
           />
           <StatsCard
             icon={ShieldCheck}
             label="Withdrawal Status"
             value={isWithdrawActive ? "WINDOW OPEN" : "LOCKED"}
             delay={300}
-            className={
-              isWithdrawActive
-                ? "!bg-emerald-500/10 !border-emerald-500/20"
-                : "!bg-rose-500/10 !border-rose-500/20"
-            }
+            
           />
           <StatsCard
             icon={Clock}
@@ -648,12 +642,6 @@ function CourseWithdrawPage() {
                 .length
             }
             delay={400}
-            className={
-              courses.filter((c) => c.status.toLowerCase().includes("pending"))
-                .length > 0
-                ? "!bg-amber-500/10 !border-amber-500/20"
-                : ""
-            }
           />
         </div>
 

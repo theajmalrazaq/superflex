@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Send, X, User, Trash2, Shield } from "lucide-react";
+import { Send, X, User, Trash2, Shield, Zap, TrendingUp, Search } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -54,9 +54,14 @@ const SuperFlexAI = () => {
     personalInfo: null,
     alerts: [],
     transcript: null,
+    mcaData: null,
     studyPlan: null,
+    feeHistory: null,
     lastScanned: null,
   });
+
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanProgress, setScanProgress] = useState(0);
 
   const [permissionStatus, setPermissionStatus] = useState(
     () => localStorage.getItem("superflex_ai_data_permission") || "pending",
@@ -197,6 +202,8 @@ const SuperFlexAI = () => {
         academicHistory: {
           transcript:
             dataContext.transcript || "Not scanned yet (Visit Transcript)",
+          mcaData:
+            dataContext.mcaData || "Not scanned yet (Visit Transcript)",
           studyPlan:
             dataContext.studyPlan || "Not scanned yet (Visit Study Plan)",
         },
@@ -236,6 +243,9 @@ const SuperFlexAI = () => {
         
         4. DEGREE ROADMAP (Tentative Study Plan):
         ${JSON.stringify(academicData.academicHistory.studyPlan, null, 2)}
+
+        5. RELATIVE GRADING THRESHOLDS (MCA Data):
+        ${JSON.stringify(academicData.academicHistory.mcaData, null, 2)}
         
         ### CONVERSATION HISTORY
         ${chatHistory}
@@ -249,11 +259,13 @@ const SuperFlexAI = () => {
         2. Use "ATTENDANCE ANALYTICS" (including detailed day-by-day logs) to warn about the 80% threshold and help identify exactly which dates the student was away.
         3. Use "ACADEMIC TRANSCRIPT" for CGPA/SGPA and history questions.
         4. Use "DEGREE ROADMAP" for graduation, core courses, and remaining credits.
-        5. If marks or attendance are missing, ask them to visit Home.
-        6. If transcript data is missing, explicitly tell them: "Could you please visit the Transcript page for a moment? I need to sync your academic history from there to ensure accurate data without risking a session timeout."
-        7. If study plan is missing, ask them to visit the Tentative Study Plan page.
-        8. Be concise, friendly, and casually professional. Speak naturally but avoid excessive slang or overly formal language.
-        9. Format performance data in clean Markdown tables when answering.
+        5. If marks or attendance are missing, ask them to visit Home or use the "Smart Scan" tool.
+        6. If transcript or MCA data is missing, explicitly tell them: "Could you please visit the Transcript page for a moment? I need to sync your academic history and grading curves from there to ensure accurate data without risking a session timeout."
+        7. If study plan is missing, ask them to visit the Tentative Study Plan page or hit "Smart Scan".
+        8. RELATIVE GRADING LOGIC: Use "RELATIVE GRADING THRESHOLDS" (MCA Data) to predict grades. For example, if a course has MCA 55, look up the "55" key in MCA data to see the marks required for each grade.
+        9. GPA PREDICTOR / SANDBOX MODE: You have the ability to simulate future CGPA. When a user asks about their future CGPA, use their current Transcript (CGPA/Total Credits) and their Study Plan (future courses/credits) to calculate projected outcomes. Assume standard grades (e.g., A, B) if they don't specify.
+        10. Be concise, friendly, and casually professional. Speak naturally but avoid excessive slang or overly formal language.
+        11. Format performance data in clean Markdown tables when answering.
       `;
 
       document.dispatchEvent(
@@ -277,6 +289,93 @@ const SuperFlexAI = () => {
       ]);
       setIsLoading(false);
     }
+  };
+
+  const runSmartScan = async () => {
+    if (isScanning) return;
+    setIsScanning(true);
+    setScanProgress(0);
+
+    const paths = [
+      { name: "Attendance", url: "/Student/StudentAttendance" },
+      { name: "Marks", url: "/Student/StudentMarks" },
+      { name: "Study Plan", url: "/Student/TentativeStudyPlan" },
+      { name: "Fees", url: "/ConsolidatedFeeReport" },
+    ];
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "assistant",
+        content: "Initiating **Smart Scan**. I'm silently vacuuming your academic records into my memory... 🚀",
+      },
+    ]);
+
+    const newCtx = { ...window.superflex_ai_context };
+
+    for (let i = 0; i < paths.length; i++) {
+        const path = paths[i];
+        setScanProgress(((i + 1) / paths.length) * 100);
+        try {
+            const res = await fetch(path.url);
+            const html = await res.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+
+            if (path.name === "Attendance") {
+                const courses = [];
+                doc.querySelectorAll(".tab-pane").forEach(pane => {
+                    const title = pane.querySelector("h5")?.textContent.trim().replace(/\(.*\)/, "").trim();
+                    const records = [];
+                    pane.querySelectorAll("tbody tr").forEach(row => {
+                        const cols = row.querySelectorAll("td");
+                        if (cols.length >= 4) records.push({ status: cols[3]?.textContent.trim() });
+                    });
+                    courses.push({ title, records, absent: records.filter(r => r.status.includes("A")).length });
+                });
+                newCtx.attendance = courses;
+            } else if (path.name === "Marks") {
+                const courses = [];
+                doc.querySelectorAll(".tab-pane").forEach(pane => {
+                    const title = pane.querySelector("h5")?.textContent.trim().replace(/\(.*\)/, "").trim();
+                    courses.push({ id: pane.id, title });
+                });
+                newCtx.marks = courses;
+            } else if (path.name === "Study Plan") {
+                const sems = [];
+                doc.querySelectorAll(".col-md-6").forEach(col => {
+                    const title = col.querySelector("h4")?.textContent.trim();
+                    if (title) sems.push({ title });
+                });
+                newCtx.studyPlan = sems;
+            } else if (path.name === "Fees") {
+                const txs = [];
+                doc.querySelectorAll("#FeeReport tbody tr").forEach(tr => {
+                    const td = tr.querySelectorAll("td");
+                    if (td.length >= 10) txs.push({ amount: td[5].textContent.trim() });
+                });
+                newCtx.feeHistory = txs;
+            }
+        } catch (e) {
+            console.error(`Sync failed for ${path.name}`, e);
+        }
+        await new Promise(r => setTimeout(r, 600));
+    }
+
+    newCtx.lastScanned = new Date().toISOString();
+    window.superflex_ai_context = newCtx;
+    setDataContext(newCtx);
+    window.dispatchEvent(new CustomEvent("superflex-data-updated", { detail: newCtx }));
+
+    setIsScanning(false);
+    setScanProgress(100);
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "assistant",
+        content: "✅ **Scan Complete!** I now have a full cache of your marks, attendance, and plans. How can I help you achieve that 4.0?",
+      },
+    ]);
   };
 
   const handlePermission = (status) => {
@@ -392,8 +491,25 @@ const SuperFlexAI = () => {
               >
                 <Trash2 size={18} />
               </button>
+              <button
+                onClick={runSmartScan}
+                disabled={isScanning}
+                title="Smart Scan Entire Portal"
+                className={`p-2.5 rounded-xl text-zinc-400 hover:text-[#a098ff] transition-all bg-white/5 border border-white/5 active:scale-95 ${isScanning ? "animate-pulse" : ""}`}
+              >
+                <Zap size={18} fill={isScanning ? "#a098ff" : "none"} />
+              </button>
             </div>
           </div>
+
+          {isScanning && (
+            <div className="h-1 bg-zinc-900 w-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-[#a098ff] to-[#ec4899] transition-all duration-500 shadow-[0_0_10px_#a098ff]"
+                style={{ width: `${scanProgress}%` }}
+              ></div>
+            </div>
+          )}
 
           <div
             ref={scrollRef}

@@ -174,13 +174,6 @@ function HomePage() {
   const [loadingMarks, setLoadingMarks] = useState(true);
   const [loadingAttendance, setLoadingAttendance] = useState(true);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoadingMarks(false);
-      setLoadingAttendance(false);
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     const canvas = document.createElement("canvas");
@@ -568,7 +561,7 @@ function HomePage() {
             </div>
 
             {}
-            <div className="flex backdrop-blur-md p-1 rounded-full shrink-0 w-full md:w-auto justify-center gap-5 md:justify-end">
+            <div className="flex backdrop-blur-md p-1 rounded-full shrink-0 w-full md:w-auto gap-5 md:justify-end">
               <button
                 onClick={() => setActiveMainTab("stats")}
                 className={`px-5 py-2 border border-white/5  rounded-full text-xs font-bold flex items-center gap-2 transition-all duration-300 ${

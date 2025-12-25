@@ -137,7 +137,7 @@ const SemesterAccordion = ({ semester }) => {
               <h5 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
                 <BookOpen size={12} /> Registration Log
               </h5>
-              <div className="!overflow-x-scroll rounded-[2rem] border border-white/5 bg-zinc-900/20 backdrop-blur-md">
+              <div className="!overflow-x-scroll scrollbar-hide rounded-[2rem] border border-white/5 bg-zinc-900/20 backdrop-blur-md">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-white/5">
@@ -367,11 +367,23 @@ function FeeDetailsPage() {
       setSemesters(mappedSemesters);
       setTransactions(txHistory);
 
-      let total = 0;
+      let totalAmount = 0;
       txHistory.forEach(
-        (t) => (total += parseFloat(t.amount.replace(/,/g, "")) || 0),
+        (t) => (totalAmount += parseFloat(t.amount.replace(/,/g, "")) || 0),
       );
-      setTotalPaid(total.toLocaleString());
+      setTotalPaid(totalAmount.toLocaleString());
+
+      // Sync with AI
+      const existingContext = window.superflex_ai_context || {};
+      const newContext = {
+        ...existingContext,
+        feeHistory: txHistory,
+        lastScanned: new Date().toISOString(),
+      };
+      window.superflex_ai_context = newContext;
+      window.dispatchEvent(
+        new CustomEvent("superflex-data-updated", { detail: newContext }),
+      );
 
       root.style.display = "none";
       setLoading(false);

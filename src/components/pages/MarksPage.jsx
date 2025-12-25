@@ -220,7 +220,7 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
   }
 
   return (
-    <div className="relative z-[900]" ref={dropdownRef}>
+    <div className="relative z-30" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`p-3 rounded-full border transition-all ${
@@ -1110,6 +1110,27 @@ function MarksPage() {
           if (parsedCourses[0].sections.length > 0) {
             setActiveSectionId(parsedCourses[0].sections[0].id);
           }
+        }
+
+        if (typeof window !== "undefined") {
+          const compatibleCourses = parsedCourses.map(c => ({
+            ...c,
+            categories: c.sections.map(s => ({
+              ...s,
+              assessments: s.rows
+            })) 
+          }));
+
+          const existingContext = window.superflex_ai_context || {};
+          const newContext = {
+            ...existingContext,
+            marks: compatibleCourses
+          };
+          
+          window.superflex_ai_context = newContext;
+          window.dispatchEvent(
+            new CustomEvent("superflex-data-updated", { detail: newContext })
+          );
         }
 
         root.style.display = "none";
