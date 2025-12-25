@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import PageLayout from "../layouts/PageLayout";
-import { LoadingSpinner } from "../LoadingOverlay";
+import PageLayout from "../components/layouts/PageLayout";
+import { LoadingSpinner } from "../components/ui/LoadingOverlay";
 import {
   CheckCircle2,
   AlertCircle,
@@ -17,10 +17,10 @@ import {
   X,
   Info,
 } from "lucide-react";
-import NotificationBanner from "../NotificationBanner";
-import PageHeader from "../PageHeader";
-import StatsCard from "../StatsCard";
-import SuperTabs from "../SuperTabs";
+import NotificationBanner from "../components/ui/NotificationBanner";
+import PageHeader from "../components/ui/PageHeader";
+import StatsCard from "../components/ui/StatsCard";
+import SuperTabs from "../components/ui/SuperTabs";
 
 const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
   const [file, setFile] = useState(null);

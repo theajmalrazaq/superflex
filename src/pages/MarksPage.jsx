@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import LoadingOverlay, { LoadingSpinner } from "../LoadingOverlay";
-import PageLayout from "../layouts/PageLayout";
+import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import PageLayout from "../components/layouts/PageLayout";
 import {
   ChevronDown,
   AlertCircle,
@@ -15,10 +15,10 @@ import {
   X,
   RotateCcw,
 } from "lucide-react";
-import NotificationBanner from "../NotificationBanner";
-import PageHeader from "../PageHeader";
-import StatsCard from "../StatsCard";
-import SuperTabs from "../SuperTabs";
+import NotificationBanner from "../components/ui/NotificationBanner";
+import PageHeader from "../components/ui/PageHeader";
+import StatsCard from "../components/ui/StatsCard";
+import SuperTabs from "../components/ui/SuperTabs";
 
 const parseFloatOrZero = (value) => {
   if (!value || value === "-" || value.trim() === "") return 0;

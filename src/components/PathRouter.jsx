@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
-import HomePage from "./pages/HomePage";
-import CourseRegistrationPage from "./pages/CourseRegistrationPage";
-import AttendancePage from "./pages/AttendancePage";
-import MarksPage from "./pages/MarksPage";
-import MarksPloReportPage from "./pages/MarksPloReportPage";
-import TranscriptPage from "./pages/TranscriptPage";
-import FeeChallanPage from "./pages/FeeChallanPage";
-import FeeDetailsPage from "./pages/FeeDetailsPage";
-import CourseFeedbackPage from "./pages/CourseFeedbackPage";
-import RetakeExamPage from "./pages/RetakeExamPage";
-import CourseWithdrawPage from "./pages/CourseWithdrawPage";
-import GradeChangePage from "./pages/GradeChangePage";
-import StudyPlanPage from "./pages/StudyPlanPage";
-import ChangePasswordPage from "./pages/ChangePasswordPage";
-import SessionExpirePage from "./pages/SessionExpirePage";
-import NotFoundPage from "./pages/NotFoundPage";
+import HomePage from "../pages/HomePage";
+import CourseRegistrationPage from "../pages/CourseRegistrationPage";
+import AttendancePage from "../pages/AttendancePage";
+import MarksPage from "../pages/MarksPage";
+import MarksPloReportPage from "../pages/MarksPloReportPage";
+import TranscriptPage from "../pages/TranscriptPage";
+import FeeChallanPage from "../pages/FeeChallanPage";
+import FeeDetailsPage from "../pages/FeeDetailsPage";
+import CourseFeedbackPage from "../pages/CourseFeedbackPage";
+import RetakeExamPage from "../pages/RetakeExamPage";
+import CourseWithdrawPage from "../pages/CourseWithdrawPage";
+import GradeChangePage from "../pages/GradeChangePage";
+import StudyPlanPage from "../pages/StudyPlanPage";
+import ChangePasswordPage from "../pages/ChangePasswordPage";
+import SessionExpirePage from "../pages/SessionExpirePage";
+import NotFoundPage from "../pages/NotFoundPage";
 import SuperFlexAI from "./SuperFlexAI";
 
 function PathRouter() {

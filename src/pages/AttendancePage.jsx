@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import LoadingOverlay, { LoadingSpinner } from "../LoadingOverlay";
-import PageLayout from "../layouts/PageLayout";
+import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import PageLayout from "../components/layouts/PageLayout";
 import {
   CheckCircle2,
   XCircle,
@@ -13,10 +13,10 @@ import {
   Bookmark,
   AlertTriangle,
 } from "lucide-react";
-import NotificationBanner from "../NotificationBanner";
-import PageHeader from "../PageHeader";
-import StatsCard from "../StatsCard";
-import SuperTabs from "../SuperTabs";
+import NotificationBanner from "../components/ui/NotificationBanner";
+import PageHeader from "../components/ui/PageHeader";
+import StatsCard from "../components/ui/StatsCard";
+import SuperTabs from "../components/ui/SuperTabs";
 
 const CourseSelector = ({ courses, selectedId, onSelect }) => {
   const [isOpen, setIsOpen] = useState(false);

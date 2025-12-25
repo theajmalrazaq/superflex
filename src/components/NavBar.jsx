@@ -581,7 +581,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
         <div className="flex items-center shrink-0">
           <img
-            src={chrome.runtime.getURL("logo.svg")}
+            src={chrome.runtime.getURL("assets/logo.svg")}
             alt="Logo"
             className="h-7 lg:h-8 w-auto"
           />

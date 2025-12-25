@@ -493,8 +493,8 @@ function LoginPageStyles() {
     heroDiv.className =
       "flex flex-col pt-7 justify-center items-center text-center w-full px-4 sm:px-6 mb-6 relative z-10";
 
-    const bgUrl = chrome.runtime.getURL("bg.png");
-    const logoUrl = chrome.runtime.getURL("logo.svg");
+    const bgUrl = chrome.runtime.getURL("assets/bg.png");
+    const logoUrl = chrome.runtime.getURL("assets/logo.svg");
 
     const styleId = "feature-marquee-styles";
     let styleElement = document.getElementById(styleId);

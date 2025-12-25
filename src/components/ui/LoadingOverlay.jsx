@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "../styles/loading.css";
+import "../../styles/loading.css";
 
 const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
   const [isVisible, setIsVisible] = useState(show);

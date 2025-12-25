@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
-import PageLayout from "../layouts/PageLayout";
-import NotificationBanner from "../NotificationBanner";
-import PageHeader from "../PageHeader";
-import StatsCard from "../StatsCard";
-import { LoadingSpinner } from "../LoadingOverlay";
-import SuperTabs from "../SuperTabs";
+import PageLayout from "../components/layouts/PageLayout";
+import NotificationBanner from "../components/ui/NotificationBanner";
+import PageHeader from "../components/ui/PageHeader";
+import StatsCard from "../components/ui/StatsCard";
+import { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import SuperTabs from "../components/ui/SuperTabs";
 import {
   ClipboardEdit,
   History,

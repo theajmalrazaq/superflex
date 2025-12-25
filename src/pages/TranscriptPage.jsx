@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import PageLayout from "../layouts/PageLayout";
-import LoadingOverlay, { LoadingSpinner } from "../LoadingOverlay";
+import PageLayout from "../components/layouts/PageLayout";
+import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
 import {
   TrendingUp,
   Award,
@@ -20,11 +20,11 @@ import {
   Search,
   Scale,
 } from "lucide-react";
-import { MCA_DATA } from "../../constants/mcaData";
-import NotificationBanner from "../NotificationBanner";
-import PageHeader from "../PageHeader";
-import StatsCard from "../StatsCard";
-import SuperTabs from "../SuperTabs";
+import { MCA_DATA } from "../constants/mcaData";
+import NotificationBanner from "../components/ui/NotificationBanner";
+import PageHeader from "../components/ui/PageHeader";
+import StatsCard from "../components/ui/StatsCard";
+import SuperTabs from "../components/ui/SuperTabs";
 import {
   Chart as ChartJS,
   CategoryScale,

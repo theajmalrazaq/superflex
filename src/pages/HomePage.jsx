@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import PageLayout from "../layouts/PageLayout";
+import PageLayout from "../components/layouts/PageLayout";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -27,8 +27,8 @@ import {
   ArrowRight,
   AlertTriangle,
 } from "lucide-react";
-import NotificationBanner from "../NotificationBanner";
-import StatsCard from "../StatsCard";
+import NotificationBanner from "../components/ui/NotificationBanner";
+import StatsCard from "../components/ui/StatsCard";
 
 ChartJS.register(
   CategoryScale,

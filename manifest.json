@@ -4,10 +4,10 @@
   "version": "1.0.0",
   "description": "Custom styled extension",
   "icons": {
-    "16": "favicon.png",
-    "32": "favicon.png",
-    "48": "favicon.png",
-    "128": "favicon.png"
+    "16": "assets/favicon.png",
+    "32": "assets/favicon.png",
+    "48": "assets/favicon.png",
+    "128": "assets/favicon.png"
   },
   "permissions": ["activeTab"],
   "content_scripts": [
@@ -25,18 +25,18 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "bg.png",
-        "favicon.png",
-        "favicon.svg",
-        "logo.svg",
-        "logo_sec.svg",
-        "overlay.png",
+        "assets/bg.png",
+        "assets/favicon.png",
+        "assets/favicon.svg",
+        "assets/logo.svg",
+        "assets/logo_sec.svg",
+        "assets/overlay.png",
         "reviews.json",
-        "umami.js",
-        "puter.js",
-        "polyfill.js",
-        "rustls.js",
-        "bridge.js"
+        "scripts/umami.js",
+        "scripts/puter.js",
+        "scripts/polyfill.js",
+        "scripts/rustls.js",
+        "scripts/bridge.js"
       ],
       "matches": ["<all_urls>"]
     }

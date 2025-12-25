@@ -1,23 +1,23 @@
 import { createRoot } from "react-dom/client";
-import LoadingOverlay from "./components/LoadingOverlay";
+import LoadingOverlay from "./components/ui/LoadingOverlay";
 import LoginPageStyles from "./components/LoginPageStyles";
 import PathRouter from "./components/PathRouter";
 import "./styles/tailwind.css";
 
 (() => {
   const scriptUmami = document.createElement("script");
-  scriptUmami.src = chrome.runtime.getURL("umami.js");
+  scriptUmami.src = chrome.runtime.getURL("scripts/umami.js");
   scriptUmami.defer = true;
   scriptUmami.dataset.websiteId = "17490ccf-0b15-4d8a-a908-5e774ad648de";
   document.head.appendChild(scriptUmami);
 
   const scriptPuter = document.createElement("script");
-  scriptPuter.src = chrome.runtime.getURL("puter.js");
+  scriptPuter.src = chrome.runtime.getURL("scripts/puter.js");
   scriptPuter.defer = true;
   document.head.appendChild(scriptPuter);
 
   const scriptBridge = document.createElement("script");
-  scriptBridge.src = chrome.runtime.getURL("bridge.js");
+  scriptBridge.src = chrome.runtime.getURL("scripts/bridge.js");
   scriptBridge.defer = true;
   document.head.appendChild(scriptBridge);
 })();
@@ -66,7 +66,7 @@ if (!favicon) {
   document.head.appendChild(favicon);
 }
 
-favicon.href = `${chrome.runtime.getURL("favicon.svg")}`;
+favicon.href = `${chrome.runtime.getURL("assets/favicon.svg")}`;
 if (document.querySelector(".m-grid__item.m-footer")) {
   document.querySelector(".m-grid__item.m-footer").remove();
 }
@@ -97,7 +97,7 @@ document.documentElement.classList.add("dark");
 document.body.style.backgroundColor = "black";
 
 document.body.style.backgroundImage = `url("${chrome.runtime.getURL(
-  "overlay.png",
+  "assets/overlay.png",
 )}")`;
 document.body.style.backgroundRepeat = "no-repeat";
 

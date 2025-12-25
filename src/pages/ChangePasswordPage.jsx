@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import PageLayout from "../layouts/PageLayout";
-import NotificationBanner from "../NotificationBanner";
-import PageHeader from "../PageHeader";
+import PageLayout from "../components/layouts/PageLayout";
+import NotificationBanner from "../components/ui/NotificationBanner";
+import PageHeader from "../components/ui/PageHeader";
 import {
   ShieldCheck,
   Check,

@@ -31,7 +31,7 @@ const SessionExpirePage = () => {
       <div
         className="fixed inset-0 pointer-events-none opacity-20"
         style={{
-          backgroundImage: `url("${chrome.runtime.getURL("overlay.png")}")`,
+          backgroundImage: `url("${chrome.runtime.getURL("assets/overlay.png")}")`,
         }}
       />
 
