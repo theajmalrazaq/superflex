@@ -12,6 +12,9 @@ import {
   CheckCircle2,
   Clock,
   AlertCircle,
+  BarChart,
+  GraduationCap,
+  User,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -101,7 +104,7 @@ const SuperFlexAI = () => {
     () => localStorage.getItem("superflex_ai_data_permission") || "pending",
   );
   const [selectedModel, setSelectedModel] = useState(
-    () => localStorage.getItem("superflex_ai_model") || "gemini-2.0-flash",
+    () => localStorage.getItem("superflex_ai_model") || "gpt-4o-mini",
   );
   const [showModelPicker, setShowModelPicker] = useState(false);
   const scrollRef = useRef(null);
@@ -174,6 +177,11 @@ const SuperFlexAI = () => {
   const handleSend = async (txt) => {
     const textToSend = txt || input;
     if (!textToSend.trim() || isLoading) return;
+
+    if (permissionStatus !== "granted") {
+      setIsOpen(false); // Close if they somehow trigger it
+      return;
+    }
 
     const userMessage = textToSend.trim();
     setInput("");
@@ -399,21 +407,22 @@ const SuperFlexAI = () => {
   const hasAttendance = dataContext.attendance && dataContext.attendance.length > 0;
   const hasTranscript = !!dataContext.transcript;
 
-  const StatusCard = ({ label, active, icon: Icon, onClick }) => (
+  const StatusCard = ({ label, active, icon: Icon, onClick, description }) => (
     <button
-      onClick={onClick}
-      className={`relative group p-4 rounded-3xl border text-left transition-all duration-300 w-full hover:-translate-y-1 ${
+      onClick={active ? onClick : undefined}
+      disabled={!active}
+      className={`relative group p-4 rounded-3xl border flex flex-col items-center justify-center text-center transition-all duration-300 w-full aspect-square ${
         active
-          ? "bg-white/5 border-white/10 hover:bg-white/10"
-          : "bg-white/5 border-white/5 opacity-60 hover:opacity-100"
+          ? "bg-white/5 border-white/10 hover:bg-white/10 shadow-lg shadow-black/20 hover:-translate-y-1 cursor-pointer"
+          : "bg-white/5 border-white/5 opacity-50 cursor-not-allowed grayscale"
       }`}
     >
-      <div className={`mb-3 p-3 rounded-2xl w-fit ${active ? "bg-x/20 text-x" : "bg-zinc-800 text-zinc-500"}`}>
-        <Icon size={24} />
+      <div className={`mb-3 p-3 rounded-2xl w-fit transition-transform group-hover:scale-105 ${active ? "bg-x/20 text-x" : "bg-zinc-800 text-zinc-500"}`}>
+        <Icon size={26} />
       </div>
       <h4 className="text-white font-bold text-sm mb-1">{label}</h4>
-      <p className="text-[10px] text-zinc-400 font-medium">
-        {active ? "Data Synced" : "Synced needed"}
+      <p className="text-[10px] text-zinc-400 font-medium leading-tight max-w-[90%]">
+        {active ? description : "Visit page to sync"}
       </p>
     </button>
   );
@@ -435,10 +444,11 @@ const SuperFlexAI = () => {
           {/* Header */}
           <div className="relative z-50 flex items-center justify-between px-8 py-6">
              <div className="flex items-center gap-3">
-                <div className="p-2 bg-zinc-900 rounded-xl border border-white/10">
-                   <AnimatedLogo size={24} />
-                </div>
-                <span className="font-bold text-white text-lg tracking-tight">SuperFlex AI</span>
+                <img 
+                  src={chrome.runtime.getURL("assets/logo.svg")} 
+                  alt="SuperFlex" 
+                  className="w-42" 
+                />
              </div>
              
              <div className="flex items-center gap-4">
@@ -483,7 +493,7 @@ const SuperFlexAI = () => {
           </div>
 
           {/* Main Content Area */}
-          <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-5xl mx-auto w-full px-6 pb-32">
+          <div className={`relative z-10 flex-1 flex flex-col ${messages.length === 0 ? "items-center justify-center" : "h-full overflow-hidden"} max-w-5xl mx-auto w-full px-6 pb-32`}>
              
              {messages.length === 0 ? (
                <div className="flex flex-col items-center text-center animate-in slide-in-from-bottom-8 duration-700 w-full max-w-3xl">
@@ -501,24 +511,34 @@ const SuperFlexAI = () => {
                     Ready to assist you with anything you need, from analyzing grades to tracking attendance. Let's get started!
                   </p>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-4xl px-2 md:px-0">
                      <StatusCard 
-                        label="Check Performance" 
-                        active={hasMarks} 
-                        icon={BarChart} 
-                        onClick={() => handleSend("Analyze my current marks performance")}
+                        label="Personal Info" 
+                        active={!!dataContext.studentName} 
+                        icon={User} 
+                        description="View profile summary"
+                        onClick={() => handleSend("Tell me about my student profile based on the synced data.")}
                      />
                      <StatusCard 
-                        label="Track Attendance" 
+                        label="Marks" 
+                        active={hasMarks} 
+                        icon={BarChart} 
+                        description="Analyze performance"
+                        onClick={() => handleSend("Analyze my current marks performance.")}
+                     />
+                     <StatusCard 
+                        label="Attendance" 
                         active={hasAttendance} 
                         icon={Clock} 
+                        description="Check status"
                          onClick={() => handleSend("What is my attendance status?")}
                      />
                      <StatusCard 
-                        label="Review Transcript" 
+                        label="Transcript" 
                         active={hasTranscript} 
                         icon={GraduationCap} 
-                         onClick={() => handleSend("Summarize my transcript GPA")}
+                        description="View GPA & history"
+                         onClick={() => handleSend("Summarize my transcript GPA.")}
                      />
                   </div>
                </div>
@@ -528,17 +548,19 @@ const SuperFlexAI = () => {
                    className="w-full h-full overflow-y-auto scrollbar-hide space-y-8 px-4 py-8"
                 >
                    {messages.map((m, i) => (
-                      <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-4`}>
-                         <div className={`max-w-[80%] rounded-3xl px-6 py-4 relative group leading-relaxed text-sm md:text-base ${
+                      <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} items-start gap-3 animate-in fade-in slide-in-from-bottom-4`}>
+                         
+                         {m.role === "assistant" && (
+                            <div className="w-8 h-8 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center shrink-0 mt-1">
+                               <AnimatedLogo size={16} animated={false} />
+                            </div>
+                         )}
+
+                         <div className={`max-w-[80%] rounded-2xl px-5 py-3.5 relative group leading-relaxed text-sm md:text-base ${
                             m.role === "user" 
-                              ? "bg-x text-white rounded-tr-sm" 
+                              ? "bg-x/30 text-white border border-x/20 rounded-tr-sm backdrop-blur-sm" 
                               : "bg-zinc-900 border border-white/10 text-zinc-300 rounded-tl-sm shadow-xl"
                          }`}>
-                            {m.role === "assistant" && (
-                              <div className="absolute -left-10 top-0 p-1.5 bg-zinc-900 border border-white/10 rounded-xl">
-                                 <AnimatedLogo size={16} animated={false} />
-                              </div>
-                            )}
                             <div className="markdown-body">
                               {m.role === "assistant" && !m.content ? (
                                 <div className="flex gap-1.5 py-1">
@@ -551,6 +573,12 @@ const SuperFlexAI = () => {
                               )}
                             </div>
                          </div>
+
+                         {m.role === "user" && (
+                            <div className="w-8 h-8 rounded-full bg-x/20 border border-x/10 flex items-center justify-center shrink-0 overflow-hidden mt-1">
+                               <img src="login/getimage" alt="Me" className="w-full h-full object-cover" />
+                            </div>
+                         )}
                       </div>
                    ))}
                 </div>
@@ -560,13 +588,13 @@ const SuperFlexAI = () => {
 
           {/* Floating Input Bar */}
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-full max-w-2xl px-6 z-50">
-             {permissionStatus === 'pending' && messages.length === 0 ? (
+{permissionStatus !== 'granted' ? (
                <div className="bg-zinc-900/90 backdrop-blur-xl border border-white/10 p-4 rounded-[2rem] flex items-center justify-between gap-4 shadow-2xl">
                   <div className="flex items-center gap-3 pl-2">
                      <Shield className="text-x" size={20} />
                      <div className="text-sm">
                         <span className="text-white font-bold block">Enable AI Access?</span>
-                        <span className="text-zinc-500 text-xs">Allow access to marks & attendance for better answers.</span>
+                        <span className="text-zinc-500 text-xs">Access to academic data is required.</span>
                      </div>
                   </div>
                   <div className="flex gap-2">
@@ -577,10 +605,13 @@ const SuperFlexAI = () => {
                         Enable
                      </button>
                       <button 
-                        onClick={() => handlePermission('denied')}
-                        className="px-4 py-2 bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white text-xs font-bold rounded-xl transition-colors"
+                        onClick={() => {
+                           handlePermission('denied');
+                           setIsOpen(false);
+                        }}
+                        className="px-4 py-2 bg-white/5 hover:bg-red-500/10 text-zinc-400 hover:text-red-400 text-xs font-bold rounded-xl transition-colors"
                      >
-                        Skip
+                        Reject
                      </button>
                   </div>
                </div>

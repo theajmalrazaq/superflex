@@ -45,11 +45,21 @@
       }
 
       const response = await window.puter.ai.chat(prompt, {
-        model: model || "gemini",
+        model: model || "gpt-4o-mini",
         stream: true,
       });
 
+      const timeoutId = setTimeout(() => {
+        if (activeRequestId === id) {
+           activeRequestId = null;
+           document.dispatchEvent(new CustomEvent("superflex-ai-response", {
+             detail: { id, error: "Request timed out after 30s" }
+           }));
+        }
+      }, 30000);
+
       for await (const part of response) {
+        clearTimeout(timeoutId); // Clear timeout on first byte
         if (activeRequestId !== id) {
           break;
         }
