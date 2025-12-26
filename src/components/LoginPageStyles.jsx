@@ -133,8 +133,6 @@ function LoginPageStyles() {
       button.style.fontFamily = "'Google Sans Flex', sans-serif";
     });
 
-
-
     const signInIcon = document.querySelector(".la-sign-in");
     if (signInIcon) signInIcon.remove();
 

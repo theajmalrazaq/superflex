@@ -302,14 +302,6 @@ function AttendancePage() {
     );
   }, [markedRecords]);
 
-  // Sync with AI Model Context
-  useAiSync({
-    data: courses,
-    dataKey: "attendance",
-    syncKey: "attendance",
-    isEnabled: courses.length > 0,
-  });
-
   const [semesters, setSemesters] = useState([]);
   const hiddenFormRef = useRef(null);
 

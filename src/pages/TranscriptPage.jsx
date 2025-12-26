@@ -403,7 +403,6 @@ function TranscriptPage() {
   const [whatIfMode, setWhatIfMode] = useState(false);
   const [overriddenGrades, setOverriddenGrades] = useState({});
 
-
   useEffect(() => {
     const parse = () => {
       try {

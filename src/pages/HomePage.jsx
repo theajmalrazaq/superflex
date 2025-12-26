@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageLayout from "../components/layouts/PageLayout";
 import { useAiSync } from "../hooks/useAiSync";
+import { processCourseMarks } from "../utils/marksProcessor";
 import LoadingOverlay, {
   LoadingSpinner,
 } from "../components/ui/LoadingOverlay";
@@ -49,7 +50,8 @@ ChartJS.register(
   Filler,
 );
 
-const CategoryAccordion = ({ category, isOpen, onToggle }) => {
+const SectionAccordion = ({ section, isOpen, onToggle }) => {
+  const rows = section.rows || [];
   return (
     <div className=" rounded-xl overflow-hidden bg-zinc-900/50 backdrop-blur-sm mb-4">
       <button
@@ -63,25 +65,15 @@ const CategoryAccordion = ({ category, isOpen, onToggle }) => {
             {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </span>
           <span className="font-semibold text-white text-sm">
-            {category.name}
+            {section.title}
           </span>
           <span className="text-xs text-zinc-500 bg-zinc-900 px-2 py-0.5 rounded ">
-            {category.assessments.length}
+            {rows.length}
           </span>
         </div>
         <div className="text-xs text-zinc-400 font-medium">
-          <span className="text-white">
-            {category.assessments
-              .reduce((acc, curr) => acc + curr.obtained, 0)
-              .toFixed(1)}
-          </span>
-          <span className="text-zinc-600">
-            {" "}
-            /{" "}
-            {category.assessments
-              .reduce((acc, curr) => acc + curr.total, 0)
-              .toFixed(1)}
-          </span>
+          <span className="text-white">{section.obtained.toFixed(1)}</span>
+          <span className="text-zinc-600"> / {section.weight.toFixed(1)}</span>
         </div>
       </button>
 
@@ -102,41 +94,45 @@ const CategoryAccordion = ({ category, isOpen, onToggle }) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {category.assessments.map((asm, idx) => (
-                <tr
-                  key={idx}
-                  className="hover:bg-white/[0.02] transition-colors group"
-                >
-                  <td className="p-3 text-sm text-zinc-300 font-medium">
-                    {asm.name}
-                  </td>
-                  <td className="p-3 text-right">
-                    <div className="flex flex-col items-end">
-                      <span className="text-sm text-white font-bold">
-                        {asm.obtained}{" "}
-                        <span className="text-zinc-600 font-normal text-xs">
-                          / {asm.total}
+              {rows.map((row, idx) => {
+                const perc =
+                  row.total > 0 ? (row.obtained / row.total) * 100 : 0;
+                return (
+                  <tr
+                    key={idx}
+                    className={`hover:bg-white/[0.02] transition-colors group ${!row.included ? "opacity-40" : ""}`}
+                  >
+                    <td className="p-3 text-sm text-zinc-300 font-medium">
+                      {row.title}
+                    </td>
+                    <td className="p-3 text-right">
+                      <div className="flex flex-col items-end">
+                        <span className="text-sm text-white font-bold">
+                          {row.obtained}{" "}
+                          <span className="text-zinc-600 font-normal text-xs">
+                            / {row.total}
+                          </span>
                         </span>
+                      </div>
+                    </td>
+                    <td className="p-3 text-right">
+                      <span
+                        className={`text-[10px] font-bold px-2 py-1 rounded-full border ${
+                          perc >= 80
+                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                            : perc >= 60
+                              ? "bg-x/10 text-x border-x/20"
+                              : perc >= 40
+                                ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                                : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                        }`}
+                      >
+                        {perc.toFixed(0)}%
                       </span>
-                    </div>
-                  </td>
-                  <td className="p-3 text-right">
-                    <span
-                      className={`text-[10px] font-bold px-2 py-1 rounded-full border ${
-                        asm.percentage >= 80
-                          ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                          : asm.percentage >= 60
-                            ? "bg-x/10 text-x border-x/20"
-                            : asm.percentage >= 40
-                              ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                              : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                      }`}
-                    >
-                      {asm.percentage.toFixed(0)}%
-                    </span>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -167,8 +163,56 @@ function HomePage() {
 
   const [loadingMarks, setLoadingMarks] = useState(false);
   const [loadingAttendance, setLoadingAttendance] = useState(false);
+  const [studyPlanData, setStudyPlanData] = useState(null);
 
+  const activeCourseData = useMemo(() => {
+    return coursesData.find((c) => c.id === activeCourse);
+  }, [coursesData, activeCourse]);
 
+  const mostAbsentSubject = useMemo(() => {
+    if (!attendanceData || attendanceData.length === 0) return null;
+    return attendanceData.reduce((prev, current) =>
+      prev.absent > current.absent ? prev : current,
+    );
+  }, [attendanceData]);
+
+  const greetingMessage = useMemo(() => {
+    const greetings = [
+      "Hey Pookie,",
+      "Academic Comeback,",
+      "Yo Bestie,",
+      "No Cap,",
+      "Main Character,",
+      "Still Mid,",
+      "Wait, you're here?",
+      "Manifesting 4.0,",
+    ];
+    return greetings[Math.floor(Math.random() * greetings.length)];
+  }, []);
+
+  const roastMessage = useMemo(() => {
+    const roasts = [
+      "Nice to see you! (not really)",
+      "Your attendance is giving 'dropout'.",
+      "Is it giving 4.0 or 0.4?",
+      "Caught in 4k checking your grades.",
+      "Don't let them catch you lacking.",
+      "Real ones check SuperFlex every hour.",
+      "Go touch some grass after this.",
+      "Imagine having 8am classes in 2025.",
+      "Your aggregate is looking real quiet...",
+      "Academic comeback starts... never?",
+    ];
+
+    if (mostAbsentSubject && mostAbsentSubject.absent > 3) {
+      return `Bestie, ${mostAbsentSubject.absent} absents in ${mostAbsentSubject.title.split(" ")[0]}? You're cooked.`;
+    }
+    if (currentAggregate.percentage > 85) {
+      return "Okay nerd, we get it, you're smart.";
+    }
+
+    return roasts[Math.floor(Math.random() * roasts.length)];
+  }, [mostAbsentSubject, currentAggregate]);
 
   useEffect(() => {
     const canvas = document.createElement("canvas");
@@ -298,7 +342,6 @@ function HomePage() {
     };
   }, []);
 
-  // Sync Profile with AI Context
   const profileData = useMemo(() => {
     if (!personalInfo || !personalInfo["Name"]) return null;
     return {
@@ -314,12 +357,34 @@ function HomePage() {
     isEnabled: !!profileData,
   });
 
+  useAiSync({
+    data: attendanceData,
+    dataKey: "attendance",
+    syncKey: "attendance",
+    isEnabled: !!attendanceData,
+  });
+
+  useAiSync({
+    data: coursesData,
+    dataKey: "marks",
+    syncKey: "marks",
+    isEnabled: !!coursesData && coursesData.length > 0,
+  });
+
+  useAiSync({
+    data: studyPlanData,
+    dataKey: "studyPlan",
+    syncKey: "studyPlan",
+    isEnabled: !!studyPlanData,
+  });
+
   const handleLinksFound = (foundLinks) => {
     const linkMap = {};
     foundLinks.forEach((l) => {
       if (l.text.includes("Attendance")) linkMap.attendance = l.href;
       if (l.text.includes("Marks") && !l.text.includes("PLO"))
         linkMap.marks = l.href;
+      if (l.text.includes("Study Plan")) linkMap.studyPlan = l.href;
     });
     setLinks(linkMap);
   };
@@ -334,6 +399,9 @@ function HomePage() {
     if (links.marks) {
       setLoadingMarks(true);
       fetchMarks(links.marks).finally(() => setLoadingMarks(false));
+    }
+    if (links.studyPlan) {
+      fetchStudyPlan(links.studyPlan);
     }
   }, [links]);
 
@@ -361,7 +429,17 @@ function HomePage() {
         const rows = table.querySelectorAll("tbody tr");
         let present = 0,
           absent = 0;
+        const records = [];
         rows.forEach((r) => {
+          const cols = r.querySelectorAll("td");
+          if (cols.length >= 4) {
+            records.push({
+              date: cols[1]?.textContent.trim(),
+              time: cols[2]?.textContent.trim(),
+              status: cols[3]?.textContent.trim(),
+              type: cols[4]?.textContent.trim() || "Lecture",
+            });
+          }
           const marker = r.querySelector("td:nth-child(4)")?.textContent.trim();
           if (marker?.includes("P")) present++;
           if (marker?.includes("A")) absent++;
@@ -379,6 +457,7 @@ function HomePage() {
           absent,
           total: rows.length,
           percentage,
+          records,
         });
       });
       setAttendanceData(summaryData);
@@ -410,9 +489,7 @@ function HomePage() {
           courseTitle = rawTitle.replace(/\(.*\)/, "").trim();
         }
 
-        let courseTotalObtained = 0;
-        let courseTotalWeight = 0;
-        const categories = [];
+        const sections = [];
 
         const cards = pane.querySelectorAll(".card");
         cards.forEach((card) => {
@@ -421,17 +498,26 @@ function HomePage() {
             ?.textContent.trim();
           if (!header || header.includes("Grand Total")) return;
 
-          const categoryAssessments = [];
-          const rows = card.querySelectorAll("tbody tr");
-          rows.forEach((tr) => {
-            if (tr.classList.contains("totalColumn_1471")) return;
+          const rows = [];
+          const cardRows = card.querySelectorAll("tbody tr");
+          cardRows.forEach((tr) => {
+            if (
+              tr.classList.contains("totalColumn_1471") ||
+              tr.querySelector(".totalColweightage")
+            )
+              return;
 
             const tds = tr.querySelectorAll("td");
             if (tds.length < 4) return;
 
             const name = tds[0]?.textContent.trim();
+            const weight = parseFloat(tds[1]?.textContent.trim() || "0");
             const obtainedStr = tds[2]?.textContent.trim();
             const totalStr = tds[3]?.textContent.trim();
+            const avg = parseFloat(tds[4]?.textContent.trim() || "0");
+            const stdDev = parseFloat(tds[5]?.textContent.trim() || "0");
+            const min = parseFloat(tds[6]?.textContent.trim() || "0");
+            const max = parseFloat(tds[7]?.textContent.trim() || "0");
 
             if (name === "Total" || name === "Grand Total") return;
 
@@ -440,51 +526,52 @@ function HomePage() {
               const total = parseFloat(totalStr);
 
               if (!isNaN(obtained)) {
-                categoryAssessments.push({
-                  name: name,
+                rows.push({
+                  title: name,
+                  weight,
                   obtained,
                   total: isNaN(total) ? 0 : total,
-                  percentage:
-                    total > 0 && !isNaN(total) ? (obtained / total) * 100 : 0,
+                  avg,
+                  stdDev,
+                  min,
+                  max,
+                  included: true,
                 });
               }
             }
           });
 
-          if (categoryAssessments.length > 0) {
-            categories.push({
-              name: header,
-              assessments: categoryAssessments,
+          const footerRow =
+            card.querySelector("tfoot tr") ||
+            card.querySelector("tr[class*='totalColumn']");
+          let categoryWeight = 0;
+          if (footerRow) {
+            categoryWeight = parseFloat(
+              footerRow.querySelector(".totalColweightage")?.textContent || "0",
+            );
+          }
+
+          if (rows.length > 0) {
+            sections.push({
+              id: `${courseId}-${header.replace(/\s+/g, "_")}`,
+              title: header,
+              weight:
+                categoryWeight || rows.reduce((acc, r) => acc + r.weight, 0),
+              rows: rows,
             });
           }
         });
 
-        const calcRows = pane.querySelectorAll(".sum_table .calculationrow");
-        calcRows.forEach((row) => {
-          const weightText = row.querySelector(".weightage")?.textContent;
-          const obtMarksText = row.querySelector(".ObtMarks")?.textContent;
-          const w = parseFloat(weightText || "0");
-          const o = parseFloat(obtMarksText || "0");
-          if (!isNaN(w) && !isNaN(o)) {
-            courseTotalObtained += o;
-            courseTotalWeight += w;
-          }
-        });
-
-        semesterTotalObtained += courseTotalObtained;
-        semesterTotalWeight += courseTotalWeight;
-
-        parsedCourses.push({
+        const processedCourse = processCourseMarks({
           id: courseId,
           title: courseTitle,
-          categories: categories,
-          obtained: courseTotalObtained,
-          total: courseTotalWeight,
-          percentage:
-            courseTotalWeight > 0
-              ? (courseTotalObtained / courseTotalWeight) * 100
-              : 0,
+          sections: sections,
         });
+
+        semesterTotalObtained += processedCourse.grandTotalStats.obtained;
+        semesterTotalWeight += processedCourse.grandTotalStats.weight;
+
+        parsedCourses.push(processedCourse);
       });
 
       setCoursesData(parsedCourses);
@@ -506,16 +593,48 @@ function HomePage() {
     }
   };
 
-  const activeCourseData = useMemo(() => {
-    return coursesData.find((c) => c.id === activeCourse);
-  }, [coursesData, activeCourse]);
+  const fetchStudyPlan = async (url) => {
+    try {
+      const res = await fetch(url);
+      const html = await res.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
 
-  const mostAbsentSubject = useMemo(() => {
-    if (!attendanceData || attendanceData.length === 0) return null;
-    return attendanceData.reduce((prev, current) =>
-      prev.absent > current.absent ? prev : current,
-    );
-  }, [attendanceData]);
+      const parsedSemesters = [];
+      const semesterCols = doc.querySelectorAll(".col-md-6");
+
+      semesterCols.forEach((col) => {
+        const h4 = col.querySelector("h4");
+        if (!h4) return;
+
+        const title = h4.textContent
+          .replace(h4.querySelector("small")?.textContent || "", "")
+          .trim();
+        const crHrsText = h4.querySelector("small")?.textContent || "";
+        const crHrs = parseInt(crHrsText.match(/\d+/)?.[0] || "0");
+
+        const courses = [];
+        const table = col.querySelector("table");
+        if (table) {
+          table.querySelectorAll("tbody tr").forEach((tr) => {
+            const cells = tr.querySelectorAll("td");
+            if (cells.length >= 4) {
+              courses.push({
+                code: cells[0].textContent.trim(),
+                title: cells[1].textContent.trim(),
+                crHrs: parseInt(cells[2].textContent.trim()),
+                type: cells[3].textContent.trim(),
+              });
+            }
+          });
+        }
+        parsedSemesters.push({ title, crHrs, courses });
+      });
+      setStudyPlanData(parsedSemesters);
+    } catch (e) {
+      console.error("Study Plan fetch error", e);
+    }
+  };
 
   return (
     <PageLayout
@@ -548,49 +667,13 @@ function HomePage() {
 
                 <div className="flex flex-col text-left space-y-0.5">
                   <h1 className="text-2xl md:text-4xl font-black text-white tracking-tight leading-none">
-                    {useMemo(() => {
-                      const greetings = [
-                        "Hey Pookie,",
-                        "Academic Comeback,",
-                        "Yo Bestie,",
-                        "No Cap,",
-                        "Main Character,",
-                        "Still Mid,",
-                        "Wait, you're here?",
-                        "Manifesting 4.0,",
-                      ];
-                      return greetings[
-                        Math.floor(Math.random() * greetings.length)
-                      ];
-                    }, [])}{" "}
+                    {greetingMessage}{" "}
                     <span className="text-x">
                       {personalInfo?.Name?.split(" ")[0] || "Student"}
                     </span>
                   </h1>
                   <p className="text-zinc-500 text-sm font-medium">
-                    {useMemo(() => {
-                      const roasts = [
-                        "Nice to see you! (not really)",
-                        "Your attendance is giving 'dropout'.",
-                        "Is it giving 4.0 or 0.4?",
-                        "Caught in 4k checking your grades.",
-                        "Don't let them catch you lacking.",
-                        "Real ones check SuperFlex every hour.",
-                        "Go touch some grass after this.",
-                        "Imagine having 8am classes in 2025.",
-                        "Your aggregate is looking real quiet...",
-                        "Academic comeback starts... never?",
-                      ];
-
-                      if (mostAbsentSubject && mostAbsentSubject.absent > 3) {
-                        return `Bestie, ${mostAbsentSubject.absent} absents in ${mostAbsentSubject.title.split(" ")[0]}? You're cooked.`;
-                      }
-                      if (currentAggregate.percentage > 85) {
-                        return "Okay nerd, we get it, you're smart.";
-                      }
-
-                      return roasts[Math.floor(Math.random() * roasts.length)];
-                    }, [mostAbsentSubject, currentAggregate])}
+                    {roastMessage}
                   </p>
                 </div>
               </div>
@@ -732,10 +815,16 @@ function HomePage() {
                             {activeCourseData.id}
                           </span>
                           <span className="text-xs text-zinc-500">
-                            {activeCourseData.categories.reduce(
-                              (acc, cat) => acc + cat.assessments.length,
-                              0,
-                            )}{" "}
+                            {(() => {
+                              const examSections =
+                                activeCourseData.sections.filter(
+                                  (s) => !s.id.endsWith("Grand_Total_Marks"),
+                                );
+                              return examSections.reduce(
+                                (acc, sec) => acc + (sec.rows?.length || 0),
+                                0,
+                              );
+                            })()}{" "}
                             Assessments
                           </span>
                         </div>
@@ -743,19 +832,21 @@ function HomePage() {
 
                       {}
                       <div className="space-y-3">
-                        {activeCourseData.categories.map((category, idx) => (
-                          <CategoryAccordion
-                            key={idx}
-                            category={category}
-                            isOpen={openCategoryIdx === idx}
-                            onToggle={() =>
-                              setOpenCategoryIdx(
-                                openCategoryIdx === idx ? null : idx,
-                              )
-                            }
-                          />
-                        ))}
-                        {activeCourseData.categories.length === 0 && (
+                        {activeCourseData.sections
+                          .filter((s) => !s.id.endsWith("Grand_Total_Marks"))
+                          .map((section, idx) => (
+                            <SectionAccordion
+                              key={idx}
+                              section={section}
+                              isOpen={openCategoryIdx === idx}
+                              onToggle={() =>
+                                setOpenCategoryIdx(
+                                  openCategoryIdx === idx ? null : idx,
+                                )
+                              }
+                            />
+                          ))}
+                        {activeCourseData.sections.length <= 1 && (
                           <div className="p-8 text-center text-zinc-500 text-sm  rounded-xl bg-black">
                             No assessments uploaded yet.
                           </div>
@@ -913,16 +1004,14 @@ const ProfileInfoTabs = ({ profileSections }) => {
           {}
           <div className="flex items-center gap-4 mb-8">
             <div className="p-3 bg-x/10 rounded-2xl text-x">
-              {section.title.toLowerCase().includes("personal") ? (
-                <User size={24} />
-              ) : section.title.toLowerCase().includes("university") ? (
-                <Building size={24} />
-              ) : section.title.toLowerCase().includes("guardian") ||
-                section.title.toLowerCase().includes("family") ? (
-                <Users size={24} />
-              ) : (
-                <Activity size={24} />
-              )}
+              {(() => {
+                const title = section.title.toLowerCase();
+                if (title.includes("personal")) return <User size={24} />;
+                if (title.includes("university")) return <Building size={24} />;
+                if (title.includes("guardian") || title.includes("family"))
+                  return <Users size={24} />;
+                return <Activity size={24} />;
+              })()}
             </div>
             <h3 className="text-2xl font-bold text-white tracking-tight">
               {section.title}

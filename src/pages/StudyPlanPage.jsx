@@ -109,19 +109,6 @@ function StudyPlanPage() {
 
         setSemesters(parsedSemesters);
 
-        if (parsedSemesters.length > 0) {
-          const existingContext = window.superflex_ai_context || {};
-          const newContext = {
-            ...existingContext,
-            studyPlan: parsedSemesters,
-            lastScanned: new Date().toISOString(),
-          };
-          window.superflex_ai_context = newContext;
-          window.dispatchEvent(
-            new CustomEvent("superflex-data-updated", { detail: newContext }),
-          );
-        }
-
         root.style.display = "none";
 
         setLoading(false);
@@ -139,6 +126,13 @@ function StudyPlanPage() {
 
     parseData();
   }, []);
+
+  useAiSync({
+    data: semesters,
+    dataKey: "studyPlan",
+    syncKey: "studyPlan",
+    isEnabled: semesters.length > 0,
+  });
 
   const stats = useMemo(() => {
     let totalCredits = 0;

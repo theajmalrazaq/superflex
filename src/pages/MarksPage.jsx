@@ -23,13 +23,7 @@ import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
 
-const parseFloatOrZero = (value) => {
-  if (!value || value === "-" || value.trim() === "") return 0;
-
-  const cleaned = value.toString().replace(/[^0-9.-]/g, "");
-  const parsed = parseFloat(cleaned);
-  return isNaN(parsed) ? 0 : parsed;
-};
+import { parseFloatOrZero, processCourseMarks } from "../utils/marksProcessor";
 
 const CourseSelector = ({ courses, selectedId, onSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -647,155 +641,7 @@ const AssessmentView = ({
   );
 };
 
-const recalculateCourse = (course) => {
-  let globalWeightage = 0;
-  let globalObtained = 0;
-
-  let globalAverage = 0;
-  let globalMinimum = 0;
-  let globalMaximum = 0;
-  let globalStdDev = 0;
-
-  const sectionsExceptTotal = course.sections.filter(
-    (s) => s.title !== "Grand Total Marks",
-  );
-
-  const newSections = sectionsExceptTotal.map((section) => {
-    let rows = [...section.rows];
-
-    const secWeight = rows.reduce((sum, r) => {
-      const val = parseFloat(r.weight);
-      return sum + (isNaN(val) ? 0 : val);
-    }, 0);
-
-    rows = rows.map((r, i) => {
-      const rawObt = parseFloat(r.obtained);
-      const obt = isNaN(rawObt) ? 0 : rawObt;
-
-      const rawTot = parseFloat(r.total);
-      const tot = isNaN(rawTot) ? 0 : rawTot;
-
-      const rawW = parseFloat(r.weight);
-      const w = isNaN(rawW) ? 0 : rawW;
-
-      const weightedScore = tot > 0 ? (obt / tot) * w : 0;
-      return { ...r, _weightedScore: weightedScore };
-    });
-
-    const sorted = rows.map((r, i) => ({ ...r, originalIdx: i }));
-
-    sorted.sort((a, b) => b._weightedScore - a._weightedScore);
-
-    let currentAccWeight = 0;
-    const includedIndices = new Set();
-    const EPSILON = 0.001;
-
-    for (let item of sorted) {
-      const rawW = parseFloat(item.weight);
-      const w = isNaN(rawW) ? 0 : rawW;
-
-      if (currentAccWeight < secWeight - EPSILON) {
-        currentAccWeight += w;
-        includedIndices.add(item.originalIdx);
-      }
-    }
-
-    rows = rows.map((r, i) => {
-      const { _weightedScore, ...rest } = r;
-      return { ...rest, included: includedIndices.has(i) };
-    });
-
-    let calculatedSecObtained = 0;
-
-    rows.forEach((r) => {
-      if (r.included) {
-        const rawObt = parseFloat(r.obtained);
-        const obt = isNaN(rawObt) ? 0 : rawObt;
-
-        const rawTot = parseFloat(r.total);
-        const tot = isNaN(rawTot) ? 0 : rawTot;
-
-        const rawW = parseFloat(r.weight);
-        const w = isNaN(rawW) ? 0 : rawW;
-
-        if (tot > 0) {
-          calculatedSecObtained += (obt / tot) * w;
-        }
-      }
-    });
-
-    if (secWeight > 0) {
-      globalWeightage += secWeight;
-      globalObtained += calculatedSecObtained;
-    }
-
-    let secWeightedAvg = 0,
-      secWeightedMin = 0,
-      secWeightedMax = 0,
-      secWeightedStd = 0;
-
-    rows.forEach((r) => {
-      const rawW = parseFloat(r.weight);
-      const w = isNaN(rawW) ? 0 : rawW;
-
-      const rawTot = parseFloat(r.total);
-      const tot = isNaN(rawTot) ? 0 : rawTot;
-
-      if (r.included && tot > 0 && secWeight > 0) {
-        const ratio = w / tot;
-        secWeightedAvg += (r.avg || 0) * ratio;
-        secWeightedMin += (r.min || 0) * ratio;
-        secWeightedMax += (r.max || 0) * ratio;
-        secWeightedStd += (r.stdDev || 0) * ratio;
-
-        globalAverage += (r.avg || 0) * ratio;
-        globalMinimum += (r.min || 0) * ratio;
-        globalMaximum += (r.max || 0) * ratio;
-        globalStdDev += (r.stdDev || 0) * ratio;
-      }
-    });
-
-    return {
-      ...section,
-      weight: secWeight,
-      obtained: calculatedSecObtained,
-      rows,
-      stats: {
-        weightedAvg: secWeightedAvg,
-        weightedStdDev: secWeightedStd,
-        weightedMin: secWeightedMin,
-        weightedMax: secWeightedMax,
-      },
-    };
-  });
-
-  const grandTotalSection = {
-    id: `${course.id}-Grand_Total_Marks`,
-    title: "Grand Total Marks",
-    weight: globalWeightage,
-    obtained: globalObtained,
-    rows: [],
-    stats: {
-      weightedAvg: globalAverage,
-      weightedStdDev: globalStdDev,
-      weightedMin: globalMinimum,
-      weightedMax: globalMaximum,
-    },
-  };
-
-  newSections.push(grandTotalSection);
-
-  return {
-    ...course,
-    sections: newSections,
-    grandTotalStats: {
-      weight: globalWeightage,
-      obtained: globalObtained,
-      percentage:
-        globalWeightage > 0 ? (globalObtained / globalWeightage) * 100 : 0,
-    },
-  };
-};
+const recalculateCourse = processCourseMarks;
 
 function MarksPage() {
   const [loading, setLoading] = useState(true);
@@ -850,13 +696,6 @@ function MarksPage() {
       })),
     }));
   }, [courses]);
-
-  useAiSync({
-    data: marksSummary,
-    dataKey: "marks",
-    syncKey: "marks",
-    isEnabled: !!marksSummary,
-  });
 
   useEffect(() => {
     localStorage.setItem(

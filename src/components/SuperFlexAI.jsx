@@ -26,37 +26,43 @@ const AVAILABLE_MODELS = [
     name: "GPT-4o Mini",
     short: "GPT-4o Mini",
     provider: "OpenAI",
-    domain: "openai.com"
+    domain: "openai.com",
   },
   {
     id: "claude-haiku-4-5-20251001",
     name: "Claude Haiku",
     short: "Claude Haiku",
     provider: "Anthropic",
-    domain: "anthropic.com"
+    domain: "anthropic.com",
   },
   {
     id: "gemini-2.0-flash",
     name: "Gemini 2.0 Flash",
     short: "Gemini 2.0",
     provider: "Google",
-    domain: "google.com"
+    domain: "google.com",
   },
   {
     id: "google/gemini-3-pro-preview",
     name: "Gemini 3 Pro",
     short: "Gemini 3",
     provider: "Google",
-    domain: "google.com"
+    domain: "google.com",
   },
   {
     id: "gemini-3-flash-preview",
     name: "Gemini 3 Flash",
     short: "Gemini 3",
     provider: "Google",
-    domain: "google.com"
+    domain: "google.com",
   },
-  { id: "grok-2", name: "Grok 2", short: "Grok 2", provider: "xAI", domain: "x.ai" },
+  {
+    id: "grok-2",
+    name: "Grok 2",
+    short: "Grok 2",
+    provider: "xAI",
+    domain: "x.ai",
+  },
 ];
 
 const AnimatedLogo = ({ size = 24, animated = true, className = "" }) => (
@@ -126,11 +132,11 @@ const SuperFlexAI = () => {
 
   useEffect(() => {
     const handleUsage = (e) => {
-      console.log("[SuperFlex AI] Usage Data Received:", e.detail);
       setUsageData(e.detail);
     };
     document.addEventListener("superflex-usage-data", handleUsage);
-    return () => document.removeEventListener("superflex-usage-data", handleUsage);
+    return () =>
+      document.removeEventListener("superflex-usage-data", handleUsage);
   }, []);
 
   useEffect(() => {
@@ -140,7 +146,7 @@ const SuperFlexAI = () => {
       }
     };
     document.addEventListener("superflex-auth-status", handleAuthStatus);
-    
+
     let interval;
     if (isOpen) {
       document.dispatchEvent(new CustomEvent("superflex-check-auth"));
@@ -148,7 +154,7 @@ const SuperFlexAI = () => {
         document.dispatchEvent(new CustomEvent("superflex-check-auth"));
       }, 5000);
     }
-    
+
     return () => {
       document.removeEventListener("superflex-auth-status", handleAuthStatus);
       if (interval) clearInterval(interval);
@@ -163,7 +169,6 @@ const SuperFlexAI = () => {
   }, [showModelPicker]);
 
   useEffect(() => {
-    // Load initial context from localStorage
     if (!window.superflex_ai_context) {
       try {
         const savedCtx = localStorage.getItem("superflex_ai_context");
@@ -207,7 +212,8 @@ const SuperFlexAI = () => {
   useEffect(() => {
     const handleToggle = () => setIsOpen((prev) => !prev);
     window.addEventListener("superflex-toggle-ai", handleToggle);
-    return () => window.removeEventListener("superflex-toggle-ai", handleToggle);
+    return () =>
+      window.removeEventListener("superflex-toggle-ai", handleToggle);
   }, []);
 
   useEffect(() => {
@@ -231,7 +237,7 @@ const SuperFlexAI = () => {
     if (!textToSend.trim() || isLoading) return;
 
     if (permissionStatus !== "granted") {
-      setIsOpen(false); // Close if they somehow trigger it
+      setIsOpen(false);
       return;
     }
 
@@ -437,7 +443,6 @@ const SuperFlexAI = () => {
     window.dispatchEvent(
       new CustomEvent("superflex-permission-updated", { detail: status }),
     );
-    // Don't modify messages immediately for cleaner UI flow in new layout
   };
 
   const clearChat = () => {
@@ -451,12 +456,16 @@ const SuperFlexAI = () => {
     if (times.length === 0) return null;
     const maxTime = new Date(Math.max(...times));
     if (isNaN(maxTime.getTime())) return null;
-    
-    return maxTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    return maxTime.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   const hasMarks = dataContext.marks && dataContext.marks.length > 0;
-  const hasAttendance = dataContext.attendance && dataContext.attendance.length > 0;
+  const hasAttendance =
+    dataContext.attendance && dataContext.attendance.length > 0;
   const hasTranscript = !!dataContext.transcript;
 
   const StatusCard = ({ label, active, icon: Icon, onClick, description }) => (
@@ -469,10 +478,14 @@ const SuperFlexAI = () => {
           : "bg-white/5 border-white/5 opacity-50 cursor-not-allowed grayscale"
       }`}
     >
-      <div className={`mb-2 md:mb-3 p-2 md:p-3 rounded-xl md:rounded-2xl w-fit transition-transform group-hover:scale-105 ${active ? "bg-x/20 text-x" : "bg-zinc-800 text-zinc-500"}`}>
+      <div
+        className={`mb-2 md:mb-3 p-2 md:p-3 rounded-xl md:rounded-2xl w-fit transition-transform group-hover:scale-105 ${active ? "bg-x/20 text-x" : "bg-zinc-800 text-zinc-500"}`}
+      >
         <Icon size={20} className="md:w-[26px] md:h-[26px]" />
       </div>
-      <h4 className="text-white font-bold text-xs md:text-sm mb-0.5 md:mb-1">{label}</h4>
+      <h4 className="text-white font-bold text-xs md:text-sm mb-0.5 md:mb-1">
+        {label}
+      </h4>
       <p className="text-[9px] md:text-[10px] text-zinc-400 font-medium leading-tight max-w-[90%]">
         {active ? description : "Visit page to sync"}
       </p>
@@ -481,284 +494,346 @@ const SuperFlexAI = () => {
 
   return (
     <>
-      <div className="fixed bottom-6 right-6 z-[9999]">
-         {/* Styles handled globaly */}
-      </div>
+      <div className="fixed bottom-6 right-6 z-[9999]">{}</div>
 
       {isOpen && (
         <div className="fixed inset-0 z-[10000] bg-[#0c0c0c] flex flex-col animate-in fade-in duration-300">
-           {/* Background Gradient */}
-           <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-x/10 blur-[150px] rounded-full opacity-40"></div>
-              <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-x/5 blur-[150px] rounded-full opacity-40"></div>
-           </div>
-
-          {/* Header */}
-          <div className="relative z-50 flex items-center justify-between px-8 py-6">
-             <div className="flex items-center gap-3">
-                <img 
-                  src={chrome.runtime.getURL("assets/logo.svg")} 
-                  alt="SuperFlex" 
-                  className="w-42" 
-                />
-             </div>
-             
-             <div className="flex items-center gap-4">
-                {isSignedIn && (
-                  <button 
-                    onClick={() => document.dispatchEvent(new CustomEvent("superflex-auth-logout"))}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 border border-red-500/20 rounded-full text-red-400 hover:bg-red-500/20 transition-all text-xs font-bold"
-                    title="Sign Out"
-                  >
-                    <LogOut size={16} />
-                    <span className="hidden md:inline">Sign Out</span>
-                  </button>
-                )}
-                <button onClick={() => setIsOpen(false)} className="p-2 text-zinc-500 hover:text-white transition-colors">
-                   <X size={24} />
-                </button>
-             </div>
+          {}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-x/10 blur-[150px] rounded-full opacity-40"></div>
+            <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-x/5 blur-[150px] rounded-full opacity-40"></div>
           </div>
 
-          {/* Main Content Area */}
-          <div className={`relative z-10 flex-1 flex flex-col ${messages.length === 0 ? "items-center justify-center" : "h-full overflow-hidden"} max-w-5xl mx-auto w-full px-6 pb-32`}>
-             
-             {messages.length === 0 ? (
-               <div className="flex flex-col items-center text-center animate-in slide-in-from-bottom-8 duration-700 w-full max-w-3xl">
-                  
-                  <div className="mb-8 relative">
-                     <div className="w-24 h-24 rounded-3xl bg-zinc-900 border border-white/10 flex items-center justify-center shadow-2xl shadow-black/50">
-                        <AnimatedLogo size={48} className="animate-pulse" />
-                     </div>
-                  </div>
+          {}
+          <div className="relative z-50 flex items-center justify-between px-8 py-6">
+            <div className="flex items-center gap-3">
+              <img
+                src={chrome.runtime.getURL("assets/logo.svg")}
+                alt="SuperFlex"
+                className="w-42"
+              />
+            </div>
 
-                  <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
-                    Hi, {dataContext.studentName?.split(" ")[0] || "Student"}
-                  </h1>
-                  <p className="text-xl text-zinc-400 mb-12 max-w-xl">
-                    Ready to assist you with anything you need, from analyzing grades to tracking attendance. Let's get started!
-                  </p>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-4xl px-2 md:px-0">
-                     <StatusCard 
-                        label="Personal Info" 
-                        active={!!dataContext.studentName} 
-                        icon={User} 
-                        description="View profile summary"
-                        onClick={() => handleSend("Tell me about my student profile based on the synced data.")}
-                     />
-                     <StatusCard 
-                        label="Marks" 
-                        active={hasMarks} 
-                        icon={BarChart} 
-                        description="Analyze performance"
-                        onClick={() => handleSend("Analyze my current marks performance.")}
-                     />
-                     <StatusCard 
-                        label="Attendance" 
-                        active={hasAttendance} 
-                        icon={Clock} 
-                        description="Check status"
-                         onClick={() => handleSend("What is my attendance status?")}
-                     />
-                     <StatusCard 
-                        label="Transcript" 
-                        active={hasTranscript} 
-                        icon={GraduationCap} 
-                        description="View GPA & history"
-                         onClick={() => handleSend("Summarize my transcript GPA.")}
-                     />
-                  </div>
-               </div>
-             ) : (
-                <div 
-                   ref={scrollRef}
-                   className="w-full h-full overflow-y-auto scrollbar-hide space-y-8 px-4 py-8"
+            <div className="flex items-center gap-4">
+              {isSignedIn && (
+                <button
+                  onClick={() =>
+                    document.dispatchEvent(
+                      new CustomEvent("superflex-auth-logout"),
+                    )
+                  }
+                  className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 border border-red-500/20 rounded-full text-red-400 hover:bg-red-500/20 transition-all text-xs font-bold"
+                  title="Sign Out"
                 >
-                   {messages.map((m, i) => (
-                      <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} items-start gap-3 animate-in fade-in slide-in-from-bottom-4`}>
-                         
-                         {m.role === "assistant" && (
-                            <div className="w-8 h-8 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center shrink-0 mt-1">
-                               <AnimatedLogo size={16} animated={false} />
-                            </div>
-                         )}
+                  <LogOut size={16} />
+                  <span className="hidden md:inline">Sign Out</span>
+                </button>
+              )}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="p-2 text-zinc-500 hover:text-white transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+          </div>
 
-                         <div className={`max-w-[80%] rounded-2xl px-5 py-3.5 relative group leading-relaxed text-sm md:text-base ${
-                            m.role === "user" 
-                              ? "bg-x/30 text-white border border-x/20 rounded-tr-sm backdrop-blur-sm" 
-                              : "bg-zinc-900 border border-white/10 text-zinc-300 rounded-tl-sm shadow-xl"
-                         }`}>
-                            <div className="markdown-body">
-                              {m.role === "assistant" && !m.content ? (
-                                <div className="flex gap-1.5 py-1">
-                                  <div className="w-2 h-2 bg-x rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                                  <div className="w-2 h-2 bg-x rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                                  <div className="w-2 h-2 bg-x rounded-full animate-bounce"></div>
-                                </div>
-                              ) : (
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
-                              )}
-                            </div>
-                         </div>
-
-                         {m.role === "user" && (
-                            <div className="w-8 h-8 rounded-full bg-x/20 border border-x/10 flex items-center justify-center shrink-0 overflow-hidden mt-1">
-                               <img src="login/getimage" alt="Me" className="w-full h-full object-cover" />
-                            </div>
-                         )}
-                      </div>
-                   ))}
+          {}
+          <div
+            className={`relative z-10 flex-1 flex flex-col ${messages.length === 0 ? "items-center justify-center" : "h-full overflow-hidden"} max-w-5xl mx-auto w-full px-6 pb-32`}
+          >
+            {messages.length === 0 ? (
+              <div className="flex flex-col items-center text-center animate-in slide-in-from-bottom-8 duration-700 w-full max-w-3xl">
+                <div className="mb-8 relative">
+                  <div className="w-24 h-24 rounded-3xl bg-zinc-900 border border-white/10 flex items-center justify-center shadow-2xl shadow-black/50">
+                    <AnimatedLogo size={48} className="animate-pulse" />
+                  </div>
                 </div>
-             )}
 
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+                  Hi, {dataContext.studentName?.split(" ")[0] || "Student"}
+                </h1>
+                <p className="text-xl text-zinc-400 mb-12 max-w-xl">
+                  Ready to assist you with anything you need, from analyzing
+                  grades to tracking attendance. Let's get started!
+                </p>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-4xl px-2 md:px-0">
+                  <StatusCard
+                    label="Personal Info"
+                    active={!!dataContext.studentName}
+                    icon={User}
+                    description="View profile summary"
+                    onClick={() =>
+                      handleSend(
+                        "Tell me about my student profile based on the synced data.",
+                      )
+                    }
+                  />
+                  <StatusCard
+                    label="Marks"
+                    active={hasMarks}
+                    icon={BarChart}
+                    description="Analyze performance"
+                    onClick={() =>
+                      handleSend("Analyze my current marks performance.")
+                    }
+                  />
+                  <StatusCard
+                    label="Attendance"
+                    active={hasAttendance}
+                    icon={Clock}
+                    description="Check status"
+                    onClick={() => handleSend("What is my attendance status?")}
+                  />
+                  <StatusCard
+                    label="Transcript"
+                    active={hasTranscript}
+                    icon={GraduationCap}
+                    description="View GPA & history"
+                    onClick={() => handleSend("Summarize my transcript GPA.")}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div
+                ref={scrollRef}
+                className="w-full h-full overflow-y-auto scrollbar-hide space-y-8 px-4 py-8"
+              >
+                {messages.map((m, i) => (
+                  <div
+                    key={i}
+                    className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} items-start gap-3 animate-in fade-in slide-in-from-bottom-4`}
+                  >
+                    {m.role === "assistant" && (
+                      <div className="w-8 h-8 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center shrink-0 mt-1">
+                        <AnimatedLogo size={16} animated={false} />
+                      </div>
+                    )}
+
+                    <div
+                      className={`max-w-[80%] rounded-2xl px-5 py-3.5 relative group leading-relaxed text-sm md:text-base ${
+                        m.role === "user"
+                          ? "bg-x/30 text-white border border-x/20 rounded-tr-sm backdrop-blur-sm"
+                          : "bg-zinc-900 border border-white/10 text-zinc-300 rounded-tl-sm shadow-xl"
+                      }`}
+                    >
+                      <div className="markdown-body">
+                        {m.role === "assistant" && !m.content ? (
+                          <div className="flex gap-1.5 py-1">
+                            <div className="w-2 h-2 bg-x rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                            <div className="w-2 h-2 bg-x rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                            <div className="w-2 h-2 bg-x rounded-full animate-bounce"></div>
+                          </div>
+                        ) : (
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {m.content}
+                          </ReactMarkdown>
+                        )}
+                      </div>
+                    </div>
+
+                    {m.role === "user" && (
+                      <div className="w-8 h-8 rounded-full bg-x/20 border border-x/10 flex items-center justify-center shrink-0 overflow-hidden mt-1">
+                        <img
+                          src="login/getimage"
+                          alt="Me"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Floating Input Bar */}
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-full max-w-2xl px-6 z-50">
-{permissionStatus !== 'granted' ? (
-               <div className="bg-zinc-900/90 backdrop-blur-xl border border-white/10 p-4 rounded-[2rem] flex items-center justify-between gap-4 shadow-2xl">
-                  <div className="flex items-center gap-3 pl-2">
-                     <Shield className="text-x" size={20} />
-                     <div className="text-sm">
-                        <span className="text-white font-bold block">Enable AI Access?</span>
-                        <span className="text-zinc-500 text-xs">Access to academic data is required.</span>
-                     </div>
-                  </div>
-                  <div className="flex gap-2">
-                     <button 
-                        onClick={() => handlePermission('granted')}
-                        className="px-4 py-2 bg-x hover:bg-x/90 text-white text-xs font-bold rounded-xl transition-colors"
-                     >
-                        Enable
-                     </button>
-                      <button 
-                        onClick={() => {
-                           handlePermission('denied');
-                           setIsOpen(false);
-                        }}
-                        className="px-4 py-2 bg-white/5 hover:bg-red-500/10 text-zinc-400 hover:text-red-400 text-xs font-bold rounded-xl transition-colors"
-                     >
-                        Reject
-                     </button>
-                  </div>
-               </div>
-             ) : (
-                <div className="group relative bg-[#1a1a1c]/80 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl shadow-black/50 transition-all focus-within:bg-[#1a1a1c] focus-within:border-x/30 focus-within:ring-4 focus-within:ring-x/10 flex items-center">
-                  <div className="relative pl-3 shrink-0">
-                    <button 
-                      onClick={() => setShowModelPicker(!showModelPicker)}
-                      className="w-10 h-10 rounded-full bg-zinc-800/50 border border-white/5 flex items-center justify-center hover:bg-zinc-700 transition-colors shrink-0 overflow-hidden group/btn"
-                      title="Select Model"
-                    >
-                       <img 
-                         src={`https://www.google.com/s2/favicons?domain=${AVAILABLE_MODELS.find(m => m.id === selectedModel)?.domain}&sz=64`}
-                         className="w-5 h-5 grayscale opacity-70 group-hover/btn:grayscale-0 rounded-full group-hover/btn:opacity-100 transition-all"
-                         alt="icon"
-                       />
-                    </button>
-                    
-                    {showModelPicker && (
-                      <div className="absolute bottom-full left-0 mb-4 w-72 bg-[#111] border border-white/10 rounded-2xl overflow-hidden z-[1000] shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200">
-                        {usageData && usageData.allowanceInfo ? (
-                          <div className="p-4 border-b border-white/5 bg-white/[0.02]">
-                             <div className="flex items-center justify-between mb-2">
-                                <div className="flex flex-col">
-                                   <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Monthly Credits</span>
-                                   <span className="text-xs font-bold text-white">
-                                      {Math.round((usageData.allowanceInfo.remaining || 0) / 1000).toLocaleString()}k / {Math.round((usageData.allowanceInfo.monthUsageAllowance || 0) / 1000).toLocaleString()}k left
-                                   </span>
-                                </div>
-                                <span className="text-xs font-bold text-x px-2 py-0.5 bg-x/10 rounded-full border border-x/20">
-                                   {Math.max(0, Math.round(((usageData.allowanceInfo.remaining || 0) / (usageData.allowanceInfo.monthUsageAllowance || 1)) * 100))}%
-                                </span>
-                             </div>
-                             <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-x transition-all duration-1000" 
-                                  style={{ width: `${Math.max(0, ((usageData.allowanceInfo.remaining || 0) / (usageData.allowanceInfo.monthUsageAllowance || 1)) * 100)}%` }}
-                                ></div>
-                             </div>
-                          </div>
-                        ) : (
-                          <div className="p-4 border-b border-white/5 bg-white/[0.02] text-center">
-                             <span className="text-[10px] font-bold text-zinc-500 uppercase">Usage data loading...</span>
-                          </div>
-                        )}
-                        <div className="max-h-64 overflow-y-auto p-2 space-y-1 custom-scrollbar">
-                          {AVAILABLE_MODELS.map((m, idx) => (
-                                <button
-                                  key={idx}
-                                  onClick={() => {
-                                    setSelectedModel(m.id);
-                                    setShowModelPicker(false);
-                                  }}
-                                  className={`w-full text-left p-3 rounded-xl transition-all flex items-center justify-between group/item ${
-                                    selectedModel === m.id
-                                      ? "bg-x/10 border border-x/20"
-                                      : "hover:bg-white/5 border border-transparent"
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
-                                      <img 
-                                        src={`https://www.google.com/s2/favicons?domain=${m.domain}&sz=64`}
-                                        className="w-5 h-5 opacity-80"
-                                        alt={m.provider}
-                                      />
-                                    </div>
-                                    <div className="flex flex-col gap-0.5">
-                                      <span className={`text-xs font-bold ${selectedModel === m.id ? "text-white" : "text-zinc-400"}`}>
-                                        {m.name}
-                                      </span>
-                                      <span className="text-[10px] text-zinc-600 font-medium">{m.provider}</span>
-                                    </div>
-                                  </div>
-                                 </button>
-                              ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                    placeholder="Ask SuperFlex anything..."
-                    className="w-full bg-transparent border-none px-4 py-4 pr-16 text-white text-sm placeholder:text-zinc-500 focus:outline-none focus:ring-0"
-                  />
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                      {messages.length > 0 && (
-                        <button onClick={clearChat} className="p-2 text-zinc-600 hover:text-rose-500 transition-colors" title="Clear Chat">
-                          <Trash2 size={18} />
-                        </button>
-                      )}
-                      
-                      {isLoading ? (
-                         <button onClick={handleInterrupt} className="p-2 bg-rose-500 hover:bg-rose-600 text-white rounded-full transition-all">
-                            <Square size={16} fill="currentColor" />
-                         </button>
-                      ) : (
-                         <button 
-                            onClick={() => handleSend()}
-                            disabled={!input.trim()}
-                            className="p-2 bg-x hover:bg-x/90 text-white rounded-full transition-all disabled:opacity-50 disabled:grayscale"
-                         >
-                            <Send size={16} />
-                         </button>
-                      )}
+            {permissionStatus !== "granted" ? (
+              <div className="bg-zinc-900/90 backdrop-blur-xl border border-white/10 p-4 rounded-[2rem] flex items-center justify-between gap-4 shadow-2xl">
+                <div className="flex items-center gap-3 pl-2">
+                  <Shield className="text-x" size={20} />
+                  <div className="text-sm">
+                    <span className="text-white font-bold block">
+                      Enable AI Access?
+                    </span>
+                    <span className="text-zinc-500 text-xs">
+                      Access to academic data is required.
+                    </span>
                   </div>
                 </div>
-             )}
-             
-             <div className="text-center mt-4">
-                <p className="text-[10px] text-zinc-600 font-medium">
-                   SuperFlex AI uses local data processing. {getLastSyncTime() ? `Last synced at ${getLastSyncTime()}` : "Data not synced yet."}
-                </p>
-             </div>
-          </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handlePermission("granted")}
+                    className="px-4 py-2 bg-x hover:bg-x/90 text-white text-xs font-bold rounded-xl transition-colors"
+                  >
+                    Enable
+                  </button>
+                  <button
+                    onClick={() => {
+                      handlePermission("denied");
+                      setIsOpen(false);
+                    }}
+                    className="px-4 py-2 bg-white/5 hover:bg-red-500/10 text-zinc-400 hover:text-red-400 text-xs font-bold rounded-xl transition-colors"
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="group relative bg-[#1a1a1c]/80 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl shadow-black/50 transition-all focus-within:bg-[#1a1a1c] focus-within:border-x/30 focus-within:ring-4 focus-within:ring-x/10 flex items-center">
+                <div className="relative pl-3 shrink-0">
+                  <button
+                    onClick={() => setShowModelPicker(!showModelPicker)}
+                    className="w-10 h-10 rounded-full bg-zinc-800/50 border border-white/5 flex items-center justify-center hover:bg-zinc-700 transition-colors shrink-0 overflow-hidden group/btn"
+                    title="Select Model"
+                  >
+                    <img
+                      src={`https://www.google.com/s2/favicons?domain=${AVAILABLE_MODELS.find((m) => m.id === selectedModel)?.domain}&sz=64`}
+                      className="w-5 h-5 grayscale opacity-70 group-hover/btn:grayscale-0 rounded-full group-hover/btn:opacity-100 transition-all"
+                      alt="icon"
+                    />
+                  </button>
 
+                  {showModelPicker && (
+                    <div className="absolute bottom-full left-0 mb-4 w-72 bg-[#111] border border-white/10 rounded-2xl overflow-hidden z-[1000] shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200">
+                      {usageData && usageData.allowanceInfo ? (
+                        <div className="p-4 border-b border-white/5 bg-white/[0.02]">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex flex-col">
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                                Monthly Credits
+                              </span>
+                              <span className="text-xs font-bold text-white">
+                                {Math.round(
+                                  (usageData.allowanceInfo.remaining || 0) /
+                                    1000,
+                                ).toLocaleString()}
+                                k /{" "}
+                                {Math.round(
+                                  (usageData.allowanceInfo
+                                    .monthUsageAllowance || 0) / 1000,
+                                ).toLocaleString()}
+                                k left
+                              </span>
+                            </div>
+                            <span className="text-xs font-bold text-x px-2 py-0.5 bg-x/10 rounded-full border border-x/20">
+                              {Math.max(
+                                0,
+                                Math.round(
+                                  ((usageData.allowanceInfo.remaining || 0) /
+                                    (usageData.allowanceInfo
+                                      .monthUsageAllowance || 1)) *
+                                    100,
+                                ),
+                              )}
+                              %
+                            </span>
+                          </div>
+                          <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-x transition-all duration-1000"
+                              style={{
+                                width: `${Math.max(0, ((usageData.allowanceInfo.remaining || 0) / (usageData.allowanceInfo.monthUsageAllowance || 1)) * 100)}%`,
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-4 border-b border-white/5 bg-white/[0.02] text-center">
+                          <span className="text-[10px] font-bold text-zinc-500 uppercase">
+                            Usage data loading...
+                          </span>
+                        </div>
+                      )}
+                      <div className="max-h-64 overflow-y-auto p-2 space-y-1 custom-scrollbar">
+                        {AVAILABLE_MODELS.map((m, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              setSelectedModel(m.id);
+                              setShowModelPicker(false);
+                            }}
+                            className={`w-full text-left p-3 rounded-xl transition-all flex items-center justify-between group/item ${
+                              selectedModel === m.id
+                                ? "bg-x/10 border border-x/20"
+                                : "hover:bg-white/5 border border-transparent"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                                <img
+                                  src={`https://www.google.com/s2/favicons?domain=${m.domain}&sz=64`}
+                                  className="w-5 h-5 opacity-80"
+                                  alt={m.provider}
+                                />
+                              </div>
+                              <div className="flex flex-col gap-0.5">
+                                <span
+                                  className={`text-xs font-bold ${selectedModel === m.id ? "text-white" : "text-zinc-400"}`}
+                                >
+                                  {m.name}
+                                </span>
+                                <span className="text-[10px] text-zinc-600 font-medium">
+                                  {m.provider}
+                                </span>
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                  placeholder="Ask SuperFlex anything..."
+                  className="w-full bg-transparent border-none px-4 py-4 pr-16 text-white text-sm placeholder:text-zinc-500 focus:outline-none focus:ring-0"
+                />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                  {messages.length > 0 && (
+                    <button
+                      onClick={clearChat}
+                      className="p-2 text-zinc-600 hover:text-rose-500 transition-colors"
+                      title="Clear Chat"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
+
+                  {isLoading ? (
+                    <button
+                      onClick={handleInterrupt}
+                      className="p-2 bg-rose-500 hover:bg-rose-600 text-white rounded-full transition-all"
+                    >
+                      <Square size={16} fill="currentColor" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleSend()}
+                      disabled={!input.trim()}
+                      className="p-2 bg-x hover:bg-x/90 text-white rounded-full transition-all disabled:opacity-50 disabled:grayscale"
+                    >
+                      <Send size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="text-center mt-4">
+              <p className="text-[10px] text-zinc-600 font-medium">
+                SuperFlex AI uses local data processing.{" "}
+                {getLastSyncTime()
+                  ? `Last synced at ${getLastSyncTime()}`
+                  : "Data not synced yet."}
+              </p>
+            </div>
+          </div>
         </div>
       )}
     </>
