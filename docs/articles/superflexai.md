@@ -15,8 +15,8 @@ SuperFlex lets you switch between different "brains." Select the right tool for 
 
 | Model                   | Best For...                                                                                             |
 | :---------------------- | :------------------------------------------------------------------------------------------------------ |
-| **Gemini 2.0 Flash**    | **Default Driver.** Balanced speed and intelligence. Best for general queries using your data.          |
-| **GPT-4o Mini**         | **Speed.** Efficient for simple checks like "What is my attendance?".                                   |
+| **GPT-4o Mini**         | **Default Driver.** Fast, efficient and reliable for everyday academic tasks. |
+| **Gemini 2.0 Flash**    | **Speed.** Balanced intelligence with high-speed response times.                |
 | **Claude Haiku**        | **Nuance.** Excellent for structured analysis and empathetic responses.                                 |
 | **Gemini 3 Pro**        | **Complex Logic.** Use this for deep "What-If" simulations and grade predictions.                       |
 | **Grok 2**              | **Direct Coaching.** Best for blunt interactions like "Roast my GPA" or strict performance reviews.      |

@@ -395,18 +395,9 @@ I use Vite with CRXJS for automated manifest processing and code splitting. Heav
 
 ### Dynamic Import Issues
 
-One major hurdle was Puter.js's dependency on `web-streams-polyfill`. The library tries to dynamically import it:
+One major hurdle was Puter.js's dependency on `web-streams-polyfill` and `rustls`. The library originally tried to dynamically import these from a CDN, which violates Chrome Extension CSP.
 
-Puter.js tries `await import('web-streams-polyfill')` which fails in extensions. **Solution:** Pre-inject the polyfill script before loading Puter.js:
-
-```javascript
-const script = document.createElement("script");
-script.src = chrome.runtime.getURL("polyfill.js");
-script.onload = () => loadScript("puter.js");
-document.head.appendChild(script);
-```
-
-This ensures `ReadableStream` exists globally before Puter.js checks for it.
+**Solution:** I downloaded these dependencies locally to the `/public/scripts/` directory, bundled them with the extension, and patched `puter.js` to import them from the same directory using relative paths. This makes the extension fully self-contained and compliant with strict security policies.
 
 ---
 

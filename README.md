@@ -214,7 +214,6 @@ superflex/
 │   │   │   ├── PageHeader.jsx
 │   │   │   ├── StatsCard.jsx
 │   │   │   └── ...
-│   │   ├── AiDataPrepare.jsx  # AI context preparation
 │   │   ├── LoginPageStyles.jsx # Login page styling
 │   │   ├── NavBar.jsx         # Navigation component
 │   │   ├── PathRouter.jsx     # Client-side router
