@@ -184,61 +184,92 @@ yarn dev
 
 ```
 superflex/
-├── docs/                      # Documentation website
-│   ├── articles/              # Markdown articles
-│   │   ├── bts.md            # Behind the Scenes technical guide
-│   │   └── superflexai.md    # AI prompting guide
-│   ├── res/                   # Documentation assets
-│   ├── index.html             # Landing page
-│   └── docs.html              # Documentation viewer
-├── public/                    # Static assets
-│   ├── assets/                # Images, logos, icons
+├── docs
+│   ├── articles
+│   │   ├── bts.md
+│   │   └── superflexai.md
+│   ├── docs.html
+│   ├── index.html
+│   ├── res
+│   │   ├── bg.png
+│   │   ├── bts.png
 │   │   ├── favicon.svg
+│   │   ├── intro.svg
+│   │   ├── logo_sec.svg
+│   │   ├── logo.svg
+│   │   └── prompt.png
+│   ├── reviews.json
+│   └── video.mp4
+├── eslint.config.js
+├── LICENSE
+├── manifest.json
+├── package.json
+├── pnpm-lock.yaml
+├── postcss.config.mjs
+├── public
+│   ├── assets
+│   │   ├── bg.png
 │   │   ├── favicon.png
+│   │   ├── favicon.svg
+│   │   ├── logo_sec.svg
 │   │   ├── logo.svg
 │   │   └── overlay.png
-│   ├── scripts/               # Injected scripts
-│   │   ├── bridge.js         # Main/Isolated world communication
-│   │   ├── puter.js          # AI library
-│   │   ├── umami.js          # Analytics
-│   │   ├── polyfill.js       # Web streams polyfill
-│   │   └── rustls.js         # Security polyfill
-│   └── reviews.json           # User reviews data
-├── src/
-│   ├── components/            # React components
-│   │   ├── layouts/          # Layout components
+│   ├── reviews.json
+│   └── scripts
+│       ├── bridge.js
+│       ├── polyfill.js
+│       ├── puter.js
+│       ├── rustls.js
+│       └── umami.js
+├── README.md
+├── scripts
+│   └── clean.js
+├── src
+│   ├── components
+│   │   ├── layouts
 │   │   │   └── PageLayout.jsx
-│   │   ├── ui/               # Reusable UI components
-│   │   │   ├── LoadingOverlay.jsx
-│   │   │   ├── NotificationBanner.jsx
-│   │   │   ├── PageHeader.jsx
-│   │   │   ├── StatsCard.jsx
-│   │   │   └── ...
-│   │   ├── LoginPageStyles.jsx # Login page styling
-│   │   ├── NavBar.jsx         # Navigation component
-│   │   ├── PathRouter.jsx     # Client-side router
-│   │   └── SuperFlexAI.jsx    # AI chat interface
-│   ├── pages/                 # Page-specific components
-│   │   ├── HomePage.jsx
-│   │   ├── MarksPage.jsx
+│   │   ├── LoginPageStyles.jsx
+│   │   ├── NavBar.jsx
+│   │   ├── PathRouter.jsx
+│   │   ├── SuperFlexAI.jsx
+│   │   └── ui
+│   │       ├── LoadingOverlay.jsx
+│   │       ├── NotificationBanner.jsx
+│   │       ├── PageHeader.jsx
+│   │       ├── ReviewCarousel.jsx
+│   │       ├── Skeleton.jsx
+│   │       ├── StatsCard.jsx
+│   │       └── SuperTabs.jsx
+│   ├── constants
+│   │   └── mcaData.js
+│   ├── content.jsx
+│   ├── hooks
+│   │   └── useAiSync.js
+│   ├── pages
 │   │   ├── AttendancePage.jsx
-│   │   ├── TranscriptPage.jsx
-│   │   ├── StudyPlanPage.jsx
+│   │   ├── ChangePasswordPage.jsx
+│   │   ├── CourseFeedbackPage.jsx
+│   │   ├── CourseRegistrationPage.jsx
+│   │   ├── CourseWithdrawPage.jsx
+│   │   ├── FeeChallanPage.jsx
 │   │   ├── FeeDetailsPage.jsx
 │   │   ├── GradeChangePage.jsx
+│   │   ├── HomePage.jsx
+│   │   ├── MarksPage.jsx
+│   │   ├── MarksPloReportPage.jsx
+│   │   ├── NotFoundPage.jsx
 │   │   ├── RetakeExamPage.jsx
-│   │   ├── ChangePasswordPage.jsx
-│   │   └── ...
-│   ├── styles/                # CSS and Tailwind
-│   │   ├── tailwind.css      # Main styles
-│   │   └── loading.css       # Loading state styles
-│   ├── constants/             # App constants
-│   ├── utils/                 # Utility functions
-│   └── content.jsx            # Content script entry point
-├── manifest.json              # Chrome extension manifest
-├── vite.config.js             # Vite build configuration
-├── package.json               # Dependencies
-└── pnpm-lock.yaml             # Lock file
+│   │   ├── SessionExpirePage.jsx
+│   │   ├── StudyPlanPage.jsx
+│   │   └── TranscriptPage.jsx
+│   ├── styles
+│   │   ├── loading.css
+│   │   └── tailwind.css
+│   └── utils
+│       └── marksProcessor.js
+└── vite.config.js
+
+17 directories, 68 files
 ```
 
 ## Building for Production
