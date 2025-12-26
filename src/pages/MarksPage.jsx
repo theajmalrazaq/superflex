@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import LoadingOverlay, {
   LoadingSpinner,
 } from "../components/ui/LoadingOverlay";
 import PageLayout from "../components/layouts/PageLayout";
+import { useAiSync } from "../hooks/useAiSync";
 import {
   ChevronDown,
   AlertCircle,
@@ -816,6 +817,45 @@ function MarksPage() {
       }
     }
     return new Set();
+  });
+
+  const marksSummary = useMemo(() => {
+    if (courses.length === 0) return null;
+    return courses.map((c) => ({
+      title: c.title,
+      obtained: c.grandTotalStats.obtained,
+      total: c.grandTotalStats.weight,
+      percentage: c.grandTotalStats.percentage,
+      sections: c.sections.map((s) => ({
+        title: s.title,
+        obtained: s.obtained,
+        total: s.weight,
+        stats: {
+          avg: s.stats?.weightedAvg,
+          min: s.stats?.weightedMin,
+          max: s.stats?.weightedMax,
+          stdDev: s.stats?.weightedStdDev,
+        },
+        rows: s.rows.map((r) => ({
+          name: r.title,
+          obtained: r.obtained,
+          total: r.total,
+          weight: r.weight,
+          avg: r.avg,
+          min: r.min,
+          max: r.max,
+          stdDev: r.stdDev,
+          included: r.included,
+        })),
+      })),
+    }));
+  }, [courses]);
+
+  useAiSync({
+    data: marksSummary,
+    dataKey: "marks",
+    syncKey: "marks",
+    isEnabled: !!marksSummary,
   });
 
   useEffect(() => {

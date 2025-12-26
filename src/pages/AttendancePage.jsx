@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useAiSync } from "../hooks/useAiSync";
 import LoadingOverlay, {
   LoadingSpinner,
 } from "../components/ui/LoadingOverlay";
@@ -300,6 +301,14 @@ function AttendancePage() {
       JSON.stringify([...markedRecords]),
     );
   }, [markedRecords]);
+
+  // Sync with AI Model Context
+  useAiSync({
+    data: courses,
+    dataKey: "attendance",
+    syncKey: "attendance",
+    isEnabled: courses.length > 0,
+  });
 
   const [semesters, setSemesters] = useState([]);
   const hiddenFormRef = useRef(null);

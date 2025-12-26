@@ -3,7 +3,7 @@
 body {
   visibility: hidden !important;
   overflow-y: hidden !important;
-  background: black;
+  background: black !important;
 }
 /* end here */
 .loading-overlay {

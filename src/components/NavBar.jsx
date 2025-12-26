@@ -19,6 +19,7 @@ import {
   Lock,
   Menu,
   X,
+  Sparkles,
 } from "lucide-react";
 
 function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
@@ -291,6 +292,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
   return (
     <div className="flex items-center justify-between lg:justify-start px-4 lg:px-6 py-2.5 lg:py-3 w-full lg:w-fit relative">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[150%] bg-x/20 blur-[80px] rounded-full pointer-events-none -z-10" />
       <div className="flex items-center gap-4">
         {}
         <button
@@ -530,6 +532,21 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
       {}
       <div className="shrink-0 flex items-center gap-3">
+        <button
+          onClick={() =>
+            window.dispatchEvent(new CustomEvent("superflex-toggle-ai"))
+          }
+          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-x/10 border border-x/20 text-x hover:bg-x/20 transition-all duration-300 group"
+        >
+          <Sparkles
+            size={18}
+            className="group-hover:scale-110 transition-transform duration-300"
+          />
+          <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline-block">
+            Ask AI
+          </span>
+        </button>
+
         {}
         <div className="relative dropdown-container">
           <button

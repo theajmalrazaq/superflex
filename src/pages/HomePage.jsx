@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageLayout from "../components/layouts/PageLayout";
+import { useAiSync } from "../hooks/useAiSync";
 import LoadingOverlay, {
   LoadingSpinner,
 } from "../components/ui/LoadingOverlay";
@@ -167,6 +168,8 @@ function HomePage() {
   const [loadingMarks, setLoadingMarks] = useState(false);
   const [loadingAttendance, setLoadingAttendance] = useState(false);
 
+
+
   useEffect(() => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -294,6 +297,22 @@ function HomePage() {
       document.head.removeChild(styleElement);
     };
   }, []);
+
+  // Sync Profile with AI Context
+  const profileData = useMemo(() => {
+    if (!personalInfo || !personalInfo["Name"]) return null;
+    return {
+      studentName: personalInfo["Name"],
+      universityInfo: universityInfo,
+      profileSections: profileSections,
+    };
+  }, [personalInfo, universityInfo, profileSections]);
+
+  useAiSync({
+    data: profileData,
+    syncKey: "profile",
+    isEnabled: !!profileData,
+  });
 
   const handleLinksFound = (foundLinks) => {
     const linkMap = {};

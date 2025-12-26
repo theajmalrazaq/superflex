@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import PageLayout from "../components/layouts/PageLayout";
+import { useAiSync } from "../hooks/useAiSync";
 import LoadingOverlay, {
   LoadingSpinner,
 } from "../components/ui/LoadingOverlay";
@@ -402,6 +403,7 @@ function TranscriptPage() {
   const [whatIfMode, setWhatIfMode] = useState(false);
   const [overriddenGrades, setOverriddenGrades] = useState({});
 
+
   useEffect(() => {
     const parse = () => {
       try {
@@ -564,11 +566,10 @@ function TranscriptPage() {
     setTimeout(parse, 300);
   }, []);
 
-  useEffect(() => {
-    if (semesters.length === 0) return;
-
-    try {
-      const transContext = semesters.map((sem) => ({
+  const transcriptData = useMemo(() => {
+    if (semesters.length === 0) return null;
+    return {
+      transcript: semesters.map((sem) => ({
         title: sem.title,
         summary: sem.summary,
         courses: sem.courses.map((c) => ({
@@ -582,28 +583,17 @@ function TranscriptPage() {
           gradingScheme: c.gradingScheme,
           schemeDetailId: c.schemeDetailId,
         })),
-      }));
-
-      const existingContext = window.superflex_ai_context || {};
-
-      const newContext = {
-        ...existingContext,
-        transcript: transContext,
-        mcaData: MCA_DATA,
-        lastScanned: new Date().toISOString(),
-      };
-
-      window.superflex_ai_context = newContext;
-
-      window.dispatchEvent(
-        new CustomEvent("superflex-data-updated", {
-          detail: { ...newContext, isTranscriptSync: true },
-        }),
-      );
-    } catch (e) {
-      console.error("AI Sync Error (Transcript):", e);
-    }
+      })),
+      mcaData: MCA_DATA,
+    };
   }, [semesters]);
+
+  useAiSync({
+    data: transcriptData,
+    syncKey: "transcript",
+    isEnabled: !!transcriptData,
+    eventExtras: { isTranscriptSync: true },
+  });
 
   const activeSemData = semesters[activeSemIdx];
 

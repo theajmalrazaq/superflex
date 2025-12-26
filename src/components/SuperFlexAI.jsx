@@ -2,15 +2,16 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   Send,
   X,
-  User,
   Trash2,
   Shield,
-  Zap,
-  TrendingUp,
-  Search,
   Sparkles,
   ChevronDown,
   Square,
+  Maximize2,
+  Minimize2,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -93,10 +94,8 @@ const SuperFlexAI = () => {
     mcaData: null,
     studyPlan: null,
     lastScanned: null,
+    lastSync: null,
   });
-
-  const [isScanning, setIsScanning] = useState(false);
-  const [scanProgress, setScanProgress] = useState(0);
 
   const [permissionStatus, setPermissionStatus] = useState(
     () => localStorage.getItem("superflex_ai_data_permission") || "pending",
@@ -109,7 +108,19 @@ const SuperFlexAI = () => {
   const activeRequestIdRef = useRef(null);
 
   useEffect(() => {
-    if (window.superflex_ai_context) {
+    // Load initial context from localStorage
+    if (!window.superflex_ai_context) {
+      try {
+        const savedCtx = localStorage.getItem("superflex_ai_context");
+        if (savedCtx) {
+          const parsed = JSON.parse(savedCtx);
+          window.superflex_ai_context = parsed;
+          setDataContext(parsed);
+        }
+      } catch (e) {
+        console.error("Failed to load AI context from storage", e);
+      }
+    } else {
       setDataContext(window.superflex_ai_context);
     }
 
@@ -124,29 +135,6 @@ const SuperFlexAI = () => {
 
     window.addEventListener("superflex-data-updated", handleDataUpdate);
 
-    const handleTranscriptSync = (e) => {
-      const data = e.detail;
-      if (data.isTranscriptSync) {
-        setIsScanning(false);
-        setScanProgress(100);
-
-        setMessages((prev) => {
-          if (prev.some((m) => m.content.includes("✅ **Sync Complete!**")))
-            return prev;
-          return [
-            ...prev,
-            {
-              role: "assistant",
-              content:
-                "✅ **Transcript Sync Complete!** I've parsed your entire academic history and the grading curves (MCA). I'm ready to predict your GPA or simulate your 'What-If' scenarios. What's on your mind?",
-            },
-          ];
-        });
-      }
-    };
-
-    window.addEventListener("superflex-data-updated", handleTranscriptSync);
-
     const savedMessages = localStorage.getItem("superflex_ai_messages");
     if (savedMessages) {
       try {
@@ -154,42 +142,18 @@ const SuperFlexAI = () => {
       } catch (e) {
         console.error("Failed to parse chat history", e);
       }
-    } else {
-      if (messages.length === 0 && permissionStatus !== "pending") {
-        setMessages([
-          {
-            role: "assistant",
-            content:
-              "Hi! I'm your SuperFlex AI assistant. I've automatically synced your marks, attendance, and degree roadmap in the background. How can I help you today?",
-          },
-        ]);
-      }
     }
-
-    const handleScanComplete = () => {
-      setIsScanning(false);
-      setScanProgress(100);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content:
-            "✅ **Auto-Sync Complete!** I've refreshed your academic records. How can I help you with your subjects?",
-        },
-      ]);
-    };
-
-    window.addEventListener("superflex-scan-complete", handleScanComplete);
 
     return () => {
       window.removeEventListener("superflex-data-updated", handleDataUpdate);
-      window.removeEventListener(
-        "superflex-data-updated",
-        handleTranscriptSync,
-      );
-      window.removeEventListener("superflex-scan-complete", handleScanComplete);
     };
   }, [permissionStatus]);
+
+  useEffect(() => {
+    const handleToggle = () => setIsOpen((prev) => !prev);
+    window.addEventListener("superflex-toggle-ai", handleToggle);
+    return () => window.removeEventListener("superflex-toggle-ai", handleToggle);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("superflex_ai_model", selectedModel);
@@ -207,10 +171,11 @@ const SuperFlexAI = () => {
     }
   }, [messages, isLoading]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleSend = async (txt) => {
+    const textToSend = txt || input;
+    if (!textToSend.trim() || isLoading) return;
 
-    const userMessage = input.trim();
+    const userMessage = textToSend.trim();
     setInput("");
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setIsLoading(true);
@@ -260,7 +225,6 @@ const SuperFlexAI = () => {
         responseText += text;
         setMessages((prev) => {
           const last = prev[prev.length - 1];
-
           if (last && last.role === "assistant") {
             const others = prev.slice(0, -1);
             return [...others, { ...last, content: responseText }];
@@ -303,11 +267,11 @@ const SuperFlexAI = () => {
           marks:
             dataContext.marks && dataContext.marks.length > 0
               ? dataContext.marks
-              : "Syncing in background...",
+              : "Missing (Visit Marks Page)",
           attendance:
             dataContext.attendance && dataContext.attendance.length > 0
               ? dataContext.attendance
-              : "Syncing in background...",
+              : "Missing (Visit Attendance Page)",
         },
         academicHistory: {
           transcript:
@@ -315,6 +279,7 @@ const SuperFlexAI = () => {
           mcaData: dataContext.mcaData || "Missing (Visit Transcript Page)",
           studyPlan: dataContext.studyPlan || "Missing (Visit Transcript Page)",
         },
+        syncStatus: dataContext.lastSync || {},
         systemAlerts: [],
       };
 
@@ -332,58 +297,30 @@ const SuperFlexAI = () => {
       }
 
       const prompt = `
-        You are "SuperFlex AI", the intelligent, human-like academic advisor for SuperFlex (a premium student portal). Your goal is to guide students through their academic journey with clarity and empathy.
+        You are "SuperFlex AI", the intelligent, human-like academic advisor.
         
-        ### PERSONALITY & TONE:
-        - Human-like, empathetic, and encouraging.
-        - Casually professional (natural language, not robotic).
-        - **NEVER** output raw code snippets (like \`print(x)\`), variable names, or technical jargon unless explicitly asked for it.
-        - **NEVER** act like a raw calculator or a command-line interface. 
-        - Always explain your calculations in full sentences.
+        ### PERSONALITY:
+        - Empathetic, encouraging, and clear.
+        - NO technical jargon or code unless asked.
         
-        ### STUDENT PROFILE
+        ### STUDENT PROFILE:
         - Name: ${academicData.student.name}
-        - CMS: ${academicData.student.cmsId || "N/A"}
-        - Program: ${academicData.student.program || "Unknown"}
-        - Section: ${academicData.student.section || "N/A"}
         
-        ### GROUND TRUTH DATA (Structured Context)
-        1. CURRENT SEMESTER MARKS:
-        ${JSON.stringify(academicData.currentPerformance.marks, null, 2)}
-        
-        2. ATTENDANCE ANALYTICS:
-        ${JSON.stringify(academicData.currentPerformance.attendance, null, 2)}
-        
-        3. ACADEMIC TRANSCRIPT (Past Semesters):
-        ${JSON.stringify(academicData.academicHistory.transcript, null, 2)}
-        
-        4. DEGREE ROADMAP (Tentative Study Plan):
-        ${JSON.stringify(academicData.academicHistory.studyPlan, null, 2)}
+        ### DATA METADATA:
+        - Marks Available: ${academicData.currentPerformance.marks !== "Missing" ? "Yes" : "No"}
+        - Attendance Available: ${academicData.currentPerformance.attendance !== "Missing" ? "Yes" : "No"}
+        - Transcript Available: ${academicData.academicHistory.transcript !== "Missing" ? "Yes" : "No"}
 
-        5. RELATIVE GRADING THRESHOLDS (MCA Data):
-        ${JSON.stringify(academicData.academicHistory.mcaData, null, 2)}
+        ### DATA CONTEXT:
+        ${JSON.stringify(academicData, null, 2)}
         
-        ### CONVERSATION HISTORY
+        ### CHAT HISTORY:
         ${chatHistory}
         
-        ### CURRENT INTERACTION
-        - Current Page: ${window.location.pathname}
-        - User Question: ${userMessage}
+        ### USER MESSAGE:
+        ${userMessage}
         
-        ### OPERATIONAL GUIDELINES:
-        1. Analyze "CURRENT SEMESTER MARKS" for assessment-level queries (quizzes, assignments, mids).
-        2. **CRITICAL FOR MARKS**: Each category (Assignment, Quiz, etc.) has a "stats" object containing sophisticated metrics: properties like \`weightedAvg\`, \`weightedMin\`, \`weightedMax\`, and \`weightedStdDev\`. Use these to compare the student's performance against the class. Use \`stats.totalObtainedWeighted\` and \`stats.totalWeight\` for grade calculations. DO NOT sum raw marks yourself. 
-        3. Use "ATTENDANCE ANALYTICS" (including detailed day-by-day logs) to warn about the 80% threshold and help identify exactly which dates the student was away.
-        4. Use "ACADEMIC TRANSCRIPT" for CGPA/SGPA and history questions.
-        5. Use "DEGREE ROADMAP" for graduation, core courses, and remaining credits.
-        6. If transcript, MCA, or study plan data is missing, explicitly tell them: "Could you please head over to the Transcript page for a split second? I need to grab your academic history and the current grading curves from there to give you accurate predictions."
-        7. You no longer need to ask them to visit 'Home' or 'Attendance' pages as those are synced automatically in the stealth background.
-        9. RELATIVE GRADING LOGIC: Use "RELATIVE GRADING THRESHOLDS" (MCA Data) to predict grades. For example, if a course has MCA 55, look up the "55" key in MCA data to see the marks required for each grade.
-        10. GPA PREDICTOR / SANDBOX MODE: You have the ability to simulate future CGPA. When a user asks about their future CGPA, use their current Transcript (CGPA/Total Credits) and their Study Plan (future courses/credits) to calculate projected outcomes. Assume standard grades (e.g., A, B) if they don't specify.
-        11. Be concise, friendly, and casually professional. Speak naturally but avoid excessive slang or overly formal language.
-        12. Format performance data in clean Markdown tables when answering.
-        13. **OUT-OF-SCOPE QUERIES**: If a user asks a question that is not related to their academics, the SuperFlex portal, or university life, politely decline by saying something like: "I'm primarily focused on your academic success here! I'm sorry, but I can't help with [topic]. Is there anything else about your grades or attendance you'd like to discuss?"
-        14. **NO RAW CODE**: Never output raw code snippets (e.g., \`print(2.5)\`) as a response to a general question. Always provide a natural, human-like explanation. If you calculate something, explain the result in a friendly way.
+        Answer helpfuly and concisely. If data is missing (Status: No), ask the user to visit that page to sync it.
       `;
 
       document.dispatchEvent(
@@ -434,348 +371,260 @@ const SuperFlexAI = () => {
     }
   };
 
-  const runSmartScan = async () => {
-    if (isScanning) return;
-    setIsScanning(true);
-    setScanProgress(10);
-
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: "assistant",
-        content:
-          "Initiating **Smart Scan**. I'm silently vacuuming your academic records into my memory... 🚀",
-      },
-    ]);
-
-    window.dispatchEvent(new CustomEvent("superflex-trigger-scan"));
-
-    setTimeout(() => {
-      if (isScanning) setScanProgress(50);
-    }, 1000);
-  };
-
   const handlePermission = (status) => {
     setPermissionStatus(status);
     localStorage.setItem("superflex_ai_data_permission", status);
-
     window.dispatchEvent(
       new CustomEvent("superflex-permission-updated", { detail: status }),
     );
-
-    const welcomeMsg =
-      status === "granted"
-        ? "Thanks! I've connected to your academic data. How can I help you?"
-        : "Understood. I will not access your academic data. I can still help you with general questions.";
-
-    setMessages((prev) => [
-      ...prev,
-      { role: "assistant", content: welcomeMsg },
-    ]);
+    // Don't modify messages immediately for cleaner UI flow in new layout
   };
 
   const clearChat = () => {
     localStorage.removeItem("superflex_ai_messages");
-    setMessages([
-      {
-        role: "assistant",
-        content: "Chat cleared! How can I help you today?",
-      },
-    ]);
+    setMessages([]);
   };
+
+  const getLastSyncTime = () => {
+    if (!dataContext.lastSync) return null;
+    const times = Object.values(dataContext.lastSync).map((t) => new Date(t));
+    if (times.length === 0) return null;
+    const maxTime = new Date(Math.max(...times));
+    if (isNaN(maxTime.getTime())) return null;
+    
+    return maxTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const hasMarks = dataContext.marks && dataContext.marks.length > 0;
+  const hasAttendance = dataContext.attendance && dataContext.attendance.length > 0;
+  const hasTranscript = !!dataContext.transcript;
+
+  const StatusCard = ({ label, active, icon: Icon, onClick }) => (
+    <button
+      onClick={onClick}
+      className={`relative group p-4 rounded-3xl border text-left transition-all duration-300 w-full hover:-translate-y-1 ${
+        active
+          ? "bg-white/5 border-white/10 hover:bg-white/10"
+          : "bg-white/5 border-white/5 opacity-60 hover:opacity-100"
+      }`}
+    >
+      <div className={`mb-3 p-3 rounded-2xl w-fit ${active ? "bg-x/20 text-x" : "bg-zinc-800 text-zinc-500"}`}>
+        <Icon size={24} />
+      </div>
+      <h4 className="text-white font-bold text-sm mb-1">{label}</h4>
+      <p className="text-[10px] text-zinc-400 font-medium">
+        {active ? "Data Synced" : "Synced needed"}
+      </p>
+    </button>
+  );
 
   return (
     <>
       <div className="fixed bottom-6 right-6 z-[9999]">
-        <style>{`
-          @keyframes superflex-gradient-spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-           .markdown-body table {
-            display: block;
-            width: 100%;
-            overflow-x: auto;
-            border-collapse: collapse;
-            margin: 10px 0;
-            font-size: 12px;
-          }
-          .markdown-body th, .markdown-body td {
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 8px;
-            text-align: left;
-            white-space: nowrap;
-          }
-          .markdown-body th {
-            background: rgba(160,152,255,0.1);
-            color: #a098ff;
-          }
-        `}</style>
-
-        {!isOpen && (
-          <div
-            className="absolute -inset-[3px] rounded-full opacity-100 blur-[8px] transition-opacity duration-500"
-            style={{
-              background:
-                "conic-gradient(from 0deg, transparent 0%, #a098ff 30%, #ec4899 50%, #a098ff 70%, transparent 100%)",
-              animation: "superflex-gradient-spin 3s linear infinite",
-            }}
-          ></div>
-        )}
-
-        {!isOpen && (
-          <div className="absolute -inset-[1px] rounded-full z-0 overflow-hidden">
-            <div
-              className="absolute inset-[-100%] animate-[superflex-gradient-spin_3s_linear_infinite]"
-              style={{
-                background:
-                  "conic-gradient(from 0deg, transparent 0%, #a098ff 30%, #ec4899 50%, #a098ff 70%, transparent 100%)",
-              }}
-            ></div>
-          </div>
-        )}
-
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="relative w-14 h-14 rounded-full bg-[#0c0c0c] border border-white/20  flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-10 group overflow-hidden"
-        >
-          {isOpen ? (
-            <X size={24} className="text-white relative z-10" />
-          ) : (
-            <AnimatedLogo
-              size={36}
-              className="animate-pulse transition-transform relative z-10"
-            />
-          )}
-        </button>
+         {/* Styles handled globaly */}
       </div>
 
       {isOpen && (
-        <div className="fixed bottom-20 left-4 right-4 md:left-auto md:right-6 md:bottom-24 md:w-[420px] h-[65vh] md:h-[650px] md:max-h-[80vh] bg-[#0c0c0c]/90 backdrop-blur-2xl border border-white/10 rounded-3xl md:rounded-[2rem] flex flex-col z-[9999] overflow-hidden animate-in slide-in-from-bottom-8 zoom-in-95 duration-500 ease-out">
-          <div className="p-6 border-b border-white/5 bg-white/5 flex items-center justify-between relative">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-x to-transparent opacity-50"></div>
-            <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-zinc-900/50 border border-white/10 flex items-center justify-center relative group overflow-hidden">
-                <AnimatedLogo size={32} className="animate-pulse" />
-              </div>
-              <div>
-                <h3 className="text-white font-bold text-lg tracking-tight">
-                  SuperFlex AI
-                </h3>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="relative z-50">
-                <button
-                  onClick={() => setShowModelPicker(!showModelPicker)}
-                  className={`p-2.5 rounded-xl border transition-all flex items-center gap-2 active:scale-95 ${
-                    showModelPicker
-                      ? "bg-x/20 text-x border-x/20"
-                      : "bg-white/5 border-white/5 text-zinc-400 hover:text-white hover:bg-white/10"
-                  }`}
-                  title="Change AI Model"
-                >
-                  <Sparkles size={18} />
-                  <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline-block">
-                    {AVAILABLE_MODELS.find((m) => m.id === selectedModel)
-                      ?.short || selectedModel}
-                  </span>
-                  <ChevronDown
-                    size={14}
-                    className={`transition-transform duration-300 ${showModelPicker ? "rotate-180" : ""}`}
-                  />
-                </button>
+        <div className="fixed inset-0 z-[10000] bg-[#0c0c0c] flex flex-col animate-in fade-in duration-300">
+           {/* Background Gradient */}
+           <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-x/10 blur-[150px] rounded-full opacity-40"></div>
+              <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-x/5 blur-[150px] rounded-full opacity-40"></div>
+           </div>
 
-                {showModelPicker && (
-                  <div className="absolute top-full right-0 mt-3 w-64 bg-[#0c0c0c] border border-white/10 rounded-2xl overflow-hidden z-[1000] animate-in fade-in zoom-in-95 duration-200">
-                    <div className="p-3 border-b border-white/5 bg-white/5">
-                      <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
-                        Select Model
-                      </h4>
-                    </div>
-                    <div className="max-h-60 overflow-y-auto p-1.5 space-y-1 custom-scrollbar">
-                      {AVAILABLE_MODELS.map((m, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => {
-                            setSelectedModel(m.id);
-                            setShowModelPicker(false);
-                          }}
-                          className={`w-full text-left p-3 rounded-xl transition-all flex flex-col gap-0.5 group ${
-                            selectedModel === m.id
-                              ? "bg-x/10 border border-x/20"
-                              : "hover:bg-white/5 border border-transparent"
-                          }`}
-                        >
-                          <span
-                            className={`text-xs font-bold leading-none ${selectedModel === m.id ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"}`}
-                          >
-                            {m.name}
-                          </span>
-                          <span className="text-[8px] font-black text-zinc-600 uppercase tracking-tighter">
-                            {m.provider}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <button
-                onClick={clearChat}
-                title="Clear chat"
-                className="p-2.5 hover:bg-rose-500/20 rounded-xl text-zinc-400 hover:text-rose-400 transition-all bg-white/5 border border-white/5 active:scale-95"
-              >
-                <Trash2 size={18} />
-              </button>
-            </div>
-          </div>
-
-          {isScanning && (
-            <div className="h-1 bg-zinc-900 w-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-x to-[#ec4899] transition-all duration-500"
-                style={{ width: `${scanProgress}%` }}
-              ></div>
-            </div>
-          )}
-
-          <div
-            ref={scrollRef}
-            className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide bg-gradient-to-b from-transparent to-black/20"
-          >
-            {messages.map((m, i) => (
-              <div
-                key={i}
-                className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-2 duration-300`}
-              >
-                <div
-                  className={`max-w-fit px-4 py-3 rounded-2xl text-sm relative ${
-                    m.role === "user"
-                      ? "bg-x text-white rounded-tr-none"
-                      : "bg-zinc-900/50 backdrop-blur-md text-zinc-200 border border-white/10 rounded-tl-none"
-                  }`}
-                >
-                  <div
-                    className={`flex items-center gap-1.5 mb-2 opacity-80 text-[9px] font-black uppercase tracking-widest ${m.role === "user" ? "justify-end text-white" : "text-x"}`}
+          {/* Header */}
+          <div className="relative z-50 flex items-center justify-between px-8 py-6">
+             <div className="flex items-center gap-3">
+                <div className="p-2 bg-zinc-900 rounded-xl border border-white/10">
+                   <AnimatedLogo size={24} />
+                </div>
+                <span className="font-bold text-white text-lg tracking-tight">SuperFlex AI</span>
+             </div>
+             
+             <div className="flex items-center gap-4">
+                <div className="relative">
+                  <button 
+                    onClick={() => setShowModelPicker(!showModelPicker)}
+                    className="flex items-center gap-2 px-4 py-2 bg-zinc-900 border border-white/10 rounded-full text-zinc-400 hover:text-white transition-colors"
                   >
-                    {m.role === "user" ? (
-                      <img
-                        src="/Login/GetImage"
-                        alt="U"
-                        className="w-4 h-4 rounded-full object-cover border border-white/20"
-                        onError={(e) => {
-                          e.target.src =
-                            'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect fill="%23fff" width="16" height="16"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23a098ff" font-size="10" font-weight="bold">U</text></svg>';
-                        }}
-                      />
-                    ) : (
-                      <AnimatedLogo size={16} animated={false} />
-                    )}
-                    {m.role === "user"
-                      ? dataContext.studentName?.split(" ")[0] || "You"
-                      : "SuperFlex AI"}
-                  </div>
-                  <div className="leading-relaxed prose prose-invert prose-sm font-medium text-white markdown-body">
-                    {m.role === "assistant" ? (
-                      m.content ? (
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {m.content}
-                        </ReactMarkdown>
-                      ) : (
-                        <div className="flex items-center gap-3 py-2 px-1">
-                          <div className="flex gap-1">
-                            <div className="w-1.5 h-1.5 bg-x rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                            <div className="w-1.5 h-1.5 bg-x rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                            <div className="w-1.5 h-1.5 bg-x rounded-full animate-bounce"></div>
-                          </div>
-                          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
-                            Thinking...
-                          </span>
+                     <Sparkles size={16} />
+                     <span className="text-xs font-bold uppercase tracking-wider">{AVAILABLE_MODELS.find(m => m.id === selectedModel)?.short}</span>
+                     <ChevronDown size={14} />
+                  </button>
+                   {showModelPicker && (
+                      <div className="absolute top-full right-0 mt-3 w-64 bg-[#111] border border-white/10 rounded-2xl overflow-hidden z-[1000] shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                        <div className="max-h-64 overflow-y-auto p-2 space-y-1 custom-scrollbar">
+                          {AVAILABLE_MODELS.map((m, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => {
+                                setSelectedModel(m.id);
+                                setShowModelPicker(false);
+                              }}
+                              className={`w-full text-left p-3 rounded-xl transition-all flex flex-col gap-0.5 group ${
+                                selectedModel === m.id
+                                  ? "bg-x/10 border border-x/20"
+                                  : "hover:bg-white/5 border border-transparent"
+                              }`}
+                            >
+                              <span className={`text-xs font-bold ${selectedModel === m.id ? "text-white" : "text-zinc-400"}`}>
+                                {m.name}
+                              </span>
+                            </button>
+                          ))}
                         </div>
-                      )
-                    ) : (
-                      <div className="whitespace-pre-wrap">{m.content}</div>
+                      </div>
                     )}
+                </div>
+                <button onClick={() => setIsOpen(false)} className="p-2 text-zinc-500 hover:text-white transition-colors">
+                   <X size={24} />
+                </button>
+             </div>
+          </div>
+
+          {/* Main Content Area */}
+          <div className="relative z-10 flex-1 flex flex-col items-center justify-center max-w-5xl mx-auto w-full px-6 pb-32">
+             
+             {messages.length === 0 ? (
+               <div className="flex flex-col items-center text-center animate-in slide-in-from-bottom-8 duration-700 w-full max-w-3xl">
+                  
+                  <div className="mb-8 relative">
+                     <div className="w-24 h-24 rounded-3xl bg-zinc-900 border border-white/10 flex items-center justify-center shadow-2xl shadow-black/50">
+                        <AnimatedLogo size={48} className="animate-pulse" />
+                     </div>
+                  </div>
+
+                  <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+                    Hi, {dataContext.studentName?.split(" ")[0] || "Student"}
+                  </h1>
+                  <p className="text-xl text-zinc-400 mb-12 max-w-xl">
+                    Ready to assist you with anything you need, from analyzing grades to tracking attendance. Let's get started!
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+                     <StatusCard 
+                        label="Check Performance" 
+                        active={hasMarks} 
+                        icon={BarChart} 
+                        onClick={() => handleSend("Analyze my current marks performance")}
+                     />
+                     <StatusCard 
+                        label="Track Attendance" 
+                        active={hasAttendance} 
+                        icon={Clock} 
+                         onClick={() => handleSend("What is my attendance status?")}
+                     />
+                     <StatusCard 
+                        label="Review Transcript" 
+                        active={hasTranscript} 
+                        icon={GraduationCap} 
+                         onClick={() => handleSend("Summarize my transcript GPA")}
+                     />
+                  </div>
+               </div>
+             ) : (
+                <div 
+                   ref={scrollRef}
+                   className="w-full h-full overflow-y-auto scrollbar-hide space-y-8 px-4 py-8"
+                >
+                   {messages.map((m, i) => (
+                      <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} animate-in fade-in slide-in-from-bottom-4`}>
+                         <div className={`max-w-[80%] rounded-3xl px-6 py-4 relative group leading-relaxed text-sm md:text-base ${
+                            m.role === "user" 
+                              ? "bg-x text-white rounded-tr-sm" 
+                              : "bg-zinc-900 border border-white/10 text-zinc-300 rounded-tl-sm shadow-xl"
+                         }`}>
+                            {m.role === "assistant" && (
+                              <div className="absolute -left-10 top-0 p-1.5 bg-zinc-900 border border-white/10 rounded-xl">
+                                 <AnimatedLogo size={16} animated={false} />
+                              </div>
+                            )}
+                            <div className="markdown-body">
+                              {m.role === "assistant" && !m.content ? (
+                                <div className="flex gap-1.5 py-1">
+                                  <div className="w-2 h-2 bg-x rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                  <div className="w-2 h-2 bg-x rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                  <div className="w-2 h-2 bg-x rounded-full animate-bounce"></div>
+                                </div>
+                              ) : (
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+                              )}
+                            </div>
+                         </div>
+                      </div>
+                   ))}
+                </div>
+             )}
+
+          </div>
+
+          {/* Floating Input Bar */}
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-full max-w-2xl px-6 z-50">
+             {permissionStatus === 'pending' && messages.length === 0 ? (
+               <div className="bg-zinc-900/90 backdrop-blur-xl border border-white/10 p-4 rounded-[2rem] flex items-center justify-between gap-4 shadow-2xl">
+                  <div className="flex items-center gap-3 pl-2">
+                     <Shield className="text-x" size={20} />
+                     <div className="text-sm">
+                        <span className="text-white font-bold block">Enable AI Access?</span>
+                        <span className="text-zinc-500 text-xs">Allow access to marks & attendance for better answers.</span>
+                     </div>
+                  </div>
+                  <div className="flex gap-2">
+                     <button 
+                        onClick={() => handlePermission('granted')}
+                        className="px-4 py-2 bg-x hover:bg-x/90 text-white text-xs font-bold rounded-xl transition-colors"
+                     >
+                        Enable
+                     </button>
+                      <button 
+                        onClick={() => handlePermission('denied')}
+                        className="px-4 py-2 bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white text-xs font-bold rounded-xl transition-colors"
+                     >
+                        Skip
+                     </button>
+                  </div>
+               </div>
+             ) : (
+                <div className="group relative bg-[#1a1a1c]/80 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl shadow-black/50 transition-all focus-within:bg-[#1a1a1c] focus-within:border-x/30 focus-within:ring-4 focus-within:ring-x/10">
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                    placeholder="Ask SuperFlex anything..."
+                    className="w-full bg-transparent border-none px-6 py-4 pr-16 text-white text-sm placeholder:text-zinc-500 focus:outline-none focus:ring-0"
+                  />
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                      {messages.length > 0 && (
+                        <button onClick={clearChat} className="p-2 text-zinc-600 hover:text-rose-500 transition-colors" title="Clear Chat">
+                          <Trash2 size={18} />
+                        </button>
+                      )}
+                      
+                      {isLoading ? (
+                         <button onClick={handleInterrupt} className="p-2 bg-rose-500 hover:bg-rose-600 text-white rounded-full transition-all">
+                            <Square size={16} fill="currentColor" />
+                         </button>
+                      ) : (
+                         <button 
+                            onClick={() => handleSend()}
+                            disabled={!input.trim()}
+                            className="p-2 bg-x hover:bg-x/90 text-white rounded-full transition-all disabled:opacity-50 disabled:grayscale"
+                         >
+                            <Send size={16} />
+                         </button>
+                      )}
                   </div>
                 </div>
-              </div>
-            ))}
+             )}
+             
+             <div className="text-center mt-4">
+                <p className="text-[10px] text-zinc-600 font-medium">
+                   SuperFlex AI uses local data processing. {getLastSyncTime() ? `Last synced at ${getLastSyncTime()}` : "Data not synced yet."}
+                </p>
+             </div>
           </div>
 
-          {}
-          {permissionStatus === "pending" && (
-            <div className="flex flex-col gap-3 p-5 bg-zinc-900/50 border border-white/10 rounded-2xl mx-2 my-4 animate-in fade-in slide-in-from-bottom-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-x/10 flex items-center justify-center text-x">
-                  <Shield size={20} />
-                </div>
-                <h3 className="text-white font-bold text-sm">
-                  Data Access Request
-                </h3>
-              </div>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                To provide personalized academic advice, SuperFlex AI needs
-                access to your marks, attendance, and transcript data. This data
-                is processed locally and securely.
-              </p>
-              <div className="flex gap-2 mt-2">
-                <button
-                  onClick={() => handlePermission("granted")}
-                  className="flex-1 bg-x hover:bg-x/90 text-white text-xs font-bold py-2.5 rounded-xl transition-colors"
-                >
-                  Allow Access
-                </button>
-                <button
-                  onClick={() => handlePermission("denied")}
-                  className="flex-1 bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white text-xs font-bold py-2.5 rounded-xl transition-colors"
-                >
-                  Deny
-                </button>
-              </div>
-            </div>
-          )}
-
-          <div className="p-6 bg-white/5 border-t border-white/10 backdrop-blur-xl">
-            <div className="relative flex items-center group">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                placeholder={
-                  permissionStatus === "pending"
-                    ? "Please select an option above..."
-                    : "Ask your SuperFlex advisor..."
-                }
-                disabled={permissionStatus === "pending"}
-                className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-x/50 focus:ring-4 focus:ring-x/5 transition-all pr-14 disabled:opacity-50 disabled:cursor-not-allowed"
-              />
-              {isLoading ? (
-                <button
-                  onClick={handleInterrupt}
-                  className="absolute right-2.5 p-2.5 text-white bg-rose-500 hover:bg-rose-600 rounded-xl transition-all active:scale-95 animate-pulse flex items-center justify-center outline-none ring-offset-2 ring-offset-black focus:ring-2 focus:ring-rose-500/50"
-                  title="Interrupt Response"
-                >
-                  <Square size={18} fill="currentColor" />
-                </button>
-              ) : (
-                <button
-                  onClick={handleSend}
-                  disabled={!input.trim()}
-                  className="absolute right-2.5 p-2.5 text-white bg-x hover:bg-x/80 rounded-xl disabled:opacity-30 disabled:grayscale transition-all active:scale-95 flex items-center justify-center outline-none ring-offset-2 ring-offset-black focus:ring-2 focus:ring-x/50"
-                >
-                  <Send size={18} />
-                </button>
-              )}
-            </div>
-            <div className="mt-2 text-center">
-              <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">
-                Protected by SuperFlex Stealth Sync
-              </span>
-            </div>
-          </div>
         </div>
       )}
     </>
