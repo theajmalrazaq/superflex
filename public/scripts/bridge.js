@@ -109,4 +109,39 @@
       }
     }
   });
+
+  document.addEventListener("superflex-check-auth", async () => {
+    if (!window.puter) return;
+    try {
+      const isSignedIn = await window.puter.auth.isSignedIn();
+      console.log("[SuperFlex Bridge] Auth check:", isSignedIn);
+      document.dispatchEvent(new CustomEvent("superflex-auth-status", { detail: { isSignedIn } }));
+    } catch (e) {
+      console.error("Failed to check auth status:", e);
+    }
+  });
+
+  document.addEventListener("superflex-get-usage", async () => {
+    if (!window.puter) return;
+    try {
+      const usage = await window.puter.auth.getMonthlyUsage();
+      console.log("[SuperFlex Bridge] Usage data fetched:", usage);
+      if (usage) {
+        document.dispatchEvent(new CustomEvent("superflex-usage-data", { detail: usage }));
+      }
+    } catch (e) {
+      console.error("Failed to get monthly usage:", e);
+    }
+  });
+
+  document.addEventListener("superflex-auth-logout", async () => {
+    if (!window.puter) return;
+    try {
+      console.log("[SuperFlex Bridge] Logging out...");
+      await window.puter.auth.signOut();
+      document.dispatchEvent(new CustomEvent("superflex-auth-status", { detail: { isSignedIn: false } }));
+    } catch (e) {
+      console.error("Failed to sign out:", e);
+    }
+  });
 })();

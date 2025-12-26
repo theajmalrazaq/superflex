@@ -15,6 +15,7 @@ import {
   BarChart,
   GraduationCap,
   User,
+  LogOut,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -25,26 +26,37 @@ const AVAILABLE_MODELS = [
     name: "GPT-4o Mini",
     short: "GPT-4o Mini",
     provider: "OpenAI",
+    domain: "openai.com"
+  },
+  {
+    id: "claude-haiku-4-5-20251001",
+    name: "Claude Haiku",
+    short: "Claude Haiku",
+    provider: "Anthropic",
+    domain: "anthropic.com"
   },
   {
     id: "gemini-2.0-flash",
     name: "Gemini 2.0 Flash",
     short: "Gemini 2.0",
     provider: "Google",
+    domain: "google.com"
   },
   {
     id: "google/gemini-3-pro-preview",
     name: "Gemini 3 Pro",
     short: "Gemini 3",
     provider: "Google",
+    domain: "google.com"
   },
   {
-    id: "deepseek-chat",
-    name: "DeepSeek Chat",
-    short: "DeepSeek",
-    provider: "DeepSeek",
+    id: "gemini-3-flash-preview",
+    name: "Gemini 3 Flash",
+    short: "Gemini 3",
+    provider: "Google",
+    domain: "google.com"
   },
-  { id: "grok-2", name: "Grok 2", short: "Grok 2", provider: "xAI" },
+  { id: "grok-2", name: "Grok 2", short: "Grok 2", provider: "xAI", domain: "x.ai" },
 ];
 
 const AnimatedLogo = ({ size = 24, animated = true, className = "" }) => (
@@ -107,8 +119,48 @@ const SuperFlexAI = () => {
     () => localStorage.getItem("superflex_ai_model") || "gpt-4o-mini",
   );
   const [showModelPicker, setShowModelPicker] = useState(false);
+  const [usageData, setUsageData] = useState(null);
+  const [isSignedIn, setIsSignedIn] = useState(false);
   const scrollRef = useRef(null);
   const activeRequestIdRef = useRef(null);
+
+  useEffect(() => {
+    const handleUsage = (e) => {
+      console.log("[SuperFlex AI] Usage Data Received:", e.detail);
+      setUsageData(e.detail);
+    };
+    document.addEventListener("superflex-usage-data", handleUsage);
+    return () => document.removeEventListener("superflex-usage-data", handleUsage);
+  }, []);
+
+  useEffect(() => {
+    const handleAuthStatus = (e) => {
+      if (e.detail?.isSignedIn !== undefined) {
+        setIsSignedIn(e.detail.isSignedIn);
+      }
+    };
+    document.addEventListener("superflex-auth-status", handleAuthStatus);
+    
+    let interval;
+    if (isOpen) {
+      document.dispatchEvent(new CustomEvent("superflex-check-auth"));
+      interval = setInterval(() => {
+        document.dispatchEvent(new CustomEvent("superflex-check-auth"));
+      }, 5000);
+    }
+    
+    return () => {
+      document.removeEventListener("superflex-auth-status", handleAuthStatus);
+      if (interval) clearInterval(interval);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (showModelPicker) {
+      document.dispatchEvent(new CustomEvent("superflex-get-usage"));
+      document.dispatchEvent(new CustomEvent("superflex-check-auth"));
+    }
+  }, [showModelPicker]);
 
   useEffect(() => {
     // Load initial context from localStorage
@@ -411,17 +463,17 @@ const SuperFlexAI = () => {
     <button
       onClick={active ? onClick : undefined}
       disabled={!active}
-      className={`relative group p-4 rounded-3xl border flex flex-col items-center justify-center text-center transition-all duration-300 w-full aspect-square ${
+      className={`relative group p-3 md:p-4 rounded-2xl md:rounded-3xl border flex flex-col items-center justify-center text-center transition-all duration-300 w-full aspect-[4/3] md:aspect-square ${
         active
           ? "bg-white/5 border-white/10 hover:bg-white/10 shadow-lg shadow-black/20 hover:-translate-y-1 cursor-pointer"
           : "bg-white/5 border-white/5 opacity-50 cursor-not-allowed grayscale"
       }`}
     >
-      <div className={`mb-3 p-3 rounded-2xl w-fit transition-transform group-hover:scale-105 ${active ? "bg-x/20 text-x" : "bg-zinc-800 text-zinc-500"}`}>
-        <Icon size={26} />
+      <div className={`mb-2 md:mb-3 p-2 md:p-3 rounded-xl md:rounded-2xl w-fit transition-transform group-hover:scale-105 ${active ? "bg-x/20 text-x" : "bg-zinc-800 text-zinc-500"}`}>
+        <Icon size={20} className="md:w-[26px] md:h-[26px]" />
       </div>
-      <h4 className="text-white font-bold text-sm mb-1">{label}</h4>
-      <p className="text-[10px] text-zinc-400 font-medium leading-tight max-w-[90%]">
+      <h4 className="text-white font-bold text-xs md:text-sm mb-0.5 md:mb-1">{label}</h4>
+      <p className="text-[9px] md:text-[10px] text-zinc-400 font-medium leading-tight max-w-[90%]">
         {active ? description : "Visit page to sync"}
       </p>
     </button>
@@ -452,40 +504,16 @@ const SuperFlexAI = () => {
              </div>
              
              <div className="flex items-center gap-4">
-                <div className="relative">
+                {isSignedIn && (
                   <button 
-                    onClick={() => setShowModelPicker(!showModelPicker)}
-                    className="flex items-center gap-2 px-4 py-2 bg-zinc-900 border border-white/10 rounded-full text-zinc-400 hover:text-white transition-colors"
+                    onClick={() => document.dispatchEvent(new CustomEvent("superflex-auth-logout"))}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 border border-red-500/20 rounded-full text-red-400 hover:bg-red-500/20 transition-all text-xs font-bold"
+                    title="Sign Out"
                   >
-                     <Sparkles size={16} />
-                     <span className="text-xs font-bold uppercase tracking-wider">{AVAILABLE_MODELS.find(m => m.id === selectedModel)?.short}</span>
-                     <ChevronDown size={14} />
+                    <LogOut size={16} />
+                    <span className="hidden md:inline">Sign Out</span>
                   </button>
-                   {showModelPicker && (
-                      <div className="absolute top-full right-0 mt-3 w-64 bg-[#111] border border-white/10 rounded-2xl overflow-hidden z-[1000] shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-                        <div className="max-h-64 overflow-y-auto p-2 space-y-1 custom-scrollbar">
-                          {AVAILABLE_MODELS.map((m, idx) => (
-                            <button
-                              key={idx}
-                              onClick={() => {
-                                setSelectedModel(m.id);
-                                setShowModelPicker(false);
-                              }}
-                              className={`w-full text-left p-3 rounded-xl transition-all flex flex-col gap-0.5 group ${
-                                selectedModel === m.id
-                                  ? "bg-x/10 border border-x/20"
-                                  : "hover:bg-white/5 border border-transparent"
-                              }`}
-                            >
-                              <span className={`text-xs font-bold ${selectedModel === m.id ? "text-white" : "text-zinc-400"}`}>
-                                {m.name}
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                </div>
+                )}
                 <button onClick={() => setIsOpen(false)} className="p-2 text-zinc-500 hover:text-white transition-colors">
                    <X size={24} />
                 </button>
@@ -616,14 +644,89 @@ const SuperFlexAI = () => {
                   </div>
                </div>
              ) : (
-                <div className="group relative bg-[#1a1a1c]/80 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl shadow-black/50 transition-all focus-within:bg-[#1a1a1c] focus-within:border-x/30 focus-within:ring-4 focus-within:ring-x/10">
+                <div className="group relative bg-[#1a1a1c]/80 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl shadow-black/50 transition-all focus-within:bg-[#1a1a1c] focus-within:border-x/30 focus-within:ring-4 focus-within:ring-x/10 flex items-center">
+                  <div className="relative pl-3 shrink-0">
+                    <button 
+                      onClick={() => setShowModelPicker(!showModelPicker)}
+                      className="w-10 h-10 rounded-full bg-zinc-800/50 border border-white/5 flex items-center justify-center hover:bg-zinc-700 transition-colors shrink-0 overflow-hidden group/btn"
+                      title="Select Model"
+                    >
+                       <img 
+                         src={`https://www.google.com/s2/favicons?domain=${AVAILABLE_MODELS.find(m => m.id === selectedModel)?.domain}&sz=64`}
+                         className="w-5 h-5 grayscale opacity-70 group-hover/btn:grayscale-0 rounded-full group-hover/btn:opacity-100 transition-all"
+                         alt="icon"
+                       />
+                    </button>
+                    
+                    {showModelPicker && (
+                      <div className="absolute bottom-full left-0 mb-4 w-72 bg-[#111] border border-white/10 rounded-2xl overflow-hidden z-[1000] shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200">
+                        {usageData && usageData.allowanceInfo ? (
+                          <div className="p-4 border-b border-white/5 bg-white/[0.02]">
+                             <div className="flex items-center justify-between mb-2">
+                                <div className="flex flex-col">
+                                   <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Monthly Credits</span>
+                                   <span className="text-xs font-bold text-white">
+                                      {Math.round((usageData.allowanceInfo.remaining || 0) / 1000).toLocaleString()}k / {Math.round((usageData.allowanceInfo.monthUsageAllowance || 0) / 1000).toLocaleString()}k left
+                                   </span>
+                                </div>
+                                <span className="text-xs font-bold text-x px-2 py-0.5 bg-x/10 rounded-full border border-x/20">
+                                   {Math.max(0, Math.round(((usageData.allowanceInfo.remaining || 0) / (usageData.allowanceInfo.monthUsageAllowance || 1)) * 100))}%
+                                </span>
+                             </div>
+                             <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-x transition-all duration-1000" 
+                                  style={{ width: `${Math.max(0, ((usageData.allowanceInfo.remaining || 0) / (usageData.allowanceInfo.monthUsageAllowance || 1)) * 100)}%` }}
+                                ></div>
+                             </div>
+                          </div>
+                        ) : (
+                          <div className="p-4 border-b border-white/5 bg-white/[0.02] text-center">
+                             <span className="text-[10px] font-bold text-zinc-500 uppercase">Usage data loading...</span>
+                          </div>
+                        )}
+                        <div className="max-h-64 overflow-y-auto p-2 space-y-1 custom-scrollbar">
+                          {AVAILABLE_MODELS.map((m, idx) => (
+                                <button
+                                  key={idx}
+                                  onClick={() => {
+                                    setSelectedModel(m.id);
+                                    setShowModelPicker(false);
+                                  }}
+                                  className={`w-full text-left p-3 rounded-xl transition-all flex items-center justify-between group/item ${
+                                    selectedModel === m.id
+                                      ? "bg-x/10 border border-x/20"
+                                      : "hover:bg-white/5 border border-transparent"
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                                      <img 
+                                        src={`https://www.google.com/s2/favicons?domain=${m.domain}&sz=64`}
+                                        className="w-5 h-5 opacity-80"
+                                        alt={m.provider}
+                                      />
+                                    </div>
+                                    <div className="flex flex-col gap-0.5">
+                                      <span className={`text-xs font-bold ${selectedModel === m.id ? "text-white" : "text-zinc-400"}`}>
+                                        {m.name}
+                                      </span>
+                                      <span className="text-[10px] text-zinc-600 font-medium">{m.provider}</span>
+                                    </div>
+                                  </div>
+                                 </button>
+                              ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   <input
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleSend()}
                     placeholder="Ask SuperFlex anything..."
-                    className="w-full bg-transparent border-none px-6 py-4 pr-16 text-white text-sm placeholder:text-zinc-500 focus:outline-none focus:ring-0"
+                    className="w-full bg-transparent border-none px-4 py-4 pr-16 text-white text-sm placeholder:text-zinc-500 focus:outline-none focus:ring-0"
                   />
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
                       {messages.length > 0 && (
