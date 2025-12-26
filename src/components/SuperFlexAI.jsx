@@ -127,8 +127,38 @@ const SuperFlexAI = () => {
   const [showModelPicker, setShowModelPicker] = useState(false);
   const [usageData, setUsageData] = useState(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [userImage, setUserImage] = useState(
+    () => localStorage.getItem("superflex_user_image") || "login/getimage",
+  );
   const scrollRef = useRef(null);
   const activeRequestIdRef = useRef(null);
+
+  useEffect(() => {
+    const cacheUserImage = async () => {
+      // If we already have a base64 image, don't fetch again
+      if (userImage.startsWith("data:image")) return;
+
+      try {
+        const response = await fetch("login/getimage");
+        if (response.ok) {
+          const blob = await response.blob();
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64data = reader.result;
+            if (base64data && base64data.length > 100) {
+              // Ensure it's a valid image
+              localStorage.setItem("superflex_user_image", base64data);
+              setUserImage(base64data);
+            }
+          };
+          reader.readAsDataURL(blob);
+        }
+      } catch (e) {
+        console.error("Failed to cache user image:", e);
+      }
+    };
+    cacheUserImage();
+  }, [userImage]);
 
   useEffect(() => {
     const handleUsage = (e) => {
@@ -636,7 +666,7 @@ const SuperFlexAI = () => {
                     {m.role === "user" && (
                       <div className="w-8 h-8 rounded-full bg-x/20 border border-x/10 flex items-center justify-center shrink-0 overflow-hidden mt-1">
                         <img
-                          src="login/getimage"
+                          src={userImage}
                           alt="Me"
                           className="w-full h-full object-cover"
                         />

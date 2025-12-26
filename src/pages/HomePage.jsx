@@ -178,30 +178,31 @@ function HomePage() {
 
   const greetingMessage = useMemo(() => {
     const greetings = [
-      "Hey Pookie,",
-      "Academic Comeback,",
-      "Yo Bestie,",
       "No Cap,",
+      "Ate and left no crumbs,",
+      "Slay,",
+      "The aura is immaculate,",
       "Main Character,",
-      "Still Mid,",
-      "Wait, you're here?",
+      "Oh you're locked in,",
+      "What's the tea,",
       "Manifesting 4.0,",
+      "Pookie is back,",
     ];
     return greetings[Math.floor(Math.random() * greetings.length)];
   }, []);
 
   const roastMessage = useMemo(() => {
     const roasts = [
-      "Nice to see you! (not really)",
+      "The GPA is giving... roommate.",
+      "Go touch some grass, pookie.",
+      "Is the 4.0 in the room with us right now?",
+      "Academic comeback? More like academic setback.",
       "Your attendance is giving 'dropout'.",
-      "Is it giving 4.0 or 0.4?",
       "Caught in 4k checking your grades.",
       "Don't let them catch you lacking.",
-      "Real ones check SuperFlex every hour.",
-      "Go touch some grass after this.",
-      "Imagine having 8am classes in 2025.",
-      "Your aggregate is looking real quiet...",
-      "Academic comeback starts... never?",
+      "Sending thoughts and prayers to your transcript.",
+      "Imagine having a lower GPA than your phone percentage.",
+      "You're cooked if you don't start studying.",
     ];
 
     if (mostAbsentSubject && mostAbsentSubject.absent > 3) {
@@ -644,64 +645,62 @@ function HomePage() {
       <div className="w-full px-4 md:px-6 py-6 md:py-8 space-y-8">
         {}
         {}
-        <div className="relative rounded-[2rem] bg-black p-6 overflow-hidden group">
+        <div className="relative rounded-[3rem] bg-zinc-900/10 border border-white/5 p-8 md:p-12 overflow-hidden group">
           {}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-x/5 blur-[80px] rounded-full pointer-events-none -mr-20 -mt-20 opacity-40"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-x/5 blur-[120px] rounded-full pointer-events-none opacity-40"></div>
 
-          <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="relative flex flex-col items-center justify-center text-center gap-8">
             {}
-            <div className="flex items-center gap-5 w-full md:w-auto">
-              <div className="flex flex-col gap-5">
-                {}
-                <div className="relative shrink-0">
-                  <img
-                    src="/Login/GetImage"
-                    alt="Profile"
-                    className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover bg-zinc-800"
-                    onError={(e) => {
-                      e.target.src =
-                        'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><rect fill="%2318181b" width="128" height="128"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2352525b" font-weight="bold" font-size="40">Use</text></svg>';
-                    }}
-                  />
-                </div>
+            <div className="flex flex-col items-center gap-6">
+              <div className="relative">
+                <div className="absolute -inset-4 bg-x/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition duration-700"></div>
+                <img
+                  src={localStorage.getItem("superflex_user_image") || "/Login/GetImage"}
+                  alt="Profile"
+                  className="w-24 h-24 md:w-32 md:h-32 rounded-3xl object-cover bg-zinc-800 border-4 border-white/5 relative z-10 shadow-2xl"
+                  onError={(e) => {
+                    e.target.src =
+                      'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><rect fill="%2318181b" width="128" height="128"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2352525b" font-weight="bold" font-size="40">User</text></svg>';
+                  }}
+                />
+              </div>
 
-                <div className="flex flex-col text-left space-y-0.5">
-                  <h1 className="text-2xl md:text-4xl font-black text-white tracking-tight leading-none">
-                    {greetingMessage}{" "}
-                    <span className="text-x">
-                      {personalInfo?.Name?.split(" ")[0] || "Student"}
-                    </span>
-                  </h1>
-                  <p className="text-zinc-500 text-sm font-medium">
-                    {roastMessage}
-                  </p>
-                </div>
+              <div className="flex flex-col items-center space-y-3">
+                <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight max-w-2xl px-4">
+                  {greetingMessage}{" "}
+                  <span className="text-x">
+                    {personalInfo?.Name?.split(" ")[0] || "Student"}
+                  </span>
+                </h1>
+                <p className="text-zinc-500 text-base md:text-lg font-medium max-w-xl">
+                  {roastMessage}
+                </p>
               </div>
             </div>
 
             {}
-            <div className="flex backdrop-blur-md p-1 rounded-full shrink-0 w-full md:w-auto gap-5 md:justify-end">
+            <div className="flex items-center backdrop-blur-md p-1.5 bg-white/5 border border-white/10 rounded-full gap-2 transition-all hover:bg-white/10">
               <button
                 onClick={() => setActiveMainTab("stats")}
-                className={`px-5 py-2 border border-white/5  rounded-full text-xs font-bold flex items-center gap-2 transition-all duration-300 ${
+                className={`px-8 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 ${
                   activeMainTab === "stats"
-                    ? "bg-x/10 text-x"
-                    : "text-zinc-500 hover:text-white hover:bg-white/5"
+                    ? "bg-x text-white shadow-lg shadow-x/20"
+                    : "text-zinc-500 hover:text-white"
                 }`}
               >
-                <Activity size={16} className={""} />
-                Stats
+                <Activity size={18} />
+                Overview
               </button>
               <button
                 onClick={() => setActiveMainTab("info")}
-                className={`px-5 py-2 border border-white/5  rounded-full text-xs font-bold flex items-center gap-2 transition-all duration-300 ${
+                className={`px-8 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 ${
                   activeMainTab === "info"
-                    ? "bg-x/10 text-x"
-                    : "text-zinc-500 hover:text-white hover:bg-white/5"
+                    ? "bg-x text-white shadow-lg shadow-x/20"
+                    : "text-zinc-500 hover:text-white"
                 }`}
               >
-                <User size={16} />
-                Info
+                <User size={18} />
+                Profile
               </button>
             </div>
           </div>

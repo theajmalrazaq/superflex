@@ -2,6 +2,9 @@ import { useEffect } from "react";
 
 function LoginPageStyles() {
   useEffect(() => {
+    localStorage.removeItem("superflex_ai_messages");
+    localStorage.removeItem("superflex_user_image");
+
     document
       .querySelectorAll(
         ".m-grid.m-grid--hor:not(.m-grid--desktop):not(.m-grid--desktop-and-tablet):not(.m-grid--tablet):not(.m-grid--tablet-and-mobile):not(.m-grid--mobile) > .m-grid__item.m-grid__item--fluid",
@@ -176,8 +179,8 @@ function LoginPageStyles() {
         const header = document.createElement("div");
         header.className = "login-header w-full text-left mb-8 space-y-1";
         header.innerHTML = `
-          <h2 class="text-2xl font-black text-white tracking-tight">Welcome Back</h2>
-          <p class="text-x text-[10px] font-black uppercase tracking-widest">Access your portal with style</p>
+          <h2 class="text-2xl font-black text-white tracking-tight">Locked In?</h2>
+          <p class="text-x text-[10px] font-black uppercase tracking-widest">Time to Flex on 'em</p>
         `;
         bglogin.insertBefore(header, bglogin.firstChild);
       }
