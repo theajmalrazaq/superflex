@@ -111,6 +111,8 @@ const SuperFlexAI = () => {
     attendance: null,
     marks: null,
     studentName: null,
+    universityInfo: null,
+    profileSections: null,
     transcript: null,
     mcaData: null,
     studyPlan: null,
@@ -355,10 +357,13 @@ const SuperFlexAI = () => {
       const academicData = {
         student: {
           name: dataContext.studentName || "Student",
-          cmsId: "REDACTED",
-          program: "Unknown",
-          section: "Unknown",
+          rollNo: dataContext.universityInfo?.["Roll No"] || "Unknown",
+          degree: dataContext.universityInfo?.["Degree"] || "Unknown",
+          section: dataContext.universityInfo?.["Section"] || "Unknown",
+          campus: dataContext.universityInfo?.["Campus"] || "Unknown",
         },
+        profile: dataContext.profileSections || [],
+        university: dataContext.universityInfo || {},
         currentPerformance: {
           marks:
             dataContext.marks && dataContext.marks.length > 0
@@ -401,6 +406,10 @@ const SuperFlexAI = () => {
         
         ### STUDENT PROFILE:
         - Name: ${academicData.student.name}
+        - Roll No: ${academicData.student.rollNo}
+        - Degree: ${academicData.student.degree}
+        - Section: ${academicData.student.section}
+        - Campus: ${academicData.student.campus}
         
         ### DATA METADATA:
         - Marks Available: ${academicData.currentPerformance.marks !== "Missing" ? "Yes" : "No"}
