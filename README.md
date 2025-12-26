@@ -40,13 +40,11 @@ This bad boy works by sneaking React components into the boring old LMS pages, b
 ### 🤖 AI-Powered Academic Assistant
 
 - **Multi-Model Support**: Chat with multiple AI models including:
-  - Google Gemini 2.0 Flash (Thinking & Experimental)
-  - OpenAI GPT-4o & GPT-4o Mini
-  - Anthropic Claude 3.5 Sonnet & Haiku
-  - DeepSeek R1 & V3
-  - xAI Grok 2 & Grok Beta
-  - Llama 3.3 70B & 3.1 405B
-  - And many more advanced models
+  - Google Gemini 2.0 Flash & Gemini 3 Pro/Flash
+  - OpenAI GPT-4o Mini
+  - Anthropic Claude Haiku
+  - xAI Grok 2
+  - And more cutting-edge models
 - **Context-Aware Responses**: AI understands your academic data (CGPA, attendance, marks, study plan)
 - **Intelligent Predictions**: Get grade forecasts, attendance warnings, and study recommendations
 - **Auto Data Sync**: Automatically fetches and syncs your academic records for AI context
@@ -59,7 +57,8 @@ This bad boy works by sneaking React components into the boring old LMS pages, b
 - **Flat Design**: Modern minimalist aesthetic with no shadow bloat
 - **Smooth Animations**: Buttery transitions and micro-interactions
 - **Responsive Layout**: Optimized for all screen sizes
-- **Custom Loading States**: Beautiful animated loading overlays
+- **Custom Loading States**: Beautiful animated loading overlays with splash branding
+- **AI Data Visualization**: Interactive status cards within the AI assistant
 
 ### 📊 Enhanced Dashboards
 

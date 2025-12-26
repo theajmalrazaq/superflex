@@ -128,10 +128,10 @@ _Capabilities:_ chrome.* APIs, persistent state, network interception.
                          │
 ┌────────────────────────▼──────────────────────────────────────┐
 │                      STATE LAYER                              │
-│  React Context + useState/useReducer                          │
-│  • Manages application state (marks, attendance, etc.)        │
-│  • Handles data normalization                                 │
-│  • Triggers re-renders when data changes                      │
+│  React Context + useAiSync Hook                               │
+│  • Manages application state & AI context synchronization     │
+│  • LocalStorage persistence for chat and sync timestamps      │
+│  • Triggers re-renders and bridge events when data changes    │
 └────────────────────────┬──────────────────────────────────────┘
                          │
 ┌────────────────────────▼──────────────────────────────────────┐
@@ -142,11 +142,12 @@ _Capabilities:_ chrome.* APIs, persistent state, network interception.
 │  • Data transformation (HTML → JSON)                          │
 └────────────────────────┬──────────────────────────────────────┘
                          │
-┌────────────────────────▼──────────────────────────────────────┐
+┌───────────────────────────────────────────────────────────────┐
 │                    BRIDGE LAYER                               │
 │  Main World ↔ Isolated World Communication                    │
 │  • CustomEvent-based messaging                                │
 │  • Handles Puter.js AI requests/responses                     │
+│  • Usage data and Authentication management                   │
 └───────────────────────────────────────────────────────────────┘
 ```
 
@@ -162,8 +163,8 @@ Let me trace a complete data flow from user action to UI update:
 6. **Data transformed to JSON array** → `[{ course: 'CS101', present: 45, absent: 3, percentage: 93.75 }, ...]`
 7. **State context updated** → All subscribed components re-render
 8. **AttendancePage receives new data** → Renders table and charts
-9. **Event dispatched to AI context** → `superflex-data-updated` with attendance data
-10. **SuperFlexAI component updates** → AI now has latest attendance for queries
+9. **Event dispatched via `useAiSync` hook** → `superflex-data-updated` with localized data context
+10. **SuperFlexAI component updates** → AI now has latest context from `window.superflex_ai_context`
 
 ---
 
@@ -357,16 +358,21 @@ This was the most complex technical challenge. My React app needs to call `windo
 ```javascript
 // Bridge: Listen for AI queries from React, call Puter.js, stream responses back
 document.addEventListener("superflex-ai-query", async (e) => {
-  const { id, prompt } = e.detail;
+  const { id, prompt, model } = e.detail;
 
-  const stream = await window.puter.ai.chat(prompt, { stream: true });
+  const stream = await window.puter.ai.chat(prompt, { 
+    model: model || "gpt-4o-mini",
+    stream: true 
+  });
 
   for await (const chunk of stream) {
-    document.dispatchEvent(
-      new CustomEvent("superflex-ai-response", {
-        detail: { id, text: chunk.text },
-      }),
-    );
+    if (activeRequestId === id) { // Verify request still active
+      document.dispatchEvent(
+        new CustomEvent("superflex-ai-response", {
+          detail: { id, text: chunk.text },
+        }),
+      );
+    }
   }
 });
 ```

@@ -6,20 +6,22 @@ SuperFlex AI isn't just a chatbot; it's a high-performance academic engine that 
 
 SuperFlex AI operates on a **Stealth Sync** architecture. It reads the actual HTML of your portal to build its memory.
 
-- **Automatic Sync (At Login)**: When you log in, SuperFlex automatically syncs data from **Home**, **Marks**, and **Attendance** pages in the background.
-- **On-Demand Sync (Transcript)**: The **Transcript** page syncs only when you visit it. This prevents logout issues that occurred with background syncing. Visit the Transcript page at least once per session for comprehensive AI context.
+- **Automatic Sync (At Login)**: When you log in, SuperFlex automatically syncs data from **Home**, **Marks**, **Attendance**, and **Study Plan** pages in the background.
+- **On-Demand Sync (Transcript)**: The **Transcript** page syncs only when you visit it. This prevents logout issues that occurred with heavy background syncing. Visit the Transcript page at least once per session for comprehensive AI context.
 
 ## Choosing Your AI Engine
 
 SuperFlex lets you switch between different "brains." Select the right tool for the job.
 
-| Model                | Best For...                                                                                    |
-| :------------------- | :--------------------------------------------------------------------------------------------- |
-| **Gemini 2.0 Flash** | **Default Driver.** Balanced speed and intelligence. Best for general queries using your data. |
-| **Gemini 3 Pro**     | **Complex Logic.** Use this for deep "What-If" simulations and grade predictions.              |
-| **DeepSeek Chat**    | **Detailed Analysis.** Excellent for chronological breakdowns and spotting subtle trends.      |
-| **GPT-4o Mini**      | **Speed.** Efficient for simple checks like "What is my attendance?".                          |
-| **Grok 2**           | **Unfiltered Advice.** Best for direct interactions like "Roast my GPA" or strict coaching.    |
+| Model                   | Best For...                                                                                             |
+| :---------------------- | :------------------------------------------------------------------------------------------------------ |
+| **Gemini 2.0 Flash**    | **Default Driver.** Balanced speed and intelligence. Best for general queries using your data.          |
+| **GPT-4o Mini**         | **Speed.** Efficient for simple checks like "What is my attendance?".                                   |
+| **Claude Haiku**        | **Nuance.** Excellent for structured analysis and empathetic responses.                                 |
+| **Gemini 3 Pro**        | **Complex Logic.** Use this for deep "What-If" simulations and grade predictions.                       |
+| **Grok 2**              | **Direct Coaching.** Best for blunt interactions like "Roast my GPA" or strict performance reviews.      |
+| **Gemini 3 Flash**      | **Lightning Fast.** Good for quick summaries of long academic histories.                                |
+
 
 ## The "C.S.G." Framework for Perfect Prompts
 
