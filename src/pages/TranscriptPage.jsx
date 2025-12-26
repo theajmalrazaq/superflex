@@ -343,7 +343,7 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
                               key={g}
                               className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
                                 g === result.grade
-                                  ? "bg-[#a098ff] text-white"
+                                  ? "bg-x text-white"
                                   : "bg-white/5 text-zinc-500"
                               }`}
                             >

@@ -657,7 +657,7 @@ function HomePage() {
                 <img
                   src={localStorage.getItem("superflex_user_image") || "/Login/GetImage"}
                   alt="Profile"
-                  className="w-24 h-24 md:w-32 md:h-32 rounded-3xl object-cover bg-zinc-800 border-4 border-white/5 relative z-10 shadow-2xl"
+                  className="w-24 h-24 md:w-32 md:h-32 rounded-3xl object-cover bg-zinc-800 border-4 border-white/5 relative z-10"
                   onError={(e) => {
                     e.target.src =
                       'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><rect fill="%2318181b" width="128" height="128"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2352525b" font-weight="bold" font-size="40">User</text></svg>';
@@ -684,7 +684,7 @@ function HomePage() {
                 onClick={() => setActiveMainTab("stats")}
                 className={`px-8 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 ${
                   activeMainTab === "stats"
-                    ? "bg-x text-white shadow-lg shadow-x/20"
+                    ? "bg-x text-white"
                     : "text-zinc-500 hover:text-white"
                 }`}
               >
@@ -695,7 +695,7 @@ function HomePage() {
                 onClick={() => setActiveMainTab("info")}
                 className={`px-8 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 ${
                   activeMainTab === "info"
-                    ? "bg-x text-white shadow-lg shadow-x/20"
+                    ? "bg-x text-white"
                     : "text-zinc-500 hover:text-white"
                 }`}
               >
