@@ -99,6 +99,11 @@ function LoginPageStyles() {
       element.style.fontFamily = "'Google Sans Flex', sans-serif";
     });
 
+    const errorFeedback = document.querySelector("#m_inputmask_4-error");
+    if (errorFeedback) {
+      errorFeedback.classList.add("!text-white");
+    }
+
     document.querySelectorAll(".m-login.m-login--1").forEach((element) => {
       element.classList.add("!bg-transparent", "!text-white");
     });
@@ -128,12 +133,7 @@ function LoginPageStyles() {
       button.style.fontFamily = "'Google Sans Flex', sans-serif";
     });
 
-    const loginBtn = document.querySelector(".m-login__signin .btn-primary");
-    if (loginBtn) {
-      loginBtn.addEventListener("click", () => {
-        localStorage.removeItem("superflex_last_scan_time");
-      });
-    }
+
 
     const signInIcon = document.querySelector(".la-sign-in");
     if (signInIcon) signInIcon.remove();

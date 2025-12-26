@@ -26,7 +26,7 @@ function PageLayout({
         </div>
       </div>
 
-      <div className="w-full flex-1 p-6 pt-4 overflow-x-hidden">{children}</div>
+      <div className="w-full flex-1 md:p-12 p-1 pt-4 overflow-x-hidden">{children}</div>
     </div>
   );
 }

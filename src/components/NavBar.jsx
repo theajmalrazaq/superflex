@@ -538,9 +538,10 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           }
           className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-x/10 border border-x/20 text-x hover:bg-x/20 transition-all duration-300 group"
         >
-          <Sparkles
-            size={18}
-            className="group-hover:scale-110 transition-transform duration-300"
+          <img
+            src={chrome.runtime.getURL("assets/favicon.svg")}
+            alt="Logo"
+            className="h-5 w-auto rounded-full"
           />
           <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline-block">
             Ask AI
