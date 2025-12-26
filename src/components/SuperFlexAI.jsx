@@ -584,7 +584,7 @@ const SuperFlexAI = () => {
             {messages.length === 0 ? (
               <div className="flex flex-col items-center text-center animate-in slide-in-from-bottom-8 duration-700 w-full max-w-3xl">
                 <div className="mb-8 relative">
-                  <div className="w-24 h-24 rounded-3xl bg-zinc-900 border border-white/10 flex items-center justify-center shadow-2xl shadow-black/50">
+                  <div className="w-24 h-24 rounded-[2.5rem] bg-zinc-900 border border-white/10 flex items-center justify-center shadow-2xl shadow-black/50">
                     <AnimatedLogo size={48} className="animate-pulse" />
                   </div>
                 </div>
