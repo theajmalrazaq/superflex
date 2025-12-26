@@ -234,7 +234,7 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-96 md:w-[500px] bg-[#111] backdrop-blur-xl border border-white/10 rounded-2xl  overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-full right-0 mt-2 w-96 md:w-[500px] bg-black/50 backdrop-blur-xl border border-white/10 rounded-2xl  overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
             <h3 className="font-bold text-white flex items-center gap-2">
               Bookmarked Items
@@ -301,7 +301,7 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount }) => {
 
   return (
     <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-[#161616] border border-white/10 rounded-[2.5rem] w-full max-w-md overflow-hidden">
+      <div className="bg-zinc-900 border border-white/10 rounded-[2.5rem] w-full max-w-md overflow-hidden">
         <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-x/10 text-x">
@@ -415,7 +415,7 @@ const AssessmentView = ({
   return (
     <div
       className={`group rounded-[2rem] border transition-all duration-300 overflow-hidden ${
-        isGrandTotal ? "bg-[#111] border-x/30 " : "bg-[#161616] border-white/5"
+        isGrandTotal ? "bg-black/40 border-x/30 " : "bg-zinc-900/50 border-white/5"
       }`}
     >
       <div className="w-full">
@@ -490,28 +490,28 @@ const AssessmentView = ({
             <table className="w-full text-sm text-left border-collapse scrollbar-hide">
               <thead>
                 <tr className="border-b border-white/10 bg-black/40 backdrop-blur-md">
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider sticky top-0 bg-[#161616]/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider sticky top-0 bg-zinc-900/90 z-20">
                     Item Name
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
                     Weightage
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
                     Total Marks
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
                     Obtained
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
                     Avg
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
                     Std Dev
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
                     Min
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-[#161616]/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
                     Max
                   </th>
                 </tr>
@@ -609,7 +609,7 @@ const AssessmentView = ({
                     );
                   })}
               </tbody>
-              <tfoot className="bg-[#1c1c1c]/50 border-t-2 border-white/10 font-bold backdrop-blur-sm">
+              <tfoot className="bg-zinc-900/50 border-t-2 border-white/10 font-bold backdrop-blur-sm">
                 <tr>
                   <td className="px-6 py-5 text-white">Total Summary</td>
                   <td className="px-6 py-5 text-center text-white">
@@ -1236,7 +1236,7 @@ function MarksPage() {
                   }
                 />
               ) : (
-                <div className="text-center py-24 bg-[#161616] rounded-[30px] border border-white/5 opacity-50">
+                <div className="text-center py-24 bg-zinc-900/50 rounded-[30px] border border-white/5 opacity-50">
                   <div className="text-xl font-bold text-zinc-500">
                     No assessments found
                   </div>

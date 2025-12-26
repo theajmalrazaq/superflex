@@ -645,7 +645,7 @@ function HomePage() {
       <div className="w-full px-4 md:px-6 py-6 md:py-8 space-y-8">
         {}
         {}
-        <div className="relative rounded-[3rem] bg-zinc-900/10 border border-white/5 p-8 md:p-12 overflow-hidden group">
+        <div className="relative rounded-[3rem] bg-zinc-900/10 p-8 md:p-12 overflow-hidden group">
           {}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-x/5 blur-[120px] rounded-full pointer-events-none opacity-40"></div>
 
