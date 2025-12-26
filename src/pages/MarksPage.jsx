@@ -3,7 +3,6 @@ import LoadingOverlay, {
   LoadingSpinner,
 } from "../components/ui/LoadingOverlay";
 import PageLayout from "../components/layouts/PageLayout";
-import { useAiSync } from "../hooks/useAiSync";
 import {
   ChevronDown,
   AlertCircle,

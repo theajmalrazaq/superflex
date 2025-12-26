@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useAiSync } from "../hooks/useAiSync";
+
 import LoadingOverlay, {
   LoadingSpinner,
 } from "../components/ui/LoadingOverlay";

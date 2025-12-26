@@ -6,9 +6,7 @@ import {
   BookOpen,
   Layers,
   CheckCircle2,
-  ChevronRight,
   TrendingUp,
-  AlertTriangle,
 } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
@@ -127,12 +125,6 @@ function StudyPlanPage() {
     parseData();
   }, []);
 
-  useAiSync({
-    data: semesters,
-    dataKey: "studyPlan",
-    syncKey: "studyPlan",
-    isEnabled: semesters.length > 0,
-  });
 
   const stats = useMemo(() => {
     let totalCredits = 0;

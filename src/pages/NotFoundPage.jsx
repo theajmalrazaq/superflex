@@ -9,6 +9,16 @@ function NotFoundPage() {
         span.remove();
       }
     });
+
+    // Remove legacy 404 style tag
+    document.querySelectorAll("style").forEach((style) => {
+      if (
+        style.textContent.includes("Verdana") &&
+        style.textContent.includes("maroon")
+      ) {
+        style.remove();
+      }
+    });
   }, []);
 
   return (
@@ -70,10 +80,10 @@ function NotFoundPage() {
             </svg>
           </div>
 
-          <h1 className="!text-4xl md:!text-5xl font-black !text-white mb-4 tracking-tighter">
+          <h1 className="!text-4xl md:!text-5xl font-black !text-white mb-4 tracking-tighter" style={{ fontFamily: "'Google Sans Flex', sans-serif" }}>
             404
           </h1>
-          <h2 className="!text-xl font-bold !text-white/90 mb-4">
+          <h2 className="!text-xl !font-medium !text-white/90 mb-4" style={{ fontFamily: "'Google Sans Flex', sans-serif" }}>
             Page Not Found
           </h2>
 
@@ -87,7 +97,7 @@ function NotFoundPage() {
 
           <button
             onClick={() => (window.location.href = "/")}
-            className="flex items-center gap-2 bg-x hover:bg-[#8f86ff] text-white font-bold py-3.5 px-8 rounded-xl transition-all"
+            className="flex items-center gap-2 bg-x hover:bg-[#8f86ff] text-white font-normal py-3.5 px-8 rounded-xl transition-all"
           >
             <Home size={18} />
             Back to Dashboard
