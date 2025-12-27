@@ -308,7 +308,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-Ajmal Razaq Bhatti - [@theajmalrazaq](https://github.com/theajmalrazaq)
+theajmalrazaq - [@theajmalrazaq](https://github.com/theajmalrazaq)
 
 Project Link: [https://github.com/theajmalrazaq/superflex](https://github.com/theajmalrazaq/superflex)
 

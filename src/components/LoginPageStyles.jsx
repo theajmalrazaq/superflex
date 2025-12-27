@@ -772,12 +772,20 @@ function LoginPageStyles() {
         </div>
         
         <p class="text-zinc-400 text-sm font-medium">
-          Crafted with obsession by <a href="https://github.com/theajmalrazaq" target="_blank" class="text-white hover:text-x transition-colors decoration-x/30 underline-offset-4 underline">Ajmal Razaq Bhatti</a>
+          Crafted with obsession by <a href="https://github.com/theajmalrazaq" target="_blank" class="text-white hover:text-x transition-colors decoration-x/30 underline-offset-4 underline">theajmalrazaq</a>
         </p>
     </div>
 
     <!-- Buttons Container -->
     <div id="login-buttons-container" class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8 hero-buttons px-4 sm:px-6 w-full sm:w-auto">
+    </div>
+
+    <!-- Privacy Policy Link -->
+    <div class="mt-8 relative z-10">
+        <a href="https://theajmalrazaq.github.io/superflex/docs.html?page=privacy" target="_blank" class="text-[10px] font-bold text-zinc-500 hover:text-x uppercase tracking-widest transition-colors flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Privacy Policy & Data Transparency
+        </a>
     </div>
 
     <!-- Review Marquee -->
