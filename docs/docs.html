@@ -196,40 +196,90 @@
           transparent 100%
         );
       }
+
+      /* Premium Mobile Menu */
+      #mobile-overlay {
+        clip-path: circle(0% at top right);
+        transition: clip-path 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+      }
+
+      #mobile-overlay.active {
+        clip-path: circle(150% at top right);
+      }
+
+      .mobile-link {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+      }
+
+      #mobile-overlay.active .mobile-link {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .mobile-link:hover span {
+        color: #a098ff;
+        padding-left: 8px;
+      }
+      
+      .mobile-link span {
+        transition: all 0.3s ease;
+      }
     </style>
   </head>
   <body>
     <!-- Standard Navbar from Index -->
+    <!-- Navigation Bar -->
     <nav
-      class="sticky top-5 w-fit mt-10 mx-auto z-50 bg-black/80 backdrop-blur-xl border border-white/10 rounded-full"
+      class="sticky top-5 w-[90%] sm:w-fit mt-10 mx-auto z-[100] bg-black/60 backdrop-blur-2xl border border-white/10 rounded-full"
+      id="main-nav"
     >
       <div class="flex items-center justify-between px-4 lg:px-6 py-3">
-        <div class="flex items-center gap-8">
+        <div class="flex items-center gap-4 lg:gap-8 w-full lg:w-auto justify-between lg:justify-start">
           <a href="index.html" class="flex items-center shrink-0">
-            <img src="res/logo_sec.svg" alt="Logo" class="h-7 lg:h-8 w-auto" />
+            <img src="res/logo_sec.svg" alt="Logo" class="h-6 lg:h-8 w-auto" />
           </a>
+          
           <div class="hidden lg:flex items-center gap-1">
-            <a
-              href="index.html"
-              class="flex items-center gap-2 px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 text-[13px] font-medium transition-all duration-300"
-              >Home</a
-            >
-            <a
-              href="docs.html?page=guide"
-              id="nav-guide"
-              class="flex items-center gap-2 px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 text-[13px] font-medium transition-all duration-300"
-              >AI Guide</a
-            >
-            <a
-              href="docs.html?page=technical"
-              id="nav-technical"
-              class="flex items-center gap-2 px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 text-[13px] font-medium transition-all duration-300"
-              >Behind the Scenes</a
-            >
+            <a href="index.html" id="nav-home" class="px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 text-[13px] font-medium transition-all duration-300">Home</a>
+            <a href="docs.html?page=guide" id="nav-guide" class="px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 text-[13px] font-medium transition-all duration-300">AI Guide</a>
+            <a href="docs.html?page=technical" id="nav-technical" class="px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 text-[13px] font-medium transition-all duration-300">Behind the Scenes</a>
+            <a href="docs.html?page=privacy" id="nav-privacy" class="px-4 py-2 rounded-full text-zinc-400 hover:text-white hover:bg-white/5 text-[13px] font-medium transition-all duration-300">Privacy</a>
           </div>
+
+          <!-- Mobile Toggle -->
+          <button id="mobile-toggle" class="lg:hidden relative w-10 h-10 flex items-center justify-center text-zinc-400">
+            <div class="flex flex-col gap-1.5 transition-all duration-300" id="hamburger">
+               <span class="w-5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center" id="line1"></span>
+               <span class="w-5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center" id="line2"></span>
+            </div>
+          </button>
         </div>
       </div>
     </nav>
+
+    <!-- Full Screen Mobile Overlay -->
+    <div id="mobile-overlay" class="fixed inset-0 z-[90] bg-black/40 backdrop-blur-3xl lg:hidden flex flex-col items-center justify-center pointer-events-none">
+       <div class="flex flex-col gap-8 text-center pointer-events-auto">
+          <a href="index.html" class="mobile-link group" style="transition-delay: 100ms;">
+            <span class="text-3xl font-medium text-white block">Home</span>
+            <span class="text-[#a098ff] text-[10px] uppercase tracking-widest font-black opacity-0 group-hover:opacity-100 transition-all">Start Here</span>
+          </a>
+          <a href="docs.html?page=guide" class="mobile-link group" style="transition-delay: 200ms;">
+            <span class="text-3xl font-medium text-zinc-400 block">AI Guide</span>
+            <span class="text-[#a098ff] text-[10px] uppercase tracking-widest font-black opacity-0 group-hover:opacity-100 transition-all">Unlock Power</span>
+          </a>
+          <a href="docs.html?page=technical" class="mobile-link group" style="transition-delay: 300ms;">
+            <span class="text-3xl font-medium text-zinc-400 block">Behind the Scenes</span>
+            <span class="text-[#a098ff] text-[10px] uppercase tracking-widest font-black opacity-0 group-hover:opacity-100 transition-all">Deep Dive Tech</span>
+          </a>
+          <a href="docs.html?page=privacy" class="mobile-link group" style="transition-delay: 400ms;">
+            <span class="text-3xl font-medium text-zinc-400 block">Privacy</span>
+            <span class="text-[#a098ff] text-[10px] uppercase tracking-widest font-black opacity-0 group-hover:opacity-100 transition-all">Your Data Matters</span>
+          </a>
+       </div>
+    </div>
 
     <!-- Main Content Container -->
     <main class="max-w-[800px] mx-auto px-6 mt-5 pb-24">
@@ -376,7 +426,7 @@
                 href="https://github.com/theajmalrazaq"
                 target="_blank"
                 class="text-zinc-500 hover:text-[#a098ff] transition-colors"
-                >ajmal</a
+                >theajmalrazaq</a
               >
             </p>
           </div>
@@ -406,6 +456,14 @@
             'A deep dive into the engineering decisions, "Parasitic Overlay" pattern, and security implementations.',
           image: "res/bts.png",
         },
+        privacy: {
+          file: "articles/privacy.md",
+          tag: "Policy",
+          title: "Privacy & Data Security",
+          subtitle:
+            "Our commitment to your security, transparency in how we handle your academic data, and your rights.",
+          image: "res/privacy.png",
+        },
       };
 
       const currentPage = pages[page] || pages.guide;
@@ -430,6 +488,7 @@
 
       if (page === "guide") setActiveNav("nav-guide");
       if (page === "technical") setActiveNav("nav-technical");
+      if (page === "privacy") setActiveNav("nav-privacy");
 
       // Init UI
       document.getElementById("page-tag").textContent = currentPage.tag;
@@ -476,6 +535,32 @@
           if (rtEl) rtEl.textContent = `${readTime} min read`;
         }
       };
+
+      // Mobile Menu Toggle
+      const mobileToggle = document.getElementById("mobile-toggle");
+      const mobileOverlay = document.getElementById("mobile-overlay");
+      const line1 = document.getElementById("line1");
+      const line2 = document.getElementById("line2");
+      const navPill = document.getElementById("main-nav");
+
+      if (mobileToggle) {
+        mobileToggle.addEventListener("click", () => {
+          const isActive = mobileOverlay.classList.toggle("active");
+          mobileOverlay.classList.toggle("pointer-events-none");
+          
+          if (isActive) {
+            line1.style.transform = "rotate(45deg) translateY(4px)";
+            line2.style.transform = "rotate(-45deg) translateY(-4px)";
+            navPill.classList.add("bg-white/10", "border-[#a098ff]/30");
+            document.body.style.overflow = "hidden";
+          } else {
+            line1.style.transform = "none";
+            line2.style.transform = "none";
+            navPill.classList.remove("bg-white/10", "border-[#a098ff]/30");
+            document.body.style.overflow = "auto";
+          }
+        });
+      }
 
       // Load Content
       async function loadContent() {
