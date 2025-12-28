@@ -772,7 +772,7 @@ function LoginPageStyles() {
         </div>
         
         <p class="text-zinc-400 text-sm font-medium">
-          Crafted with obsession by <a href="https://github.com/theajmalrazaq" target="_blank" class="text-white hover:text-x transition-colors decoration-x/30 underline-offset-4 underline">theajmalrazaq</a>
+          Crafted with obsession by <a href="https://github.com/theajmalrazaq" target="_blank" class="text-white hover:text-x transition-colors decoration-x/30 underline-offset-4 underline">Ajmal Razaq Bhatti</a>
         </p>
     </div>
 
