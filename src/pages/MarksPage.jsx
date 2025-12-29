@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
-import { AlertCircle, BookOpen, Bookmark, Layers, Award, Settings, X, RotateCcw, ChevronDown } from "lucide-react";
+import { AlertCircle, BookOpen, Bookmark, Layers, Award, Settings, X, RotateCcw, ChevronDown, Zap } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
@@ -383,13 +383,17 @@ const AssessmentView = ({
   courseId,
   onBestOf,
   onReset,
+  onToggleSimulation,
+  isSimulationMode,
 }) => {
   const [isBestOfOpen, setIsBestOfOpen] = useState(false);
   const isGrandTotal = section.title.includes("Grand Total");
   const isBestOfEligible =
+    !isGrandTotal && (
     section.title.toLowerCase().includes("quiz") ||
     section.title.toLowerCase().includes("assignment") ||
-    section.title.toLowerCase().includes("lab");
+    section.title.toLowerCase().includes("lab")
+    );
   const obtained = section.obtained || 0;
   const weight = section.weight || 0;
   const percentage = weight > 0 ? (obtained / weight) * 100 : 0;
@@ -434,14 +438,34 @@ const AssessmentView = ({
                   Final
                 </span>
               )}
+              {isSimulationMode && !isGrandTotal && (
+                 <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-500 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                 <Zap size={10} fill="currentColor" /> Simulating
+               </span>
+              )}
             </div>
             <p className="text-sm font-medium text-zinc-500">
               {section.rows?.length || 0} items &bull; Breakdown & Statistics
             </p>
           </div>
 
-          {isBestOfEligible && (
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            {!isGrandTotal && (
+              <button
+                onClick={onToggleSimulation}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-bold text-sm border ${
+                  isSimulationMode 
+                    ? "bg-amber-500 text-black border-amber-600" 
+                    : "bg-zinc-800 text-zinc-400 border-white/5 hover:bg-zinc-700"
+                }`}
+                title={isSimulationMode ? "Exit Simulation Mode" : "Enter Simulation Mode (Custom Weights)"}
+              >
+                <Zap size={16} fill={isSimulationMode ? "currentColor" : "none"} />
+                {isSimulationMode ? "Simulating" : "Simulate"}
+              </button>
+            )}
+
+            {isBestOfEligible && !isSimulationMode && (
               <button
                 onClick={() => setIsBestOfOpen(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl bg-x/10 text-x border border-x/20 hover:bg-x/20 transition-all font-bold text-sm"
@@ -449,6 +473,9 @@ const AssessmentView = ({
                 <Settings size={16} />
                 Best Of
               </button>
+            )}
+
+            {!isGrandTotal && (
               <button
                 onClick={onReset}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800 text-zinc-400 border border-white/5 hover:bg-zinc-700 hover:text-white transition-all font-bold text-sm"
@@ -457,8 +484,8 @@ const AssessmentView = ({
                 <RotateCcw size={16} />
                 Reset
               </button>
-            </div>
-          )}
+            )}
+          </div>
 
           <BestOfModal
             isOpen={isBestOfOpen}
@@ -505,6 +532,9 @@ const AssessmentView = ({
                   </th>
                   <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
                     Obtained
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold text-x uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
+                    Obt Weight
                   </th>
                   <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
                     Avg
@@ -597,6 +627,9 @@ const AssessmentView = ({
                             }`}
                           />
                         </td>
+                        <td className="px-6 py-4 text-center font-bold text-x bg-x/5">
+                          {(row.total > 0 ? (row.obtained / row.total) * row.weight : 0).toFixed(2)}
+                        </td>
                         <td className="px-6 py-4 text-center text-zinc-500">
                           ~{row.avg.toFixed(2)}
                         </td>
@@ -620,6 +653,7 @@ const AssessmentView = ({
                     {weight.toFixed(2)}
                   </td>
                   <td className="px-6 py-5 text-center">-</td>
+                  <td className="px-6 py-5 text-center text-zinc-400">-</td>
                   <td className="px-6 py-5 text-center text-x text-lg">
                     {obtained.toFixed(2)}
                   </td>
@@ -1037,6 +1071,12 @@ function MarksPage() {
       };
 
       const updatedSections = [...course.sections];
+      let newSimulationMode = course.simulationMode;
+
+      // Automatically enable simulation mode if weight is edited
+      if (field === "weight") {
+        newSimulationMode = true;
+      }
 
       // Update the modified row
       updatedSections[sectionIdx] = {
@@ -1044,7 +1084,7 @@ function MarksPage() {
         rows: newRows,
       };
 
-      const tempCourse = { ...course, sections: updatedSections };
+      const tempCourse = { ...course, sections: updatedSections, simulationMode: newSimulationMode };
       const recalculatedCourse = recalculateCourse(tempCourse);
 
       const newCourses = [...prevCourses];
@@ -1125,6 +1165,40 @@ function MarksPage() {
       const tempCourse = { ...course, sections: updatedSections };
       const recalculatedCourse = recalculateCourse(tempCourse);
 
+      const newCourses = [...prevCourses];
+      newCourses[courseIdx] = recalculatedCourse;
+      return newCourses;
+    });
+  };
+
+  const handleToggleSimulation = () => {
+    if (!selectedCourseId || !initialCoursesRef.current.length) return;
+    setCourses((prevCourses) => {
+      const courseIdx = prevCourses.findIndex((c) => c.id === selectedCourseId);
+      if (courseIdx === -1) return prevCourses;
+
+      const course = prevCourses[courseIdx];
+      const nextSimMode = !course.simulationMode;
+      
+      let newCourse;
+      if (!nextSimMode) {
+        // EXITING SIMULATION: Restore all sections from initial data
+        const initialCourse = initialCoursesRef.current.find(c => c.id === selectedCourseId);
+        if (initialCourse) {
+          // Clone initial course sections but set simulationMode to false
+          newCourse = { 
+            ...JSON.parse(JSON.stringify(initialCourse)), 
+            simulationMode: false 
+          };
+        } else {
+          newCourse = { ...course, simulationMode: false };
+        }
+      } else {
+        // ENTERING SIMULATION: Just flip the bit
+        newCourse = { ...course, simulationMode: true };
+      }
+      
+      const recalculatedCourse = recalculateCourse(newCourse);
       const newCourses = [...prevCourses];
       newCourses[courseIdx] = recalculatedCourse;
       return newCourses;
@@ -1218,6 +1292,8 @@ function MarksPage() {
                     handleBestOfUpdate(activeSectionId, count, weight)
                   }
                   onReset={() => handleResetSection(activeSectionId)}
+                  onToggleSimulation={handleToggleSimulation}
+                  isSimulationMode={selectedCourse.simulationMode}
                 />
               ) : selectedCourse.sections.length > 0 ? (
                 <AssessmentView
@@ -1243,6 +1319,8 @@ function MarksPage() {
                   onReset={() =>
                     handleResetSection(selectedCourse.sections[0].id)
                   }
+                  onToggleSimulation={handleToggleSimulation}
+                  isSimulationMode={selectedCourse.simulationMode}
                 />
               ) : (
                 <div className="text-center py-24 bg-zinc-900/50 rounded-[30px] border border-white/5 opacity-50">

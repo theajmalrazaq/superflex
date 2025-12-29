@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import { Award, BookOpen, Calendar, Calculator, Target, Info, RefreshCw, Zap, AlertTriangle, Scale,TrendingUp } from "lucide-react";
+import { Award, BookOpen, Calendar, Target, Info, RefreshCw, Zap, AlertTriangle, Scale,TrendingUp, X } from "lucide-react";
 import { MCA_DATA } from "../constants/mcaData";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
@@ -79,9 +79,16 @@ const CGPAPlannerModal = ({
       onClick={onClose}
     >
       <div
-        className="bg-black/20 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 w-full max-w-[420px] animate-in zoom-in-95 fade-in duration-300 relative overflow-hidden "
+        className="bg-zinc-900/90 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 w-full max-w-[420px] animate-in zoom-in-95 fade-in duration-300 relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 p-2 rounded-full hover:bg-white/5 text-zinc-500 hover:text-white transition-all z-10"
+        >
+          <X size={20} />
+        </button>
+
         <div className="absolute top-0 right-0 w-64 h-64 bg-x/5 blur-[80px] rounded-full -mr-32 -mt-32 pointer-events-none"></div>
 
         <div className="relative">
@@ -93,12 +100,12 @@ const CGPAPlannerModal = ({
               CGPA Planner
             </h2>
             <p className="text-zinc-400 font-medium text-sm mt-1">
-              Calculate your future strategy
+              Strategize your target CGPA
             </p>
           </div>
 
           <form onSubmit={calculate} className="space-y-6">
-            <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-xs font-bold text-white/50 uppercase tracking-widest ml-1">
                   Target CGPA
@@ -130,46 +137,59 @@ const CGPAPlannerModal = ({
 
             <button
               type="submit"
-              className="w-full h-[48px] bg-x hover:bg-[#8f86ff] text-white rounded-xl font-bold text-sm"
+              className="w-full h-[48px] bg-x hover:bg-[#8f86ff] text-white rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5"
             >
               Generate Strategy
             </button>
           </form>
 
           {result !== null && (
-            <div className="mt-8 p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">
-                Required GPA Strategy
-              </p>
-              {result > 4.0 ? (
-                <div className="text-rose-400">
-                  <p className="text-3xl font-bold tracking-tight mb-2">
-                    {result.toFixed(2)}
+            <div className="mt-8 animate-in slide-in-from-bottom-4 duration-500">
+              <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm flex items-center justify-between relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-x/5 blur-2xl rounded-full -mr-12 -mt-12 transition-all duration-500 group-hover:bg-x/10"></div>
+                
+                <div className="space-y-1 relative z-10">
+                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                    Required SGPA
                   </p>
-                  <div className="flex items-center gap-2 text-xs font-medium bg-rose-500/10 p-2 rounded-lg">
-                    <Info size={14} />
-                    Target unreachable in one semester.
-                  </div>
+                  
+                  {result > 4.0 ? (
+                    <p className="text-4xl font-bold text-rose-500 tracking-tighter">
+                      {result.toFixed(2)}
+                    </p>
+                  ) : result < 0 ? (
+                    <p className="text-4xl font-bold text-emerald-500 tracking-tighter">0.00</p>
+                  ) : (
+                    <p className="text-5xl font-bold text-white tracking-tighter">
+                      {result.toFixed(2)}
+                    </p>
+                  )}
                 </div>
-              ) : result < 0 ? (
-                <div className="text-x">
-                  <p className="text-3xl font-bold tracking-tight mb-2">0.00</p>
-                  <div className="flex items-center gap-2 text-xs font-medium bg-x/10 p-2 rounded-lg">
-                    <Zap size={14} />
-                    Target already achieved!
-                  </div>
+
+                <div className="text-right relative z-10">
+                   {result > 4.0 ? (
+                      <span className="px-3 py-1 bg-rose-500/10 text-rose-400 rounded-lg text-[10px] font-bold uppercase border border-rose-500/20">
+                        Unreachable
+                      </span>
+                   ) : result < 0 ? (
+                      <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-lg text-[10px] font-bold uppercase border border-emerald-500/20">
+                        Achieved
+                      </span>
+                   ) : (
+                      <span className="px-3 py-1 bg-x/10 text-x rounded-lg text-[10px] font-bold uppercase border border-x/20">
+                        Target Goal
+                      </span>
+                   )}
+                   <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-3">
+                     In {nextCH} Cr.Hrs
+                   </p>
                 </div>
-              ) : (
-                <div className="text-x">
-                  <p className="text-4xl font-bold tracking-tight mb-3">
-                    {result.toFixed(2)}
-                  </p>
-                  <p className="text-xs text-zinc-400 font-medium leading-relaxed">
-                    Maintain an average of{" "}
-                    <span className="text-white">{result.toFixed(2)}</span> in
-                    your next <span className="text-white">{nextCH}</span>{" "}
-                    credit hours.
-                  </p>
+              </div>
+
+              {result > 4.0 && (
+                <div className="mt-3 flex items-start gap-2 text-[11px] font-medium text-rose-400 bg-rose-500/5 p-3 rounded-xl border border-rose-500/10 italic">
+                  <AlertTriangle size={14} className="shrink-0" />
+                  Note: This target requires exceeding a 4.00 GPA in a single term.
                 </div>
               )}
             </div>
@@ -380,7 +400,7 @@ function TranscriptPage() {
   const [isMCALookupOpen, setIsMCALookupOpen] = useState(false);
   const [selectedMCA, setSelectedMCA] = useState("");
   const [alerts, setAlerts] = useState([]);
-  const [whatIfMode, setWhatIfMode] = useState(false);
+  const [simulationMode, setSimulationMode] = useState(false);
   const [overriddenGrades, setOverriddenGrades] = useState({});
 
   useEffect(() => {
@@ -808,18 +828,19 @@ function TranscriptPage() {
           </button>
           <button
             onClick={() =>
-              whatIfMode
-                ? (setOverriddenGrades({}), setWhatIfMode(false))
-                : setWhatIfMode(true)
+              simulationMode
+                ? (setOverriddenGrades({}), setSimulationMode(false))
+                : setSimulationMode(true)
             }
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-full border transition-all duration-300 text-xs font-bold ${
-              whatIfMode
-                ? "bg-x/10 text-x border-x/20"
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-full transition-all font-bold text-xs border ${
+              simulationMode
+                ? "bg-amber-500 text-black border-amber-600"
                 : "bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
             }`}
+             title={simulationMode ? "Exit Simulation Mode" : "Enter Simulation Mode (Edit Grades)"}
           >
-            <Calculator size={16} />
-            {whatIfMode ? "Abort Simulation" : "Simulation Lab"}
+            <Zap size={16} fill={simulationMode ? "currentColor" : "none"} />
+            {simulationMode ? "Simulating" : "Simulate"}
           </button>
         </PageHeader>
 
@@ -832,7 +853,7 @@ function TranscriptPage() {
             label="Cumulative GPA"
             value={calculatedStats?.currentCGPA.toFixed(2) || "0.00"}
             subValue={
-              whatIfMode ? `(Was ${originalCGPA.toFixed(2)})` : "Current"
+              simulationMode ? `(Was ${originalCGPA.toFixed(2)})` : "Current"
             }
             delay={0}
           />
@@ -1112,7 +1133,7 @@ function TranscriptPage() {
                                 </span>
                               </td>
                               <td className="px-6 py-4 text-center">
-                                {whatIfMode ? (
+                                {simulationMode ? (
                                   <select
                                     value={currentGrade}
                                     onChange={(e) =>
@@ -1228,7 +1249,7 @@ function TranscriptPage() {
                       <span className="text-4xl font-bold font-sans text-white tracking-tighter">
                         {calculatedStats?.currentCGPA.toFixed(2)}
                       </span>
-                      {whatIfMode && (
+                      {simulationMode && (
                         <div
                           className={`flex items-center gap-1 text-xs font-medium font-sans ${calculatedStats.currentCGPA >= originalCGPA ? "text-x" : "text-rose-400"}`}
                         >
@@ -1254,7 +1275,7 @@ function TranscriptPage() {
                           Changes
                         </span>
                       </span>
-                      {whatIfMode && (
+                      {simulationMode && (
                         <button
                           onClick={() => setOverriddenGrades({})}
                           className="p-1.5 text-zinc-600 hover:text-white transition-colors"

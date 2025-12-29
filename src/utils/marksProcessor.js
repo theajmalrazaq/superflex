@@ -29,6 +29,9 @@ export const processCourseMarks = (course) => {
       .filter((r) => r.title !== "Total")
       .reduce((acc, r) => acc + parseFloatOrZero(r.weight), 0);
 
+    // 2. Determine if we are in Simulation Mode
+    const isSimMode = course.simulationMode;
+
     // 3. Setup Items for Sorting (Capture original indices first)
     const sorted = rows
       .map((r, i) => ({ ...r, _originalIdx: i }))
@@ -47,39 +50,45 @@ export const processCourseMarks = (course) => {
         };
       });
 
-    // Sort by performance ratio descending
-    sorted.sort((a, b) => b._performanceRatio - a._performanceRatio);
-
-    // 2. Determine the cap (secWeight)
-    // If it's a Best-Of with an item limit, the weight budget is the dynamic sum of the best N items.
-    // Otherwise, we use section.weight (fixed target) or fallback to rowsWeightSum.
+    // 4. Determine the cap (secWeight) & Inclusion Logic
     let secWeight = section.weight;
-
-    if (
-      section.itemLimit &&
-      section.itemLimit > 0 &&
-      section.itemLimit < sorted.length
-    ) {
-      secWeight = sorted
-        .slice(0, section.itemLimit)
-        .reduce((acc, item) => acc + item.weight, 0);
-    } else if (secWeight === undefined || secWeight === null || secWeight <= 0) {
-      secWeight = rowsWeightSum;
-    }
-
-    // 4. Inclusion Logic (Greedy Fill)
-    let currentAccWeight = 0;
     const includedIndices = new Set();
     const EPSILON = 0.001;
-    const itemLimit = section.itemLimit || 999;
 
-    for (let item of sorted) {
+    if (isSimMode) {
+      // IN SIMULATION MODE: 
+      // 1. Total Weight = Sum of all items
+      // 2. All items are included
+      secWeight = rowsWeightSum;
+      sorted.forEach(item => includedIndices.add(item._originalIdx));
+    } else {
+      // IN NORMAL MODE: Apply Best-Of Logic
       if (
-        currentAccWeight < secWeight - EPSILON &&
-        includedIndices.size < itemLimit
+        section.itemLimit &&
+        section.itemLimit > 0 &&
+        section.itemLimit < sorted.length
       ) {
-        currentAccWeight += item.weight;
-        includedIndices.add(item._originalIdx);
+        secWeight = sorted
+          .slice(0, section.itemLimit)
+          .reduce((acc, item) => acc + item.weight, 0);
+      } else if (secWeight === undefined || secWeight === null || secWeight <= 0) {
+        secWeight = rowsWeightSum;
+      }
+
+      // Sort by performance ratio descending for Best-Of picking
+      sorted.sort((a, b) => b._performanceRatio - a._performanceRatio);
+
+      let currentAccWeight = 0;
+      const itemLimit = section.itemLimit || 999;
+
+      for (let item of sorted) {
+        if (
+          currentAccWeight < secWeight - EPSILON &&
+          includedIndices.size < itemLimit
+        ) {
+          currentAccWeight += item.weight;
+          includedIndices.add(item._originalIdx);
+        }
       }
     }
 
@@ -103,14 +112,18 @@ export const processCourseMarks = (course) => {
       usedWeightBudget = 0;
 
     const sortedIncluded = sorted
-      .filter((s) => includedIndices.has(s._originalIdx))
-      .sort((a, b) => b._performanceRatio - a._performanceRatio);
+      .filter((s) => includedIndices.has(s._originalIdx));
+
+    // For better stats in normal mode, we sort by performance ratio
+    if (!isSimMode) {
+      sortedIncluded.sort((a, b) => b._performanceRatio - a._performanceRatio);
+    }
 
     sortedIncluded.forEach((item) => {
       const remaining = secWeight - usedWeightBudget;
-      if (remaining <= EPSILON) return;
+      if (remaining <= EPSILON && !isSimMode) return;
 
-      const takenWeight = Math.min(item.weight, remaining);
+      const takenWeight = isSimMode ? item.weight : Math.min(item.weight, remaining);
       const weightRatio = secWeight > 0 ? takenWeight / secWeight : 0;
 
       calculatedSecObtained += (item.obtained / item.total) * takenWeight;
