@@ -1,17 +1,13 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import { LoadingSpinner } from "../components/ui/LoadingOverlay";
-import {
-  GraduationCap,
-  BookOpen,
-  Layers,
-  CheckCircle2,
-  TrendingUp,
-} from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
+import LoadingOverlay, {
+  LoadingSpinner,
+} from "../components/ui/LoadingOverlay";
+import { BookOpen, Layers, CheckCircle2, TrendingUp, GraduationCap } from "lucide-react";
 
 function StudyPlanPage() {
   const [loading, setLoading] = useState(true);

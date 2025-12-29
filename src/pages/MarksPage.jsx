@@ -1,26 +1,13 @@
-import { useEffect, useState, useRef, useMemo } from "react";
-import LoadingOverlay, {
-  LoadingSpinner,
-} from "../components/ui/LoadingOverlay";
-import PageLayout from "../components/layouts/PageLayout";
-import {
-  ChevronDown,
-  AlertCircle,
-  BookOpen,
-  Bookmark,
-  Layers,
-  AlertTriangle,
-  Award,
-  Activity,
-  BarChart2,
-  Settings,
-  X,
-  RotateCcw,
-} from "lucide-react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
+import { AlertCircle, BookOpen, Bookmark, Layers, Award, Settings, X, RotateCcw, ChevronDown } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
+import PageLayout from "../components/layouts/PageLayout";
+import LoadingOverlay, {
+  LoadingSpinner,
+} from "../components/ui/LoadingOverlay";
 
 import { parseFloatOrZero, processCourseMarks } from "../utils/marksProcessor";
 
@@ -897,23 +884,27 @@ function MarksPage() {
               (acc, r) => acc + (r.weight || 0),
               0,
             );
-            const useSecWeight = Math.max(secWeight, rowsWeightSum);
+            
+            // Respect server weightage if present, otherwise fallback to sum
+            // This enables "Best Of" logic when secWeight < rowsWeightSum
+            const useSecWeight = (secWeight > 0) ? secWeight : rowsWeightSum;
 
             if (useSecWeight > 0) {
-              let currentAccWeight = 0;
               const EPSILON = 0.001;
+              let currentAccWeight = 0;
 
+              // Sort by performance ratio (obtained/total) to pick the "best" items
               const sorted = [...rowsData].map((r, i) => {
                 const ratio = r.total > 0 ? r.obtained / r.total : 0;
-                const score = ratio * r.weight;
                 return {
                   ...r,
                   originalIdx: i,
-                  _sortScore: score,
+                  _performanceRatio: ratio,
                 };
               });
 
-              sorted.sort((a, b) => b._sortScore - a._sortScore);
+              // Sort descending by ratio
+              sorted.sort((a, b) => b._performanceRatio - a._performanceRatio);
 
               const includedIndices = new Set();
               for (let item of sorted) {
@@ -1034,19 +1025,26 @@ function MarksPage() {
       const section = course.sections[sectionIdx];
       const newRows = [...section.rows];
 
+      // Convert value for numeric fields
+      const numericValue =
+        field === "weight" || field === "obtained"
+          ? parseFloat(value) || 0
+          : value;
+
       newRows[rowIndex] = {
         ...newRows[rowIndex],
-        [field]: value,
+        [field]: numericValue,
       };
 
       const updatedSections = [...course.sections];
+
+      // Update the modified row
       updatedSections[sectionIdx] = {
         ...section,
         rows: newRows,
       };
 
       const tempCourse = { ...course, sections: updatedSections };
-
       const recalculatedCourse = recalculateCourse(tempCourse);
 
       const newCourses = [...prevCourses];
@@ -1084,23 +1082,11 @@ function MarksPage() {
         sorted.slice(0, numCount).map((item) => item.originalIdx),
       );
 
-      const weightPerItem = numCount > 0 ? numWeight / numCount : 0;
-
-      const newRows = section.rows.map((row, idx) => {
-        if (row.title === "Total") return row;
-        const isTop = topIndices.has(idx);
-        return {
-          ...row,
-          weight: isTop ? weightPerItem : 0,
-          included: isTop,
-        };
-      });
-
       const updatedSections = [...course.sections];
       updatedSections[sectionIdx] = {
         ...section,
-        rows: newRows,
         weight: numWeight,
+        itemLimit: numCount,
       };
 
       const tempCourse = { ...course, sections: updatedSections };

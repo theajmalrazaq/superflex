@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import { LoadingSpinner } from "../components/ui/LoadingOverlay";
-import {
-  AlertCircle,
-  BookOpen,
-  Calendar,
-  CheckCircle2,
-  Info,
-  Layers,
-  AlertTriangle,
-} from "lucide-react";
+import { BookOpen, Layers } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
+import LoadingOverlay, {
+  LoadingSpinner,
+} from "../components/ui/LoadingOverlay";
 
 function CourseRegistrationPage() {
   const [loading, setLoading] = useState(true);

@@ -4,18 +4,7 @@ import LoadingOverlay, {
   LoadingSpinner,
 } from "../components/ui/LoadingOverlay";
 import PageLayout from "../components/layouts/PageLayout";
-import {
-  CheckCircle2,
-  XCircle,
-  Calendar,
-  Clock,
-  BookOpen,
-  BarChart2,
-  AlertCircle,
-  ChevronDown,
-  Bookmark,
-  AlertTriangle,
-} from "lucide-react";
+import { CheckCircle2, XCircle, Calendar, Clock, BookOpen, BarChart2, ChevronDown, Bookmark } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";

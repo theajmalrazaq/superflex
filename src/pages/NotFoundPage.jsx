@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import { Home, AlertTriangle } from "lucide-react";
+import { Home } from "lucide-react";
 
 function NotFoundPage() {
   useEffect(() => {

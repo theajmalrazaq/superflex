@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import { LoadingSpinner } from "../components/ui/LoadingOverlay";
-import {
-  MessageSquare,
-  CheckCircle2,
-  AlertCircle,
-  BookOpen,
-  Clock,
-  Layout,
-  AlertTriangle,
-} from "lucide-react";
+import { CheckCircle2, BookOpen, Clock, Layout, MessageSquare } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
+import LoadingOverlay, {
+  LoadingSpinner,
+} from "../components/ui/LoadingOverlay";
 
 const FeedbackCard = ({ course, onAction, index }) => {
   const isPending = course.hasAction;

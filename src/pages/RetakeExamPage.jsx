@@ -1,26 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import { LoadingSpinner } from "../components/ui/LoadingOverlay";
-import {
-  CheckCircle2,
-  AlertCircle,
-  BookOpen,
-  Clock,
-  Layout,
-  FileText,
-  Download,
-  AlertTriangle,
-  ChevronDown,
-  ChevronRight,
-  ShieldCheck,
-  Upload,
-  X,
-  Info,
-} from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
+import LoadingOverlay, {
+  LoadingSpinner,
+} from "../components/ui/LoadingOverlay";
+import { AlertCircle, BookOpen, Layout, FileText, Download, AlertTriangle, ChevronDown, ChevronRight, ShieldCheck, Upload, X, CheckCircle2 } from "lucide-react";
 
 const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
   const [file, setFile] = useState(null);

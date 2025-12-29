@@ -1,19 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import { LoadingSpinner } from "../components/ui/LoadingOverlay";
-import {
-  BarChart3,
-  TrendingUp,
-  Target,
-  FileBarChart,
-  Layout,
-  Info,
-  AlertTriangle,
-} from "lucide-react";
+import { TrendingUp, Target, FileBarChart, Layout, Info } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
+import LoadingOverlay, {
+  LoadingSpinner,
+} from "../components/ui/LoadingOverlay";
 
 function MarksPloReportPage() {
   const [loading, setLoading] = useState(true);

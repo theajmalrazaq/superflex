@@ -3,7 +3,6 @@ import { useEffect } from "react";
 function LoginPageStyles() {
   useEffect(() => {
     localStorage.removeItem("superflex_ai_messages");
-    localStorage.removeItem("superflex_user_image");
 
     document
       .querySelectorAll(

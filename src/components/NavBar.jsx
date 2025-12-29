@@ -1,26 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
-import {
-  Home,
-  BookOpen,
-  Calendar,
-  Award,
-  BarChart,
-  FileText,
-  Receipt,
-  DollarSign,
-  MessageSquare,
-  Clock,
-  XCircle,
-  RefreshCw,
-  ListChecks,
-  GraduationCap,
-  LogOut,
-  Lock,
-  Menu,
-  X,
-  Sparkles,
-} from "lucide-react";
+import { Home, BookOpen, Calendar, Award, BarChart, FileText, Receipt, DollarSign, MessageSquare, Clock, XCircle, RefreshCw, ListChecks, GraduationCap, LogOut, Menu, X, Settings, User, ChevronDown } from "lucide-react";
+import ProfileImageModal from "./ui/ProfileImageModal";
 
 function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   const [menuLinks, setMenuLinks] = useState([]);
@@ -39,6 +19,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     "Grade Change Request": <RefreshCw />,
     "Tentative Study Plan": <ListChecks />,
     "Grade Report": <GraduationCap />,
+    Settings: <Settings />,
 
     default: <FileText />,
   };
@@ -71,6 +52,22 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     return () => {
       document.head.removeChild(styleElement);
     };
+  }, []);
+
+  const [profileImage, setProfileImage] = useState(
+    localStorage.getItem("superflex_user_custom_image") || 
+    "/Login/GetImage",
+  );
+
+  useEffect(() => {
+    const handleStorage = () => {
+      setProfileImage(
+        localStorage.getItem("superflex_user_custom_image") || 
+        "/Login/GetImage",
+      );
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
   useEffect(() => {
@@ -121,6 +118,11 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
       return links.filter((link) => link.text.trim() !== "Grade Report");
     };
+
+    const nameElem = document.querySelector(".m-card-user__name");
+    if (nameElem && nameElem.textContent.trim()) {
+      setUserName(nameElem.textContent.trim());
+    }
 
     const links = extractMenuLinks();
 
@@ -269,6 +271,9 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
   const [openDropdown, setOpenDropdown] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [userName, setUserName] = useState("Student Account");
+  const [isProfileExpanded, setIsProfileExpanded] = useState(false);
   const [openMobileCategories, setOpenMobileCategories] = useState({});
 
   useEffect(() => {
@@ -393,25 +398,71 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       {isMobileMenuOpen && (
         <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[90vw] max-w-[400px] bg-[#0c0c0c]/90 backdrop-blur-2xl border border-white/10 rounded-3xl p-4 z-[999] animate-in slide-in-from-top-4 fade-in duration-300">
           <div className="flex flex-col gap-4 max-h-[70vh] backdrop-blur-2xl overflow-y-auto scrollbar-hide">
-            {}
-            <div className="flex items-center gap-3 p-3 bg-white/5 rounded-2xl border border-white/5">
-              <div className="w-10 h-10 rounded-full bg-zinc-800 border border-white/5 overflow-hidden shrink-0">
-                <img
-                  src="/Login/GetImage"
-                  alt="User"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="flex flex-col overflow-hidden">
-                <span className="text-sm font-bold text-white truncate">
-                  Student Account
-                </span>
-                <a
-                  href="/Student/ChangePassword"
-                  className="text-xs text-x font-medium hover:underline"
-                >
-                  Settings
-                </a>
+            {/* Compact Mobile Profile Dropdown */}
+            <div className={`relative rounded-3xl overflow-hidden transition-all duration-300 ${isProfileExpanded ? "bg-zinc-900/80 border border-white/10" : "bg-zinc-900/40 border border-white/5 hover:bg-zinc-900/60"}`}>
+              <button 
+                onClick={() => setIsProfileExpanded(!isProfileExpanded)}
+                className="w-full flex items-center justify-between p-4"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <div className="w-10 h-10 rounded-full bg-zinc-800 border-2 border-white/10 overflow-hidden shrink-0 shadow-lg">
+                      <img
+                        src={profileImage}
+                        alt="User"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 p-0.5 bg-x text-white rounded-full shadow-lg border border-[#0c0c0c]">
+                      <User size={8} />
+                    </div>
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-white font-bold text-sm leading-tight truncate max-w-[150px]">{userName}</h3>
+                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none mt-0.5">Profile Info</p>
+                  </div>
+                </div>
+                <div className={`p-1.5 rounded-lg bg-white/5 text-zinc-400 transition-transform duration-300 ${isProfileExpanded ? "rotate-180" : ""}`}>
+                  <ChevronDown size={16} />
+                </div>
+              </button>
+
+              <div className={`overflow-y-auto transition-all duration-300 scrollbar-hide ${isProfileExpanded ? "max-h-60 border-t border-white/5" : "max-h-0"}`}>
+                <div className="p-4 flex flex-col gap-2">
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setIsProfileModalOpen(true);
+                      setIsProfileExpanded(false);
+                    }}
+                    className="flex items-center gap-3 w-full p-2.5 rounded-xl text-left hover:bg-white/5 transition-colors group"
+                  >
+                    <div className="p-2 bg-x/10 text-x rounded-lg group-hover:bg-x group-hover:text-white transition-colors">
+                      <User size={14} />
+                    </div>
+                    <span className="text-xs font-bold text-zinc-300 group-hover:text-white">Change DP</span>
+                  </button>
+                  
+                  <a 
+                    href="/Student/ChangePassword"
+                    className="flex items-center gap-3 w-full p-2.5 rounded-xl text-left hover:bg-white/5 transition-colors group no-underline"
+                  >
+                    <div className="p-2 bg-zinc-800 text-zinc-400 rounded-lg group-hover:bg-zinc-700 group-hover:text-white transition-colors">
+                      <Settings size={14} />
+                    </div>
+                    <span className="text-xs font-bold text-zinc-300 group-hover:text-white">Change Password</span>
+                  </a>
+
+                   <a 
+                    href="/Login/logout"
+                    className="flex items-center gap-3 w-full p-2.5 rounded-xl text-left hover:bg-rose-500/10 transition-colors group no-underline"
+                  >
+                    <div className="p-2 bg-rose-500/10 text-rose-500 rounded-lg group-hover:bg-rose-500 group-hover:text-white transition-colors">
+                      <LogOut size={14} />
+                    </div>
+                    <span className="text-xs font-bold text-rose-500/80 group-hover:text-rose-500">Logout</span>
+                  </a>
+                </div>
               </div>
             </div>
 
@@ -548,8 +599,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           </span>
         </button>
 
-        {}
-        <div className="relative dropdown-container">
+        <div className="relative dropdown-container hidden lg:block">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -558,7 +608,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
             className="flex items-center gap-3 px-3 py-2 rounded-full hover:bg-white/5 transition-all duration-200"
           >
             <img
-              src="/Login/GetImage"
+              src={profileImage}
               alt="Profile"
               className="h-8 w-8 rounded-full object-cover border border-white/10"
               onError={(e) => {
@@ -586,14 +636,21 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           {openDropdown === "profile" && (
             <div className="absolute right-0 top-full mt-2 z-[999] w-56 animate-in fade-in slide-in-from-top-2 duration-200">
               <div className="bg-black border border-white/10 rounded-2xl p-2 ">
-                <a
-                  href="/Student/ChangePassword"
+                <button
                   onClick={() => {
                     setOpenDropdown(null);
+                    setIsProfileModalOpen(true);
                   }}
+                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all text-left text-zinc-300 hover:text-white border-0 bg-transparent cursor-pointer"
+                >
+                  <User size={18} />
+                  <span className="text-sm font-medium">Change DP</span>
+                </button>
+                <a
+                  href="/Student/ChangePassword"
                   className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all text-left text-zinc-300 hover:text-white no-underline"
                 >
-                  <Lock size={18} />
+                  <Settings size={18} />
                   <span className="text-sm font-medium">Change Password</span>
                 </a>
                 <div className="h-px bg-white/10 my-1"></div>
@@ -609,6 +666,11 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           )}
         </div>
       </div>
+      <ProfileImageModal 
+        isOpen={isProfileModalOpen} 
+        onClose={() => setIsProfileModalOpen(false)} 
+        currentImage={profileImage}
+      />
     </div>
   );
 }

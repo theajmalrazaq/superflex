@@ -147,6 +147,21 @@ function HomePage() {
   const [profileSections, setProfileSections] = useState([]);
   const [activeMainTab, setActiveMainTab] = useState("stats");
   const [alerts, setAlerts] = useState([]);
+  const [profileImage, setProfileImage] = useState(
+    localStorage.getItem("superflex_user_custom_image") ||
+    "/Login/GetImage",
+  );
+
+  useEffect(() => {
+    const handleStorage = () => {
+      setProfileImage(
+        localStorage.getItem("superflex_user_custom_image") ||
+        "/Login/GetImage",
+      );
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
 
   const [attendanceData, setAttendanceData] = useState(null);
   const [currentAggregate, setCurrentAggregate] = useState({
@@ -655,7 +670,7 @@ function HomePage() {
               <div className="relative">
                 <div className="absolute -inset-4 bg-x/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition duration-700"></div>
                 <img
-                  src={localStorage.getItem("superflex_user_image") || "/Login/GetImage"}
+                  src={profileImage}
                   alt="Profile"
                   className="w-24 h-24 md:w-32 md:h-32 rounded-3xl object-cover bg-zinc-800 border-4 border-white/5 relative z-10"
                   onError={(e) => {

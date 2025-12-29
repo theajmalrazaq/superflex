@@ -2,13 +2,6 @@ import React, { useEffect, useState } from "react";
 import PageLayout from "../components/layouts/PageLayout";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
-import {
-  ShieldCheck,
-  Check,
-  KeyRound,
-  Lock,
-  AlertTriangle,
-} from "lucide-react";
 
 function ChangePasswordPage() {
   const [elemContent, setElemContent] = useState(null);

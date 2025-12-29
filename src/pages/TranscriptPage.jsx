@@ -1,33 +1,13 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import { useAiSync } from "../hooks/useAiSync";
-import LoadingOverlay, {
-  LoadingSpinner,
-} from "../components/ui/LoadingOverlay";
-import {
-  TrendingUp,
-  Award,
-  BookOpen,
-  Calendar,
-  ChevronRight,
-  Calculator,
-  Target,
-  Plus,
-  Minus,
-  Info,
-  ArrowRight,
-  Save,
-  RefreshCw,
-  Zap,
-  AlertTriangle,
-  Search,
-  Scale,
-} from "lucide-react";
+import { Award, BookOpen, Calendar, Calculator, Target, Info, RefreshCw, Zap, AlertTriangle, Scale,TrendingUp } from "lucide-react";
 import { MCA_DATA } from "../constants/mcaData";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
+import LoadingOverlay from "../components/ui/LoadingOverlay";
+import { useAiSync } from "../hooks/useAiSync";
 import {
   Chart as ChartJS,
   CategoryScale,
