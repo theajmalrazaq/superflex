@@ -292,12 +292,21 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
   );
 };
 
-const BestOfModal = ({ isOpen, onClose, onApply, itemCount }) => {
+const BestOfModal = ({ isOpen, onClose, onApply, itemCount, sectionTitle }) => {
   const [count, setCount] = useState(4);
   const [totalWeight, setTotalWeight] = useState(20);
 
-  if (!isOpen) return null;
+  const getItemType = () => {
+    const title = sectionTitle?.toLowerCase() || "";
+    if (title.includes("quiz")) return "Quiz";
+    if (title.includes("assignment")) return "Assignment";
+    if (title.includes("lab")) return "Lab";
+    return "Item";
+  };
 
+  const itemType = getItemType();
+
+  if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-zinc-900 border border-white/10 rounded-[2.5rem] w-full max-w-md overflow-hidden">
@@ -319,13 +328,17 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount }) => {
         <div className="p-8 space-y-6">
           <div className="space-y-2">
             <label className="text-sm font-bold text-zinc-400 uppercase tracking-wider">
-              Number of Best Items
+              Number of Best {itemType}{count > 1 ? itemType === "Quiz" ? "es" : "s" : ""}
             </label>
             <div className="relative">
               <input
                 type="number"
                 value={count}
-                onChange={(e) => setCount(parseInt(e.target.value) || 0)}
+                onChange={(e) =>
+                  setCount(
+                    e.target.value === "" ? "" : parseInt(e.target.value),
+                  )
+                }
                 max={itemCount}
                 min={1}
                 className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-x transition-all text-xl font-bold"
@@ -344,7 +357,11 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount }) => {
             <input
               type="number"
               value={totalWeight}
-              onChange={(e) => setTotalWeight(parseFloat(e.target.value) || 0)}
+              onChange={(e) =>
+                setTotalWeight(
+                  e.target.value === "" ? "" : parseFloat(e.target.value),
+                )
+              }
               className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-x transition-all text-xl font-bold"
               placeholder="e.g. 20"
             />
@@ -353,9 +370,9 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount }) => {
           <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex gap-3">
             <AlertCircle className="text-amber-400 shrink-0" size={18} />
             <p className="text-xs text-amber-200/70 leading-relaxed">
-              This will automatically pick the highest scoring {count} items and
-              assign them an equal portion of the {totalWeight}% total
-              weightage.
+              This will automatically pick the highest scoring {count} {itemType}
+              {count > 1 ? (itemType === "Quiz" ? "zes" : "s") : ""} and assign
+              them an equal portion of the {totalWeight}% total weightage.
             </p>
           </div>
 
@@ -460,6 +477,7 @@ const AssessmentView = ({
             isOpen={isBestOfOpen}
             onClose={() => setIsBestOfOpen(false)}
             itemCount={section.rows.filter((r) => r.title !== "Total").length}
+            sectionTitle={section.title}
             onApply={(count, weight) => {
               onBestOf(count, weight);
               setIsBestOfOpen(false);
@@ -875,15 +893,18 @@ function MarksPage() {
               secObtained = rowsData.reduce((acc, r) => acc + r.obtained, 0);
             }
 
-            const includeInStats = secWeight > 0;
+            const rowsWeightSum = rowsData.reduce(
+              (acc, r) => acc + (r.weight || 0),
+              0,
+            );
+            const useSecWeight = Math.max(secWeight, rowsWeightSum);
 
-            if (includeInStats) {
+            if (useSecWeight > 0) {
               let currentAccWeight = 0;
               const EPSILON = 0.001;
 
               const sorted = [...rowsData].map((r, i) => {
                 const ratio = r.total > 0 ? r.obtained / r.total : 0;
-
                 const score = ratio * r.weight;
                 return {
                   ...r,
@@ -896,7 +917,7 @@ function MarksPage() {
 
               const includedIndices = new Set();
               for (let item of sorted) {
-                if (currentAccWeight < secWeight - EPSILON) {
+                if (currentAccWeight < useSecWeight - EPSILON) {
                   currentAccWeight += item.weight;
                   includedIndices.add(item.originalIdx);
                 }
@@ -906,7 +927,7 @@ function MarksPage() {
                 r.included = includedIndices.has(i);
               });
 
-              globalWeightage += secWeight;
+              globalWeightage += useSecWeight;
               globalObtained += secObtained;
             }
 
@@ -916,7 +937,7 @@ function MarksPage() {
               secWeightedStd = 0;
 
             rowsData.forEach((r) => {
-              if (r.included && r.total > 0 && includeInStats) {
+              if (r.included && r.total > 0 && useSecWeight > 0) {
                 const ratio = r.weight / r.total;
                 secWeightedAvg += r.avg * ratio;
                 secWeightedMin += r.min * ratio;
@@ -933,7 +954,7 @@ function MarksPage() {
             sections.push({
               id: secId,
               title: secTitle,
-              weight: secWeight,
+              weight: useSecWeight,
               obtained: secObtained,
               rows: rowsData,
               stats: {
@@ -1037,6 +1058,9 @@ function MarksPage() {
   const handleBestOfUpdate = (sectionId, count, totalWeight) => {
     if (!selectedCourseId) return;
 
+    const numCount = parseInt(count) || 0;
+    const numWeight = parseFloat(totalWeight) || 0;
+
     setCourses((prevCourses) => {
       const courseIdx = prevCourses.findIndex((c) => c.id === selectedCourseId);
       if (courseIdx === -1) return prevCourses;
@@ -1057,10 +1081,10 @@ function MarksPage() {
         .sort((a, b) => b.ratio - a.ratio);
 
       const topIndices = new Set(
-        sorted.slice(0, count).map((item) => item.originalIdx),
+        sorted.slice(0, numCount).map((item) => item.originalIdx),
       );
 
-      const weightPerItem = count > 0 ? totalWeight / count : 0;
+      const weightPerItem = numCount > 0 ? numWeight / numCount : 0;
 
       const newRows = section.rows.map((row, idx) => {
         if (row.title === "Total") return row;
@@ -1076,7 +1100,7 @@ function MarksPage() {
       updatedSections[sectionIdx] = {
         ...section,
         rows: newRows,
-        weight: totalWeight,
+        weight: numWeight,
       };
 
       const tempCourse = { ...course, sections: updatedSections };

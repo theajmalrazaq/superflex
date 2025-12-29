@@ -1,6 +1,9 @@
 export const parseFloatOrZero = (value) => {
-  if (!value || value === "-" || value.trim() === "") return 0;
-  const cleaned = value.toString().replace(/[^0-9.-]/g, "");
+  if (value === null || value === undefined) return 0;
+  if (typeof value === "number") return value;
+  const str = value.toString();
+  if (str === "-" || str.trim() === "") return 0;
+  const cleaned = str.replace(/[^0-9.-]/g, "");
   const parsed = parseFloat(cleaned);
   return isNaN(parsed) ? 0 : parsed;
 };
@@ -21,13 +24,19 @@ export const processCourseMarks = (course) => {
   const processedSections = sectionsExceptTotal.map((section) => {
     let rows = [...section.rows];
 
-    const secWeight =
-      section.weight || rows.reduce((acc, r) => acc + r.weight, 0);
+    const rowsWeightSum = rows.reduce(
+      (acc, r) => acc + parseFloatOrZero(r.weight),
+      0,
+    );
+    const secWeight = rowsWeightSum;
 
     const sorted = rows.map((r, i) => {
-      const ratio = r.total > 0 ? r.obtained / r.total : 0;
-      const score = ratio * r.weight;
-      return { ...r, originalIdx: i, _sortScore: score };
+      const weight = parseFloatOrZero(r.weight);
+      const total = parseFloatOrZero(r.total);
+      const obtained = parseFloatOrZero(r.obtained);
+      const ratio = total > 0 ? obtained / total : 0;
+      const score = ratio * weight;
+      return { ...r, weight, total, obtained, originalIdx: i, _sortScore: score };
     });
 
     sorted.sort((a, b) => b._sortScore - a._sortScore);
@@ -45,6 +54,9 @@ export const processCourseMarks = (course) => {
 
     rows = rows.map((r, i) => ({
       ...r,
+      weight: r.weight === "" ? "" : parseFloatOrZero(r.weight),
+      total: r.total === "" ? "" : parseFloatOrZero(r.total),
+      obtained: r.obtained === "" ? "" : parseFloatOrZero(r.obtained),
       included: includedIndices.has(i),
     }));
 
