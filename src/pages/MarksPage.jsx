@@ -128,7 +128,7 @@ const SectionSelector = ({ sections, selectedId, onSelect }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (!selectedSection) return null;
+  if (!selectedSection || sections.length <= 1) return null;
 
   return (
     <div className="relative w-full md:w-auto z-40" ref={dropdownRef}>
@@ -389,13 +389,6 @@ const AssessmentView = ({
   const weight = section.weight || 0;
   const percentage = weight > 0 ? (obtained / weight) * 100 : 0;
 
-  const statusColor =
-    percentage >= 80
-      ? "text-emerald-400"
-      : percentage >= 60
-        ? "text-amber-400"
-        : "text-rose-400";
-
   const statusBg =
     percentage >= 80
       ? "bg-emerald-500/10"
@@ -410,22 +403,22 @@ const AssessmentView = ({
         ? "border-amber-500/20"
         : "border-rose-500/20";
 
+  const assessmentRows = section.rows?.filter((r) => r.title !== "Total") || [];
+  const hasAssessments = assessmentRows.length > 0;
+
   return (
     <div
       className={`group rounded-[2rem] border transition-all duration-300 overflow-hidden ${
         isGrandTotal
-          ? "bg-black/40 border-x/30 "
+          ? "bg-black/40 border-white/10"
           : "bg-zinc-900/50 border-white/5"
       }`}
     >
       <div className="w-full">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 border-b border-white/5">
-          {}
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
-              <h3 className={`text-xl font-bold text-white`}>
-                {section.title}
-              </h3>
+              <h3 className="text-xl font-bold text-white">{section.title}</h3>
               {isGrandTotal && (
                 <span className="px-2 py-0.5 rounded-md bg-x/20 text-x text-[10px] font-bold uppercase tracking-wider">
                   Final
@@ -437,13 +430,15 @@ const AssessmentView = ({
                 </span>
               )}
             </div>
-            <p className="text-sm font-medium text-zinc-500">
-              {section.rows?.length || 0} items &bull; Breakdown & Statistics
-            </p>
+            {hasAssessments && (
+              <p className="text-sm font-medium text-zinc-500">
+                {assessmentRows.length} items &bull; Breakdown & Statistics
+              </p>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
-            {!isGrandTotal && (
+            {!isGrandTotal && hasAssessments && (
               <button
                 onClick={onToggleSimulation}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-bold text-sm border ${
@@ -465,7 +460,7 @@ const AssessmentView = ({
               </button>
             )}
 
-            {isBestOfEligible && !isSimulationMode && (
+            {isBestOfEligible && !isSimulationMode && hasAssessments && (
               <button
                 onClick={() => setIsBestOfOpen(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl bg-x/10 text-x border border-x/20 hover:bg-x/20 transition-all font-bold text-sm"
@@ -475,7 +470,7 @@ const AssessmentView = ({
               </button>
             )}
 
-            {!isGrandTotal && (
+            {!isGrandTotal && hasAssessments && (
               <button
                 onClick={onReset}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800 text-zinc-400 border border-white/5 hover:bg-zinc-700 hover:text-white transition-all font-bold text-sm"
@@ -490,7 +485,7 @@ const AssessmentView = ({
           <BestOfModal
             isOpen={isBestOfOpen}
             onClose={() => setIsBestOfOpen(false)}
-            itemCount={section.rows.filter((r) => r.title !== "Total").length}
+            itemCount={assessmentRows.length}
             sectionTitle={section.title}
             onApply={(count, weight) => {
               onBestOf(count, weight);
@@ -499,7 +494,6 @@ const AssessmentView = ({
           />
         </div>
 
-        {}
         <div className="flex flex-wrap items-center gap-4 p-6 border-b border-white/5">
           <StatsCard
             icon={Layers}
@@ -516,6 +510,7 @@ const AssessmentView = ({
             className={`!p-4 !rounded-2xl !min-w-[150px] !gap-2 ${statusBg} ${borderColor}`}
           />
         </div>
+
         <div className="p-6">
           <div className="w-full overflow-x-auto rounded-xl border border-white/5 scrollbar-hide bg-black/20">
             <table className="w-full text-sm text-left border-collapse scrollbar-hide">
@@ -551,12 +546,9 @@ const AssessmentView = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {section.rows
-                  .filter((r) => r.title !== "Total")
-                  .map((row, idx) => {
+                {assessmentRows.map((row, idx) => {
                     const uniqueId = `${courseId}-${section.id}-${row.title}`;
                     const isMarked = markedItems?.has(uniqueId);
-
                     return (
                       <tr
                         key={idx}
@@ -609,7 +601,14 @@ const AssessmentView = ({
                           />
                         </td>
                         <td className="px-6 py-4 text-center text-zinc-400">
-                          {row.total.toFixed(1)}
+                          <input
+                            type="text"
+                            value={row.total}
+                            onChange={(e) =>
+                              onUpdate(idx, "total", e.target.value)
+                            }
+                            className="bg-transparent text-center w-16 focus:outline-none focus:border focus:border-x hover:bg-white/5 rounded transition-colors"
+                          />
                         </td>
                         <td className="px-6 py-4 text-center">
                           <input
@@ -661,16 +660,16 @@ const AssessmentView = ({
                     {obtained.toFixed(2)}
                   </td>
                   <td className="px-6 py-5 text-center text-zinc-400">
-                    ~{section.stats.weightedAvg.toFixed(2)}
+                    ~{section.stats?.weightedAvg.toFixed(2) || "0.00"}
                   </td>
                   <td className="px-6 py-5 text-center text-zinc-400">
-                    ~{section.stats.weightedStdDev.toFixed(2)}
+                    ~{section.stats?.weightedStdDev.toFixed(2) || "0.00"}
                   </td>
                   <td className="px-6 py-5 text-center text-zinc-400 text-xs">
-                    ~{section.stats.weightedMin.toFixed(2)}
+                    ~{section.stats?.weightedMin.toFixed(2) || "0.00"}
                   </td>
                   <td className="px-6 py-5 text-center text-zinc-400 text-xs">
-                    ~{section.stats.weightedMax.toFixed(2)}
+                    ~{section.stats?.weightedMax.toFixed(2) || "0.00"}
                   </td>
                 </tr>
               </tfoot>
@@ -999,20 +998,22 @@ function MarksPage() {
                 : 0,
           };
 
-          sections.push({
-            id: `${pane.id}-Grand_Total_Marks`,
-            title: "Grand Total Marks",
-            weight: globalWeightage,
-            obtained: globalObtained,
-            rows: [],
+          if (sections.length > 0) {
+            sections.push({
+              id: `${pane.id}-Grand_Total_Marks`,
+              title: "Grand Total Marks",
+              weight: globalWeightage,
+              obtained: globalObtained,
+              rows: [],
 
-            stats: {
-              weightedAvg: globalAverage,
-              weightedStdDev: globalStdDev,
-              weightedMin: globalMinimum,
-              weightedMax: globalMaximum,
-            },
-          });
+              stats: {
+                weightedAvg: globalAverage,
+                weightedStdDev: globalStdDev,
+                weightedMin: globalMinimum,
+                weightedMax: globalMaximum,
+              },
+            });
+          }
 
           parsedCourses.push({
             id: pane.id,
@@ -1059,7 +1060,7 @@ function MarksPage() {
       const newRows = [...section.rows];
 
       const numericValue =
-        field === "weight" || field === "obtained"
+        field === "weight" || field === "obtained" || field === "total"
           ? parseFloat(value) || 0
           : value;
 
@@ -1071,7 +1072,7 @@ function MarksPage() {
       const updatedSections = [...course.sections];
       let newSimulationMode = course.simulationMode;
 
-      if (field === "weight") {
+      if (field === "weight" || field === "total") {
         newSimulationMode = true;
       }
 
@@ -1322,10 +1323,17 @@ function MarksPage() {
                   isSimulationMode={selectedCourse.simulationMode}
                 />
               ) : (
-                <div className="text-center py-24 bg-zinc-900/50 rounded-[30px] border border-white/5 opacity-50">
-                  <div className="text-xl font-bold text-zinc-500">
-                    No assessments found
+                <div className="flex flex-col items-center justify-center py-32 text-center bg-zinc-900/40 border border-white/5 rounded-[3rem]">
+                  <div className="p-6 rounded-[2.5rem] bg-zinc-900/50 border border-white/5 mb-6 text-zinc-700">
+                    <Layers size={48} />
                   </div>
+                  <h4 className="text-2xl font-black text-zinc-500 tracking-tight mb-2">
+                    No Assessment Available
+                  </h4>
+                  <p className="text-zinc-600 max-w-xs mx-auto text-sm font-medium">
+                    The university hasn't uploaded any evaluation data for this
+                    course yet.
+                  </p>
                 </div>
               )}
             </div>
