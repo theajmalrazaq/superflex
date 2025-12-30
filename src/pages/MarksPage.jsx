@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
-import { AlertCircle, BookOpen, Bookmark, Layers, Award, Settings, X, RotateCcw, ChevronDown, Zap } from "lucide-react";
+import { AlertCircle, BookOpen, Bookmark, Layers, Award, Settings, X, RotateCcw, ChevronDown, Zap, Check } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
@@ -8,6 +8,9 @@ import PageLayout from "../components/layouts/PageLayout";
 import LoadingOverlay, {
   LoadingSpinner,
 } from "../components/ui/LoadingOverlay";
+import Modal from "../components/ui/Modal";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
 
 import { parseFloatOrZero, processCourseMarks } from "../utils/marksProcessor";
 
@@ -293,85 +296,56 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount, sectionTitle }) => {
 
   const itemType = getItemType();
 
-  if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-zinc-900 border border-white/10 rounded-[2.5rem] w-full max-w-md overflow-hidden">
-        <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-x/10 text-x">
-              <Settings size={20} />
-            </div>
-            <h3 className="text-xl font-bold text-white">Best Of Calculator</h3>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-white/10 rounded-full text-zinc-400 hover:text-white transition-colors"
-          >
-            <X size={20} />
-          </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Best Of Calculator"
+      subtitle={`Configure ${sectionTitle}`}
+      icon={<Settings size={24} />}
+      maxWidth="max-w-md"
+    >
+      <div className="space-y-8 pt-4">
+        <div className="space-y-6">
+          <Input 
+            label={`Number of Best ${itemType}${count > 1 ? (itemType === "Quiz" ? "es" : "s") : ""}`}
+            type="number"
+            value={count}
+            onChange={(e) => setCount(e.target.value === "" ? "" : parseInt(e.target.value))}
+            max={itemCount}
+            min={1}
+            placeholder="e.g. 4"
+            className="text-xl font-bold"
+          />
+
+          <Input 
+            label="Total Weightage (%)"
+            type="number"
+            value={totalWeight}
+            onChange={(e) => setTotalWeight(e.target.value === "" ? "" : parseFloat(e.target.value))}
+            placeholder="e.g. 20"
+            className="text-xl font-bold"
+          />
         </div>
 
-        <div className="p-8 space-y-6">
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-zinc-400 uppercase tracking-wider">
-              Number of Best {itemType}{count > 1 ? itemType === "Quiz" ? "es" : "s" : ""}
-            </label>
-            <div className="relative">
-              <input
-                type="number"
-                value={count}
-                onChange={(e) =>
-                  setCount(
-                    e.target.value === "" ? "" : parseInt(e.target.value),
-                  )
-                }
-                max={itemCount}
-                min={1}
-                className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-x transition-all text-xl font-bold"
-                placeholder="e.g. 4"
-              />
-              <span className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">
-                out of {itemCount}
-              </span>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-zinc-400 uppercase tracking-wider">
-              Total Weightage (%)
-            </label>
-            <input
-              type="number"
-              value={totalWeight}
-              onChange={(e) =>
-                setTotalWeight(
-                  e.target.value === "" ? "" : parseFloat(e.target.value),
-                )
-              }
-              className="w-full bg-black/40 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-x transition-all text-xl font-bold"
-              placeholder="e.g. 20"
-            />
-          </div>
-
-          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex gap-3">
-            <AlertCircle className="text-amber-400 shrink-0" size={18} />
-            <p className="text-xs text-amber-200/70 leading-relaxed">
-              This will automatically pick the highest scoring {count} {itemType}
-              {count > 1 ? (itemType === "Quiz" ? "zes" : "s") : ""} and assign
-              them an equal portion of the {totalWeight}% total weightage.
-            </p>
-          </div>
-
-          <button
-            onClick={() => onApply(count, totalWeight)}
-            className="w-full bg-x hover:bg-x/90 text-white font-bold py-4 rounded-2xl transition-all"
-          >
-            Apply Calculation
-          </button>
+        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex gap-4">
+          <AlertCircle className="text-amber-400 shrink-0" size={20} />
+          <p className="text-xs text-amber-200/70 leading-relaxed font-medium">
+            This will automatically pick the highest scoring {count} {itemType}
+            {count > 1 ? (itemType === "Quiz" ? "zes" : "s") : ""} and assign
+            them an equal portion of the {totalWeight}% total weightage.
+          </p>
         </div>
+
+        <Button 
+          onClick={() => onApply(count, totalWeight)}
+          className="w-full"
+          icon={<Check size={18} />}
+        >
+          Apply Calculation
+        </Button>
       </div>
-    </div>
+    </Modal>
   );
 };
 

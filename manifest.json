@@ -20,7 +20,8 @@
     "https://flexstudent.nu.edu.pk/*",
     "https://js.puter.com/*",
     "https://*.puter.site/*",
-    "https://puter-net.b-cdn.net/*"
+    "https://puter-net.b-cdn.net/*",
+    "https://api-gateway.umami.dev/*"
   ],
   "web_accessible_resources": [
     {

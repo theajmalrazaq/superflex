@@ -538,9 +538,9 @@ const SuperFlexAI = () => {
               )}
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-2 text-zinc-500 hover:text-white transition-colors"
+                className="p-2.5 text-zinc-500 hover:text-white hover:bg-white/5 rounded-full transition-all duration-300"
               >
-                <X size={24} />
+                <X size={20} />
               </button>
             </div>
           </div>

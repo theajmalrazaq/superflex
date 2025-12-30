@@ -7,6 +7,9 @@ import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
+import Modal from "../components/ui/Modal";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
 import { useAiSync } from "../hooks/useAiSync";
 import {
   Chart as ChartJS,
@@ -58,7 +61,7 @@ const CGPAPlannerModal = ({
   const [result, setResult] = useState(null);
 
   const calculate = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const target = parseFloat(targetCGPA);
     const nextHours = parseFloat(nextCH);
 
@@ -71,132 +74,92 @@ const CGPAPlannerModal = ({
     setResult(requiredGPA);
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300"
-      onClick={onClose}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="CGPA Planner"
+      subtitle="Strategize your target CGPA"
+      icon={<Target size={24} />}
+      maxWidth="max-w-[420px]"
     >
-      <div
-        className="bg-zinc-900/90 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 w-full max-w-[420px] animate-in zoom-in-95 fade-in duration-300 relative overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full hover:bg-white/5 text-zinc-500 hover:text-white transition-all z-10"
-        >
-          <X size={20} />
-        </button>
-
-        <div className="absolute top-0 right-0 w-64 h-64 bg-x/5 blur-[80px] rounded-full -mr-32 -mt-32 pointer-events-none"></div>
-
-        <div className="relative">
-          <div className="flex flex-col items-center text-center mb-8">
-            <div className="p-4 bg-x/10 rounded-2xl text-x mb-4">
-              <Target size={32} />
-            </div>
-            <h2 className="text-2xl font-bold text-white tracking-tight">
-              CGPA Planner
-            </h2>
-            <p className="text-zinc-400 font-medium text-sm mt-1">
-              Strategize your target CGPA
-            </p>
+      <div className="space-y-8 pt-4">
+        <form onSubmit={calculate} className="space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            <Input 
+              label="Target CGPA"
+              type="number"
+              step="0.01"
+              min="0"
+              max="4"
+              value={targetCGPA}
+              onChange={(e) => setTargetCGPA(e.target.value)}
+              placeholder="e.g. 3.70"
+            />
+            <Input 
+              label="Next Cr.Hrs"
+              type="number"
+              value={nextCH}
+              onChange={(e) => setNextCH(e.target.value)}
+              placeholder="e.g. 18"
+            />
           </div>
 
-          <form onSubmit={calculate} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-white/50 uppercase tracking-widest ml-1">
-                  Target CGPA
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  max="4"
-                  value={targetCGPA}
-                  onChange={(e) => setTargetCGPA(e.target.value)}
-                  placeholder="e.g. 3.70"
-                  className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-x/50 focus:ring-4 focus:ring-x/5 transition-all font-medium placeholder:text-white/20"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-white/50 uppercase tracking-widest ml-1">
-                  Next Cr.Hrs
-                </label>
-                <input
-                  type="number"
-                  value={nextCH}
-                  onChange={(e) => setNextCH(e.target.value)}
-                  placeholder="e.g. 18"
-                  className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-x/50 focus:ring-4 focus:ring-x/5 transition-all font-medium placeholder:text-white/20"
-                />
-              </div>
-            </div>
+          <Button type="submit" className="w-full">
+            Generate Strategy
+          </Button>
+        </form>
 
-            <button
-              type="submit"
-              className="w-full h-[48px] bg-x hover:bg-[#8f86ff] text-white rounded-xl font-bold text-sm transition-all hover:-translate-y-0.5"
-            >
-              Generate Strategy
-            </button>
-          </form>
-
-          {result !== null && (
-            <div className="mt-8 animate-in slide-in-from-bottom-4 duration-500">
-              <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm flex items-center justify-between relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-x/5 blur-2xl rounded-full -mr-12 -mt-12 transition-all duration-500 group-hover:bg-x/10"></div>
-                
-                <div className="space-y-1 relative z-10">
-                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-                    Required SGPA
+        {result !== null && (
+          <div className="animate-in slide-in-from-bottom-4 duration-500">
+            <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-sm flex items-center justify-between relative overflow-hidden group">
+              <div className="space-y-1 relative z-10">
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                  Required SGPA
+                </p>
+                {result > 4.0 ? (
+                  <p className="text-4xl font-bold text-rose-500 tracking-tighter">
+                    {result.toFixed(2)}
                   </p>
-                  
-                  {result > 4.0 ? (
-                    <p className="text-4xl font-bold text-rose-500 tracking-tighter">
-                      {result.toFixed(2)}
-                    </p>
-                  ) : result < 0 ? (
-                    <p className="text-4xl font-bold text-emerald-500 tracking-tighter">0.00</p>
-                  ) : (
-                    <p className="text-5xl font-bold text-white tracking-tighter">
-                      {result.toFixed(2)}
-                    </p>
-                  )}
-                </div>
-
-                <div className="text-right relative z-10">
-                   {result > 4.0 ? (
-                      <span className="px-3 py-1 bg-rose-500/10 text-rose-400 rounded-lg text-[10px] font-bold uppercase border border-rose-500/20">
-                        Unreachable
-                      </span>
-                   ) : result < 0 ? (
-                      <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-lg text-[10px] font-bold uppercase border border-emerald-500/20">
-                        Achieved
-                      </span>
-                   ) : (
-                      <span className="px-3 py-1 bg-x/10 text-x rounded-lg text-[10px] font-bold uppercase border border-x/20">
-                        Target Goal
-                      </span>
-                   )}
-                   <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-3">
-                     In {nextCH} Cr.Hrs
-                   </p>
-                </div>
+                ) : result < 0 ? (
+                  <p className="text-4xl font-bold text-emerald-500 tracking-tighter">0.00</p>
+                ) : (
+                  <p className="text-5xl font-bold text-white tracking-tighter">
+                    {result.toFixed(2)}
+                  </p>
+                )}
               </div>
 
-              {result > 4.0 && (
-                <div className="mt-3 flex items-start gap-2 text-[11px] font-medium text-rose-400 bg-rose-500/5 p-3 rounded-xl border border-rose-500/10 italic">
-                  <AlertTriangle size={14} className="shrink-0" />
-                  Note: This target requires exceeding a 4.00 GPA in a single term.
-                </div>
-              )}
+              <div className="text-right relative z-10 flex flex-col items-end gap-3">
+                 {result > 4.0 ? (
+                    <span className="px-3 py-1 bg-rose-500/10 text-rose-400 rounded-lg text-[10px] font-bold uppercase border border-rose-500/20">
+                      Unreachable
+                    </span>
+                 ) : result < 0 ? (
+                    <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-lg text-[10px] font-bold uppercase border border-emerald-500/20">
+                      Achieved
+                    </span>
+                 ) : (
+                    <span className="px-3 py-1 bg-x/10 text-x rounded-lg text-[10px] font-bold uppercase border border-x/20">
+                      Target Goal
+                    </span>
+                 )}
+                 <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                   In {nextCH} Cr.Hrs
+                 </p>
+              </div>
             </div>
-          )}
-        </div>
+
+            {result > 4.0 && (
+              <div className="mt-4 flex items-start gap-3 text-[11px] font-medium text-rose-400 bg-rose-500/5 p-4 rounded-2xl border border-rose-500/10 italic">
+                <AlertTriangle size={14} className="shrink-0 mt-0.5" />
+                <span>Note: This target requires exceeding a 4.00 GPA in a single term.</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    </div>
+    </Modal>
   );
 };
 
@@ -249,146 +212,108 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
     setResult({ grade: detectedGrade, thresholds: thresholds });
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300"
-      onClick={onClose}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Relative Grade Lookup"
+      subtitle="Determine grade based on MCA thresholds"
+      icon={<Scale size={24} />}
     >
-      <div
-        className="bg-zinc-900/90 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 w-full max-w-[500px] animate-in zoom-in-95 fade-in duration-300 relative overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-x/5 blur-[80px] rounded-full -mr-32 -mt-32 pointer-events-none"></div>
-
-        <div className="relative">
-          <div className="flex flex-col items-center text-center mb-8">
-            <div className="p-4 bg-x/10 rounded-2xl text-x mb-4">
-              <Scale size={32} />
-            </div>
-            <h2 className="text-2xl font-bold text-white tracking-tight">
-              Relative Grade Lookup
-            </h2>
-            <p className="text-zinc-400 font-medium text-sm mt-1">
-              Determine grade based on MCA thresholds
-            </p>
+      <div className="space-y-8 pt-4">
+        <form onSubmit={calculateGrade} className="space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            <Input 
+              label="Rounded MCA"
+              type="number"
+              value={mca}
+              onChange={(e) => setMca(e.target.value)}
+              placeholder="30-91"
+            />
+            <Input 
+              label="Total Marks"
+              type="number"
+              value={marks}
+              onChange={(e) => setMarks(e.target.value)}
+              placeholder="e.g. 65"
+            />
           </div>
 
-          <form onSubmit={calculateGrade} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-white/50 uppercase tracking-widest ml-1">
-                  Rounded MCA
-                </label>
-                <input
-                  type="number"
-                  value={mca}
-                  onChange={(e) => setMca(e.target.value)}
-                  placeholder="30-91"
-                  className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-x/50 focus:ring-4 focus:ring-x/5 transition-all font-medium placeholder:text-white/20"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-white/50 uppercase tracking-widest ml-1">
-                  Total Marks
-                </label>
-                <input
-                  type="number"
-                  value={marks}
-                  onChange={(e) => setMarks(e.target.value)}
-                  placeholder="e.g. 65"
-                  className="w-full h-[45px] bg-white/5 border border-white/10 rounded-xl px-4 text-white focus:outline-none focus:border-x/50 focus:ring-4 focus:ring-x/5 transition-all font-medium placeholder:text-white/20"
-                />
-              </div>
-            </div>
+          <Button type="submit" className="w-full">
+            Lookup Grade
+          </Button>
+        </form>
 
-            <button
-              type="submit"
-              className="w-full h-[48px] bg-x hover:bg-[#8f86ff] text-white rounded-xl font-bold text-sm transition-all"
-            >
-              Lookup Grade
-            </button>
-          </form>
-
-          {result && (
-            <div className="mt-8 space-y-4">
-              {result.error ? (
-                <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-bold flex items-center gap-2">
-                  <AlertTriangle size={14} />
-                  {result.error}
-                </div>
-              ) : (
-                <>
-                  <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm flex items-center justify-between">
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-                        Predicted Grade
-                      </p>
-                      <p className="text-4xl font-black text-white tracking-tighter">
-                        {result.grade}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">
-                        At MCA {Math.round(mca)}
-                      </p>
-                      <div className="flex flex-wrap justify-end gap-1 max-w-[200px]">
-                        {Object.entries(result.thresholds)
-                          .filter(([_, val]) => val !== null)
-                          .reverse()
-                          .slice(0, 4)
-                          .map(([g, val]) => (
-                            <span
-                              key={g}
-                              className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
-                                g === result.grade
-                                  ? "bg-x text-white"
-                                  : "bg-white/5 text-zinc-500"
-                              }`}
-                            >
-                              {g}: {val}+
-                            </span>
-                          ))}
-                      </div>
-                    </div>
+        {result && (
+          <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+            {result.error ? (
+              <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-bold flex items-center gap-3">
+                <AlertTriangle size={16} className="shrink-0" />
+                {result.error}
+              </div>
+            ) : (
+              <>
+                <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-sm flex items-center justify-between">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                      Predicted Grade
+                    </p>
+                    <p className="text-4xl font-black text-white tracking-tighter">
+                      {result.grade}
+                    </p>
                   </div>
-
-                  <div className="grid grid-cols-4 gap-2">
-                    {Object.entries(result.thresholds)
-                      .filter(([_, val]) => val !== null)
-                      .map(([g, val]) => (
-                        <div
-                          key={g}
-                          className={`p-2 rounded-lg border text-center transition-all ${
-                            g === result.grade
-                              ? "bg-x/10 border-x/50"
-                              : "bg-white/5 border-white/5"
-                          }`}
-                        >
-                          <p className="text-[9px] font-bold text-zinc-500 uppercase">
-                            {g}
-                          </p>
-                          <p
-                            className={`text-xs font-bold ${
+                  <div className="text-right">
+                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">
+                      At MCA {Math.round(mca)}
+                    </p>
+                    <div className="flex flex-wrap justify-end gap-1.5 max-w-[200px]">
+                      {Object.entries(result.thresholds)
+                        .filter(([_, val]) => val !== null)
+                        .reverse()
+                        .slice(0, 4)
+                        .map(([g, val]) => (
+                          <span
+                            key={g}
+                            className={`text-[9px] font-black px-2 py-1 rounded-md border transition-all ${
                               g === result.grade
-                                ? "text-white"
-                                : "text-zinc-400"
+                                ? "bg-x border-x text-white shadow-lg shadow-x/20"
+                                : "bg-white/5 border-white/5 text-zinc-500"
                             }`}
                           >
-                            {val}
-                            {g === "F" ? " (max)" : "+"}
-                          </p>
-                        </div>
-                      ))}
+                            {g}: {val}+
+                          </span>
+                        ))}
+                    </div>
                   </div>
-                </>
-              )}
-            </div>
-          )}
-        </div>
+                </div>
+
+                <div className="grid grid-cols-4 gap-2.5">
+                  {Object.entries(result.thresholds)
+                    .filter(([_, val]) => val !== null)
+                    .map(([g, val]) => (
+                      <div
+                        key={g}
+                        className={`p-3 rounded-2xl border transition-all duration-300 ${
+                          g === result.grade
+                            ? "bg-x/10 border-x/30 shadow-lg shadow-x/10"
+                            : "bg-white/[0.02] border-white/5 hover:bg-white/[0.04]"
+                        }`}
+                      >
+                        <p className={`text-[10px] font-bold uppercase tracking-wider mb-1 ${g === result.grade ? "text-x" : "text-zinc-600"}`}>
+                          {g}
+                        </p>
+                        <p className={`text-xs font-black ${g === result.grade ? "text-white" : "text-zinc-400"}`}>
+                          {val}{g === "F" ? "" : "+"}
+                        </p>
+                      </div>
+                    ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
-    </div>
+    </Modal>
   );
 };
 

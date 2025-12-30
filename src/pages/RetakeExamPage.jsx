@@ -7,56 +7,42 @@ import SuperTabs from "../components/ui/SuperTabs";
 import LoadingOverlay, {
   LoadingSpinner,
 } from "../components/ui/LoadingOverlay";
-import { AlertCircle, BookOpen, Layout, FileText, Download, AlertTriangle, ChevronDown, ChevronRight, ShieldCheck, Upload, X, CheckCircle2 } from "lucide-react";
+import { AlertCircle, BookOpen, Layout, FileText, Download, AlertTriangle, ChevronDown, ChevronRight, ShieldCheck, Upload, X, CheckCircle2, Check, Shield } from "lucide-react";
+import Modal from "../components/ui/Modal";
+import Button from "../components/ui/Button";
+import Input, { TextArea } from "../components/ui/Input";
 
 const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
   const [file, setFile] = useState(null);
   const [remarks, setRemarks] = useState("");
   const fileInputRef = useRef(null);
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
-        onClick={onClose}
-      />
-      <div className="relative w-full max-w-lg bg-zinc-900 border border-white/10 rounded-[2rem] p-6 animate-in zoom-in-95 duration-300 space-y-6">
-        <div className="flex justify-between items-start">
-          <div className="space-y-0.5">
-            <h2 className="text-xl font-black text-white tracking-tight">
-              Request Details
-            </h2>
-            <p className="text-x text-[9px] font-black uppercase tracking-widest">
-              Retake Exam Submission
-            </p>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Request Details"
+      subtitle="Retake Exam Submission"
+      icon={<FileText size={24} />}
+    >
+      <div className="space-y-6 pt-4">
+        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-4">
+          <div className="p-2 bg-amber-500/20 rounded-xl text-amber-500">
+            <AlertTriangle size={18} />
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-zinc-400 hover:text-white transition-all"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-3">
-          <div className="p-1.5 bg-amber-500/20 rounded-lg text-amber-500">
-            <AlertTriangle size={14} />
-          </div>
-          <p className="text-[10px] font-bold text-amber-500/90 leading-tight">
+          <p className="text-xs font-bold text-amber-500/90 leading-tight">
             Important: Fee of Rs. {fee} will be charged upon submission.
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="space-y-2">
-            <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest px-1">
+            <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">
               Evidence Documentation
             </label>
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="group relative border-2 border-dashed border-white/5 hover:border-x/30 rounded-2xl p-4 transition-all cursor-pointer bg-white/[0.02] hover:bg-white/[0.04]"
+              className="group relative border-2 border-dashed border-white/5 hover:border-x/30 rounded-2xl p-6 transition-all cursor-pointer bg-white/[0.02] hover:bg-white/[0.04]"
             >
               <input
                 type="file"
@@ -65,149 +51,125 @@ const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
                 onChange={(e) => setFile(e.target.files[0])}
                 className="hidden"
               />
-              <div className="flex flex-col items-center gap-2 text-center">
-                <div className="p-3 bg-x/10 rounded-xl text-x group-hover:scale-110 transition-transform">
-                  <Upload size={18} />
+              <div className="flex flex-col items-center gap-3 text-center">
+                <div className="p-4 bg-x/10 rounded-2xl text-x group-hover:scale-110 transition-transform duration-300">
+                  <Upload size={24} />
                 </div>
-                <div className="space-y-0.5">
-                  <p className="text-xs font-bold text-white truncate max-w-[200px]">
+                <div className="space-y-1">
+                  <p className="text-sm font-bold text-white truncate max-w-[250px]">
                     {file ? file.name : "Upload Form (PDF)"}
                   </p>
-                  <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest">
+                  <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
                     {file
                       ? `${(file.size / 1024 / 1024).toFixed(2)} MB`
-                      : "Max 3MB"}
+                      : "Max 3MB • Combined ONE File"}
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest px-1">
-              Applicant Remarks
-            </label>
-            <textarea
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
-              placeholder="Provide details..."
-              className="w-full bg-white/[0.02] border border-white/5 text-white p-4 rounded-2xl text-xs font-medium focus:outline-none focus:ring-1 focus:ring-x/30 transition-all min-h-[80px] resize-none"
-            />
-          </div>
+          <TextArea 
+            label="Applicant Remarks"
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value)}
+            placeholder="Provide necessary context or details for your request..."
+          />
         </div>
 
-        <button
+        <Button 
           onClick={() => onSubmit(file, remarks)}
           disabled={!file || !remarks}
-          className="w-full bg-x hover:bg-[#b0a8ff] disabled:bg-zinc-800 disabled:text-zinc-600 text-white px-6 py-4 rounded-xl font-bold uppercase"
+          className="w-full"
+          icon={<Check size={18} />}
         >
           Confirm & Submit Request
-        </button>
+        </Button>
       </div>
-    </div>
+    </Modal>
   );
 };
 
 const InstructionsModal = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
-        onClick={onClose}
-      />
-      <div className="relative w-full max-w-lg bg-zinc-900 border border-white/10 rounded-[2rem] animate-in zoom-in-95 duration-300 overflow-hidden flex flex-col max-h-[85vh]">
-        <div className="p-5 border-b border-white/5 flex justify-between items-center bg-zinc-900/50 backdrop-blur-xl shrink-0">
-          <div className="space-y-0.5">
-            <h2 className="text-lg font-black text-white tracking-tight">
-              Rules & Procedures
-            </h2>
-            <p className="text-x text-[9px] font-black uppercase tracking-[0.2em]">
-              Exam Framework
-            </p>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Rules & Procedures"
+      subtitle="Exam Framework"
+      icon={<Shield size={24} />}
+    >
+      <div className="space-y-8 pt-4">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 px-1">
+            <div className="w-1.5 h-5 bg-x rounded-full"></div>
+            <h3 className="text-sm font-black text-white uppercase tracking-widest">
+              Eligible Situations
+            </h3>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-zinc-400 hover:text-white transition-all"
-          >
-            <X size={18} />
-          </button>
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              {
+                title: "Hospitalization",
+                desc: "Severe illness with records",
+              },
+              { title: "Bereavement", desc: "First relative death docs" },
+              { title: "Marriage", desc: "Self/Siblings with receipts" },
+              { title: "Special Cases", desc: "Director's advance approval" },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2 hover:bg-white/[0.04] transition-colors"
+              >
+                <h4 className="text-[11px] font-black text-x uppercase tracking-wider">
+                  {item.title}
+                </h4>
+                <p className="text-[10px] text-zinc-500 leading-relaxed font-bold">
+                  {item.desc}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="p-5 overflow-y-auto scrollbar-hide flex-1 space-y-6 text-left">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-1 h-4 bg-x rounded-full"></div>
-              <h3 className="text-sm font-black text-white uppercase tracking-wider">
-                Eligible Situations
-              </h3>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                {
-                  title: "Hospitalization",
-                  desc: "Severe illness with records",
-                },
-                { title: "Bereavement", desc: "First relative death docs" },
-                { title: "Marriage", desc: "Self/Siblings with receipts" },
-                { title: "Special Cases", desc: "Director's advance approval" },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1"
-                >
-                  <h4 className="text-[10px] font-black text-white uppercase">
-                    {item.title}
-                  </h4>
-                  <p className="text-[9px] text-zinc-500 leading-tight font-medium">
-                    {item.desc}
-                  </p>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 px-1">
+            <div className="w-1.5 h-5 bg-x rounded-full"></div>
+            <h3 className="text-sm font-black text-white uppercase tracking-widest">
+              Submission Protocol
+            </h3>
+          </div>
+          <div className="space-y-3">
+            {[
+              "Submit within specified dates only.",
+              "Combine Form + Evidence into SINGLE PDF (< 3MB).",
+              "Rs. 2,000 per paper processing fee.",
+              "Select all papers in one application.",
+            ].map((step, i) => (
+              <div
+                key={i}
+                className="flex gap-4 p-3 rounded-2xl hover:bg-white/[0.02] transition-colors group border border-transparent hover:border-white/5"
+              >
+                <div className="w-6 h-6 rounded-full bg-x/10 border border-x/20 flex items-center justify-center text-x text-[10px] font-black shrink-0 group-hover:scale-110 transition-transform">
+                  {i + 1}
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-1 h-4 bg-x rounded-full"></div>
-              <h3 className="text-sm font-black text-white uppercase tracking-wider">
-                Submission Protocol
-              </h3>
-            </div>
-            <div className="space-y-2">
-              {[
-                "Submit within specified dates only.",
-                "Combine Form + Evidence into SINGLE PDF (< 3MB).",
-                "Rs. 2,000 per paper processing fee.",
-                "Select all papers in one application.",
-              ].map((step, i) => (
-                <div
-                  key={i}
-                  className="flex gap-3 p-2 rounded-lg hover:bg-white/[0.02] transition-colors group"
-                >
-                  <div className="w-5 h-5 rounded-full bg-x/10 border border-x/20 flex items-center justify-center text-x text-[9px] font-black shrink-0">
-                    {i + 1}
-                  </div>
-                  <p className="text-[11px] text-zinc-400 font-medium leading-relaxed">
-                    {step}
-                  </p>
-                </div>
-              ))}
-            </div>
+                <p className="text-xs text-zinc-400 font-bold leading-relaxed">
+                  {step}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="p-5 border-t border-white/5 bg-zinc-900/50 shrink-0">
-          <button
-            onClick={onClose}
-            className="w-full bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all"
-          >
-            Understood, Close
-          </button>
-        </div>
+        <Button 
+          variant="secondary"
+          onClick={onClose}
+          className="w-full"
+        >
+          Understood, Close
+        </Button>
       </div>
-    </div>
+    </Modal>
   );
 };
 

@@ -8,6 +8,9 @@ import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
+import Modal from "../components/ui/Modal";
+import Button from "../components/ui/Button";
+import { TextArea } from "../components/ui/Input";
 
 const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
   const [remarks, setRemarks] = useState("");
@@ -17,8 +20,6 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
     cnicBack: null,
   });
   const MAX_SIZE = 0.63 * 1024 * 1024;
-
-  if (!isOpen) return null;
 
   const handleFileChange = (key, file) => {
     if (file && file.size > MAX_SIZE) {
@@ -34,39 +35,24 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
     remarks.trim() && files.withdrawForm && files.cnicFront && files.cnicBack;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
-        onClick={onClose}
-      />
-      <div className="relative w-full max-w-lg bg-zinc-900 border border-white/10 rounded-[2rem] p-6 animate-in zoom-in-95 duration-300 space-y-6 max-h-[90vh] overflow-y-auto scrollbar-hide scrollbar-hide">
-        <div className="flex justify-between items-start">
-          <div className="space-y-0.5">
-            <h2 className="text-xl font-black text-white tracking-tight">
-              Withdrawal Intake
-            </h2>
-            <p className="text-x text-[9px] font-black uppercase tracking-widest">
-              Complete Documentation Required
-            </p>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Withdrawal Intake"
+      subtitle="Complete Documentation Required"
+      icon={<FileText size={24} />}
+    >
+      <div className="space-y-6 pt-4">
+        <div className="p-4 rounded-2xl bg-x/5 border border-x/10 flex items-center gap-4">
+          <div className="p-2 bg-x/20 rounded-xl text-x">
+            <Info size={18} />
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-zinc-400 hover:text-white transition-all"
-          >
-            <X size={18} />
-          </button>
-        </div>
-
-        <div className="p-3 rounded-xl bg-x/5 border border-x/10 flex items-center gap-3">
-          <div className="p-1.5 bg-x/20 rounded-lg text-x">
-            <Info size={14} />
-          </div>
-          <p className="text-[10px] font-bold text-x/90 leading-tight">
+          <p className="text-xs font-bold text-x/90 leading-tight">
             Important: Uploaded images must be under 650KB each.
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="grid grid-cols-1 gap-4">
             {[
               { key: "withdrawForm", label: "Withdraw Form", icon: FileText },
@@ -74,11 +60,11 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
               { key: "cnicBack", label: "CNIC Back", icon: CreditCard },
             ].map((input) => (
               <div key={input.key} className="space-y-2">
-                <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest px-1">
+                <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">
                   {input.label}
                 </label>
                 <div
-                  className="group relative border-2 border-dashed border-white/5 hover:border-x/30 rounded-2xl p-4 transition-all cursor-pointer bg-white/[0.02] hover:bg-white/[0.04] overflow-hidden"
+                  className="group relative border-2 border-dashed border-white/5 hover:border-x/30 rounded-2xl p-5 transition-all cursor-pointer bg-white/[0.02] hover:bg-white/[0.04] overflow-hidden"
                   onClick={() =>
                     document.getElementById(`file-${input.key}`).click()
                   }
@@ -92,17 +78,17 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
                       handleFileChange(input.key, e.target.files[0])
                     }
                   />
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-white/5 rounded-xl text-zinc-400 group-hover:text-x group-hover:bg-x/10 transition-all">
-                      <input.icon size={18} />
+                  <div className="flex items-center gap-5">
+                    <div className="p-4 bg-white/5 rounded-2xl text-zinc-400 group-hover:text-x group-hover:bg-x/10 transition-all">
+                      <input.icon size={20} />
                     </div>
-                    <div className="space-y-0.5 flex-1 min-w-0">
-                      <p className="text-xs font-bold text-white truncate px-1">
+                    <div className="space-y-1 flex-1 min-w-0">
+                      <p className="text-sm font-bold text-white truncate px-1">
                         {files[input.key]
                           ? files[input.key].name
                           : `Select ${input.label}`}
                       </p>
-                      <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest px-1">
+                      <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest px-1">
                         {files[input.key]
                           ? `${(files[input.key].size / 1024).toFixed(0)} KB`
                           : "Image Store (Max 650KB)"}
@@ -114,129 +100,104 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
             ))}
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest px-1">
-              Reason for Withdrawal
-            </label>
-            <textarea
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
-              placeholder="Provide a detailed reason..."
-              className="w-full bg-white/[0.02] border border-white/5 text-white p-4 rounded-2xl text-xs font-medium focus:outline-none focus:ring-1 focus:ring-x/30 transition-all min-h-[100px] resize-none"
-            />
-          </div>
+          <TextArea 
+            label="Reason for Withdrawal"
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value)}
+            placeholder="Provide a detailed reason for your withdrawal request..."
+          />
         </div>
 
-        <button
+        <Button 
           onClick={() => onSubmit({ remarks, files })}
           disabled={!isFormValid}
-          className="w-full bg-x hover:bg-[#8f86ff] disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-950 px-6 py-4 rounded-xl font-white uppercase text-[10px] flex items-center justify-center gap-2"
+          className="w-full"
+          icon={<Send size={18} />}
         >
-          <Send size={16} />
           Confirm & Submit Request
-        </button>
+        </Button>
       </div>
-    </div>
+    </Modal>
   );
 };
 
 const InstructionsModal = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
-        onClick={onClose}
-      />
-      <div className="relative w-full max-w-lg bg-zinc-900 border border-white/10 rounded-[2rem] animate-in zoom-in-95 duration-300 overflow-hidden flex flex-col max-h-[85vh]">
-        <div className="p-5 border-b border-white/5 flex justify-between items-center bg-zinc-900/50 backdrop-blur-xl shrink-0">
-          <div className="space-y-0.5">
-            <h2 className="text-lg font-black text-white tracking-tight">
-              Rules & Procedures
-            </h2>
-            <p className="text-x text-[9px] font-black uppercase tracking-[0.2em]">
-              Withdrawal Framework
-            </p>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Rules & Procedures"
+      subtitle="Withdrawal Framework"
+      icon={<ShieldCheck size={24} />}
+    >
+      <div className="space-y-8 pt-4">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 px-1">
+            <div className="w-1.5 h-5 bg-x rounded-full"></div>
+            <h3 className="text-sm font-black text-white uppercase tracking-widest">
+              Mandatory Documents
+            </h3>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-zinc-400 hover:text-white transition-all"
-          >
-            <X size={18} />
-          </button>
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { title: "Withdraw Form", desc: "Signed by you and parents" },
+              { title: "CNIC Front", desc: "Clear scan of Parent/Guardian" },
+              { title: "CNIC Back", desc: "Clear scan of Parent/Guardian" },
+              { title: "Valid Images", desc: "Format: JPG, PNG, WEBP" },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2 hover:bg-white/[0.04] transition-colors"
+              >
+                <h4 className="text-[11px] font-black text-x uppercase tracking-wider">
+                  {item.title}
+                </h4>
+                <p className="text-[10px] text-zinc-500 leading-relaxed font-bold">
+                  {item.desc}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="p-5 overflow-y-auto scrollbar-hide flex-1 space-y-6 text-left scrollbar-hide">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-1 h-4 bg-x rounded-full"></div>
-              <h3 className="text-sm font-black text-white uppercase tracking-wider">
-                Mandatory Documents
-              </h3>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { title: "Withdraw Form", desc: "Signed by you and parents" },
-                { title: "CNIC Front", desc: "Clear scan of Parent/Guardian" },
-                { title: "CNIC Back", desc: "Clear scan of Parent/Guardian" },
-                { title: "Valid Images", desc: "Format: JPG, PNG, WEBP" },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1"
-                >
-                  <h4 className="text-[10px] font-black text-white uppercase">
-                    {item.title}
-                  </h4>
-                  <p className="text-[9px] text-zinc-500 leading-tight font-medium">
-                    {item.desc}
-                  </p>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 px-1">
+            <div className="w-1.5 h-5 bg-x rounded-full"></div>
+            <h3 className="text-sm font-black text-white uppercase tracking-widest">
+              Submission Protocol
+            </h3>
+          </div>
+          <div className="space-y-3">
+            {[
+              "Ensure the withdrawal window is active for the course.",
+              "All files must be strictly under 650KB (0.63 MB).",
+              "A 'W' grade will be permanent on the transcript.",
+              "Withdrawal does not refund any tuition fees.",
+            ].map((step, i) => (
+              <div
+                key={i}
+                className="flex gap-4 p-3 rounded-2xl hover:bg-white/[0.02] transition-colors group border border-transparent hover:border-white/5"
+              >
+                <div className="w-6 h-6 rounded-full bg-x/10 border border-x/20 flex items-center justify-center text-x text-[10px] font-black shrink-0 group-hover:scale-110 transition-transform">
+                  {i + 1}
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-1 h-4 bg-x rounded-full"></div>
-              <h3 className="text-sm font-black text-white uppercase tracking-wider">
-                Submission Protocol
-              </h3>
-            </div>
-            <div className="space-y-2">
-              {[
-                "Ensure the withdrawal window is active for the course.",
-                "All files must be strictly under 650KB (0.63 MB).",
-                "A 'W' grade will be permanent on the transcript.",
-                "Withdrawal does not refund any tuition fees.",
-              ].map((step, i) => (
-                <div
-                  key={i}
-                  className="flex gap-3 p-2 rounded-lg hover:bg-white/[0.02] transition-colors group"
-                >
-                  <div className="w-5 h-5 rounded-full bg-x/10 border border-x/20 flex items-center justify-center text-x text-[9px] font-black shrink-0">
-                    {i + 1}
-                  </div>
-                  <p className="text-[11px] text-zinc-400 font-medium leading-relaxed">
-                    {step}
-                  </p>
-                </div>
-              ))}
-            </div>
+                <p className="text-xs text-zinc-400 font-bold leading-relaxed">
+                  {step}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="p-5 border-t border-white/5 bg-zinc-900/50 shrink-0">
-          <button
-            onClick={onClose}
-            className="w-full bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all"
-          >
-            Understood, Close
-          </button>
-        </div>
+        <Button 
+          variant="secondary"
+          onClick={onClose}
+          className="w-full"
+        >
+          Understood, Close
+        </Button>
       </div>
-    </div>
+    </Modal>
   );
 };
 

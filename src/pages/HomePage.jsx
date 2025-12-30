@@ -672,7 +672,7 @@ function HomePage() {
                 <img
                   src={profileImage}
                   alt="Profile"
-                  className="w-24 h-24 md:w-32 md:h-32 rounded-3xl object-cover bg-zinc-800 border-4 border-white/5 relative z-10"
+                  className="w-24 h-24 md:w-32 md:h-32 rounded-[2.5rem] object-cover bg-zinc-800 border-4 border-white/5 relative z-10"
                   onError={(e) => {
                     e.target.src =
                       'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><rect fill="%2318181b" width="128" height="128"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2352525b" font-weight="bold" font-size="40">User</text></svg>';
