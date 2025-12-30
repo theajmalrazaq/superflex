@@ -547,106 +547,104 @@ const AssessmentView = ({
               </thead>
               <tbody className="divide-y divide-white/5">
                 {assessmentRows.map((row, idx) => {
-                    const uniqueId = `${courseId}-${section.id}-${row.title}`;
-                    const isMarked = markedItems?.has(uniqueId);
-                    return (
-                      <tr
-                        key={idx}
-                        className={`group transition-all duration-300 border-b border-white/5 ${
-                          !row.included ? "opacity-40 grayscale-[0.8]" : ""
-                        } ${
-                          isMarked
-                            ? "bg-x/10"
-                            : "hover:bg-white/5 border-white/5"
-                        }`}
-                      >
-                        <td className="px-6 py-4 font-medium text-white/90">
-                          <div className="flex items-center gap-3">
-                            <button
-                              onClick={() => onToggleMark?.(uniqueId)}
-                              className={`p-1.5 rounded-full shrink-0 transition-all border ${
-                                isMarked
-                                  ? "bg-x/20 text-x border-x/30"
-                                  : "bg-zinc-900/50 text-zinc-600 border-white/5 hover:text-zinc-400 hover:bg-white/10"
-                              }`}
-                            >
-                              <Bookmark
-                                size={16}
-                                fill={isMarked ? "currentColor" : "none"}
-                              />
-                            </button>
-                            <div className="flex items-center gap-2">
-                              {row.included ? (
-                                <div className="w-1.5 h-1.5 rounded-full bg-x"></div>
-                              ) : (
-                                <div className="w-1.5 h-1.5 rounded-full bg-zinc-600"></div>
-                              )}
-                              {row.title}
-                              {!row.included && (
-                                <span className="ml-2 text-[9px] font-bold bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded uppercase">
-                                  Dropped
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-center text-zinc-400">
-                          <input
-                            type="text"
-                            value={row.weight}
-                            onChange={(e) =>
-                              onUpdate(idx, "weight", e.target.value)
-                            }
-                            className="bg-transparent text-center w-16 focus:outline-none focus:border focus:border-x hover:bg-white/5 rounded transition-colors"
-                          />
-                        </td>
-                        <td className="px-6 py-4 text-center text-zinc-400">
-                          <input
-                            type="text"
-                            value={row.total}
-                            onChange={(e) =>
-                              onUpdate(idx, "total", e.target.value)
-                            }
-                            className="bg-transparent text-center w-16 focus:outline-none focus:border focus:border-x hover:bg-white/5 rounded transition-colors"
-                          />
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <input
-                            type="text"
-                            value={row.obtained !== null ? row.obtained : ""}
-                            onChange={(e) =>
-                              onUpdate(idx, "obtained", e.target.value)
-                            }
-                            className={`font-bold text-base text-center w-16 bg-transparent focus:outline-none focus:border focus:border-x hover:bg-white/5 rounded transition-colors ${
-                              (row.obtained / row.total) * 100 >= 80
-                                ? "text-emerald-400"
-                                : (row.obtained / row.total) * 100 >= 60
-                                  ? "text-amber-400"
-                                  : "text-rose-400"
+                  const uniqueId = `${courseId}-${section.id}-${row.title}`;
+                  const isMarked = markedItems?.has(uniqueId);
+                  return (
+                    <tr
+                      key={idx}
+                      className={`group transition-all duration-300 border-b border-white/5 ${
+                        !row.included ? "opacity-40 grayscale-[0.8]" : ""
+                      } ${
+                        isMarked ? "bg-x/10" : "hover:bg-white/5 border-white/5"
+                      }`}
+                    >
+                      <td className="px-6 py-4 font-medium text-white/90">
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => onToggleMark?.(uniqueId)}
+                            className={`p-1.5 rounded-full shrink-0 transition-all border ${
+                              isMarked
+                                ? "bg-x/20 text-x border-x/30"
+                                : "bg-zinc-900/50 text-zinc-600 border-white/5 hover:text-zinc-400 hover:bg-white/10"
                             }`}
-                          />
-                        </td>
-                        <td className="px-6 py-4 text-center font-bold text-x bg-x/5">
-                          {(row.total > 0
-                            ? (row.obtained / row.total) * row.weight
-                            : 0
-                          ).toFixed(2)}
-                        </td>
-                        <td className="px-6 py-4 text-center text-zinc-500">
-                          ~{row.avg.toFixed(2)}
-                        </td>
-                        <td className="px-6 py-4 text-center text-zinc-500">
-                          ~{row.stdDev.toFixed(2)}
-                        </td>
-                        <td className="px-6 py-4 text-center text-zinc-500">
-                          {row.min.toFixed(1)}
-                        </td>
-                        <td className="px-6 py-4 text-center text-zinc-500">
-                          {row.max.toFixed(1)}
-                        </td>
-                      </tr>
-                    );
-                  })}
+                          >
+                            <Bookmark
+                              size={16}
+                              fill={isMarked ? "currentColor" : "none"}
+                            />
+                          </button>
+                          <div className="flex items-center gap-2">
+                            {row.included ? (
+                              <div className="w-1.5 h-1.5 rounded-full bg-x"></div>
+                            ) : (
+                              <div className="w-1.5 h-1.5 rounded-full bg-zinc-600"></div>
+                            )}
+                            {row.title}
+                            {!row.included && (
+                              <span className="ml-2 text-[9px] font-bold bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded uppercase">
+                                Dropped
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-center text-zinc-400">
+                        <input
+                          type="text"
+                          value={row.weight}
+                          onChange={(e) =>
+                            onUpdate(idx, "weight", e.target.value)
+                          }
+                          className="bg-transparent text-center w-16 focus:outline-none focus:border focus:border-x hover:bg-white/5 rounded transition-colors"
+                        />
+                      </td>
+                      <td className="px-6 py-4 text-center text-zinc-400">
+                        <input
+                          type="text"
+                          value={row.total}
+                          onChange={(e) =>
+                            onUpdate(idx, "total", e.target.value)
+                          }
+                          className="bg-transparent text-center w-16 focus:outline-none focus:border focus:border-x hover:bg-white/5 rounded transition-colors"
+                        />
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <input
+                          type="text"
+                          value={row.obtained !== null ? row.obtained : ""}
+                          onChange={(e) =>
+                            onUpdate(idx, "obtained", e.target.value)
+                          }
+                          className={`font-bold text-base text-center w-16 bg-transparent focus:outline-none focus:border focus:border-x hover:bg-white/5 rounded transition-colors ${
+                            (row.obtained / row.total) * 100 >= 80
+                              ? "text-emerald-400"
+                              : (row.obtained / row.total) * 100 >= 60
+                                ? "text-amber-400"
+                                : "text-rose-400"
+                          }`}
+                        />
+                      </td>
+                      <td className="px-6 py-4 text-center font-bold text-x bg-x/5">
+                        {(row.total > 0
+                          ? (row.obtained / row.total) * row.weight
+                          : 0
+                        ).toFixed(2)}
+                      </td>
+                      <td className="px-6 py-4 text-center text-zinc-500">
+                        ~{row.avg.toFixed(2)}
+                      </td>
+                      <td className="px-6 py-4 text-center text-zinc-500">
+                        ~{row.stdDev.toFixed(2)}
+                      </td>
+                      <td className="px-6 py-4 text-center text-zinc-500">
+                        {row.min.toFixed(1)}
+                      </td>
+                      <td className="px-6 py-4 text-center text-zinc-500">
+                        {row.max.toFixed(1)}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
               <tfoot className="bg-zinc-900/50 border-t-2 border-white/10 font-bold backdrop-blur-sm">
                 <tr>

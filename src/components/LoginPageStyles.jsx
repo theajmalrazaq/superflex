@@ -729,7 +729,7 @@ function LoginPageStyles() {
       })
       .catch((err) => console.error("Failed to load reviews:", err));
 
-    const CURRENT_VERSION = "2.0.0";
+    const CURRENT_VERSION = "3.0.0";
 
     heroDiv.innerHTML = `
     <!-- Version Display Button -->

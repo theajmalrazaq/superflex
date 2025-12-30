@@ -4,11 +4,6 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      version:
-        description: "Release version"
-        required: true
-        default: "2.0.0"
 
 permissions:
   contents: write
@@ -47,14 +42,30 @@ jobs:
         id: date
         run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
+      - name: Read WHAT_CHANGED.md
+        id: get_changelog
+        run: |
+          CHANGELOG=$(cat WHAT_CHANGED.md)
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Get version
+        id: get_version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.event.inputs.version || format('v{0}', github.run_number) }}
-          name: SuperFlex ${{ github.event.inputs.version || format('v{0}', github.run_number) }}
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: SuperFlex ${{ steps.get_version.outputs.version }}
           body: |
-            SuperFlex Chrome Extension Release
+            ${{ steps.get_changelog.outputs.changelog }}
+
+            ---
             Built on: ${{ steps.date.outputs.date }}
           files: superflex.zip
           draft: false

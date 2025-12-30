@@ -1157,7 +1157,10 @@ function TranscriptPage() {
                                   className={`text-sm font-bold font-sans ${isSimulated ? "text-x" : "text-zinc-300"}`}
                                 >
                                   {isSimulated
-                                    ? ((GRADE_POINTS[currentGrade] || 0) * course.crHrs).toFixed(1)
+                                    ? (
+                                        (GRADE_POINTS[currentGrade] || 0) *
+                                        course.crHrs
+                                      ).toFixed(1)
                                     : course.points.toFixed(2)}
                                 </span>
                               </td>
