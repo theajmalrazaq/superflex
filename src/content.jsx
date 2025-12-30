@@ -2,7 +2,6 @@ import { createRoot } from "react-dom/client";
 import LoadingOverlay from "./components/ui/LoadingOverlay";
 import LoginPageStyles from "./components/LoginPageStyles";
 import PathRouter from "./components/PathRouter";
-import { safeGetURL } from "./utils/chromeUtils";
 import "./styles/tailwind.css";
 
 (() => {
