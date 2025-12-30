@@ -3,7 +3,7 @@ import PageLayout from "../components/layouts/PageLayout";
 import LoadingOverlay, {
   LoadingSpinner,
 } from "../components/ui/LoadingOverlay";
-import { FileText, Clock, CheckCircle2, Trash2, Printer, Info, Layers, Zap, Send, X, CreditCard, BookOpen, Layout, ShieldCheck, Download } from "lucide-react";
+import { FileText, Clock, CheckCircle2, Trash2, Printer, Info, Layers, Zap, Send, X, CreditCard, BookOpen, Layout, ShieldCheck, Download, ChevronRight } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
@@ -669,28 +669,25 @@ function CourseWithdrawPage() {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <button
+                  <Button
+                    variant="secondary"
                     onClick={handlePrintForm}
                     disabled={selectedCount === 0}
-                    className="group flex items-center justify-center gap-3 w-full bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:pointer-events-none text-white px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
+                    className="w-full"
+                    icon={<Download size={16} />}
                   >
-                    <Printer
-                      size={16}
-                      className="group-hover:scale-110 transition-transform"
-                    />
                     Download Form
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="primary"
                     onClick={handleWithdrawAction}
                     disabled={selectedCount === 0 || isSubmitting}
-                    className="group flex items-center justify-center gap-3 w-full bg-rose-500 hover:bg-rose-600 disabled:bg-zinc-800 disabled:text-zinc-600 text-white px-6 py-4 rounded-2xl text-[10px] font-bold uppercase"
+                    isLoading={isSubmitting}
+                    className="w-full"
+                    icon={<ChevronRight size={16} />}
                   >
-                    <Trash2
-                      size={16}
-                      className="group-hover:rotate-12 transition-transform"
-                    />
-                    {isSubmitting ? "Processing..." : "Initiate Withdraw"}
-                  </button>
+                    Initiate Withdraw
+                  </Button>
                 </div>
               </div>
 

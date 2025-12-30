@@ -645,14 +645,12 @@ function RetakeExamPage() {
             label="Selected"
             value={selectedCourses.size}
             delay={200}
-            className={selectedCourses.size > 0 ? "!bg-x/10 !border-x/20" : ""}
           />
           <StatsCard
             icon={ShieldCheck}
             label="Processed"
             value={
-              courses.filter((c) => c.status && c.status.trim().length > 0)
-                .length
+              courses.filter((c) => c.status && c.status.trim().length > 0 && c.status.trim().toLowerCase() === "processed").length
             }
             delay={300}
           />
@@ -661,11 +659,6 @@ function RetakeExamPage() {
             label="Total Fee"
             value={`Rs. ${selectedCourses.size * 2000}`}
             delay={400}
-            className={
-              selectedCourses.size > 0
-                ? "!bg-amber-500/10 !border-amber-500/20"
-                : ""
-            }
           />
         </div>
 
@@ -771,34 +764,25 @@ function RetakeExamPage() {
               </div>
 
               <div className="flex flex-col gap-3">
-                <button
-                  disabled={selectedCourses.size === 0}
-                  onClick={handleInitiateRequest}
-                  className={`w-full group flex items-center justify-between px-6 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all duration-300 ${
-                    selectedCourses.size > 0
-                      ? "bg-x text-zinc-950 hover:bg-[#b0a8ff]"
-                      : "bg-zinc-800 text-zinc-600 cursor-not-allowed"
-                  }`}
-                >
-                  Initiate Request
-                  <ChevronRight
-                    size={16}
-                    className="group-hover:translate-x-1 transition-transform"
-                  />
-                </button>
 
-                <button
+                <Button
+                  variant="secondary"
                   disabled={selectedCourses.size === 0}
                   onClick={handleDownloadForm}
-                  className={`w-full group flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all duration-300 border ${
-                    selectedCourses.size > 0
-                      ? "border-x/30 text-x hover:bg-x/5"
-                      : "border-white/5 text-zinc-600 cursor-not-allowed"
-                  }`}
+                  className="w-full"
+                  icon={<Download size={16} />}
                 >
-                  <Download size={16} />
                   Download Form
-                </button>
+                </Button>
+                <Button
+                  disabled={selectedCourses.size === 0}
+                  onClick={handleInitiateRequest}
+                  className="w-full"
+                  variant="primary"
+                  icon={<ChevronRight size={16} />}
+                >
+                  Initiate Request
+                </Button>
               </div>
             </div>
           </div>

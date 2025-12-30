@@ -7,7 +7,173 @@ import SuperTabs from "../components/ui/SuperTabs";
 import LoadingOverlay, {
   LoadingSpinner,
 } from "../components/ui/LoadingOverlay";
-import { History, CheckCircle2, Clock, AlertTriangle, Search, Layout, ClipboardEdit } from "lucide-react";
+import { History, CheckCircle2, Clock, AlertTriangle, Search, Layout, ClipboardEdit, FileText, Send, ChevronDown, ChevronRight } from "lucide-react";
+import Modal from "../components/ui/Modal";
+import Button from "../components/ui/Button";
+import { TextArea } from "../components/ui/Input";
+
+const GradeChangeModal = ({ isOpen, onClose, onSubmit }) => {
+  const [reason, setReason] = useState("");
+  const [remarks, setRemarks] = useState("");
+
+  const REASONS = [
+    { value: "1", label: "Error in assessment marks" },
+    { value: "2", label: "Missing assessment marks" },
+    { value: "3", label: "Not satisfied (recheck exam)" },
+  ];
+
+  const handleSubmit = () => {
+    if (!reason) {
+      alert("Please select a reason.");
+      return;
+    }
+    if (!remarks.trim()) {
+      alert("Please provide remarks.");
+      return;
+    }
+    onSubmit({ reason, remarks });
+  };
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Application Details"
+      subtitle="Grade Change Request"
+      icon={<FileText size={24} />}
+    >
+      <div className="space-y-6 pt-4">
+        <div className="space-y-3">
+          <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">
+            Reason for Rectification
+          </label>
+          <div className="relative group">
+            <select
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              className="w-full appearance-none bg-zinc-900 border border-white/5 text-white px-5 py-4 rounded-2xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-x/50 transition-all cursor-pointer pr-12"
+            >
+              <option value="" disabled>Select a reason</option>
+              {REASONS.map((r) => (
+                <option key={r.value} value={r.value}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={16}
+              className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none group-hover:text-white transition-colors"
+            />
+          </div>
+        </div>
+
+        <TextArea
+          label="Detailed Remarks"
+          value={remarks}
+          onChange={(e) => setRemarks(e.target.value)}
+          placeholder="Explain the discrepancy in detail..."
+          rows={5}
+        />
+
+        <div className="pt-2">
+          <Button
+            onClick={handleSubmit}
+            className="w-full"
+            icon={<Send size={18} />}
+          >
+            Submit Request
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+
+const GradeChangeCard = ({ req, isSelected, onToggle, index }) => {
+  return (
+    <div
+      onClick={() => req.checkboxId && onToggle(req.checkboxId)}
+      className={`group flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border transition-all duration-300 gap-4 ${
+        req.checkboxId ? "cursor-pointer" : "cursor-not-allowed opacity-60"
+      } ${
+        isSelected
+          ? "bg-x/10 border-x/50"
+          : "bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5"
+      }`}
+    >
+      <div className="flex items-center gap-3 min-w-0 flex-1">
+        <span
+          className={`font-bold text-xs min-w-[1.2rem] ${isSelected ? "text-x" : "text-zinc-600"}`}
+        >
+          {index}.
+        </span>
+
+        <div
+          className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 transition-all duration-300 ${
+            isSelected
+              ? "bg-x/20 border-x/30 text-x scale-105"
+              : "bg-zinc-800/50 border-white/5 text-zinc-500"
+          }`}
+        >
+          <FileText size={18} />
+        </div>
+
+        <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-[10px] font-black text-x uppercase tracking-tighter opacity-80 shrink-0">
+              {req.code}
+            </span>
+            <h4 className="text-white font-bold text-sm leading-tight truncate">
+              {req.course}
+            </h4>
+          </div>
+
+          <div className="flex items-center gap-2.5 text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
+            <span className="shrink-0">{req.credits} Credits</span>
+            <span className="w-1 h-1 rounded-full bg-zinc-700 shrink-0"></span>
+            <span className="truncate">Section {req.section}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-row items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-white/5">
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col items-end gap-1">
+            <span className="px-2.5 py-1 rounded-lg bg-x/10 text-x font-black text-[10px]">
+              Grade: {req.grade}
+            </span>
+          </div>
+          
+          <div
+            className={`px-3 py-1 rounded-lg border text-[9px] font-black uppercase tracking-widest ${
+              req.status.toLowerCase().includes("pending")
+                ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
+                : req.status.toLowerCase().includes("rejected")
+                  ? "bg-rose-500/10 border-rose-500/20 text-rose-400"
+                  : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+            }`}
+          >
+            {req.status}
+          </div>
+        </div>
+
+        <div
+          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 shrink-0 ${
+            isSelected
+              ? "bg-x border-x text-zinc-950 scale-110"
+              : "border-zinc-700 bg-transparent"
+          }`}
+        >
+          {isSelected && <CheckCircle2 size={14} strokeWidth={3} />}
+          {!isSelected && !req.checkboxId && (
+            <Search size={10} className="text-zinc-800" />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 function GradeChangePage() {
   const [loading, setLoading] = useState(true);
@@ -16,6 +182,7 @@ function GradeChangePage() {
   const [requests, setRequests] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [stats, setStats] = useState({ total: 0, pending: 0, processed: 0 });
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const hiddenContentRef = useRef(null);
 
@@ -23,19 +190,14 @@ function GradeChangePage() {
     const hiderStyle = document.createElement("style");
     hiderStyle.id = "superflex-grade-change-hide";
     hiderStyle.innerHTML = `
-      .m-grid.m-grid--hor.m-grid--root.m-page:not(#legacy-root-hidden),
-      .m-content:not(#legacy-root-hidden .m-content),
-      #FormGradeChange:not(#legacy-root-hidden #FormGradeChange) {
-        display: none !important;
+      .m-grid.m-grid--hor.m-grid--root.m-page:not(#legacy-root-hidden) {
+        visibility: hidden !important;
+        position: absolute !important;
+        pointer-events: none !important;
+        z-index: -1 !important;
       }
       #legacy-root-hidden {
-        position: absolute !important;
-        top: -9999px !important;
-        left: -9999px !important;
-        width: 1px !important;
-        height: 1px !important;
-        overflow: hidden !important;
-        visibility: hidden !important;
+        display: none !important;
       }
       /* Ensure modals and their backdrops stay functional */
       .modal, .modal-backdrop {
@@ -46,7 +208,6 @@ function GradeChangePage() {
         border: 1px solid rgba(255,255,255,0.1) !important;
         border-radius: 2rem !important;
         color: white !important;
-       ;
       }
       #RemarksDetail .modal-header { border-bottom: 1px solid rgba(255,255,255,0.1) !important; padding: 1.5rem !important; }
       #RemarksDetail .modal-footer { border-top: 1px solid rgba(255,255,255,0.1) !important; padding: 1.5rem !important; }
@@ -85,6 +246,8 @@ function GradeChangePage() {
           }
           return;
         }
+
+        root.id = "superflex-grade-change-original";
 
         const alertList = [];
         root.querySelectorAll(".m-alert, .alert").forEach((alert) => {
@@ -199,6 +362,7 @@ function GradeChangePage() {
         if (hiddenContentRef.current) {
           hiddenContentRef.current.innerHTML = "";
           const clone = root.cloneNode(true);
+          clone.id = "legacy-root-hidden";
           hiddenContentRef.current.appendChild(clone);
         }
 
@@ -229,9 +393,7 @@ function GradeChangePage() {
   }, []);
 
   const handleSemesterChange = (val) => {
-    const root = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
+    const root = document.getElementById("superflex-grade-change-original");
     const select = root?.querySelector("select#SemId");
     if (select) {
       select.value = val;
@@ -242,9 +404,7 @@ function GradeChangePage() {
   };
 
   const handleCheckboxToggle = (checkboxId) => {
-    const root = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
+    const root = document.getElementById("superflex-grade-change-original");
     const legacyCb = root?.querySelector(`#${checkboxId}`);
     if (legacyCb && !legacyCb.disabled) {
       legacyCb.checked = !legacyCb.checked;
@@ -259,9 +419,7 @@ function GradeChangePage() {
   };
 
   const handleSelectAll = (checked) => {
-    const root = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
+    const root = document.getElementById("superflex-grade-change-original");
     const legacyCheckboxes = root?.querySelectorAll(
       'input[name="OfferIdCheckBox"]:not(:disabled)',
     );
@@ -281,23 +439,42 @@ function GradeChangePage() {
   };
 
   const handleOpenRequestModal = () => {
-    const root = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
-    const legacyBtn =
-      root?.querySelector("#btnModalGradeChange") ||
-      root?.querySelector("[data-target='#RemarksDetail']");
-
     if (selectedIds.length === 0) {
       alert("Kindly select at least one course to proceed.");
       return;
     }
+    setIsModalOpen(true);
+  };
 
-    if (legacyBtn) {
-      legacyBtn.click();
-    } else if (window.$) {
-      window.$("#RemarksDetail").modal("show");
+  const submitGradeChange = ({ reason, remarks }) => {
+    const root = document.getElementById("superflex-grade-change-original");
+    
+    // Sync to legacy elements
+    const legacyReason = root?.querySelector("#GradeChangeReason");
+    const legacyRemarks = root?.querySelector("#StdRmktxtarea");
+
+    if (legacyReason) {
+      legacyReason.value = reason;
+      legacyReason.dispatchEvent(new Event("change", { bubbles: true }));
     }
+    if (legacyRemarks) {
+      legacyRemarks.value = remarks;
+      legacyRemarks.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
+    // Trigger legacy submission
+    if (typeof window.fn_SubmitStdRemarks === "function") {
+      window.fn_SubmitStdRemarks();
+    } else {
+      const legacyBtn = root?.querySelector('#remrksbtn input[type="button"]');
+      if (legacyBtn) {
+        legacyBtn.click();
+      } else {
+        alert("Submit function not found. Legacy system may have changed.");
+      }
+    }
+    
+    setIsModalOpen(false);
   };
 
   const hasAvailableRequests = requests.some((r) => r.checkboxId);
@@ -315,6 +492,11 @@ function GradeChangePage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
+      <GradeChangeModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={submitGradeChange}
+      />
       <div className="w-full min-h-screen p-4 md:p-8 space-y-8 relative z-10">
         {}
         <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
@@ -332,22 +514,6 @@ function GradeChangePage() {
                 onTabChange={handleSemesterChange}
               />
             )}
-
-            {hasAvailableRequests && (
-              <button
-                onClick={handleOpenRequestModal}
-                className={`flex items-center gap-2 px-6 py-3 rounded-full font-black uppercase text-[10px] tracking-widest transition-all  ${
-                  selectedIds.length > 0
-                    ? "bg-x hover:bg-x/90 text-zinc-950 animate-pulse"
-                    : "bg-zinc-800 text-zinc-500 border border-white/5 opacity-50 cursor-not-allowed"
-                }`}
-              >
-                <ClipboardEdit size={14} />
-                {selectedIds.length > 0
-                  ? `Submit ${selectedIds.length} Request${selectedIds.length > 1 ? "s" : ""}`
-                  : "New Application"}
-              </button>
-            )}
           </div>
         </PageHeader>
 
@@ -364,20 +530,14 @@ function GradeChangePage() {
             label="In Review"
             value={stats.pending}
             delay={200}
-            className={
-              stats.pending > 0 ? "!bg-amber-500/10 !border-amber-500/20" : ""
-            }
+           
           />
           <StatsCard
             icon={CheckCircle2}
             label="Processed"
             value={stats.processed}
             delay={300}
-            className={
-              stats.processed > 0
-                ? "!bg-emerald-500/10 !border-emerald-500/20"
-                : ""
-            }
+           
           />
           <StatsCard
             icon={AlertTriangle}
@@ -389,237 +549,111 @@ function GradeChangePage() {
 
         <NotificationBanner alerts={alerts} />
 
-        <div className="grid grid-cols-1 gap-8">
-          <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-4 md:p-8 overflow-hidden">
-            <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/5">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-x/10 rounded-xl text-x">
-                  <Layout size={20} />
-                </div>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          <div className="xl:col-span-2 space-y-6">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between px-2">
                 <h3 className="text-xl font-bold text-white tracking-tight">
-                  Application Log
+                  Eligible Courses
                 </h3>
+                {hasAvailableRequests && (
+                  <button
+                    onClick={() => handleSelectAll(selectedIds.length !== requests.filter(r => r.checkboxId).length)}
+                    className="text-[10px] font-black text-x uppercase tracking-widest hover:opacity-80 transition-opacity"
+                  >
+                    {selectedIds.length === requests.filter(r => r.checkboxId).length ? "Deselect All" : "Select All"}
+                  </button>
+                )}
               </div>
-            </div>
 
-            <div className="hidden md:block overflow-x-auto scrollbar-hide">
-              <table className="w-full min-w-[800px]">
-                <thead>
-                  <tr className="border-b border-white/5">
-                    <th className="py-4 px-4 text-center">
-                      {hasAvailableRequests && (
-                        <input
-                          type="checkbox"
-                          onChange={(e) => handleSelectAll(e.target.checked)}
-                          className="w-4 h-4 rounded border-white/10 bg-white/5 checked:bg-x transition-all cursor-pointer"
-                        />
-                      )}
-                    </th>
-                    <th className="text-left py-4 px-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">
-                      Index
-                    </th>
-                    <th className="text-left py-4 px-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">
-                      Course Detail
-                    </th>
-                    <th className="text-center py-4 px-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">
-                      Code
-                    </th>
-                    <th className="text-center py-4 px-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">
-                      Grade
-                    </th>
-                    <th className="text-center py-4 px-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">
-                      Section
-                    </th>
-                    <th className="text-right py-4 px-4 text-[10px] font-black text-zinc-500 uppercase tracking-widest">
-                      Process Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/[0.03]">
-                  {requests.map((req, idx) => (
-                    <tr
-                      key={idx}
-                      className={`group hover:bg-white/[0.02] transition-colors ${selectedIds.includes(req.checkboxId) ? "bg-x/5" : ""}`}
-                    >
-                      <td className="py-4 px-4 text-center">
-                        {req.checkboxId && (
-                          <input
-                            type="checkbox"
-                            checked={selectedIds.includes(req.checkboxId)}
-                            onChange={() =>
-                              handleCheckboxToggle(req.checkboxId)
-                            }
-                            className="w-4 h-4 rounded border-white/10 bg-white/5 checked:bg-x transition-all cursor-pointer"
-                          />
-                        )}
-                      </td>
-                      <td className="py-4 px-4 text-xs font-bold text-zinc-500">
-                        {idx + 1}
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex flex-col">
-                          <span className="text-white font-bold text-sm tracking-tight">
-                            {req.course}
-                          </span>
-                          <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
-                            {req.credits} Credits
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="px-2.5 py-1 rounded-md bg-zinc-800/50 text-zinc-400 font-bold text-[10px] uppercase tracking-wider">
-                          {req.code}
-                        </span>
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="px-3 py-1.5 rounded-lg bg-x/10 text-x font-black text-xs">
-                          {req.grade}
-                        </span>
-                      </td>
-                      <td className="py-4 px-4 text-center text-xs text-zinc-400 font-bold tracking-widest">
-                        {req.section}
-                      </td>
-                      <td className="py-4 px-4 text-right">
-                        <span
-                          className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
-                            req.status.toLowerCase().includes("pending")
-                              ? "bg-amber-500/5 text-amber-500 border-amber-500/10"
-                              : req.status.toLowerCase().includes("rejected")
-                                ? "bg-rose-500/5 text-rose-400 border-rose-500/10"
-                                : "bg-emerald-500/5 text-emerald-400 border-emerald-500/10"
-                          }`}
-                        >
-                          {req.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {}
-            <div className="md:hidden space-y-4">
-              {hasAvailableRequests && requests.length > 0 && (
-                <div className="flex items-center gap-2 px-2 pb-2">
-                  <input
-                    type="checkbox"
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                    className="w-5 h-5 rounded-lg border-white/10 bg-white/5 checked:bg-x transition-all cursor-pointer"
+              <div className="grid grid-cols-1 gap-3">
+                {requests.map((req, idx) => (
+                  <GradeChangeCard
+                    key={idx}
+                    req={req}
+                    index={idx + 1}
+                    isSelected={selectedIds.includes(req.checkboxId)}
+                    onToggle={handleCheckboxToggle}
                   />
-                  <span className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.15em]">
-                    Select All Courses
-                  </span>
+                ))}
+              </div>
+
+              {requests.length === 0 && (
+                <div className="text-center py-20 bg-zinc-900/30 rounded-[2rem] border border-dashed border-white/5">
+                  <div className="flex flex-col items-center gap-4 opacity-50">
+                    <Search size={48} className="text-zinc-600" />
+                    <p className="text-zinc-500 font-medium uppercase tracking-widest text-xs">
+                      No records available for this semester
+                    </p>
+                  </div>
                 </div>
               )}
-              {requests.map((req, idx) => (
-                <div
-                  key={idx}
-                  onClick={() =>
-                    req.checkboxId && handleCheckboxToggle(req.checkboxId)
-                  }
-                  className={`p-5 rounded-[2rem] border transition-all duration-300 ${
-                    selectedIds.includes(req.checkboxId)
-                      ? "bg-x/10 border-x/30"
-                      : "bg-white/[0.02] border-white/5 hover:border-white/10"
-                  }`}
-                >
-                  <div className="flex justify-between items-start mb-5">
-                    <div className="flex items-center gap-3">
-                      {req.checkboxId ? (
-                        <input
-                          type="checkbox"
-                          checked={selectedIds.includes(req.checkboxId)}
-                          readOnly
-                          className="w-5 h-5 rounded-lg border-white/10 bg-white/5 checked:bg-x transition-all cursor-pointer"
-                        />
-                      ) : (
-                        <div className="w-5 h-5 rounded-lg bg-zinc-800/50 flex items-center justify-center">
-                          <span className="text-[8px] font-black text-zinc-600">
-                            #
-                          </span>
-                        </div>
-                      )}
-                      <span className="text-xs font-black text-zinc-500">
-                        {idx + 1}.
-                      </span>
-                    </div>
-                    <span
-                      className={`px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border transition-all ${
-                        req.status.toLowerCase().includes("pending")
-                          ? "bg-amber-500/5 text-amber-500 border-amber-500/20"
-                          : req.status.toLowerCase().includes("rejected")
-                            ? "bg-rose-500/5 text-rose-400 border-rose-500/20"
-                            : "bg-emerald-500/5 text-emerald-400 border-emerald-500/20"
-                      }`}
-                    >
-                      {req.status}
-                    </span>
-                  </div>
+            </div>
+          </div>
 
-                  <div className="space-y-4">
-                    <h4 className="text-white font-black text-[15px] leading-tight tracking-tight">
-                      {req.course}
+          <div className="space-y-6">
+            <div className="bg-zinc-900/50 border border-white/5 backdrop-blur-xl rounded-[2.5rem] p-8 space-y-8 sticky top-8">
+              <div className="space-y-6">
+                <div className="p-5 rounded-2xl bg-x/5 border border-x/10 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-x/10 rounded-lg text-x">
+                      <Layout size={18} />
+                    </div>
+                    <h4 className="text-sm font-bold text-white tracking-tight">
+                      Action Summary
                     </h4>
-
-                    <div className="flex flex-wrap gap-2">
-                      <div className="px-3 py-1.5 rounded-xl bg-zinc-800/80 border border-white/5 flex items-center gap-2">
-                        <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">
-                          Code
-                        </span>
-                        <span className="text-zinc-300 font-bold text-[10px] uppercase">
-                          {req.code}
-                        </span>
-                      </div>
-                      <div className="px-3 py-1.5 rounded-xl bg-zinc-800/80 border border-white/5 flex items-center gap-2">
-                        <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">
-                          Credits
-                        </span>
-                        <span className="text-zinc-300 font-bold text-[10px] uppercase">
-                          {req.credits}
-                        </span>
-                      </div>
-                      <div className="px-3 py-1.5 rounded-xl bg-zinc-800/80 border border-white/5 flex items-center gap-2">
-                        <span className="text-[8px] font-black text-zinc-500 uppercase tracking-tighter">
-                          Sec
-                        </span>
-                        <span className="text-zinc-300 font-bold text-[10px] uppercase">
-                          {req.section}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="pt-2 flex items-center justify-between border-t border-white/[0.03]">
-                      <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">
-                        Initial Grade
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-xs font-medium">
+                      <span className="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
+                        Selected
                       </span>
-                      <span className="px-4 py-1.5 rounded-xl bg-x/10 text-x font-black text-sm">
-                        {req.grade}
+                      <span className="text-white font-black">
+                        {selectedIds.length} Courses
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-xs font-medium">
+                      <span className="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
+                        Pending
+                      </span>
+                      <span className="text-white font-black">{stats.pending}</span>
+                    </div>
+                    <div className="pt-3 border-t border-white/10 flex justify-between items-center">
+                      <span className="text-zinc-400 text-[10px] font-black uppercase tracking-widest">
+                        Total Applications
+                      </span>
+                      <span className="text-x font-black text-xs">
+                        {stats.total}
                       </span>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
 
-            {requests.length === 0 && (
-              <div className="py-20 text-center">
-                <div className="flex flex-col items-center gap-4">
-                  <div className="p-6 bg-zinc-800/50 rounded-full text-zinc-600 border border-white/5">
-                    <Search size={40} />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-zinc-500 font-black uppercase tracking-widest text-xs">
-                      No records available
-                    </p>
-                    <p className="text-zinc-600 text-[10px] font-medium px-4">
-                      There are currently no subjects available for grade change
-                      in this semester.
-                    </p>
-                  </div>
+                <div className="flex flex-col gap-3">
+                <Button
+                  disabled={selectedIds.length === 0}
+                  onClick={handleOpenRequestModal}
+                  className="w-full"
+                  variant="primary"
+                  icon={<ChevronRight size={16} />}
+                >
+                  Initiate Request
+                </Button>
                 </div>
               </div>
-            )}
+
+              <div className="pt-4 border-t border-white/5 space-y-4">
+                <div className="flex items-center gap-3 px-1 text-x">
+                  <AlertTriangle size={14} />
+                  <span className="text-[10px] font-black uppercase tracking-widest">
+                    Important Note
+                  </span>
+                </div>
+                <p className="text-[10px] text-zinc-500 font-medium leading-relaxed px-1 italic">
+                  Grade change requests are only reviewed and processed by the respective course teacher.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 

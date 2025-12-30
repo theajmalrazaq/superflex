@@ -5,24 +5,21 @@ import PathRouter from "./components/PathRouter";
 import "./styles/tailwind.css";
 
 (() => {
-  const scripts = [
-    { src: "scripts/umami.js", id: "umami-script" },
-    { src: "scripts/puter.js", id: "puter-script" },
-    { src: "scripts/bridge.js", id: "bridge-script" },
-  ];
+  const scriptUmami = document.createElement("script");
+  scriptUmami.src = chrome.runtime.getURL("scripts/umami.js");
+  scriptUmami.defer = true;
+  scriptUmami.dataset.websiteId = "17490ccf-0b15-4d8a-a908-5e774ad648de";
+  document.head.appendChild(scriptUmami);
 
-  scripts.forEach((s) => {
-    const url = safeGetURL(s.src);
-    if (url) {
-      const script = document.createElement("script");
-      script.src = url;
-      script.defer = true;
-      if (s.src.includes("umami")) {
-        script.dataset.websiteId = "17490ccf-0b15-4d8a-a908-5e774ad648de";
-      }
-      document.head.appendChild(script);
-    }
-  });
+  const scriptPuter = document.createElement("script");
+  scriptPuter.src = chrome.runtime.getURL("scripts/puter.js");
+  scriptPuter.defer = true;
+  document.head.appendChild(scriptPuter);
+
+  const scriptBridge = document.createElement("script");
+  scriptBridge.src = chrome.runtime.getURL("scripts/bridge.js");
+  scriptBridge.defer = true;
+  document.head.appendChild(scriptBridge);
 })();
 
 const fontLinks = [
@@ -69,7 +66,7 @@ if (!favicon) {
   document.head.appendChild(favicon);
 }
 
-favicon.href = safeGetURL("assets/favicon.svg") || favicon.href;
+favicon.href = chrome.runtime.getURL("assets/favicon.svg");
 document.title = "Superflex";
 
 if (document.querySelector(".m-grid__item.m-footer")) {
@@ -100,12 +97,6 @@ document.querySelectorAll("button").forEach((button) => {
 
 document.documentElement.classList.add("dark");
 document.body.style.backgroundColor = "black";
-
-const bgUrl = safeGetURL("assets/overlay.png");
-if (bgUrl) {
-  document.body.style.backgroundImage = `url("${bgUrl}")`;
-}
-document.body.style.backgroundRepeat = "no-repeat";
 
 root.render(
   <>

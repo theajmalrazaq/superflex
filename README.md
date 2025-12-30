@@ -213,7 +213,7 @@ superflex/
 │   │   ├── favicon.svg
 │   │   ├── logo_sec.svg
 │   │   ├── logo.svg
-│   │   └── overlay.png
+│   │   
 │   ├── reviews.json
 │   └── scripts
 │       ├── bridge.js

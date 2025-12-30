@@ -28,13 +28,6 @@ const SessionExpirePage = () => {
     <div className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center p-6 space-y-8 animate-in fade-in duration-700 font-sans">
       <style>{`#react-chrome-app, #react-chrome-app * { font-family: 'Google Sans Flex', sans-serif !important; }`}</style>
 
-      <div
-        className="fixed inset-0 pointer-events-none opacity-20"
-        style={{
-          backgroundImage: `url("${chrome.runtime.getURL("assets/overlay.png")}")`,
-        }}
-      />
-
       <div className="relative z-10 text-center space-y-6 max-w-lg">
         <div className="mx-auto w-20 h-20 rounded-3xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">
           <ShieldAlert size={40} className="text-rose-500 animate-pulse" />
