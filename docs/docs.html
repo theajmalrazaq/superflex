@@ -31,8 +31,9 @@
       }
 
       body {
-        background: #050505;
-        color: #e5e5e5;
+        font-family: "Google Sans Flex", sans-serif;
+        background: #000000;
+        color: white;
         overflow-x: hidden;
       }
 
@@ -233,9 +234,73 @@
       .mobile-link span {
         transition: all 0.3s ease;
       }
+
+      /* Animated Background */
+      .animated-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        overflow: hidden;
+      }
+
+      /* Atmospheric Glows */
+      @keyframes pulse-glow {
+        0%, 100% { opacity: 0.3; transform: scale(1); }
+        50% { opacity: 0.6; transform: scale(1.1); }
+      }
+
+      .glow-1 {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 800px;
+        height: 800px;
+        background: radial-gradient(circle, rgba(160, 152, 255, 0.15) 0%, transparent 70%);
+        filter: blur(150px);
+        margin-right: -400px;
+        margin-top: -400px;
+        pointer-events: none;
+        animation: pulse-glow 10s ease-in-out infinite;
+      }
+
+      .glow-2 {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+        filter: blur(150px);
+        margin-left: -300px;
+        margin-bottom: -300px;
+        pointer-events: none;
+        animation: pulse-glow 15s ease-in-out infinite;
+        animation-delay: 2s;
+      }
+
+      /* Hero Logo Animation */
+      @keyframes splash {
+        0% { transform: scale(0.2); opacity: 0.8; }
+        80% { transform: scale(1.2); opacity: 0; }
+        100% { transform: scale(2.2); opacity: 0; }
+      }
     </style>
   </head>
   <body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+      <div class="glow-1"></div>
+      <div class="glow-2"></div>
+      <img
+        src="https://theajmalrazaq.github.io/superflex/res/intro.svg"
+        class="fixed inset-0 w-full h-full object-cover opacity-20 mix-blend-luminosity"
+        alt="Background"
+      />
+      <div
+        class="fixed inset-0 bg-gradient-to-b from-black/40 via-black/80 to-black z-10"
+      ></div>
+    </div>
+
     <!-- Standard Navbar from Index -->
     <!-- Navigation Bar -->
     <nav
@@ -356,7 +421,7 @@
     </div>
 
     <!-- Main Content Container -->
-    <main class="max-w-[800px] mx-auto px-6 mt-5 pb-24">
+    <main class="relative z-20 max-w-[800px] mx-auto px-6 mt-5 pb-24">
       <!-- Meta Header -->
       <div class="mb-16 pt-32 text-center">
         <span
