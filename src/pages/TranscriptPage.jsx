@@ -1,6 +1,18 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import { Award, BookOpen, Calendar, Target, Info, RefreshCw, Zap, AlertTriangle, Scale,TrendingUp, X } from "lucide-react";
+import {
+  Award,
+  BookOpen,
+  Calendar,
+  Target,
+  Info,
+  RefreshCw,
+  Zap,
+  AlertTriangle,
+  Scale,
+  TrendingUp,
+  X,
+} from "lucide-react";
 import { MCA_DATA } from "../constants/mcaData";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
@@ -86,7 +98,7 @@ const CGPAPlannerModal = ({
       <div className="space-y-8 pt-4">
         <form onSubmit={calculate} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
-            <Input 
+            <Input
               label="Target CGPA"
               type="number"
               step="0.01"
@@ -96,7 +108,7 @@ const CGPAPlannerModal = ({
               onChange={(e) => setTargetCGPA(e.target.value)}
               placeholder="e.g. 3.70"
             />
-            <Input 
+            <Input
               label="Next Cr.Hrs"
               type="number"
               value={nextCH}
@@ -122,7 +134,9 @@ const CGPAPlannerModal = ({
                     {result.toFixed(2)}
                   </p>
                 ) : result < 0 ? (
-                  <p className="text-4xl font-bold text-emerald-500 tracking-tighter">0.00</p>
+                  <p className="text-4xl font-bold text-emerald-500 tracking-tighter">
+                    0.00
+                  </p>
                 ) : (
                   <p className="text-5xl font-bold text-white tracking-tighter">
                     {result.toFixed(2)}
@@ -131,29 +145,32 @@ const CGPAPlannerModal = ({
               </div>
 
               <div className="text-right relative z-10 flex flex-col items-end gap-3">
-                 {result > 4.0 ? (
-                    <span className="px-3 py-1 bg-rose-500/10 text-rose-400 rounded-lg text-[10px] font-bold uppercase border border-rose-500/20">
-                      Unreachable
-                    </span>
-                 ) : result < 0 ? (
-                    <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-lg text-[10px] font-bold uppercase border border-emerald-500/20">
-                      Achieved
-                    </span>
-                 ) : (
-                    <span className="px-3 py-1 bg-x/10 text-x rounded-lg text-[10px] font-bold uppercase border border-x/20">
-                      Target Goal
-                    </span>
-                 )}
-                 <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-                   In {nextCH} Cr.Hrs
-                 </p>
+                {result > 4.0 ? (
+                  <span className="px-3 py-1 bg-rose-500/10 text-rose-400 rounded-lg text-[10px] font-bold uppercase border border-rose-500/20">
+                    Unreachable
+                  </span>
+                ) : result < 0 ? (
+                  <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-lg text-[10px] font-bold uppercase border border-emerald-500/20">
+                    Achieved
+                  </span>
+                ) : (
+                  <span className="px-3 py-1 bg-x/10 text-x rounded-lg text-[10px] font-bold uppercase border border-x/20">
+                    Target Goal
+                  </span>
+                )}
+                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                  In {nextCH} Cr.Hrs
+                </p>
               </div>
             </div>
 
             {result > 4.0 && (
               <div className="mt-4 flex items-start gap-3 text-[11px] font-medium text-rose-400 bg-rose-500/5 p-4 rounded-2xl border border-rose-500/10 italic">
                 <AlertTriangle size={14} className="shrink-0 mt-0.5" />
-                <span>Note: This target requires exceeding a 4.00 GPA in a single term.</span>
+                <span>
+                  Note: This target requires exceeding a 4.00 GPA in a single
+                  term.
+                </span>
               </div>
             )}
           </div>
@@ -223,14 +240,14 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
       <div className="space-y-8 pt-4">
         <form onSubmit={calculateGrade} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
-            <Input 
+            <Input
               label="Rounded MCA"
               type="number"
               value={mca}
               onChange={(e) => setMca(e.target.value)}
               placeholder="30-91"
             />
-            <Input 
+            <Input
               label="Total Marks"
               type="number"
               value={marks}
@@ -299,11 +316,16 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
                             : "bg-white/[0.02] border-white/5 hover:bg-white/[0.04]"
                         }`}
                       >
-                        <p className={`text-[10px] font-bold uppercase tracking-wider mb-1 ${g === result.grade ? "text-x" : "text-zinc-600"}`}>
+                        <p
+                          className={`text-[10px] font-bold uppercase tracking-wider mb-1 ${g === result.grade ? "text-x" : "text-zinc-600"}`}
+                        >
                           {g}
                         </p>
-                        <p className={`text-xs font-black ${g === result.grade ? "text-white" : "text-zinc-400"}`}>
-                          {val}{g === "F" ? "" : "+"}
+                        <p
+                          className={`text-xs font-black ${g === result.grade ? "text-white" : "text-zinc-400"}`}
+                        >
+                          {val}
+                          {g === "F" ? "" : "+"}
                         </p>
                       </div>
                     ))}
@@ -762,7 +784,11 @@ function TranscriptPage() {
                 ? "bg-amber-500 text-black border-amber-600"
                 : "bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
             }`}
-             title={simulationMode ? "Exit Simulation Mode" : "Enter Simulation Mode (Edit Grades)"}
+            title={
+              simulationMode
+                ? "Exit Simulation Mode"
+                : "Enter Simulation Mode (Edit Grades)"
+            }
           >
             <Zap size={16} fill={simulationMode ? "currentColor" : "none"} />
             {simulationMode ? "Simulating" : "Simulate"}

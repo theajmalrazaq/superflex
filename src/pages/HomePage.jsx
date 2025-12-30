@@ -148,15 +148,14 @@ function HomePage() {
   const [activeMainTab, setActiveMainTab] = useState("stats");
   const [alerts, setAlerts] = useState([]);
   const [profileImage, setProfileImage] = useState(
-    localStorage.getItem("superflex_user_custom_image") ||
-    "/Login/GetImage",
+    localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage",
   );
 
   useEffect(() => {
     const handleStorage = () => {
       setProfileImage(
         localStorage.getItem("superflex_user_custom_image") ||
-        "/Login/GetImage",
+          "/Login/GetImage",
       );
     };
     window.addEventListener("storage", handleStorage);

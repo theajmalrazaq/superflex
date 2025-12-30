@@ -360,13 +360,14 @@ This was the most complex technical challenge. My React app needs to call `windo
 document.addEventListener("superflex-ai-query", async (e) => {
   const { id, prompt, model } = e.detail;
 
-  const stream = await window.puter.ai.chat(prompt, { 
+  const stream = await window.puter.ai.chat(prompt, {
     model: model || "gpt-4o-mini",
-    stream: true 
+    stream: true,
   });
 
   for await (const chunk of stream) {
-    if (activeRequestId === id) { // Verify request still active
+    if (activeRequestId === id) {
+      // Verify request still active
       document.dispatchEvent(
         new CustomEvent("superflex-ai-response", {
           detail: { id, text: chunk.text },

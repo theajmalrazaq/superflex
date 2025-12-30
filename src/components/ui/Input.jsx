@@ -1,14 +1,14 @@
 import React from "react";
 
-const Input = ({ 
-  label, 
-  type = "text", 
-  value, 
-  onChange, 
-  placeholder, 
-  error, 
+const Input = ({
+  label,
+  type = "text",
+  value,
+  onChange,
+  placeholder,
+  error,
   className = "",
-  ...props 
+  ...props
 }) => {
   return (
     <div className={`space-y-2 w-full ${className}`}>
@@ -32,7 +32,7 @@ const Input = ({
           `}
           {...props}
         />
-        {/* Animated border gradient effect on focus */}
+        {}
         <div className="absolute inset-0 rounded-2xl border border-x/0 group-focus-within:border-x/30 pointer-events-none transition-all duration-500" />
       </div>
       {error && (
@@ -44,15 +44,15 @@ const Input = ({
   );
 };
 
-export const TextArea = ({ 
-  label, 
-  value, 
-  onChange, 
-  placeholder, 
-  error, 
+export const TextArea = ({
+  label,
+  value,
+  onChange,
+  placeholder,
+  error,
   className = "",
   rows = 4,
-  ...props 
+  ...props
 }) => {
   return (
     <div className={`space-y-2 w-full ${className}`}>

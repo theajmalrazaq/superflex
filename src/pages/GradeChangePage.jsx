@@ -7,7 +7,19 @@ import SuperTabs from "../components/ui/SuperTabs";
 import LoadingOverlay, {
   LoadingSpinner,
 } from "../components/ui/LoadingOverlay";
-import { History, CheckCircle2, Clock, AlertTriangle, Search, Layout, ClipboardEdit, FileText, Send, ChevronDown, ChevronRight } from "lucide-react";
+import {
+  History,
+  CheckCircle2,
+  Clock,
+  AlertTriangle,
+  Search,
+  Layout,
+  ClipboardEdit,
+  FileText,
+  Send,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react";
 import Modal from "../components/ui/Modal";
 import Button from "../components/ui/Button";
 import { TextArea } from "../components/ui/Input";
@@ -53,7 +65,9 @@ const GradeChangeModal = ({ isOpen, onClose, onSubmit }) => {
               onChange={(e) => setReason(e.target.value)}
               className="w-full appearance-none bg-zinc-900 border border-white/5 text-white px-5 py-4 rounded-2xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-x/50 transition-all cursor-pointer pr-12"
             >
-              <option value="" disabled>Select a reason</option>
+              <option value="" disabled>
+                Select a reason
+              </option>
               {REASONS.map((r) => (
                 <option key={r.value} value={r.value}>
                   {r.label}
@@ -88,7 +102,6 @@ const GradeChangeModal = ({ isOpen, onClose, onSubmit }) => {
     </Modal>
   );
 };
-
 
 const GradeChangeCard = ({ req, isSelected, onToggle, index }) => {
   return (
@@ -144,7 +157,7 @@ const GradeChangeCard = ({ req, isSelected, onToggle, index }) => {
               Grade: {req.grade}
             </span>
           </div>
-          
+
           <div
             className={`px-3 py-1 rounded-lg border text-[9px] font-black uppercase tracking-widest ${
               req.status.toLowerCase().includes("pending")
@@ -448,8 +461,7 @@ function GradeChangePage() {
 
   const submitGradeChange = ({ reason, remarks }) => {
     const root = document.getElementById("superflex-grade-change-original");
-    
-    // Sync to legacy elements
+
     const legacyReason = root?.querySelector("#GradeChangeReason");
     const legacyRemarks = root?.querySelector("#StdRmktxtarea");
 
@@ -462,7 +474,6 @@ function GradeChangePage() {
       legacyRemarks.dispatchEvent(new Event("input", { bubbles: true }));
     }
 
-    // Trigger legacy submission
     if (typeof window.fn_SubmitStdRemarks === "function") {
       window.fn_SubmitStdRemarks();
     } else {
@@ -473,7 +484,7 @@ function GradeChangePage() {
         alert("Submit function not found. Legacy system may have changed.");
       }
     }
-    
+
     setIsModalOpen(false);
   };
 
@@ -530,14 +541,12 @@ function GradeChangePage() {
             label="In Review"
             value={stats.pending}
             delay={200}
-           
           />
           <StatsCard
             icon={CheckCircle2}
             label="Processed"
             value={stats.processed}
             delay={300}
-           
           />
           <StatsCard
             icon={AlertTriangle}
@@ -558,10 +567,18 @@ function GradeChangePage() {
                 </h3>
                 {hasAvailableRequests && (
                   <button
-                    onClick={() => handleSelectAll(selectedIds.length !== requests.filter(r => r.checkboxId).length)}
+                    onClick={() =>
+                      handleSelectAll(
+                        selectedIds.length !==
+                          requests.filter((r) => r.checkboxId).length,
+                      )
+                    }
                     className="text-[10px] font-black text-x uppercase tracking-widest hover:opacity-80 transition-opacity"
                   >
-                    {selectedIds.length === requests.filter(r => r.checkboxId).length ? "Deselect All" : "Select All"}
+                    {selectedIds.length ===
+                    requests.filter((r) => r.checkboxId).length
+                      ? "Deselect All"
+                      : "Select All"}
                   </button>
                 )}
               </div>
@@ -616,7 +633,9 @@ function GradeChangePage() {
                       <span className="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
                         Pending
                       </span>
-                      <span className="text-white font-black">{stats.pending}</span>
+                      <span className="text-white font-black">
+                        {stats.pending}
+                      </span>
                     </div>
                     <div className="pt-3 border-t border-white/10 flex justify-between items-center">
                       <span className="text-zinc-400 text-[10px] font-black uppercase tracking-widest">
@@ -630,15 +649,15 @@ function GradeChangePage() {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                <Button
-                  disabled={selectedIds.length === 0}
-                  onClick={handleOpenRequestModal}
-                  className="w-full"
-                  variant="primary"
-                  icon={<ChevronRight size={16} />}
-                >
-                  Initiate Request
-                </Button>
+                  <Button
+                    disabled={selectedIds.length === 0}
+                    onClick={handleOpenRequestModal}
+                    className="w-full"
+                    variant="primary"
+                    icon={<ChevronRight size={16} />}
+                  >
+                    Initiate Request
+                  </Button>
                 </div>
               </div>
 
@@ -650,7 +669,8 @@ function GradeChangePage() {
                   </span>
                 </div>
                 <p className="text-[10px] text-zinc-500 font-medium leading-relaxed px-1 italic">
-                  Grade change requests are only reviewed and processed by the respective course teacher.
+                  Grade change requests are only reviewed and processed by the
+                  respective course teacher.
                 </p>
               </div>
             </div>

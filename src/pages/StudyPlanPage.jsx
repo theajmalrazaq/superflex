@@ -7,7 +7,13 @@ import SuperTabs from "../components/ui/SuperTabs";
 import LoadingOverlay, {
   LoadingSpinner,
 } from "../components/ui/LoadingOverlay";
-import { BookOpen, Layers, CheckCircle2, TrendingUp, GraduationCap } from "lucide-react";
+import {
+  BookOpen,
+  Layers,
+  CheckCircle2,
+  TrendingUp,
+  GraduationCap,
+} from "lucide-react";
 
 function StudyPlanPage() {
   const [loading, setLoading] = useState(true);
@@ -120,7 +126,6 @@ function StudyPlanPage() {
 
     parseData();
   }, []);
-
 
   const stats = useMemo(() => {
     let totalCredits = 0;

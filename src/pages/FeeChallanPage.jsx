@@ -1,6 +1,16 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import { DollarSign, Calendar, CheckCircle2, AlertCircle, Printer, FileText, Clock, ExternalLink, Receipt } from "lucide-react";
+import {
+  DollarSign,
+  Calendar,
+  CheckCircle2,
+  AlertCircle,
+  Printer,
+  FileText,
+  Clock,
+  ExternalLink,
+  Receipt,
+} from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";

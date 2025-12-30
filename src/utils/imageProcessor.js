@@ -26,7 +26,6 @@ export const processImage = (file) => {
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Compress to JPEG quality 0.8
         const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
         resolve(dataUrl);
       };

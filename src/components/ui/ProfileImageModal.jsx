@@ -76,15 +76,23 @@ const ProfileImageModal = ({ isOpen, onClose, currentImage }) => {
           <div className="absolute -inset-4 bg-x/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
           <div className="w-40 h-40 rounded-[2.5rem] border-4 border-white/5 overflow-hidden bg-zinc-900 flex items-center justify-center relative z-10 shadow-2xl">
             {preview ? (
-              <img src={preview.url} alt="Preview" className="w-full h-full object-cover" />
+              <img
+                src={preview.url}
+                alt="Preview"
+                className="w-full h-full object-cover"
+              />
             ) : currentImage ? (
-              <img src={currentImage} alt="Profile" className="w-full h-full object-cover" />
+              <img
+                src={currentImage}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
             ) : (
               <User size={64} className="text-zinc-700" />
             )}
           </div>
           {!preview && (
-            <button 
+            <button
               onClick={() => fileInputRef.current?.click()}
               className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-[2.5rem] text-white font-bold text-xs uppercase tracking-widest z-20"
             >
@@ -96,7 +104,7 @@ const ProfileImageModal = ({ isOpen, onClose, currentImage }) => {
         <div className="flex flex-col w-full gap-3">
           {!preview ? (
             <>
-              <Button 
+              <Button
                 onClick={() => fileInputRef.current?.click()}
                 icon={<Upload size={18} />}
                 className="w-full"
@@ -104,7 +112,7 @@ const ProfileImageModal = ({ isOpen, onClose, currentImage }) => {
                 Upload New Image
               </Button>
               {localStorage.getItem(CUSTOM_IMAGE_KEY) && (
-                <Button 
+                <Button
                   onClick={handleRemove}
                   variant="danger"
                   icon={<Trash2 size={16} />}
@@ -116,7 +124,7 @@ const ProfileImageModal = ({ isOpen, onClose, currentImage }) => {
             </>
           ) : (
             <div className="flex gap-3">
-              <Button 
+              <Button
                 variant="success"
                 isLoading={isProcessing}
                 onClick={handleSave}
@@ -125,7 +133,7 @@ const ProfileImageModal = ({ isOpen, onClose, currentImage }) => {
               >
                 Save
               </Button>
-              <Button 
+              <Button
                 variant="secondary"
                 disabled={isProcessing}
                 onClick={() => setPreview(null)}
@@ -150,15 +158,17 @@ const ProfileImageModal = ({ isOpen, onClose, currentImage }) => {
             Privacy Note
           </h4>
           <p className="text-[11px] text-zinc-500 leading-relaxed font-bold">
-            Your profile picture is processed locally and stored in your browser's local storage. SuperFlex does not upload it to any external servers.
+            Your profile picture is processed locally and stored in your
+            browser's local storage. SuperFlex does not upload it to any
+            external servers.
           </p>
         </div>
 
-        <input 
-          type="file" 
-          ref={fileInputRef} 
-          onChange={handleFileChange} 
-          className="hidden" 
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          className="hidden"
           accept="image/png,image/jpeg,image/jpg"
         />
       </div>

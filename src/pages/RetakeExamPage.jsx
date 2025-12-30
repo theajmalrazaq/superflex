@@ -7,7 +7,22 @@ import SuperTabs from "../components/ui/SuperTabs";
 import LoadingOverlay, {
   LoadingSpinner,
 } from "../components/ui/LoadingOverlay";
-import { AlertCircle, BookOpen, Layout, FileText, Download, AlertTriangle, ChevronDown, ChevronRight, ShieldCheck, Upload, X, CheckCircle2, Check, Shield } from "lucide-react";
+import {
+  AlertCircle,
+  BookOpen,
+  Layout,
+  FileText,
+  Download,
+  AlertTriangle,
+  ChevronDown,
+  ChevronRight,
+  ShieldCheck,
+  Upload,
+  X,
+  CheckCircle2,
+  Check,
+  Shield,
+} from "lucide-react";
 import Modal from "../components/ui/Modal";
 import Button from "../components/ui/Button";
 import Input, { TextArea } from "../components/ui/Input";
@@ -69,7 +84,7 @@ const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
             </div>
           </div>
 
-          <TextArea 
+          <TextArea
             label="Applicant Remarks"
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
@@ -77,7 +92,7 @@ const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
           />
         </div>
 
-        <Button 
+        <Button
           onClick={() => onSubmit(file, remarks)}
           disabled={!file || !remarks}
           className="w-full"
@@ -161,11 +176,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        <Button 
-          variant="secondary"
-          onClick={onClose}
-          className="w-full"
-        >
+        <Button variant="secondary" onClick={onClose} className="w-full">
           Understood, Close
         </Button>
       </div>
@@ -650,7 +661,12 @@ function RetakeExamPage() {
             icon={ShieldCheck}
             label="Processed"
             value={
-              courses.filter((c) => c.status && c.status.trim().length > 0 && c.status.trim().toLowerCase() === "processed").length
+              courses.filter(
+                (c) =>
+                  c.status &&
+                  c.status.trim().length > 0 &&
+                  c.status.trim().toLowerCase() === "processed",
+              ).length
             }
             delay={300}
           />
@@ -764,7 +780,6 @@ function RetakeExamPage() {
               </div>
 
               <div className="flex flex-col gap-3">
-
                 <Button
                   variant="secondary"
                   disabled={selectedCourses.size === 0}

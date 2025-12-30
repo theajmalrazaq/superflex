@@ -1,23 +1,28 @@
 import React from "react";
 
-const Button = ({ 
-  children, 
-  onClick, 
-  type = "button", 
-  variant = "primary", 
+const Button = ({
+  children,
+  onClick,
+  type = "button",
+  variant = "primary",
   disabled = false,
   className = "",
   icon,
-  isLoading = false
+  isLoading = false,
 }) => {
-  const baseStyles = "relative flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold uppercase text-[10px] tracking-widest transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 overflow-hidden group";
-  
+  const baseStyles =
+    "relative flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold uppercase text-[10px] tracking-widest transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 overflow-hidden group";
+
   const variants = {
     primary: "bg-x text-zinc-950 border-none hover:bg-[#b0a8ff]",
-    secondary: "bg-white/5 text-zinc-400 hover:text-white border border-white/5 hover:bg-white/10",
-    danger: "bg-rose-500 text-white border-none hover:bg-rose-600 disabled:bg-zinc-800 disabled:text-zinc-400",
-    success: "bg-emerald-500 text-white border-none hover:bg-emerald-600 disabled:bg-zinc-800 disabled:text-zinc-400",
-    outline: "bg-transparent text-zinc-400 border border-white/10 hover:border-white/20 hover:text-white"
+    secondary:
+      "bg-white/5 text-zinc-400 hover:text-white border border-white/5 hover:bg-white/10",
+    danger:
+      "bg-rose-500 text-white border-none hover:bg-rose-600 disabled:bg-zinc-800 disabled:text-zinc-400",
+    success:
+      "bg-emerald-500 text-white border-none hover:bg-emerald-600 disabled:bg-zinc-800 disabled:text-zinc-400",
+    outline:
+      "bg-transparent text-zinc-400 border border-white/10 hover:border-white/20 hover:text-white",
   };
 
   return (

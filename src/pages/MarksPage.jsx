@@ -1,5 +1,17 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
-import { AlertCircle, BookOpen, Bookmark, Layers, Award, Settings, X, RotateCcw, ChevronDown, Zap, Check } from "lucide-react";
+import {
+  AlertCircle,
+  BookOpen,
+  Bookmark,
+  Layers,
+  Award,
+  Settings,
+  X,
+  RotateCcw,
+  ChevronDown,
+  Zap,
+  Check,
+} from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
@@ -307,22 +319,28 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount, sectionTitle }) => {
     >
       <div className="space-y-8 pt-4">
         <div className="space-y-6">
-          <Input 
+          <Input
             label={`Number of Best ${itemType}${count > 1 ? (itemType === "Quiz" ? "es" : "s") : ""}`}
             type="number"
             value={count}
-            onChange={(e) => setCount(e.target.value === "" ? "" : parseInt(e.target.value))}
+            onChange={(e) =>
+              setCount(e.target.value === "" ? "" : parseInt(e.target.value))
+            }
             max={itemCount}
             min={1}
             placeholder="e.g. 4"
             className="text-xl font-bold"
           />
 
-          <Input 
+          <Input
             label="Total Weightage (%)"
             type="number"
             value={totalWeight}
-            onChange={(e) => setTotalWeight(e.target.value === "" ? "" : parseFloat(e.target.value))}
+            onChange={(e) =>
+              setTotalWeight(
+                e.target.value === "" ? "" : parseFloat(e.target.value),
+              )
+            }
             placeholder="e.g. 20"
             className="text-xl font-bold"
           />
@@ -337,7 +355,7 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount, sectionTitle }) => {
           </p>
         </div>
 
-        <Button 
+        <Button
           onClick={() => onApply(count, totalWeight)}
           className="w-full"
           icon={<Check size={18} />}
@@ -363,11 +381,10 @@ const AssessmentView = ({
   const [isBestOfOpen, setIsBestOfOpen] = useState(false);
   const isGrandTotal = section.title.includes("Grand Total");
   const isBestOfEligible =
-    !isGrandTotal && (
-    section.title.toLowerCase().includes("quiz") ||
-    section.title.toLowerCase().includes("assignment") ||
-    section.title.toLowerCase().includes("lab")
-    );
+    !isGrandTotal &&
+    (section.title.toLowerCase().includes("quiz") ||
+      section.title.toLowerCase().includes("assignment") ||
+      section.title.toLowerCase().includes("lab"));
   const obtained = section.obtained || 0;
   const weight = section.weight || 0;
   const percentage = weight > 0 ? (obtained / weight) * 100 : 0;
@@ -396,7 +413,9 @@ const AssessmentView = ({
   return (
     <div
       className={`group rounded-[2rem] border transition-all duration-300 overflow-hidden ${
-        isGrandTotal ? "bg-black/40 border-x/30 " : "bg-zinc-900/50 border-white/5"
+        isGrandTotal
+          ? "bg-black/40 border-x/30 "
+          : "bg-zinc-900/50 border-white/5"
       }`}
     >
       <div className="w-full">
@@ -413,9 +432,9 @@ const AssessmentView = ({
                 </span>
               )}
               {isSimulationMode && !isGrandTotal && (
-                 <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-500 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
-                 <Zap size={10} fill="currentColor" /> Simulating
-               </span>
+                <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-500 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                  <Zap size={10} fill="currentColor" /> Simulating
+                </span>
               )}
             </div>
             <p className="text-sm font-medium text-zinc-500">
@@ -428,13 +447,20 @@ const AssessmentView = ({
               <button
                 onClick={onToggleSimulation}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-bold text-sm border ${
-                  isSimulationMode 
-                    ? "bg-amber-500 text-black border-amber-600" 
+                  isSimulationMode
+                    ? "bg-amber-500 text-black border-amber-600"
                     : "bg-zinc-800 text-zinc-400 border-white/5 hover:bg-zinc-700"
                 }`}
-                title={isSimulationMode ? "Exit Simulation Mode" : "Enter Simulation Mode (Custom Weights)"}
+                title={
+                  isSimulationMode
+                    ? "Exit Simulation Mode"
+                    : "Enter Simulation Mode (Custom Weights)"
+                }
               >
-                <Zap size={16} fill={isSimulationMode ? "currentColor" : "none"} />
+                <Zap
+                  size={16}
+                  fill={isSimulationMode ? "currentColor" : "none"}
+                />
                 {isSimulationMode ? "Simulating" : "Simulate"}
               </button>
             )}
@@ -602,7 +628,10 @@ const AssessmentView = ({
                           />
                         </td>
                         <td className="px-6 py-4 text-center font-bold text-x bg-x/5">
-                          {(row.total > 0 ? (row.obtained / row.total) * row.weight : 0).toFixed(2)}
+                          {(row.total > 0
+                            ? (row.obtained / row.total) * row.weight
+                            : 0
+                          ).toFixed(2)}
                         </td>
                         <td className="px-6 py-4 text-center text-zinc-500">
                           ~{row.avg.toFixed(2)}
@@ -892,16 +921,13 @@ function MarksPage() {
               (acc, r) => acc + (r.weight || 0),
               0,
             );
-            
-            // Respect server weightage if present, otherwise fallback to sum
-            // This enables "Best Of" logic when secWeight < rowsWeightSum
-            const useSecWeight = (secWeight > 0) ? secWeight : rowsWeightSum;
+
+            const useSecWeight = secWeight > 0 ? secWeight : rowsWeightSum;
 
             if (useSecWeight > 0) {
               const EPSILON = 0.001;
               let currentAccWeight = 0;
 
-              // Sort by performance ratio (obtained/total) to pick the "best" items
               const sorted = [...rowsData].map((r, i) => {
                 const ratio = r.total > 0 ? r.obtained / r.total : 0;
                 return {
@@ -911,7 +937,6 @@ function MarksPage() {
                 };
               });
 
-              // Sort descending by ratio
               sorted.sort((a, b) => b._performanceRatio - a._performanceRatio);
 
               const includedIndices = new Set();
@@ -1033,7 +1058,6 @@ function MarksPage() {
       const section = course.sections[sectionIdx];
       const newRows = [...section.rows];
 
-      // Convert value for numeric fields
       const numericValue =
         field === "weight" || field === "obtained"
           ? parseFloat(value) || 0
@@ -1047,18 +1071,20 @@ function MarksPage() {
       const updatedSections = [...course.sections];
       let newSimulationMode = course.simulationMode;
 
-      // Automatically enable simulation mode if weight is edited
       if (field === "weight") {
         newSimulationMode = true;
       }
 
-      // Update the modified row
       updatedSections[sectionIdx] = {
         ...section,
         rows: newRows,
       };
 
-      const tempCourse = { ...course, sections: updatedSections, simulationMode: newSimulationMode };
+      const tempCourse = {
+        ...course,
+        sections: updatedSections,
+        simulationMode: newSimulationMode,
+      };
       const recalculatedCourse = recalculateCourse(tempCourse);
 
       const newCourses = [...prevCourses];
@@ -1153,25 +1179,24 @@ function MarksPage() {
 
       const course = prevCourses[courseIdx];
       const nextSimMode = !course.simulationMode;
-      
+
       let newCourse;
       if (!nextSimMode) {
-        // EXITING SIMULATION: Restore all sections from initial data
-        const initialCourse = initialCoursesRef.current.find(c => c.id === selectedCourseId);
+        const initialCourse = initialCoursesRef.current.find(
+          (c) => c.id === selectedCourseId,
+        );
         if (initialCourse) {
-          // Clone initial course sections but set simulationMode to false
-          newCourse = { 
-            ...JSON.parse(JSON.stringify(initialCourse)), 
-            simulationMode: false 
+          newCourse = {
+            ...JSON.parse(JSON.stringify(initialCourse)),
+            simulationMode: false,
           };
         } else {
           newCourse = { ...course, simulationMode: false };
         }
       } else {
-        // ENTERING SIMULATION: Just flip the bit
         newCourse = { ...course, simulationMode: true };
       }
-      
+
       const recalculatedCourse = recalculateCourse(newCourse);
       const newCourses = [...prevCourses];
       newCourses[courseIdx] = recalculatedCourse;

@@ -10,7 +10,6 @@ function NotFoundPage() {
       }
     });
 
-    // Remove legacy 404 style tag
     document.querySelectorAll("style").forEach((style) => {
       if (
         style.textContent.includes("Verdana") &&
@@ -80,10 +79,16 @@ function NotFoundPage() {
             </svg>
           </div>
 
-          <h1 className="!text-4xl md:!text-5xl font-black !text-white mb-4 tracking-tighter" style={{ fontFamily: "'Google Sans Flex', sans-serif" }}>
+          <h1
+            className="!text-4xl md:!text-5xl font-black !text-white mb-4 tracking-tighter"
+            style={{ fontFamily: "'Google Sans Flex', sans-serif" }}
+          >
             404
           </h1>
-          <h2 className="!text-xl !font-medium !text-white/90 mb-4" style={{ fontFamily: "'Google Sans Flex', sans-serif" }}>
+          <h2
+            className="!text-xl !font-medium !text-white/90 mb-4"
+            style={{ fontFamily: "'Google Sans Flex', sans-serif" }}
+          >
             Page Not Found
           </h2>
 

@@ -1,7 +1,16 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageLayout from "../components/layouts/PageLayout";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
-import { DollarSign, ChevronDown, FileText, History, CreditCard, Layers, BookOpen, TrendingUp } from "lucide-react";
+import {
+  DollarSign,
+  ChevronDown,
+  FileText,
+  History,
+  CreditCard,
+  Layers,
+  BookOpen,
+  TrendingUp,
+} from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";

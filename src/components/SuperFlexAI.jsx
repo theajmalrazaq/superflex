@@ -1,5 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Send, X, Trash2, Shield, Square, Clock, BarChart, GraduationCap, User, LogOut, LogIn } from "lucide-react";
+import {
+  Send,
+  X,
+  Trash2,
+  Shield,
+  Square,
+  Clock,
+  BarChart,
+  GraduationCap,
+  User,
+  LogOut,
+  LogIn,
+} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -113,7 +125,8 @@ const SuperFlexAI = () => {
   const [usageData, setUsageData] = useState(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [userImage, setUserImage] = useState(
-    () => localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage",
+    () =>
+      localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage",
   );
   const scrollRef = useRef(null);
   const activeRequestIdRef = useRef(null);
@@ -121,14 +134,13 @@ const SuperFlexAI = () => {
   useEffect(() => {
     const handleStorage = () => {
       setUserImage(
-        localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage",
+        localStorage.getItem("superflex_user_custom_image") ||
+          "/Login/GetImage",
       );
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
-
-
 
   useEffect(() => {
     const handleUsage = (e) => {
@@ -505,13 +517,6 @@ const SuperFlexAI = () => {
 
       {isOpen && (
         <div className="fixed inset-0 z-[10000] bg-[#0c0c0c] flex flex-col animate-in fade-in duration-300">
-          {}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-x/10 blur-[150px] rounded-full opacity-40"></div>
-            <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-x/5 blur-[150px] rounded-full opacity-40"></div>
-          </div>
-
-          {}
           <div className="relative z-50 flex items-center justify-between px-8 py-6">
             <div className="flex items-center gap-3">
               <img
@@ -566,7 +571,7 @@ const SuperFlexAI = () => {
               <div className="flex flex-col items-center text-center animate-in slide-in-from-bottom-8 duration-700 w-full max-w-3xl">
                 <div className="mb-8 relative">
                   <div className="w-24 h-24 rounded-[2.5rem] bg-zinc-900 border border-white/10 flex items-center justify-center shadow-2xl shadow-black/50">
-                    <AnimatedLogo size={48} className="animate-pulse" />
+                    <AnimatedLogo size={48} className="animate-ping" />
                   </div>
                 </div>
 

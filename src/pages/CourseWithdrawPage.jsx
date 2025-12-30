@@ -3,7 +3,24 @@ import PageLayout from "../components/layouts/PageLayout";
 import LoadingOverlay, {
   LoadingSpinner,
 } from "../components/ui/LoadingOverlay";
-import { FileText, Clock, CheckCircle2, Trash2, Printer, Info, Layers, Zap, Send, X, CreditCard, BookOpen, Layout, ShieldCheck, Download, ChevronRight } from "lucide-react";
+import {
+  FileText,
+  Clock,
+  CheckCircle2,
+  Trash2,
+  Printer,
+  Info,
+  Layers,
+  Zap,
+  Send,
+  X,
+  CreditCard,
+  BookOpen,
+  Layout,
+  ShieldCheck,
+  Download,
+  ChevronRight,
+} from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
@@ -100,7 +117,7 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
             ))}
           </div>
 
-          <TextArea 
+          <TextArea
             label="Reason for Withdrawal"
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
@@ -108,7 +125,7 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
           />
         </div>
 
-        <Button 
+        <Button
           onClick={() => onSubmit({ remarks, files })}
           disabled={!isFormValid}
           className="w-full"
@@ -189,11 +206,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        <Button 
-          variant="secondary"
-          onClick={onClose}
-          className="w-full"
-        >
+        <Button variant="secondary" onClick={onClose} className="w-full">
           Understood, Close
         </Button>
       </div>
