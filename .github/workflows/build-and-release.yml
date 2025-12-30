@@ -8,7 +8,7 @@ on:
       version:
         description: "Release version"
         required: true
-        default: "2.0.0"
+        default: "3.0.0"
 
 permissions:
   contents: write
@@ -47,15 +47,21 @@ jobs:
         id: date
         run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
+      - name: Generate Changelog
+        id: build_changelog
+        uses: mikepenz/release-changelog-builder-action@v4
+        with:
+          configuration: ".github/changelog-config.json"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.event.inputs.version || format('v{0}', github.run_number) }}
           name: SuperFlex ${{ github.event.inputs.version || format('v{0}', github.run_number) }}
-          body: |
-            SuperFlex Chrome Extension Release
-            Built on: ${{ steps.date.outputs.date }}
+          body: ${{ steps.build_changelog.outputs.changelog }}
           files: superflex.zip
           draft: false
         env:

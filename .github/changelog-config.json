@@ -1,0 +1,23 @@
+{
+  "categories": [
+    {
+      "title": "## Additions",
+      "labels": ["enhancement", "feature"]
+    },
+    {
+      "title": "## Fixes",
+      "labels": ["bug", "fix"]
+    },
+    {
+      "title": "## Documentation",
+      "labels": ["documentation"]
+    },
+    {
+      "title": "## Other Changes",
+      "labels": []
+    }
+  ],
+  "template": "## What changed?\n\n#{{CHANGELOG}}\n\n---\n*Built on #{{DATE}}*",
+  "pr_template": "* #{{TITLE}} by @#{{AUTHOR}}",
+  "empty_template": "## What changed?\n\nNo major changes in this release.\n\n---\n*Built on #{{DATE}}*"
+}
