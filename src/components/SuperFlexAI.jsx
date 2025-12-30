@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Send, X, Trash2, Shield, Square, Clock, BarChart, GraduationCap, User, LogOut } from "lucide-react";
+import { Send, X, Trash2, Shield, Square, Clock, BarChart, GraduationCap, User, LogOut, LogIn } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -522,7 +522,7 @@ const SuperFlexAI = () => {
             </div>
 
             <div className="flex items-center gap-4">
-              {isSignedIn && (
+              {isSignedIn ? (
                 <button
                   onClick={() =>
                     document.dispatchEvent(
@@ -534,6 +534,19 @@ const SuperFlexAI = () => {
                 >
                   <LogOut size={16} />
                   <span className="hidden md:inline">Sign Out</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() =>
+                    document.dispatchEvent(
+                      new CustomEvent("superflex-auth-trigger"),
+                    )
+                  }
+                  className="flex items-center gap-2 px-3 py-1.5 bg-x/10 border border-x/20 rounded-full text-x hover:bg-x/20 transition-all text-xs font-bold"
+                  title="Sign In with Puter"
+                >
+                  <LogIn size={16} />
+                  <span className="hidden md:inline">Sign In</span>
                 </button>
               )}
               <button
@@ -687,6 +700,30 @@ const SuperFlexAI = () => {
                     Reject
                   </button>
                 </div>
+              </div>
+            ) : !isSignedIn ? (
+              <div className="bg-zinc-900/90 backdrop-blur-xl border border-white/10 p-4 rounded-[2rem] flex items-center justify-between gap-4 shadow-2xl">
+                <div className="flex items-center gap-3 pl-2">
+                  <LogIn className="text-x" size={20} />
+                  <div className="text-sm">
+                    <span className="text-white font-bold block">
+                      Sign In Required
+                    </span>
+                    <span className="text-zinc-500 text-xs">
+                      Please sign in with Puter to chat with SuperFlex.
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() =>
+                    document.dispatchEvent(
+                      new CustomEvent("superflex-auth-trigger"),
+                    )
+                  }
+                  className="px-6 py-2 bg-x hover:bg-x/90 text-white text-xs font-bold rounded-xl transition-colors"
+                >
+                  Sign In
+                </button>
               </div>
             ) : (
               <div className="group relative bg-[#1a1a1c]/80 backdrop-blur-2xl border border-white/10 rounded-full shadow-2xl shadow-black/50 transition-all focus-within:bg-[#1a1a1c] focus-within:border-x/30 focus-within:ring-4 focus-within:ring-x/10 flex items-center">

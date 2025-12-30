@@ -10,7 +10,7 @@ const Button = ({
   icon,
   isLoading = false
 }) => {
-  const baseStyles = "relative flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold text-xs transition-all duration-300 active:scale-[0.98] disabled:opacity-50 capitalize disabled:cursor-not-allowed disabled:active:scale-100 overflow-hidden group";
+  const baseStyles = "relative flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold uppercase text-xs transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 overflow-hidden group";
   
   const variants = {
     primary: "bg-x text-white border-none",
