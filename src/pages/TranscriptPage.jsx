@@ -422,7 +422,7 @@ function TranscriptPage() {
           const rows = col.querySelectorAll("tbody tr");
           rows.forEach((row) => {
             const cells = row.querySelectorAll("td");
-            if (cells.length >= 6) {
+            if (cells.length >= 7) {
               const ch = parseFloat(cells[3].textContent.trim()) || 0;
               const pts = parseFloat(cells[5].textContent.trim()) || 0;
               const codeCell = cells[0];
@@ -473,10 +473,11 @@ function TranscriptPage() {
               courses.push({
                 code: codeText,
                 description: cells[1].textContent.trim(),
-                type: cells[2].textContent.trim(),
+                section: cells[2].textContent.trim(),
                 crHrs: ch,
                 grade: cells[4].textContent.trim(),
                 points: pts,
+                type: cells[6].textContent.trim(),
                 mca: mca,
                 gradingScheme: gradingScheme,
                 schemeDetailId: schemeDetailId,
@@ -521,6 +522,7 @@ function TranscriptPage() {
         courses: sem.courses.map((c) => ({
           code: c.code,
           name: c.description,
+          section: c.section,
           type: c.type,
           crHrs: c.crHrs,
           grade: c.grade,
@@ -557,6 +559,7 @@ function TranscriptPage() {
     let lastNonEmptyCGPA = 0;
 
     const semesterStats = semesters.map((sem, sIdx) => {
+      const isSummer = sem.title.toLowerCase().includes("summer");
       let semGradePoints = 0;
       let semCreditsForGPA = 0;
       let semCreditsAttempted = 0;
@@ -607,7 +610,9 @@ function TranscriptPage() {
       const isEmptySemester = semCreditsForGPA === 0 && !hasOverriddenGrade;
 
       if (!isEmptySemester) {
-        totalCreditsAttempted += semCreditsAttempted;
+        if (!isSummer) {
+          totalCreditsAttempted += semCreditsAttempted;
+        }
         tempPassedCredits.forEach((ch, code) => {
           passedUniqueCredits.set(
             code,
@@ -944,10 +949,16 @@ function TranscriptPage() {
                             Course Name
                           </th>
                           <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-center">
+                            Section
+                          </th>
+                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-center">
                             Cr.H
                           </th>
                           <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-center">
                             Grade
+                          </th>
+                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-center">
+                            Type
                           </th>
                           <th className="px-8 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-right">
                             Points
@@ -1054,9 +1065,6 @@ function TranscriptPage() {
                                   <p className="text-sm font-bold text-white leading-tight">
                                     {course.description}
                                   </p>
-                                  <p className="text-[10px] font-medium text-zinc-600 uppercase tracking-wide">
-                                    {course.type}
-                                  </p>
                                   {course.mca && (
                                     <div className="flex items-center gap-2 mt-1">
                                       <button
@@ -1077,6 +1085,11 @@ function TranscriptPage() {
                                     </div>
                                   )}
                                 </div>
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                                  {course.section}
+                                </span>
                               </td>
                               <td className="px-6 py-4 text-center">
                                 <span className="text-sm font-medium text-zinc-400 group-hover:text-white transition-colors">
@@ -1134,14 +1147,18 @@ function TranscriptPage() {
                                   </div>
                                 )}
                               </td>
+                              <td className="px-6 py-4 text-center">
+                                <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded">
+                                  {course.type}
+                                </span>
+                              </td>
                               <td className="px-8 py-4 text-right">
                                 <span
                                   className={`text-sm font-bold font-sans ${isSimulated ? "text-x" : "text-zinc-300"}`}
                                 >
-                                  {(
-                                    (GRADE_POINTS[currentGrade] || 0) *
-                                    course.crHrs
-                                  ).toFixed(1)}
+                                  {isSimulated
+                                    ? ((GRADE_POINTS[currentGrade] || 0) * course.crHrs).toFixed(1)
+                                    : course.points.toFixed(2)}
                                 </span>
                               </td>
                             </tr>
