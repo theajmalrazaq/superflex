@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version (e.g. 3.0.0)"
+        description: "Release version (e.g. 4.0.0)"
         required: true
-        default: "3.0.0"
+        default: "4.0.0"
       updates:
         description: "Release notes / What's changed"
         required: true

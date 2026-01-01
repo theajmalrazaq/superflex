@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SuperFlex",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "A modern UI overlay and AI academic assistant for the Flex Student Portal.",
   "icons": {
     "16": "assets/favicon.png",
