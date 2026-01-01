@@ -120,13 +120,13 @@ export const processCourseMarks = (course) => {
       const takenWeight = isSimMode
         ? item.weight
         : Math.min(item.weight, remaining);
-      const weightRatio = secWeight > 0 ? takenWeight / secWeight : 0;
+      const weightageFactor = item.total > 0 ? takenWeight / item.total : 0;
 
-      calculatedSecObtained += (item.obtained / item.total) * takenWeight;
-      tempSumAvg += (item.avg || 0) * weightRatio;
-      tempSumMin += (item.min || 0) * weightRatio;
-      tempSumMax += (item.max || 0) * weightRatio;
-      tempSumStd += (item.stdDev || 0) * weightRatio;
+      calculatedSecObtained += (item.obtained || 0) * weightageFactor;
+      tempSumAvg += (item.avg || 0) * weightageFactor;
+      tempSumMin += (item.min || 0) * weightageFactor;
+      tempSumMax += (item.max || 0) * weightageFactor;
+      tempSumStd += (item.stdDev || 0) * weightageFactor;
 
       usedWeightBudget += takenWeight;
     });

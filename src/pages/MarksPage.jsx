@@ -959,16 +959,21 @@ function MarksPage() {
 
             rowsData.forEach((r) => {
               if (r.included && r.total > 0 && useSecWeight > 0) {
-                const ratio = r.weight / r.total;
-                secWeightedAvg += r.avg * ratio;
-                secWeightedMin += r.min * ratio;
-                secWeightedMax += r.max * ratio;
-                secWeightedStd += r.stdDev * ratio;
+                const weightageFactor = r.weight / r.total;
+                const rowAvgWeightage = (r.avg || 0) * weightageFactor;
+                const rowMinWeightage = (r.min || 0) * weightageFactor;
+                const rowMaxWeightage = (r.max || 0) * weightageFactor;
+                const rowStdWeightage = (r.stdDev || 0) * weightageFactor;
 
-                globalAverage += r.avg * ratio;
-                globalMinimum += r.min * ratio;
-                globalMaximum += r.max * ratio;
-                globalStdDev += r.stdDev * ratio;
+                secWeightedAvg += rowAvgWeightage;
+                secWeightedMin += rowMinWeightage;
+                secWeightedMax += rowMaxWeightage;
+                secWeightedStd += rowStdWeightage;
+
+                globalAverage += rowAvgWeightage;
+                globalMinimum += rowMinWeightage;
+                globalMaximum += rowMaxWeightage;
+                globalStdDev += rowStdWeightage;
               }
             });
 

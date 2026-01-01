@@ -498,7 +498,7 @@ function AttendancePage() {
                 </div>
 
                 {}
-                <div className="bg-zinc-900/30 rounded-[2rem] p-6 backdrop-blur-xl">
+                <div className="bg-zinc-900/50 border border-white/5 rounded-[2rem] p-6 backdrop-blur-xl">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="text-xl font-bold text-white">
                       History Log

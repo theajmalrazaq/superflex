@@ -673,24 +673,6 @@ function TranscriptPage() {
       window.removeEventListener("superflex-theme-changed", handleThemeChange);
   }, []);
 
-  const hexToRgba = (hex, alpha = 1) => {
-    let c;
-    if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
-      c = hex.substring(1).split("");
-      if (c.length === 3) {
-        c = [c[0], c[0], c[1], c[1], c[2], c[2]];
-      }
-      c = "0x" + c.join("");
-      return (
-        "rgba(" +
-        [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(",") +
-        "," +
-        alpha +
-        ")"
-      );
-    }
-    return hex;
-  };
 
   const chartData = useMemo(() => {
     if (!calculatedStats) return null;
@@ -704,8 +686,8 @@ function TranscriptPage() {
           backgroundColor: (context) => {
             const ctx = context.chart.ctx;
             const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, hexToRgba(themeColor, 0.15));
-            gradient.addColorStop(1, hexToRgba(themeColor, 0));
+            gradient.addColorStop(0, themeColor.slice(0, 7) + "26");
+            gradient.addColorStop(1, themeColor.slice(0, 7) + "00");
             return gradient;
           },
           tension: 0.45,
@@ -746,7 +728,7 @@ function TranscriptPage() {
         bodyFont: { size: 12 },
         padding: 16,
         borderRadius: 16,
-        borderColor: "rgba(255,255,255,0.1)",
+        borderColor: "#ffffff1a",
         borderWidth: 1,
         displayColors: false,
         callbacks: {
@@ -760,7 +742,7 @@ function TranscriptPage() {
         min: 0,
         max: 4,
         ticks: { color: "#3f3f46", stepSize: 1, font: { weight: "bold" } },
-        grid: { color: "rgba(255,255,255,0.03)" },
+        grid: { color: "#ffffff08" },
       },
       x: {
         ticks: { color: "#3f3f46", font: { weight: "bold" } },
@@ -1071,8 +1053,7 @@ function TranscriptPage() {
                                         } else {
                                           modal.style.display = "block";
                                           modal.classList.add("show");
-                                          modal.style.backgroundColor =
-                                            "rgba(0,0,0,0.5)";
+                                          modal.style.backgroundColor = "#00000080";
                                           modal.onclick = (e) => {
                                             if (e.target === modal) {
                                               modal.style.display = "none";
