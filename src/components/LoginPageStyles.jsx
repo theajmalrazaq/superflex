@@ -476,15 +476,17 @@ function LoginPageStyles() {
     `;
 
     const suggestionButton = document.createElement("a");
-    suggestionButton.href = "https://github.com/theajmalrazaq/superflex";
+    suggestionButton.href = "https://instagram.com/superflex.fr";
     suggestionButton.target = "_blank";
     suggestionButton.className =
       "group relative bg-white/10 backdrop-blur-sm px-8 py-3.5 rounded-2xl text-white hover:bg-white/20 hover:border-white/40 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto whitespace-nowrap h-[52px]";
     suggestionButton.style.fontFamily = "'Google Sans Flex', sans-serif";
     suggestionButton.innerHTML = `
-      <span class="text-sm font-medium">Star on Github (<span id="starCount">...</span>)</span>
+      <span class="text-sm font-medium">Follow on Insta</span>
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-x">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
       </svg>
     `;
 
@@ -868,16 +870,6 @@ function LoginPageStyles() {
     };
 
     checkForUpdates();
-
-    fetch("https://api.github.com/repos/theajmalrazaq/superflex")
-      .then((res) => res.json())
-      .then((data) => {
-        const el = document.getElementById("starCount");
-        if (el && data.stargazers_count !== undefined) {
-          el.innerText = data.stargazers_count;
-        }
-      })
-      .catch((err) => console.error("Failed to fetch stars", err));
 
     if (bglogin && bglogin.parentNode) {
       const wrapper = bglogin.parentNode;
