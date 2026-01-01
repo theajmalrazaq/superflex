@@ -14,13 +14,15 @@ import {
   RefreshCw,
   ListChecks,
   GraduationCap,
-  LogOut,
+  Settings,
   Menu,
   X,
-  Settings,
   User,
+  LogOut,
   ChevronDown,
+  Pipette,
 } from "lucide-react";
+import { Logo } from "./ui/Logo";
 import ProfileImageModal from "./ui/ProfileImageModal";
 
 function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
@@ -311,9 +313,39 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         setOpenDropdown(null);
       }
     };
-    document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
+
+  const [themeColor, setThemeColor] = useState(
+    localStorage.getItem("superflex-theme-color") || "#a098ff",
+  );
+
+  const themeColors = [
+    "#a098ff",
+    "#F77FBE",
+    "#ff3838ff",
+    "#ff6a00ff",
+    "#ffb83eff",
+  ];
+
+  useEffect(() => {
+    const savedColor =
+      localStorage.getItem("superflex-theme-color") || "#a098ff";
+    document.documentElement.style.setProperty("--color-x", savedColor);
+    setThemeColor(savedColor);
+  }, []);
+
+  const handleColorChange = (color, shouldClose = true) => {
+    setThemeColor(color);
+    localStorage.setItem("superflex-theme-color", color);
+    document.documentElement.style.setProperty("--color-x", color);
+    window.dispatchEvent(
+      new CustomEvent("superflex-theme-changed", { detail: color }),
+    );
+    if (shouldClose) {
+      setOpenDropdown(null);
+    }
+  };
 
   return (
     <div className="flex items-center justify-between lg:justify-start px-4 lg:px-6 py-2.5 lg:py-3 w-full lg:w-fit relative">
@@ -328,11 +360,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         </button>
 
         <div className="flex items-center shrink-0">
-          <img
-            src={chrome.runtime.getURL("assets/logo.svg")}
-            alt="Logo"
-            className="h-7 lg:h-8 w-auto"
-          />
+          <Logo className="h-7 lg:h-8 w-auto" />
         </div>
       </div>
 
@@ -368,20 +396,10 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                       className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-white/5 ${isActive ? "bg-x/10 text-x border border-white/10" : "!text-zinc-400 hover:!text-white"}`}
                     >
                       {category}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                      <ChevronDown
+                        size={14}
                         className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-                      >
-                        <path d="m6 9 6 6 6-6" />
-                      </svg>
+                      />
                     </button>
 
                     {isOpen && (
@@ -443,7 +461,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                     <h3 className="text-white font-bold text-sm leading-tight truncate max-w-[150px]">
                       {userName}
                     </h3>
-                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none mt-0.5">
+                    <p className="text-[10px] text-zinc-500 font-bold capitalize leading-none mt-0.5">
                       Profile Info
                     </p>
                   </div>
@@ -502,6 +520,57 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
               </div>
             </div>
 
+            {}
+            <div className="bg-zinc-900/40 border border-white/5 rounded-3xl p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-x/10 text-x rounded-xl">
+                    <Pipette size={16} />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold text-sm leading-tight">
+                      Accent Color
+                    </h3>
+                    <p className="text-[10px] text-zinc-500 font-bold capitalize leading-none mt-1">
+                      Personalization
+                    </p>
+                  </div>
+                </div>
+                <div
+                  className="w-6 h-6 rounded-full border-2 border-white/20 shadow-lg"
+                  style={{ backgroundColor: themeColor }}
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-2.5  pt-2">
+                <div className="relative group">
+                  <button className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-400 via-purple-400 to-orange-400 p-[2.5px] transition-transform active:scale-95">
+                    <div className="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center">
+                      <Pipette size={14} stroke="white" strokeWidth={2.5} />
+                    </div>
+                  </button>
+                  <input
+                    type="color"
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    value={themeColor}
+                    onChange={(e) => handleColorChange(e.target.value, false)}
+                  />
+                </div>
+                {themeColors.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => handleColorChange(color, false)}
+                    className={`w-10 h-10 rounded-full transition-all duration-300 active:scale-95 border-2 ${
+                      themeColor === color
+                        ? "border-white scale-110 shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+                        : "border-white/10"
+                    }`}
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-2">
               {groupedLinks.root?.map((link, index) => {
                 const isActive =
@@ -557,19 +626,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                       <div
                         className={`p-1 rounded-full bg-white/5 transition-transform duration-300 ${isExpanded ? "rotate-180 bg-white/10 text-white" : ""}`}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
+                        <ChevronDown size={14} />
                       </div>
                     </button>
 
@@ -623,17 +680,92 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           onClick={() =>
             window.dispatchEvent(new CustomEvent("superflex-toggle-ai"))
           }
-          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-x/10 border border-x/20 text-x hover:bg-x/20 transition-all duration-300 group"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-x/10 text-x hover:bg-x/20 transition-all duration-300 group animate-border-beam"
         >
-          <img
-            src={chrome.runtime.getURL("assets/favicon.svg")}
-            alt="Logo"
-            className="h-5 w-auto rounded-full"
-          />
+          <div className="border-beam-element" />
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 432 432"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+          >
+            <path
+              d="M247.227 185.616L282.286 69L133 216L186.861 231.146L133 363L298 208.65L247.227 185.616Z"
+              fill="var(--color-x)"
+            />
+            <path
+              d="M246.748 185.472L246.623 185.891L247.021 186.071L297.111 208.796L134.327 361.073L187.324 231.335L187.536 230.816L186.996 230.664L133.964 215.751L281.243 70.7275L246.748 185.472Z"
+              stroke="white"
+              strokeOpacity="0.03"
+            />
+          </svg>
           <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline-block">
             Ask AI
           </span>
         </button>
+
+        <div className="relative dropdown-container hidden md:block">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpenDropdown(openDropdown === "theme" ? null : "theme");
+            }}
+            className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/5 transition-all duration-200"
+          >
+            <div
+              className="w-7 h-7 rounded-full border-2 border-white/20"
+              style={{ backgroundColor: themeColor }}
+            />
+          </button>
+
+          {openDropdown === "theme" && (
+            <div className="absolute right-0 top-full mt-4 z-[999] w-[calc(100vw-2rem)] sm:w-[340px] animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="bg-[#0c0c0c]/95 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-6 shadow-2xl flex flex-col gap-6">
+                <div className="space-y-1">
+                  <h3 className="text-lg font-bold text-white tracking-tight">
+                    Accent Colors
+                  </h3>
+                  <p className="text-xs text-zinc-400 font-medium">
+                    Increase Aura of your Flex!
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <div className="relative group">
+                    <button className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-400 via-purple-400 to-orange-400 p-[3px] transition-transform hover:scale-110 active:scale-95">
+                      <div className="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center">
+                        <Pipette size={14} stroke="white" strokeWidth={2.5} />
+                      </div>
+                    </button>
+                    <input
+                      type="color"
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                      value={themeColor}
+                      onChange={(e) => handleColorChange(e.target.value, false)}
+                    />
+                  </div>
+
+                  {themeColors.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => handleColorChange(color)}
+                      className={`w-10 h-10 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center ${
+                        themeColor === color
+                          ? "scale-110"
+                          : "hover:brightness-110"
+                      }`}
+                      style={{ backgroundColor: color }}
+                    >
+                      <div className="w-[22px] h-[22px] rounded-full bg-zinc-900" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="relative dropdown-container hidden lg:block">
           <button
@@ -652,20 +784,10 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                   'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><rect fill="%23a098ff" width="32" height="32"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="14">?</text></svg>';
               }}
             />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+            <ChevronDown
+              size={14}
               className={`text-zinc-400 transition-transform duration-200 ${openDropdown === "profile" ? "rotate-180" : ""}`}
-            >
-              <path d="m6 9 6 6 6-6" />
-            </svg>
+            />
           </button>
 
           {}

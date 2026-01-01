@@ -234,7 +234,7 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
       isOpen={isOpen}
       onClose={onClose}
       title="Relative Grade Lookup"
-      subtitle="Determine grade based on MCA thresholds"
+      subtitle="Determine grade based on MCA"
       icon={<Scale size={24} />}
     >
       <div className="space-y-8 pt-4">
@@ -660,6 +660,38 @@ function TranscriptPage() {
     };
   }, [semesters, overriddenGrades]);
 
+  const [themeColor, setThemeColor] = useState(
+    localStorage.getItem("superflex-theme-color") || "#a098ff",
+  );
+
+  useEffect(() => {
+    const handleThemeChange = (e) => {
+      setThemeColor(e.detail);
+    };
+    window.addEventListener("superflex-theme-changed", handleThemeChange);
+    return () =>
+      window.removeEventListener("superflex-theme-changed", handleThemeChange);
+  }, []);
+
+  const hexToRgba = (hex, alpha = 1) => {
+    let c;
+    if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+      c = hex.substring(1).split("");
+      if (c.length === 3) {
+        c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+      }
+      c = "0x" + c.join("");
+      return (
+        "rgba(" +
+        [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(",") +
+        "," +
+        alpha +
+        ")"
+      );
+    }
+    return hex;
+  };
+
   const chartData = useMemo(() => {
     if (!calculatedStats) return null;
     return {
@@ -668,17 +700,17 @@ function TranscriptPage() {
         {
           label: "SGPA",
           data: calculatedStats.history.map((h) => h.sgpa),
-          borderColor: "#a098ff",
+          borderColor: themeColor,
           backgroundColor: (context) => {
             const ctx = context.chart.ctx;
             const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, "rgba(160, 152, 255, 0.15)");
-            gradient.addColorStop(1, "rgba(160, 152, 255, 0)");
+            gradient.addColorStop(0, hexToRgba(themeColor, 0.15));
+            gradient.addColorStop(1, hexToRgba(themeColor, 0));
             return gradient;
           },
           tension: 0.45,
           fill: true,
-          pointBackgroundColor: "#a098ff",
+          pointBackgroundColor: themeColor,
           pointBorderWidth: 4,
           pointBorderColor: "#111",
           pointRadius: 4,
@@ -688,10 +720,10 @@ function TranscriptPage() {
         {
           label: "CGPA",
           data: calculatedStats.history.map((h) => h.cgpa),
-          borderColor: "#a098ff",
+          borderColor: themeColor,
           tension: 0.45,
           fill: false,
-          pointBackgroundColor: "#a098ff",
+          pointBackgroundColor: themeColor,
           pointBorderWidth: 4,
           pointBorderColor: "#111",
           pointRadius: 4,
@@ -701,7 +733,7 @@ function TranscriptPage() {
         },
       ],
     };
-  }, [calculatedStats]);
+  }, [calculatedStats, themeColor]);
 
   const chartOptions = {
     responsive: true,
@@ -750,7 +782,7 @@ function TranscriptPage() {
     <PageLayout currentPage={window.location.pathname}>
       {}
       <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
-      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
+      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
       <div className="w-full p-4 md:p-8 space-y-10 relative z-10">
         {}

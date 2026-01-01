@@ -78,7 +78,7 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
         >
           <path
             className="animate-splash"
-            fill="#a098ff"
+            fill="var(--color-x)"
             d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
           />
         </svg>
@@ -102,7 +102,7 @@ export const LoadingSpinner = () => {
         >
           <path
             className="animate-splash"
-            fill="#a098ff"
+            fill="var(--color-x)"
             d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
           />
         </svg>

@@ -4,6 +4,20 @@ function LoginPageStyles() {
   useEffect(() => {
     localStorage.removeItem("superflex_ai_messages");
 
+    const setThemeColor = (color) => {
+      document.documentElement.style.setProperty("--color-x", color);
+    };
+
+    const currentTheme =
+      localStorage.getItem("superflex-theme-color") || "#a098ff";
+    setThemeColor(currentTheme);
+
+    const handleThemeChange = (e) => {
+      setThemeColor(e.detail);
+    };
+
+    window.addEventListener("superflex-theme-changed", handleThemeChange);
+
     document
       .querySelectorAll(
         ".m-grid.m-grid--hor:not(.m-grid--desktop):not(.m-grid--desktop-and-tablet):not(.m-grid--tablet):not(.m-grid--tablet-and-mobile):not(.m-grid--mobile) > .m-grid__item.m-grid__item--fluid",
@@ -129,7 +143,7 @@ function LoginPageStyles() {
         "!flex",
         "justify-center",
         "items-center",
-        "hover:!bg-[#8f86ff]",
+        "hover:!bg-x/80",
         "!transition-all",
       );
       button.style.fontFamily = "'Google Sans Flex', sans-serif";
@@ -280,7 +294,7 @@ function LoginPageStyles() {
       forgotPasswordLink.textContent = "Forgot Password?";
       forgotPasswordLink.classList.add(
         "!text-x",
-        "hover:!text-[#8f86ff]",
+        "hover:!text-x",
         "!text-sm",
         "!cursor-pointer",
         "!transition-all",
@@ -296,7 +310,7 @@ function LoginPageStyles() {
     } else {
       forgotPasswordLink.classList.add(
         "!text-x",
-        "hover:!text-[#8f86ff]",
+        "hover:!text-x",
         "!text-sm",
         "!mt-4",
         "!cursor-pointer",
@@ -371,7 +385,7 @@ function LoginPageStyles() {
           "!rounded-2xl",
           "!py-4",
           "!px-6",
-          "hover:!bg-[#8f86ff]",
+          "hover:!bg-x/80",
           "!transition-all",
           "!border-none",
           "!w-full",
@@ -648,8 +662,8 @@ function LoginPageStyles() {
           cursor: default;
         }
         .review-card:hover {
-          background: rgba(160, 152, 255, 0.08);
-          border-color: rgba(160, 152, 255, 0.3);
+          background: color-mix(in srgb, var(--color-x), transparent 92%);
+          border-color: color-mix(in srgb, var(--color-x), transparent 70%);
           transform: translateY(-6px) scale(1.02);
         }
         .review-header {
@@ -671,7 +685,7 @@ function LoginPageStyles() {
           font-size: 13px;
         }
         .review-verified {
-          color: #a098ff;
+          color: var(--color-x);
           font-size: 10px;
           font-weight: 800;
           text-transform: uppercase;
@@ -737,10 +751,10 @@ function LoginPageStyles() {
         <button class="group relative bg-neutral-800 rounded-full p-px overflow-hidden cursor-pointer transition-all duration-200 ease-in-out">
           <span class="flex items-center justify-center gap-1 relative z-[1] bg-neutral-950/90 rounded-full py-2 px-4 pl-2 w-full">
             <span class="relative transition-transform duration-500">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a098ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-x)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
               </svg>
-              <span class="rounded-full size-11 absolute opacity-30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-lg" style="animation: 14s ease-in-out 0s infinite alternate none running star-shine; background: #a098ff;"></span>
+              <span class="rounded-full size-11 absolute opacity-30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-lg" style="animation: 14s ease-in-out 0s infinite alternate none running star-shine; background: var(--color-x);"></span>
             </span>
             <span id="version-text" class="bg-gradient-to-b ml-1.5 from-white to-white/50 bg-clip-text text-xs text-transparent uppercase font-bold">
               SuperFlex v${CURRENT_VERSION}
@@ -756,13 +770,23 @@ function LoginPageStyles() {
           <div class="h-24 w-24 bg-black border-8 border-white/5 bg-cover rounded-[32px] flex items-center justify-center relative z-10 " style="background-image: url('${bgUrl}');">
                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="96" height="96" fill="none">
                   <style>@keyframes splash{0%{transform:scale(.2);opacity:.8}80%{transform:scale(1.2);opacity:0}to{transform:scale(2.2);opacity:0}}</style>
-                  <path fill="#a098ff" d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z" style="animation:splash 1.5s cubic-bezier(.165,.84,.44,1) infinite both;transform-origin:center center"/>
+                  <path fill="var(--color-x)" d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z" style="animation:splash 1.5s cubic-bezier(.165,.84,.44,1) infinite both;transform-origin:center center"/>
                </svg>
           </div>
         </div>
         
         <div class="space-y-4 flex items-center flex-col gap-2 w-full px-4 sm:px-6">
-          <img src="https://theajmalrazaq.github.io/superflex/res/logo.svg" alt="SuperFlex" class="w-full max-w-[280px] sm:max-w-md hero-logo" />
+          <svg viewBox="0 0 1584 300" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-[280px] sm:max-w-md hero-logo">
+            <path d="M109.001 111.467L142.455 0L0 140.509L51.3965 154.986L0 281.018L157.45 133.484L109.001 111.467Z" fill="var(--color-x)" />
+            <path d="M230.977 211.553V164.092L327.656 164.531V215.508H180V45H230.977V211.553ZM378.633 164.092H327.656V45H378.633V164.092Z" fill="white" />
+            <path d="M444.99 215.508V299.883H394.453V46.7578H512.666V96.416L444.99 97.2949V164.971H512.666V96.416H563.203V215.508H444.99Z" fill="white" />
+            <path d="M727.119 92.4609H630.439V110.039H727.119V153.984H630.439V171.562H727.119V215.508H579.023V92.4609H630V48.5156H727.119V92.4609Z" fill="white" />
+            <path d="M793.037 215.508H742.5V97.2949H793.037V215.508ZM888.838 97.2949H793.037V46.7578H888.838V97.2949Z" fill="white" />
+            <path d="M1054.07 92.4609H957.393V110.039H1054.07V153.984H957.393V215.508H905.977V92.4609H956.953V48.5156H1054.07V92.4609Z" fill="var(--color-x)" />
+            <path d="M1216.67 164.531V215.508H1120.43V164.531H1216.67ZM1120.43 46.7578V164.531H1069.45V46.7578H1120.43Z" fill="var(--color-x)" />
+            <path d="M1381.03 92.4609H1284.35V110.039H1381.03V153.984H1284.35V171.562H1381.03V215.508H1232.93V92.4609H1283.91V48.5156H1381.03V92.4609Z" fill="var(--color-x)" />
+            <path d="M1460.13 215.508H1398.16V164.971H1460.13V215.508ZM1583.61 97.2949H1522.09V164.971H1583.61V215.508H1522.09V164.971H1460.13V97.2949H1522.09V46.7578H1583.61V97.2949ZM1460.13 97.2949H1398.16V46.7578H1460.13V97.2949Z" fill="var(--color-x)" />
+          </svg>
           <div class="flex items-center justify-center gap-3 w-full">
             <span class="w-8 sm:w-12 h-px bg-gradient-to-r from-transparent to-white/20"></span>
             <span class="font-black text-[8px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.4em] text-x/80 text-center">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span>
@@ -894,7 +918,7 @@ function LoginPageStyles() {
           <div class="p-4 sm:p-5 border-b border-white/5 bg-white/5">
             <div class="flex items-center gap-3">
               <div class="p-2 rounded-xl bg-x/10 border border-x/20">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a098ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-x)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                   <polyline points="14 2 14 8 20 8"/>
                   <line x1="16" y1="13" x2="8" y2="13"/>
@@ -972,7 +996,7 @@ function LoginPageStyles() {
 
           <!-- Footer -->
           <div class="p-4 sm:p-5 border-t border-white/5 bg-white/5">
-            <button id="terms-accept-btn" class="w-full bg-x text-white border-none rounded-xl py-3 px-6 font-bold text-sm hover:bg-[#8f86ff] transition-all">
+            <button id="terms-accept-btn" class="w-full bg-x text-white border-none rounded-xl py-3 px-6 font-bold text-sm hover:bg-x/80 transition-all">
               Accept & Continue
             </button>
           </div>
@@ -1050,6 +1074,10 @@ function LoginPageStyles() {
     });
 
     document.body.classList.add("!h-screen", "!overflow-hidden");
+
+    return () => {
+      window.removeEventListener("superflex-theme-changed", handleThemeChange);
+    };
   }, []);
 
   return null;

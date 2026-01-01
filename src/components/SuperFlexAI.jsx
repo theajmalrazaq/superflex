@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Logo } from "./ui/Logo";
 
 const AVAILABLE_MODELS = [
   {
@@ -74,7 +75,7 @@ const AnimatedLogo = ({ size = 24, animated = true, className = "" }) => (
       className="relative z-10"
     >
       <path
-        fill="#a098ff"
+        fill="var(--color-x)"
         d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
       />
     </svg>
@@ -88,7 +89,7 @@ const AnimatedLogo = ({ size = 24, animated = true, className = "" }) => (
         className="absolute inset-0 pointer-events-none"
       >
         <path
-          fill="#a098ff"
+          fill="var(--color-x)"
           className="animate-splash"
           d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
         />
@@ -519,11 +520,7 @@ const SuperFlexAI = () => {
         <div className="fixed inset-0 z-[10000] bg-[#0c0c0c] flex flex-col animate-in fade-in duration-300">
           <div className="relative z-50 flex items-center justify-between px-8 py-6">
             <div className="flex items-center gap-3">
-              <img
-                src={chrome.runtime.getURL("assets/logo.svg")}
-                alt="SuperFlex"
-                className="w-42"
-              />
+              <Logo className="w-40 h-8" />
             </div>
 
             <div className="flex items-center gap-4">

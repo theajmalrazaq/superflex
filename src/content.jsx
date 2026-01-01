@@ -95,6 +95,9 @@ document.querySelectorAll("button").forEach((button) => {
   button.style.fontFamily = "'Google Sans Flex', sans-serif";
 });
 
+const savedColor = localStorage.getItem("superflex-theme-color") || "#a098ff";
+document.documentElement.style.setProperty("--color-x", savedColor);
+
 document.documentElement.classList.add("dark");
 document.body.style.backgroundColor = "black";
 

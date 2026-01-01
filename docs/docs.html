@@ -245,8 +245,15 @@
 
       /* Atmospheric Glows */
       @keyframes pulse-glow {
-        0%, 100% { opacity: 0.3; transform: scale(1); }
-        50% { opacity: 0.6; transform: scale(1.1); }
+        0%,
+        100% {
+          opacity: 0.3;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.6;
+          transform: scale(1.1);
+        }
       }
 
       .glow-1 {
@@ -255,7 +262,11 @@
         right: 0;
         width: 800px;
         height: 800px;
-        background: radial-gradient(circle, rgba(160, 152, 255, 0.15) 0%, transparent 70%);
+        background: radial-gradient(
+          circle,
+          rgba(160, 152, 255, 0.15) 0%,
+          transparent 70%
+        );
         filter: blur(150px);
         margin-right: -400px;
         margin-top: -400px;
@@ -269,7 +280,11 @@
         left: 0;
         width: 600px;
         height: 600px;
-        background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+        background: radial-gradient(
+          circle,
+          rgba(16, 185, 129, 0.08) 0%,
+          transparent 70%
+        );
         filter: blur(150px);
         margin-left: -300px;
         margin-bottom: -300px;
@@ -280,9 +295,18 @@
 
       /* Hero Logo Animation */
       @keyframes splash {
-        0% { transform: scale(0.2); opacity: 0.8; }
-        80% { transform: scale(1.2); opacity: 0; }
-        100% { transform: scale(2.2); opacity: 0; }
+        0% {
+          transform: scale(0.2);
+          opacity: 0.8;
+        }
+        80% {
+          transform: scale(1.2);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(2.2);
+          opacity: 0;
+        }
       }
     </style>
   </head>
@@ -312,7 +336,7 @@
           class="flex items-center gap-4 lg:gap-8 w-full lg:w-auto justify-between lg:justify-start"
         >
           <a href="index.html" class="flex items-center shrink-0">
-            <img src="res/logo_sec.svg" alt="Logo" class="h-6 lg:h-8 w-auto" />
+            <img src="res/logo.svg" alt="Logo" class="h-6 lg:h-8 w-auto" />
           </a>
 
           <div class="hidden lg:flex items-center gap-1">
@@ -501,7 +525,7 @@
               </div>
             </div>
             <img
-              src="https://theajmalrazaq.github.io/superflex/res/logo.svg"
+              src="res/logo.svg"
               alt="SuperFlex"
               class="w-64 filter opacity-90"
             />

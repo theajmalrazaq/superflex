@@ -1,19 +1,6 @@
 import React, { useEffect } from "react";
 import { ShieldAlert, ArrowRight, Home } from "lucide-react";
-
-const ActionBtn = ({ onClick, primary, children, icon: Icon }) => (
-  <button
-    onClick={onClick}
-    className={`w-full flex items-center justify-center gap-3 py-4 px-8 rounded-2xl font-bold transition-all duration-300 ${
-      primary
-        ? "bg-x hover:bg-[#8f86ff] !text-white"
-        : "bg-white/5 hover:bg-white/10 !text-white border border-white/5"
-    }`}
-  >
-    <span className="text-sm">{children}</span>
-    {Icon && <Icon size={18} className={!primary ? "text-zinc-400" : ""} />}
-  </button>
-);
+import Button from "../components/ui/Button";
 
 const SessionExpirePage = () => {
   useEffect(() => {
@@ -34,7 +21,7 @@ const SessionExpirePage = () => {
         </div>
 
         <div className="space-y-4">
-          <h1 className="text-4xl font-black !text-white">
+          <h1 className="text-4xl !font-bold !text-white">
             Session <span className="!text-rose-500">Expired</span>
           </h1>
           <p className="!text-zinc-500 text-sm leading-relaxed">
@@ -42,17 +29,23 @@ const SessionExpirePage = () => {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4">
-          <ActionBtn
+        <div className="flex flex-col sm:flex-row gap-4 w-full">
+          <Button
             onClick={() => (window.location.href = "/Login")}
-            primary
-            icon={ArrowRight}
+            variant="primary"
+            icon={<ArrowRight size={18} />}
+            className="w-full !text-white"
           >
             Log In Again
-          </ActionBtn>
-          <ActionBtn onClick={() => (window.location.href = "/")} icon={Home}>
+          </Button>
+          <Button
+            onClick={() => (window.location.href = "/")}
+            variant="secondary"
+            icon={<Home size={18} />}
+            className="w-full"
+          >
             Home
-          </ActionBtn>
+          </Button>
         </div>
       </div>
     </div>

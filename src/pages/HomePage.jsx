@@ -2,9 +2,6 @@ import React, { useEffect, useState, useMemo } from "react";
 import PageLayout from "../components/layouts/PageLayout";
 import { useAiSync } from "../hooks/useAiSync";
 import { processCourseMarks } from "../utils/marksProcessor";
-import LoadingOverlay, {
-  LoadingSpinner,
-} from "../components/ui/LoadingOverlay";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -651,6 +648,19 @@ function HomePage() {
     }
   };
 
+  const [themeColor, setThemeColor] = useState(
+    localStorage.getItem("superflex-theme-color") || "#a098ff",
+  );
+
+  useEffect(() => {
+    const handleThemeChange = (e) => {
+      setThemeColor(e.detail);
+    };
+    window.addEventListener("superflex-theme-changed", handleThemeChange);
+    return () =>
+      window.removeEventListener("superflex-theme-changed", handleThemeChange);
+  }, []);
+
   return (
     <PageLayout
       currentPage={window.location.pathname}
@@ -917,7 +927,7 @@ function HomePage() {
                                 label: "Attended",
                                 data: attendanceData.map((d) => d.percentage),
                                 backgroundColor: attendanceData.map((d) => {
-                                  if (d.percentage >= 75) return "#a098ff";
+                                  if (d.percentage >= 75) return themeColor;
                                   if (d.percentage >= 60) return "#f59e0b";
                                   return "#f43f5e";
                                 }),
@@ -995,9 +1005,7 @@ function HomePage() {
 
         {}
         {activeMainTab === "info" && (
-          <div className="">
-            <ProfileInfoTabs profileSections={profileSections} />
-          </div>
+          <ProfileInfoTabs profileSections={profileSections} />
         )}
       </div>
     </PageLayout>

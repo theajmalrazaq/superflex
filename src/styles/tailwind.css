@@ -141,3 +141,42 @@ h6 {
   top: 12px;
   right: 12px;
 }
+
+@keyframes border-beam {
+  100% {
+    offset-distance: 100%;
+  }
+}
+
+.animate-border-beam {
+  position: relative;
+}
+
+.border-beam-element {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  padding: 1px;
+  background: rgba(255, 255, 255, 0.08); /* Modern, subtle static border */
+  z-index: 10;
+}
+
+.border-beam-element::after {
+  content: "";
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(
+    circle at center,
+    var(--color-x),
+    transparent 80%
+  );
+  offset-path: inset(0.5px round 9999px);
+  offset-anchor: 50% 50%;
+  animation: border-beam 4s linear infinite;
+}

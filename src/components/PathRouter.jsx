@@ -28,15 +28,22 @@ function PathRouter() {
 
     const checkSession = () => {
       const txt = (
-        document.body?.innerText +
-        document.title +
-        document.querySelector("h1")?.innerText
-      ).toLowerCase();
+        (document.body?.textContent || "") +
+        " " +
+        (document.title || "") +
+        " " +
+        (document.querySelector("h1")?.textContent || "")
+      )
+        .toLowerCase()
+        .replace(/\s+/g, " ");
+
       const isError = [
         "server error",
         "runtime error",
         "internal server error",
-        "500",
+        "server error in '/' application",
+        "application error",
+        "custom error settings",
       ].some((err) => txt.includes(err));
 
       setIsSessionExpired(isError);
