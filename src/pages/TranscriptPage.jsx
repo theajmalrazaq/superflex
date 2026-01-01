@@ -673,7 +673,6 @@ function TranscriptPage() {
       window.removeEventListener("superflex-theme-changed", handleThemeChange);
   }, []);
 
-
   const chartData = useMemo(() => {
     if (!calculatedStats) return null;
     return {
@@ -1053,7 +1052,8 @@ function TranscriptPage() {
                                         } else {
                                           modal.style.display = "block";
                                           modal.classList.add("show");
-                                          modal.style.backgroundColor = "#00000080";
+                                          modal.style.backgroundColor =
+                                            "#00000080";
                                           modal.onclick = (e) => {
                                             if (e.target === modal) {
                                               modal.style.display = "none";

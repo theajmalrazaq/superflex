@@ -620,7 +620,7 @@
         >
           <a
             id="add-to-chrome-btn"
-            href="#"
+            href="https://chromewebstore.google.com/detail/superflex/gipkdnbjfhjenfgehofkimpffdbkgppd?authuser=0&hl=en"
             target="_blank"
             class="bg-[#a098ff] text-white border-none rounded-2xl px-8 py-3.5 cursor-pointer transition-all duration-300 flex items-center justify-center gap-3 hover:bg-[#8f86ff] w-full sm:w-auto whitespace-nowrap h-[52px]"
             style="font-family: &quot;Google Sans Flex&quot;, sans-serif"
@@ -1084,33 +1084,6 @@
           closeModal();
         }
       });
-
-      // Fetch latest release and update Add to Chrome button
-      fetch(
-        "https://api.github.com/repos/theajmalrazaq/superflex/releases/latest",
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          const addToChromeBtn = document.getElementById("add-to-chrome-btn");
-          const downloadV1Btn = document.getElementById("download-v1-link");
-
-          if (data.assets && data.assets.length > 0) {
-            const downloadUrl = data.assets[0].browser_download_url;
-            if (addToChromeBtn) addToChromeBtn.href = downloadUrl;
-            if (downloadV1Btn) downloadV1Btn.href = downloadUrl;
-          }
-        })
-        .catch((err) => {
-          console.error("Failed to fetch latest release:", err);
-          // Fallback to GitHub releases page
-          const addToChromeBtn = document.getElementById("add-to-chrome-btn");
-          const downloadV1Btn = document.getElementById("download-v1-link");
-          const releaseUrl =
-            "https://github.com/theajmalrazaq/superflex/releases/latest";
-
-          if (addToChromeBtn) addToChromeBtn.href = releaseUrl;
-          if (downloadV1Btn) downloadV1Btn.href = releaseUrl;
-        });
 
       // Generate Review Cards
       const generateReviewCards = (items) => {

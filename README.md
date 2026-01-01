@@ -113,6 +113,11 @@ SuperFlex enhances the following university LMS pages:
 
 ### Desktop (Chrome/Chromium Browsers)
 
+1. Install directly from the [Chrome Web Store](https://chromewebstore.google.com/detail/superflex/gipkdnbjfhjenfgehofkimpffdbkgppd?authuser=0&hl=en)
+2. SuperFlex will now be active when you visit your university LMS
+
+#### Manual Installation (Alternative)
+
 1. Download the latest release from the [GitHub Releases page](https://github.com/theajmalrazaq/superflex/releases)
 2. Unzip the downloaded file
 3. Open Chrome and go to `chrome://extensions/`
@@ -125,11 +130,11 @@ SuperFlex enhances the following university LMS pages:
 SuperFlex works on mobile devices using **Quetta Browser** - a Chromium-based browser with extension support:
 
 1. Download **Quetta Browser** from the Play Store or visit [quetta.net](https://www.quetta.net/features/extensions)
-2. Download the latest SuperFlex release from [GitHub Releases](https://github.com/theajmalrazaq/superflex/releases)
-3. Extract the downloaded file to your device
+2. Install SuperFlex from the [Chrome Web Store](https://chromewebstore.google.com/detail/superflex/gipkdnbjfhjenfgehofkimpffdbkgppd?authuser=0&hl=en) or download the latest release from [GitHub Releases](https://github.com/theajmalrazaq/superflex/releases)
+3. If downloading from GitHub, extract the downloaded file to your device
 4. Open Quetta Browser and navigate to the extensions page
 5. Enable "Developer Mode"
-6. Load the unpacked SuperFlex extension folder
+6. Load the unpacked SuperFlex extension folder (if not using Chrome Web Store)
 7. Enjoy SuperFlex on your mobile device! 📱
 
 ## Development
