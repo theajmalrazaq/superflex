@@ -73,8 +73,8 @@ const ProfileImageModal = ({ isOpen, onClose, currentImage }) => {
     >
       <div className="flex flex-col items-center gap-8 pt-4">
         <div className="relative group">
-          <div className="absolute -inset-4 bg-x/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-          <div className="w-40 h-40 rounded-[2.5rem] border-4 border-white/5 overflow-hidden bg-zinc-900 flex items-center justify-center relative z-10 shadow-2xl">
+          <div className="absolute -inset-4 bg-accent/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          <div className="w-40 h-40 rounded-[2.5rem] border-4 border-foreground/10 overflow-hidden bg-secondary flex items-center justify-center relative z-10">
             {preview ? (
               <img
                 src={preview.url}
@@ -88,13 +88,13 @@ const ProfileImageModal = ({ isOpen, onClose, currentImage }) => {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <User size={64} className="text-zinc-700" />
+              <User size={64} className="text-foreground/30" />
             )}
           </div>
           {!preview && (
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-[2.5rem] text-white font-bold text-xs uppercase tracking-widest z-20"
+              className="absolute inset-0 bg-background/60 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-[2.5rem] text-foreground font-bold text-xs Cap tracking-[0px] z-20"
             >
               Change
             </button>
@@ -146,18 +146,18 @@ const ProfileImageModal = ({ isOpen, onClose, currentImage }) => {
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 text-rose-400 text-[10px] font-bold uppercase tracking-wider bg-rose-400/10 px-4 py-3 rounded-xl border border-rose-400/20 w-fit">
+          <div className="flex items-center gap-2 text-error text-[10px] font-bold Cap tracking-wider bg-error/10 px-4 py-3 rounded-xl border border-error/20 w-fit">
             <AlertCircle size={14} />
             {error}
           </div>
         )}
 
-        <div className="w-full p-5 rounded-3xl bg-white/[0.02] border border-white/5 space-y-2">
-          <h4 className="text-x font-bold text-[10px] uppercase tracking-[0.2em] flex items-center gap-2">
+        <div className="w-full p-5 rounded-3xl bg-foreground/[0.02] border border-foreground/10 space-y-2">
+          <h4 className="text-accent font-bold text-[10px] Cap tracking-[0px] flex items-center gap-2">
             <Shield size={14} />
             Privacy Note
           </h4>
-          <p className="text-[11px] text-zinc-500 leading-relaxed font-bold">
+          <p className="text-[11px] text-foreground/50 leading-relaxed font-bold">
             Your profile picture is processed locally and stored in your
             browser's local storage. SuperFlex does not upload it to any
             external servers.

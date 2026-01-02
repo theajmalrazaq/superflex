@@ -1,6 +1,29 @@
 @import "tailwindcss";
+/* stylelint-disable-next-line at-rule-no-unknown */
 @theme {
-  --color-x: #a098ff;
+  --color-accent: var(--accent);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
+
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f4f4f5;
+  --color-neutral-200: #e4e4e7;
+  --color-neutral-300: #d4d4d8;
+  --color-neutral-400: #a1a1aa;
+  --color-neutral-500: #71717a;
+  --color-neutral-600: #52525b;
+  --color-neutral-700: #3f3f46;
+  --color-neutral-800: #27272a;
+  --color-neutral-900: #18181b;
+  --color-neutral-950: #09090b;
+
+  --color-success: #10b981;
+  --color-error: #f43f5e;
+  --color-warning: #f59e0b;
+  --color-info: #3b82f6;
+
   --font-garnett-regular: "Google Sans Flex", sans-serif;
   --font-garnett-medium: "Google Sans Flex", sans-serif;
   --font-inter: "Google Sans Flex", sans-serif;
@@ -9,13 +32,28 @@
   --font-mono: "Google Sans Flex", sans-serif;
 }
 
+:root {
+  --accent: #a098ff;
+  --background: #ffffff;
+  --foreground: #000000;
+  --secondary: #f4f4f5;
+  --tertiary: #e4e4e7;
+}
+
+.dark {
+  --background: #000000;
+  --foreground: #ffffff;
+  --secondary: #18181b;
+  --tertiary: #27272a;
+}
+
 html {
-  font-size: 90%; /* Scale down to approx 14.4px base */
+  font-size: 80%; /* Scale down to approx 14.4px base */
 }
 
 @media (max-width: 640px) {
   html {
-    font-size: 80%; /* Scale down to approx 12.8px base on mobile */
+    font-size: 70%; /* Scale down to approx 12.8px base on mobile */
   }
 }
 
@@ -53,7 +91,9 @@ button:focus {
   outline: none !important;
 }
 .border {
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: color-mix(in srgb, var(--foreground), transparent 90%);
 }
 
 h1,
@@ -80,27 +120,31 @@ h6 {
   width: 350px !important;
   border-radius: 20px !important;
   padding: 16px 20px !important;
-  background-color: rgba(24, 24, 27, 0.6) !important; /* zinc-900/60 */
+  background-color: color-mix(
+    in srgb,
+    var(--secondary),
+    transparent 40%
+  ) !important;
   backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: white !important;
+  border: 1px solid color-mix(in srgb, var(--foreground), transparent 90%) !important;
+  color: var(--foreground) !important;
   font-family: "Google Sans Flex", sans-serif !important;
   font-weight: 600 !important;
-  font-size: 0.875rem !important; /* text-sm */
+  font-size: 0.875rem !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  background-image: none !important; /* Remove older library background images */
+  background-image: none !important;
   position: relative;
   overflow: hidden;
 }
 
 #toast-container > div:hover {
   box-shadow: none !important; /* Glow effect on hover */
-  border-color: rgba(160, 152, 255, 0.3) !important;
+  border-color: color-mix(in srgb, var(--accent), transparent 0.7) !important;
   transform: translateY(-2px);
 }
 
 .toast-message {
-  color: #fff !important;
+  color: var(--foreground) !important;
   margin-left: 0 !important;
 }
 
@@ -171,11 +215,7 @@ h6 {
   position: absolute;
   width: 60px;
   height: 60px;
-  background: radial-gradient(
-    circle at center,
-    var(--color-x),
-    transparent 80%
-  );
+  background: radial-gradient(circle at center, var(--accent), transparent 80%);
   offset-path: inset(0.5px round 9999px);
   offset-anchor: 50% 50%;
   animation: border-beam 4s linear infinite;

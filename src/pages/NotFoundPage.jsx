@@ -30,10 +30,10 @@ const NotFoundPage = () => {
           </div>
 
           <div className="space-y-4">
-            <h1 className="text-4xl !font-bold !text-white">
+            <h1 className="text-4xl !font-bold !text-foreground">
               Page <span className="!text-rose-500">Not Found</span>
             </h1>
-            <p className="!text-zinc-500 text-sm leading-relaxed">
+            <p className="!text-foreground/50 text-sm leading-relaxed">
               The page you are looking for doesn't exist, has been moved, or is
               currently unavailable in the SuperFlex universe.
             </p>
@@ -44,7 +44,7 @@ const NotFoundPage = () => {
               onClick={() => (window.location.href = "/")}
               variant="primary"
               icon={<Home size={18} />}
-              className="w-full sm:w-auto min-w-[200px] !text-white"
+              className="w-full sm:w-auto min-w-[200px] !text-foreground"
             >
               Back to Dashboard
             </Button>

@@ -56,14 +56,14 @@ const GradeChangeModal = ({ isOpen, onClose, onSubmit }) => {
     >
       <div className="space-y-6 pt-4">
         <div className="space-y-3">
-          <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">
+          <label className="text-[10px] font-black text-foreground/50 Cap tracking-[0px] px-1">
             Reason for Rectification
           </label>
           <div className="relative group">
             <select
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full appearance-none bg-zinc-900 border border-white/5 text-white px-5 py-4 rounded-2xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-x/50 transition-all cursor-pointer pr-12"
+              className="w-full appearance-none bg-secondary border border-foreground/10 text-foreground px-5 py-4 rounded-2xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-x/50 transition-all cursor-pointer pr-12"
             >
               <option value="" disabled>
                 Select a reason
@@ -76,7 +76,7 @@ const GradeChangeModal = ({ isOpen, onClose, onSubmit }) => {
             </select>
             <ChevronDown
               size={16}
-              className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none group-hover:text-white transition-colors"
+              className="absolute right-5 top-1/2 -translate-y-1/2 text-foreground/50 pointer-events-none group-hover:text-foreground transition-colors"
             />
           </div>
         </div>
@@ -111,13 +111,13 @@ const GradeChangeCard = ({ req, isSelected, onToggle, index }) => {
         req.checkboxId ? "cursor-pointer" : "cursor-not-allowed opacity-60"
       } ${
         isSelected
-          ? "bg-x/10 border-x/50"
-          : "bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5"
+          ? "bg-accent/10 border-accent/50"
+          : "bg-secondary/30 border-transparent hover:bg-secondary/50 hover:border-foreground/10"
       }`}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">
         <span
-          className={`font-bold text-xs min-w-[1.2rem] ${isSelected ? "text-x" : "text-zinc-600"}`}
+          className={`font-bold text-xs min-w-[1.2rem] ${isSelected ? "text-accent" : "text-foreground/40"}`}
         >
           {index}.
         </span>
@@ -125,8 +125,8 @@ const GradeChangeCard = ({ req, isSelected, onToggle, index }) => {
         <div
           className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 transition-all duration-300 ${
             isSelected
-              ? "bg-x/20 border-x/30 text-x scale-105"
-              : "bg-zinc-800/50 border-white/5 text-zinc-500"
+              ? "bg-accent/20 border-accent/30 text-accent scale-105"
+              : "bg-tertiary/50 border-foreground/10 text-foreground/50"
           }`}
         >
           <FileText size={18} />
@@ -134,32 +134,32 @@ const GradeChangeCard = ({ req, isSelected, onToggle, index }) => {
 
         <div className="flex flex-col gap-0.5 min-w-0 flex-1">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-[10px] font-black text-x uppercase tracking-tighter opacity-80 shrink-0">
+            <span className="text-[10px] font-black text-accent Cap tracking-tighter opacity-80 shrink-0">
               {req.code}
             </span>
-            <h4 className="text-white font-bold text-sm leading-tight truncate">
+            <h4 className="text-foreground font-bold text-sm leading-tight truncate">
               {req.course}
             </h4>
           </div>
 
-          <div className="flex items-center gap-2.5 text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
+          <div className="flex items-center gap-2.5 text-[10px] text-foreground/50 font-bold Cap tracking-[0px] leading-none">
             <span className="shrink-0">{req.credits} Credits</span>
-            <span className="w-1 h-1 rounded-full bg-zinc-700 shrink-0"></span>
+            <span className="w-1 h-1 rounded-full bg-tertiary shrink-0"></span>
             <span className="truncate">Section {req.section}</span>
           </div>
         </div>
       </div>
 
-      <div className="flex flex-row items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-white/5">
+      <div className="flex flex-row items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-foreground/10">
         <div className="flex items-center gap-4">
           <div className="flex flex-col items-end gap-1">
-            <span className="px-2.5 py-1 rounded-lg bg-x/10 text-x font-black text-[10px]">
+            <span className="px-2.5 py-1 rounded-lg bg-accent/10 text-accent font-black text-[10px]">
               Grade: {req.grade}
             </span>
           </div>
 
           <div
-            className={`px-3 py-1 rounded-lg border text-[9px] font-black uppercase tracking-widest ${
+            className={`px-3 py-1 rounded-lg border text-[9px] font-black Cap tracking-[0px] ${
               req.status.toLowerCase().includes("pending")
                 ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
                 : req.status.toLowerCase().includes("rejected")
@@ -174,13 +174,13 @@ const GradeChangeCard = ({ req, isSelected, onToggle, index }) => {
         <div
           className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 shrink-0 ${
             isSelected
-              ? "bg-x border-x text-zinc-950 scale-110"
-              : "border-zinc-700 bg-transparent"
+              ? "bg-accent border-accent text-zinc-950 scale-110"
+              : "border-tertiary bg-transparent"
           }`}
         >
           {isSelected && <CheckCircle2 size={14} strokeWidth={3} />}
           {!isSelected && !req.checkboxId && (
-            <Search size={10} className="text-zinc-800" />
+            <Search size={10} className="text-foreground/20" />
           )}
         </div>
       </div>
@@ -224,8 +224,8 @@ function GradeChangePage() {
       }
       #RemarksDetail .modal-header { border-bottom: 1px solid rgba(255,255,255,0.1) !important; padding: 1.5rem !important; }
       #RemarksDetail .modal-footer { border-top: 1px solid rgba(255,255,255,0.1) !important; padding: 1.5rem !important; }
-      #RemarksDetail .modal-title { font-weight: 900 !important; color: white !important; text-transform: uppercase !important; letter-spacing: 0.05em !important; font-size: 1.125rem !important; }
-      #RemarksDetail label { color: #71717a !important; font-size: 10px !important; font-weight: 900 !important; text-transform: uppercase !important; letter-spacing: 0.1em !important; margin-bottom: 0.5rem !important; }
+      #RemarksDetail .modal-title { font-weight: 900 !important; color: white !important; text-transform: Cap !important; letter-spacing: 0.05em !important; font-size: 1.125rem !important; }
+      #RemarksDetail label { color: #71717a !important; font-size: 10px !important; font-weight: 900 !important; text-transform: Cap !important; letter-spacing: 0.1em !important; margin-bottom: 0.5rem !important; }
       #RemarksDetail input, #RemarksDetail select, #RemarksDetail textarea {
         background: rgba(255,255,255,0.03) !important;
         border: 1px solid rgba(255,255,255,0.1) !important;
@@ -510,7 +510,7 @@ function GradeChangePage() {
       />
       <div className="w-full min-h-screen p-4 md:p-8 space-y-8 relative z-10">
         {}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
         <PageHeader
@@ -562,7 +562,7 @@ function GradeChangePage() {
           <div className="xl:col-span-2 space-y-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between px-2">
-                <h3 className="text-xl font-bold text-white tracking-tight">
+                <h3 className="text-xl font-bold text-foreground tracking-tight">
                   Eligible Courses
                 </h3>
                 {hasAvailableRequests && (
@@ -573,7 +573,7 @@ function GradeChangePage() {
                           requests.filter((r) => r.checkboxId).length,
                       )
                     }
-                    className="text-[10px] font-black text-x uppercase tracking-widest hover:opacity-80 transition-opacity"
+                    className="text-[10px] font-black text-accent Cap tracking-[0px] hover:opacity-80 transition-opacity"
                   >
                     {selectedIds.length ===
                     requests.filter((r) => r.checkboxId).length
@@ -596,10 +596,10 @@ function GradeChangePage() {
               </div>
 
               {requests.length === 0 && (
-                <div className="text-center py-20 bg-zinc-900/30 rounded-[2rem] border border-dashed border-white/5">
+                <div className="text-center py-20 bg-secondary/30 rounded-[2rem] border border-dashed border-foreground/10">
                   <div className="flex flex-col items-center gap-4 opacity-50">
-                    <Search size={48} className="text-zinc-600" />
-                    <p className="text-zinc-500 font-medium uppercase tracking-widest text-xs">
+                    <Search size={48} className="text-foreground/40" />
+                    <p className="text-foreground/50 font-medium Cap tracking-[0px] text-xs">
                       No records available for this semester
                     </p>
                   </div>
@@ -609,39 +609,39 @@ function GradeChangePage() {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-zinc-900/50 border border-white/5 backdrop-blur-xl rounded-[2.5rem] p-8 space-y-8 sticky top-8">
+            <div className="bg-secondary/50 border border-foreground/10 backdrop-blur-xl rounded-[2.5rem] p-8 space-y-8 sticky top-8">
               <div className="space-y-6">
-                <div className="p-5 rounded-2xl bg-x/5 border border-x/10 space-y-4">
+                <div className="p-5 rounded-2xl bg-accent/5 border border-accent/10 space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-x/10 rounded-lg text-x">
+                    <div className="p-2 bg-accent/10 rounded-lg text-accent">
                       <Layout size={18} />
                     </div>
-                    <h4 className="text-sm font-bold text-white tracking-tight">
+                    <h4 className="text-sm font-bold text-foreground tracking-tight">
                       Action Summary
                     </h4>
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs font-medium">
-                      <span className="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
+                      <span className="text-foreground/50 font-bold Cap tracking-[0px] text-[10px]">
                         Selected
                       </span>
-                      <span className="text-white font-black">
+                      <span className="text-foreground font-black">
                         {selectedIds.length} Courses
                       </span>
                     </div>
                     <div className="flex justify-between text-xs font-medium">
-                      <span className="text-zinc-500 font-bold uppercase tracking-widest text-[10px]">
+                      <span className="text-foreground/50 font-bold Cap tracking-[0px] text-[10px]">
                         Pending
                       </span>
-                      <span className="text-white font-black">
+                      <span className="text-foreground font-black">
                         {stats.pending}
                       </span>
                     </div>
-                    <div className="pt-3 border-t border-white/10 flex justify-between items-center">
-                      <span className="text-zinc-400 text-[10px] font-black uppercase tracking-widest">
+                    <div className="pt-3 border-t border-foreground/10 flex justify-between items-center">
+                      <span className="text-foreground/60 text-[10px] font-black Cap tracking-[0px]">
                         Total Applications
                       </span>
-                      <span className="text-x font-black text-xs">
+                      <span className="text-accent font-black text-xs">
                         {stats.total}
                       </span>
                     </div>
@@ -661,14 +661,14 @@ function GradeChangePage() {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-white/5 space-y-4">
-                <div className="flex items-center gap-3 px-1 text-x">
+              <div className="pt-4 border-t border-foreground/10 space-y-4">
+                <div className="flex items-center gap-3 px-1 text-accent">
                   <AlertTriangle size={14} />
-                  <span className="text-[10px] font-black uppercase tracking-widest">
+                  <span className="text-[10px] font-black Cap tracking-[0px]">
                     Important Note
                   </span>
                 </div>
-                <p className="text-[10px] text-zinc-500 font-medium leading-relaxed px-1 italic">
+                <p className="text-[10px] text-foreground/50 font-medium leading-relaxed px-1 italic">
                   Grade change requests are only reviewed and processed by the
                   respective course teacher.
                 </p>

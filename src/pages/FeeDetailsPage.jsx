@@ -21,27 +21,27 @@ const SemesterAccordion = ({ semester }) => {
     semester.feeItems.length > 0 || semester.courses.length > 0;
 
   return (
-    <div className="group border border-white/5 bg-zinc-900/40 rounded-[2.5rem] overflow-hidden transition-all duration-300 hover:border-white/10">
+    <div className="group border border-foreground/10 bg-secondary/40 rounded-[2.5rem] overflow-hidden transition-all duration-300 hover:border-foreground/10">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 text-left"
       >
         <div className="flex items-center gap-5">
           <div
-            className={`p-4 rounded-2xl bg-white/5 transition-all duration-500 ${isOpen ? "bg-x/20 text-x" : "text-zinc-400 group-hover:text-white"}`}
+            className={`p-4 rounded-2xl bg-foreground/5 transition-all duration-500 ${isOpen ? "bg-accent/20 text-accent" : "text-foreground/60 group-hover:text-foreground"}`}
           >
             <Layers size={22} />
           </div>
           <div>
-            <h4 className="text-xl font-black text-white font-sans uppercase tracking-tight">
+            <h4 className="text-xl font-black text-foreground font-sans Cap tracking-tight">
               {semester.name}
             </h4>
             <div className="flex items-center gap-3 mt-1">
-              <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+              <p className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px]">
                 {semester.courses.length || 0} Registered Items
               </p>
-              <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
-              <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+              <span className="w-1 h-1 rounded-full bg-tertiary"></span>
+              <p className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px]">
                 GPA: {semester.academic.sgpa || "0.00"}
               </p>
             </div>
@@ -50,17 +50,17 @@ const SemesterAccordion = ({ semester }) => {
 
         <div className="flex items-center gap-8">
           <div className="text-right hidden sm:block">
-            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none mb-2">
+            <p className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px] leading-none mb-2">
               Collection
             </p>
-            <p className="text-xl font-black text-white font-sans tracking-tight">
+            <p className="text-xl font-black text-foreground font-sans tracking-tight">
               Rs. {semester.totalPaid}
             </p>
           </div>
           <div
-            className={`p-3 rounded-xl bg-white/5 transition-all duration-500 ${isOpen ? "rotate-180 bg-white/10" : ""}`}
+            className={`p-3 rounded-xl bg-foreground/5 transition-all duration-500 ${isOpen ? "rotate-180 bg-foreground/10" : ""}`}
           >
-            <ChevronDown size={20} className="text-zinc-500" />
+            <ChevronDown size={20} className="text-foreground/50" />
           </div>
         </div>
       </button>
@@ -70,40 +70,40 @@ const SemesterAccordion = ({ semester }) => {
           <div className="flex flex-col gap-10">
             <div className="lg:col-span-5 space-y-8">
               <div className="space-y-4">
-                <h5 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-x">
+                <h5 className="flex items-center gap-2 text-[10px] font-black Cap tracking-[0px] text-accent">
                   <DollarSign size={12} /> Fee Breakdown
                 </h5>
                 <div className="space-y-3">
                   {semester.feeItems.map((item, idx) => (
                     <div
                       key={idx}
-                      className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 group/item hover:border-white/10 transition-all"
+                      className="p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10 group/item hover:border-foreground/10 transition-all"
                     >
                       <div className="flex justify-between items-center">
-                        <span className="text-zinc-400 font-bold font-sans text-xs uppercase tracking-tight">
+                        <span className="text-foreground/60 font-bold font-sans text-xs Cap tracking-tight">
                           {item.name}
                         </span>
-                        <span className="text-white font-black font-sans">
+                        <span className="text-foreground font-black font-sans">
                           Rs. {item.val}
                         </span>
                       </div>
                     </div>
                   ))}
-                  <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-white/5">
-                    <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5">
-                      <p className="text-[8px] text-zinc-500 font-black uppercase tracking-widest mb-1.5">
+                  <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-foreground/10">
+                    <div className="p-5 rounded-2xl bg-foreground/[0.02] border border-foreground/10">
+                      <p className="text-[8px] text-foreground/50 font-black Cap tracking-[0px] mb-1.5">
                         Net Dues
                       </p>
-                      <p className="text-lg font-black text-white font-sans tracking-tight">
+                      <p className="text-lg font-black text-foreground font-sans tracking-tight">
                         Rs. {semester.summary.due}
                       </p>
                     </div>
-                    <div className="p-5 rounded-2xl bg-x/5 border border-x/10">
-                      <p className="text-[8px] text-x/70 font-black uppercase tracking-widest mb-1.5">
+                    <div className="p-5 rounded-2xl bg-accent/5 border border-accent/10">
+                      <p className="text-[8px] text-accent/70 font-black Cap tracking-[0px] mb-1.5">
                         Balance
                       </p>
                       <p
-                        className={`text-lg font-black font-sans tracking-tight ${semester.summary.balance === "0" ? "text-emerald-400" : "text-white"}`}
+                        className={`text-lg font-black font-sans tracking-tight ${semester.summary.balance === "0" ? "text-emerald-400" : "text-foreground"}`}
                       >
                         Rs. {semester.summary.balance}
                       </p>
@@ -114,18 +114,18 @@ const SemesterAccordion = ({ semester }) => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-6 rounded-[1.8rem] bg-emerald-500/5 border border-emerald-500/10 flex flex-col gap-1 relative overflow-hidden group/gpa">
-                  <span className="text-[9px] text-emerald-500/50 font-black uppercase tracking-widest">
+                  <span className="text-[9px] text-emerald-500/50 font-black Cap tracking-[0px]">
                     SGPA
                   </span>
                   <span className="text-3xl font-black text-emerald-400 font-sans tracking-tight leading-none">
                     {semester.academic.sgpa}
                   </span>
                 </div>
-                <div className="p-6 rounded-[1.8rem] bg-white/5 border border-white/10 flex flex-col gap-1 relative overflow-hidden">
-                  <span className="text-[9px] text-zinc-500 font-black uppercase tracking-widest">
+                <div className="p-6 rounded-[1.8rem] bg-foreground/5 border border-foreground/10 flex flex-col gap-1 relative overflow-hidden">
+                  <span className="text-[9px] text-foreground/50 font-black Cap tracking-[0px]">
                     CGPA
                   </span>
-                  <span className="text-3xl font-black text-white font-sans tracking-tight leading-none">
+                  <span className="text-3xl font-black text-foreground font-sans tracking-tight leading-none">
                     {semester.academic.cgpa}
                   </span>
                 </div>
@@ -133,48 +133,48 @@ const SemesterAccordion = ({ semester }) => {
             </div>
 
             <div className="lg:col-span-7 space-y-6">
-              <h5 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+              <h5 className="flex items-center gap-2 text-[10px] font-black Cap tracking-[0px] text-foreground/50">
                 <BookOpen size={12} /> Registration Log
               </h5>
-              <div className="!overflow-x-scroll scrollbar-hide rounded-[2rem] border border-white/5 bg-zinc-900/20 backdrop-blur-md">
+              <div className="!overflow-x-scroll scrollbar-hide rounded-[2rem] border border-foreground/10 bg-secondary/20 backdrop-blur-md">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="bg-white/5">
-                      <th className="p-5 text-[9px] font-black uppercase tracking-widest text-zinc-500 font-sans border-b border-white/5">
+                    <tr className="bg-foreground/5">
+                      <th className="p-5 text-[9px] font-black Cap tracking-[0px] text-foreground/50 font-sans border-b border-foreground/10">
                         Course
                       </th>
-                      <th className="p-5 text-[9px] font-black uppercase tracking-widest text-zinc-500 font-sans border-b border-white/5">
+                      <th className="p-5 text-[9px] font-black Cap tracking-[0px] text-foreground/50 font-sans border-b border-foreground/10">
                         Type
                       </th>
-                      <th className="p-5 text-[9px] font-black uppercase tracking-widest text-zinc-500 font-sans border-b border-white/5 text-right">
+                      <th className="p-5 text-[9px] font-black Cap tracking-[0px] text-foreground/50 font-sans border-b border-foreground/10 text-right">
                         Status
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-foreground/5">
                     {semester.courses.map((course, idx) => (
                       <tr
                         key={idx}
-                        className="group/course hover:bg-white/[0.02]"
+                        className="group/course hover:bg-foreground/[0.02]"
                       >
                         <td className="p-5">
-                          <p className="text-xs font-black text-white font-sans tracking-tight">
+                          <p className="text-xs font-black text-foreground font-sans tracking-tight">
                             {course.title}
                           </p>
                           {course.date && (
-                            <p className="text-[9px] text-zinc-600 font-medium mt-1 uppercase">
+                            <p className="text-[9px] text-foreground/40 font-medium mt-1 Cap">
                               {course.date}
                             </p>
                           )}
                         </td>
                         <td className="p-5">
-                          <span className="text-[10px] font-bold text-zinc-400 font-sans uppercase tracking-widest">
+                          <span className="text-[10px] font-bold text-foreground/60 font-sans Cap tracking-[0px]">
                             {course.type}
                           </span>
                         </td>
                         <td className="p-5 text-right">
                           <span
-                            className={`px-2.5 py-1 rounded-lg border font-black uppercase font-sans text-[8px] tracking-widest ${
+                            className={`px-2.5 py-1 rounded-lg border font-black Cap font-sans text-[8px] tracking-[0px] ${
                               course.status.toLowerCase().includes("registered")
                                 ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
                                 : "bg-rose-500/10 border-rose-500/20 text-rose-400"
@@ -392,19 +392,19 @@ function FeeDetailsPage() {
   return (
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-4 md:p-8 space-y-12 relative z-10 font-sans">
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full pointer-events-none -mr-64 -mt-64 z-0"></div>
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full pointer-events-none -mr-64 -mt-64 z-0"></div>
 
         <PageHeader title="Fee Vault" subtitle="Academic Portfolio & Accounts">
-          <div className="flex items-center gap-6 bg-zinc-900/50 p-6 rounded-[2rem] border border-white/5 backdrop-blur-xl group hover:bg-zinc-900/70 transition-all">
+          <div className="flex items-center gap-6 bg-secondary/50 p-6 rounded-[2rem] border border-foreground/10 backdrop-blur-xl group hover:bg-secondary/70 transition-all">
             <div className="text-right">
-              <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest leading-none mb-2">
+              <p className="text-[10px] font-black text-foreground/50 Cap tracking-[0px] leading-none mb-2">
                 Total Paid
               </p>
-              <h4 className="text-3xl font-black text-white">
+              <h4 className="text-3xl font-black text-foreground">
                 Rs. {totalPaid}
               </h4>
             </div>
-            <div className="p-4 rounded-2xl bg-x/10 text-x group-hover:scale-110 transition-transform duration-300">
+            <div className="p-4 rounded-2xl bg-accent/10 text-accent group-hover:scale-110 transition-transform duration-300">
               <CreditCard size={24} />
             </div>
           </div>
@@ -447,10 +447,10 @@ function FeeDetailsPage() {
           {}
           <div className="space-y-10">
             <div className="flex items-center gap-4 px-2">
-              <div className="p-3 rounded-2xl bg-zinc-900 border border-white/5 text-zinc-500">
+              <div className="p-3 rounded-2xl bg-secondary border border-foreground/10 text-foreground/50">
                 <FileText size={20} />
               </div>
-              <h3 className="text-xl font-black text-white uppercase tracking-tight">
+              <h3 className="text-xl font-black text-foreground Cap tracking-tight">
                 Financial Books
               </h3>
             </div>
@@ -464,87 +464,87 @@ function FeeDetailsPage() {
           {}
           <div className="space-y-10">
             <div className="flex items-center gap-4 px-2">
-              <div className="p-3 rounded-2xl bg-zinc-900 border border-white/5 text-zinc-500">
+              <div className="p-3 rounded-2xl bg-secondary border border-foreground/10 text-foreground/50">
                 <History size={20} />
               </div>
-              <h3 className="text-xl font-black text-white uppercase tracking-tight">
+              <h3 className="text-xl font-black text-foreground Cap tracking-tight">
                 Transaction Journal
               </h3>
             </div>
 
-            <div className="overflow-hidden rounded-[2.5rem] border border-white/5 bg-zinc-900/20 backdrop-blur-xl">
+            <div className="overflow-hidden rounded-[2.5rem] border border-foreground/10 bg-secondary/20 backdrop-blur-xl">
               <div className="overflow-x-auto scrollbar-hide">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="bg-white/5 border-b border-white/5">
-                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">
+                    <tr className="bg-foreground/5 border-b border-foreground/10">
+                      <th className="p-5 text-[9px] font-black Cap tracking-[0px] text-foreground/50 font-sans">
                         S#
                       </th>
-                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">
+                      <th className="p-5 text-[9px] font-black Cap tracking-[0px] text-foreground/50 font-sans">
                         Semester
                       </th>
-                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">
+                      <th className="p-5 text-[9px] font-black Cap tracking-[0px] text-foreground/50 font-sans">
                         Challan No
                       </th>
-                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">
+                      <th className="p-5 text-[9px] font-black Cap tracking-[0px] text-foreground/50 font-sans">
                         Instrument
                       </th>
-                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">
+                      <th className="p-5 text-[9px] font-black Cap tracking-[0px] text-foreground/50 font-sans">
                         Instrument No
                       </th>
-                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-x font-sans">
+                      <th className="p-5 text-[9px] font-black Cap tracking-[0px] text-accent font-sans">
                         Amount
                       </th>
-                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">
+                      <th className="p-5 text-[9px] font-black Cap tracking-[0px] text-foreground/50 font-sans">
                         Due Date
                       </th>
-                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400 font-sans">
+                      <th className="p-5 text-[9px] font-black Cap tracking-[0px] text-emerald-400 font-sans">
                         Payment Date
                       </th>
-                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">
+                      <th className="p-5 text-[9px] font-black Cap tracking-[0px] text-foreground/50 font-sans">
                         Source
                       </th>
-                      <th className="p-5 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-500 font-sans">
+                      <th className="p-5 text-[9px] font-black Cap tracking-[0px] text-foreground/50 font-sans">
                         Status
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-foreground/5">
                     {transactions.map((t, idx) => (
                       <tr
                         key={idx}
-                        className="group hover:bg-white/[0.02] transition-colors"
+                        className="group hover:bg-foreground/[0.02] transition-colors"
                       >
-                        <td className="p-5 text-[10px] text-zinc-600 font-black">
+                        <td className="p-5 text-[10px] text-foreground/40 font-black">
                           {t.sNo}
                         </td>
-                        <td className="p-5 text-[10px] text-white font-black uppercase tracking-tight">
+                        <td className="p-5 text-[10px] text-foreground font-black Cap tracking-tight">
                           {t.semester}
                         </td>
-                        <td className="p-5 text-[10px] text-zinc-400 font-bold">
+                        <td className="p-5 text-[10px] text-foreground/60 font-bold">
                           {t.challanNo}
                         </td>
-                        <td className="p-5 text-[10px] text-zinc-500 font-medium uppercase">
+                        <td className="p-5 text-[10px] text-foreground/50 font-medium Cap">
                           {t.instrumentType}
                         </td>
-                        <td className="p-5 text-[10px] text-zinc-400 font-bold">
+                        <td className="p-5 text-[10px] text-foreground/60 font-bold">
                           {t.instrumentNo}
                         </td>
-                        <td className="p-5 text-[11px] text-white font-black">
+                        <td className="p-5 text-[11px] text-foreground font-black">
                           Rs. {t.amount}
                         </td>
-                        <td className="p-5 text-[10px] text-zinc-500 font-medium">
+                        <td className="p-5 text-[10px] text-foreground/50 font-medium">
                           {t.dueDate}
                         </td>
                         <td className="p-5 text-[10px] text-emerald-400 font-bold">
                           {t.paymentDate}
                         </td>
-                        <td className="p-5 text-[10px] text-zinc-500 font-black uppercase tracking-widest">
+                        <td className="p-5 text-[10px] text-foreground/50 font-black Cap tracking-[0px]">
                           {t.enteredBy}
                         </td>
                         <td className="p-5">
                           <span
-                            className={`px-2 py-0.5 rounded-md border text-[8px] font-black uppercase tracking-widest leading-none ${
+                            className={`px-2 py-0.5 rounded-md border text-[8px] font-black Cap tracking-[0px] leading-none ${
                               t.status.toLowerCase().includes("paid")
                                 ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
                                 : "bg-rose-500/10 border-rose-500/20 text-rose-400"

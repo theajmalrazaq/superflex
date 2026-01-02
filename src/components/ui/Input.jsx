@@ -13,7 +13,7 @@ const Input = ({
   return (
     <div className={`space-y-2 w-full ${className}`}>
       {label && (
-        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">
+        <label className="text-[10px] font-black text-foreground/50 Cap tracking-[0px] px-1">
           {label}
         </label>
       )}
@@ -24,19 +24,19 @@ const Input = ({
           onChange={onChange}
           placeholder={placeholder}
           className={`
-            w-full bg-white/[0.03] border border-white/5 text-white p-4 rounded-2xl text-sm font-medium 
-            focus:outline-none focus:border-x/30 focus:bg-white/[0.05]
-            placeholder:text-zinc-600 placeholder:text-xs placeholder:uppercase placeholder:tracking-widest
+            w-full bg-foreground/[0.03] border border-foreground/10 text-foreground p-4 rounded-2xl text-sm font-medium 
+            focus:outline-none focus:border-accent/30 focus:bg-foreground/[0.05]
+            placeholder:text-foreground/40 placeholder:text-xs placeholder:Cap placeholder:tracking-[0px]
             transition-all duration-300
             ${error ? "border-rose-500/50 focus:border-rose-500" : ""}
           `}
           {...props}
         />
         {}
-        <div className="absolute inset-0 rounded-2xl border border-x/0 group-focus-within:border-x/30 pointer-events-none transition-all duration-500" />
+        <div className="absolute inset-0 rounded-2xl border border-accent/0 group-focus-within:border-accent/30 pointer-events-none transition-all duration-500" />
       </div>
       {error && (
-        <p className="text-[10px] text-rose-400 font-bold uppercase tracking-wider px-1">
+        <p className="text-[10px] text-rose-400 font-bold Cap tracking-wider px-1">
           {error}
         </p>
       )}
@@ -57,7 +57,7 @@ export const TextArea = ({
   return (
     <div className={`space-y-2 w-full ${className}`}>
       {label && (
-        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">
+        <label className="text-[10px] font-black text-foreground/50 Cap tracking-[0px] px-1">
           {label}
         </label>
       )}
@@ -67,16 +67,16 @@ export const TextArea = ({
         placeholder={placeholder}
         rows={rows}
         className={`
-          w-full bg-white/[0.03] border border-white/5 text-white p-4 rounded-2xl text-sm font-medium 
-          focus:outline-none focus:border-x/30 focus:bg-white/[0.05]
-          placeholder:text-zinc-600 placeholder:text-xs placeholder:uppercase placeholder:tracking-widest
+          w-full bg-foreground/[0.03] border border-foreground/10 text-foreground p-4 rounded-2xl text-sm font-medium 
+          focus:outline-none focus:border-accent/30 focus:bg-foreground/[0.05]
+          placeholder:text-foreground/40 placeholder:text-xs placeholder:Cap placeholder:tracking-[0px]
           transition-all duration-300 resize-none
           ${error ? "border-rose-500/50 focus:border-rose-500" : ""}
         `}
         {...props}
       />
       {error && (
-        <p className="text-[10px] text-rose-400 font-bold uppercase tracking-wider px-1">
+        <p className="text-[10px] text-rose-400 font-bold Cap tracking-wider px-1">
           {error}
         </p>
       )}

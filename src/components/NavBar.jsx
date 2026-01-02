@@ -21,6 +21,8 @@ import {
   LogOut,
   ChevronDown,
   Pipette,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { Logo } from "./ui/Logo";
 import ProfileImageModal from "./ui/ProfileImageModal";
@@ -251,7 +253,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       onClick={() => {
         window.location.href = link.href;
       }}
-      className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 text-[13px] font-medium whitespace-nowrap cursor-pointer ${isActive ? "bg-x/10 text-x border  border-white/10" : "text-zinc-400 border-transparent hover:text-white hover:bg-white/5"}`}
+      className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 text-[13px] font-medium whitespace-nowrap cursor-pointer ${isActive ? "bg-accent/10 text-accent border  border-foreground/10" : "text-foreground/60 border-transparent hover:text-foreground hover:bg-foreground/5"}`}
     >
       <span className={isActive ? "text-inherit" : "text-current"}>
         {React.cloneElement(getIcon(link), { size: 16 })}
@@ -265,26 +267,26 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       onClick={() => {
         window.location.href = link.href;
       }}
-      className={`group flex items-center !bg-zinc-900/50 backdrop-blur-xl gap-4 p-4 rounded-xl transition-all duration-200 no-underline hover:no-underline border cursor-pointer
+      className={`group flex items-center !bg-secondary/50 backdrop-blur-xl gap-4 p-4 rounded-xl transition-all duration-200 no-underline hover:no-underline border cursor-pointer
         ${
           isActive
-            ? "bg-zinc-800 border-white/10"
-            : "bg-zinc-900 border-white/5 hover:bg-zinc-800 hover:border-white/10"
+            ? "bg-tertiary border-foreground/10"
+            : "bg-secondary border-foreground/10 hover:bg-tertiary hover:border-foreground/10"
         } 
       `}
     >
       <div
-        className={`p-2.5 rounded-full shrink-0 ${isActive ? "bg-x text-white" : "bg-black/40 text-x group-hover:bg-x group-hover:text-white transition-colors duration-300"}`}
+        className={`p-2.5 rounded-full shrink-0 ${isActive ? "bg-accent text-foreground" : "bg-background/40 text-accent group-hover:bg-accent group-hover:text-foreground transition-colors duration-300"}`}
       >
         {React.cloneElement(getIcon(link), { size: 20 })}
       </div>
       <div>
         <div
-          className={`text-sm font-semibold mb-0.5 ${isActive ? "text-white " : "text-zinc-200 group-hover:text-white"}`}
+          className={`text-sm font-semibold mb-0.5 ${isActive ? "text-foreground " : "text-foreground/80 group-hover:text-foreground"}`}
         >
           {link.text}
         </div>
-        <div className="text-[11px] text-zinc-500 font-medium group-hover:text-zinc-400">
+        <div className="text-[11px] text-foreground/50 font-medium group-hover:text-foreground/60">
           View {link.text.toLowerCase()}
         </div>
       </div>
@@ -320,6 +322,46 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     localStorage.getItem("superflex-theme-color") || "#a098ff",
   );
 
+  const [themeMode, setThemeMode] = useState(
+    localStorage.getItem("superflex-theme-mode") || "dark",
+  );
+
+  useEffect(() => {
+    const savedMode = localStorage.getItem("superflex-theme-mode") || "dark";
+    setThemeMode(savedMode);
+    if (savedMode === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
+  const handleThemeModeChange = (mode) => {
+    setThemeMode(mode);
+    localStorage.setItem("superflex-theme-mode", mode);
+    if (mode === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    window.dispatchEvent(
+      new CustomEvent("superflex-theme-mode-changed", { detail: mode }),
+    );
+  };
+
+  const [bgUrl, setBgUrl] = useState(
+    localStorage.getItem("superflex-bg-url") ||
+      "https://cdn.midjourney.com/video/c107d5a0-541d-4a46-bd95-c5adc337c89d/0.mp4",
+  );
+
+  const handleBgChange = (url) => {
+    setBgUrl(url);
+    localStorage.setItem("superflex-bg-url", url);
+    window.dispatchEvent(
+      new CustomEvent("superflex-bg-changed", { detail: url }),
+    );
+  };
+
   const themeColors = [
     "#a098ff",
     "#F77FBE",
@@ -331,14 +373,14 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   useEffect(() => {
     const savedColor =
       localStorage.getItem("superflex-theme-color") || "#a098ff";
-    document.documentElement.style.setProperty("--color-x", savedColor);
+    document.documentElement.style.setProperty("--accent", savedColor);
     setThemeColor(savedColor);
   }, []);
 
   const handleColorChange = (color, shouldClose = true) => {
     setThemeColor(color);
     localStorage.setItem("superflex-theme-color", color);
-    document.documentElement.style.setProperty("--color-x", color);
+    document.documentElement.style.setProperty("--accent", color);
     window.dispatchEvent(
       new CustomEvent("superflex-theme-changed", { detail: color }),
     );
@@ -349,12 +391,12 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
   return (
     <div className="flex items-center justify-between lg:justify-start px-4 lg:px-6 py-2.5 lg:py-3 w-full lg:w-fit relative">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[150%] bg-x/10 blur-[80px] rounded-full pointer-events-none -z-10" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[150%] bg-accent/10 blur-[80px] rounded-full pointer-events-none -z-10" />
       <div className="flex items-center gap-4">
         {}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="lg:hidden p-2 text-zinc-400 hover:text-white transition-colors"
+          className="lg:hidden p-2 text-foreground/60 hover:text-foreground transition-colors"
         >
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -368,7 +410,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       <div className="hidden lg:flex justify-center !px-8">
         <nav>
           {menuLinks.length === 0 ? (
-            <div className="text-white/50 text-sm">Loading...</div>
+            <div className="text-foreground/50 text-sm">Loading...</div>
           ) : (
             <div className="flex items-center gap-1">
               {}
@@ -393,7 +435,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         e.stopPropagation();
                         setOpenDropdown(isOpen ? null : category);
                       }}
-                      className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-white/5 ${isActive ? "bg-x/10 text-x border border-white/10" : "!text-zinc-400 hover:!text-white"}`}
+                      className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-foreground/5 ${isActive ? "bg-accent/10 text-accent border border-foreground/10" : "!text-foreground/60 hover:!text-foreground"}`}
                     >
                       {category}
                       <ChevronDown
@@ -404,7 +446,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
                     {isOpen && (
                       <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-[999] w-max animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="bg-black border border-white/10 rounded-2xl p-2 min-w-[520px]">
+                        <div className="bg-background border border-foreground/10 rounded-2xl p-2 min-w-[520px]">
                           <div className="grid grid-cols-2 gap-2 max-h-[70vh] overflow-y-auto scrollbar-hide p-1">
                             {links.map((link, idx) => {
                               const isLinkActive =
@@ -434,11 +476,11 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       {}
       {}
       {isMobileMenuOpen && (
-        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[90vw] max-w-[400px] bg-[#0c0c0c]/90 backdrop-blur-2xl border border-white/10 rounded-3xl p-4 z-[999] animate-in slide-in-from-top-4 fade-in duration-300">
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[90vw] max-w-[400px] bg-background/95 backdrop-blur-3xl border border-foreground/10 rounded-3xl p-4 z-[999] animate-in slide-in-from-top-4 fade-in duration-300 shadow-2xl">
           <div className="flex flex-col gap-4 max-h-[70vh] backdrop-blur-2xl overflow-y-auto scrollbar-hide">
             {}
             <div
-              className={`relative rounded-3xl overflow-hidden transition-all duration-300 ${isProfileExpanded ? "bg-zinc-900/80 border border-white/10" : "bg-zinc-900/40 border border-white/5 hover:bg-zinc-900/60"}`}
+              className={`relative rounded-3xl overflow-hidden transition-all duration-300 ${isProfileExpanded ? "bg-secondary/80 border border-foreground/10" : "bg-secondary/40 border border-foreground/10 hover:bg-secondary/60"}`}
             >
               <button
                 onClick={() => setIsProfileExpanded(!isProfileExpanded)}
@@ -446,35 +488,35 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
               >
                 <div className="flex items-center gap-3">
                   <div className="relative">
-                    <div className="w-10 h-10 rounded-full bg-zinc-800 border-2 border-white/10 overflow-hidden shrink-0 shadow-lg">
+                    <div className="w-10 h-10 rounded-full bg-tertiary border-2 border-foreground/10 overflow-hidden shrink-0">
                       <img
                         src={profileImage}
                         alt="User"
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="absolute -bottom-1 -right-1 p-0.5 bg-x text-white rounded-full shadow-lg border border-[#0c0c0c]">
+                    <div className="absolute -bottom-1 -right-1 p-0.5 bg-accent text-foreground rounded-full border border-background">
                       <User size={8} />
                     </div>
                   </div>
                   <div className="text-left">
-                    <h3 className="text-white font-bold text-sm leading-tight truncate max-w-[150px]">
+                    <h3 className="text-foreground font-bold text-sm leading-tight truncate max-w-[150px]">
                       {userName}
                     </h3>
-                    <p className="text-[10px] text-zinc-500 font-bold capitalize leading-none mt-0.5">
+                    <p className="text-[10px] text-foreground/60 font-bold capitalize leading-none mt-1">
                       Profile Info
                     </p>
                   </div>
                 </div>
                 <div
-                  className={`p-1.5 rounded-lg bg-white/5 text-zinc-400 transition-transform duration-300 ${isProfileExpanded ? "rotate-180" : ""}`}
+                  className={`p-1.5 rounded-lg bg-foreground/5 text-foreground/60 transition-transform duration-300 ${isProfileExpanded ? "rotate-180" : ""}`}
                 >
                   <ChevronDown size={16} />
                 </div>
               </button>
 
               <div
-                className={`overflow-y-auto transition-all duration-300 scrollbar-hide ${isProfileExpanded ? "max-h-60 border-t border-white/5" : "max-h-0"}`}
+                className={`overflow-y-auto transition-all duration-300 scrollbar-hide ${isProfileExpanded ? "max-h-60 border-t border-foreground/10" : "max-h-0"}`}
               >
                 <div className="p-4 flex flex-col gap-2">
                   <button
@@ -483,24 +525,24 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                       setIsProfileModalOpen(true);
                       setIsProfileExpanded(false);
                     }}
-                    className="flex items-center gap-3 w-full p-2.5 rounded-xl text-left hover:bg-white/5 transition-colors group"
+                    className="flex items-center gap-3 w-full p-2.5 rounded-xl text-left hover:bg-foreground/5 transition-colors group"
                   >
-                    <div className="p-2 bg-x/10 text-x rounded-lg group-hover:bg-x group-hover:text-white transition-colors">
+                    <div className="p-2 bg-accent/10 text-accent rounded-lg group-hover:bg-accent group-hover:text-foreground transition-colors">
                       <User size={14} />
                     </div>
-                    <span className="text-xs font-bold text-zinc-300 group-hover:text-white">
+                    <span className="text-xs font-bold text-foreground/70 group-hover:text-foreground">
                       Change DP
                     </span>
                   </button>
 
                   <a
                     href="/Student/ChangePassword"
-                    className="flex items-center gap-3 w-full p-2.5 rounded-xl text-left hover:bg-white/5 transition-colors group no-underline"
+                    className="flex items-center gap-3 w-full p-2.5 rounded-xl text-left hover:bg-foreground/5 transition-colors group no-underline"
                   >
-                    <div className="p-2 bg-zinc-800 text-zinc-400 rounded-lg group-hover:bg-zinc-700 group-hover:text-white transition-colors">
+                    <div className="p-2 bg-tertiary text-foreground/60 rounded-lg group-hover:bg-tertiary group-hover:text-foreground transition-colors">
                       <Settings size={14} />
                     </div>
-                    <span className="text-xs font-bold text-zinc-300 group-hover:text-white">
+                    <span className="text-xs font-bold text-foreground/70 group-hover:text-foreground">
                       Change Password
                     </span>
                   </a>
@@ -509,7 +551,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                     href="/Login/logout"
                     className="flex items-center gap-3 w-full p-2.5 rounded-xl text-left hover:bg-rose-500/10 transition-colors group no-underline"
                   >
-                    <div className="p-2 bg-rose-500/10 text-rose-500 rounded-lg group-hover:bg-rose-500 group-hover:text-white transition-colors">
+                    <div className="p-2 bg-rose-500/10 text-rose-500 rounded-lg group-hover:bg-rose-500 group-hover:text-foreground transition-colors">
                       <LogOut size={14} />
                     </div>
                     <span className="text-xs font-bold text-rose-500/80 group-hover:text-rose-500">
@@ -521,53 +563,112 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
             </div>
 
             {}
-            <div className="bg-zinc-900/40 border border-white/5 rounded-3xl p-5 space-y-4">
+            {}
+            <div className="bg-secondary/40 border border-foreground/10 rounded-3xl p-5 space-y-6">
+              {}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-x/10 text-x rounded-xl">
-                    <Pipette size={16} />
+                  <div className="p-2 bg-accent/10 text-accent rounded-xl">
+                    <Pipette size={18} />
                   </div>
                   <div>
-                    <h3 className="text-white font-bold text-sm leading-tight">
-                      Accent Color
+                    <h3 className="text-foreground font-semibold text-sm leading-tight">
+                      Aura Settings
                     </h3>
-                    <p className="text-[10px] text-zinc-500 font-bold capitalize leading-none mt-1">
+                    <p className="text-[11px] text-foreground/50 font-medium mt-1">
                       Personalization
                     </p>
                   </div>
                 </div>
-                <div
-                  className="w-6 h-6 rounded-full border-2 border-white/20 shadow-lg"
-                  style={{ backgroundColor: themeColor }}
-                />
               </div>
 
-              <div className="flex flex-wrap gap-2.5  pt-2">
-                <div className="relative group">
-                  <button className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-400 via-purple-400 to-orange-400 p-[2.5px] transition-transform active:scale-95">
-                    <div className="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center">
-                      <Pipette size={14} stroke="white" strokeWidth={2.5} />
-                    </div>
-                  </button>
-                  <input
-                    type="color"
-                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                    value={themeColor}
-                    onChange={(e) => handleColorChange(e.target.value, false)}
-                  />
-                </div>
-                {themeColors.map((color) => (
+              {}
+              <div className="space-y-3">
+                <p className="text-[11px] text-foreground/60 font-medium px-1">
+                  Appearance
+                </p>
+                <div className="grid grid-cols-2 gap-2">
                   <button
-                    key={color}
-                    onClick={() => handleColorChange(color, false)}
-                    className={`w-10 h-10 rounded-full transition-all duration-300 active:scale-95 border-2 ${
-                      themeColor === color
-                        ? "border-white scale-110 shadow-[0_0_15px_rgba(255,255,255,0.3)]"
-                        : "border-white/10"
+                    onClick={() => handleThemeModeChange("light")}
+                    className={`flex items-center justify-center gap-2 py-3 rounded-2xl border transition-all ${
+                      themeMode === "light"
+                        ? "bg-tertiary border-accent/20 text-accent font-bold"
+                        : "bg-background/80 border-foreground/10 text-foreground/60"
                     }`}
-                    style={{ backgroundColor: color }}
+                  >
+                    <Sun size={14} />
+                    <span className="text-xs font-semibold">Light</span>
+                  </button>
+                  <button
+                    onClick={() => handleThemeModeChange("dark")}
+                    className={`flex items-center justify-center gap-2 py-3 rounded-2xl border transition-all ${
+                      themeMode === "dark"
+                        ? "bg-tertiary border-accent/20 text-accent font-bold"
+                        : "bg-background/80 border-foreground/10 text-foreground/60"
+                    }`}
+                  >
+                    <Moon size={14} />
+                    <span className="text-xs font-semibold">Dark</span>
+                  </button>
+                </div>
+              </div>
+
+              {}
+              <div className="space-y-3">
+                <p className="text-[11px] text-foreground/60 font-medium px-1">
+                  Accent Color
+                </p>
+                <div className="flex flex-wrap gap-2.5 px-0.5">
+                  <div className="relative group">
+                    <button className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-400 via-purple-400 to-orange-400 p-[2.5px] transition-transform active:scale-95 shadow-lg">
+                      <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center">
+                        <Pipette size={14} stroke="white" strokeWidth={2.5} />
+                      </div>
+                    </button>
+                    <input
+                      type="color"
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                      value={themeColor}
+                      onChange={(e) => handleColorChange(e.target.value, false)}
+                    />
+                  </div>
+                  {themeColors.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => handleColorChange(color, false)}
+                      className={`w-10 h-10 rounded-full transition-all duration-300 active:scale-95 border-2 ${
+                        themeColor === color
+                          ? "border-accent scale-110 shadow-[0_0_15px_rgba(var(--accent-rgb),0.3)]"
+                          : "border-foreground/10"
+                      }`}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {}
+              <div className="space-y-3">
+                <p className="text-[11px] text-foreground/60 font-medium px-1">
+                  Background Aura
+                </p>
+                <div className="relative group">
+                  <input
+                    type="text"
+                    placeholder="Paste Video/Image URL..."
+                    value={bgUrl}
+                    onChange={(e) => handleBgChange(e.target.value)}
+                    className="w-full bg-background/40 border border-foreground/5 rounded-2xl px-4 py-3.5 text-xs text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-accent/30 transition-all"
                   />
-                ))}
+                  {bgUrl && (
+                    <button
+                      onClick={() => handleBgChange("")}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground transition-colors"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -588,11 +689,15 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         : "flex-col aspect-[4/3]"
                     } ${
                       isActive
-                        ? "bg-x/10 text-x border border-x/20"
-                        : "bg-zinc-900/50 text-zinc-400 hover:bg-white/10 hover:text-white border border-white/5"
+                        ? "bg-accent/10 text-accent border border-accent/20"
+                        : "bg-secondary/50 text-foreground/60 hover:bg-foreground/10 hover:text-foreground border border-foreground/10"
                     }`}
                   >
-                    <div className={isActive ? "text-x" : "text-zinc-500"}>
+                    <div
+                      className={
+                        isActive ? "text-accent" : "text-foreground/50"
+                      }
+                    >
                       {React.cloneElement(getIcon(link), { size: 24 })}
                     </div>
                     <span className="font-bold text-xs">{link.text}</span>
@@ -611,7 +716,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                 return (
                   <div
                     key={category}
-                    className="rounded-2xl overflow-hidden bg-zinc-900/30 border border-white/5"
+                    className="rounded-2xl overflow-hidden bg-secondary/30 border border-foreground/10"
                   >
                     <button
                       onClick={() =>
@@ -620,11 +725,11 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                           [category]: !prev[category],
                         }))
                       }
-                      className="w-full flex items-center justify-between px-4 py-3 text-xs font-bold uppercase tracking-wider text-zinc-500 hover:text-white hover:bg-white/5 transition-colors"
+                      className="w-full flex items-center justify-between px-4 py-3 text-xs font-bold Cap tracking-wider text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors"
                     >
                       <span>{category}</span>
                       <div
-                        className={`p-1 rounded-full bg-white/5 transition-transform duration-300 ${isExpanded ? "rotate-180 bg-white/10 text-white" : ""}`}
+                        className={`p-1 rounded-full bg-foreground/5 transition-transform duration-300 ${isExpanded ? "rotate-180 bg-foreground/10 text-foreground" : ""}`}
                       >
                         <ChevronDown size={14} />
                       </div>
@@ -645,13 +750,15 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                               }}
                               className={`flex flex-col items-center justify-center gap-2 px-3 py-3 rounded-xl transition-all h-24 ${
                                 isActive
-                                  ? "bg-x/10 text-x border border-x/20"
-                                  : "text-zinc-400 bg-black/20 hover:text-white hover:bg-white/5 border border-white/5"
+                                  ? "bg-accent/10 text-accent border border-accent/20"
+                                  : "text-foreground/60 bg-background/20 hover:text-foreground hover:bg-foreground/5 border border-foreground/10"
                               }`}
                             >
                               <div
                                 className={
-                                  isActive ? "text-x" : "text-zinc-500"
+                                  isActive
+                                    ? "text-accent"
+                                    : "text-foreground/50"
                                 }
                               >
                                 {React.cloneElement(getIcon(link), {
@@ -680,7 +787,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           onClick={() =>
             window.dispatchEvent(new CustomEvent("superflex-toggle-ai"))
           }
-          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-x/10 text-x hover:bg-x/20 transition-all duration-300 group animate-border-beam"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-accent/10 text-accent hover:bg-accent/20 transition-all duration-300 group animate-border-beam"
         >
           <div className="border-beam-element" />
           <svg
@@ -693,7 +800,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           >
             <path
               d="M247.227 185.616L282.286 69L133 216L186.861 231.146L133 363L298 208.65L247.227 185.616Z"
-              fill="var(--color-x)"
+              fill="var(--accent)"
             />
             <path
               d="M246.748 185.472L246.623 185.891L247.021 186.071L297.111 208.796L134.327 361.073L187.324 231.335L187.536 230.816L186.996 230.664L133.964 215.751L281.243 70.7275L246.748 185.472Z"
@@ -701,7 +808,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
               strokeOpacity="0.03"
             />
           </svg>
-          <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline-block">
+          <span className="text-xs font-bold Cap tracking-wider hidden sm:inline-block">
             Ask AI
           </span>
         </button>
@@ -712,55 +819,135 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
               e.stopPropagation();
               setOpenDropdown(openDropdown === "theme" ? null : "theme");
             }}
-            className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/5 transition-all duration-200"
+            className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-foreground/5 transition-all duration-200"
           >
             <div
-              className="w-7 h-7 rounded-full border-2 border-white/20"
+              className="w-7 h-7 rounded-full border-2 border-foreground/20"
               style={{ backgroundColor: themeColor }}
             />
           </button>
 
           {openDropdown === "theme" && (
-            <div className="absolute right-0 top-full mt-4 z-[999] w-[calc(100vw-2rem)] sm:w-[340px] animate-in fade-in slide-in-from-top-2 duration-200">
-              <div className="bg-[#0c0c0c]/95 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-6 shadow-2xl flex flex-col gap-6">
-                <div className="space-y-1">
-                  <h3 className="text-lg font-bold text-white tracking-tight">
-                    Accent Colors
-                  </h3>
-                  <p className="text-xs text-zinc-400 font-medium">
-                    Increase Aura of your Flex!
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap gap-3">
-                  <div className="relative group">
-                    <button className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-400 via-purple-400 to-orange-400 p-[3px] transition-transform hover:scale-110 active:scale-95">
-                      <div className="w-full h-full rounded-full bg-zinc-900 flex items-center justify-center">
-                        <Pipette size={14} stroke="white" strokeWidth={2.5} />
-                      </div>
-                    </button>
-                    <input
-                      type="color"
-                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                      value={themeColor}
-                      onChange={(e) => handleColorChange(e.target.value, false)}
-                    />
+            <div className="absolute right-0 top-full mt-2 z-[999] w-[calc(100vw-2rem)] sm:w-[320px] animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="bg-background border border-foreground/10 rounded-2xl p-2 flex flex-col shadow-2xl shadow-black/40">
+                {}
+                <div className="p-4 space-y-4">
+                  <div className="px-1">
+                    <h3 className="text-sm font-semibold mb-0.5 text-foreground/80 tracking-tight">
+                      Appearance
+                    </h3>
+                    <p className="text-[11px] text-foreground/50 font-medium">
+                      Choice of interface
+                    </p>
                   </div>
 
-                  {themeColors.map((color) => (
+                  <div className="grid grid-cols-2 gap-2 pb-2">
                     <button
-                      key={color}
-                      onClick={() => handleColorChange(color)}
-                      className={`w-10 h-10 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center ${
-                        themeColor === color
-                          ? "scale-110"
-                          : "hover:brightness-110"
+                      onClick={() => handleThemeModeChange("light")}
+                      className={`flex items-center justify-center gap-2.5 p-3 rounded-xl border transition-all duration-300 ${
+                        themeMode === "light"
+                          ? "bg-tertiary border-foreground/10 text-foreground"
+                          : "bg-secondary/50 border-foreground/5 text-foreground/60 hover:bg-tertiary hover:text-foreground"
                       }`}
-                      style={{ backgroundColor: color }}
                     >
-                      <div className="w-[22px] h-[22px] rounded-full bg-zinc-900" />
+                      <Sun size={14} />
+                      <span className="text-xs font-semibold">Light</span>
                     </button>
-                  ))}
+                    <button
+                      onClick={() => handleThemeModeChange("dark")}
+                      className={`flex items-center justify-center gap-2.5 p-3 rounded-xl border transition-all duration-300 ${
+                        themeMode === "dark"
+                          ? "bg-tertiary border-foreground/10 text-foreground"
+                          : "bg-secondary/50 border-foreground/5 text-foreground/60 hover:bg-tertiary hover:text-foreground"
+                      }`}
+                    >
+                      <Moon size={14} />
+                      <span className="text-xs font-semibold">Dark</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="h-px bg-foreground/10 mx-4"></div>
+
+                {}
+                <div className="p-4 space-y-4">
+                  <div className="px-1">
+                    <h3 className="text-sm font-semibold mb-0.5 text-foreground/80 tracking-tight">
+                      Accent Color
+                    </h3>
+                    <p className="text-[11px] text-foreground/50 font-medium">
+                      Personalize your aura
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2.5 px-1">
+                    <div className="relative group">
+                      <button className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-400 via-purple-400 to-orange-400 p-[2px] transition-all hover:scale-110 active:scale-95 shadow-lg">
+                        <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center">
+                          <Pipette
+                            size={12}
+                            stroke="currentColor"
+                            strokeWidth={2.5}
+                            className="text-foreground"
+                          />
+                        </div>
+                      </button>
+                      <input
+                        type="color"
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                        value={themeColor}
+                        onChange={(e) =>
+                          handleColorChange(e.target.value, false)
+                        }
+                      />
+                    </div>
+
+                    {themeColors.map((color) => (
+                      <button
+                        key={color}
+                        onClick={() => handleColorChange(color, false)}
+                        className={`w-8 h-8 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center relative shadow-sm ${
+                          themeColor === color
+                            ? "ring-2 ring-accent ring-offset-2 ring-offset-background scale-105"
+                            : "hover:ring-2 hover:ring-foreground/20"
+                        }`}
+                        style={{ backgroundColor: color }}
+                      >
+                        <div className="w-[14px] h-[14px] rounded-full bg-background/40 backdrop-blur-sm border border-white/10" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="h-px bg-foreground/10 mx-4"></div>
+
+                {}
+                <div className="p-4 space-y-4">
+                  <div className="px-1">
+                    <h3 className="text-sm font-semibold mb-0.5 text-foreground/80 tracking-tight">
+                      Background Aura
+                    </h3>
+                    <p className="text-[11px] text-foreground/50 font-medium">
+                      Video or image URL
+                    </p>
+                  </div>
+                  <div className="relative group px-1 pb-2">
+                    <input
+                      type="text"
+                      placeholder="https://..."
+                      value={bgUrl}
+                      onChange={(e) => handleBgChange(e.target.value)}
+                      className="w-full bg-secondary/50 border border-foreground/5 rounded-xl px-4 py-3 text-[11px] text-foreground placeholder:text-foreground/30 focus:outline-none focus:bg-tertiary focus:border-foreground/10 transition-all font-medium"
+                    />
+                    {bgUrl && (
+                      <button
+                        onClick={() => handleBgChange("")}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground transition-colors p-1"
+                      >
+                        <X size={12} />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -773,48 +960,48 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
               e.stopPropagation();
               setOpenDropdown(openDropdown === "profile" ? null : "profile");
             }}
-            className="flex items-center gap-3 px-3 py-2 rounded-full hover:bg-white/5 transition-all duration-200"
+            className="flex items-center gap-3 px-3 py-2 rounded-full hover:bg-foreground/5 transition-all duration-200"
           >
             <img
               src={profileImage}
               alt="Profile"
-              className="h-8 w-8 rounded-full object-cover border border-white/10"
+              className="h-8 w-8 rounded-full object-cover border border-foreground/10"
               onError={(e) => {
                 e.target.src =
-                  'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><rect fill="%23a098ff" width="32" height="32"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="14">?</text></svg>';
+                  'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><rect fill="%23a098ff" width="32" height="32"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="var(--foreground)" font-size="14">?</text></svg>';
               }}
             />
             <ChevronDown
               size={14}
-              className={`text-zinc-400 transition-transform duration-200 ${openDropdown === "profile" ? "rotate-180" : ""}`}
+              className={`text-foreground/60 transition-transform duration-200 ${openDropdown === "profile" ? "rotate-180" : ""}`}
             />
           </button>
 
           {}
           {openDropdown === "profile" && (
             <div className="absolute right-0 top-full mt-2 z-[999] w-56 animate-in fade-in slide-in-from-top-2 duration-200">
-              <div className="bg-black border border-white/10 rounded-2xl p-2 ">
+              <div className="bg-background border border-foreground/10 rounded-2xl p-2 ">
                 <button
                   onClick={() => {
                     setOpenDropdown(null);
                     setIsProfileModalOpen(true);
                   }}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all text-left text-zinc-300 hover:text-white border-0 bg-transparent cursor-pointer"
+                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-foreground/5 transition-all text-left text-foreground/70 hover:text-foreground border-0 bg-transparent cursor-pointer"
                 >
                   <User size={18} />
                   <span className="text-sm font-medium">Change DP</span>
                 </button>
                 <a
                   href="/Student/ChangePassword"
-                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-all text-left text-zinc-300 hover:text-white no-underline"
+                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-foreground/5 transition-all text-left text-foreground/70 hover:text-foreground no-underline"
                 >
                   <Settings size={18} />
                   <span className="text-sm font-medium">Change Password</span>
                 </a>
-                <div className="h-px bg-white/10 my-1"></div>
+                <div className="h-px bg-foreground/10 my-1"></div>
                 <a
                   href="/Login/logout"
-                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-500/10 transition-all text-left text-zinc-300 hover:text-red-400 no-underline"
+                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-500/10 transition-all text-left text-foreground/70 hover:text-red-400 no-underline"
                 >
                   <LogOut size={18} />
                   <span className="text-sm font-medium">Logout</span>

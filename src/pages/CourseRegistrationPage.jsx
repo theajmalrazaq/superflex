@@ -136,13 +136,13 @@ function CourseRegistrationPage() {
               ? tables.map((table, tIdx) => (
                   <div
                     key={tIdx}
-                    className="bg-zinc-900/40 rounded-[2.5rem] p-8 backdrop-blur-xl border border-white/5"
+                    className="bg-secondary/40 rounded-[2.5rem] p-8 backdrop-blur-xl border border-foreground/10"
                   >
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="p-3 bg-x/10 rounded-xl text-x">
+                      <div className="p-3 bg-accent/10 rounded-xl text-accent">
                         <Layers size={24} />
                       </div>
-                      <h3 className="text-xl font-bold text-white">
+                      <h3 className="text-xl font-bold text-foreground">
                         {table.title}
                       </h3>
                     </div>
@@ -150,32 +150,32 @@ function CourseRegistrationPage() {
                     <div className="overflow-x-auto scrollbar-hide">
                       <table className="w-full min-w-[800px]">
                         <thead>
-                          <tr className="border-b border-white/10">
+                          <tr className="border-b border-foreground/10">
                             {table.headers.map((h, i) => (
                               <th
                                 key={i}
-                                className="text-left py-4 px-4 text-xs font-bold text-zinc-500 uppercase tracking-wider"
+                                className="text-left py-4 px-4 text-xs font-bold text-foreground/50 Cap tracking-wider"
                               >
                                 {h}
                               </th>
                             ))}
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-foreground/5">
                           {table.rows.map((row, rIdx) => (
                             <tr
                               key={rIdx}
-                              className="hover:bg-white/5 transition-colors group"
+                              className="hover:bg-foreground/5 transition-colors group"
                             >
                               {row.map((cell, cIdx) => (
                                 <td
                                   key={cIdx}
-                                  className="py-4 px-4 text-sm text-zinc-300 group-hover:text-white transition-colors"
+                                  className="py-4 px-4 text-sm text-foreground/70 group-hover:text-foreground transition-colors"
                                 >
                                   {}
                                   <div
                                     dangerouslySetInnerHTML={{ __html: cell }}
-                                    className="[&>a]:text-x [&>a]:hover:underline [&>button]:bg-x [&>button]:text-white [&>button]:px-3 [&>button]:py-1 [&>button]:rounded-lg [&>button]:text-xs [&>button]:font-bold"
+                                    className="[&>a]:text-accent [&>a]:hover:underline [&>button]:bg-accent [&>button]:text-foreground [&>button]:px-3 [&>button]:py-1 [&>button]:rounded-lg [&>button]:text-xs [&>button]:font-bold"
                                   />
                                 </td>
                               ))}
@@ -189,13 +189,13 @@ function CourseRegistrationPage() {
               : !loading &&
                 alerts.length === 0 && (
                   <div className="flex flex-col items-center justify-center py-20 opacity-50">
-                    <div className="p-6 rounded-full bg-zinc-800/50 mb-4">
-                      <BookOpen size={40} className="text-zinc-600" />
+                    <div className="p-6 rounded-full bg-tertiary/50 mb-4">
+                      <BookOpen size={40} className="text-foreground/40" />
                     </div>
-                    <h3 className="text-xl font-bold text-zinc-500">
+                    <h3 className="text-xl font-bold text-foreground/50">
                       No Information Available
                     </h3>
-                    <p className="text-zinc-600 mt-2">
+                    <p className="text-foreground/40 mt-2">
                       Registration might be closed or data is unavailable.
                     </p>
                   </div>

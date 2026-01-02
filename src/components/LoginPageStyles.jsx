@@ -5,18 +5,31 @@ function LoginPageStyles() {
     localStorage.removeItem("superflex_ai_messages");
 
     const setThemeColor = (color) => {
-      document.documentElement.style.setProperty("--color-x", color);
+      document.documentElement.style.setProperty("--accent", color);
+    };
+
+    const setThemeMode = (mode) => {
+      document.documentElement.classList.toggle("dark", mode === "dark");
     };
 
     const currentTheme =
       localStorage.getItem("superflex-theme-color") || "#a098ff";
+    const currentMode = localStorage.getItem("superflex-theme-mode") || "dark";
+
     setThemeColor(currentTheme);
+    setThemeMode(currentMode);
 
     const handleThemeChange = (e) => {
       setThemeColor(e.detail);
     };
 
+    const handleModeChange = () => {
+      const mode = localStorage.getItem("superflex-theme-mode") || "dark";
+      setThemeMode(mode);
+    };
+
     window.addEventListener("superflex-theme-changed", handleThemeChange);
+    window.addEventListener("superflex-theme-mode-changed", handleModeChange);
 
     document
       .querySelectorAll(
@@ -74,7 +87,7 @@ function LoginPageStyles() {
       .classList.add("!p-0");
 
     const formHelp = document.querySelector(".m-form__help");
-    if (formHelp) formHelp.classList.add("!text-white", "!text-xs");
+    if (formHelp) formHelp.classList.add("!text-foreground", "!text-xs");
 
     document
       .querySelectorAll(".input-group.m-input-group.m-input-group--square")
@@ -87,7 +100,7 @@ function LoginPageStyles() {
         ".input-group label, .m-form__label, label, .input-group h5, h5",
       )
       .forEach((label) => {
-        label.classList.add("!text-white", "!font-medium");
+        label.classList.add("!text-foreground", "!font-medium");
       });
 
     document.querySelectorAll(".input-group-addon").forEach((element) => {
@@ -97,18 +110,18 @@ function LoginPageStyles() {
     document.querySelectorAll(".form-control.m-input").forEach((element) => {
       element.classList.add(
         "!rounded-2xl",
-        "!bg-white/5",
+        "!bg-foreground/5",
         "!border",
-        "!border-white/5",
-        "!text-white",
-        "!placeholder:text-white/40",
+        "!border-foreground/10",
+        "!text-foreground",
+        "!placeholder:text-foreground/40",
         "!placeholder:font-medium",
         "!placeholder:text-xs",
         "!h-[48px]",
         "!px-5",
         "!w-full",
-        "focus:!border-x/30",
-        "focus:!bg-white/[0.08]",
+        "focus:!border-accent/30",
+        "focus:!bg-foreground/[0.08]",
         "!transition-all",
         "!duration-300",
       );
@@ -117,11 +130,11 @@ function LoginPageStyles() {
 
     const errorFeedback = document.querySelector("#m_inputmask_4-error");
     if (errorFeedback) {
-      errorFeedback.classList.add("!text-white");
+      errorFeedback.classList.add("!text-foreground");
     }
 
     document.querySelectorAll(".m-login.m-login--1").forEach((element) => {
-      element.classList.add("!bg-transparent", "!text-white");
+      element.classList.add("!bg-transparent", "!text-foreground");
     });
 
     const oldLogo = document.querySelector(".m-login__logo");
@@ -129,9 +142,9 @@ function LoginPageStyles() {
 
     document.querySelectorAll(".btn-primary").forEach((button) => {
       button.classList.add(
-        "!bg-x",
-        "!text-white",
-        "!uppercase",
+        "!bg-accent",
+        "!text-zinc-950",
+        "!Cap",
         "!border-none",
         "!rounded-2xl",
         "!w-full",
@@ -143,7 +156,7 @@ function LoginPageStyles() {
         "!flex",
         "justify-center",
         "items-center",
-        "hover:!bg-x/80",
+        "hover:!bg-accent/80",
         "!transition-all",
       );
       button.style.fontFamily = "'Google Sans Flex', sans-serif";
@@ -160,13 +173,13 @@ function LoginPageStyles() {
     let bglogin = document.querySelector(".m-login__signin");
     if (bglogin) {
       bglogin.classList.add(
-        "!bg-zinc-900/90",
+        "!bg-secondary/90",
         "backdrop-blur-2xl",
         "!p-6",
         "sm:!p-10",
         "!rounded-[2.5rem]",
         "!border",
-        "!border-white/10",
+        "!border-foreground/10",
         "!flex",
         "!flex-col",
         "!items-center",
@@ -192,8 +205,8 @@ function LoginPageStyles() {
         const header = document.createElement("div");
         header.className = "login-header w-full text-left mb-8 space-y-1";
         header.innerHTML = `
-          <h2 class="text-2xl font-black text-white tracking-tight">Locked In?</h2>
-          <p class="text-x text-[10px] font-black uppercase tracking-widest">Time to Flex on 'em</p>
+          <h2 class="text-2xl font-black text-foreground tracking-tight">Locked In?</h2>
+          <p class="text-accent text-[10px] font-black Cap tracking-[0px]">Time to Flex on 'em</p>
         `;
         bglogin.insertBefore(header, bglogin.firstChild);
       }
@@ -204,13 +217,13 @@ function LoginPageStyles() {
     );
     if (forgotPasswordSection) {
       forgotPasswordSection.classList.add(
-        "!bg-zinc-900/95",
+        "!bg-secondary/95",
         "backdrop-blur-2xl",
         "!p-6",
         "sm:!p-10",
         "!rounded-[2.5rem]",
         "!border",
-        "!border-white/10",
+        "!border-foreground/10",
         "!flex",
         "!flex-col",
         "!gap-8",
@@ -241,7 +254,7 @@ function LoginPageStyles() {
       if (forgotTitle) {
         forgotTitle.style.display = "block";
         forgotTitle.classList.add(
-          "!text-white",
+          "!text-foreground",
           "!text-2xl",
           "!font-bold",
           "!mb-0",
@@ -251,7 +264,7 @@ function LoginPageStyles() {
       const forgotDesc = forgotPasswordSection.querySelector(".m-login__desc");
       if (forgotDesc) {
         forgotDesc.classList.add(
-          "!text-white/70",
+          "!text-foreground/70",
           "!text-sm",
           "!leading-relaxed",
           "!mb-0",
@@ -293,8 +306,8 @@ function LoginPageStyles() {
       forgotPasswordLink.href = "#";
       forgotPasswordLink.textContent = "Forgot Password?";
       forgotPasswordLink.classList.add(
-        "!text-x",
-        "hover:!text-x",
+        "!text-accent",
+        "hover:!text-accent",
         "!text-sm",
         "!cursor-pointer",
         "!transition-all",
@@ -309,8 +322,8 @@ function LoginPageStyles() {
       }
     } else {
       forgotPasswordLink.classList.add(
-        "!text-x",
-        "hover:!text-x",
+        "!text-accent",
+        "hover:!text-accent",
         "!text-sm",
         "!mt-4",
         "!cursor-pointer",
@@ -340,12 +353,12 @@ function LoginPageStyles() {
       );
       if (cancelButton) {
         cancelButton.classList.add(
-          "!bg-zinc-800/50",
-          "!text-zinc-400",
-          "hover:!bg-zinc-800",
-          "hover:!text-white",
+          "!bg-tertiary/50",
+          "!text-foreground/60",
+          "hover:!bg-tertiary",
+          "hover:!text-foreground",
           "!border",
-          "!border-white/5",
+          "!border-foreground/10",
           "!rounded-2xl",
           "!py-3",
           "!px-6",
@@ -379,13 +392,13 @@ function LoginPageStyles() {
         ) || forgotPasswordSection.querySelector("button[type='submit']");
       if (requestButton) {
         requestButton.classList.add(
-          "!bg-x",
-          "!text-white",
+          "!bg-accent",
+          "!text-zinc-950",
           "!font-bold",
           "!rounded-2xl",
           "!py-4",
           "!px-6",
-          "hover:!bg-x/80",
+          "hover:!bg-accent/80",
           "!transition-all",
           "!border-none",
           "!w-full",
@@ -405,7 +418,7 @@ function LoginPageStyles() {
           );
           toast.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            <span class="text-[10px] font-black uppercase tracking-widest">${message}</span>
+            <span class="text-[10px] font-black Cap tracking-[0px]">${message}</span>
           `;
         } else {
           toast.classList.add(
@@ -415,7 +428,7 @@ function LoginPageStyles() {
           );
           toast.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span class="text-[10px] font-black uppercase tracking-widest">${message}</span>
+            <span class="text-[10px] font-black Cap tracking-[0px]">${message}</span>
           `;
         }
 
@@ -447,8 +460,8 @@ function LoginPageStyles() {
     const signInButton = document.createElement("button");
     signInButton.id = "show-login-btn";
     signInButton.className = `
-      !bg-x 
-      !text-white
+      !bg-accent 
+      !text-zinc-950
       !border-none 
       !rounded-2xl 
       !px-8
@@ -479,11 +492,11 @@ function LoginPageStyles() {
     suggestionButton.href = "https://instagram.com/superflex.fr";
     suggestionButton.target = "_blank";
     suggestionButton.className =
-      "group relative bg-white/10 backdrop-blur-sm px-8 py-3.5 rounded-2xl text-white hover:bg-white/20 hover:border-white/40 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto whitespace-nowrap h-[52px]";
+      "group relative bg-foreground/10 backdrop-blur-sm px-8 py-3.5 rounded-2xl text-foreground hover:bg-foreground/20 hover:border-foreground/40 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto whitespace-nowrap h-[52px]";
     suggestionButton.style.fontFamily = "'Google Sans Flex', sans-serif";
     suggestionButton.innerHTML = `
       <span class="text-sm font-medium">Follow on Insta</span>
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-x">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-accent">
         <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
         <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
         <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
@@ -495,7 +508,7 @@ function LoginPageStyles() {
     backdrop.className = `
       !fixed
       !inset-0
-      !bg-black/50
+      !bg-background/50
       backdrop-blur-sm
       !z-[99]
       !hidden
@@ -565,7 +578,7 @@ function LoginPageStyles() {
 
       const glow1 = document.createElement("div");
       glow1.className =
-        "fixed top-0 right-0 w-[800px] h-[800px] bg-x/10 blur-[150px] rounded-full -mr-96 -mt-96 pointer-events-none z-10 animate-pulse";
+        "fixed top-0 right-0 w-[800px] h-[800px] bg-accent/10 blur-[150px] rounded-full -mr-96 -mt-96 pointer-events-none z-10 animate-pulse";
       glow1.style.animationDuration = "10s";
 
       const glow2 = document.createElement("div");
@@ -585,7 +598,7 @@ function LoginPageStyles() {
 
       const blackMask = document.createElement("div");
       blackMask.className =
-        "absolute inset-0 bg-gradient-to-b from-black/40 via-black/80 to-black z-10";
+        "absolute inset-0 bg-gradient-to-b from-background/40 via-background/80 to-background z-10";
 
       rightImage.appendChild(glow1);
       rightImage.appendChild(glow2);
@@ -597,9 +610,6 @@ function LoginPageStyles() {
     const heroDiv = document.createElement("div");
     heroDiv.className =
       "flex flex-col pt-7 justify-center items-center text-center w-full px-4 sm:px-6 mb-6 relative z-10";
-
-    const bgUrl = chrome.runtime.getURL("assets/bg.png");
-    const logoUrl = chrome.runtime.getURL("assets/logo.svg");
 
     const styleId = "feature-marquee-styles";
     let styleElement = document.getElementById(styleId);
@@ -632,11 +642,11 @@ function LoginPageStyles() {
         }
         .marquee-overlay-left {
           left: 0;
-          background: linear-gradient(to right, black 0%, rgba(0,0,0,0.9) 20%, transparent 100%);
+          background: linear-gradient(to right, var(--background) 0%, color-mix(in srgb, var(--background), transparent 10%) 20%, transparent 100%);
         }
         .marquee-overlay-right {
           right: 0;
-          background: linear-gradient(to left, black 0%, rgba(0,0,0,0.9) 20%, transparent 100%);
+          background: linear-gradient(to left, var(--background) 0%, color-mix(in srgb, var(--background), transparent 10%) 20%, transparent 100%);
         }
         .feature-marquee-track {
           display: flex;
@@ -652,10 +662,10 @@ function LoginPageStyles() {
           align-items: flex-start;
           text-align: left;
           gap: 12px;
-          background: rgba(255, 255, 255, 0.03);
+          background: color-mix(in srgb, var(--foreground), transparent 97%);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          border: 1px solid color-mix(in srgb, var(--foreground), transparent 92%);
           padding: 20px 24px;
           border-radius: 24px;
           width: 280px;
@@ -664,8 +674,8 @@ function LoginPageStyles() {
           cursor: default;
         }
         .review-card:hover {
-          background: color-mix(in srgb, var(--color-x), transparent 92%);
-          border-color: color-mix(in srgb, var(--color-x), transparent 70%);
+          background: color-mix(in srgb, var(--accent), transparent 92%);
+          border-color: color-mix(in srgb, var(--accent), transparent 70%);
           transform: translateY(-6px) scale(1.02);
         }
         .review-header {
@@ -682,19 +692,19 @@ function LoginPageStyles() {
           text-align: left;
         }
         .review-name {
-          color: white;
+          color: var(--foreground);
           font-weight: 700;
           font-size: 13px;
         }
         .review-verified {
-          color: var(--color-x);
+          color: var(--accent);
           font-size: 10px;
           font-weight: 800;
-          text-transform: uppercase;
+          text-transform: Cap;
           letter-spacing: 0.05em;
         }
         .review-comment {
-          color: rgba(255, 255, 255, 0.7);
+          color: color-mix(in srgb, var(--foreground), transparent 30%);
           font-size: 13px;
           line-height: 1.6;
           font-weight: 500;
@@ -750,15 +760,15 @@ function LoginPageStyles() {
     heroDiv.innerHTML = `
     <!-- Version Display Button -->
     <a href="https://theajmalrazaq.github.io/superflex" target="_blank" class="mt-4 md:mt-0 mb-6">
-        <button class="group relative bg-neutral-800 rounded-full p-px overflow-hidden cursor-pointer transition-all duration-200 ease-in-out">
-          <span class="flex items-center justify-center gap-1 relative z-[1] bg-neutral-950/90 rounded-full py-2 px-4 pl-2 w-full">
+        <button class="group relative bg-foreground/10 rounded-full p-px overflow-hidden cursor-pointer transition-all duration-200 ease-in-out">
+          <span class="flex items-center justify-center gap-1 relative z-[1] bg-secondary/90 rounded-full py-2 px-4 pl-2 w-full">
             <span class="relative transition-transform duration-500">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-x)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
               </svg>
-              <span class="rounded-full size-11 absolute opacity-30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-lg" style="animation: 14s ease-in-out 0s infinite alternate none running star-shine; background: var(--color-x);"></span>
+              <span class="rounded-full size-11 absolute opacity-30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-lg" style="animation: 14s ease-in-out 0s infinite alternate none running star-shine; background: var(--accent);"></span>
             </span>
-            <span id="version-text" class="bg-gradient-to-b ml-1.5 from-white to-white/50 bg-clip-text text-xs text-transparent uppercase font-bold">
+            <span id="version-text" class="bg-gradient-to-b ml-1.5 from-foreground to-foreground/50 bg-clip-text text-xs text-transparent Cap font-bold">
               SuperFlex v${CURRENT_VERSION}
             </span>
           </span>
@@ -768,36 +778,36 @@ function LoginPageStyles() {
     <!-- Logo & Text Section -->
     <div class="flex flex-col gap-6 justify-center items-center text-center relative z-10">
         <div class="group relative">
-          <div class="absolute -inset-4 bg-x/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition duration-700"></div>
-          <div class="h-24 w-24 bg-black border-8 border-white/5 bg-cover rounded-[32px] flex items-center justify-center relative z-10 " style="background-image: url('${bgUrl}');">
+          <div class="absolute -inset-4 bg-accent/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition duration-700"></div>
+          <div class="h-24 w-24 bg-background border-8 border-foreground/10 bg-cover rounded-[32px] flex items-center justify-center relative z-10 ">
                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="96" height="96" fill="none">
                   <style>@keyframes splash{0%{transform:scale(.2);opacity:.8}80%{transform:scale(1.2);opacity:0}to{transform:scale(2.2);opacity:0}}</style>
-                  <path fill="var(--color-x)" d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z" style="animation:splash 1.5s cubic-bezier(.165,.84,.44,1) infinite both;transform-origin:center center"/>
+                  <path fill="var(--accent)" d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z" style="animation:splash 1.5s cubic-bezier(.165,.84,.44,1) infinite both;transform-origin:center center"/>
                </svg>
           </div>
         </div>
         
         <div class="space-y-4 flex items-center flex-col gap-2 w-full px-4 sm:px-6">
           <svg viewBox="0 0 1584 300" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-[280px] sm:max-w-md hero-logo">
-            <path d="M109.001 111.467L142.455 0L0 140.509L51.3965 154.986L0 281.018L157.45 133.484L109.001 111.467Z" fill="var(--color-x)" />
-            <path d="M230.977 211.553V164.092L327.656 164.531V215.508H180V45H230.977V211.553ZM378.633 164.092H327.656V45H378.633V164.092Z" fill="white" />
-            <path d="M444.99 215.508V299.883H394.453V46.7578H512.666V96.416L444.99 97.2949V164.971H512.666V96.416H563.203V215.508H444.99Z" fill="white" />
-            <path d="M727.119 92.4609H630.439V110.039H727.119V153.984H630.439V171.562H727.119V215.508H579.023V92.4609H630V48.5156H727.119V92.4609Z" fill="white" />
-            <path d="M793.037 215.508H742.5V97.2949H793.037V215.508ZM888.838 97.2949H793.037V46.7578H888.838V97.2949Z" fill="white" />
-            <path d="M1054.07 92.4609H957.393V110.039H1054.07V153.984H957.393V215.508H905.977V92.4609H956.953V48.5156H1054.07V92.4609Z" fill="var(--color-x)" />
-            <path d="M1216.67 164.531V215.508H1120.43V164.531H1216.67ZM1120.43 46.7578V164.531H1069.45V46.7578H1120.43Z" fill="var(--color-x)" />
-            <path d="M1381.03 92.4609H1284.35V110.039H1381.03V153.984H1284.35V171.562H1381.03V215.508H1232.93V92.4609H1283.91V48.5156H1381.03V92.4609Z" fill="var(--color-x)" />
-            <path d="M1460.13 215.508H1398.16V164.971H1460.13V215.508ZM1583.61 97.2949H1522.09V164.971H1583.61V215.508H1522.09V164.971H1460.13V97.2949H1522.09V46.7578H1583.61V97.2949ZM1460.13 97.2949H1398.16V46.7578H1460.13V97.2949Z" fill="var(--color-x)" />
+            <path d="M109.001 111.467L142.455 0L0 140.509L51.3965 154.986L0 281.018L157.45 133.484L109.001 111.467Z" fill="var(--accent)" />
+            <path d="M230.977 211.553V164.092L327.656 164.531V215.508H180V45H230.977V211.553ZM378.633 164.092H327.656V45H378.633V164.092Z" fill="var(--foreground)" />
+            <path d="M444.99 215.508V299.883H394.453V46.7578H512.666V96.416L444.99 97.2949V164.971H512.666V96.416H563.203V215.508H444.99Z" fill="var(--foreground)" />
+            <path d="M727.119 92.4609H630.439V110.039H727.119V153.984H630.439V171.562H727.119V215.508H579.023V92.4609H630V48.5156H727.119V92.4609Z" fill="var(--foreground)" />
+            <path d="M793.037 215.508H742.5V97.2949H793.037V215.508ZM888.838 97.2949H793.037V46.7578H888.838V97.2949Z" fill="var(--foreground)" />
+            <path d="M1054.07 92.4609H957.393V110.039H1054.07V153.984H957.393V215.508H905.977V92.4609H956.953V48.5156H1054.07V92.4609Z" fill="var(--accent)" />
+            <path d="M1216.67 164.531V215.508H1120.43V164.531H1216.67ZM1120.43 46.7578V164.531H1069.45V46.7578H1120.43Z" fill="var(--accent)" />
+            <path d="M1381.03 92.4609H1284.35V110.039H1381.03V153.984H1284.35V171.562H1381.03V215.508H1232.93V92.4609H1283.91V48.5156H1381.03V92.4609Z" fill="var(--accent)" />
+            <path d="M1460.13 215.508H1398.16V164.971H1460.13V215.508ZM1583.61 97.2949H1522.09V164.971H1583.61V215.508H1522.09V164.971H1460.13V97.2949H1522.09V46.7578H1583.61V97.2949ZM1460.13 97.2949H1398.16V46.7578H1460.13V97.2949Z" fill="var(--accent)" />
           </svg>
           <div class="flex items-center justify-center gap-3 w-full">
-            <span class="w-8 sm:w-12 h-px bg-gradient-to-r from-transparent to-white/20"></span>
-            <span class="font-black text-[8px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.4em] text-x/80 text-center">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span>
-            <span class="w-8 sm:w-12 h-px bg-gradient-to-l from-transparent to-white/20"></span>
+            <span class="w-8 sm:w-12 h-px bg-gradient-to-r from-transparent to-foreground/20"></span>
+            <span class="font-black text-[8px] sm:text-[10px] Cap tracking-[0.15em] sm:tracking-[0.4em] text-accent/80 text-center">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span>
+            <span class="w-8 sm:w-12 h-px bg-gradient-to-l from-transparent to-foreground/20"></span>
           </div>
         </div>
         
-        <p class="text-zinc-400 text-sm font-medium">
-          Crafted with obsession by <a href="https://github.com/theajmalrazaq" target="_blank" class="text-white hover:text-x transition-colors decoration-x/30 underline-offset-4 underline">Ajmal Razaq Bhatti</a>
+        <p class="text-foreground/60 text-sm font-medium">
+          Crafted with obsession by <a href="https://github.com/theajmalrazaq" target="_blank" class="text-foreground hover:text-accent transition-colors decoration-accent/30 underline-offset-4 underline">Ajmal Razaq Bhatti</a>
         </p>
     </div>
 
@@ -807,7 +817,7 @@ function LoginPageStyles() {
 
     <!-- Privacy Policy Link -->
     <div class="mt-8 relative z-10">
-        <a href="https://theajmalrazaq.github.io/superflex/docs.html?page=privacy" target="_blank" class="text-[10px] font-bold text-zinc-500 hover:text-x uppercase tracking-widest transition-colors flex items-center gap-2">
+        <a href="https://theajmalrazaq.github.io/superflex/docs.html?page=privacy" target="_blank" class="text-[10px] font-bold text-foreground/50 hover:text-accent Cap tracking-[0px] transition-colors flex items-center gap-2">
             Privacy Policy & Data Transparency
         </a>
     </div>
@@ -902,15 +912,15 @@ function LoginPageStyles() {
       const termsModal = document.createElement("div");
       termsModal.id = "terms-modal";
       termsModal.className =
-        "fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md";
+        "fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-background/90 backdrop-blur-md";
 
       termsModal.innerHTML = `
-        <div class="bg-zinc-900/95 backdrop-blur-2xl border border-white/10 rounded-[2rem] w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-500">
+        <div class="bg-secondary/95 backdrop-blur-2xl border border-foreground/10 rounded-[2rem] w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-500">
           <!-- Header -->
-          <div class="p-4 sm:p-5 border-b border-white/5 bg-white/5">
+          <div class="p-4 sm:p-5 border-b border-foreground/10 bg-foreground/5">
             <div class="flex items-center gap-3">
-              <div class="p-2 rounded-xl bg-x/10 border border-x/20">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-x)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <div class="p-2 rounded-xl bg-accent/10 border border-accent/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                   <polyline points="14 2 14 8 20 8"/>
                   <line x1="16" y1="13" x2="8" y2="13"/>
@@ -918,8 +928,8 @@ function LoginPageStyles() {
                 </svg>
               </div>
               <div>
-                <h2 class="text-lg font-black text-white tracking-tight">Terms & Conditions</h2>
-                <p class="text-[9px] text-x font-black uppercase tracking-widest">First Time Setup</p>
+                <h2 class="text-lg font-black text-foreground tracking-tight">Terms & Conditions</h2>
+                <p class="text-[9px] text-accent font-black Cap tracking-[0px]">First Time Setup</p>
               </div>
             </div>
           </div>
@@ -927,8 +937,8 @@ function LoginPageStyles() {
           <!-- Content -->
           <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
             <div class="space-y-2.5">
-              <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5">
-                <h3 class="text-xs font-black text-white mb-1.5 flex items-center gap-2">
+              <div class="p-3 rounded-xl bg-foreground/[0.02] border border-foreground/10">
+                <h3 class="text-xs font-black text-foreground mb-1.5 flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"/>
                     <line x1="12" y1="16" x2="12" y2="12"/>
@@ -936,33 +946,33 @@ function LoginPageStyles() {
                   </svg>
                   Independent Project
                 </h3>
-                <p class="text-[11px] text-zinc-400 leading-relaxed">
-                  SuperFlex is an independent project that redesigns the Flex portal of NUCES university. This extension is <strong class="text-white">not affiliated with, endorsed by, or sponsored by</strong> NUCES university.
+                <p class="text-[11px] text-foreground/60 leading-relaxed">
+                  SuperFlex is an independent project that redesigns the Flex portal of NUCES university. This extension is <strong class="text-foreground">not affiliated with, endorsed by, or sponsored by</strong> NUCES university.
                 </p>
               </div>
 
-              <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5">
-                <h3 class="text-xs font-black text-white mb-1.5 flex items-center gap-2">
+              <div class="p-3 rounded-xl bg-foreground/[0.02] border border-foreground/10">
+                <h3 class="text-xs font-black text-foreground mb-1.5 flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                   </svg>
                   Security & Privacy
                 </h3>
-                <p class="text-[11px] text-zinc-400 leading-relaxed">
-                  This is a personal project intended to enhance the learning experience. SuperFlex <strong class="text-white">only applies cosmetic changes</strong> to the user interface without compromising any security measures or accessing unauthorized data. No hacking involved.
+                <p class="text-[11px] text-foreground/60 leading-relaxed">
+                  This is a personal project intended to enhance the learning experience. SuperFlex <strong class="text-foreground">only applies cosmetic changes</strong> to the user interface without compromising any security measures or accessing unauthorized data. No hacking involved.
                 </p>
               </div>
 
-              <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5">
-                <h3 class="text-xs font-black text-white mb-1.5 flex items-center gap-2">
+              <div class="p-3 rounded-xl bg-foreground/[0.02] border border-foreground/10">
+                <h3 class="text-xs font-black text-foreground mb-1.5 flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                   </svg>
                   User Responsibility
                 </h3>
-                <p class="text-[11px] text-zinc-400 leading-relaxed">
-                  You are using this extension at <strong class="text-white">your own consent and responsibility</strong>. The creator of SuperFlex is not responsible for any issues that may arise, including but not limited to academic discrepancies, data inaccuracies, or system incompatibilities.
+                <p class="text-[11px] text-foreground/60 leading-relaxed">
+                  You are using this extension at <strong class="text-foreground">your own consent and responsibility</strong>. The creator of SuperFlex is not responsible for any issues that may arise, including but not limited to academic discrepancies, data inaccuracies, or system incompatibilities.
                 </p>
               </div>
 
@@ -973,22 +983,22 @@ function LoginPageStyles() {
                   </svg>
                   Analytics
                 </h3>
-                <p class="text-[11px] text-zinc-400 leading-relaxed">
+                <p class="text-[11px] text-foreground/60 leading-relaxed">
                   We use <strong class="text-emerald-400">Umami Analytics</strong> to track usage patterns and improve the extension. No personal information, grades, or attendance data is collected. Only anonymous usage statistics.
                 </p>
               </div>
             </div>
 
-            <div class="p-3 rounded-xl bg-x/5 border border-x/10">
-              <p class="text-[11px] text-zinc-300 leading-relaxed">
-                By clicking <strong class="text-white">"Accept & Continue"</strong>, you acknowledge that you are using a third-party modification to the university's official system and do so at your own risk.
+            <div class="p-3 rounded-xl bg-accent/5 border border-accent/10">
+              <p class="text-[11px] text-foreground/70 leading-relaxed">
+                By clicking <strong class="text-foreground">"Accept & Continue"</strong>, you acknowledge that you are using a third-party modification to the university's official system and do so at your own risk.
               </p>
             </div>
           </div>
 
           <!-- Footer -->
-          <div class="p-4 sm:p-5 border-t border-white/5 bg-white/5">
-            <button id="terms-accept-btn" class="w-full bg-x text-white border-none rounded-xl py-3 px-6 font-bold text-sm hover:bg-x/80 transition-all">
+          <div class="p-4 sm:p-5 border-t border-foreground/10 bg-foreground/5">
+            <button id="terms-accept-btn" class="w-full bg-accent text-foreground border-none rounded-xl py-3 px-6 font-bold text-sm hover:bg-accent/80 transition-all">
               Accept & Continue
             </button>
           </div>
@@ -1020,7 +1030,7 @@ function LoginPageStyles() {
 
       const icon = document.createElement("span");
       icon.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
           <circle cx="12" cy="12" r="3"/>
         </svg>
@@ -1033,8 +1043,8 @@ function LoginPageStyles() {
         "top-1/2",
         "transform",
         "-translate-y-1/2",
-        "text-white/50",
-        "hover:text-white",
+        "text-foreground/50",
+        "hover:text-foreground",
         "focus:outline-none",
         "z-10",
       );
@@ -1053,11 +1063,11 @@ function LoginPageStyles() {
 
           icon.innerHTML =
             type === "password"
-              ? `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              ? `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
                 <circle cx="12" cy="12" r="3"/>
               </svg>`
-              : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-10-7-10-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
                 <line x1="1" y1="1" x2="23" y2="23"/>
               </svg>`;
@@ -1066,9 +1076,15 @@ function LoginPageStyles() {
     });
 
     document.body.classList.add("!h-screen", "!overflow-hidden");
+    document.body.style.backgroundColor = "var(--background)";
+    document.body.style.color = "var(--foreground)";
 
     return () => {
       window.removeEventListener("superflex-theme-changed", handleThemeChange);
+      window.removeEventListener(
+        "superflex-theme-mode-changed",
+        handleModeChange,
+      );
     };
   }, []);
 

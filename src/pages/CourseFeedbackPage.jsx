@@ -17,9 +17,9 @@ import LoadingOverlay, {
 const FeedbackCard = ({ course, onAction, index }) => {
   const isPending = course.hasAction;
   return (
-    <div className="group cursor-default flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border transition-all duration-300 bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5 gap-4">
+    <div className="group cursor-default flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border transition-all duration-300 bg-secondary/30 border-transparent hover:bg-secondary/50 hover:border-foreground/10 gap-4">
       <div className="flex items-center gap-4">
-        <span className="font-bold text-sm min-w-[1.5rem] text-zinc-600">
+        <span className="font-bold text-sm min-w-[1.5rem] text-foreground/40">
           {index}.
         </span>
 
@@ -35,30 +35,30 @@ const FeedbackCard = ({ course, onAction, index }) => {
 
         <div className="flex flex-col gap-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] font-black text-x uppercase tracking-tighter opacity-80 shrink-0">
+            <span className="text-[10px] font-black text-accent Cap tracking-tighter opacity-80 shrink-0">
               {course.code}
             </span>
-            <span className="text-white font-medium text-sm leading-tight truncate">
+            <span className="text-foreground font-medium text-sm leading-tight truncate">
               {course.courseName}
             </span>
           </div>
 
-          <div className="flex items-center gap-3 text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
+          <div className="flex items-center gap-3 text-[10px] text-foreground/50 font-bold Cap tracking-[0px] leading-none">
             <span className="flex items-center gap-1.5">
-              <BookOpen size={11} className="text-zinc-600" />
+              <BookOpen size={11} className="text-foreground/40" />
               {course.credits} Credits
             </span>
-            <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
-            <span className="flex items-center gap-1.5 uppercase">
+            <span className="w-1 h-1 rounded-full bg-tertiary"></span>
+            <span className="flex items-center gap-1.5 Cap">
               Faculty Survey
             </span>
           </div>
         </div>
       </div>
 
-      <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-white/5">
+      <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-foreground/10">
         <div
-          className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-all duration-300 ${
+          className={`px-3 py-1.5 rounded-lg text-[10px] font-black Cap tracking-[0px] border transition-all duration-300 ${
             isPending
               ? "bg-amber-500/5 text-amber-500 border-amber-500/10 group-hover:border-amber-500/30"
               : "bg-emerald-500/5 text-emerald-400 border-emerald-500/10 group-hover:border-emerald-500/30"
@@ -69,7 +69,7 @@ const FeedbackCard = ({ course, onAction, index }) => {
         {isPending && (
           <button
             onClick={() => onAction(course)}
-            className="text-x text-[9px] font-black uppercase tracking-[0.2em] hover:text-white transition-colors"
+            className="text-accent text-[9px] font-black Cap tracking-[0px] hover:text-foreground transition-colors"
           >
             Review Now
           </button>
@@ -228,7 +228,7 @@ function CourseFeedbackPage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-4 md:p-8 space-y-8">
         {}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
         <PageHeader
@@ -269,7 +269,9 @@ function CourseFeedbackPage() {
 
         <div className="space-y-4">
           <div className="flex items-center justify-between px-2">
-            <h3 className="text-xl font-bold text-white">Evaluation Log</h3>
+            <h3 className="text-xl font-bold text-foreground">
+              Evaluation Log
+            </h3>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -284,8 +286,8 @@ function CourseFeedbackPage() {
           </div>
 
           {courses.length === 0 && (
-            <div className="text-center py-20 bg-zinc-900/30 rounded-[2rem] border border-dashed border-white/5">
-              <p className="text-zinc-500 font-medium">
+            <div className="text-center py-20 bg-secondary/30 rounded-[2rem] border border-dashed border-foreground/10">
+              <p className="text-foreground/50 font-medium">
                 No pending evaluations found.
               </p>
             </div>

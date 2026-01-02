@@ -11,18 +11,18 @@ const Button = ({
   isLoading = false,
 }) => {
   const baseStyles =
-    "relative flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold uppercase text-[10px] tracking-widest transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 overflow-hidden group";
+    "relative flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold Cap text-[10px] tracking-[0px] transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 overflow-hidden group";
 
   const variants = {
-    primary: "bg-x text-zinc-950 border-none hover:bg-[#b0a8ff]",
+    primary: "bg-accent text-zinc-950 border-none hover:opacity-90",
     secondary:
-      "bg-white/5 text-zinc-400 hover:text-white border border-white/5 hover:bg-white/10",
+      "bg-foreground/5 text-foreground/60 hover:text-foreground border border-foreground/10 hover:bg-foreground/10",
     danger:
-      "bg-rose-500 text-white border-none hover:bg-rose-600 disabled:bg-zinc-800 disabled:text-zinc-400",
+      "bg-error text-foreground border-none hover:opacity-90 disabled:bg-tertiary disabled:text-foreground/60",
     success:
-      "bg-emerald-500 text-white border-none hover:bg-emerald-600 disabled:bg-zinc-800 disabled:text-zinc-400",
+      "bg-success text-foreground border-none hover:opacity-90 disabled:bg-tertiary disabled:text-foreground/60",
     outline:
-      "bg-transparent text-zinc-400 border border-white/10 hover:border-white/20 hover:text-white",
+      "bg-transparent text-foreground/60 border border-foreground/10 hover:border-foreground/20 hover:text-foreground",
   };
 
   return (

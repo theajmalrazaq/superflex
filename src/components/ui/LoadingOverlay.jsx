@@ -66,8 +66,8 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
         !show || !loading ? "fade-out" : ""
       }`}
     >
-      <div className="bg-black border-[1px] border-white/10 bg-cover flex items-center justify-center h-24 w-24 rounded-[32px]  relative overflow-hidden">
-        <div className="absolute inset-0 bg-x/10 blur-xl"></div>
+      <div className="bg-background border flex items-center justify-center h-24 w-24 rounded-[32px] relative overflow-hidden">
+        <div className="absolute inset-0 bg-accent/10 blur-xl"></div>
         <svg
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
@@ -78,7 +78,7 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
         >
           <path
             className="animate-splash"
-            fill="var(--color-x)"
+            fill="var(--accent)"
             d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
           />
         </svg>
@@ -90,8 +90,8 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
 export const LoadingSpinner = () => {
   return (
     <div className="flex items-center justify-center w-full h-full min-h-[200px]">
-      <div className="bg-black/50 border border-white/5 flex items-center justify-center h-16 w-16 rounded-[20px] relative overflow-hidden">
-        <div className="absolute inset-0 bg-x/5 blur-md"></div>
+      <div className="bg-background/50 border flex items-center justify-center h-16 w-16 rounded-[20px] relative overflow-hidden">
+        <div className="absolute inset-0 bg-accent/5 blur-md"></div>
         <svg
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
@@ -102,7 +102,7 @@ export const LoadingSpinner = () => {
         >
           <path
             className="animate-splash"
-            fill="var(--color-x)"
+            fill="var(--accent)"
             d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
           />
         </svg>

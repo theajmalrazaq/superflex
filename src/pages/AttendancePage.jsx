@@ -39,10 +39,10 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
     <div className="relative w-full md:w-auto z-50" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full md:w-[350px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-zinc-900/50 border border-white/5 text-white hover:bg-white/5 transition-all group"
+        className="w-full md:w-[350px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-secondary/50 border border-foreground/10 text-foreground hover:bg-foreground/5 transition-all group"
       >
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="p-2 rounded-xl bg-x/10 text-x">
+          <div className="p-2 rounded-xl bg-accent/10 text-accent">
             <BookOpen size={16} />
           </div>
           <div className="flex flex-col items-start truncate">
@@ -53,12 +53,12 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
         </div>
         <ChevronDown
           size={16}
-          className={`text-zinc-500 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+          className={`text-foreground/50 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10  max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-background/50 backdrop-blur-2xl border border-foreground/10  max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200">
           <div className="flex flex-col gap-3">
             {courses.map((course) => (
               <button
@@ -67,15 +67,15 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
                   onSelect(course.id);
                   setIsOpen(false);
                 }}
-                className={`w-full flex bg-zinc-900 items-center justify-between p-3 rounded-xl transition-all ${
+                className={`w-full flex bg-secondary items-center justify-between p-3 rounded-xl transition-all ${
                   selectedId === course.id
-                    ? "bg-x/10 border border-x/20"
-                    : "hover:bg-white/5 border border-transparent"
+                    ? "bg-accent/10 border border-accent/20"
+                    : "hover:bg-foreground/5 border border-transparent"
                 }`}
               >
                 <div className="flex items-center gap-3 text-left overflow-hidden">
                   <span
-                    className={`text-sm font-medium truncate ${selectedId === course.id ? "text-white" : "text-zinc-400"}`}
+                    className={`text-sm font-medium truncate ${selectedId === course.id ? "text-foreground" : "text-foreground/60"}`}
                   >
                     {course.title}
                   </span>
@@ -106,13 +106,13 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
       onClick={onToggleMark}
       className={`group cursor-pointer flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${
         isMarked
-          ? "bg-x/10 border-x/50"
-          : "bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5"
+          ? "bg-accent/10 border-accent/50"
+          : "bg-secondary/30 border-transparent hover:bg-secondary/50 hover:border-foreground/10"
       }`}
     >
       <div className="flex items-center gap-4">
         <span
-          className={`font-bold text-sm min-w-[1.5rem] ${isMarked ? "text-x" : "text-zinc-600"}`}
+          className={`font-bold text-sm min-w-[1.5rem] ${isMarked ? "text-accent" : "text-foreground/40"}`}
         >
           {index}.
         </span>
@@ -127,14 +127,14 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
         </div>
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <span className="text-white font-medium text-sm">
+            <span className="text-foreground font-medium text-sm">
               {record.date}
             </span>
-            <span className="text-zinc-500 text-xs px-2 py-0.5 rounded-full bg-white/5">
+            <span className="text-foreground/50 text-xs px-2 py-0.5 rounded-full bg-foreground/5">
               {record.day}
             </span>
           </div>
-          <div className="flex items-center gap-3 text-xs text-zinc-500">
+          <div className="flex items-center gap-3 text-xs text-foreground/50">
             <span className="flex items-center gap-1">
               <Clock size={12} /> {record.time || "N/A"}
             </span>
@@ -157,8 +157,8 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
         <div
           className={`p-2 rounded-full shrink-0 transition-all duration-300 border ${
             isMarked
-              ? "text-x bg-x/10 border-x/30"
-              : "text-zinc-700 bg-zinc-900/50 border-white/5 group-hover:text-zinc-500 hover:bg-white/10"
+              ? "text-accent bg-accent/10 border-accent/30"
+              : "text-foreground/30 bg-secondary/50 border-foreground/10 group-hover:text-foreground/50 hover:bg-foreground/10"
           }`}
         >
           <Bookmark size={18} fill={isMarked ? "currentColor" : "none"} />
@@ -207,8 +207,8 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
         onClick={() => setIsOpen(!isOpen)}
         className={`p-3 rounded-full border transition-all ${
           isOpen
-            ? "bg-x/20 text-x border-x/20"
-            : "bg-zinc-900/50 text-zinc-400 border-white/5 hover:text-white hover:bg-white/10"
+            ? "bg-accent/20 text-accent border-accent/20"
+            : "bg-secondary/50 text-foreground/60 border-foreground/10 hover:text-foreground hover:bg-foreground/10"
         }`}
         title="View Bookmarks"
       >
@@ -219,16 +219,16 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-80 md:w-96 bg-[#111] backdrop-blur-xl border border-white/10 rounded-2xl  overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-          <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
-            <h3 className="font-bold text-white flex items-center gap-2">
+        <div className="absolute top-full right-0 mt-2 w-80 md:w-96 bg-[#111] backdrop-blur-xl border border-foreground/10 rounded-2xl  overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="p-4 border-b border-foreground/10 bg-foreground/5 flex justify-between items-center">
+            <h3 className="font-bold text-foreground flex items-center gap-2">
               Bookmarked Items
             </h3>
           </div>
 
           <div className="max-h-[60vh] overflow-y-auto scrollbar-hide p-2 space-y-1">
             {bookmarkedDetails.length === 0 ? (
-              <div className="p-8 text-center text-zinc-500 text-sm">
+              <div className="p-8 text-center text-foreground/50 text-sm">
                 <p>No bookmarks yet.</p>
                 <p className="text-xs mt-1 opacity-50">
                   Click the bookmark icon on any attendance record to save it
@@ -243,10 +243,10 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
                     onNavigate(item.courseId);
                     setIsOpen(false);
                   }}
-                  className="w-full text-left p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all group"
+                  className="w-full text-left p-3 rounded-xl hover:bg-foreground/5 border border-transparent hover:border-foreground/10 transition-all group"
                 >
                   <div className="flex justify-between items-start mb-1">
-                    <div className="font-bold text-sm text-white group-hover:text-x transition-colors truncate w-full pr-2">
+                    <div className="font-bold text-sm text-foreground group-hover:text-accent transition-colors truncate w-full pr-2">
                       {item.date}
                     </div>
                     <span
@@ -259,7 +259,7 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
                       {(item.status || "").includes("P") ? "Present" : "Absent"}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-[10px] text-zinc-500 uppercase tracking-wider font-bold">
+                  <div className="flex items-center gap-2 text-[10px] text-foreground/50 Cap tracking-wider font-bold">
                     <span className="truncate max-w-[200px]">
                       {item.courseTitle}
                     </span>
@@ -498,12 +498,12 @@ function AttendancePage() {
                 </div>
 
                 {}
-                <div className="bg-zinc-900/50 border border-white/5 rounded-[2rem] p-6 backdrop-blur-xl">
+                <div className="bg-secondary/50 border border-foreground/10 rounded-[2rem] p-6 backdrop-blur-xl">
                   <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-bold text-white">
+                    <h3 className="text-xl font-bold text-foreground">
                       History Log
                     </h3>
-                    <div className="px-3 py-1 rounded-lg bg-white/5 text-xs text-zinc-400 font-medium">
+                    <div className="px-3 py-1 rounded-lg bg-foreground/5 text-xs text-foreground/60 font-medium">
                       Session History
                     </div>
                   </div>
@@ -528,7 +528,7 @@ function AttendancePage() {
                   </div>
 
                   {selectedCourseData.records.length === 0 && (
-                    <div className="text-center py-12 text-zinc-500">
+                    <div className="text-center py-12 text-foreground/50">
                       No attendance records found.
                     </div>
                   )}
@@ -560,13 +560,13 @@ function AttendancePage() {
               />
             ) : (
               <div className="flex flex-col items-center justify-center opacity-50 py-12">
-                <div className="p-4 rounded-full bg-zinc-900 mb-4 ring-1 ring-white/10">
-                  <BookOpen size={32} className="text-zinc-600" />
+                <div className="p-4 rounded-full bg-secondary mb-4 ring-1 ring-white/10">
+                  <BookOpen size={32} className="text-foreground/40" />
                 </div>
-                <div className="text-xl font-bold text-zinc-500">
+                <div className="text-xl font-bold text-foreground/50">
                   No attendance data found
                 </div>
-                <p className="text-sm text-zinc-600 mt-2">
+                <p className="text-sm text-foreground/40 mt-2">
                   Try selecting a different semester
                 </p>
               </div>

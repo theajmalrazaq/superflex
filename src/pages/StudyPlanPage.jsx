@@ -167,22 +167,24 @@ function StudyPlanPage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-4 md:p-8 space-y-10 relative z-10">
         {}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
         <PageHeader
           title="Study Plan"
           subtitle="Degree requirements and course roadmaps"
         >
-          <div className="flex items-center gap-4 bg-zinc-900/50 px-6 py-3 rounded-2xl border border-white/5 backdrop-blur-xl">
+          <div className="flex items-center gap-4 bg-secondary/50 px-6 py-3 rounded-2xl border border-foreground/10 backdrop-blur-xl">
             <div className="text-right">
-              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+              <p className="text-[10px] font-bold text-foreground/50 Cap tracking-[0px]">
                 Graduation Path
               </p>
-              <h4 className="text-lg font-bold text-white">4 Year Degree</h4>
+              <h4 className="text-lg font-bold text-foreground">
+                4 Year Degree
+              </h4>
             </div>
-            <div className="w-px h-8 bg-white/10 mx-2"></div>
-            <GraduationCap className="text-x" size={24} />
+            <div className="w-px h-8 bg-foreground/10 mx-2"></div>
+            <GraduationCap className="text-accent" size={24} />
           </div>
         </PageHeader>
 
@@ -223,7 +225,7 @@ function StudyPlanPage() {
         {}
         <div className="space-y-8">
           {}
-          <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8">
+          <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
               <SuperTabs
                 tabs={semesters.map((s, idx) => ({
@@ -237,12 +239,12 @@ function StudyPlanPage() {
               {activeSemData && (
                 <div className="flex items-center gap-6 pr-4">
                   <div className="text-right">
-                    <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">
+                    <p className="text-[10px] font-bold text-foreground/40 Cap tracking-[0px] mb-1">
                       Year
                     </p>
-                    <span className="text-xl font-bold text-x font-sans">
+                    <span className="text-xl font-bold text-accent font-sans">
                       {activeSemData.crHrs}{" "}
-                      <span className="text-xs text-zinc-500 uppercase ml-1">
+                      <span className="text-xs text-foreground/50 Cap ml-1">
                         Courses
                       </span>
                     </span>
@@ -254,16 +256,16 @@ function StudyPlanPage() {
 
           {}
           {activeSemData && (
-            <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden">
-              <div className="flex items-center gap-3 mb-10 border-b border-white/5 pb-8">
-                <div className="p-3 bg-zinc-800 rounded-xl text-zinc-400">
+            <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden">
+              <div className="flex items-center gap-3 mb-10 border-b border-foreground/10 pb-8">
+                <div className="p-3 bg-tertiary rounded-xl text-foreground/60">
                   <BookOpen size={20} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white tracking-tight">
+                  <h3 className="text-xl font-bold text-foreground tracking-tight">
                     {activeSemData.title} Timeline
                   </h3>
-                  <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">
+                  <p className="text-[10px] text-foreground/40 font-bold Cap tracking-[0px]">
                     Curriculum Roadmap
                   </p>
                 </div>
@@ -272,45 +274,45 @@ function StudyPlanPage() {
               <div className="overflow-x-auto scrollbar-hide">
                 <table className="w-full text-left order-collapse border-spacing-0">
                   <thead>
-                    <tr className="border-b border-white/5">
-                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
+                    <tr className="border-b border-foreground/10">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider">
                         Code
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider">
                         Course Title
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider text-center">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider text-center">
                         Cr.H
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider text-right">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider text-right">
                         Category
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-foreground/5">
                     {activeSemData.courses.map((course, cIdx) => (
                       <tr
                         key={cIdx}
-                        className="group hover:bg-white/[0.02] transition-colors"
+                        className="group hover:bg-foreground/[0.02] transition-colors"
                       >
                         <td className="px-6 py-5">
-                          <span className="px-2.5 py-1 rounded-lg bg-zinc-800 text-zinc-400 text-[10px] font-bold tracking-tight border border-white/5">
+                          <span className="px-2.5 py-1 rounded-lg bg-tertiary text-foreground/60 text-[10px] font-bold tracking-tight border border-foreground/10">
                             {course.code}
                           </span>
                         </td>
                         <td className="px-6 py-5">
-                          <span className="text-white font-medium group-hover:text-x transition-colors">
+                          <span className="text-foreground font-medium group-hover:text-accent transition-colors">
                             {course.title}
                           </span>
                         </td>
                         <td className="px-6 py-5 text-center">
-                          <span className="text-zinc-400 font-bold font-sans">
+                          <span className="text-foreground/60 font-bold font-sans">
                             {course.crHrs}
                           </span>
                         </td>
                         <td className="px-6 py-5 text-right">
                           <span
-                            className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                            className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black Cap tracking-[0px] ${
                               course.type === "Core"
                                 ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                                 : "bg-amber-500/10 text-amber-400 border border-amber-500/20"

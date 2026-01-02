@@ -50,63 +50,66 @@ ChartJS.register(
 const SectionAccordion = ({ section, isOpen, onToggle }) => {
   const rows = section.rows || [];
   return (
-    <div className=" rounded-xl overflow-hidden bg-zinc-900/50 backdrop-blur-sm mb-4">
+    <div className=" rounded-xl overflow-hidden bg-secondary/50 backdrop-blur-sm mb-4">
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 transition-colors"
+        className="w-full flex items-center justify-between p-4 bg-foreground/5 hover:bg-foreground/10 transition-colors"
       >
         <div className="flex items-center gap-3">
           <span
-            className={`p-1.5 rounded-lg ${isOpen ? "bg-x/20 text-x" : "bg-zinc-800 text-zinc-500"}`}
+            className={`p-1.5 rounded-lg ${isOpen ? "bg-accent/20 text-accent" : "bg-tertiary text-foreground/50"}`}
           >
             {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </span>
-          <span className="font-semibold text-white text-sm">
+          <span className="font-semibold text-foreground text-sm">
             {section.title}
           </span>
-          <span className="text-xs text-zinc-500 bg-zinc-900 px-2 py-0.5 rounded ">
+          <span className="text-xs text-foreground/50 bg-secondary px-2 py-0.5 rounded ">
             {rows.length}
           </span>
         </div>
-        <div className="text-xs text-zinc-400 font-medium">
-          <span className="text-white">{section.obtained.toFixed(1)}</span>
-          <span className="text-zinc-600"> / {section.weight.toFixed(1)}</span>
+        <div className="text-xs text-foreground/60 font-medium">
+          <span className="text-foreground">{section.obtained.toFixed(1)}</span>
+          <span className="text-foreground/40">
+            {" "}
+            / {section.weight.toFixed(1)}
+          </span>
         </div>
       </button>
 
       {isOpen && (
-        <div className="border-t border-white/5">
+        <div className="border-t border-foreground/10">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/[0.02]">
-                <th className="p-3 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider border-b border-white/5 w-16">
+              <tr className="bg-foreground/[0.02]">
+                <th className="p-3 text-[11px] font-semibold text-foreground/50 Cap tracking-wider border-b border-foreground/10 w-16">
                   No.
                 </th>
-                <th className="p-3 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-right">
+                <th className="p-3 text-[11px] font-semibold text-foreground/50 Cap tracking-wider border-b border-foreground/10 text-right">
                   Marks
                 </th>
-                <th className="p-3 text-[11px] font-semibold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-right w-24">
+                <th className="p-3 text-[11px] font-semibold text-foreground/50 Cap tracking-wider border-b border-foreground/10 text-right w-24">
                   Status
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-foreground/5">
               {rows.map((row, idx) => {
                 const perc =
                   row.total > 0 ? (row.obtained / row.total) * 100 : 0;
                 return (
                   <tr
                     key={idx}
-                    className={`hover:bg-white/[0.02] transition-colors group ${!row.included ? "opacity-40" : ""}`}
+                    className={`hover:bg-foreground/[0.02] transition-colors group ${!row.included ? "opacity-40" : ""}`}
                   >
-                    <td className="p-3 text-sm text-zinc-300 font-medium">
+                    <td className="p-3 text-sm text-foreground/70 font-medium">
                       {row.title}
                     </td>
                     <td className="p-3 text-right">
                       <div className="flex flex-col items-end">
-                        <span className="text-sm text-white font-bold">
+                        <span className="text-sm text-foreground font-bold">
                           {row.obtained}{" "}
-                          <span className="text-zinc-600 font-normal text-xs">
+                          <span className="text-foreground/40 font-normal text-xs">
                             / {row.total}
                           </span>
                         </span>
@@ -118,7 +121,7 @@ const SectionAccordion = ({ section, isOpen, onToggle }) => {
                           perc >= 80
                             ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                             : perc >= 60
-                              ? "bg-x/10 text-x border-x/20"
+                              ? "bg-accent/10 text-accent border-accent/20"
                               : perc >= 40
                                 ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
                                 : "bg-rose-500/10 text-rose-400 border-rose-500/20"
@@ -652,361 +655,406 @@ function HomePage() {
     localStorage.getItem("superflex-theme-color") || "#a098ff",
   );
 
+  const [bgUrl, setBgUrl] = useState(
+    localStorage.getItem("superflex-bg-url") ||
+      "https://cdn.midjourney.com/video/c107d5a0-541d-4a46-bd95-c5adc337c89d/0.mp4",
+  );
+
   useEffect(() => {
     const handleThemeChange = (e) => {
       setThemeColor(e.detail);
     };
+    const handleBgChange = (e) => {
+      setBgUrl(e.detail);
+    };
     window.addEventListener("superflex-theme-changed", handleThemeChange);
-    return () =>
+    window.addEventListener("superflex-bg-changed", handleBgChange);
+    return () => {
       window.removeEventListener("superflex-theme-changed", handleThemeChange);
+      window.removeEventListener("superflex-bg-changed", handleBgChange);
+    };
   }, []);
+
+  const isVideo = (url) => {
+    return url?.match(/\.(mp4|webm|ogg)$/) || url?.includes("video");
+  };
 
   return (
     <PageLayout
       currentPage={window.location.pathname}
       onLinksFound={handleLinksFound}
+      fullWidth={true}
     >
-      <div className="w-full px-4 md:px-6 py-6 md:py-8 space-y-8">
+      <div className="relative">
         {}
-        {}
-        <div className="relative rounded-[3rem] bg-zinc-900/10 p-8 md:p-12 overflow-hidden group">
-          {}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-x/5 blur-[120px] rounded-full pointer-events-none opacity-40"></div>
+        {bgUrl && (
+          <div className="absolute top-0 left-0 right-0 h-[850px] overflow-hidden pointer-events-none">
+            {isVideo(bgUrl) ? (
+              <video
+                key={bgUrl}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover opacity-70 transition-opacity duration-1000"
+              >
+                <source src={bgUrl} type="video/mp4" />
+              </video>
+            ) : (
+              <img
+                key={bgUrl}
+                src={bgUrl}
+                alt="Background"
+                className="w-full h-full object-cover opacity-70 transition-opacity duration-1000"
+              />
+            )}
+            <div className="absolute inset-0 bg-black/50"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background"></div>
+          </div>
+        )}
 
-          <div className="relative flex flex-col items-center justify-center text-center gap-8">
-            {}
-            <div className="flex flex-col items-center gap-6">
-              <div className="relative">
-                <div className="absolute -inset-4 bg-x/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition duration-700"></div>
-                <img
-                  src={profileImage}
-                  alt="Profile"
-                  className="w-24 h-24 md:w-32 md:h-32 rounded-[2.5rem] object-cover bg-zinc-800 border-4 border-white/5 relative z-10"
-                  onError={(e) => {
-                    e.target.src =
-                      'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><rect fill="%2318181b" width="128" height="128"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2352525b" font-weight="bold" font-size="40">User</text></svg>';
-                  }}
+        <div className="relative z-10 w-full px-4 md:px-12 pt-28 pb-8 space-y-8">
+          {}
+          <div className="relative p-8 md:p-12 overflow-hidden group">
+            <div className="relative flex flex-col items-center justify-center text-center gap-8">
+              {}
+              <div className="flex flex-col items-center gap-6">
+                <div className="relative">
+                  <img
+                    src={profileImage}
+                    alt="Profile"
+                    className="w-24 h-24 md:w-32 md:h-32 rounded-[2.5rem] object-cover bg-tertiary border-4 border-foreground/10 relative z-10"
+                    onError={(e) => {
+                      e.target.src =
+                        'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><rect fill="%2318181b" width="128" height="128"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2352525b" font-weight="bold" font-size="40">User</text></svg>';
+                    }}
+                  />
+                </div>
+
+                <div className="flex flex-col items-center space-y-3">
+                  <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tight leading-tight max-w-2xl px-4">
+                    {greetingMessage}{" "}
+                    <span className="text-accent">
+                      {personalInfo?.Name?.split(" ")[0] || "Student"}
+                    </span>
+                  </h1>
+                  <p className="text-foreground/50 text-base md:text-lg font-medium max-w-xl">
+                    {roastMessage}
+                  </p>
+                </div>
+              </div>
+
+              {}
+              <div className="flex items-center backdrop-blur-md p-1.5 bg-foreground/5 border border-foreground/10 rounded-full gap-2 transition-all hover:bg-foreground/10">
+                <button
+                  onClick={() => setActiveMainTab("stats")}
+                  className={`px-8 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 ${
+                    activeMainTab === "stats"
+                      ? "bg-accent text-foreground"
+                      : "text-foreground/50 hover:text-foreground"
+                  }`}
+                >
+                  <Activity size={18} />
+                  Overview
+                </button>
+                <button
+                  onClick={() => setActiveMainTab("info")}
+                  className={`px-8 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 ${
+                    activeMainTab === "info"
+                      ? "bg-accent text-foreground"
+                      : "text-foreground/50 hover:text-foreground"
+                  }`}
+                >
+                  <User size={18} />
+                  Profile
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <NotificationBanner alerts={alerts} />
+
+          {}
+          {activeMainTab === "stats" && (
+            <div className="space-y-8">
+              {}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <StatsCard
+                  icon={GraduationCap}
+                  label="Degree Program"
+                  value={universityInfo?.Degree || "..."}
+                  delay={0}
+                />
+                <StatsCard
+                  icon={Users}
+                  label="Section"
+                  value={universityInfo?.Section || "..."}
+                  delay={100}
+                />
+                <StatsCard
+                  icon={Award}
+                  label="Registered Courses"
+                  value={coursesData?.length || 0}
+                  delay={200}
+                />
+                <StatsCard
+                  icon={Activity}
+                  label="Critical Attendance"
+                  value={
+                    loadingAttendance ? (
+                      <Skeleton className="h-6 w-24 my-1" />
+                    ) : mostAbsentSubject ? (
+                      mostAbsentSubject.title
+                    ) : (
+                      "None"
+                    )
+                  }
+                  subValue={
+                    loadingAttendance ? (
+                      <Skeleton className="h-3 w-16" />
+                    ) : mostAbsentSubject ? (
+                      `${mostAbsentSubject.absent} Absents`
+                    ) : (
+                      ""
+                    )
+                  }
+                  delay={300}
                 />
               </div>
 
-              <div className="flex flex-col items-center space-y-3">
-                <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight max-w-2xl px-4">
-                  {greetingMessage}{" "}
-                  <span className="text-x">
-                    {personalInfo?.Name?.split(" ")[0] || "Student"}
-                  </span>
-                </h1>
-                <p className="text-zinc-500 text-base md:text-lg font-medium max-w-xl">
-                  {roastMessage}
-                </p>
-              </div>
-            </div>
-
-            {}
-            <div className="flex items-center backdrop-blur-md p-1.5 bg-white/5 border border-white/10 rounded-full gap-2 transition-all hover:bg-white/10">
-              <button
-                onClick={() => setActiveMainTab("stats")}
-                className={`px-8 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 ${
-                  activeMainTab === "stats"
-                    ? "bg-x text-white"
-                    : "text-zinc-500 hover:text-white"
-                }`}
-              >
-                <Activity size={18} />
-                Overview
-              </button>
-              <button
-                onClick={() => setActiveMainTab("info")}
-                className={`px-8 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 ${
-                  activeMainTab === "info"
-                    ? "bg-x text-white"
-                    : "text-zinc-500 hover:text-white"
-                }`}
-              >
-                <User size={18} />
-                Profile
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <NotificationBanner alerts={alerts} />
-
-        {}
-        {activeMainTab === "stats" && (
-          <div className="space-y-8">
-            {}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <StatsCard
-                icon={GraduationCap}
-                label="Degree Program"
-                value={universityInfo?.Degree || "..."}
-                delay={0}
-              />
-              <StatsCard
-                icon={Users}
-                label="Section"
-                value={universityInfo?.Section || "..."}
-                delay={100}
-              />
-              <StatsCard
-                icon={Award}
-                label="Registered Courses"
-                value={coursesData?.length || 0}
-                delay={200}
-              />
-              <StatsCard
-                icon={Activity}
-                label="Critical Attendance"
-                value={
-                  loadingAttendance ? (
-                    <Skeleton className="h-6 w-24 my-1" />
-                  ) : mostAbsentSubject ? (
-                    mostAbsentSubject.title
-                  ) : (
-                    "None"
-                  )
-                }
-                subValue={
-                  loadingAttendance ? (
-                    <Skeleton className="h-3 w-16" />
-                  ) : mostAbsentSubject ? (
-                    `${mostAbsentSubject.absent} Absents`
-                  ) : (
-                    ""
-                  )
-                }
-                delay={300}
-              />
-            </div>
-
-            {}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               {}
-              {loadingMarks ? (
-                <MarksSkeleton />
-              ) : coursesData.length > 0 ? (
-                <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden flex flex-col gap-8 h-full">
-                  <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-                    <div className="space-y-1">
-                      <h3 className="text-xl font-bold text-white tracking-tight">
-                        Course Performance
-                      </h3>
-                      <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
-                        Detailed marks and assessments
-                      </p>
-                    </div>
-                    {links.marks && (
-                      <a
-                        href={links.marks}
-                        className="bg-white/5 hover:bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-lg  transition-colors flex items-center gap-1.5"
-                      >
-                        View Details
-                        <ArrowRight size={12} />
-                      </a>
-                    )}
-                  </div>
-
-                  {}
-                  <div className="w-full overflow-x-auto scrollbar-hide scrollbar-hide">
-                    <div className="flex gap-2 bg-black/40 p-1.5 rounded-full border border-white/5 backdrop-blur-sm w-fit">
-                      {coursesData.map((course) => (
-                        <button
-                          key={course.id}
-                          onClick={() => setActiveCourse(course.id)}
-                          className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
-                            activeCourse === course.id
-                              ? "bg-x text-white"
-                              : "text-zinc-500 hover:text-white"
-                          }`}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                {}
+                {loadingMarks ? (
+                  <MarksSkeleton />
+                ) : coursesData.length > 0 ? (
+                  <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden flex flex-col gap-8 h-full">
+                    <div className="flex flex-col md:flex-row justify-between items-start gap-6">
+                      <div className="space-y-1">
+                        <h3 className="text-xl font-bold text-foreground tracking-tight">
+                          Course Performance
+                        </h3>
+                        <p className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px]">
+                          Detailed marks and assessments
+                        </p>
+                      </div>
+                      {links.marks && (
+                        <a
+                          href={links.marks}
+                          className="bg-foreground/5 hover:bg-foreground/10 text-foreground text-xs font-semibold px-3 py-1.5 rounded-lg  transition-colors flex items-center gap-1.5"
                         >
-                          {course.id}
-                        </button>
-                      ))}
+                          View Details
+                          <ArrowRight size={12} />
+                        </a>
+                      )}
                     </div>
-                  </div>
 
-                  {}
-                  {activeCourseData && (
-                    <div key={activeCourse} className="">
-                      <div className="flex flex-col gap-2 mb-4">
-                        <h2 className="text-xl font-bold text-white leading-tight">
-                          {activeCourseData.title}
-                        </h2>
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded-md bg-zinc-900  text-zinc-400 text-xs font-medium">
-                            {activeCourseData.id}
-                          </span>
-                          <span className="text-xs text-zinc-500">
-                            {(() => {
-                              const examSections =
-                                activeCourseData.sections.filter(
-                                  (s) => !s.id.endsWith("Grand_Total_Marks"),
+                    {}
+                    <div className="w-full overflow-x-auto scrollbar-hide scrollbar-hide">
+                      <div className="flex gap-2 bg-background/40 p-1.5 rounded-full border border-foreground/10 backdrop-blur-sm w-fit">
+                        {coursesData.map((course) => (
+                          <button
+                            key={course.id}
+                            onClick={() => setActiveCourse(course.id)}
+                            className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
+                              activeCourse === course.id
+                                ? "bg-accent text-foreground"
+                                : "text-foreground/50 hover:text-foreground"
+                            }`}
+                          >
+                            {course.id}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {}
+                    {activeCourseData && (
+                      <div key={activeCourse} className="">
+                        <div className="flex flex-col gap-2 mb-4">
+                          <h2 className="text-xl font-bold text-foreground leading-tight">
+                            {activeCourseData.title}
+                          </h2>
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded-md bg-secondary  text-foreground/60 text-xs font-medium">
+                              {activeCourseData.id}
+                            </span>
+                            <span className="text-xs text-foreground/50">
+                              {(() => {
+                                const examSections =
+                                  activeCourseData.sections.filter(
+                                    (s) => !s.id.endsWith("Grand_Total_Marks"),
+                                  );
+                                return examSections.reduce(
+                                  (acc, sec) => acc + (sec.rows?.length || 0),
+                                  0,
                                 );
-                              return examSections.reduce(
-                                (acc, sec) => acc + (sec.rows?.length || 0),
-                                0,
-                              );
-                            })()}{" "}
-                            Assessments
-                          </span>
+                              })()}{" "}
+                              Assessments
+                            </span>
+                          </div>
+                        </div>
+
+                        {}
+                        <div className="space-y-3">
+                          {activeCourseData.sections
+                            .filter((s) => !s.id.endsWith("Grand_Total_Marks"))
+                            .map((section, idx) => (
+                              <SectionAccordion
+                                key={idx}
+                                section={section}
+                                isOpen={openCategoryIdx === idx}
+                                onToggle={() =>
+                                  setOpenCategoryIdx(
+                                    openCategoryIdx === idx ? null : idx,
+                                  )
+                                }
+                              />
+                            ))}
+                          {activeCourseData.sections.length <= 1 && (
+                            <div className="p-8 text-center text-foreground/50 text-sm  rounded-xl bg-background">
+                              No assessments uploaded yet.
+                            </div>
+                          )}
                         </div>
                       </div>
-
-                      {}
-                      <div className="space-y-3">
-                        {activeCourseData.sections
-                          .filter((s) => !s.id.endsWith("Grand_Total_Marks"))
-                          .map((section, idx) => (
-                            <SectionAccordion
-                              key={idx}
-                              section={section}
-                              isOpen={openCategoryIdx === idx}
-                              onToggle={() =>
-                                setOpenCategoryIdx(
-                                  openCategoryIdx === idx ? null : idx,
-                                )
-                              }
-                            />
-                          ))}
-                        {activeCourseData.sections.length <= 1 && (
-                          <div className="p-8 text-center text-zinc-500 text-sm  rounded-xl bg-black">
-                            No assessments uploaded yet.
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="bg-black rounded-3xl  p-6 flex items-center justify-center text-zinc-500 min-h-[300px]">
-                  No marks data available
-                </div>
-              )}
-              {loadingAttendance ? (
-                <AttendanceSkeleton />
-              ) : (
-                <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 h-full flex flex-col">
-                  <div className="flex justify-between items-start mb-8">
-                    <div className="space-y-1">
-                      <h3 className="text-xl font-bold text-white tracking-tight">
-                        Attendance Overview
-                      </h3>
-                      <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
-                        Presence and Absence Analytics
-                      </p>
-                    </div>
-                    {links.attendance && (
-                      <a
-                        href={links.attendance}
-                        className="bg-white/5 hover:bg-white/10 text-white text-xs font-semibold px-3 py-1.5 rounded-lg  transition-colors flex items-center gap-1.5"
-                      >
-                        View Details
-                        <ArrowRight size={12} />
-                      </a>
                     )}
                   </div>
-                  <div className="flex-1 w-full overflow-hidden relative min-h-[400px]">
-                    {attendanceData && chartPattern && (
-                      <div
-                        style={{
-                          height: `${Math.max(400, attendanceData.length * 60)}px`,
-                          width: "100%",
-                        }}
-                      >
-                        <Bar
-                          data={{
-                            labels: attendanceData.map((d) => {
-                              const t = d.title;
-                              const trunc =
-                                t.length > 15 ? t.substring(0, 15) + "..." : t;
-                              return `${trunc} (P:${d.present} A:${d.absent})`;
-                            }),
-                            datasets: [
-                              {
-                                label: "Attended",
-                                data: attendanceData.map((d) => d.percentage),
-                                backgroundColor: attendanceData.map((d) => {
-                                  if (d.percentage >= 75) return themeColor;
-                                  if (d.percentage >= 60) return "#f59e0b";
-                                  return "#f43f5e";
-                                }),
-                                barPercentage: 0.6,
-                                categoryPercentage: 0.8,
-                                borderRadius: { topLeft: 100, bottomLeft: 100 },
-                                borderSkipped: false,
-                              },
-                              {
-                                label: "Remaining",
-                                data: attendanceData.map(
-                                  (d) => 100 - d.percentage,
-                                ),
-                                backgroundColor: chartPattern,
-                                barPercentage: 0.6,
-                                categoryPercentage: 0.8,
-                                borderRadius: {
-                                  topRight: 100,
-                                  bottomRight: 100,
-                                },
-                                borderSkipped: false,
-                              },
-                            ],
+                ) : (
+                  <div className="bg-background rounded-3xl  p-6 flex items-center justify-center text-foreground/50 min-h-[300px]">
+                    No marks data available
+                  </div>
+                )}
+                {loadingAttendance ? (
+                  <AttendanceSkeleton />
+                ) : (
+                  <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 h-full flex flex-col">
+                    <div className="flex justify-between items-start mb-8">
+                      <div className="space-y-1">
+                        <h3 className="text-xl font-bold text-foreground tracking-tight">
+                          Attendance Overview
+                        </h3>
+                        <p className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px]">
+                          Presence and Absence Analytics
+                        </p>
+                      </div>
+                      {links.attendance && (
+                        <a
+                          href={links.attendance}
+                          className="bg-foreground/5 hover:bg-foreground/10 text-foreground text-xs font-semibold px-3 py-1.5 rounded-lg  transition-colors flex items-center gap-1.5"
+                        >
+                          View Details
+                          <ArrowRight size={12} />
+                        </a>
+                      )}
+                    </div>
+                    <div className="flex-1 w-full overflow-hidden relative min-h-[400px]">
+                      {attendanceData && chartPattern && (
+                        <div
+                          style={{
+                            height: `${Math.max(400, attendanceData.length * 60)}px`,
+                            width: "100%",
                           }}
-                          options={{
-                            indexAxis: "y",
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                              legend: { display: false },
-                              tooltip: {
-                                callbacks: {
-                                  label: (context) => {
-                                    const idx = context.dataIndex;
-                                    const item = attendanceData[idx];
-                                    if (context.datasetIndex === 0) {
-                                      return `Present: ${item.present} (${item.percentage.toFixed(1)}%)`;
-                                    }
-                                    return `Absent: ${item.absent}`;
+                        >
+                          <Bar
+                            data={{
+                              labels: attendanceData.map((d) => {
+                                const t = d.title;
+                                const trunc =
+                                  t.length > 15
+                                    ? t.substring(0, 15) + "..."
+                                    : t;
+                                return `${trunc} (P:${d.present} A:${d.absent})`;
+                              }),
+                              datasets: [
+                                {
+                                  label: "Attended",
+                                  data: attendanceData.map((d) => d.percentage),
+                                  backgroundColor: attendanceData.map((d) => {
+                                    if (d.percentage >= 75) return themeColor;
+                                    if (d.percentage >= 60) return "#f59e0b";
+                                    return "#f43f5e";
+                                  }),
+                                  barPercentage: 0.6,
+                                  categoryPercentage: 0.8,
+                                  borderRadius: {
+                                    topLeft: 100,
+                                    bottomLeft: 100,
+                                  },
+                                  borderSkipped: false,
+                                },
+                                {
+                                  label: "Remaining",
+                                  data: attendanceData.map(
+                                    (d) => 100 - d.percentage,
+                                  ),
+                                  backgroundColor: chartPattern,
+                                  barPercentage: 0.6,
+                                  categoryPercentage: 0.8,
+                                  borderRadius: {
+                                    topRight: 100,
+                                    bottomRight: 100,
+                                  },
+                                  borderSkipped: false,
+                                },
+                              ],
+                            }}
+                            options={{
+                              indexAxis: "y",
+                              responsive: true,
+                              maintainAspectRatio: false,
+                              plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                  callbacks: {
+                                    label: (context) => {
+                                      const idx = context.dataIndex;
+                                      const item = attendanceData[idx];
+                                      if (context.datasetIndex === 0) {
+                                        return `Present: ${item.present} (${item.percentage.toFixed(1)}%)`;
+                                      }
+                                      return `Absent: ${item.absent}`;
+                                    },
                                   },
                                 },
                               },
-                            },
-                            scales: {
-                              x: {
-                                stacked: true,
-                                display: false,
-                                max: 100,
-                                grid: { display: false },
-                              },
-                              y: {
-                                stacked: true,
-                                grid: { display: false },
-                                ticks: {
-                                  color: "#a1a1aa",
-                                  font: {
-                                    size: 11,
-                                    family: "'Google Sans Flex', sans-serif",
-                                  },
-                                  autoSkip: false,
+                              scales: {
+                                x: {
+                                  stacked: true,
+                                  display: false,
+                                  max: 100,
+                                  grid: { display: false },
                                 },
-                                border: { display: false },
+                                y: {
+                                  stacked: true,
+                                  grid: { display: false },
+                                  ticks: {
+                                    color: "#a1a1aa",
+                                    font: {
+                                      size: 11,
+                                      family: "'Google Sans Flex', sans-serif",
+                                    },
+                                    autoSkip: false,
+                                  },
+                                  border: { display: false },
+                                },
                               },
-                            },
-                          }}
-                        />
-                      </div>
-                    )}
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {}
-        {activeMainTab === "info" && (
-          <ProfileInfoTabs profileSections={profileSections} />
-        )}
+          {}
+          {activeMainTab === "info" && (
+            <ProfileInfoTabs profileSections={profileSections} />
+          )}
+        </div>
       </div>
     </PageLayout>
   );
@@ -1020,11 +1068,11 @@ const ProfileInfoTabs = ({ profileSections }) => {
       {profileSections.map((section, idx) => (
         <div
           key={idx}
-          className="bg-zinc-900/60 border backdrop-blur-xl rounded-[2rem]  p-8 overflow-hidden"
+          className="bg-secondary/60 border backdrop-blur-xl rounded-[2rem]  p-8 overflow-hidden"
         >
           {}
           <div className="flex items-center gap-4 mb-8">
-            <div className="p-3 bg-x/10 rounded-2xl text-x">
+            <div className="p-3 bg-accent/10 rounded-2xl text-accent">
               {(() => {
                 const title = section.title.toLowerCase();
                 if (title.includes("personal")) return <User size={24} />;
@@ -1034,7 +1082,7 @@ const ProfileInfoTabs = ({ profileSections }) => {
                 return <Activity size={24} />;
               })()}
             </div>
-            <h3 className="text-2xl font-bold text-white tracking-tight">
+            <h3 className="text-2xl font-bold text-foreground tracking-tight">
               {section.title}
             </h3>
           </div>
@@ -1044,12 +1092,12 @@ const ProfileInfoTabs = ({ profileSections }) => {
             {Object.entries(section.data).map(([key, val], i) => (
               <div
                 key={i}
-                className="flex flex-col p-4 rounded-2xl bg-black/20 hover:bg-white/5 transition-colors group"
+                className="flex flex-col p-4 rounded-2xl bg-background/20 border border-foreground/10 hover:bg-foreground/5 transition-colors group"
               >
-                <span className="text-zinc-500 text-[10px] uppercase tracking-wider font-bold mb-1.5 group-hover:text-zinc-400">
+                <span className="text-foreground/50 text-[10px] Cap tracking-wider font-bold mb-1.5 group-hover:text-foreground/60">
                   {key}
                 </span>
-                <span className="text-zinc-100 text-sm font-medium break-words leading-relaxed">
+                <span className="text-foreground text-sm font-medium break-words leading-relaxed">
                   {val}
                 </span>
               </div>

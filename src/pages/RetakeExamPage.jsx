@@ -52,12 +52,12 @@ const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
 
         <div className="space-y-6">
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">
+            <label className="text-[10px] font-black text-foreground/50 Cap tracking-[0px] px-1">
               Evidence Documentation
             </label>
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="group relative border-2 border-dashed border-white/5 hover:border-x/30 rounded-2xl p-6 transition-all cursor-pointer bg-white/[0.02] hover:bg-white/[0.04]"
+              className="group relative border-2 border-dashed border-foreground/10 hover:border-accent/30 rounded-2xl p-6 transition-all cursor-pointer bg-foreground/[0.02] hover:bg-foreground/[0.04]"
             >
               <input
                 type="file"
@@ -67,14 +67,14 @@ const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
                 className="hidden"
               />
               <div className="flex flex-col items-center gap-3 text-center">
-                <div className="p-4 bg-x/10 rounded-2xl text-x group-hover:scale-110 transition-transform duration-300">
+                <div className="p-4 bg-accent/10 rounded-2xl text-accent group-hover:scale-110 transition-transform duration-300">
                   <Upload size={24} />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm font-bold text-white truncate max-w-[250px]">
+                  <p className="text-sm font-bold text-foreground truncate max-w-[250px]">
                     {file ? file.name : "Upload Form (PDF)"}
                   </p>
-                  <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+                  <p className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px]">
                     {file
                       ? `${(file.size / 1024 / 1024).toFixed(2)} MB`
                       : "Max 3MB • Combined ONE File"}
@@ -117,8 +117,8 @@ const InstructionsModal = ({ isOpen, onClose }) => {
       <div className="space-y-8 pt-4">
         <div className="space-y-4">
           <div className="flex items-center gap-2 px-1">
-            <div className="w-1.5 h-5 bg-x rounded-full"></div>
-            <h3 className="text-sm font-black text-white uppercase tracking-widest">
+            <div className="w-1.5 h-5 bg-accent rounded-full"></div>
+            <h3 className="text-sm font-black text-foreground Cap tracking-[0px]">
               Eligible Situations
             </h3>
           </div>
@@ -134,12 +134,12 @@ const InstructionsModal = ({ isOpen, onClose }) => {
             ].map((item, i) => (
               <div
                 key={i}
-                className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 space-y-2 hover:bg-white/[0.04] transition-colors"
+                className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2 hover:bg-foreground/[0.04] transition-colors"
               >
-                <h4 className="text-[11px] font-black text-x uppercase tracking-wider">
+                <h4 className="text-[11px] font-black text-accent Cap tracking-wider">
                   {item.title}
                 </h4>
-                <p className="text-[10px] text-zinc-500 leading-relaxed font-bold">
+                <p className="text-[10px] text-foreground/50 leading-relaxed font-bold">
                   {item.desc}
                 </p>
               </div>
@@ -149,8 +149,8 @@ const InstructionsModal = ({ isOpen, onClose }) => {
 
         <div className="space-y-4">
           <div className="flex items-center gap-2 px-1">
-            <div className="w-1.5 h-5 bg-x rounded-full"></div>
-            <h3 className="text-sm font-black text-white uppercase tracking-widest">
+            <div className="w-1.5 h-5 bg-accent rounded-full"></div>
+            <h3 className="text-sm font-black text-foreground Cap tracking-[0px]">
               Submission Protocol
             </h3>
           </div>
@@ -163,12 +163,12 @@ const InstructionsModal = ({ isOpen, onClose }) => {
             ].map((step, i) => (
               <div
                 key={i}
-                className="flex gap-4 p-3 rounded-2xl hover:bg-white/[0.02] transition-colors group border border-transparent hover:border-white/5"
+                className="flex gap-4 p-3 rounded-2xl hover:bg-foreground/[0.02] transition-colors group border border-transparent hover:border-foreground/10"
               >
-                <div className="w-6 h-6 rounded-full bg-x/10 border border-x/20 flex items-center justify-center text-x text-[10px] font-black shrink-0 group-hover:scale-110 transition-transform">
+                <div className="w-6 h-6 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-accent text-[10px] font-black shrink-0 group-hover:scale-110 transition-transform">
                   {i + 1}
                 </div>
-                <p className="text-xs text-zinc-400 font-bold leading-relaxed">
+                <p className="text-xs text-foreground/60 font-bold leading-relaxed">
                   {step}
                 </p>
               </div>
@@ -190,13 +190,13 @@ const RetakeCourseCard = ({ course, isSelected, onToggle, index }) => {
       onClick={onToggle}
       className={`group cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border transition-all duration-300 gap-4 ${
         isSelected
-          ? "bg-x/10 border-x/50"
-          : "bg-zinc-900/30 border-transparent hover:bg-zinc-900/50 hover:border-white/5"
+          ? "bg-accent/10 border-accent/50"
+          : "bg-secondary/30 border-transparent hover:bg-secondary/50 hover:border-foreground/10"
       }`}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">
         <span
-          className={`font-bold text-xs min-w-[1.2rem] ${isSelected ? "text-x" : "text-zinc-600"}`}
+          className={`font-bold text-xs min-w-[1.2rem] ${isSelected ? "text-accent" : "text-foreground/40"}`}
         >
           {index}.
         </span>
@@ -204,8 +204,8 @@ const RetakeCourseCard = ({ course, isSelected, onToggle, index }) => {
         <div
           className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 transition-all duration-300 ${
             isSelected
-              ? "bg-x/20 border-x/30 text-x scale-105"
-              : "bg-zinc-800/50 border-white/5 text-zinc-500"
+              ? "bg-accent/20 border-accent/30 text-accent scale-105"
+              : "bg-tertiary/50 border-foreground/10 text-foreground/50"
           }`}
         >
           <BookOpen size={18} />
@@ -213,33 +213,33 @@ const RetakeCourseCard = ({ course, isSelected, onToggle, index }) => {
 
         <div className="flex flex-col gap-0.5 min-w-0 flex-1">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-[10px] font-black text-x uppercase tracking-tighter opacity-80 shrink-0">
+            <span className="text-[10px] font-black text-accent Cap tracking-tighter opacity-80 shrink-0">
               {course.code}
             </span>
-            <h4 className="text-white font-bold text-sm leading-tight truncate">
+            <h4 className="text-foreground font-bold text-sm leading-tight truncate">
               {course.courseName}
             </h4>
           </div>
 
-          <div className="flex items-center gap-2.5 text-[10px] text-zinc-500 font-bold uppercase tracking-widest leading-none">
+          <div className="flex items-center gap-2.5 text-[10px] text-foreground/50 font-bold Cap tracking-[0px] leading-none">
             <span className="shrink-0">{course.credits} Credits</span>
-            <span className="w-1 h-1 rounded-full bg-zinc-700 shrink-0"></span>
+            <span className="w-1 h-1 rounded-full bg-tertiary shrink-0"></span>
             <span className="truncate">Section {course.section}</span>
           </div>
         </div>
       </div>
 
-      <div className="flex flex-row items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-white/5">
+      <div className="flex flex-row items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-foreground/10">
         {course.status && (
-          <div className="px-3 py-1 rounded-lg bg-white/5 border border-white/5 text-[9px] font-black text-zinc-400 uppercase tracking-widest">
+          <div className="px-3 py-1 rounded-lg bg-foreground/5 border border-foreground/10 text-[9px] font-black text-foreground/60 Cap tracking-[0px]">
             {course.status}
           </div>
         )}
         <div
           className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
             isSelected
-              ? "bg-x border-x text-zinc-950 scale-110"
-              : "border-zinc-700 bg-transparent"
+              ? "bg-accent border-accent text-zinc-950 scale-110"
+              : "border-tertiary bg-transparent"
           }`}
         >
           {isSelected && <CheckCircle2 size={14} strokeWidth={3} />}
@@ -269,10 +269,10 @@ const ExamTypeSelector = ({ types, selectedValue, onSelect }) => {
     <div className="relative w-full md:w-auto z-50" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full md:w-[280px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-zinc-900/50 border border-white/5 text-white hover:bg-white/5 transition-all group"
+        className="w-full md:w-[280px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-secondary/50 border border-foreground/10 text-foreground hover:bg-foreground/5 transition-all group"
       >
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="p-2 rounded-xl bg-x/10 text-x">
+          <div className="p-2 rounded-xl bg-accent/10 text-accent">
             <Layout size={16} />
           </div>
           <span className="text-sm font-bold truncate">
@@ -281,12 +281,12 @@ const ExamTypeSelector = ({ types, selectedValue, onSelect }) => {
         </div>
         <ChevronDown
           size={16}
-          className={`text-zinc-500 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+          className={`text-foreground/50 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10 max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-background/50 backdrop-blur-2xl border border-foreground/10 max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200">
           <div className="flex flex-col gap-3">
             {types.map((type, idx) => (
               <button
@@ -295,14 +295,14 @@ const ExamTypeSelector = ({ types, selectedValue, onSelect }) => {
                   onSelect(type.value);
                   setIsOpen(false);
                 }}
-                className={`w-full flex bg-zinc-900 items-center justify-between p-3 rounded-xl transition-all ${
+                className={`w-full flex bg-secondary items-center justify-between p-3 rounded-xl transition-all ${
                   selectedValue === type.value
-                    ? "bg-x/10 border border-x/20"
-                    : "hover:bg-white/5 border border-transparent"
+                    ? "bg-accent/10 border border-accent/20"
+                    : "hover:bg-foreground/5 border border-transparent"
                 }`}
               >
                 <span
-                  className={`text-sm font-medium truncate ${selectedValue === type.value ? "text-white" : "text-zinc-400"}`}
+                  className={`text-sm font-medium truncate ${selectedValue === type.value ? "text-foreground" : "text-foreground/60"}`}
                 >
                   {type.label}
                 </span>
@@ -620,7 +620,7 @@ function RetakeExamPage() {
         />
 
         {}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
 
         <PageHeader
           title="Retake Exam"
@@ -689,10 +689,10 @@ function RetakeExamPage() {
           <div className="xl:col-span-2 space-y-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between px-2">
-                <h3 className="text-xl font-bold text-white">
+                <h3 className="text-xl font-bold text-foreground">
                   Eligible Courses
                 </h3>
-                <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest bg-white/5 px-3 py-1 rounded-lg">
+                <div className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px] bg-foreground/5 px-3 py-1 rounded-lg">
                   {courses.length} Total
                 </div>
               </div>
@@ -710,10 +710,10 @@ function RetakeExamPage() {
               </div>
 
               {courses.length === 0 && (
-                <div className="text-center py-20 bg-zinc-900/30 rounded-[2rem] border border-dashed border-white/5">
+                <div className="text-center py-20 bg-secondary/30 rounded-[2rem] border border-dashed border-foreground/10">
                   <div className="flex flex-col items-center gap-4 opacity-50">
-                    <FileText size={48} className="text-zinc-600" />
-                    <p className="text-zinc-500 font-medium uppercase tracking-widest text-xs">
+                    <FileText size={48} className="text-foreground/40" />
+                    <p className="text-foreground/50 font-medium Cap tracking-[0px] text-xs">
                       No courses eligible for retake
                     </p>
                   </div>
@@ -724,17 +724,17 @@ function RetakeExamPage() {
 
           {}
           <div className="space-y-6">
-            <div className="bg-zinc-900/50 border border-white/5 backdrop-blur-xl rounded-[2.5rem] p-8 space-y-8 sticky top-8">
+            <div className="bg-secondary/50 border border-foreground/10 backdrop-blur-xl rounded-[2.5rem] p-8 space-y-8 sticky top-8">
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">
+                  <label className="text-[10px] font-black text-foreground/50 Cap tracking-[0px] px-1">
                     Retake Situation
                   </label>
                   <div className="relative group">
                     <select
                       value={selectedReason}
                       onChange={(e) => handleReasonChange(e.target.value)}
-                      className="w-full appearance-none bg-zinc-800/50 border border-white/5 text-white px-5 py-4 rounded-2xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-x/50 transition-all cursor-pointer pr-12"
+                      className="w-full appearance-none bg-tertiary/50 border border-foreground/10 text-foreground px-5 py-4 rounded-2xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-x/50 transition-all cursor-pointer pr-12"
                     >
                       {reasons.map((reason, idx) => (
                         <option key={idx} value={reason.value}>
@@ -744,34 +744,38 @@ function RetakeExamPage() {
                     </select>
                     <ChevronDown
                       size={16}
-                      className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none group-hover:text-white transition-colors"
+                      className="absolute right-5 top-1/2 -translate-y-1/2 text-foreground/50 pointer-events-none group-hover:text-foreground transition-colors"
                     />
                   </div>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-x/5 border border-x/10 space-y-4">
+                <div className="p-5 rounded-2xl bg-accent/5 border border-accent/10 space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-x/10 rounded-lg text-x">
+                    <div className="p-2 bg-accent/10 rounded-lg text-accent">
                       <ShieldCheck size={18} />
                     </div>
-                    <h4 className="text-sm font-bold text-white">
+                    <h4 className="text-sm font-bold text-foreground">
                       Order Summary
                     </h4>
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs font-medium">
-                      <span className="text-zinc-500">Selected Papers</span>
-                      <span className="text-white">{selectedCourses.size}</span>
+                      <span className="text-foreground/50">
+                        Selected Papers
+                      </span>
+                      <span className="text-foreground">
+                        {selectedCourses.size}
+                      </span>
                     </div>
                     <div className="flex justify-between text-xs font-medium">
-                      <span className="text-zinc-500">Processing Fee</span>
-                      <span className="text-white">Rs. 2,000 / paper</span>
+                      <span className="text-foreground/50">Processing Fee</span>
+                      <span className="text-foreground">Rs. 2,000 / paper</span>
                     </div>
-                    <div className="pt-3 border-t border-white/10 flex justify-between items-center">
-                      <span className="text-xs font-bold text-zinc-400">
+                    <div className="pt-3 border-t border-foreground/10 flex justify-between items-center">
+                      <span className="text-xs font-bold text-foreground/60">
                         Total Charged
                       </span>
-                      <span className="text-lg font-black text-white">
+                      <span className="text-lg font-black text-foreground">
                         Rs. {selectedCourses.size * 2000}
                       </span>
                     </div>

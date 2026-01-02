@@ -13,7 +13,7 @@ const NotificationBanner = ({
         {onActionClick && (
           <button
             onClick={onActionClick}
-            className="group/btn flex items-center gap-2 px-4 py-1.5 bg-white/5 hover:bg-white/10 text-white rounded-full text-[9px] font-black uppercase border border-white/5"
+            className="group/btn flex items-center gap-2 px-4 py-1.5 bg-foreground/5 hover:bg-foreground/10 text-foreground rounded-full text-[9px] font-black Cap border border-foreground/10"
           >
             {actionLabel}
             <ChevronRight
@@ -29,15 +29,15 @@ const NotificationBanner = ({
           key={idx}
           className={`p-4 rounded-[2rem] border backdrop-blur-2xl flex items-center gap-5 relative overflow-hidden group ${
             alert.type === "error"
-              ? "bg-rose-500/5 border-rose-500/10 text-rose-200"
-              : "bg-[#0ea5e9]/5 border-[#0ea5e9]/10 text-blue-200"
+              ? "bg-error/5 border-error/10 text-error"
+              : "bg-info/5 border-info/10 text-info"
           }`}
         >
           <div
             className={`p-3 rounded-xl shrink-0 ${
               alert.type === "error"
-                ? "bg-rose-500/10 text-rose-500"
-                : "bg-[#0ea5e9]/10 text-[#0ea5e9]"
+                ? "bg-error/10 text-error"
+                : "bg-info/10 text-info"
             }`}
           >
             <AlertTriangle size={20} />

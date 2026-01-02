@@ -6,14 +6,15 @@ function PageLayout({
   currentPage,
   onAttendanceLinkFound,
   onLinksFound,
+  fullWidth = false,
 }) {
   const [navLinks, setNavLinks] = useState([]);
 
   return (
-    <div className="min-h-screen bg-black flex flex-col font-sans transition-colors duration-300">
+    <div className="min-h-screen bg-background font-sans transition-colors duration-300 relative">
       {}
-      <div className="sticky flex justify-center top-4 z-[100] px-6 mb-2">
-        <div className="w-full md:w-fit lg:w-fit rounded-full flex justify-center items-center border border-white/10 bg-black/20 backdrop-blur-2xl transition-all duration-300">
+      <div className="fixed left-0 right-0 top-6 z-[100] flex justify-center px-6 pointer-events-none">
+        <div className="w-full md:w-fit lg:w-fit rounded-full flex justify-center items-center border border-foreground/10 bg-background/20 backdrop-blur-2xl transition-all duration-300 pointer-events-auto">
           <NavBar
             currentPage={currentPage}
             onAttendanceLinkFound={onAttendanceLinkFound}
@@ -25,7 +26,9 @@ function PageLayout({
         </div>
       </div>
 
-      <div className="w-full flex-1 md:p-12 p-1 pt-4 overflow-x-hidden">
+      <div
+        className={`w-full flex-1 overflow-x-hidden ${fullWidth ? "" : "md:px-12 px-4 pt-28 pb-12"}`}
+      >
         {children}
       </div>
     </div>

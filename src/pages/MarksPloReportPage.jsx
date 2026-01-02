@@ -142,19 +142,19 @@ function MarksPloReportPage() {
           const thead = clonedTable.querySelector("thead");
           if (thead) {
             thead.classList.add(
-              "bg-zinc-900/50",
+              "bg-secondary/50",
               "text-xs",
-              "uppercase",
+              "Cap",
               "tracking-wider",
               "font-bold",
-              "text-zinc-400",
+              "text-foreground/60",
             );
             const ths = thead.querySelectorAll("th");
             ths.forEach((th) => {
               th.classList.add(
                 "p-3",
                 "border",
-                "border-white/5",
+                "border-foreground/10",
                 "text-center",
               );
               th.removeAttribute("style");
@@ -167,8 +167,8 @@ function MarksPloReportPage() {
             trs.forEach((tr) => {
               tr.classList.add(
                 "border-b",
-                "border-white/5",
-                "hover:bg-white/5",
+                "border-foreground/10",
+                "hover:bg-foreground/5",
                 "transition-colors",
               );
               tr.removeAttribute("style");
@@ -178,9 +178,9 @@ function MarksPloReportPage() {
                 td.classList.add(
                   "p-3",
                   "text-sm",
-                  "border-x",
-                  "border-white/5",
-                  "text-zinc-300",
+                  "border-accent",
+                  "border-foreground/10",
+                  "text-foreground/70",
                 );
 
                 const txt = td.textContent.trim();
@@ -194,15 +194,15 @@ function MarksPloReportPage() {
                 }
 
                 if (td.classList.contains("bold"))
-                  td.classList.add("font-bold", "text-white");
+                  td.classList.add("font-bold", "text-foreground");
               });
             });
 
             const lastTr = tbody.querySelector("tr:last-child");
             if (lastTr) {
-              lastTr.classList.add("bg-white/5", "!font-bold");
+              lastTr.classList.add("bg-foreground/5", "!font-bold");
               const tds = lastTr.querySelectorAll("td");
-              tds.forEach((td) => td.classList.add("!text-white"));
+              tds.forEach((td) => td.classList.add("!text-foreground"));
             }
           }
 
@@ -264,7 +264,7 @@ function MarksPloReportPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-4 md:p-8 space-y-8 print:p-0 print:bg-white">
+      <div className="w-full min-h-screen p-4 md:p-8 space-y-8 print:p-0 print:bg-foreground">
         <PageHeader
           className="print:hidden"
           title="PLO Report"
@@ -297,7 +297,7 @@ function MarksPloReportPage() {
                   value={`${summaryData.percentage}%`}
                   subValue="Based on CLO mapping"
                   delay={100}
-                  className={`print:border-gray-200 print:bg-white ${getStatus(summaryData.percentage).color}`}
+                  className={`print:border-gray-200 print:bg-foreground ${getStatus(summaryData.percentage).color}`}
                 />
                 <StatsCard
                   icon={TrendingUp}
@@ -305,31 +305,31 @@ function MarksPloReportPage() {
                   value={getStatus(summaryData.percentage).label}
                   subValue="Performance Level"
                   delay={200}
-                  className={`print:border-gray-200 print:bg-white ${getStatus(summaryData.percentage).color}`}
+                  className={`print:border-gray-200 print:bg-foreground ${getStatus(summaryData.percentage).color}`}
                 />
 
                 {}
-                <div className="flex-1 min-w-[140px] p-6 rounded-[2rem] border bg-zinc-900/50 backdrop-blur-xl hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group print:border-gray-200 print:bg-white">
+                <div className="flex-1 min-w-[140px] p-6 rounded-[2rem] border bg-secondary/50 backdrop-blur-xl hover:bg-secondary/70 transition-all duration-300 hover:-translate-y-1 group print:border-gray-200 print:bg-foreground">
                   <div className="flex justify-between items-start mb-6">
-                    <div className="p-3.5 rounded-2xl bg-x/10 text-x group-hover:scale-110 transition-transform duration-300">
+                    <div className="p-3.5 rounded-2xl bg-accent/10 text-accent group-hover:scale-110 transition-transform duration-300">
                       <FileBarChart size={24} />
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <p className="text-zinc-500 text-xs uppercase tracking-widest font-bold mb-1 print:text-black">
+                    <p className="text-foreground/50 text-xs Cap tracking-[0px] font-bold mb-1 print:text-foreground">
                       PLO Breakdown
                     </p>
                     <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
                       {summaryData.ploBreakdown.map((plo, i) => (
                         <div
                           key={i}
-                          className="flex flex-col items-center bg-black/20 rounded-lg p-2 border border-white/5 hover:border-white/10 transition-colors print:border-gray-200 print:bg-transparent"
+                          className="flex flex-col items-center bg-background/20 rounded-lg p-2 border border-foreground/10 hover:border-foreground/10 transition-colors print:border-gray-200 print:bg-transparent"
                         >
-                          <span className="text-[9px] text-zinc-500 uppercase font-black tracking-widest print:text-black leading-none mb-1">
+                          <span className="text-[9px] text-foreground/50 Cap font-black tracking-[0px] print:text-foreground leading-none mb-1">
                             PLO{plo.id}
                           </span>
                           <span
-                            className={`text-[11px] font-black text-x print:text-black`}
+                            className={`text-[11px] font-black text-accent print:text-foreground`}
                           >
                             {plo.value}%
                           </span>
@@ -345,12 +345,12 @@ function MarksPloReportPage() {
 
             {}
             {reportHtml ? (
-              <div className="bg-zinc-900/50 border border-white/5 rounded-3xl overflow-hidden">
-                <div className="p-6 border-b border-white/5 flex items-center gap-3 bg-white/5">
-                  <div className="p-2 bg-x/10 rounded-lg text-x">
+              <div className="bg-secondary/50 border border-foreground/10 rounded-3xl overflow-hidden">
+                <div className="p-6 border-b border-foreground/10 flex items-center gap-3 bg-foreground/5">
+                  <div className="p-2 bg-accent/10 rounded-lg text-accent">
                     <Layout size={20} />
                   </div>
-                  <h3 className="font-bold text-lg text-white">
+                  <h3 className="font-bold text-lg text-foreground">
                     Detailed Result
                   </h3>
                 </div>
@@ -363,16 +363,16 @@ function MarksPloReportPage() {
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-center opacity-50 border border-white/5 rounded-3xl bg-zinc-900/20">
-                <Info size={48} className="mb-4 text-zinc-500" />
-                <p className="text-xl font-bold text-white">
+              <div className="flex flex-col items-center justify-center py-20 text-center opacity-50 border border-foreground/10 rounded-3xl bg-secondary/20">
+                <Info size={48} className="mb-4 text-foreground/50" />
+                <p className="text-xl font-bold text-foreground">
                   No PLO Report Available
                 </p>
-                <p className="text-zinc-400 mt-2">
+                <p className="text-foreground/60 mt-2">
                   There is no PLO attainment data available for the selected
                   semester.
                 </p>
-                <p className="text-zinc-500 text-sm mt-1">
+                <p className="text-foreground/50 text-sm mt-1">
                   Please select a different semester.
                 </p>
               </div>

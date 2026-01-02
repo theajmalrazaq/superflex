@@ -10,22 +10,22 @@ const StatsCard = ({
 }) => {
   return (
     <div
-      className={`flex-1 min-w-[200px] p-6 rounded-[2rem] border border-white/5 bg-zinc-900/50 backdrop-blur-xl hover:bg-zinc-900/70 transition-all duration-300 hover:-translate-y-1 group ${className}`}
+      className={`flex-1 min-w-[200px] p-6 rounded-[2rem] border border-foreground/10 bg-secondary/50 backdrop-blur-xl hover:bg-secondary/70 transition-all duration-300 hover:-translate-y-1 group ${className}`}
     >
       <div className="flex justify-between items-start mb-6">
-        <div className="p-3.5 bg-x/10 rounded-2xl text-x group-hover:scale-110 transition-transform duration-300">
+        <div className="p-3.5 bg-accent/10 rounded-2xl text-accent group-hover:scale-110 transition-transform duration-300">
           <Icon size={24} />
         </div>
       </div>
-      <p className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-black mb-1">
+      <p className="text-foreground/50 text-[10px] Cap tracking-[0px] font-black mb-1">
         {label}
       </p>
       <div className="flex items-baseline gap-2 overflow-hidden">
-        <h3 className="text-2xl md:text-3xl font-black font-sans text-white tracking-tighter truncate">
+        <h3 className="text-2xl md:text-3xl font-black font-sans text-foreground tracking-tighter truncate">
           {value}
         </h3>
         {subValue && (
-          <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest truncate">
+          <span className="text-[10px] font-bold text-foreground/50 Cap tracking-[0px] truncate">
             {subValue}
           </span>
         )}

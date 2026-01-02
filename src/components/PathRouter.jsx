@@ -55,7 +55,7 @@ function PathRouter() {
         });
         document.body.removeAttribute("bgcolor");
         document.body.classList.add(
-          "!bg-black",
+          "!bg-background",
           "!overflow-hidden",
           "!font-sans",
         );

@@ -96,10 +96,16 @@ document.querySelectorAll("button").forEach((button) => {
 });
 
 const savedColor = localStorage.getItem("superflex-theme-color") || "#a098ff";
-document.documentElement.style.setProperty("--color-x", savedColor);
+document.documentElement.style.setProperty("--accent", savedColor);
 
-document.documentElement.classList.add("dark");
-document.body.style.backgroundColor = "black";
+const savedMode = localStorage.getItem("superflex-theme-mode") || "dark";
+if (savedMode === "dark") {
+  document.documentElement.classList.add("dark");
+  document.body.style.backgroundColor = "black";
+} else {
+  document.documentElement.classList.remove("dark");
+  document.body.style.backgroundColor = "white";
+}
 
 root.render(
   <>

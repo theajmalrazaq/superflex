@@ -15,7 +15,7 @@ const SuperTabs = ({
 
   return (
     <div
-      className={`flex gap-1.5 bg-zinc-900/50 p-1 rounded-full border border-white/5 backdrop-blur-md overflow-x-auto scrollbar-hide max-w-full ${className}`}
+      className={`flex gap-1.5 bg-secondary/50 p-1 rounded-full border border-foreground/10 backdrop-blur-md overflow-x-auto scrollbar-hide max-w-full ${className}`}
     >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.value;
@@ -28,14 +28,14 @@ const SuperTabs = ({
               rounded-full font-bold transition-all duration-300 whitespace-nowrap relative
               ${
                 isActive
-                  ? "text-white"
-                  : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
+                  ? "text-foreground"
+                  : "text-foreground/50 hover:text-foreground/70 hover:bg-foreground/5"
               }
             `}
           >
             {}
             {isActive && (
-              <div className="absolute inset-0 bg-x rounded-full -z-10 animate-in fade-in zoom-in-95 duration-300" />
+              <div className="absolute inset-0 bg-accent rounded-full -z-10 animate-in fade-in zoom-in-95 duration-300" />
             )}
             <span className="relative z-10">{tab.label}</span>
           </button>

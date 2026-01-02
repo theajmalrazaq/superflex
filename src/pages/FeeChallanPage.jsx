@@ -174,8 +174,8 @@ function FeeChallanPage() {
             text: (
               <>
                 Select Bill Payment / Payments and then select{" "}
-                <span className="text-x font-bold">'kuickpay'</span> from given
-                categories
+                <span className="text-accent font-bold">'kuickpay'</span> from
+                given categories
               </>
             ),
           },
@@ -199,13 +199,15 @@ function FeeChallanPage() {
         ].map((item, idx) => (
           <div key={idx} className="flex gap-4">
             <div className="mt-1">
-              <div className="w-5 h-5 rounded-full border border-x/50 flex items-center justify-center shrink-0">
-                <div className="w-1.5 h-1.5 rounded-full bg-x/20"></div>
+              <div className="w-5 h-5 rounded-full border border-accent/50 flex items-center justify-center shrink-0">
+                <div className="w-1.5 h-1.5 rounded-full bg-accent/20"></div>
               </div>
             </div>
             <div className="space-y-1">
-              <p className="text-white font-bold tracking-wide">{item.step}</p>
-              <p className="text-zinc-500 text-xs leading-relaxed font-medium">
+              <p className="text-foreground font-bold tracking-wide">
+                {item.step}
+              </p>
+              <p className="text-foreground/50 text-xs leading-relaxed font-medium">
                 {item.text}
               </p>
             </div>
@@ -215,10 +217,10 @@ function FeeChallanPage() {
 
       <div className="space-y-6 pt-2">
         <div className="space-y-4">
-          <p className="text-[10px] text-x font-black uppercase tracking-[0.2em]">
+          <p className="text-[10px] text-accent font-black Cap tracking-[0px]">
             * Supported Banks
           </p>
-          <p className="text-[11px] text-zinc-500 leading-relaxed font-medium">
+          <p className="text-[11px] text-foreground/50 leading-relaxed font-medium">
             Allied Bank, Askari Bank, Bank Al Habib, Bank Alfalah, Bank Islami,
             Bank of Punjab, Dubai Islamic Bank, Faysal Bank, First Women Bank,
             Habib Metro Bank, Habib Bank Limited, JS Bank, MCB Bank, MCB Islamic
@@ -229,7 +231,7 @@ function FeeChallanPage() {
 
         <div className="py-3.5 px-5 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 flex items-center gap-3">
           <div className="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></div>
-          <p className="text-[10px] text-emerald-400 font-black uppercase tracking-widest leading-none">
+          <p className="text-[10px] text-emerald-400 font-black Cap tracking-[0px] leading-none">
             EasyPaisa & JazzCash Supported via Kuickpay
           </p>
         </div>
@@ -237,7 +239,7 @@ function FeeChallanPage() {
         <div className="pt-2">
           <a
             href="https://app.kuickpay.com/PaymentsBillPayment"
-            className="flex items-center justify-center gap-2 w-full p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-white transition-all text-xs font-bold"
+            className="flex items-center justify-center gap-2 w-full p-4 rounded-2xl bg-foreground/5 border border-foreground/10 hover:bg-foreground/10 text-foreground transition-all text-xs font-bold"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -247,18 +249,18 @@ function FeeChallanPage() {
         </div>
       </div>
 
-      <div className="pt-6 border-t border-white/5">
+      <div className="pt-6 border-t border-foreground/10">
         <div className="flex gap-4">
           <div className="w-5 h-5 rounded-full border border-amber-500/50 flex items-center justify-center shrink-0">
             <div className="w-1.5 h-1.5 rounded-full bg-amber-500/20"></div>
           </div>
           <div className="space-y-1">
-            <p className="text-white font-bold tracking-wide uppercase text-xs">
+            <p className="text-foreground font-bold tracking-wide Cap text-xs">
               Physical Cash Deposit
             </p>
-            <p className="text-zinc-500 text-xs leading-relaxed font-medium">
+            <p className="text-foreground/50 text-xs leading-relaxed font-medium">
               Print the challan form and then visit any nearest{" "}
-              <strong className="text-white font-bold">
+              <strong className="text-foreground font-bold">
                 Faysal Bank branch
               </strong>{" "}
               for cash deposit.
@@ -283,16 +285,16 @@ function FeeChallanPage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-4 md:p-8 space-y-10 relative z-10">
         {}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
         <PageHeader
           title="Fee Challans"
           subtitle="Manage your semester invoices and payments"
         >
-          <div className="flex items-center gap-4 bg-zinc-900/50 px-6 py-3 rounded-2xl border border-white/5 backdrop-blur-xl group hover:bg-zinc-900/70 transition-all">
+          <div className="flex items-center gap-4 bg-secondary/50 px-6 py-3 rounded-2xl border border-foreground/10 backdrop-blur-xl group hover:bg-secondary/70 transition-all">
             <div className="text-right">
-              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+              <p className="text-[10px] font-bold text-foreground/50 Cap tracking-[0px]">
                 Payment Status
               </p>
               <h4
@@ -301,8 +303,8 @@ function FeeChallanPage() {
                 {stats.unpaid > 0 ? `${stats.unpaid} Outstanding` : "All Paid"}
               </h4>
             </div>
-            <div className="w-px h-8 bg-white/10 mx-2"></div>
-            <Receipt className="text-x" size={24} />
+            <div className="w-px h-8 bg-foreground/10 mx-2"></div>
+            <Receipt className="text-accent" size={24} />
           </div>
         </PageHeader>
 
@@ -353,16 +355,16 @@ function FeeChallanPage() {
               )}
             />
 
-            <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden">
-              <div className="flex items-center gap-3 mb-10 border-b border-white/5 pb-8">
-                <div className="p-3 bg-zinc-800 rounded-xl text-zinc-400">
+            <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden">
+              <div className="flex items-center gap-3 mb-10 border-b border-foreground/10 pb-8">
+                <div className="p-3 bg-tertiary rounded-xl text-foreground/60">
                   <FileText size={20} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white tracking-tight font-sans">
+                  <h3 className="text-xl font-bold text-foreground tracking-tight font-sans">
                     Invoice History
                   </h3>
-                  <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest font-sans">
+                  <p className="text-[10px] text-foreground/40 font-bold Cap tracking-[0px] font-sans">
                     Download and proof of payment
                   </p>
                 </div>
@@ -372,59 +374,59 @@ function FeeChallanPage() {
               <div className="hidden md:block overflow-x-auto scrollbar-hide">
                 <table className="w-full text-left border-collapse border-spacing-0">
                   <thead>
-                    <tr className="border-b border-white/5">
-                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider font-sans">
+                    <tr className="border-b border-foreground/10">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider font-sans">
                         Sr.
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider font-sans w-full">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider font-sans w-full">
                         Description
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider font-sans">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider font-sans">
                         Status
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider text-right font-sans">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider text-right font-sans">
                         Amount
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider text-right font-sans">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider text-right font-sans">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-foreground/5">
                     {challans.map((c, idx) => (
                       <tr
                         key={idx}
-                        className="group hover:bg-white/[0.02] transition-colors"
+                        className="group hover:bg-foreground/[0.02] transition-colors"
                       >
                         <td className="px-6 py-5">
-                          <span className="text-zinc-500 font-bold font-sans text-xs">
+                          <span className="text-foreground/50 font-bold font-sans text-xs">
                             {c.srNo}
                           </span>
                         </td>
                         <td className="px-6 py-5">
                           <div className="flex flex-col">
-                            <span className="text-white font-bold group-hover:text-x transition-colors font-sans">
+                            <span className="text-foreground font-bold group-hover:text-accent transition-colors font-sans">
                               {c.description}
                             </span>
                             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
-                              <span className="flex items-center gap-1.5 text-[10px] text-zinc-500 font-bold uppercase tracking-tight font-sans whitespace-nowrap">
-                                <div className="p-1 bg-zinc-800/50 rounded-md">
-                                  <Clock size={10} className="text-x" />
+                              <span className="flex items-center gap-1.5 text-[10px] text-foreground/50 font-bold Cap tracking-tight font-sans whitespace-nowrap">
+                                <div className="p-1 bg-tertiary/50 rounded-md">
+                                  <Clock size={10} className="text-accent" />
                                 </div>
                                 Issued:{" "}
-                                <span className="text-zinc-400">
+                                <span className="text-foreground/60">
                                   {c.issueDate}
                                 </span>
                               </span>
-                              <span className="flex items-center gap-1.5 text-[10px] text-zinc-500 font-bold uppercase tracking-tight font-sans whitespace-nowrap">
-                                <div className="p-1 bg-zinc-800/50 rounded-md">
+                              <span className="flex items-center gap-1.5 text-[10px] text-foreground/50 font-bold Cap tracking-tight font-sans whitespace-nowrap">
+                                <div className="p-1 bg-tertiary/50 rounded-md">
                                   <Calendar
                                     size={10}
                                     className="text-emerald-400"
                                   />
                                 </div>
                                 Due:{" "}
-                                <span className="text-zinc-400">
+                                <span className="text-foreground/60">
                                   {c.dueDate}
                                 </span>
                               </span>
@@ -434,7 +436,7 @@ function FeeChallanPage() {
                         <td className="px-6 py-5">
                           <div className="flex justify-center w-full">
                             <span
-                              className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest font-sans ${
+                              className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black Cap tracking-[0px] font-sans ${
                                 c.status.toLowerCase().includes("paid")
                                   ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                                   : "bg-rose-500/10 text-rose-400 border border-rose-500/20 animate-pulse"
@@ -445,7 +447,7 @@ function FeeChallanPage() {
                           </div>
                         </td>
                         <td className="px-6 py-5 text-right font-sans">
-                          <span className="text-white font-black text-sm">
+                          <span className="text-foreground font-black text-sm">
                             Rs. {c.amount}
                           </span>
                         </td>
@@ -454,7 +456,7 @@ function FeeChallanPage() {
                             {c.status.toLowerCase().includes("unpaid") && (
                               <button
                                 onClick={() => handleOnlinePayment(c.challanNo)}
-                                className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all group/pay"
+                                className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-foreground transition-all group/pay"
                                 title="Pay Online (KuickPay)"
                               >
                                 <ExternalLink
@@ -465,7 +467,7 @@ function FeeChallanPage() {
                             )}
                             <button
                               onClick={() => handlePrint(c.challanNo)}
-                              className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-zinc-400 hover:text-white hover:bg-x hover:border-x transition-all group/btn disabled:opacity-30 disabled:cursor-not-allowed"
+                              className="p-2.5 rounded-xl bg-foreground/5 border border-foreground/10 text-foreground/60 hover:text-foreground hover:bg-accent hover:border-accent transition-all group/btn disabled:opacity-30 disabled:cursor-not-allowed"
                               title="Download/Print Challan"
                               disabled={!c.challanNo}
                             >
@@ -487,19 +489,19 @@ function FeeChallanPage() {
                 {challans.map((c, idx) => (
                   <div
                     key={idx}
-                    className="p-6 rounded-[2rem] bg-zinc-900/50 border border-white/5 space-y-6"
+                    className="p-6 rounded-[2rem] bg-secondary/50 border border-foreground/10 space-y-6"
                   >
                     <div className="flex justify-between items-start">
                       <div className="space-y-1">
-                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">
+                        <p className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px]">
                           DESCRIPTION
                         </p>
-                        <h4 className="text-lg font-black text-x leading-tight">
+                        <h4 className="text-lg font-black text-accent leading-tight">
                           {c.description}
                         </h4>
                       </div>
                       <span
-                        className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest font-sans ${
+                        className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black Cap tracking-[0px] font-sans ${
                           c.status.toLowerCase().includes("paid")
                             ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                             : "bg-rose-500/10 text-rose-400 border border-rose-500/20 animate-pulse"
@@ -509,33 +511,33 @@ function FeeChallanPage() {
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
+                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-foreground/10">
                       <div className="space-y-1.5">
-                        <div className="flex items-center gap-1.5 text-[9px] text-zinc-500 font-black uppercase tracking-widest">
-                          <Clock size={10} className="text-x" />
+                        <div className="flex items-center gap-1.5 text-[9px] text-foreground/50 font-black Cap tracking-[0px]">
+                          <Clock size={10} className="text-accent" />
                           ISSUED
                         </div>
-                        <p className="text-xs font-bold text-white ml-4">
+                        <p className="text-xs font-bold text-foreground ml-4">
                           {c.issueDate}
                         </p>
                       </div>
                       <div className="space-y-1.5 text-right">
-                        <div className="flex items-center justify-end gap-1.5 text-[9px] text-zinc-500 font-black uppercase tracking-widest">
+                        <div className="flex items-center justify-end gap-1.5 text-[9px] text-foreground/50 font-black Cap tracking-[0px]">
                           <Calendar size={10} className="text-emerald-400" />
                           DUE
                         </div>
-                        <p className="text-xs font-bold text-white mr-4">
+                        <p className="text-xs font-bold text-foreground mr-4">
                           {c.dueDate}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                    <div className="flex items-center justify-between pt-4 border-t border-foreground/10">
                       <div className="space-y-0.5">
-                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+                        <p className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px]">
                           Total Amount
                         </p>
-                        <p className="text-xl font-black text-white">
+                        <p className="text-xl font-black text-foreground">
                           Rs. {c.amount}
                         </p>
                       </div>
@@ -550,7 +552,7 @@ function FeeChallanPage() {
                         )}
                         <button
                           onClick={() => handlePrint(c.challanNo)}
-                          className="p-3.5 rounded-2xl bg-x/10 border border-x/20 text-x active:scale-95 transition-all disabled:opacity-30"
+                          className="p-3.5 rounded-2xl bg-accent/10 border border-accent/20 text-accent active:scale-95 transition-all disabled:opacity-30"
                           disabled={!c.challanNo}
                         >
                           <Printer size={20} />
@@ -564,8 +566,8 @@ function FeeChallanPage() {
               {challans.length === 0 && (
                 <div className="px-6 py-20 text-center">
                   <div className="flex flex-col items-center gap-4 opacity-50">
-                    <Receipt size={48} className="text-zinc-500" />
-                    <p className="text-zinc-400 font-medium font-sans">
+                    <Receipt size={48} className="text-foreground/50" />
+                    <p className="text-foreground/60 font-medium font-sans">
                       No challans found in the records.
                     </p>
                   </div>
@@ -576,16 +578,16 @@ function FeeChallanPage() {
 
           {}
           <div className="space-y-6">
-            <div className="bg-x/5 border border-x/10 backdrop-blur-2xl rounded-[2.5rem] p-8">
-              <div className="flex items-center gap-3 mb-8 border-b border-white/5 pb-6">
-                <div className="p-3 bg-x/10 rounded-xl text-x">
+            <div className="bg-accent/5 border border-accent/10 backdrop-blur-2xl rounded-[2.5rem] p-8">
+              <div className="flex items-center gap-3 mb-8 border-b border-foreground/10 pb-6">
+                <div className="p-3 bg-accent/10 rounded-xl text-accent">
                   <Printer size={20} />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white tracking-tight font-sans">
+                  <h3 className="text-lg font-bold text-foreground tracking-tight font-sans">
                     Payment Portal
                   </h3>
-                  <p className="text-[10px] text-x font-bold uppercase tracking-widest font-sans underline decoration-x/30 underline-offset-4">
+                  <p className="text-[10px] text-accent font-bold Cap tracking-[0px] font-sans underline decoration-x/30 underline-offset-4">
                     Legal Roadmap
                   </p>
                 </div>

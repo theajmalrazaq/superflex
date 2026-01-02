@@ -12,7 +12,7 @@ const SessionExpirePage = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center p-6 space-y-8 animate-in fade-in duration-700 font-sans">
+    <div className="fixed inset-0 z-[9999] bg-background flex flex-col items-center justify-center p-6 space-y-8 animate-in fade-in duration-700 font-sans">
       <style>{`#react-chrome-app, #react-chrome-app * { font-family: 'Google Sans Flex', sans-serif !important; }`}</style>
 
       <div className="relative z-10 text-center space-y-6 max-w-lg">
@@ -21,10 +21,10 @@ const SessionExpirePage = () => {
         </div>
 
         <div className="space-y-4">
-          <h1 className="text-4xl !font-bold !text-white">
+          <h1 className="text-4xl !font-bold !text-foreground">
             Session <span className="!text-rose-500">Expired</span>
           </h1>
-          <p className="!text-zinc-500 text-sm leading-relaxed">
+          <p className="!text-foreground/50 text-sm leading-relaxed">
             Your session timed out. Please sign in again to continue.
           </p>
         </div>
@@ -34,7 +34,7 @@ const SessionExpirePage = () => {
             onClick={() => (window.location.href = "/Login")}
             variant="primary"
             icon={<ArrowRight size={18} />}
-            className="w-full !text-white"
+            className="w-full !text-foreground"
           >
             Log In Again
           </Button>

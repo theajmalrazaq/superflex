@@ -48,10 +48,10 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
     <div className="relative w-full md:w-auto z-50" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full md:w-[350px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-zinc-900/50 border border-white/5 text-white hover:bg-white/5 transition-all group"
+        className="w-full md:w-[350px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-secondary/50 border border-foreground/10 text-foreground hover:bg-foreground/5 transition-all group"
       >
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="p-2 rounded-xl bg-x/10 text-x">
+          <div className="p-2 rounded-xl bg-accent/10 text-accent">
             <BookOpen size={16} />
           </div>
           <div className="flex flex-col items-start truncate">
@@ -62,12 +62,12 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
         </div>
         <ChevronDown
           size={16}
-          className={`text-zinc-500 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+          className={`text-foreground/50 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10  max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200 z-[60]">
+        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-background/50 backdrop-blur-2xl border border-foreground/10  max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200 z-[60]">
           <div className="flex flex-col gap-3">
             {courses.map((course) => (
               <button
@@ -76,15 +76,15 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
                   onSelect(course.id);
                   setIsOpen(false);
                 }}
-                className={`w-full flex bg-zinc-900 items-center justify-between p-3 rounded-xl transition-all ${
+                className={`w-full flex bg-secondary items-center justify-between p-3 rounded-xl transition-all ${
                   selectedId === course.id
-                    ? "bg-x/10 border border-x/20"
-                    : "hover:bg-white/5 border border-transparent"
+                    ? "bg-accent/10 border border-accent/20"
+                    : "hover:bg-foreground/5 border border-transparent"
                 }`}
               >
                 <div className="flex items-center gap-3 text-left overflow-hidden">
                   <span
-                    className={`text-sm font-medium truncate ${selectedId === course.id ? "text-white" : "text-zinc-400"}`}
+                    className={`text-sm font-medium truncate ${selectedId === course.id ? "text-foreground" : "text-foreground/60"}`}
                   >
                     {course.title}
                   </span>
@@ -134,10 +134,10 @@ const SectionSelector = ({ sections, selectedId, onSelect }) => {
     <div className="relative w-full md:w-auto z-40" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full md:w-[280px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-zinc-900/50 border border-white/5 text-white hover:bg-white/5 transition-all group"
+        className="w-full md:w-[280px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-secondary/50 border border-foreground/10 text-foreground hover:bg-foreground/5 transition-all group"
       >
         <div className="flex items-center gap-3 overflow-hidden">
-          <div className="p-2 rounded-xl bg-x/10 text-x">
+          <div className="p-2 rounded-xl bg-accent/10 text-accent">
             <Layers size={16} />
           </div>
           <div className="flex flex-col items-start truncate">
@@ -148,12 +148,12 @@ const SectionSelector = ({ sections, selectedId, onSelect }) => {
         </div>
         <ChevronDown
           size={16}
-          className={`text-zinc-500 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+          className={`text-foreground/50 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-black/50 backdrop-blur-2xl border border-white/10  max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200 z-[60]">
+        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-background/50 backdrop-blur-2xl border border-foreground/10  max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200 z-[60]">
           <div className="flex flex-col gap-2">
             {sections.map((section) => (
               <button
@@ -162,10 +162,10 @@ const SectionSelector = ({ sections, selectedId, onSelect }) => {
                   onSelect(section.id);
                   setIsOpen(false);
                 }}
-                className={`w-full flex bg-zinc-900 items-center justify-between p-3 rounded-xl transition-all ${
+                className={`w-full flex bg-secondary items-center justify-between p-3 rounded-xl transition-all ${
                   selectedId === section.id
-                    ? "bg-x/10 text-white border border-x/20"
-                    : "text-zinc-400 hover:bg-white/5 border border-transparent hover:text-white"
+                    ? "bg-accent/10 text-foreground border border-accent/20"
+                    : "text-foreground/60 hover:bg-foreground/5 border border-transparent hover:text-foreground"
                 }`}
               >
                 <span className="text-sm font-medium truncate">
@@ -223,8 +223,8 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
         onClick={() => setIsOpen(!isOpen)}
         className={`p-3 rounded-full border transition-all ${
           isOpen
-            ? "bg-x/20 text-x border-x/20"
-            : "bg-zinc-900/50 text-zinc-400 border-white/5 hover:text-white hover:bg-white/10"
+            ? "bg-accent/20 text-accent border-accent/20"
+            : "bg-secondary/50 text-foreground/60 border-foreground/10 hover:text-foreground hover:bg-foreground/10"
         }`}
         title="View Bookmarks"
       >
@@ -235,16 +235,16 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-96 md:w-[500px] bg-black/50 backdrop-blur-xl border border-white/10 rounded-2xl  overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-          <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
-            <h3 className="font-bold text-white flex items-center gap-2">
+        <div className="absolute top-full right-0 mt-2 w-96 md:w-[500px] bg-background/50 backdrop-blur-xl border border-foreground/10 rounded-2xl  overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="p-4 border-b border-foreground/10 bg-foreground/5 flex justify-between items-center">
+            <h3 className="font-bold text-foreground flex items-center gap-2">
               Bookmarked Items
             </h3>
           </div>
 
           <div className="max-h-[60vh] overflow-y-auto scrollbar-hide p-2 space-y-1">
             {bookmarkedDetails.length === 0 ? (
-              <div className="p-8 text-center text-zinc-500 text-sm">
+              <div className="p-8 text-center text-foreground/50 text-sm">
                 <p>No bookmarks yet.</p>
                 <p className="text-xs mt-1 opacity-50">
                   Click the bookmark icon on any assessment item to save it
@@ -259,10 +259,10 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
                     onNavigate(item.courseId, item.sectionId);
                     setIsOpen(false);
                   }}
-                  className="w-full text-left p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all group"
+                  className="w-full text-left p-3 rounded-xl hover:bg-foreground/5 border border-transparent hover:border-foreground/10 transition-all group"
                 >
                   <div className="flex justify-between items-start mb-1">
-                    <div className="font-bold text-sm text-white group-hover:text-x transition-colors truncate w-full pr-2">
+                    <div className="font-bold text-sm text-foreground group-hover:text-accent transition-colors truncate w-full pr-2">
                       {item.rowTitle}
                     </div>
                     <span
@@ -277,11 +277,11 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
                       {item.obtained} / {item.total}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-[10px] text-zinc-500 uppercase tracking-wider font-bold">
+                  <div className="flex items-center gap-2 text-[10px] text-foreground/50 Cap tracking-wider font-bold">
                     <span className="truncate max-w-[120px]">
                       {item.courseTitle}
                     </span>
-                    <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
+                    <span className="w-1 h-1 rounded-full bg-tertiary"></span>
                     <span className="truncate">{item.sectionTitle}</span>
                   </div>
                 </button>
@@ -410,28 +410,30 @@ const AssessmentView = ({
     <div
       className={`group rounded-[2rem] border transition-all duration-300 overflow-hidden ${
         isGrandTotal
-          ? "bg-black/40 border-white/10"
-          : "bg-zinc-900/50 border-white/5"
+          ? "bg-background/40 border-foreground/10"
+          : "bg-secondary/50 border-foreground/10"
       }`}
     >
       <div className="w-full">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 border-b border-white/5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 border-b border-foreground/10">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
-              <h3 className="text-xl font-bold text-white">{section.title}</h3>
+              <h3 className="text-xl font-bold text-foreground">
+                {section.title}
+              </h3>
               {isGrandTotal && (
-                <span className="px-2 py-0.5 rounded-md bg-x/20 text-x text-[10px] font-bold uppercase tracking-wider">
+                <span className="px-2 py-0.5 rounded-md bg-accent/20 text-accent text-[10px] font-bold Cap tracking-wider">
                   Final
                 </span>
               )}
               {isSimulationMode && !isGrandTotal && (
-                <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-500 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-500 text-[10px] font-bold Cap tracking-wider flex items-center gap-1">
                   <Zap size={10} fill="currentColor" /> Simulating
                 </span>
               )}
             </div>
             {hasAssessments && (
-              <p className="text-sm font-medium text-zinc-500">
+              <p className="text-sm font-medium text-foreground/50">
                 {assessmentRows.length} items &bull; Breakdown & Statistics
               </p>
             )}
@@ -443,8 +445,8 @@ const AssessmentView = ({
                 onClick={onToggleSimulation}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-bold text-sm border ${
                   isSimulationMode
-                    ? "bg-amber-500 text-black border-amber-600"
-                    : "bg-zinc-800 text-zinc-400 border-white/5 hover:bg-zinc-700"
+                    ? "bg-amber-500 text-foreground border-amber-600"
+                    : "bg-tertiary text-foreground/60 border-foreground/10 hover:bg-tertiary"
                 }`}
                 title={
                   isSimulationMode
@@ -463,7 +465,7 @@ const AssessmentView = ({
             {isBestOfEligible && !isSimulationMode && hasAssessments && (
               <button
                 onClick={() => setIsBestOfOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-x/10 text-x border border-x/20 hover:bg-x/20 transition-all font-bold text-sm"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-all font-bold text-sm"
               >
                 <Settings size={16} />
                 Best Of
@@ -473,7 +475,7 @@ const AssessmentView = ({
             {!isGrandTotal && hasAssessments && (
               <button
                 onClick={onReset}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800 text-zinc-400 border border-white/5 hover:bg-zinc-700 hover:text-white transition-all font-bold text-sm"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-tertiary text-foreground/60 border border-foreground/10 hover:bg-tertiary hover:text-foreground transition-all font-bold text-sm"
                 title="Reset to original scores"
               >
                 <RotateCcw size={16} />
@@ -494,7 +496,7 @@ const AssessmentView = ({
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 p-6 border-b border-white/5">
+        <div className="flex flex-wrap items-center gap-4 p-6 border-b border-foreground/10">
           <StatsCard
             icon={Layers}
             label="Weight"
@@ -512,60 +514,62 @@ const AssessmentView = ({
         </div>
 
         <div className="p-6">
-          <div className="w-full overflow-x-auto rounded-xl border border-white/5 scrollbar-hide bg-black/20">
+          <div className="w-full overflow-x-auto rounded-xl border border-foreground/10 scrollbar-hide bg-background/20">
             <table className="w-full text-sm text-left border-collapse scrollbar-hide">
               <thead>
-                <tr className="border-b border-white/10 bg-black/40 backdrop-blur-md">
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider sticky top-0 bg-zinc-900/90 z-20">
+                <tr className="border-b border-foreground/10 bg-background/40 backdrop-blur-md">
+                  <th className="px-6 py-4 text-xs font-bold text-foreground/60 Cap tracking-wider sticky top-0 bg-secondary/90 z-20">
                     Item Name
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-foreground/60 Cap tracking-wider text-center sticky top-0 bg-secondary/90 z-20">
                     Weightage
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-foreground/60 Cap tracking-wider text-center sticky top-0 bg-secondary/90 z-20">
                     Total Marks
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-foreground/60 Cap tracking-wider text-center sticky top-0 bg-secondary/90 z-20">
                     Obtained
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-x uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-accent Cap tracking-wider text-center sticky top-0 bg-secondary/90 z-20">
                     Obt Weight
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-foreground/60 Cap tracking-wider text-center sticky top-0 bg-secondary/90 z-20">
                     Avg
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-foreground/60 Cap tracking-wider text-center sticky top-0 bg-secondary/90 z-20">
                     Std Dev
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-foreground/60 Cap tracking-wider text-center sticky top-0 bg-secondary/90 z-20">
                     Min
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center sticky top-0 bg-zinc-900/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-foreground/60 Cap tracking-wider text-center sticky top-0 bg-secondary/90 z-20">
                     Max
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-foreground/5">
                 {assessmentRows.map((row, idx) => {
                   const uniqueId = `${courseId}-${section.id}-${row.title}`;
                   const isMarked = markedItems?.has(uniqueId);
                   return (
                     <tr
                       key={idx}
-                      className={`group transition-all duration-300 border-b border-white/5 ${
+                      className={`group transition-all duration-300 border-b border-foreground/10 ${
                         !row.included ? "opacity-40 grayscale-[0.8]" : ""
                       } ${
-                        isMarked ? "bg-x/10" : "hover:bg-white/5 border-white/5"
+                        isMarked
+                          ? "bg-accent/10"
+                          : "hover:bg-foreground/5 border-foreground/10"
                       }`}
                     >
-                      <td className="px-6 py-4 font-medium text-white/90">
+                      <td className="px-6 py-4 font-medium text-foreground/90">
                         <div className="flex items-center gap-3">
                           <button
                             onClick={() => onToggleMark?.(uniqueId)}
                             className={`p-1.5 rounded-full shrink-0 transition-all border ${
                               isMarked
-                                ? "bg-x/20 text-x border-x/30"
-                                : "bg-zinc-900/50 text-zinc-600 border-white/5 hover:text-zinc-400 hover:bg-white/10"
+                                ? "bg-accent/20 text-accent border-accent/30"
+                                : "bg-secondary/50 text-foreground/40 border-foreground/10 hover:text-foreground/60 hover:bg-foreground/10"
                             }`}
                           >
                             <Bookmark
@@ -575,37 +579,37 @@ const AssessmentView = ({
                           </button>
                           <div className="flex items-center gap-2">
                             {row.included ? (
-                              <div className="w-1.5 h-1.5 rounded-full bg-x"></div>
+                              <div className="w-1.5 h-1.5 rounded-full bg-accent"></div>
                             ) : (
-                              <div className="w-1.5 h-1.5 rounded-full bg-zinc-600"></div>
+                              <div className="w-1.5 h-1.5 rounded-full bg-tertiary/80"></div>
                             )}
                             {row.title}
                             {!row.included && (
-                              <span className="ml-2 text-[9px] font-bold bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded uppercase">
+                              <span className="ml-2 text-[9px] font-bold bg-tertiary text-foreground/60 px-1.5 py-0.5 rounded Cap">
                                 Dropped
                               </span>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-center text-zinc-400">
+                      <td className="px-6 py-4 text-center text-foreground/60">
                         <input
                           type="text"
                           value={row.weight}
                           onChange={(e) =>
                             onUpdate(idx, "weight", e.target.value)
                           }
-                          className="bg-transparent text-center w-16 focus:outline-none focus:border focus:border-x hover:bg-white/5 rounded transition-colors"
+                          className="bg-transparent text-center w-16 focus:outline-none focus:border focus:border-accent hover:bg-foreground/5 rounded transition-colors"
                         />
                       </td>
-                      <td className="px-6 py-4 text-center text-zinc-400">
+                      <td className="px-6 py-4 text-center text-foreground/60">
                         <input
                           type="text"
                           value={row.total}
                           onChange={(e) =>
                             onUpdate(idx, "total", e.target.value)
                           }
-                          className="bg-transparent text-center w-16 focus:outline-none focus:border focus:border-x hover:bg-white/5 rounded transition-colors"
+                          className="bg-transparent text-center w-16 focus:outline-none focus:border focus:border-accent hover:bg-foreground/5 rounded transition-colors"
                         />
                       </td>
                       <td className="px-6 py-4 text-center">
@@ -615,7 +619,7 @@ const AssessmentView = ({
                           onChange={(e) =>
                             onUpdate(idx, "obtained", e.target.value)
                           }
-                          className={`font-bold text-base text-center w-16 bg-transparent focus:outline-none focus:border focus:border-x hover:bg-white/5 rounded transition-colors ${
+                          className={`font-bold text-base text-center w-16 bg-transparent focus:outline-none focus:border focus:border-accent hover:bg-foreground/5 rounded transition-colors ${
                             (row.obtained / row.total) * 100 >= 80
                               ? "text-emerald-400"
                               : (row.obtained / row.total) * 100 >= 60
@@ -624,49 +628,51 @@ const AssessmentView = ({
                           }`}
                         />
                       </td>
-                      <td className="px-6 py-4 text-center font-bold text-x bg-x/5">
+                      <td className="px-6 py-4 text-center font-bold text-accent bg-accent/5">
                         {(row.total > 0
                           ? (row.obtained / row.total) * row.weight
                           : 0
                         ).toFixed(2)}
                       </td>
-                      <td className="px-6 py-4 text-center text-zinc-500">
+                      <td className="px-6 py-4 text-center text-foreground/50">
                         ~{row.avg.toFixed(2)}
                       </td>
-                      <td className="px-6 py-4 text-center text-zinc-500">
+                      <td className="px-6 py-4 text-center text-foreground/50">
                         ~{row.stdDev.toFixed(2)}
                       </td>
-                      <td className="px-6 py-4 text-center text-zinc-500">
+                      <td className="px-6 py-4 text-center text-foreground/50">
                         {row.min.toFixed(1)}
                       </td>
-                      <td className="px-6 py-4 text-center text-zinc-500">
+                      <td className="px-6 py-4 text-center text-foreground/50">
                         {row.max.toFixed(1)}
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
-              <tfoot className="bg-zinc-900/50 border-t-2 border-white/10 font-bold backdrop-blur-sm">
+              <tfoot className="bg-secondary/50 border-t-2 border-foreground/10 font-bold backdrop-blur-sm">
                 <tr>
-                  <td className="px-6 py-5 text-white">Total Summary</td>
-                  <td className="px-6 py-5 text-center text-white">
+                  <td className="px-6 py-5 text-foreground">Total Summary</td>
+                  <td className="px-6 py-5 text-center text-foreground">
                     {weight.toFixed(2)}
                   </td>
                   <td className="px-6 py-5 text-center">-</td>
-                  <td className="px-6 py-5 text-center text-zinc-400">-</td>
-                  <td className="px-6 py-5 text-center text-x text-lg">
+                  <td className="px-6 py-5 text-center text-foreground/60">
+                    -
+                  </td>
+                  <td className="px-6 py-5 text-center text-accent text-lg">
                     {obtained.toFixed(2)}
                   </td>
-                  <td className="px-6 py-5 text-center text-zinc-400">
+                  <td className="px-6 py-5 text-center text-foreground/60">
                     ~{section.stats?.weightedAvg.toFixed(2) || "0.00"}
                   </td>
-                  <td className="px-6 py-5 text-center text-zinc-400">
+                  <td className="px-6 py-5 text-center text-foreground/60">
                     ~{section.stats?.weightedStdDev.toFixed(2) || "0.00"}
                   </td>
-                  <td className="px-6 py-5 text-center text-zinc-400 text-xs">
+                  <td className="px-6 py-5 text-center text-foreground/60 text-xs">
                     ~{section.stats?.weightedMin.toFixed(2) || "0.00"}
                   </td>
-                  <td className="px-6 py-5 text-center text-zinc-400 text-xs">
+                  <td className="px-6 py-5 text-center text-foreground/60 text-xs">
                     ~{section.stats?.weightedMax.toFixed(2) || "0.00"}
                   </td>
                 </tr>
@@ -1326,14 +1332,14 @@ function MarksPage() {
                   isSimulationMode={selectedCourse.simulationMode}
                 />
               ) : (
-                <div className="flex flex-col items-center justify-center py-32 text-center bg-zinc-900/40 border border-white/5 rounded-[3rem]">
-                  <div className="p-6 rounded-[2.5rem] bg-zinc-900/50 border border-white/5 mb-6 text-zinc-700">
+                <div className="flex flex-col items-center justify-center py-32 text-center bg-secondary/40 border border-foreground/10 rounded-[3rem]">
+                  <div className="p-6 rounded-[2.5rem] bg-secondary/50 border border-foreground/10 mb-6 text-foreground/30">
                     <Layers size={48} />
                   </div>
-                  <h4 className="text-2xl font-black text-zinc-500 tracking-tight mb-2">
+                  <h4 className="text-2xl font-black text-foreground/50 tracking-tight mb-2">
                     No Assessment Available
                   </h4>
-                  <p className="text-zinc-600 max-w-xs mx-auto text-sm font-medium">
+                  <p className="text-foreground/40 max-w-xs mx-auto text-sm font-medium">
                     The university hasn't uploaded any evaluation data for this
                     course yet.
                   </p>

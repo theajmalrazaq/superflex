@@ -124,9 +124,9 @@ const CGPAPlannerModal = ({
 
         {result !== null && (
           <div className="animate-in slide-in-from-bottom-4 duration-500">
-            <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-sm flex items-center justify-between relative overflow-hidden group">
+            <div className="p-6 rounded-3xl bg-foreground/[0.03] border border-foreground/10 backdrop-blur-sm flex items-center justify-between relative overflow-hidden group">
               <div className="space-y-1 relative z-10">
-                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                <p className="text-[10px] font-bold text-foreground/50 Cap tracking-[0px]">
                   Required SGPA
                 </p>
                 {result > 4.0 ? (
@@ -138,7 +138,7 @@ const CGPAPlannerModal = ({
                     0.00
                   </p>
                 ) : (
-                  <p className="text-5xl font-bold text-white tracking-tighter">
+                  <p className="text-5xl font-bold text-foreground tracking-tighter">
                     {result.toFixed(2)}
                   </p>
                 )}
@@ -146,19 +146,19 @@ const CGPAPlannerModal = ({
 
               <div className="text-right relative z-10 flex flex-col items-end gap-3">
                 {result > 4.0 ? (
-                  <span className="px-3 py-1 bg-rose-500/10 text-rose-400 rounded-lg text-[10px] font-bold uppercase border border-rose-500/20">
+                  <span className="px-3 py-1 bg-rose-500/10 text-rose-400 rounded-lg text-[10px] font-bold Cap border border-rose-500/20">
                     Unreachable
                   </span>
                 ) : result < 0 ? (
-                  <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-lg text-[10px] font-bold uppercase border border-emerald-500/20">
+                  <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-lg text-[10px] font-bold Cap border border-emerald-500/20">
                     Achieved
                   </span>
                 ) : (
-                  <span className="px-3 py-1 bg-x/10 text-x rounded-lg text-[10px] font-bold uppercase border border-x/20">
+                  <span className="px-3 py-1 bg-accent/10 text-accent rounded-lg text-[10px] font-bold Cap border border-accent/20">
                     Target Goal
                   </span>
                 )}
-                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                <p className="text-[10px] font-bold text-foreground/50 Cap tracking-[0px]">
                   In {nextCH} Cr.Hrs
                 </p>
               </div>
@@ -270,17 +270,17 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
               </div>
             ) : (
               <>
-                <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-sm flex items-center justify-between">
+                <div className="p-6 rounded-3xl bg-foreground/[0.03] border border-foreground/10 backdrop-blur-sm flex items-center justify-between">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                    <p className="text-[10px] font-bold text-foreground/50 Cap tracking-[0px]">
                       Predicted Grade
                     </p>
-                    <p className="text-4xl font-black text-white tracking-tighter">
+                    <p className="text-4xl font-black text-foreground tracking-tighter">
                       {result.grade}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">
+                    <p className="text-[10px] font-bold text-foreground/50 Cap tracking-[0px] mb-2">
                       At MCA {Math.round(mca)}
                     </p>
                     <div className="flex flex-wrap justify-end gap-1.5 max-w-[200px]">
@@ -293,8 +293,8 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
                             key={g}
                             className={`text-[9px] font-black px-2 py-1 rounded-md border transition-all ${
                               g === result.grade
-                                ? "bg-x border-x text-white shadow-lg shadow-x/20"
-                                : "bg-white/5 border-white/5 text-zinc-500"
+                                ? "bg-accent border-accent text-foreground"
+                                : "bg-foreground/5 border-foreground/10 text-foreground/50"
                             }`}
                           >
                             {g}: {val}+
@@ -312,17 +312,17 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
                         key={g}
                         className={`p-3 rounded-2xl border transition-all duration-300 ${
                           g === result.grade
-                            ? "bg-x/10 border-x/30 shadow-lg shadow-x/10"
-                            : "bg-white/[0.02] border-white/5 hover:bg-white/[0.04]"
+                            ? "bg-accent/10 border-accent/30"
+                            : "bg-foreground/[0.02] border-foreground/10 hover:bg-foreground/[0.04]"
                         }`}
                       >
                         <p
-                          className={`text-[10px] font-bold uppercase tracking-wider mb-1 ${g === result.grade ? "text-x" : "text-zinc-600"}`}
+                          className={`text-[10px] font-bold Cap tracking-wider mb-1 ${g === result.grade ? "text-accent" : "text-foreground/40"}`}
                         >
                           {g}
                         </p>
                         <p
-                          className={`text-xs font-black ${g === result.grade ? "text-white" : "text-zinc-400"}`}
+                          className={`text-xs font-black ${g === result.grade ? "text-foreground" : "text-foreground/60"}`}
                         >
                           {val}
                           {g === "F" ? "" : "+"}
@@ -660,6 +660,9 @@ function TranscriptPage() {
     };
   }, [semesters, overriddenGrades]);
 
+  const [themeMode, setThemeMode] = useState(
+    localStorage.getItem("superflex-theme-mode") || "dark",
+  );
   const [themeColor, setThemeColor] = useState(
     localStorage.getItem("superflex-theme-color") || "#a098ff",
   );
@@ -668,9 +671,18 @@ function TranscriptPage() {
     const handleThemeChange = (e) => {
       setThemeColor(e.detail);
     };
+    const handleModeChange = () => {
+      setThemeMode(localStorage.getItem("superflex-theme-mode") || "dark");
+    };
     window.addEventListener("superflex-theme-changed", handleThemeChange);
-    return () =>
+    window.addEventListener("superflex-theme-mode-changed", handleModeChange);
+    return () => {
       window.removeEventListener("superflex-theme-changed", handleThemeChange);
+      window.removeEventListener(
+        "superflex-theme-mode-changed",
+        handleModeChange,
+      );
+    };
   }, []);
 
   const chartData = useMemo(() => {
@@ -693,7 +705,7 @@ function TranscriptPage() {
           fill: true,
           pointBackgroundColor: themeColor,
           pointBorderWidth: 4,
-          pointBorderColor: "#111",
+          pointBorderColor: "var(--background)",
           pointRadius: 4,
           pointHoverRadius: 6,
           borderWidth: 3,
@@ -706,7 +718,7 @@ function TranscriptPage() {
           fill: false,
           pointBackgroundColor: themeColor,
           pointBorderWidth: 4,
-          pointBorderColor: "#111",
+          pointBorderColor: "var(--background)",
           pointRadius: 4,
           pointHoverRadius: 6,
           borderWidth: 3,
@@ -722,12 +734,20 @@ function TranscriptPage() {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: "#18181b",
+        backgroundColor:
+          themeMode === "dark"
+            ? "rgba(18, 18, 18, 0.9)"
+            : "rgba(255, 255, 255, 0.9)",
+        titleColor: themeMode === "dark" ? "#fff" : "#000",
+        bodyColor: themeMode === "dark" ? "#fff" : "#000",
         titleFont: { size: 13, weight: "bold" },
         bodyFont: { size: 12 },
         padding: 16,
         borderRadius: 16,
-        borderColor: "#ffffff1a",
+        borderColor:
+          themeMode === "dark"
+            ? "rgba(255, 255, 255, 0.1)"
+            : "rgba(0, 0, 0, 0.1)",
         borderWidth: 1,
         displayColors: false,
         callbacks: {
@@ -740,11 +760,29 @@ function TranscriptPage() {
       y: {
         min: 0,
         max: 4,
-        ticks: { color: "#3f3f46", stepSize: 1, font: { weight: "bold" } },
-        grid: { color: "#ffffff08" },
+        ticks: {
+          color:
+            themeMode === "dark"
+              ? "rgba(161, 161, 170, 0.6)"
+              : "rgba(39, 39, 42, 0.6)",
+          stepSize: 1,
+          font: { weight: "bold", size: 10 },
+        },
+        grid: {
+          color:
+            themeMode === "dark"
+              ? "rgba(255, 255, 255, 0.03)"
+              : "rgba(0, 0, 0, 0.03)",
+        },
       },
       x: {
-        ticks: { color: "#3f3f46", font: { weight: "bold" } },
+        ticks: {
+          color:
+            themeMode === "dark"
+              ? "rgba(161, 161, 170, 0.6)"
+              : "rgba(39, 39, 42, 0.6)",
+          font: { weight: "bold", size: 10 },
+        },
         grid: { display: false },
       },
     },
@@ -762,8 +800,8 @@ function TranscriptPage() {
   return (
     <PageLayout currentPage={window.location.pathname}>
       {}
-      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
-      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
+      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
       <div className="w-full p-4 md:p-8 space-y-10 relative z-10">
         {}
@@ -773,7 +811,7 @@ function TranscriptPage() {
         >
           <button
             onClick={() => setIsPlannerOpen(true)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/5 bg-zinc-900/50 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-300 group"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-foreground/10 bg-secondary/50 text-xs font-bold text-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all duration-300 group"
           >
             <Target
               size={16}
@@ -783,7 +821,7 @@ function TranscriptPage() {
           </button>
           <button
             onClick={() => setIsMCALookupOpen(true)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/5 bg-zinc-900/50 text-xs font-bold text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-300 group"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-foreground/10 bg-secondary/50 text-xs font-bold text-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all duration-300 group"
           >
             <Scale
               size={16}
@@ -799,8 +837,8 @@ function TranscriptPage() {
             }
             className={`flex items-center gap-2 px-5 py-2.5 rounded-full transition-all font-bold text-xs border ${
               simulationMode
-                ? "bg-amber-500 text-black border-amber-600"
-                : "bg-zinc-900/50 border-white/5 text-zinc-400 hover:text-white hover:bg-white/5"
+                ? "bg-amber-500 text-foreground border-amber-600"
+                : "bg-secondary/50 border-foreground/10 text-foreground/60 hover:text-foreground hover:bg-foreground/5"
             }`}
             title={
               simulationMode
@@ -853,8 +891,8 @@ function TranscriptPage() {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
           {}
           <div className="xl:col-span-2 space-y-8">
-            <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 flex flex-col gap-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-x/5 blur-[100px] rounded-full -mr-48 -mt-48 pointer-events-none"></div>
+            <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 flex flex-col gap-8 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-accent/5 blur-[100px] rounded-full -mr-48 -mt-48 pointer-events-none"></div>
 
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
                 <SuperTabs
@@ -869,21 +907,21 @@ function TranscriptPage() {
 
               {activeSemData && (
                 <div className="space-y-10 relative z-10">
-                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-10">
+                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-foreground/10 pb-10">
                     <div className="space-y-1">
-                      <h2 className="text-3xl font-black text-white tracking-tighter">
+                      <h2 className="text-3xl font-black text-foreground tracking-tighter">
                         {activeSemData.title}
                       </h2>
-                      <p className="text-xs text-zinc-500 font-black uppercase tracking-widest">
+                      <p className="text-xs text-foreground/50 font-black Cap tracking-[0px]">
                         Semester Detail Report
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-x-12 lg:gap-x-16 gap-y-6">
                       <div className="text-right flex flex-col items-end min-w-[70px]">
-                        <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-black text-foreground/40 Cap tracking-[0px] mb-2 bg-tertiary px-2 py-0.5 rounded">
                           Attemp.
                         </span>
-                        <span className="text-3xl font-bold font-sans text-white tracking-tighter">
+                        <span className="text-3xl font-bold font-sans text-foreground tracking-tighter">
                           {activeSemData.courses.reduce((acc, c) => {
                             const grade =
                               overriddenGrades[
@@ -898,10 +936,10 @@ function TranscriptPage() {
                         </span>
                       </div>
                       <div className="text-right flex flex-col items-end min-w-[70px]">
-                        <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-black text-foreground/40 Cap tracking-[0px] mb-2 bg-tertiary px-2 py-0.5 rounded">
                           Earned
                         </span>
-                        <span className="text-3xl font-bold font-sans text-x tracking-tighter">
+                        <span className="text-3xl font-bold font-sans text-accent tracking-tighter">
                           {activeSemIdx === semesters.length - 1 &&
                           !overriddenGrades[
                             Object.keys(overriddenGrades).find((k) =>
@@ -915,10 +953,10 @@ function TranscriptPage() {
                         </span>
                       </div>
                       <div className="text-right flex flex-col items-end min-w-[70px]">
-                        <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-bold text-foreground/40 Cap tracking-[0px] mb-2 bg-tertiary px-2 py-0.5 rounded">
                           SGPA
                         </span>
-                        <span className="text-3xl font-bold font-sans text-x tracking-tighter">
+                        <span className="text-3xl font-bold font-sans text-accent tracking-tighter">
                           {activeSemIdx === semesters.length - 1 &&
                           !overriddenGrades[
                             Object.keys(overriddenGrades).find((k) =>
@@ -932,10 +970,10 @@ function TranscriptPage() {
                         </span>
                       </div>
                       <div className="text-right flex flex-col items-end min-w-[70px]">
-                        <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-2 bg-zinc-800 px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-bold text-foreground/40 Cap tracking-[0px] mb-2 bg-tertiary px-2 py-0.5 rounded">
                           CGPA
                         </span>
-                        <span className="text-3xl font-bold font-sans text-white tracking-tighter">
+                        <span className="text-3xl font-bold font-sans text-foreground tracking-tighter">
                           {activeSemIdx === semesters.length - 1 &&
                           !overriddenGrades[
                             Object.keys(overriddenGrades).find((k) =>
@@ -954,26 +992,26 @@ function TranscriptPage() {
                   <div className="overflow-x-auto scrollbar-hide -mx-2">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-white/[0.02]">
-                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5">
+                        <tr className="bg-foreground/[0.02]">
+                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider border-b border-foreground/10">
                             Code
                           </th>
-                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5">
+                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider border-b border-foreground/10">
                             Course Name
                           </th>
-                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-center">
+                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider border-b border-foreground/10 text-center">
                             Section
                           </th>
-                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-center">
+                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider border-b border-foreground/10 text-center">
                             Cr.H
                           </th>
-                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-center">
+                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider border-b border-foreground/10 text-center">
                             Grade
                           </th>
-                          <th className="px-6 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-center">
+                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider border-b border-foreground/10 text-center">
                             Type
                           </th>
-                          <th className="px-8 py-4 text-[11px] font-bold text-zinc-500 uppercase tracking-wider border-b border-white/5 text-right">
+                          <th className="px-8 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider border-b border-foreground/10 text-right">
                             Points
                           </th>
                         </tr>
@@ -992,7 +1030,7 @@ function TranscriptPage() {
                           return (
                             <tr
                               key={idx}
-                              className={`group transition-all duration-300 border-b border-white/5 last:border-0 hover:bg-white/[0.03]`}
+                              className={`group transition-all duration-300 border-b border-foreground/10 last:border-0 hover:bg-foreground/[0.03]`}
                             >
                               <td className="px-6 py-4">
                                 <button
@@ -1064,10 +1102,10 @@ function TranscriptPage() {
                                       }
                                     }
                                   }}
-                                  className={`text-xs font-bold px-2.5 py-1 bg-white/5 rounded-lg transition-all ${
+                                  className={`text-xs font-bold px-2.5 py-1 bg-foreground/5 rounded-lg transition-all ${
                                     course.schemeDetailId
-                                      ? "text-x hover:bg-x/20 cursor-pointer"
-                                      : "text-white group-hover:bg-white/10"
+                                      ? "text-accent hover:bg-accent/20 cursor-pointer"
+                                      : "text-foreground group-hover:bg-foreground/10"
                                   }`}
                                 >
                                   {course.code}
@@ -1075,7 +1113,7 @@ function TranscriptPage() {
                               </td>
                               <td className="px-6 py-4">
                                 <div className="space-y-0.5">
-                                  <p className="text-sm font-bold text-white leading-tight">
+                                  <p className="text-sm font-bold text-foreground leading-tight">
                                     {course.description}
                                   </p>
                                   {course.mca && (
@@ -1085,13 +1123,13 @@ function TranscriptPage() {
                                           setSelectedMCA(course.mca);
                                           setIsMCALookupOpen(true);
                                         }}
-                                        className="text-[10px] font-bold text-x bg-x/10 px-1.5 py-0.5 rounded flex items-center gap-1 hover:bg-x/20 transition-colors"
+                                        className="text-[10px] font-bold text-accent bg-accent/10 px-1.5 py-0.5 rounded flex items-center gap-1 hover:bg-accent/20 transition-colors"
                                       >
                                         <TrendingUp size={10} />
                                         MCA: {course.mca}
                                       </button>
                                       {course.gradingScheme && (
-                                        <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide">
+                                        <span className="text-[10px] font-medium text-foreground/50 Cap tracking-wide">
                                           {course.gradingScheme}
                                         </span>
                                       )}
@@ -1100,12 +1138,12 @@ function TranscriptPage() {
                                 </div>
                               </td>
                               <td className="px-6 py-4 text-center">
-                                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                                <span className="text-xs font-bold text-foreground/50 Cap tracking-wider">
                                   {course.section}
                                 </span>
                               </td>
                               <td className="px-6 py-4 text-center">
-                                <span className="text-sm font-medium text-zinc-400 group-hover:text-white transition-colors">
+                                <span className="text-sm font-medium text-foreground/60 group-hover:text-foreground transition-colors">
                                   {course.crHrs}
                                 </span>
                               </td>
@@ -1120,16 +1158,16 @@ function TranscriptPage() {
                                         e.target.value,
                                       )
                                     }
-                                    className={`text-xs font-bold px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/10 text-center cursor-pointer hover:border-x/50 transition-all outline-none appearance-none ${
+                                    className={`text-xs font-bold px-3 py-1.5 rounded-lg bg-secondary border border-foreground/10 text-center cursor-pointer hover:border-accent/50 transition-all outline-none appearance-none ${
                                       currentGrade.startsWith("A")
-                                        ? "text-x"
+                                        ? "text-accent"
                                         : currentGrade.startsWith("B")
                                           ? "text-blue-400"
                                           : currentGrade.startsWith("C")
                                             ? "text-amber-400"
                                             : currentGrade === "F"
                                               ? "text-rose-400"
-                                              : "text-zinc-500"
+                                              : "text-foreground/50"
                                     }`}
                                   >
                                     {Object.keys(GRADE_POINTS)
@@ -1145,14 +1183,14 @@ function TranscriptPage() {
                                     <span
                                       className={`text-[10px] font-bold px-3 py-1 rounded-full border ${
                                         currentGrade.startsWith("A")
-                                          ? "bg-x/10 text-x border-x/20"
+                                          ? "bg-accent/10 text-accent border-accent/20"
                                           : currentGrade.startsWith("B")
                                             ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
                                             : currentGrade.startsWith("C")
                                               ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
                                               : currentGrade === "F"
                                                 ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                                                : "bg-zinc-800 text-zinc-500 border-transparent"
+                                                : "bg-tertiary text-foreground/50 border-transparent"
                                       }`}
                                     >
                                       {currentGrade}
@@ -1161,13 +1199,13 @@ function TranscriptPage() {
                                 )}
                               </td>
                               <td className="px-6 py-4 text-center">
-                                <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded">
+                                <span className="text-[10px] font-black text-foreground/50 Cap tracking-[0px] bg-foreground/5 px-2 py-0.5 rounded">
                                   {course.type}
                                 </span>
                               </td>
                               <td className="px-8 py-4 text-right">
                                 <span
-                                  className={`text-sm font-bold font-sans ${isSimulated ? "text-x" : "text-zinc-300"}`}
+                                  className={`text-sm font-bold font-sans ${isSimulated ? "text-accent" : "text-foreground/70"}`}
                                 >
                                   {isSimulated
                                     ? (
@@ -1191,17 +1229,17 @@ function TranscriptPage() {
           {}
           <div className="space-y-10">
             {}
-            <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 relative overflow-hidden group">
+            <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 relative overflow-hidden group">
               <div className="flex items-center justify-between mb-8">
                 <div className="space-y-1">
-                  <h3 className="text-xl font-bold text-white tracking-tight">
+                  <h3 className="text-xl font-bold text-foreground tracking-tight">
                     Performance Flow
                   </h3>
-                  <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">
+                  <p className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px]">
                     Historical GPA Trend
                   </p>
                 </div>
-                <div className="p-3 bg-x/10 rounded-2xl text-x">
+                <div className="p-3 bg-accent/10 rounded-2xl text-accent">
                   <TrendingUp size={18} />
                 </div>
               </div>
@@ -1211,31 +1249,31 @@ function TranscriptPage() {
             </div>
 
             {}
-            <div className="bg-[#111] border border-x/20 rounded-[2.5rem] p-7 relative overflow-hidden ">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-x/5 blur-[80px] rounded-full -mr-32 -mt-32"></div>
+            <div className="bg-secondary/80 border border-accent/20 rounded-[2.5rem] p-7 relative overflow-hidden ">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 blur-[80px] rounded-full -mr-32 -mt-32"></div>
 
               <div className="relative z-10 flex flex-col h-full">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="p-3 bg-x/10 rounded-xl text-x">
+                  <div className="p-3 bg-accent/10 rounded-xl text-accent">
                     <Zap size={20} />
                   </div>
-                  <h3 className="text-lg font-bold text-white tracking-tight">
+                  <h3 className="text-lg font-bold text-foreground tracking-tight">
                     Simulation Desk
                   </h3>
                 </div>
 
                 <div className="space-y-4 flex-1">
-                  <div className="p-5 rounded-[1.5rem] bg-zinc-900/40 border border-white/5  transition-colors">
-                    <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">
+                  <div className="p-5 rounded-[1.5rem] bg-secondary/40 border border-foreground/10  transition-colors">
+                    <p className="text-[10px] font-bold text-foreground/40 Cap tracking-[0px] mb-1">
                       Projected CGPA
                     </p>
                     <div className="flex items-end justify-between">
-                      <span className="text-4xl font-bold font-sans text-white tracking-tighter">
+                      <span className="text-4xl font-bold font-sans text-foreground tracking-tighter">
                         {calculatedStats?.currentCGPA.toFixed(2)}
                       </span>
                       {simulationMode && (
                         <div
-                          className={`flex items-center gap-1 text-xs font-medium font-sans ${calculatedStats.currentCGPA >= originalCGPA ? "text-x" : "text-rose-400"}`}
+                          className={`flex items-center gap-1 text-xs font-medium font-sans ${calculatedStats.currentCGPA >= originalCGPA ? "text-accent" : "text-rose-400"}`}
                         >
                           {calculatedStats.currentCGPA >= originalCGPA
                             ? "+"
@@ -1248,21 +1286,21 @@ function TranscriptPage() {
                     </div>
                   </div>
 
-                  <div className="p-5 rounded-[1.5rem] bg-zinc-900/40 border border-white/5  transition-colors">
-                    <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mb-1">
+                  <div className="p-5 rounded-[1.5rem] bg-secondary/40 border border-foreground/10  transition-colors">
+                    <p className="text-[10px] font-bold text-foreground/40 Cap tracking-[0px] mb-1">
                       Simulation Impact
                     </p>
                     <div className="flex items-center justify-between">
-                      <span className="text-xl font-medium font-sans text-zinc-400">
+                      <span className="text-xl font-medium font-sans text-foreground/60">
                         {Object.keys(overriddenGrades).length}{" "}
-                        <span className="text-[10px] uppercase ml-1 opacity-60">
+                        <span className="text-[10px] Cap ml-1 opacity-60">
                           Changes
                         </span>
                       </span>
                       {simulationMode && (
                         <button
                           onClick={() => setOverriddenGrades({})}
-                          className="p-1.5 text-zinc-600 hover:text-white transition-colors"
+                          className="p-1.5 text-foreground/40 hover:text-foreground transition-colors"
                         >
                           <RefreshCw size={12} />
                         </button>

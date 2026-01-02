@@ -9,11 +9,11 @@ const PageHeader = ({ title, subtitle, children, className = "" }) => {
       className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-6 md:mb-10 ${className}`}
     >
       <div className="space-y-1">
-        <h1 className="text-3xl md:text-5xl font-black text-white tracking-tighter leading-tight">
+        <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tighter leading-tight">
           {title}
         </h1>
         {subtitle && (
-          <p className="text-zinc-500 font-medium text-sm md:text-lg">
+          <p className="text-foreground/50 font-medium text-sm md:text-lg">
             {subtitle}
           </p>
         )}

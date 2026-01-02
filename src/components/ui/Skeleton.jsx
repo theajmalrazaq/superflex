@@ -3,14 +3,14 @@ import React from "react";
 const Skeleton = ({ className }) => {
   return (
     <div
-      className={`animate-pulse bg-zinc-800/50 rounded-lg ${className}`}
+      className={`animate-pulse bg-tertiary/50 rounded-lg ${className}`}
     ></div>
   );
 };
 
 export const MarksSkeleton = () => {
   return (
-    <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden flex flex-col gap-8 h-full w-full">
+    <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden flex flex-col gap-8 h-full w-full">
       <div className="flex flex-col md:flex-row justify-between items-start gap-6">
         <div className="space-y-2">
           <Skeleton className="h-6 w-48" />
@@ -42,7 +42,7 @@ export const MarksSkeleton = () => {
 
 export const AttendanceSkeleton = () => {
   return (
-    <div className="bg-zinc-900/40 border border-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 h-full flex flex-col w-full">
+    <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 h-full flex flex-col w-full">
       <div className="flex justify-between items-start mb-8">
         <div className="space-y-2">
           <Skeleton className="h-6 w-48" />

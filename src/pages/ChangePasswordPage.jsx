@@ -67,10 +67,10 @@ function ChangePasswordPage() {
     const portlet = element.querySelector(".m-portlet");
     if (portlet) {
       portlet.classList.add(
-        "!bg-zinc-900/40",
+        "!bg-secondary/40",
         "!backdrop-blur-2xl",
         "!border",
-        "!border-white/5",
+        "!border-foreground/10",
         "!rounded-[2.5rem]",
         "!p-8",
       );
@@ -91,7 +91,11 @@ function ChangePasswordPage() {
 
     const portletBody = element.querySelector(".m-portlet__body");
     if (portletBody) {
-      portletBody.classList.add("!p-0", "!text-zinc-300", "bg-transparent");
+      portletBody.classList.add(
+        "!p-0",
+        "!text-foreground/70",
+        "bg-transparent",
+      );
     }
 
     const legacyButtons = element.querySelectorAll("#success, #error");
@@ -109,13 +113,13 @@ function ChangePasswordPage() {
       const headerDiv = document.createElement("div");
       headerDiv.className = "space-y-2";
       headerDiv.innerHTML = `
-          <h3 class="text-xl font-bold text-white flex items-center gap-3">
-              <div class="p-2 rounded-lg bg-x/10 text-x">
+          <h3 class="text-xl font-bold text-foreground flex items-center gap-3">
+              <div class="p-2 rounded-lg bg-accent/10 text-accent">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
               </div>
               Update Password
           </h3>
-          <p class="text-sm text-zinc-400">Ensure your account is using a strong, unique password.</p>
+          <p class="text-sm text-foreground/60">Ensure your account is using a strong, unique password.</p>
       `;
       formColumn.appendChild(headerDiv);
 
@@ -140,16 +144,16 @@ function ChangePasswordPage() {
             const clonedInput = input.cloneNode(true);
 
             clonedInput.classList.add(
-              "!bg-white/5",
-              "!text-white",
+              "!bg-foreground/5",
+              "!text-foreground",
               "!border",
-              "!border-white/10",
+              "!border-foreground/10",
               "!rounded-xl",
               "!p-4",
               "!px-4",
               "!transition-all",
               "!duration-300",
-              "!focus:border-x/50",
+              "!focus:border-accent/50",
               "!focus:ring-4",
               "!focus:ring-x/10",
               "!focus:outline-none",
@@ -177,9 +181,9 @@ function ChangePasswordPage() {
             labelElem.classList.add(
               "text-xs",
               "font-bold",
-              "text-zinc-400",
+              "text-foreground/60",
               "mb-2",
-              "uppercase",
+              "Cap",
               "tracking-wider",
               "ml-1",
               "block",
@@ -238,9 +242,9 @@ function ChangePasswordPage() {
           submitButton.appendChild(buttonContent);
 
           submitButton.classList.add(
-            "!bg-x",
+            "!bg-accent",
             "hover:!bg-[#8f86ff]",
-            "!text-white",
+            "!text-foreground",
             "!font-bold",
             "!py-4",
             "!px-8",
@@ -275,37 +279,37 @@ function ChangePasswordPage() {
       const infoColumn = document.createElement("div");
       infoColumn.className = "flex flex-col gap-6";
       infoColumn.innerHTML = `
-        <div class="p-6 rounded-2xl bg-white/5 border border-white/5 space-y-4">
-            <h4 class="text-white font-bold flex items-center gap-2">
+        <div class="p-6 rounded-2xl bg-foreground/5 border border-foreground/10 space-y-4">
+            <h4 class="text-foreground font-bold flex items-center gap-2">
                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
                 Password Requirements
             </h4>
             <ul class="space-y-3">
-                <li class="flex items-start gap-3 text-sm text-zinc-400">
-                    <div class="mt-1 w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0"></div>
+                <li class="flex items-start gap-3 text-sm text-foreground/60">
+                    <div class="mt-1 w-1.5 h-1.5 rounded-full bg-tertiary/80 shrink-0"></div>
                     Minimum 8 characters long
                 </li>
-                 <li class="flex items-start gap-3 text-sm text-zinc-400">
-                    <div class="mt-1 w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0"></div>
-                    At least one uppercase letter
+                 <li class="flex items-start gap-3 text-sm text-foreground/60">
+                    <div class="mt-1 w-1.5 h-1.5 rounded-full bg-tertiary/80 shrink-0"></div>
+                    At least one Cap letter
                 </li>
-                 <li class="flex items-start gap-3 text-sm text-zinc-400">
-                    <div class="mt-1 w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0"></div>
+                 <li class="flex items-start gap-3 text-sm text-foreground/60">
+                    <div class="mt-1 w-1.5 h-1.5 rounded-full bg-tertiary/80 shrink-0"></div>
                     At least one number
                 </li>
-                 <li class="flex items-start gap-3 text-sm text-zinc-400">
-                    <div class="mt-1 w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0"></div>
+                 <li class="flex items-start gap-3 text-sm text-foreground/60">
+                    <div class="mt-1 w-1.5 h-1.5 rounded-full bg-tertiary/80 shrink-0"></div>
                     At least one special character
                 </li>
             </ul>
         </div>
 
-         <div class="p-6 rounded-2xl bg-x/5 border border-x/10 space-y-3">
-            <h4 class="text-x font-bold flex items-center gap-2 text-sm uppercase tracking-wide">
+         <div class="p-6 rounded-2xl bg-accent/5 border border-accent/10 space-y-3">
+            <h4 class="text-accent font-bold flex items-center gap-2 text-sm Cap tracking-wide">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
                 Security Tip
             </h4>
-            <p class="text-sm text-zinc-400 leading-relaxed">
+            <p class="text-sm text-foreground/60 leading-relaxed">
                 Regularly updating your password helps protect your academic records and personal information from unauthorized access.
             </p>
         </div>
@@ -332,7 +336,7 @@ function ChangePasswordPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-x/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
       <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
       <div className="w-full p-4 md:p-8 space-y-10 relative z-10">
@@ -348,7 +352,7 @@ function ChangePasswordPage() {
           />
         ) : (
           <div className="flex items-center justify-center p-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-x"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-accent"></div>
           </div>
         )}
       </div>
