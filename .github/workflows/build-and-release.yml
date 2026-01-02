@@ -13,6 +13,11 @@ on:
         description: "Release notes / What's changed"
         required: true
         default: "SuperFlex Update"
+      publish:
+        description: "Publish to Chrome Web Store?"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -66,3 +71,13 @@ jobs:
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload to Chrome Web Store
+        if: github.event.inputs.publish == 'true'
+        uses: mnao305/chrome-extension-upload@v5.0.0
+        with:
+          file-path: superflex.zip
+          extension-id: ${{ secrets.EXTENSION_ID }}
+          client-id: ${{ secrets.CLIENT_ID }}
+          client-secret: ${{ secrets.CLIENT_SECRET }}
+          refresh-token: ${{ secrets.REFRESH_TOKEN }}
