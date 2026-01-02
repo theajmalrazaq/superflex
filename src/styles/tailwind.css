@@ -6,6 +6,7 @@
   --color-foreground: var(--foreground);
   --color-secondary: var(--secondary);
   --color-tertiary: var(--tertiary);
+  --color-accent-foreground: var(--accent-foreground);
 
   --color-neutral-50: #fafafa;
   --color-neutral-100: #f4f4f5;
@@ -34,10 +35,15 @@
 
 :root {
   --accent: #a098ff;
+  --accent-foreground: #000000;
   --background: #ffffff;
   --foreground: #000000;
   --secondary: #f4f4f5;
   --tertiary: #e4e4e7;
+}
+
+.Cap {
+  text-transform: capitalize !important;
 }
 
 .dark {
@@ -205,7 +211,7 @@ h6 {
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
   mask-composite: exclude;
-  padding: 1px;
+  padding: 2px;
   background: rgba(255, 255, 255, 0.08); /* Modern, subtle static border */
   z-index: 10;
 }
@@ -216,7 +222,7 @@ h6 {
   width: 60px;
   height: 60px;
   background: radial-gradient(circle at center, var(--accent), transparent 80%);
-  offset-path: inset(0.5px round 9999px);
+  offset-path: inset(1px round 9999px);
   offset-anchor: 50% 50%;
   animation: border-beam 4s linear infinite;
 }

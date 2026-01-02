@@ -23,6 +23,9 @@ import {
   Pipette,
   Sun,
   Moon,
+  Eye,
+  EyeOff,
+  Check,
 } from "lucide-react";
 import { Logo } from "./ui/Logo";
 import ProfileImageModal from "./ui/ProfileImageModal";
@@ -258,7 +261,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       <span className={isActive ? "text-inherit" : "text-current"}>
         {React.cloneElement(getIcon(link), { size: 16 })}
       </span>
-      <span>{link.text}</span>
+      <span className="md:text-sm">{link.text}</span>
     </button>
   );
 
@@ -276,7 +279,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       `}
     >
       <div
-        className={`p-2.5 rounded-full shrink-0 ${isActive ? "bg-accent text-foreground" : "bg-background/40 text-accent group-hover:bg-accent group-hover:text-foreground transition-colors duration-300"}`}
+        className={`p-2.5 rounded-full shrink-0 ${isActive ? "bg-accent text-[var(--accent-foreground)]" : "bg-background/40 text-accent group-hover:bg-accent group-hover:text-[var(--accent-foreground)] transition-colors duration-300"}`}
       >
         {React.cloneElement(getIcon(link), { size: 20 })}
       </div>
@@ -315,6 +318,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         setOpenDropdown(null);
       }
     };
+    document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
@@ -351,7 +355,11 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
   const [bgUrl, setBgUrl] = useState(
     localStorage.getItem("superflex-bg-url") ||
-      "https://cdn.midjourney.com/video/c107d5a0-541d-4a46-bd95-c5adc337c89d/0.mp4",
+      "https://motionbgs.com/media/6867/omen-valorant2.960x540.mp4",
+  );
+
+  const [bgEnabled, setBgEnabled] = useState(
+    localStorage.getItem("superflex-bg-enabled") !== "false",
   );
 
   const handleBgChange = (url) => {
@@ -359,6 +367,15 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     localStorage.setItem("superflex-bg-url", url);
     window.dispatchEvent(
       new CustomEvent("superflex-bg-changed", { detail: url }),
+    );
+  };
+
+  const handleBgToggle = () => {
+    const newState = !bgEnabled;
+    setBgEnabled(newState);
+    localStorage.setItem("superflex-bg-enabled", newState);
+    window.dispatchEvent(
+      new CustomEvent("superflex-bg-enabled-changed", { detail: newState }),
     );
   };
 
@@ -370,17 +387,35 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     "#ffb83eff",
   ];
 
+  const updateThemeColors = (hex) => {
+    if (!hex) return;
+
+    document.documentElement.style.setProperty("--accent", hex);
+
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    document.documentElement.style.setProperty(
+      "--accent-rgb",
+      `${r}, ${g}, ${b}`,
+    );
+
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    const contrast = luminance > 0.5 ? "#000000" : "#ffffff";
+    document.documentElement.style.setProperty("--accent-foreground", contrast);
+  };
+
   useEffect(() => {
     const savedColor =
       localStorage.getItem("superflex-theme-color") || "#a098ff";
-    document.documentElement.style.setProperty("--accent", savedColor);
+    updateThemeColors(savedColor);
     setThemeColor(savedColor);
   }, []);
 
   const handleColorChange = (color, shouldClose = true) => {
     setThemeColor(color);
     localStorage.setItem("superflex-theme-color", color);
-    document.documentElement.style.setProperty("--accent", color);
+    updateThemeColors(color);
     window.dispatchEvent(
       new CustomEvent("superflex-theme-changed", { detail: color }),
     );
@@ -476,8 +511,8 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       {}
       {}
       {isMobileMenuOpen && (
-        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[90vw] max-w-[400px] bg-background/95 backdrop-blur-3xl border border-foreground/10 rounded-3xl p-4 z-[999] animate-in slide-in-from-top-4 fade-in duration-300 shadow-2xl">
-          <div className="flex flex-col gap-4 max-h-[70vh] backdrop-blur-2xl overflow-y-auto scrollbar-hide">
+        <div className="absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[90vw] max-w-[400px] bg-background/95 backdrop-blur-3xl border border-foreground/10 rounded-3xl z-[999] animate-in slide-in-from-top-4 fade-in duration-300 max-h-[80vh] overflow-y-auto scrollbar-hide shadow-2xl">
+          <div className="flex flex-col gap-4 p-4">
             {}
             <div
               className={`relative rounded-3xl overflow-hidden transition-all duration-300 ${isProfileExpanded ? "bg-secondary/80 border border-foreground/10" : "bg-secondary/40 border border-foreground/10 hover:bg-secondary/60"}`}
@@ -495,7 +530,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="absolute -bottom-1 -right-1 p-0.5 bg-accent text-foreground rounded-full border border-background">
+                    <div className="absolute -bottom-1 -right-1 p-0.5 bg-accent text-[var(--accent-foreground)] rounded-full border border-background">
                       <User size={8} />
                     </div>
                   </div>
@@ -527,7 +562,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                     }}
                     className="flex items-center gap-3 w-full p-2.5 rounded-xl text-left hover:bg-foreground/5 transition-colors group"
                   >
-                    <div className="p-2 bg-accent/10 text-accent rounded-lg group-hover:bg-accent group-hover:text-foreground transition-colors">
+                    <div className="p-2 bg-accent/10 text-accent rounded-lg group-hover:bg-accent group-hover:text-[var(--accent-foreground)] transition-colors">
                       <User size={14} />
                     </div>
                     <span className="text-xs font-bold text-foreground/70 group-hover:text-foreground">
@@ -562,16 +597,20 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
               </div>
             </div>
 
-            {}
-            {}
-            <div className="bg-secondary/40 border border-foreground/10 rounded-3xl p-5 space-y-6">
-              {}
-              <div className="flex items-center justify-between">
+            <div className="bg-secondary/40 border border-foreground/10 rounded-3xl overflow-hidden transition-all duration-300">
+              <button
+                onClick={() =>
+                  setOpenDropdown(
+                    openDropdown === "mobile-aura" ? null : "mobile-aura",
+                  )
+                }
+                className="w-full flex items-center justify-between p-5 hover:bg-foreground/5 transition-colors"
+              >
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-accent/10 text-accent rounded-xl">
                     <Pipette size={18} />
                   </div>
-                  <div>
+                  <div className="text-left">
                     <h3 className="text-foreground font-semibold text-sm leading-tight">
                       Aura Settings
                     </h3>
@@ -580,96 +619,145 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                     </p>
                   </div>
                 </div>
-              </div>
+                <ChevronDown
+                  size={16}
+                  className={`text-foreground/50 transition-transform duration-300 ${
+                    openDropdown === "mobile-aura" ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
 
               {}
-              <div className="space-y-3">
-                <p className="text-[11px] text-foreground/60 font-medium px-1">
-                  Appearance
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => handleThemeModeChange("light")}
-                    className={`flex items-center justify-center gap-2 py-3 rounded-2xl border transition-all ${
-                      themeMode === "light"
-                        ? "bg-tertiary border-accent/20 text-accent font-bold"
-                        : "bg-background/80 border-foreground/10 text-foreground/60"
-                    }`}
-                  >
-                    <Sun size={14} />
-                    <span className="text-xs font-semibold">Light</span>
-                  </button>
-                  <button
-                    onClick={() => handleThemeModeChange("dark")}
-                    className={`flex items-center justify-center gap-2 py-3 rounded-2xl border transition-all ${
-                      themeMode === "dark"
-                        ? "bg-tertiary border-accent/20 text-accent font-bold"
-                        : "bg-background/80 border-foreground/10 text-foreground/60"
-                    }`}
-                  >
-                    <Moon size={14} />
-                    <span className="text-xs font-semibold">Dark</span>
-                  </button>
-                </div>
-              </div>
+              {openDropdown === "mobile-aura" && (
+                <div className="px-5 pb-5 space-y-6 animate-in slide-in-from-top-2 fade-in duration-200">
+                  {}
+                  <div className="bg-foreground/5 h-px w-full"></div>
 
-              {}
-              <div className="space-y-3">
-                <p className="text-[11px] text-foreground/60 font-medium px-1">
-                  Accent Color
-                </p>
-                <div className="flex flex-wrap gap-2.5 px-0.5">
-                  <div className="relative group">
-                    <button className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-400 via-purple-400 to-orange-400 p-[2.5px] transition-transform active:scale-95 shadow-lg">
-                      <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center">
-                        <Pipette size={14} stroke="white" strokeWidth={2.5} />
-                      </div>
-                    </button>
-                    <input
-                      type="color"
-                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                      value={themeColor}
-                      onChange={(e) => handleColorChange(e.target.value, false)}
-                    />
+                  <div className="space-y-3">
+                    <p className="text-[11px] text-foreground/60 font-medium px-1">
+                      Appearance
+                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => handleThemeModeChange("light")}
+                        className={`flex items-center justify-center gap-2 py-3 rounded-2xl border transition-all ${
+                          themeMode === "light"
+                            ? "bg-tertiary border-accent/20 text-accent font-bold"
+                            : "bg-background/80 border-foreground/10 text-foreground/60"
+                        }`}
+                      >
+                        <Sun size={14} />
+                        <span className="text-xs font-semibold md:mt-2">
+                          Light
+                        </span>
+                      </button>
+                      <button
+                        onClick={() => handleThemeModeChange("dark")}
+                        className={`flex items-center justify-center gap-2 py-3 rounded-2xl border transition-all ${
+                          themeMode === "dark"
+                            ? "bg-tertiary border-accent/20 text-accent font-bold"
+                            : "bg-background/80 border-foreground/10 text-foreground/60"
+                        }`}
+                      >
+                        <Moon size={14} />
+                        <span className="text-xs font-semibold md:mt-2">
+                          Dark
+                        </span>
+                      </button>
+                    </div>
                   </div>
-                  {themeColors.map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => handleColorChange(color, false)}
-                      className={`w-10 h-10 rounded-full transition-all duration-300 active:scale-95 border-2 ${
-                        themeColor === color
-                          ? "border-accent scale-110 shadow-[0_0_15px_rgba(var(--accent-rgb),0.3)]"
-                          : "border-foreground/10"
-                      }`}
-                      style={{ backgroundColor: color }}
-                    />
-                  ))}
-                </div>
-              </div>
 
-              {}
-              <div className="space-y-3">
-                <p className="text-[11px] text-foreground/60 font-medium px-1">
-                  Background Aura
-                </p>
-                <div className="relative group">
-                  <input
-                    type="text"
-                    placeholder="Paste Video/Image URL..."
-                    value={bgUrl}
-                    onChange={(e) => handleBgChange(e.target.value)}
-                    className="w-full bg-background/40 border border-foreground/5 rounded-2xl px-4 py-3.5 text-xs text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-accent/30 transition-all"
-                  />
-                  {bgUrl && (
-                    <button
-                      onClick={() => handleBgChange("")}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground transition-colors"
-                    >
-                      <X size={14} />
-                    </button>
-                  )}
+                  {}
+                  <div className="flex flex-col items-start gap-3 px-1 text-left">
+                    <div>
+                      <h3 className="text-foreground font-semibold text-sm leading-tight">
+                        Accent Color
+                      </h3>
+                      <p className="text-[11px] text-foreground/50 font-medium mt-0.5">
+                        Personalize your aura
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3 bg-secondary/30 p-2 rounded-full border border-foreground/5 w-fit">
+                      {themeColors.map((color) => (
+                        <button
+                          key={color}
+                          onClick={() => handleColorChange(color, false)}
+                          className={`w-8 h-8 rounded-full transition-all duration-300 flex items-center justify-center`}
+                          style={{ backgroundColor: color }}
+                        >
+                          {themeColor === color && (
+                            <Check
+                              size={14}
+                              className="text-[var(--accent-foreground)]"
+                            />
+                          )}
+                        </button>
+                      ))}
+
+                      <div className="w-px h-6 bg-foreground/10 mx-1"></div>
+
+                      <div className="relative group">
+                        <button className="w-8 h-8 rounded-full bg-secondary hover:bg-tertiary transition-colors flex items-center justify-center border border-foreground/10">
+                          <Pipette size={14} className="text-foreground/70" />
+                        </button>
+                        <input
+                          type="color"
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                          value={themeColor}
+                          onChange={(e) =>
+                            handleColorChange(e.target.value, false)
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between px-1">
+                      <div>
+                        <h3 className="text-foreground font-semibold text-sm leading-tight">
+                          Background Aura
+                        </h3>
+                        <p className="text-[11px] text-foreground/50 font-medium mt-1">
+                          Video or image URL
+                        </p>
+                      </div>
+                      <button
+                        onClick={handleBgToggle}
+                        className={`p-2 rounded-xl transition-all ${
+                          bgEnabled
+                            ? "bg-accent/10 text-accent"
+                            : "bg-foreground/5 text-foreground/40"
+                        }`}
+                        title={
+                          bgEnabled ? "Hide Background" : "Show Background"
+                        }
+                      >
+                        {bgEnabled ? <Eye size={16} /> : <EyeOff size={16} />}
+                      </button>
+                    </div>
+                    <div className="relative group">
+                      <input
+                        type="text"
+                        placeholder="Paste Video/Image URL..."
+                        value={bgUrl}
+                        onChange={(e) => handleBgChange(e.target.value)}
+                        className="w-full bg-background/40 border border-foreground/5 rounded-2xl px-4 py-3.5 text-xs text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-accent/30 transition-all"
+                      />
+                      {bgUrl && (
+                        <button
+                          onClick={() => handleBgChange("")}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground transition-colors p-1"
+                        >
+                          <X size={14} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-2">
@@ -683,10 +771,8 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                     onClick={() => {
                       window.location.href = link.href;
                     }}
-                    className={`flex items-center justify-center gap-2 px-4 py-4 rounded-2xl transition-all ${
-                      isHome
-                        ? "col-span-2 flex-row aspect-[3/1]"
-                        : "flex-col aspect-[4/3]"
+                    className={`flex items-center justify-center gap-2 px-4 rounded-2xl transition-all ${
+                      isHome ? "col-span-2 flex-row h-14 mt-2" : "flex-col h-24"
                     } ${
                       isActive
                         ? "bg-accent/10 text-accent border border-accent/20"
@@ -700,7 +786,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                     >
                       {React.cloneElement(getIcon(link), { size: 24 })}
                     </div>
-                    <span className="font-bold text-xs">{link.text}</span>
+                    <span className="font-bold md:text-xs">{link.text}</span>
                   </button>
                 );
               })}
@@ -750,14 +836,14 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                               }}
                               className={`flex flex-col items-center justify-center gap-2 px-3 py-3 rounded-xl transition-all h-24 ${
                                 isActive
-                                  ? "bg-accent/10 text-accent border border-accent/20"
+                                  ? "bg-accent text-[var(--accent-foreground)]"
                                   : "text-foreground/60 bg-background/20 hover:text-foreground hover:bg-foreground/5 border border-foreground/10"
                               }`}
                             >
                               <div
                                 className={
                                   isActive
-                                    ? "text-accent"
+                                    ? "text-[var(--accent-foreground)]"
                                     : "text-foreground/50"
                                 }
                               >
@@ -829,7 +915,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
           {openDropdown === "theme" && (
             <div className="absolute right-0 top-full mt-2 z-[999] w-[calc(100vw-2rem)] sm:w-[320px] animate-in fade-in slide-in-from-top-2 duration-200">
-              <div className="bg-background border border-foreground/10 rounded-2xl p-2 flex flex-col shadow-2xl shadow-black/40">
+              <div className="bg-background border border-foreground/10 rounded-2xl p-2 flex flex-col">
                 {}
                 <div className="p-4 space-y-4">
                   <div className="px-1">
@@ -841,10 +927,10 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 pb-2">
+                  <div className="grid grid-cols-2 gap-2 pb-2 px-1">
                     <button
                       onClick={() => handleThemeModeChange("light")}
-                      className={`flex items-center justify-center gap-2.5 p-3 rounded-xl border transition-all duration-300 ${
+                      className={`w-full flex items-center justify-center gap-1.5 p-3 rounded-xl border transition-all duration-300 ${
                         themeMode === "light"
                           ? "bg-tertiary border-foreground/10 text-foreground"
                           : "bg-secondary/50 border-foreground/5 text-foreground/60 hover:bg-tertiary hover:text-foreground"
@@ -855,7 +941,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                     </button>
                     <button
                       onClick={() => handleThemeModeChange("dark")}
-                      className={`flex items-center justify-center gap-2.5 p-3 rounded-xl border transition-all duration-300 ${
+                      className={`w-full flex items-center justify-center gap-1.5 p-3 rounded-xl border transition-all duration-300 ${
                         themeMode === "dark"
                           ? "bg-tertiary border-foreground/10 text-foreground"
                           : "bg-secondary/50 border-foreground/5 text-foreground/60 hover:bg-tertiary hover:text-foreground"
@@ -870,7 +956,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                 <div className="h-px bg-foreground/10 mx-4"></div>
 
                 {}
-                <div className="p-4 space-y-4">
+                <div className="p-4 flex flex-col items-start gap-3">
                   <div className="px-1">
                     <h3 className="text-sm font-semibold mb-0.5 text-foreground/80 tracking-tight">
                       Accent Color
@@ -880,17 +966,28 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                     </p>
                   </div>
 
-                  <div className="flex flex-wrap gap-2.5 px-1">
-                    <div className="relative group">
-                      <button className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-400 via-purple-400 to-orange-400 p-[2px] transition-all hover:scale-110 active:scale-95 shadow-lg">
-                        <div className="w-full h-full rounded-full bg-secondary flex items-center justify-center">
-                          <Pipette
-                            size={12}
-                            stroke="currentColor"
-                            strokeWidth={2.5}
-                            className="text-foreground"
+                  <div className="flex items-center gap-2.5 bg-secondary/30 p-2 rounded-full border border-foreground/5 w-fit">
+                    {themeColors.map((color) => (
+                      <button
+                        key={color}
+                        onClick={() => handleColorChange(color, false)}
+                        className={`w-8 h-8 rounded-full transition-all duration-300 flex items-center justify-center`}
+                        style={{ backgroundColor: color }}
+                      >
+                        {themeColor === color && (
+                          <Check
+                            size={14}
+                            className="text-[var(--accent-foreground)]"
                           />
-                        </div>
+                        )}
+                      </button>
+                    ))}
+
+                    <div className="w-px h-6 bg-foreground/10 mx-1"></div>
+
+                    <div className="relative group">
+                      <button className="w-8 h-8 rounded-full bg-secondary hover:bg-tertiary transition-colors flex items-center justify-center border border-foreground/10">
+                        <Pipette size={14} className="text-foreground/70" />
                       </button>
                       <input
                         type="color"
@@ -901,21 +998,6 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         }
                       />
                     </div>
-
-                    {themeColors.map((color) => (
-                      <button
-                        key={color}
-                        onClick={() => handleColorChange(color, false)}
-                        className={`w-8 h-8 rounded-full transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center relative shadow-sm ${
-                          themeColor === color
-                            ? "ring-2 ring-accent ring-offset-2 ring-offset-background scale-105"
-                            : "hover:ring-2 hover:ring-foreground/20"
-                        }`}
-                        style={{ backgroundColor: color }}
-                      >
-                        <div className="w-[14px] h-[14px] rounded-full bg-background/40 backdrop-blur-sm border border-white/10" />
-                      </button>
-                    ))}
                   </div>
                 </div>
 
@@ -923,13 +1005,26 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
                 {}
                 <div className="p-4 space-y-4">
-                  <div className="px-1">
-                    <h3 className="text-sm font-semibold mb-0.5 text-foreground/80 tracking-tight">
-                      Background Aura
-                    </h3>
-                    <p className="text-[11px] text-foreground/50 font-medium">
-                      Video or image URL
-                    </p>
+                  <div className="px-1 flex justify-between items-start">
+                    <div>
+                      <h3 className="text-sm font-semibold mb-0.5 text-foreground/80 tracking-tight">
+                        Background Aura
+                      </h3>
+                      <p className="text-[11px] text-foreground/50 font-medium">
+                        Video or image URL
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleBgToggle}
+                      className={`p-1.5 rounded-lg transition-all ${
+                        bgEnabled
+                          ? "bg-accent/10 text-accent ring-1 ring-accent/20"
+                          : "bg-secondary text-foreground/40 hover:bg-tertiary hover:text-foreground/60"
+                      }`}
+                      title={bgEnabled ? "Hide Background" : "Show Background"}
+                    >
+                      {bgEnabled ? <Eye size={14} /> : <EyeOff size={14} />}
+                    </button>
                   </div>
                   <div className="relative group px-1 pb-2">
                     <input
@@ -942,7 +1037,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                     {bgUrl && (
                       <button
                         onClick={() => handleBgChange("")}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground transition-colors p-1"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground transition-colors p-1"
                       >
                         <X size={12} />
                       </button>
@@ -1015,6 +1110,10 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
         currentImage={profileImage}
+        onImageUpdate={(newImage) => {
+          setProfileImage(newImage);
+          localStorage.setItem("superflex_user_custom_image", newImage);
+        }}
       />
     </div>
   );

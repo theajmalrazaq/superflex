@@ -238,7 +238,7 @@ const RetakeCourseCard = ({ course, isSelected, onToggle, index }) => {
         <div
           className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
             isSelected
-              ? "bg-accent border-accent text-zinc-950 scale-110"
+              ? "bg-accent border-accent text-[var(--accent-foreground)] scale-110"
               : "border-tertiary bg-transparent"
           }`}
         >

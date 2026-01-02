@@ -657,7 +657,10 @@ function HomePage() {
 
   const [bgUrl, setBgUrl] = useState(
     localStorage.getItem("superflex-bg-url") ||
-      "https://cdn.midjourney.com/video/c107d5a0-541d-4a46-bd95-c5adc337c89d/0.mp4",
+      "https://motionbgs.com/media/6867/omen-valorant2.960x540.mp4",
+  );
+  const [bgEnabled, setBgEnabled] = useState(
+    localStorage.getItem("superflex-bg-enabled") !== "false",
   );
 
   useEffect(() => {
@@ -667,11 +670,24 @@ function HomePage() {
     const handleBgChange = (e) => {
       setBgUrl(e.detail);
     };
+    const handleBgEnabledChange = (e) => {
+      setBgEnabled(e.detail);
+    };
+
     window.addEventListener("superflex-theme-changed", handleThemeChange);
     window.addEventListener("superflex-bg-changed", handleBgChange);
+    window.addEventListener(
+      "superflex-bg-enabled-changed",
+      handleBgEnabledChange,
+    );
+
     return () => {
       window.removeEventListener("superflex-theme-changed", handleThemeChange);
       window.removeEventListener("superflex-bg-changed", handleBgChange);
+      window.removeEventListener(
+        "superflex-bg-enabled-changed",
+        handleBgEnabledChange,
+      );
     };
   }, []);
 
@@ -687,7 +703,7 @@ function HomePage() {
     >
       <div className="relative">
         {}
-        {bgUrl && (
+        {bgUrl && bgEnabled && (
           <div className="absolute top-0 left-0 right-0 h-[850px] overflow-hidden pointer-events-none">
             {isVideo(bgUrl) ? (
               <video
@@ -708,8 +724,7 @@ function HomePage() {
                 className="w-full h-full object-cover opacity-70 transition-opacity duration-1000"
               />
             )}
-            <div className="absolute inset-0 bg-black/50"></div>
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/95 to-background"></div>
           </div>
         )}
 
@@ -719,16 +734,19 @@ function HomePage() {
             <div className="relative flex flex-col items-center justify-center text-center gap-8">
               {}
               <div className="flex flex-col items-center gap-6">
-                <div className="relative">
-                  <img
-                    src={profileImage}
-                    alt="Profile"
-                    className="w-24 h-24 md:w-32 md:h-32 rounded-[2.5rem] object-cover bg-tertiary border-4 border-foreground/10 relative z-10"
-                    onError={(e) => {
-                      e.target.src =
-                        'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><rect fill="%2318181b" width="128" height="128"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2352525b" font-weight="bold" font-size="40">User</text></svg>';
-                    }}
-                  />
+                <div className="relative ">
+                  <div className="relative inline-block rounded-full">
+                    <img
+                      src={profileImage}
+                      alt="Profile"
+                      className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover bg-tertiary relative z-10"
+                      onError={(e) => {
+                        e.target.src =
+                          'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><rect fill="%2318181b" width="128" height="128"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2352525b" font-weight="bold" font-size="40">User</text></svg>';
+                      }}
+                    />
+                    <div className="border-beam-element rounded-full" />
+                  </div>
                 </div>
 
                 <div className="flex flex-col items-center space-y-3">
@@ -750,7 +768,7 @@ function HomePage() {
                   onClick={() => setActiveMainTab("stats")}
                   className={`px-8 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 ${
                     activeMainTab === "stats"
-                      ? "bg-accent text-foreground"
+                      ? "bg-accent text-[var(--accent-foreground)]"
                       : "text-foreground/50 hover:text-foreground"
                   }`}
                 >
@@ -761,7 +779,7 @@ function HomePage() {
                   onClick={() => setActiveMainTab("info")}
                   className={`px-8 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 ${
                     activeMainTab === "info"
-                      ? "bg-accent text-foreground"
+                      ? "bg-accent text-[var(--accent-foreground)]"
                       : "text-foreground/50 hover:text-foreground"
                   }`}
                 >
@@ -858,7 +876,7 @@ function HomePage() {
                             onClick={() => setActiveCourse(course.id)}
                             className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
                               activeCourse === course.id
-                                ? "bg-accent text-foreground"
+                                ? "bg-accent text-[var(--accent-foreground)]"
                                 : "text-foreground/50 hover:text-foreground"
                             }`}
                           >

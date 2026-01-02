@@ -332,7 +332,11 @@ const SuperFlexAI = () => {
 
     try {
       const chatHistory = messages
-        .map((m) => `${m.role.toCap()}: ${m.content}`)
+        .map((m) => {
+          const role =
+            m.role.charAt(0).toUpperCase() + m.role.slice(1).toLowerCase();
+          return `${role}: ${m.content}`;
+        })
         .join("\n");
 
       const academicData = {
@@ -567,7 +571,7 @@ const SuperFlexAI = () => {
             {messages.length === 0 ? (
               <div className="flex flex-col items-center text-center animate-in slide-in-from-bottom-8 duration-700 w-full max-w-3xl">
                 <div className="mb-8 relative">
-                  <div className="w-24 h-24 rounded-[2.5rem] bg-secondary border border-foreground/10 flex items-center justify-center ">
+                  <div className="w-24 h-24 rounded-[24px] bg-secondary border border-foreground/10 flex items-center justify-center ">
                     <AnimatedLogo size={48} className="animate-ping" />
                   </div>
                 </div>
@@ -688,7 +692,7 @@ const SuperFlexAI = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handlePermission("granted")}
-                    className="px-4 py-2 bg-accent hover:bg-accent/90 text-foreground text-xs font-bold rounded-xl transition-colors"
+                    className="px-4 py-2 bg-accent hover:bg-accent/90 text-[var(--accent-foreground)] text-xs font-bold rounded-xl transition-colors"
                   >
                     Enable
                   </button>
@@ -722,7 +726,7 @@ const SuperFlexAI = () => {
                       new CustomEvent("superflex-auth-trigger"),
                     )
                   }
-                  className="px-6 py-2 bg-accent hover:bg-accent/90 text-foreground text-xs font-bold rounded-xl transition-colors"
+                  className="px-6 py-2 bg-accent hover:bg-accent/90 text-[var(--accent-foreground)] text-xs font-bold rounded-xl transition-colors"
                 >
                   Sign In
                 </button>
@@ -862,7 +866,7 @@ const SuperFlexAI = () => {
                     <button
                       onClick={() => handleSend()}
                       disabled={!input.trim()}
-                      className="p-2 bg-accent hover:bg-accent/90 text-foreground rounded-full transition-all disabled:opacity-50 disabled:grayscale"
+                      className="p-2 bg-accent hover:bg-accent/90 text-[var(--accent-foreground)] rounded-full transition-all disabled:opacity-50 disabled:grayscale"
                     >
                       <Send size={16} />
                     </button>

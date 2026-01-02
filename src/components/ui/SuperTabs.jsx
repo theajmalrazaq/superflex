@@ -28,7 +28,7 @@ const SuperTabs = ({
               rounded-full font-bold transition-all duration-300 whitespace-nowrap relative
               ${
                 isActive
-                  ? "text-foreground"
+                  ? "!text-[var(--accent-foreground)]"
                   : "text-foreground/50 hover:text-foreground/70 hover:bg-foreground/5"
               }
             `}

@@ -497,11 +497,6 @@ function TranscriptPage() {
           setActiveSemIdx(semesterData.length - 1);
         }
 
-        const gModal = document.querySelector("#GradePolicyDetail");
-        if (gModal && root.contains(gModal)) {
-          document.body.appendChild(gModal);
-        }
-
         root.style.display = "none";
         setLoading(false);
       } catch (e) {

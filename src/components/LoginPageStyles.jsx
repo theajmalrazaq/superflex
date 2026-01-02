@@ -143,7 +143,7 @@ function LoginPageStyles() {
     document.querySelectorAll(".btn-primary").forEach((button) => {
       button.classList.add(
         "!bg-accent",
-        "!text-zinc-950",
+        "!text-[var(--accent-foreground)]",
         "!Cap",
         "!border-none",
         "!rounded-2xl",
@@ -393,7 +393,7 @@ function LoginPageStyles() {
       if (requestButton) {
         requestButton.classList.add(
           "!bg-accent",
-          "!text-zinc-950",
+          "!text-[var(--accent-foreground)]",
           "!font-bold",
           "!rounded-2xl",
           "!py-4",
@@ -461,7 +461,7 @@ function LoginPageStyles() {
     signInButton.id = "show-login-btn";
     signInButton.className = `
       !bg-accent 
-      !text-zinc-950
+      !text-[var(--accent-foreground)]
       !border-none 
       !rounded-2xl 
       !px-8
@@ -755,7 +755,7 @@ function LoginPageStyles() {
       })
       .catch((err) => console.error("Failed to load reviews:", err));
 
-    const CURRENT_VERSION = "4.0.0";
+    const CURRENT_VERSION = "5.0.0";
 
     heroDiv.innerHTML = `
     <!-- Version Display Button -->

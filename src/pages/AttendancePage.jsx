@@ -12,6 +12,8 @@ import {
   BookOpen,
   BarChart2,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Bookmark,
 } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
@@ -35,67 +37,105 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const currentIndex = courses.findIndex((c) => c.id === selectedId);
+  const handlePrev = () => {
+    if (currentIndex > 0) {
+      onSelect(courses[currentIndex - 1].id);
+    }
+  };
+  const handleNext = () => {
+    if (currentIndex < courses.length - 1) {
+      onSelect(courses[currentIndex + 1].id);
+    }
+  };
+
   return (
-    <div className="relative w-full md:w-auto z-50" ref={dropdownRef}>
+    <div className="flex items-center gap-2 w-full md:w-auto z-50">
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full md:w-[350px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-secondary/50 border border-foreground/10 text-foreground hover:bg-foreground/5 transition-all group"
+        onClick={handlePrev}
+        disabled={currentIndex <= 0}
+        className={`p-2 rounded-full border transition-all shrink-0 ${
+          currentIndex <= 0
+            ? "opacity-30 cursor-not-allowed border-transparent text-foreground"
+            : "bg-secondary/50 border-foreground/10 text-foreground hover:bg-foreground/5"
+        }`}
       >
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="p-2 rounded-xl bg-accent/10 text-accent">
-            <BookOpen size={16} />
-          </div>
-          <div className="flex flex-col items-start truncate">
-            <span className="text-sm font-bold truncate w-full text-left leading-none">
-              {selectedCourse?.title}
-            </span>
-          </div>
-        </div>
-        <ChevronDown
-          size={16}
-          className={`text-foreground/50 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
-        />
+        <ChevronLeft size={16} />
       </button>
 
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-background/50 backdrop-blur-2xl border border-foreground/10  max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200">
-          <div className="flex flex-col gap-3">
-            {courses.map((course) => (
-              <button
-                key={course.id}
-                onClick={() => {
-                  onSelect(course.id);
-                  setIsOpen(false);
-                }}
-                className={`w-full flex bg-secondary items-center justify-between p-3 rounded-xl transition-all ${
-                  selectedId === course.id
-                    ? "bg-accent/10 border border-accent/20"
-                    : "hover:bg-foreground/5 border border-transparent"
-                }`}
-              >
-                <div className="flex items-center gap-3 text-left overflow-hidden">
-                  <span
-                    className={`text-sm font-medium truncate ${selectedId === course.id ? "text-foreground" : "text-foreground/60"}`}
-                  >
-                    {course.title}
-                  </span>
-                </div>
-                <span
-                  className={`text-xs font-bold px-2 py-1 rounded-lg ${
-                    course.percentage >= 75
-                      ? "bg-emerald-500/20 text-emerald-400"
-                      : course.percentage >= 60
-                        ? "bg-amber-500/20 text-amber-400"
-                        : "bg-rose-500/20 text-rose-400"
+      <div className="relative flex-1 md:flex-none" ref={dropdownRef}>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full md:w-[300px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-secondary/50 border border-foreground/10 text-foreground hover:bg-foreground/5 transition-all group"
+        >
+          <div className="flex items-center gap-3 overflow-hidden">
+            <div className="p-2 rounded-xl bg-accent/10 text-accent">
+              <BookOpen size={16} />
+            </div>
+            <div className="flex flex-col items-start truncate">
+              <span className="text-sm font-bold truncate w-full text-left leading-none">
+                {selectedCourse?.title}
+              </span>
+            </div>
+          </div>
+          <ChevronDown
+            size={16}
+            className={`text-foreground/50 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+          />
+        </button>
+
+        {isOpen && (
+          <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-background/50 backdrop-blur-2xl border border-foreground/10  max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex flex-col gap-3">
+              {courses.map((course) => (
+                <button
+                  key={course.id}
+                  onClick={() => {
+                    onSelect(course.id);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full flex bg-secondary items-center justify-between p-3 rounded-xl transition-all ${
+                    selectedId === course.id
+                      ? "bg-accent/10 border border-accent/20"
+                      : "hover:bg-foreground/5 border border-transparent"
                   }`}
                 >
-                  {course.percentage.toFixed(0)}%
-                </span>
-              </button>
-            ))}
+                  <div className="flex items-center gap-3 text-left overflow-hidden">
+                    <span
+                      className={`text-sm font-medium truncate ${selectedId === course.id ? "text-foreground" : "text-foreground/60"}`}
+                    >
+                      {course.title}
+                    </span>
+                  </div>
+                  <span
+                    className={`text-xs font-bold px-2 py-1 rounded-lg ${
+                      course.percentage >= 75
+                        ? "bg-emerald-500/20 text-emerald-400"
+                        : course.percentage >= 60
+                          ? "bg-amber-500/20 text-amber-400"
+                          : "bg-rose-500/20 text-rose-400"
+                    }`}
+                  >
+                    {course.percentage.toFixed(0)}%
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
+
+      <button
+        onClick={handleNext}
+        disabled={currentIndex >= courses.length - 1}
+        className={`p-2 rounded-full border transition-all shrink-0 ${
+          currentIndex >= courses.length - 1
+            ? "opacity-30 cursor-not-allowed border-transparent text-foreground"
+            : "bg-secondary/50 border-foreground/10 text-foreground hover:bg-foreground/5"
+        }`}
+      >
+        <ChevronRight size={16} />
+      </button>
     </div>
   );
 };
@@ -219,7 +259,7 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-80 md:w-96 bg-[#111] backdrop-blur-xl border border-foreground/10 rounded-2xl  overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-full right-0 mt-2 w-80 md:w-96 bg-background/95 backdrop-blur-xl border border-foreground/10 rounded-2xl  overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           <div className="p-4 border-b border-foreground/10 bg-foreground/5 flex justify-between items-center">
             <h3 className="font-bold text-foreground flex items-center gap-2">
               Bookmarked Items
@@ -252,8 +292,8 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
                     <span
                       className={`text-xs font-bold whitespace-nowrap ${
                         (item.status || "").includes("P")
-                          ? "text-emerald-400"
-                          : "text-rose-400"
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : "text-rose-600 dark:text-rose-400"
                       }`}
                     >
                       {(item.status || "").includes("P") ? "Present" : "Absent"}

@@ -52,8 +52,27 @@ export const processCourseMarks = (course) => {
     const EPSILON = 0.001;
 
     if (isSimMode) {
-      secWeight = rowsWeightSum;
-      sorted.forEach((item) => includedIndices.add(item._originalIdx));
+      if (
+        section.itemLimit &&
+        section.itemLimit > 0 &&
+        section.itemLimit < sorted.length
+      ) {
+        sorted.sort((a, b) => b._performanceRatio - a._performanceRatio);
+
+        secWeight = 0;
+        let count = 0;
+
+        for (let item of sorted) {
+          if (count < section.itemLimit) {
+            includedIndices.add(item._originalIdx);
+            secWeight += item.weight;
+            count++;
+          }
+        }
+      } else {
+        secWeight = rowsWeightSum;
+        sorted.forEach((item) => includedIndices.add(item._originalIdx));
+      }
     } else {
       if (
         section.itemLimit &&

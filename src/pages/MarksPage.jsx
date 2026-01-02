@@ -9,6 +9,8 @@ import {
   X,
   RotateCcw,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Zap,
   Check,
 } from "lucide-react";
@@ -44,69 +46,107 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
 
   if (!selectedCourse) return null;
 
+  const currentIndex = courses.findIndex((c) => c.id === selectedId);
+  const handlePrev = () => {
+    if (currentIndex > 0) {
+      onSelect(courses[currentIndex - 1].id);
+    }
+  };
+  const handleNext = () => {
+    if (currentIndex < courses.length - 1) {
+      onSelect(courses[currentIndex + 1].id);
+    }
+  };
+
   return (
-    <div className="relative w-full md:w-auto z-50" ref={dropdownRef}>
+    <div className="flex items-center gap-2 w-full md:w-auto z-50">
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full md:w-[350px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-secondary/50 border border-foreground/10 text-foreground hover:bg-foreground/5 transition-all group"
+        onClick={handlePrev}
+        disabled={currentIndex <= 0}
+        className={`p-2 rounded-full border transition-all shrink-0 ${
+          currentIndex <= 0
+            ? "opacity-30 cursor-not-allowed border-transparent text-foreground"
+            : "bg-secondary/50 border-foreground/10 text-foreground hover:bg-foreground/5"
+        }`}
       >
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="p-2 rounded-xl bg-accent/10 text-accent">
-            <BookOpen size={16} />
-          </div>
-          <div className="flex flex-col items-start truncate">
-            <span className="text-sm font-bold truncate w-full text-left leading-none">
-              {selectedCourse.title}
-            </span>
-          </div>
-        </div>
-        <ChevronDown
-          size={16}
-          className={`text-foreground/50 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
-        />
+        <ChevronLeft size={16} />
       </button>
 
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-background/50 backdrop-blur-2xl border border-foreground/10  max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200 z-[60]">
-          <div className="flex flex-col gap-3">
-            {courses.map((course) => (
-              <button
-                key={course.id}
-                onClick={() => {
-                  onSelect(course.id);
-                  setIsOpen(false);
-                }}
-                className={`w-full flex bg-secondary items-center justify-between p-3 rounded-xl transition-all ${
-                  selectedId === course.id
-                    ? "bg-accent/10 border border-accent/20"
-                    : "hover:bg-foreground/5 border border-transparent"
-                }`}
-              >
-                <div className="flex items-center gap-3 text-left overflow-hidden">
-                  <span
-                    className={`text-sm font-medium truncate ${selectedId === course.id ? "text-foreground" : "text-foreground/60"}`}
-                  >
-                    {course.title}
-                  </span>
-                </div>
-                {course.grandTotalStats && (
-                  <span
-                    className={`text-xs font-bold px-2 py-1 rounded-lg ${
-                      (course.grandTotalStats.percentage || 0) >= 80
-                        ? "bg-emerald-500/20 text-emerald-400"
-                        : (course.grandTotalStats.percentage || 0) >= 60
-                          ? "bg-amber-500/20 text-amber-400"
-                          : "bg-rose-500/20 text-rose-400"
-                    }`}
-                  >
-                    {(course.grandTotalStats.percentage || 0).toFixed(0)}%
-                  </span>
-                )}
-              </button>
-            ))}
+      <div className="relative flex-1 md:flex-none" ref={dropdownRef}>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full md:w-[300px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-secondary/50 border border-foreground/10 text-foreground hover:bg-foreground/5 transition-all group"
+        >
+          <div className="flex items-center gap-3 overflow-hidden">
+            <div className="p-2 rounded-xl bg-accent/10 text-accent">
+              <BookOpen size={16} />
+            </div>
+            <div className="flex flex-col items-start truncate">
+              <span className="text-sm font-bold truncate w-full text-left leading-none">
+                {selectedCourse?.title}
+              </span>
+            </div>
           </div>
-        </div>
-      )}
+          <ChevronDown
+            size={16}
+            className={`text-foreground/50 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+          />
+        </button>
+
+        {isOpen && (
+          <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-background/50 backdrop-blur-2xl border border-foreground/10  max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex flex-col gap-3">
+              {courses.map((course) => (
+                <button
+                  key={course.id}
+                  onClick={() => {
+                    onSelect(course.id);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full flex bg-secondary items-center justify-between p-3 rounded-xl transition-all ${
+                    selectedId === course.id
+                      ? "bg-accent/10 border border-accent/20"
+                      : "hover:bg-foreground/5 border border-transparent"
+                  }`}
+                >
+                  <div className="flex items-center gap-3 text-left overflow-hidden">
+                    <span
+                      className={`text-sm font-medium truncate ${selectedId === course.id ? "text-foreground" : "text-foreground/60"}`}
+                    >
+                      {course.title}
+                    </span>
+                  </div>
+                  {course.grandTotalStats && (
+                    <span
+                      className={`text-xs font-bold px-2 py-1 rounded-lg ${
+                        (course.grandTotalStats.percentage || 0) >= 80
+                          ? "bg-emerald-500/20 text-emerald-400"
+                          : (course.grandTotalStats.percentage || 0) >= 60
+                            ? "bg-amber-500/20 text-amber-400"
+                            : "bg-rose-500/20 text-rose-400"
+                      }`}
+                    >
+                      {(course.grandTotalStats.percentage || 0).toFixed(0)}%
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <button
+        onClick={handleNext}
+        disabled={currentIndex >= courses.length - 1}
+        className={`p-2 rounded-full border transition-all shrink-0 ${
+          currentIndex >= courses.length - 1
+            ? "opacity-30 cursor-not-allowed border-transparent text-foreground"
+            : "bg-secondary/50 border-foreground/10 text-foreground hover:bg-foreground/5"
+        }`}
+      >
+        <ChevronRight size={16} />
+      </button>
     </div>
   );
 };
@@ -130,52 +170,90 @@ const SectionSelector = ({ sections, selectedId, onSelect }) => {
 
   if (!selectedSection || sections.length <= 1) return null;
 
+  const currentIndex = sections.findIndex((s) => s.id === selectedId);
+  const handlePrev = () => {
+    if (currentIndex > 0) {
+      onSelect(sections[currentIndex - 1].id);
+    }
+  };
+  const handleNext = () => {
+    if (currentIndex < sections.length - 1) {
+      onSelect(sections[currentIndex + 1].id);
+    }
+  };
+
   return (
-    <div className="relative w-full md:w-auto z-40" ref={dropdownRef}>
+    <div className="flex items-center gap-2 w-full md:w-auto z-40">
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full md:w-[280px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-secondary/50 border border-foreground/10 text-foreground hover:bg-foreground/5 transition-all group"
+        onClick={handlePrev}
+        disabled={currentIndex <= 0}
+        className={`p-2 rounded-full border transition-all shrink-0 ${
+          currentIndex <= 0
+            ? "opacity-30 cursor-not-allowed border-transparent text-foreground"
+            : "bg-secondary/50 border-foreground/10 text-foreground hover:bg-foreground/5"
+        }`}
       >
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="p-2 rounded-xl bg-accent/10 text-accent">
-            <Layers size={16} />
-          </div>
-          <div className="flex flex-col items-start truncate">
-            <span className="text-sm font-bold truncate w-full text-left leading-none">
-              {selectedSection.title}
-            </span>
-          </div>
-        </div>
-        <ChevronDown
-          size={16}
-          className={`text-foreground/50 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
-        />
+        <ChevronLeft size={16} />
       </button>
 
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-background/50 backdrop-blur-2xl border border-foreground/10  max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200 z-[60]">
-          <div className="flex flex-col gap-2">
-            {sections.map((section) => (
-              <button
-                key={section.id}
-                onClick={() => {
-                  onSelect(section.id);
-                  setIsOpen(false);
-                }}
-                className={`w-full flex bg-secondary items-center justify-between p-3 rounded-xl transition-all ${
-                  selectedId === section.id
-                    ? "bg-accent/10 text-foreground border border-accent/20"
-                    : "text-foreground/60 hover:bg-foreground/5 border border-transparent hover:text-foreground"
-                }`}
-              >
-                <span className="text-sm font-medium truncate">
-                  {section.title}
-                </span>
-              </button>
-            ))}
+      <div className="relative flex-1 md:flex-none" ref={dropdownRef}>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full md:w-[230px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-secondary/50 border border-foreground/10 text-foreground hover:bg-foreground/5 transition-all group"
+        >
+          <div className="flex items-center gap-3 overflow-hidden">
+            <div className="p-2 rounded-xl bg-accent/10 text-accent">
+              <Layers size={16} />
+            </div>
+            <div className="flex flex-col items-start truncate">
+              <span className="text-sm font-bold truncate w-full text-left leading-none">
+                {selectedSection.title}
+              </span>
+            </div>
           </div>
-        </div>
-      )}
+          <ChevronDown
+            size={16}
+            className={`text-foreground/50 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+          />
+        </button>
+
+        {isOpen && (
+          <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-background/50 backdrop-blur-2xl border border-foreground/10  max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex flex-col gap-2">
+              {sections.map((section) => (
+                <button
+                  key={section.id}
+                  onClick={() => {
+                    onSelect(section.id);
+                    setIsOpen(false);
+                  }}
+                  className={`w-full flex bg-secondary items-center justify-between p-3 rounded-xl transition-all ${
+                    selectedId === section.id
+                      ? "bg-accent/10 text-foreground border border-accent/20"
+                      : "text-foreground/60 hover:bg-foreground/5 border border-transparent hover:text-foreground"
+                  }`}
+                >
+                  <span className="text-sm font-medium truncate">
+                    {section.title}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <button
+        onClick={handleNext}
+        disabled={currentIndex >= sections.length - 1}
+        className={`p-2 rounded-full border transition-all shrink-0 ${
+          currentIndex >= sections.length - 1
+            ? "opacity-30 cursor-not-allowed border-transparent text-foreground"
+            : "bg-secondary/50 border-foreground/10 text-foreground hover:bg-foreground/5"
+        }`}
+      >
+        <ChevronRight size={16} />
+      </button>
     </div>
   );
 };
@@ -235,7 +313,7 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-96 md:w-[500px] bg-background/50 backdrop-blur-xl border border-foreground/10 rounded-2xl  overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-full right-0 mt-2 w-96 md:w-[500px] bg-background/95 backdrop-blur-xl border border-foreground/10 rounded-2xl  overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           <div className="p-4 border-b border-foreground/10 bg-foreground/5 flex justify-between items-center">
             <h3 className="font-bold text-foreground flex items-center gap-2">
               Bookmarked Items
@@ -268,10 +346,10 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
                     <span
                       className={`text-xs font-bold whitespace-nowrap ${
                         (item.obtained / item.total) * 100 >= 80
-                          ? "text-emerald-400"
+                          ? "text-emerald-600 dark:text-emerald-400"
                           : (item.obtained / item.total) * 100 >= 60
-                            ? "text-amber-400"
-                            : "text-rose-400"
+                            ? "text-amber-600 dark:text-amber-400"
+                            : "text-rose-600 dark:text-rose-400"
                       }`}
                     >
                       {item.obtained} / {item.total}
@@ -346,13 +424,18 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount, sectionTitle }) => {
           />
         </div>
 
-        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex gap-4">
-          <AlertCircle className="text-amber-400 shrink-0" size={20} />
-          <p className="text-xs text-amber-200/70 leading-relaxed font-medium">
-            This will automatically pick the highest scoring {count} {itemType}
-            {count > 1 ? (itemType === "Quiz" ? "zes" : "s") : ""} and assign
-            them an equal portion of the {totalWeight}% total weightage.
-          </p>
+        <div className="p-4 rounded-[2rem] border backdrop-blur-2xl flex items-center gap-5 relative overflow-hidden group bg-warning/5 border-warning/10 text-warning">
+          <div className="p-3 rounded-xl shrink-0 bg-warning/10 text-warning">
+            <AlertCircle size={20} />
+          </div>
+          <div className="space-y-0.5 flex-1 min-w-0">
+            <p className="text-xs md:text-sm font-medium leading-relaxed">
+              This will automatically pick the highest scoring {count}{" "}
+              {itemType}
+              {count > 1 ? (itemType === "Quiz" ? "zes" : "s") : ""} and assign
+              them an equal portion of the {totalWeight}% total weightage.
+            </p>
+          </div>
         </div>
 
         <Button
@@ -462,7 +545,7 @@ const AssessmentView = ({
               </button>
             )}
 
-            {isBestOfEligible && !isSimulationMode && hasAssessments && (
+            {isBestOfEligible && isSimulationMode && hasAssessments && (
               <button
                 onClick={() => setIsBestOfOpen(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-all font-bold text-sm"
@@ -472,7 +555,7 @@ const AssessmentView = ({
               </button>
             )}
 
-            {!isGrandTotal && hasAssessments && (
+            {!isGrandTotal && isSimulationMode && hasAssessments && (
               <button
                 onClick={onReset}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl bg-tertiary text-foreground/60 border border-foreground/10 hover:bg-tertiary hover:text-foreground transition-all font-bold text-sm"
@@ -1118,23 +1201,21 @@ function MarksPage() {
       if (sectionIdx === -1) return prevCourses;
 
       const section = course.sections[sectionIdx];
-      const items = section.rows.filter((r) => r.title !== "Total");
+      let updatedRows = [...section.rows];
+      const isSimMode = course.simulationMode;
 
-      const sorted = items
-        .map((r, i) => ({
-          ...r,
-          originalIdx: i,
-          ratio: r.total > 0 ? r.obtained / r.total : 0,
-        }))
-        .sort((a, b) => b.ratio - a.ratio);
-
-      const topIndices = new Set(
-        sorted.slice(0, numCount).map((item) => item.originalIdx),
-      );
+      if (isSimMode) {
+        const newWeightPerItem = numCount > 0 ? numWeight / numCount : 0;
+        updatedRows = section.rows.map((row) => ({
+          ...row,
+          weight: row.title !== "Total" ? newWeightPerItem : row.weight,
+        }));
+      }
 
       const updatedSections = [...course.sections];
       updatedSections[sectionIdx] = {
         ...section,
+        rows: updatedRows,
         weight: numWeight,
         itemLimit: numCount,
       };
