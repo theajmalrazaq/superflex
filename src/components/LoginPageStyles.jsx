@@ -33,7 +33,7 @@ function LoginPageStyles() {
 
     document
       .querySelectorAll(
-        ".m-grid.m-grid--hor:not(.m-grid--desktop):not(.m-grid--desktop-and-tablet):not(.m-grid--tablet):not(.m-grid--tablet-and-mobile):not(.m-grid--mobile) > .m-grid__item.m-grid__item--fluid",
+        ".m-grid.m-grid--hor:not(.m-grid--desktop):not(.m-grid--desktop-and-tablet):not(.m-grid--tablet):not(.m-grid--tablet-and-mobile):not(.m-grid--mobile) > .m-grid__item.m-grid__item--fluid"
       )
       .forEach((element) => {
         element.classList.add("!justify-center", "!w-full");
@@ -41,7 +41,7 @@ function LoginPageStyles() {
 
     document
       .querySelectorAll(
-        ".m-grid.m-grid--ver-desktop.m-grid--desktop > .m-grid__item.m-grid__item--fluid",
+        ".m-grid.m-grid--ver-desktop.m-grid--desktop > .m-grid__item.m-grid__item--fluid"
       )
       .forEach((element) => {
         element.classList.add("!hidden", "!w-full");
@@ -53,11 +53,11 @@ function LoginPageStyles() {
 
     document
       .querySelector(
-        ".m-grid__item.m-grid__item--order-tablet-and-mobile-2.m-login__aside",
+        ".m-grid__item.m-grid__item--order-tablet-and-mobile-2.m-login__aside"
       )
       .classList.add("!w-full", "!p-0");
     const mainContainer = document.querySelector(
-      ".m-stack__item.m-stack__item--fluid",
+      ".m-stack__item.m-stack__item--fluid"
     );
     if (mainContainer) {
       mainContainer.classList.add(
@@ -67,7 +67,7 @@ function LoginPageStyles() {
         "!w-full",
         "!bg-transparent",
         "!relative",
-        "!z-[50]",
+        "!z-[50]"
       );
     }
 
@@ -78,7 +78,7 @@ function LoginPageStyles() {
         "!items-center",
         "!w-full",
         "!max-w-full",
-        "!p-0",
+        "!p-0"
       );
     });
 
@@ -97,7 +97,7 @@ function LoginPageStyles() {
 
     document
       .querySelectorAll(
-        ".input-group label, .m-form__label, label, .input-group h5, h5",
+        ".input-group label, .m-form__label, label, .input-group h5, h5"
       )
       .forEach((label) => {
         label.classList.add("!text-foreground", "!font-medium");
@@ -123,7 +123,7 @@ function LoginPageStyles() {
         "focus:!border-accent/30",
         "focus:!bg-foreground/[0.08]",
         "!transition-all",
-        "!duration-300",
+        "!duration-300"
       );
       element.style.fontFamily = "'Google Sans Flex', sans-serif";
     });
@@ -144,6 +144,7 @@ function LoginPageStyles() {
       button.classList.add(
         "!bg-accent",
         "!text-[var(--accent-foreground)]",
+        "!cursor-pointer",
         "!Cap",
         "!border-none",
         "!rounded-2xl",
@@ -157,7 +158,7 @@ function LoginPageStyles() {
         "justify-center",
         "items-center",
         "hover:!bg-accent/80",
-        "!transition-all",
+        "!transition-all"
       );
       button.style.fontFamily = "'Google Sans Flex', sans-serif";
     });
@@ -197,7 +198,7 @@ function LoginPageStyles() {
         "!scale-95",
         "!transition-all",
         "!duration-500",
-        "!ease-out",
+        "!ease-out"
       );
       bglogin.setAttribute("id", "login-popup");
 
@@ -213,7 +214,7 @@ function LoginPageStyles() {
     }
 
     const forgotPasswordSection = document.querySelector(
-      ".m-login__forget-password",
+      ".m-login__forget-password"
     );
     if (forgotPasswordSection) {
       forgotPasswordSection.classList.add(
@@ -240,7 +241,7 @@ function LoginPageStyles() {
         "!scale-95",
         "!transition-all",
         "!duration-500",
-        "!ease-out",
+        "!ease-out"
       );
       forgotPasswordSection.setAttribute("id", "forgot-password-popup");
 
@@ -257,7 +258,7 @@ function LoginPageStyles() {
           "!text-foreground",
           "!text-2xl",
           "!font-bold",
-          "!mb-0",
+          "!mb-0"
         );
       }
 
@@ -267,7 +268,7 @@ function LoginPageStyles() {
           "!text-foreground/70",
           "!text-sm",
           "!leading-relaxed",
-          "!mb-0",
+          "!mb-0"
         );
       }
 
@@ -283,7 +284,7 @@ function LoginPageStyles() {
       }
 
       const forgotFormAction = forgotPasswordSection.querySelector(
-        ".m-login__form-action",
+        ".m-login__form-action"
       );
       if (forgotFormAction) {
         forgotFormAction.classList.add(
@@ -291,7 +292,7 @@ function LoginPageStyles() {
           "!flex-col",
           "!gap-3",
           "!w-full",
-          "!mt-2",
+          "!mt-2"
         );
       }
 
@@ -299,7 +300,7 @@ function LoginPageStyles() {
     }
 
     let forgotPasswordLink = document.querySelector(
-      'a[href*="ForgotPassword"]',
+      'a[href*="ForgotPassword"]'
     );
     if (!forgotPasswordLink) {
       forgotPasswordLink = document.createElement("a");
@@ -311,11 +312,11 @@ function LoginPageStyles() {
         "!text-sm",
         "!cursor-pointer",
         "!transition-all",
-        "!duration-200",
+        "!duration-200"
       );
 
       const loginFormAction = document.querySelector(
-        ".m-login__signin .m-form__actions",
+        ".m-login__signin .m-form__actions"
       );
       if (loginFormAction) {
         loginFormAction.appendChild(forgotPasswordLink);
@@ -328,7 +329,7 @@ function LoginPageStyles() {
         "!mt-4",
         "!cursor-pointer",
         "!transition-all",
-        "!duration-200",
+        "!duration-200"
       );
     }
 
@@ -349,13 +350,14 @@ function LoginPageStyles() {
       });
 
       const cancelButton = forgotPasswordSection.querySelector(
-        "#m_login_forget_password_cancel",
+        "#m_login_forget_password_cancel"
       );
       if (cancelButton) {
         cancelButton.classList.add(
           "!bg-tertiary/50",
           "!text-foreground/60",
           "hover:!bg-tertiary",
+          "!cursor-pointer",
           "hover:!text-foreground",
           "!border",
           "!border-foreground/10",
@@ -363,7 +365,7 @@ function LoginPageStyles() {
           "!py-3",
           "!px-6",
           "!transition-all",
-          "!w-full",
+          "!w-full"
         );
         cancelButton.addEventListener("click", (e) => {
           e.preventDefault();
@@ -388,13 +390,14 @@ function LoginPageStyles() {
 
       const requestButton =
         forgotPasswordSection.querySelector(
-          "#m_login_forget_password_submit",
+          "#m_login_forget_password_submit"
         ) || forgotPasswordSection.querySelector("button[type='submit']");
       if (requestButton) {
         requestButton.classList.add(
           "!bg-accent",
           "!text-[var(--accent-foreground)]",
           "!font-bold",
+          "cursor-pointer",
           "!rounded-2xl",
           "!py-4",
           "!px-6",
@@ -402,7 +405,7 @@ function LoginPageStyles() {
           "!transition-all",
           "!border-none",
           "!w-full",
-          "!mb-2",
+          "!mb-2"
         );
       }
 
@@ -414,7 +417,7 @@ function LoginPageStyles() {
           toast.classList.add(
             "bg-emerald-500/10",
             "border-emerald-500/20",
-            "text-emerald-400",
+            "text-emerald-400"
           );
           toast.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -424,7 +427,7 @@ function LoginPageStyles() {
           toast.classList.add(
             "bg-rose-500/10",
             "border-rose-500/20",
-            "text-rose-400",
+            "text-rose-400"
           );
           toast.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -492,7 +495,7 @@ function LoginPageStyles() {
     suggestionButton.href = "https://instagram.com/superflex.fr";
     suggestionButton.target = "_blank";
     suggestionButton.className =
-      "group relative bg-foreground/10 backdrop-blur-sm px-8 py-3.5 rounded-2xl text-foreground hover:bg-foreground/20 hover:border-foreground/40 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto whitespace-nowrap h-[52px]";
+      "group relative cursor-pointer bg-foreground/10 backdrop-blur-sm px-8 py-3.5 rounded-2xl text-foreground hover:bg-foreground/20 hover:border-foreground/40 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto whitespace-nowrap h-[52px]";
     suggestionButton.style.fontFamily = "'Google Sans Flex', sans-serif";
     suggestionButton.innerHTML = `
       <span class="text-sm font-medium">Follow on Insta</span>
@@ -573,7 +576,7 @@ function LoginPageStyles() {
         "w-full",
         "h-full",
         "z-0",
-        "overflow-hidden",
+        "overflow-hidden"
       );
 
       const glow1 = document.createElement("div");
@@ -593,7 +596,7 @@ function LoginPageStyles() {
         "h-full",
         "object-cover",
         "opacity-20",
-        "mix-blend-luminosity",
+        "mix-blend-luminosity"
       );
 
       const blackMask = document.createElement("div");
@@ -732,7 +735,7 @@ function LoginPageStyles() {
             </div>
             <p class="review-comment">"${item.comment}"</p>
         </div>
-      `,
+      `
         )
         .join("");
     };
@@ -842,7 +845,7 @@ function LoginPageStyles() {
         const today = new Date().toDateString();
 
         const response = await fetch(
-          "https://api.github.com/repos/theajmalrazaq/superflex/releases/latest",
+          "https://api.github.com/repos/theajmalrazaq/superflex/releases/latest"
         );
         const data = await response.json();
 
@@ -898,7 +901,7 @@ function LoginPageStyles() {
       wrapper.insertBefore(heroDiv, bglogin);
 
       const buttonsContainer = heroDiv.querySelector(
-        "#login-buttons-container",
+        "#login-buttons-container"
       );
       if (buttonsContainer) {
         buttonsContainer.appendChild(signInButton);
@@ -1022,7 +1025,7 @@ function LoginPageStyles() {
     }
 
     const passwordInputs = document.querySelectorAll(
-      '.m-input-icon--right input[type="password"]',
+      '.m-input-icon--right input[type="password"]'
     );
     passwordInputs.forEach((input) => {
       const toggleButton = document.createElement("button");
@@ -1046,7 +1049,7 @@ function LoginPageStyles() {
         "text-foreground/50",
         "hover:text-foreground",
         "focus:outline-none",
-        "z-10",
+        "z-10"
       );
 
       const inputGroup = input.closest(".input-group");
@@ -1083,7 +1086,7 @@ function LoginPageStyles() {
       window.removeEventListener("superflex-theme-changed", handleThemeChange);
       window.removeEventListener(
         "superflex-theme-mode-changed",
-        handleModeChange,
+        handleModeChange
       );
     };
   }, []);
