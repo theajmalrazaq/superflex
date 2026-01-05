@@ -83,14 +83,13 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   }, []);
 
   const [profileImage, setProfileImage] = useState(
-    localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage",
+    localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage"
   );
 
   useEffect(() => {
     const handleStorage = () => {
       setProfileImage(
-        localStorage.getItem("superflex_user_custom_image") ||
-          "/Login/GetImage",
+        localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage"
       );
     };
     window.addEventListener("storage", handleStorage);
@@ -156,7 +155,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     if (links.length > 0) {
       setMenuLinks(links);
       const attendanceLink = links.find(
-        (link) => link.text.trim() === "Attendance",
+        (link) => link.text.trim() === "Attendance"
       );
 
       if (attendanceLink && onAttendanceLinkFound) {
@@ -186,7 +185,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
     document
       .querySelectorAll(
-        ".m-grid__item.m-grid__item--fluid.m-grid.m-grid--ver-desktop.m-grid--desktop.m-body",
+        ".m-grid__item.m-grid__item--fluid.m-grid.m-grid--ver-desktop.m-grid--desktop.m-body"
       )
       .forEach((element) => {
         element.classList.remove("m-grid--desktop", "m-body");
@@ -247,7 +246,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
   const isCategoryActive = (categoryLinks) => {
     return categoryLinks.some(
-      (link) => link.path && currentPage && currentPage.includes(link.path),
+      (link) => link.path && currentPage && currentPage.includes(link.path)
     );
   };
 
@@ -256,7 +255,11 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       onClick={() => {
         window.location.href = link.href;
       }}
-      className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 text-[13px] font-medium whitespace-nowrap cursor-pointer ${isActive ? "bg-accent/10 text-accent border  border-foreground/10" : "text-foreground/60 border-transparent hover:text-foreground hover:bg-foreground/5"}`}
+      className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 text-[13px] font-medium whitespace-nowrap cursor-pointer ${
+        isActive
+          ? "bg-accent/10 text-accent border  border-foreground/10"
+          : "text-foreground/60 border-transparent hover:text-foreground hover:bg-foreground/5"
+      }`}
     >
       <span className={isActive ? "text-inherit" : "text-current"}>
         {React.cloneElement(getIcon(link), { size: 16 })}
@@ -279,13 +282,21 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       `}
     >
       <div
-        className={`p-2.5 rounded-full shrink-0 ${isActive ? "bg-accent text-[var(--accent-foreground)]" : "bg-background/40 text-accent group-hover:bg-accent group-hover:text-[var(--accent-foreground)] transition-colors duration-300"}`}
+        className={`p-2.5 rounded-full shrink-0 ${
+          isActive
+            ? "bg-accent text-[var(--accent-foreground)]"
+            : "bg-background/40 text-accent group-hover:bg-accent group-hover:text-[var(--accent-foreground)] transition-colors duration-300"
+        }`}
       >
         {React.cloneElement(getIcon(link), { size: 20 })}
       </div>
       <div>
         <div
-          className={`text-sm font-semibold mb-0.5 ${isActive ? "text-foreground " : "text-foreground/80 group-hover:text-foreground"}`}
+          className={`text-sm font-semibold mb-0.5 ${
+            isActive
+              ? "text-foreground "
+              : "text-foreground/80 group-hover:text-foreground"
+          }`}
         >
           {link.text}
         </div>
@@ -305,7 +316,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
   useEffect(() => {
     const activeCategory = ["Academics", "Finance", "Services", "More"].find(
-      (cat) => groupedLinks[cat] && isCategoryActive(groupedLinks[cat]),
+      (cat) => groupedLinks[cat] && isCategoryActive(groupedLinks[cat])
     );
     if (activeCategory) {
       setOpenMobileCategories((prev) => ({ ...prev, [activeCategory]: true }));
@@ -323,11 +334,11 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   }, []);
 
   const [themeColor, setThemeColor] = useState(
-    localStorage.getItem("superflex-theme-color") || "#a098ff",
+    localStorage.getItem("superflex-theme-color") || "#a098ff"
   );
 
   const [themeMode, setThemeMode] = useState(
-    localStorage.getItem("superflex-theme-mode") || "dark",
+    localStorage.getItem("superflex-theme-mode") || "dark"
   );
 
   useEffect(() => {
@@ -349,24 +360,24 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       document.documentElement.classList.remove("dark");
     }
     window.dispatchEvent(
-      new CustomEvent("superflex-theme-mode-changed", { detail: mode }),
+      new CustomEvent("superflex-theme-mode-changed", { detail: mode })
     );
   };
 
   const [bgUrl, setBgUrl] = useState(
     localStorage.getItem("superflex-bg-url") ||
-      "https://motionbgs.com/media/6867/omen-valorant2.960x540.mp4",
+      "https://motionbgs.com/media/6867/omen-valorant2.960x540.mp4"
   );
 
   const [bgEnabled, setBgEnabled] = useState(
-    localStorage.getItem("superflex-bg-enabled") !== "false",
+    localStorage.getItem("superflex-bg-enabled") !== "false"
   );
 
   const handleBgChange = (url) => {
     setBgUrl(url);
     localStorage.setItem("superflex-bg-url", url);
     window.dispatchEvent(
-      new CustomEvent("superflex-bg-changed", { detail: url }),
+      new CustomEvent("superflex-bg-changed", { detail: url })
     );
   };
 
@@ -375,7 +386,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     setBgEnabled(newState);
     localStorage.setItem("superflex-bg-enabled", newState);
     window.dispatchEvent(
-      new CustomEvent("superflex-bg-enabled-changed", { detail: newState }),
+      new CustomEvent("superflex-bg-enabled-changed", { detail: newState })
     );
   };
 
@@ -397,7 +408,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     const b = parseInt(hex.slice(5, 7), 16);
     document.documentElement.style.setProperty(
       "--accent-rgb",
-      `${r}, ${g}, ${b}`,
+      `${r}, ${g}, ${b}`
     );
 
     const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
@@ -417,7 +428,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     localStorage.setItem("superflex-theme-color", color);
     updateThemeColors(color);
     window.dispatchEvent(
-      new CustomEvent("superflex-theme-changed", { detail: color }),
+      new CustomEvent("superflex-theme-changed", { detail: color })
     );
     if (shouldClose) {
       setOpenDropdown(null);
@@ -431,7 +442,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         {}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="lg:hidden p-2 text-foreground/60 hover:text-foreground transition-colors"
+          className="lg:hidden p-2 cursor-pointer text-foreground/60 hover:text-foreground transition-colors"
         >
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -470,12 +481,18 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         e.stopPropagation();
                         setOpenDropdown(isOpen ? null : category);
                       }}
-                      className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-foreground/5 ${isActive ? "bg-accent/10 text-accent border border-foreground/10" : "!text-foreground/60 hover:!text-foreground"}`}
+                      className={`flex items-center cursor-pointer gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:bg-foreground/5 ${
+                        isActive
+                          ? "bg-accent/10 text-accent border border-foreground/10"
+                          : "!text-foreground/60 hover:!text-foreground"
+                      }`}
                     >
                       {category}
                       <ChevronDown
                         size={14}
-                        className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+                        className={`transition-transform duration-200 ${
+                          isOpen ? "rotate-180" : ""
+                        }`}
                       />
                     </button>
 
@@ -515,11 +532,15 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           <div className="flex flex-col gap-4 p-4">
             {}
             <div
-              className={`relative rounded-3xl overflow-hidden transition-all duration-300 ${isProfileExpanded ? "bg-secondary/80 border border-foreground/10" : "bg-secondary/40 border border-foreground/10 hover:bg-secondary/60"}`}
+              className={`relative rounded-3xl overflow-hidden transition-all duration-300 ${
+                isProfileExpanded
+                  ? "bg-secondary/80 border border-foreground/10"
+                  : "bg-secondary/40 border border-foreground/10 hover:bg-secondary/60"
+              }`}
             >
               <button
                 onClick={() => setIsProfileExpanded(!isProfileExpanded)}
-                className="w-full flex items-center justify-between p-4"
+                className="w-full flex items-center justify-between p-4 !cursor-pointer"
               >
                 <div className="flex items-center gap-3">
                   <div className="relative">
@@ -544,14 +565,20 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                   </div>
                 </div>
                 <div
-                  className={`p-1.5 rounded-lg bg-foreground/5 text-foreground/60 transition-transform duration-300 ${isProfileExpanded ? "rotate-180" : ""}`}
+                  className={`p-1.5 rounded-lg bg-foreground/5 text-foreground/60 transition-transform duration-300 ${
+                    isProfileExpanded ? "rotate-180" : ""
+                  }`}
                 >
                   <ChevronDown size={16} />
                 </div>
               </button>
 
               <div
-                className={`overflow-y-auto transition-all duration-300 scrollbar-hide ${isProfileExpanded ? "max-h-60 border-t border-foreground/10" : "max-h-0"}`}
+                className={`overflow-y-auto transition-all duration-300 scrollbar-hide ${
+                  isProfileExpanded
+                    ? "max-h-60 border-t border-foreground/10"
+                    : "max-h-0"
+                }`}
               >
                 <div className="p-4 flex flex-col gap-2">
                   <button
@@ -601,10 +628,10 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
               <button
                 onClick={() =>
                   setOpenDropdown(
-                    openDropdown === "mobile-aura" ? null : "mobile-aura",
+                    openDropdown === "mobile-aura" ? null : "mobile-aura"
                   )
                 }
-                className="w-full flex items-center justify-between p-5 hover:bg-foreground/5 transition-colors"
+                className="w-full !cursor-pointer flex items-center justify-between p-5 hover:bg-foreground/5 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-accent/10 text-accent rounded-xl">
@@ -815,7 +842,11 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                     >
                       <span>{category}</span>
                       <div
-                        className={`p-1 rounded-full bg-foreground/5 transition-transform duration-300 ${isExpanded ? "rotate-180 bg-foreground/10 text-foreground" : ""}`}
+                        className={`p-1 rounded-full bg-foreground/5 transition-transform duration-300 ${
+                          isExpanded
+                            ? "rotate-180 bg-foreground/10 text-foreground"
+                            : ""
+                        }`}
                       >
                         <ChevronDown size={14} />
                       </div>
@@ -873,7 +904,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           onClick={() =>
             window.dispatchEvent(new CustomEvent("superflex-toggle-ai"))
           }
-          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-accent/10 text-accent hover:bg-accent/20 transition-all duration-300 group animate-border-beam"
+          className="flex items-center !cursor-pointer gap-2 px-4 py-2.5 rounded-full bg-accent/10 text-accent hover:bg-accent/20 transition-all duration-300 group animate-border-beam"
         >
           <div className="border-beam-element" />
           <svg
@@ -905,7 +936,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
               e.stopPropagation();
               setOpenDropdown(openDropdown === "theme" ? null : "theme");
             }}
-            className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-foreground/5 transition-all duration-200"
+            className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-foreground/5 transition-all duration-200 !cursor-pointer"
           >
             <div
               className="w-7 h-7 rounded-full border-2 border-foreground/20"
@@ -1055,7 +1086,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
               e.stopPropagation();
               setOpenDropdown(openDropdown === "profile" ? null : "profile");
             }}
-            className="flex items-center gap-3 px-3 py-2 rounded-full hover:bg-foreground/5 transition-all duration-200"
+            className="flex items-center !cursor-pointer gap-3 px-3 py-2 rounded-full hover:bg-foreground/5 transition-all duration-200"
           >
             <img
               src={profileImage}
@@ -1068,7 +1099,9 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
             />
             <ChevronDown
               size={14}
-              className={`text-foreground/60 transition-transform duration-200 ${openDropdown === "profile" ? "rotate-180" : ""}`}
+              className={`text-foreground/60 transition-transform duration-200 ${
+                openDropdown === "profile" ? "rotate-180" : ""
+              }`}
             />
           </button>
 
@@ -1081,7 +1114,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                     setOpenDropdown(null);
                     setIsProfileModalOpen(true);
                   }}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-foreground/5 transition-all text-left text-foreground/70 hover:text-foreground border-0 bg-transparent cursor-pointer"
+                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-foreground/5 transition-all text-left text-foreground/70 hover:text-foreground border-0 bg-transparent !cursor-pointer"
                 >
                   <User size={18} />
                   <span className="text-sm font-medium">Change DP</span>
