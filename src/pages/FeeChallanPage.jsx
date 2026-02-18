@@ -255,7 +255,7 @@ function FeeChallanPage() {
             <div className="w-1.5 h-1.5 rounded-full bg-amber-500/20"></div>
           </div>
           <div className="space-y-1">
-            <p className="text-foreground font-bold tracking-wide Cap text-xs">
+            <p className="text-foreground font-medium Cap text-xs">
               Physical Cash Deposit
             </p>
             <p className="text-foreground/50 text-xs leading-relaxed font-medium">
@@ -375,19 +375,19 @@ function FeeChallanPage() {
                 <table className="w-full text-left border-collapse border-spacing-0">
                   <thead>
                     <tr className="border-b border-foreground/10">
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider font-sans">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 font-sans Cap">
                         Sr.
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider font-sans w-full">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 font-sans w-full Cap">
                         Description
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider font-sans">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 font-sans Cap">
                         Status
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider text-right font-sans">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 text-right font-sans Cap">
                         Amount
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider text-right font-sans">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 text-right font-sans Cap">
                         Actions
                       </th>
                     </tr>

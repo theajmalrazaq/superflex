@@ -144,8 +144,6 @@ function MarksPloReportPage() {
             thead.classList.add(
               "bg-secondary/50",
               "text-xs",
-              "Cap",
-              "tracking-wider",
               "font-bold",
               "text-foreground/60",
             );
@@ -316,7 +314,7 @@ function MarksPloReportPage() {
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <p className="text-foreground/50 text-xs Cap tracking-[0px] font-bold mb-1 print:text-foreground">
+                    <p className="text-foreground/50 text-xs  tracking-[0px] font-bold mb-1 print:text-foreground">
                       PLO Breakdown
                     </p>
                     <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
@@ -325,11 +323,11 @@ function MarksPloReportPage() {
                           key={i}
                           className="flex flex-col items-center bg-background/20 rounded-lg p-2 border border-foreground/10 hover:border-foreground/10 transition-colors print:border-gray-200 print:bg-transparent"
                         >
-                          <span className="text-[9px] text-foreground/50 Cap font-black tracking-[0px] print:text-foreground leading-none mb-1">
+                          <span className="text-[9px] text-foreground/50  font-bold tracking-[0px] print:text-foreground leading-none mb-1">
                             PLO{plo.id}
                           </span>
                           <span
-                            className={`text-[11px] font-black text-accent print:text-foreground`}
+                            className={`text-[11px] font-bold text-accent print:text-foreground`}
                           >
                             {plo.value}%
                           </span>

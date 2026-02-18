@@ -141,6 +141,7 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
 };
 const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
   const isPresent = record.status.includes("P");
+  const isLate = record.status.includes("L");
   return (
     <div
       onClick={onToggleMark}
@@ -160,10 +161,18 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
           className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
             isPresent
               ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-              : "bg-rose-500/10 border-rose-500/20 text-rose-400"
+              : isLate
+                ? "bg-amber-500/10 border-amber-500/20 text-amber-400"
+                : "bg-rose-500/10 border-rose-500/20 text-rose-400"
           }`}
         >
-          {isPresent ? <CheckCircle2 size={20} /> : <XCircle size={20} />}
+          {isPresent ? (
+            <CheckCircle2 size={20} />
+          ) : isLate ? (
+            <Clock size={20} />
+          ) : (
+            <XCircle size={20} />
+          )}
         </div>
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
@@ -189,10 +198,12 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
           className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${
             isPresent
               ? "bg-emerald-500/5 text-emerald-400 border-emerald-500/10"
-              : "bg-rose-500/5 text-rose-400 border-rose-500/10"
+              : isLate
+                ? "bg-amber-500/5 text-amber-400 border-amber-500/10"
+                : "bg-rose-500/5 text-rose-400 border-rose-500/10"
           }`}
         >
-          {isPresent ? "Present" : "Absent"}
+          {isPresent ? "Present" : isLate ? "Late" : "Absent"}
         </div>
         <div
           className={`p-2 rounded-full shrink-0 transition-all duration-300 border ${
@@ -293,13 +304,19 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
                       className={`text-xs font-bold whitespace-nowrap ${
                         (item.status || "").includes("P")
                           ? "text-emerald-600 dark:text-emerald-400"
-                          : "text-rose-600 dark:text-rose-400"
+                          : (item.status || "").includes("L")
+                            ? "text-amber-600 dark:text-amber-400"
+                            : "text-rose-600 dark:text-rose-400"
                       }`}
                     >
-                      {(item.status || "").includes("P") ? "Present" : "Absent"}
+                      {(item.status || "").includes("P")
+                        ? "Present"
+                        : (item.status || "").includes("L")
+                          ? "Late"
+                          : "Absent"}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-[10px] text-foreground/50 Cap tracking-wider font-bold">
+                  <div className="flex items-center gap-2 text-[10px] text-foreground/50 font-medium Cap">
                     <span className="truncate max-w-[200px]">
                       {item.courseTitle}
                     </span>
@@ -435,6 +452,7 @@ function AttendancePage() {
             percentage,
             records,
             present: records.filter((r) => r.status.includes("P")).length,
+            late: records.filter((r) => r.status.includes("L")).length,
             absent: records.filter((r) => r.status.includes("A")).length,
           });
         });
@@ -522,6 +540,12 @@ function AttendancePage() {
                     label="Present"
                     value={selectedCourseData.present}
                     delay={200}
+                  />
+                  <StatsCard
+                    icon={Clock}
+                    label="Late"
+                    value={selectedCourseData.late}
+                    delay={250}
                   />
                   <StatsCard
                     icon={XCircle}

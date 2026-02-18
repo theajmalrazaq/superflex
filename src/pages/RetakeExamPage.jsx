@@ -136,7 +136,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
                 key={i}
                 className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2 hover:bg-foreground/[0.04] transition-colors"
               >
-                <h4 className="text-[11px] font-black text-accent Cap tracking-wider">
+                <h4 className="text-[11px] font-bold text-accent Cap">
                   {item.title}
                 </h4>
                 <p className="text-[10px] text-foreground/50 leading-relaxed font-bold">

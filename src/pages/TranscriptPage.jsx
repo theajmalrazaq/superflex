@@ -126,19 +126,19 @@ const CGPAPlannerModal = ({
           <div className="animate-in slide-in-from-bottom-4 duration-500">
             <div className="p-6 rounded-3xl bg-foreground/[0.03] border border-foreground/10 backdrop-blur-sm flex items-center justify-between relative overflow-hidden group">
               <div className="space-y-1 relative z-10">
-                <p className="text-[10px] font-bold text-foreground/50 Cap tracking-[0px]">
+                <p className="text-[10px] font-bold text-foreground/50  tracking-[0px]">
                   Required SGPA
                 </p>
                 {result > 4.0 ? (
-                  <p className="text-4xl font-bold text-rose-500 tracking-tighter">
+                  <p className="text-4xl font-bold text-rose-500 ">
                     {result.toFixed(2)}
                   </p>
                 ) : result < 0 ? (
-                  <p className="text-4xl font-bold text-emerald-500 tracking-tighter">
+                  <p className="text-4xl font-bold text-emerald-500 ">
                     0.00
                   </p>
                 ) : (
-                  <p className="text-5xl font-bold text-foreground tracking-tighter">
+                  <p className="text-5xl font-bold text-foreground ">
                     {result.toFixed(2)}
                   </p>
                 )}
@@ -146,19 +146,19 @@ const CGPAPlannerModal = ({
 
               <div className="text-right relative z-10 flex flex-col items-end gap-3">
                 {result > 4.0 ? (
-                  <span className="px-3 py-1 bg-rose-500/10 text-rose-400 rounded-lg text-[10px] font-bold Cap border border-rose-500/20">
+                  <span className="px-3 py-1 bg-rose-500/10 text-rose-400 rounded-lg text-[10px] font-bold  border border-rose-500/20">
                     Unreachable
                   </span>
                 ) : result < 0 ? (
-                  <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-lg text-[10px] font-bold Cap border border-emerald-500/20">
+                  <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-lg text-[10px] font-bold  border border-emerald-500/20">
                     Achieved
                   </span>
                 ) : (
-                  <span className="px-3 py-1 bg-accent/10 text-accent rounded-lg text-[10px] font-bold Cap border border-accent/20">
+                  <span className="px-3 py-1 bg-accent/10 text-accent rounded-lg text-[10px] font-bold  border border-accent/20">
                     Target Goal
                   </span>
                 )}
-                <p className="text-[10px] font-bold text-foreground/50 Cap tracking-[0px]">
+                <p className="text-[10px] font-bold text-foreground/50  tracking-[0px]">
                   In {nextCH} Cr.Hrs
                 </p>
               </div>
@@ -272,15 +272,15 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
               <>
                 <div className="p-6 rounded-3xl bg-foreground/[0.03] border border-foreground/10 backdrop-blur-sm flex items-center justify-between">
                   <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-foreground/50 Cap tracking-[0px]">
+                    <p className="text-[10px] font-medium text-foreground/50  tracking-[0px]">
                       Predicted Grade
                     </p>
-                    <p className="text-4xl font-black text-foreground tracking-tighter">
+                    <p className="text-4xl font-bold text-foreground ">
                       {result.grade}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] font-bold text-foreground/50 Cap tracking-[0px] mb-2">
+                    <p className="text-[10px] font-bold text-foreground/50  tracking-[0px] mb-2">
                       At MCA {Math.round(mca)}
                     </p>
                     <div className="flex flex-wrap justify-end gap-1.5 max-w-[200px]">
@@ -291,7 +291,7 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
                         .map(([g, val]) => (
                           <span
                             key={g}
-                            className={`text-[9px] font-black px-2 py-1 rounded-md border transition-all ${
+                            className={`text-[9px] font-bold px-2 py-1 rounded-md border transition-all ${
                               g === result.grade
                                 ? "bg-accent border-accent text-foreground"
                                 : "bg-foreground/5 border-foreground/10 text-foreground/50"
@@ -317,12 +317,12 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
                         }`}
                       >
                         <p
-                          className={`text-[10px] font-bold Cap tracking-wider mb-1 ${g === result.grade ? "text-accent" : "text-foreground/40"}`}
+                          className={`text-[10px] font-medium   mb-1 ${g === result.grade ? "text-accent" : "text-foreground/40"}`}
                         >
                           {g}
                         </p>
                         <p
-                          className={`text-xs font-black ${g === result.grade ? "text-foreground" : "text-foreground/60"}`}
+                          className={`text-xs font-medium ${g === result.grade ? "text-foreground" : "text-foreground/60"}`}
                         >
                           {val}
                           {g === "F" ? "" : "+"}
@@ -904,19 +904,19 @@ function TranscriptPage() {
                 <div className="space-y-10 relative z-10">
                   <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-foreground/10 pb-10">
                     <div className="space-y-1">
-                      <h2 className="text-3xl font-black text-foreground tracking-tighter">
+                      <h2 className="text-3xl font-bold text-foreground ">
                         {activeSemData.title}
                       </h2>
-                      <p className="text-xs text-foreground/50 font-black Cap tracking-[0px]">
+                      <p className="text-xs text-foreground/50 font-bold  tracking-[0px]">
                         Semester Detail Report
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-x-12 lg:gap-x-16 gap-y-6">
                       <div className="text-right flex flex-col items-end min-w-[70px]">
-                        <span className="text-[10px] font-black text-foreground/40 Cap tracking-[0px] mb-2 bg-tertiary px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-bold text-foreground/40  tracking-[0px] mb-2 bg-tertiary px-2 py-0.5 rounded">
                           Attemp.
                         </span>
-                        <span className="text-3xl font-bold font-sans text-foreground tracking-tighter">
+                        <span className="text-3xl font-bold font-sans text-foreground ">
                           {activeSemData.courses.reduce((acc, c) => {
                             const grade =
                               overriddenGrades[
@@ -931,10 +931,10 @@ function TranscriptPage() {
                         </span>
                       </div>
                       <div className="text-right flex flex-col items-end min-w-[70px]">
-                        <span className="text-[10px] font-black text-foreground/40 Cap tracking-[0px] mb-2 bg-tertiary px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-bold text-foreground/40  tracking-[0px] mb-2 bg-tertiary px-2 py-0.5 rounded">
                           Earned
                         </span>
-                        <span className="text-3xl font-bold font-sans text-accent tracking-tighter">
+                        <span className="text-3xl font-bold font-sans text-accent ">
                           {activeSemIdx === semesters.length - 1 &&
                           !overriddenGrades[
                             Object.keys(overriddenGrades).find((k) =>
@@ -948,10 +948,10 @@ function TranscriptPage() {
                         </span>
                       </div>
                       <div className="text-right flex flex-col items-end min-w-[70px]">
-                        <span className="text-[10px] font-bold text-foreground/40 Cap tracking-[0px] mb-2 bg-tertiary px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-bold text-foreground/40  tracking-[0px] mb-2 bg-tertiary px-2 py-0.5 rounded">
                           SGPA
                         </span>
-                        <span className="text-3xl font-bold font-sans text-accent tracking-tighter">
+                        <span className="text-3xl font-bold font-sans text-accent ">
                           {activeSemIdx === semesters.length - 1 &&
                           !overriddenGrades[
                             Object.keys(overriddenGrades).find((k) =>
@@ -965,10 +965,10 @@ function TranscriptPage() {
                         </span>
                       </div>
                       <div className="text-right flex flex-col items-end min-w-[70px]">
-                        <span className="text-[10px] font-bold text-foreground/40 Cap tracking-[0px] mb-2 bg-tertiary px-2 py-0.5 rounded">
+                        <span className="text-[10px] font-bold text-foreground/40  tracking-[0px] mb-2 bg-tertiary px-2 py-0.5 rounded">
                           CGPA
                         </span>
-                        <span className="text-3xl font-bold font-sans text-foreground tracking-tighter">
+                        <span className="text-3xl font-bold font-sans text-foreground ">
                           {activeSemIdx === semesters.length - 1 &&
                           !overriddenGrades[
                             Object.keys(overriddenGrades).find((k) =>
@@ -988,25 +988,25 @@ function TranscriptPage() {
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-foreground/[0.02]">
-                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider border-b border-foreground/10">
+                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50   border-b border-foreground/10">
                             Code
                           </th>
-                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider border-b border-foreground/10">
+                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50   border-b border-foreground/10">
                             Course Name
                           </th>
-                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider border-b border-foreground/10 text-center">
+                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50   border-b border-foreground/10 text-center">
                             Section
                           </th>
-                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider border-b border-foreground/10 text-center">
+                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50   border-b border-foreground/10 text-center">
                             Cr.H
                           </th>
-                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider border-b border-foreground/10 text-center">
+                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50   border-b border-foreground/10 text-center">
                             Grade
                           </th>
-                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider border-b border-foreground/10 text-center">
+                          <th className="px-6 py-4 text-[11px] font-bold text-foreground/50   border-b border-foreground/10 text-center">
                             Type
                           </th>
-                          <th className="px-8 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider border-b border-foreground/10 text-right">
+                          <th className="px-8 py-4 text-[11px] font-bold text-foreground/50   border-b border-foreground/10 text-right">
                             Points
                           </th>
                         </tr>
@@ -1124,7 +1124,7 @@ function TranscriptPage() {
                                         MCA: {course.mca}
                                       </button>
                                       {course.gradingScheme && (
-                                        <span className="text-[10px] font-medium text-foreground/50 Cap tracking-wide">
+                                        <span className="text-[10px] font-bold text-foreground/50">
                                           {course.gradingScheme}
                                         </span>
                                       )}
@@ -1133,7 +1133,7 @@ function TranscriptPage() {
                                 </div>
                               </td>
                               <td className="px-6 py-4 text-center">
-                                <span className="text-xs font-bold text-foreground/50 Cap tracking-wider">
+                                <span className="text-xs font-bold text-foreground/50">
                                   {course.section}
                                 </span>
                               </td>
@@ -1194,7 +1194,7 @@ function TranscriptPage() {
                                 )}
                               </td>
                               <td className="px-6 py-4 text-center">
-                                <span className="text-[10px] font-black text-foreground/50 Cap tracking-[0px] bg-foreground/5 px-2 py-0.5 rounded">
+                                <span className="text-[10px] font-bold text-foreground/50 tracking-[0px] bg-foreground/5 px-2 py-0.5 rounded">
                                   {course.type}
                                 </span>
                               </td>
@@ -1227,10 +1227,10 @@ function TranscriptPage() {
             <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 relative overflow-hidden group">
               <div className="flex items-center justify-between mb-8">
                 <div className="space-y-1">
-                  <h3 className="text-xl font-bold text-foreground tracking-tight">
+                  <h3 className="text-xl font-bold text-foreground ">
                     Performance Flow
                   </h3>
-                  <p className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px]">
+                  <p className="text-[10px] text-foreground/50 font-bold tracking-[0px]">
                     Historical GPA Trend
                   </p>
                 </div>
@@ -1252,18 +1252,18 @@ function TranscriptPage() {
                   <div className="p-3 bg-accent/10 rounded-xl text-accent">
                     <Zap size={20} />
                   </div>
-                  <h3 className="text-lg font-bold text-foreground tracking-tight">
+                  <h3 className="text-lg font-bold text-foreground ">
                     Simulation Desk
                   </h3>
                 </div>
 
                 <div className="space-y-4 flex-1">
                   <div className="p-5 rounded-[1.5rem] bg-secondary/40 border border-foreground/10  transition-colors">
-                    <p className="text-[10px] font-bold text-foreground/40 Cap tracking-[0px] mb-1">
+                    <p className="text-[10px] font-bold text-foreground/40  tracking-[0px] mb-1">
                       Projected CGPA
                     </p>
                     <div className="flex items-end justify-between">
-                      <span className="text-4xl font-bold font-sans text-foreground tracking-tighter">
+                      <span className="text-4xl font-bold font-sans text-foreground ">
                         {calculatedStats?.currentCGPA.toFixed(2)}
                       </span>
                       {simulationMode && (
@@ -1282,13 +1282,13 @@ function TranscriptPage() {
                   </div>
 
                   <div className="p-5 rounded-[1.5rem] bg-secondary/40 border border-foreground/10  transition-colors">
-                    <p className="text-[10px] font-bold text-foreground/40 Cap tracking-[0px] mb-1">
+                    <p className="text-[10px] font-bold text-foreground/40  tracking-[0px] mb-1">
                       Simulation Impact
                     </p>
                     <div className="flex items-center justify-between">
-                      <span className="text-xl font-medium font-sans text-foreground/60">
+                      <span className="text-xl font-bold font-sans text-foreground/60">
                         {Object.keys(overriddenGrades).length}{" "}
-                        <span className="text-[10px] Cap ml-1 opacity-60">
+                        <span className="text-[10px]  ml-1 opacity-60">
                           Changes
                         </span>
                       </span>

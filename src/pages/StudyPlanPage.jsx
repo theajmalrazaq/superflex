@@ -275,16 +275,16 @@ function StudyPlanPage() {
                 <table className="w-full text-left order-collapse border-spacing-0">
                   <thead>
                     <tr className="border-b border-foreground/10">
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap">
                         Code
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap">
                         Course Title
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider text-center">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 text-center Cap">
                         Cr.H
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap tracking-wider text-right">
+                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 text-right Cap">
                         Category
                       </th>
                     </tr>

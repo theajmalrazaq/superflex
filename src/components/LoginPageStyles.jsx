@@ -206,8 +206,8 @@ function LoginPageStyles() {
         const header = document.createElement("div");
         header.className = "login-header w-full text-left mb-8 space-y-1";
         header.innerHTML = `
-          <h2 class="text-2xl font-black text-foreground tracking-tight">Locked In?</h2>
-          <p class="text-accent text-[10px] font-black Cap tracking-[0px]">Time to Flex on 'em</p>
+          <h2 class="text-2xl font-black text-foreground">Locked In?</h2>
+          <p class="text-accent text-[10px] font-medium Cap tracking-[0px]">Time to Flex on 'em</p>
         `;
         bglogin.insertBefore(header, bglogin.firstChild);
       }
@@ -257,7 +257,7 @@ function LoginPageStyles() {
         forgotTitle.classList.add(
           "!text-foreground",
           "!text-2xl",
-          "!font-bold",
+          "!font-medium",
           "!mb-0"
         );
       }
@@ -396,7 +396,7 @@ function LoginPageStyles() {
         requestButton.classList.add(
           "!bg-accent",
           "!text-[var(--accent-foreground)]",
-          "!font-bold",
+          "!font-medium",
           "cursor-pointer",
           "!rounded-2xl",
           "!py-4",
@@ -421,7 +421,7 @@ function LoginPageStyles() {
           );
           toast.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            <span class="text-[10px] font-black Cap tracking-[0px]">${message}</span>
+            <span class="text-[10px] font-medium  tracking-[0px]">${message}</span>
           `;
         } else {
           toast.classList.add(
@@ -431,7 +431,7 @@ function LoginPageStyles() {
           );
           toast.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span class="text-[10px] font-black Cap tracking-[0px]">${message}</span>
+            <span class="text-[10px] font-medium  tracking-[0px]">${message}</span>
           `;
         }
 
@@ -702,9 +702,8 @@ function LoginPageStyles() {
         .review-verified {
           color: var(--accent);
           font-size: 10px;
-          font-weight: 800;
-          text-transform: Cap;
-          letter-spacing: 0.05em;
+          font-weight: 500;
+          text-transform: none;
         }
         .review-comment {
           color: color-mix(in srgb, var(--foreground), transparent 30%);
@@ -771,7 +770,7 @@ function LoginPageStyles() {
               </svg>
               <span class="rounded-full size-11 absolute opacity-30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-lg" style="animation: 14s ease-in-out 0s infinite alternate none running star-shine; background: var(--accent);"></span>
             </span>
-            <span id="version-text" class="bg-gradient-to-b ml-1.5 from-foreground to-foreground/50 bg-clip-text text-xs text-transparent Cap font-bold">
+            <span id="version-text" class="bg-gradient-to-b ml-1.5 from-foreground to-foreground/50 bg-clip-text text-xs text-transparent mt-[1px] uppercase font-bold">
               SuperFlex v${CURRENT_VERSION}
             </span>
           </span>
@@ -804,7 +803,7 @@ function LoginPageStyles() {
           </svg>
           <div class="flex items-center justify-center gap-3 w-full">
             <span class="w-8 sm:w-12 h-px bg-gradient-to-r from-transparent to-foreground/20"></span>
-            <span class="font-black text-[8px] sm:text-[10px] Cap tracking-[0.15em] sm:tracking-[0.4em] text-accent/80 text-center">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span>
+            <span class="font-medium text-[8px] sm:text-[10px]  tracking-[0.15em] sm:tracking-[0.4em] uppercase text-accent/80 text-center">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span>
             <span class="w-8 sm:w-12 h-px bg-gradient-to-l from-transparent to-foreground/20"></span>
           </div>
         </div>
@@ -820,7 +819,7 @@ function LoginPageStyles() {
 
     <!-- Privacy Policy Link -->
     <div class="mt-8 relative z-10">
-        <a href="https://theajmalrazaq.github.io/superflex/docs.html?page=privacy" target="_blank" class="text-[10px] font-bold text-foreground/50 hover:text-accent Cap tracking-[0px] transition-colors flex items-center gap-2">
+        <a href="https://theajmalrazaq.github.io/superflex/docs.html?page=privacy" target="_blank" class="text-[10px] font-medium text-foreground/50 hover:text-accent  tracking-[0px] transition-colors flex items-center gap-2">
             Privacy Policy & Data Transparency
         </a>
     </div>
@@ -931,8 +930,8 @@ function LoginPageStyles() {
                 </svg>
               </div>
               <div>
-                <h2 class="text-lg font-black text-foreground tracking-tight">Terms & Conditions</h2>
-                <p class="text-[9px] text-accent font-black Cap tracking-[0px]">First Time Setup</p>
+                <h2 class="text-lg font-black text-foreground ">Terms & Conditions</h2>
+                <p class="text-[9px] text-accent font-medium  tracking-[0px]">First Time Setup</p>
               </div>
             </div>
           </div>
@@ -941,7 +940,7 @@ function LoginPageStyles() {
           <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
             <div class="space-y-2.5">
               <div class="p-3 rounded-xl bg-foreground/[0.02] border border-foreground/10">
-                <h3 class="text-xs font-black text-foreground mb-1.5 flex items-center gap-2">
+                <h3 class="text-xs font-medium text-foreground mb-1.5 flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"/>
                     <line x1="12" y1="16" x2="12" y2="12"/>
@@ -955,7 +954,7 @@ function LoginPageStyles() {
               </div>
 
               <div class="p-3 rounded-xl bg-foreground/[0.02] border border-foreground/10">
-                <h3 class="text-xs font-black text-foreground mb-1.5 flex items-center gap-2">
+                <h3 class="text-xs font-medium text-foreground mb-1.5 flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
@@ -968,7 +967,7 @@ function LoginPageStyles() {
               </div>
 
               <div class="p-3 rounded-xl bg-foreground/[0.02] border border-foreground/10">
-                <h3 class="text-xs font-black text-foreground mb-1.5 flex items-center gap-2">
+                <h3 class="text-xs font-medium text-foreground mb-1.5 flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                   </svg>
@@ -980,7 +979,7 @@ function LoginPageStyles() {
               </div>
 
               <div class="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
-                <h3 class="text-xs font-black text-emerald-400 mb-1.5 flex items-center gap-2">
+                <h3 class="text-xs font-medium text-emerald-400 mb-1.5 flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 3h18v18H3zM21 9H3M9 21V9"/>
                   </svg>
@@ -1001,7 +1000,7 @@ function LoginPageStyles() {
 
           <!-- Footer -->
           <div class="p-4 sm:p-5 border-t border-foreground/10 bg-foreground/5">
-            <button id="terms-accept-btn" class="w-full bg-accent text-foreground border-none rounded-xl py-3 px-6 font-bold text-sm hover:bg-accent/80 transition-all">
+            <button id="terms-accept-btn" class="w-full bg-accent text-foreground border-none rounded-xl py-3 px-6 font-medium text-sm hover:bg-accent/80 transition-all">
               Accept & Continue
             </button>
           </div>

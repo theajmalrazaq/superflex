@@ -154,7 +154,7 @@ function CourseRegistrationPage() {
                             {table.headers.map((h, i) => (
                               <th
                                 key={i}
-                                className="text-left py-4 px-4 text-xs font-bold text-foreground/50 Cap tracking-wider"
+                                className="text-left py-4 px-4 text-xs font-bold text-foreground/50 Cap"
                               >
                                 {h}
                               </th>

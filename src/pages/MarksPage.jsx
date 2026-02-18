@@ -118,7 +118,7 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
                   </div>
                   {course.grandTotalStats && (
                     <span
-                      className={`text-xs font-bold px-2 py-1 rounded-lg ${
+                      className={`text-xs font-medium px-2 py-1 rounded-lg ${
                         (course.grandTotalStats.percentage || 0) >= 80
                           ? "bg-emerald-500/20 text-emerald-400"
                           : (course.grandTotalStats.percentage || 0) >= 60
@@ -355,7 +355,7 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
                       {item.obtained} / {item.total}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-[10px] text-foreground/50 Cap tracking-wider font-bold">
+                  <div className="flex items-center gap-2 text-[10px] text-foreground/50   font-bold">
                     <span className="truncate max-w-[120px]">
                       {item.courseTitle}
                     </span>
@@ -505,12 +505,12 @@ const AssessmentView = ({
                 {section.title}
               </h3>
               {isGrandTotal && (
-                <span className="px-2 py-0.5 rounded-md bg-accent/20 text-accent text-[10px] font-bold Cap tracking-wider">
+                <span className="px-2 py-0.5 rounded-md bg-accent/20 text-accent text-[10px] font-bold">
                   Final
                 </span>
               )}
               {isSimulationMode && !isGrandTotal && (
-                <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-500 text-[10px] font-bold Cap tracking-wider flex items-center gap-1">
+                <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-500 text-[10px] font-bold  flex items-center gap-1">
                   <Zap size={10} fill="currentColor" /> Simulating
                 </span>
               )}
@@ -526,7 +526,7 @@ const AssessmentView = ({
             {!isGrandTotal && hasAssessments && (
               <button
                 onClick={onToggleSimulation}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-bold text-sm border ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-medium text-sm border ${
                   isSimulationMode
                     ? "bg-amber-500 text-foreground border-amber-600"
                     : "bg-tertiary text-foreground/60 border-foreground/10 hover:bg-tertiary"
@@ -601,31 +601,31 @@ const AssessmentView = ({
             <table className="w-full text-sm text-left border-collapse scrollbar-hide">
               <thead>
                 <tr className="border-b border-foreground/10 bg-background/40 backdrop-blur-md">
-                  <th className="px-6 py-4 text-xs font-bold text-foreground/60 Cap tracking-wider sticky top-0 bg-secondary/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-foreground/60   sticky top-0 bg-secondary/90 z-20">
                     Item Name
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-foreground/60 Cap tracking-wider text-center sticky top-0 bg-secondary/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-foreground/60   text-center sticky top-0 bg-secondary/90 z-20">
                     Weightage
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-foreground/60 Cap tracking-wider text-center sticky top-0 bg-secondary/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-foreground/60   text-center sticky top-0 bg-secondary/90 z-20">
                     Total Marks
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-foreground/60 Cap tracking-wider text-center sticky top-0 bg-secondary/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-foreground/60   text-center sticky top-0 bg-secondary/90 z-20">
                     Obtained
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-accent Cap tracking-wider text-center sticky top-0 bg-secondary/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-accent   text-center sticky top-0 bg-secondary/90 z-20">
                     Obt Weight
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-foreground/60 Cap tracking-wider text-center sticky top-0 bg-secondary/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-foreground/60   text-center sticky top-0 bg-secondary/90 z-20">
                     Avg
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-foreground/60 Cap tracking-wider text-center sticky top-0 bg-secondary/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-foreground/60   text-center sticky top-0 bg-secondary/90 z-20">
                     Std Dev
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-foreground/60 Cap tracking-wider text-center sticky top-0 bg-secondary/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-foreground/60   text-center sticky top-0 bg-secondary/90 z-20">
                     Min
                   </th>
-                  <th className="px-6 py-4 text-xs font-bold text-foreground/60 Cap tracking-wider text-center sticky top-0 bg-secondary/90 z-20">
+                  <th className="px-6 py-4 text-xs font-bold text-foreground/60   text-center sticky top-0 bg-secondary/90 z-20">
                     Max
                   </th>
                 </tr>
@@ -668,7 +668,7 @@ const AssessmentView = ({
                             )}
                             {row.title}
                             {!row.included && (
-                              <span className="ml-2 text-[9px] font-bold bg-tertiary text-foreground/60 px-1.5 py-0.5 rounded Cap">
+                              <span className="ml-2 text-[9px] font-bold bg-tertiary text-foreground/60 px-1.5 py-0.5 rounded ">
                                 Dropped
                               </span>
                             )}
@@ -1417,7 +1417,7 @@ function MarksPage() {
                   <div className="p-6 rounded-[2.5rem] bg-secondary/50 border border-foreground/10 mb-6 text-foreground/30">
                     <Layers size={48} />
                   </div>
-                  <h4 className="text-2xl font-black text-foreground/50 tracking-tight mb-2">
+                  <h4 className="text-2xl font-bold text-foreground/50  mb-2">
                     No Assessment Available
                   </h4>
                   <p className="text-foreground/40 max-w-xs mx-auto text-sm font-medium">

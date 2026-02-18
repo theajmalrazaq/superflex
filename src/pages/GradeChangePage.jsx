@@ -224,8 +224,8 @@ function GradeChangePage() {
       }
       #RemarksDetail .modal-header { border-bottom: 1px solid rgba(255,255,255,0.1) !important; padding: 1.5rem !important; }
       #RemarksDetail .modal-footer { border-top: 1px solid rgba(255,255,255,0.1) !important; padding: 1.5rem !important; }
-      #RemarksDetail .modal-title { font-weight: 900 !important; color: white !important; text-transform: Cap !important; letter-spacing: 0.05em !important; font-size: 1.125rem !important; }
-      #RemarksDetail label { color: #71717a !important; font-size: 10px !important; font-weight: 900 !important; text-transform: Cap !important; letter-spacing: 0.1em !important; margin-bottom: 0.5rem !important; }
+      #RemarksDetail .modal-title { font-weight: 500 !important; color: white !important; text-transform: uppercase !important; font-size: 1.125rem !important; }
+      #RemarksDetail label { color: #71717a !important; font-size: 10px !important; font-weight: 800 !important; text-transform: uppercase !important; margin-bottom: 0.5rem !important; }
       #RemarksDetail input, #RemarksDetail select, #RemarksDetail textarea {
         background: rgba(255,255,255,0.03) !important;
         border: 1px solid rgba(255,255,255,0.1) !important;

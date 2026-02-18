@@ -292,7 +292,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       </div>
       <div>
         <div
-          className={`text-sm font-semibold mb-0.5 ${
+          className={`text-sm font-medium mb-0.5 ${
             isActive
               ? "text-foreground "
               : "text-foreground/80 group-hover:text-foreground"
@@ -638,7 +638,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                     <Pipette size={18} />
                   </div>
                   <div className="text-left">
-                    <h3 className="text-foreground font-semibold text-sm leading-tight">
+                    <h3 className="text-foreground font-medium text-sm leading-tight">
                       Aura Settings
                     </h3>
                     <p className="text-[11px] text-foreground/50 font-medium mt-1">
@@ -674,7 +674,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         }`}
                       >
                         <Sun size={14} />
-                        <span className="text-xs font-semibold md:mt-2">
+                        <span className="text-xs font-bold md:mt-2">
                           Light
                         </span>
                       </button>
@@ -687,7 +687,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         }`}
                       >
                         <Moon size={14} />
-                        <span className="text-xs font-semibold md:mt-2">
+                        <span className="text-xs font-medium md:mt-2">
                           Dark
                         </span>
                       </button>
@@ -697,7 +697,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                   {}
                   <div className="flex flex-col items-start gap-3 px-1 text-left">
                     <div>
-                      <h3 className="text-foreground font-semibold text-sm leading-tight">
+                      <h3 className="text-foreground font-bold text-sm leading-tight">
                         Accent Color
                       </h3>
                       <p className="text-[11px] text-foreground/50 font-medium mt-0.5">
@@ -744,7 +744,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between px-1">
                       <div>
-                        <h3 className="text-foreground font-semibold text-sm leading-tight">
+                        <h3 className="text-foreground font-medium text-sm leading-tight">
                           Background Aura
                         </h3>
                         <p className="text-[11px] text-foreground/50 font-medium mt-1">
@@ -838,7 +838,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                           [category]: !prev[category],
                         }))
                       }
-                      className="w-full flex items-center justify-between px-4 py-3 text-xs font-bold Cap tracking-wider text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors"
+                      className="w-full flex items-center justify-between px-4 py-3 text-xs font-bold   text-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors"
                     >
                       <span>{category}</span>
                       <div
@@ -925,7 +925,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
               strokeOpacity="0.03"
             />
           </svg>
-          <span className="text-xs font-bold Cap tracking-wider hidden sm:inline-block">
+          <span className="text-xs font-bold   hidden sm:inline-block">
             Ask AI
           </span>
         </button>
@@ -950,7 +950,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                 {}
                 <div className="p-4 space-y-4">
                   <div className="px-1">
-                    <h3 className="text-sm font-semibold mb-0.5 text-foreground/80 tracking-tight">
+                    <h3 className="text-sm font-medium mb-0.5 text-foreground/80 ">
                       Appearance
                     </h3>
                     <p className="text-[11px] text-foreground/50 font-medium">
@@ -968,7 +968,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                       }`}
                     >
                       <Sun size={14} />
-                      <span className="text-xs font-semibold">Light</span>
+                      <span className="text-xs font-medium">Light</span>
                     </button>
                     <button
                       onClick={() => handleThemeModeChange("dark")}
@@ -979,7 +979,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                       }`}
                     >
                       <Moon size={14} />
-                      <span className="text-xs font-semibold">Dark</span>
+                      <span className="text-xs font-medium">Dark</span>
                     </button>
                   </div>
                 </div>
@@ -989,7 +989,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                 {}
                 <div className="p-4 flex flex-col items-start gap-3">
                   <div className="px-1">
-                    <h3 className="text-sm font-semibold mb-0.5 text-foreground/80 tracking-tight">
+                    <h3 className="text-sm font-bold mb-0.5 text-foreground/80 ">
                       Accent Color
                     </h3>
                     <p className="text-[11px] text-foreground/50 font-medium">
@@ -1038,7 +1038,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                 <div className="p-4 space-y-4">
                   <div className="px-1 flex justify-between items-start">
                     <div>
-                      <h3 className="text-sm font-semibold mb-0.5 text-foreground/80 tracking-tight">
+                      <h3 className="text-sm font-bold mb-0.5 text-foreground/80 ">
                         Background Aura
                       </h3>
                       <p className="text-[11px] text-foreground/50 font-medium">

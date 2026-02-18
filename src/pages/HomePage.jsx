@@ -82,13 +82,13 @@ const SectionAccordion = ({ section, isOpen, onToggle }) => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-foreground/[0.02]">
-                <th className="p-3 text-[11px] font-semibold text-foreground/50 Cap tracking-wider border-b border-foreground/10 w-16">
+                <th className="p-3 text-[11px] font-bold text-foreground/50 border-b border-foreground/10 w-16 Cap">
                   No.
                 </th>
-                <th className="p-3 text-[11px] font-semibold text-foreground/50 Cap tracking-wider border-b border-foreground/10 text-right">
+                <th className="p-3 text-[11px] font-bold text-foreground/50 border-b border-foreground/10 text-right Cap">
                   Marks
                 </th>
-                <th className="p-3 text-[11px] font-semibold text-foreground/50 Cap tracking-wider border-b border-foreground/10 text-right w-24">
+                <th className="p-3 text-[11px] font-bold text-foreground/50 border-b border-foreground/10 text-right w-24 Cap">
                   Status
                 </th>
               </tr>
@@ -1112,7 +1112,7 @@ const ProfileInfoTabs = ({ profileSections }) => {
                 key={i}
                 className="flex flex-col p-4 rounded-2xl bg-background/20 border border-foreground/10 hover:bg-foreground/5 transition-colors group"
               >
-                <span className="text-foreground/50 text-[10px] Cap tracking-wider font-bold mb-1.5 group-hover:text-foreground/60">
+                <span className="text-foreground/50 text-[10px] font-bold mb-1.5 group-hover:text-foreground/60 Cap">
                   {key}
                 </span>
                 <span className="text-foreground text-sm font-medium break-words leading-relaxed">

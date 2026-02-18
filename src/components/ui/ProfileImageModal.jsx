@@ -146,7 +146,7 @@ const ProfileImageModal = ({ isOpen, onClose, currentImage }) => {
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 text-error text-[10px] font-bold Cap tracking-wider bg-error/10 px-4 py-3 rounded-xl border border-error/20 w-fit">
+          <div className="flex items-center gap-2 text-error text-[10px] font-bold bg-error/10 px-4 py-3 rounded-xl border border-error/20 w-fit Cap">
             <AlertCircle size={14} />
             {error}
           </div>
