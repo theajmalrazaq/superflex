@@ -8,6 +8,7 @@ import TranscriptPage from "../pages/TranscriptPage";
 import FeeChallanPage from "../pages/FeeChallanPage";
 import FeeDetailsPage from "../pages/FeeDetailsPage";
 import CourseFeedbackPage from "../pages/CourseFeedbackPage";
+import SubmitFeedbackPage from "../pages/SubmitFeedbackPage";
 import RetakeExamPage from "../pages/RetakeExamPage";
 import CourseWithdrawPage from "../pages/CourseWithdrawPage";
 import GradeChangePage from "../pages/GradeChangePage";
@@ -115,6 +116,13 @@ function PathRouter() {
 
     if (currentPath.includes("/Student/CourseFeedback")) {
       return <CourseFeedbackPage />;
+    }
+
+    if (
+      currentPath.includes("/Student/SubmitFeedback") ||
+      currentPath.includes("/Student/FeedBackQuestions")
+    ) {
+      return <SubmitFeedbackPage />;
     }
 
     if (currentPath.includes("/Student/RetakeRequest")) {

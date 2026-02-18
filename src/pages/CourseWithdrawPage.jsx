@@ -584,7 +584,7 @@ function CourseWithdrawPage() {
           <StatsCard
             icon={ShieldCheck}
             label="Withdrawal Status"
-            value={isWithdrawActive ? "WINDOW OPEN" : "LOCKED"}
+            value={isWithdrawActive ? "Open" : "Locked"}
             delay={300}
           />
           <StatsCard
