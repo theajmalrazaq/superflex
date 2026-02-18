@@ -845,8 +845,8 @@ function HomePage() {
                 {}
                 {loadingMarks ? (
                   <MarksSkeleton />
-                ) : coursesData.length > 0 ? (
-                  <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden flex flex-col gap-8 h-full">
+                ) : (
+                  <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden flex flex-col gap-8 h-full min-h-[500px]">
                     <div className="flex flex-col md:flex-row justify-between items-start gap-6">
                       <div className="space-y-1">
                         <h3 className="text-xl font-bold text-foreground tracking-tight">
@@ -867,86 +867,97 @@ function HomePage() {
                       )}
                     </div>
 
-                    {}
-                    <div className="w-full overflow-x-auto scrollbar-hide scrollbar-hide">
-                      <div className="flex gap-2 bg-background/40 p-1.5 rounded-full border border-foreground/10 backdrop-blur-sm w-fit">
-                        {coursesData.map((course) => (
-                          <button
-                            key={course.id}
-                            onClick={() => setActiveCourse(course.id)}
-                            className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
-                              activeCourse === course.id
-                                ? "bg-accent text-[var(--accent-foreground)]"
-                                : "text-foreground/50 hover:text-foreground"
-                            }`}
-                          >
-                            {course.id}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {}
-                    {activeCourseData && (
-                      <div key={activeCourse} className="">
-                        <div className="flex flex-col gap-2 mb-4">
-                          <h2 className="text-xl font-bold text-foreground leading-tight">
-                            {activeCourseData.title}
-                          </h2>
-                          <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded-md bg-secondary  text-foreground/60 text-xs font-medium">
-                              {activeCourseData.id}
-                            </span>
-                            <span className="text-xs text-foreground/50">
-                              {(() => {
-                                const examSections =
-                                  activeCourseData.sections.filter(
-                                    (s) => !s.id.endsWith("Grand_Total_Marks"),
-                                  );
-                                return examSections.reduce(
-                                  (acc, sec) => acc + (sec.rows?.length || 0),
-                                  0,
-                                );
-                              })()}{" "}
-                              Assessments
-                            </span>
+                    {coursesData.length > 0 ? (
+                      <>
+                        {/* Tabs */}
+                        <div className="w-full overflow-x-auto scrollbar-hide scrollbar-hide">
+                          <div className="flex gap-2 bg-background/40 p-1.5 rounded-full border border-foreground/10 backdrop-blur-sm w-fit">
+                            {coursesData.map((course) => (
+                              <button
+                                key={course.id}
+                                onClick={() => setActiveCourse(course.id)}
+                                className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
+                                  activeCourse === course.id
+                                    ? "bg-accent text-[var(--accent-foreground)]"
+                                    : "text-foreground/50 hover:text-foreground"
+                                }`}
+                              >
+                                {course.id}
+                              </button>
+                            ))}
                           </div>
                         </div>
 
-                        {}
-                        <div className="space-y-3">
-                          {activeCourseData.sections
-                            .filter((s) => !s.id.endsWith("Grand_Total_Marks"))
-                            .map((section, idx) => (
-                              <SectionAccordion
-                                key={idx}
-                                section={section}
-                                isOpen={openCategoryIdx === idx}
-                                onToggle={() =>
-                                  setOpenCategoryIdx(
-                                    openCategoryIdx === idx ? null : idx,
-                                  )
-                                }
-                              />
-                            ))}
-                          {activeCourseData.sections.length <= 1 && (
-                            <div className="p-8 text-center text-foreground/50 text-sm  rounded-xl bg-background">
-                              No assessments uploaded yet.
+                        {/* Content */}
+                        {activeCourseData && (
+                          <div key={activeCourse} className="">
+                            <div className="flex flex-col gap-2 mb-4">
+                              <h2 className="text-xl font-bold text-foreground leading-tight">
+                                {activeCourseData.title}
+                              </h2>
+                              <div className="flex items-center gap-2">
+                                <span className="px-2 py-0.5 rounded-md bg-secondary  text-foreground/60 text-xs font-medium">
+                                  {activeCourseData.id}
+                                </span>
+                                <span className="text-xs text-foreground/50">
+                                  {(() => {
+                                    const examSections =
+                                      activeCourseData.sections.filter(
+                                        (s) =>
+                                          !s.id.endsWith("Grand_Total_Marks"),
+                                      );
+                                    return examSections.reduce(
+                                      (acc, sec) =>
+                                        acc + (sec.rows?.length || 0),
+                                      0,
+                                    );
+                                  })()}{" "}
+                                  Assessments
+                                </span>
+                              </div>
                             </div>
-                          )}
+
+                            {}
+                            <div className="space-y-3">
+                              {activeCourseData.sections
+                                .filter(
+                                  (s) => !s.id.endsWith("Grand_Total_Marks"),
+                                )
+                                .map((section, idx) => (
+                                  <SectionAccordion
+                                    key={idx}
+                                    section={section}
+                                    isOpen={openCategoryIdx === idx}
+                                    onToggle={() =>
+                                      setOpenCategoryIdx(
+                                        openCategoryIdx === idx ? null : idx,
+                                      )
+                                    }
+                                  />
+                                ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="flex-1 flex flex-col items-center justify-center opacity-50">
+                        <div className="p-6 rounded-3xl bg-foreground/5 mb-4">
+                          <Award size={48} className="text-foreground/40" />
                         </div>
+                        <h4 className="text-lg font-bold text-foreground/50">
+                          No Performance Data
+                        </h4>
+                        <p className="text-xs text-foreground/40 mt-1">
+                          Course marks haven't been uploaded yet.
+                        </p>
                       </div>
                     )}
-                  </div>
-                ) : (
-                  <div className="bg-background rounded-3xl  p-6 flex items-center justify-center text-foreground/50 min-h-[300px]">
-                    No marks data available
                   </div>
                 )}
                 {loadingAttendance ? (
                   <AttendanceSkeleton />
                 ) : (
-                  <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 h-full flex flex-col">
+                  <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 h-full min-h-[500px] flex flex-col">
                     <div className="flex justify-between items-start mb-8">
                       <div className="space-y-1">
                         <h3 className="text-xl font-bold text-foreground tracking-tight">
@@ -966,8 +977,8 @@ function HomePage() {
                         </a>
                       )}
                     </div>
-                    <div className="flex-1 w-full overflow-hidden relative min-h-[400px]">
-                      {attendanceData && chartPattern && (
+                    {attendanceData && attendanceData.length > 0 && chartPattern ? (
+                      <div className="flex-1 w-full overflow-hidden relative min-h-[400px]">
                         <div
                           style={{
                             height: `${Math.max(400, attendanceData.length * 60)}px`,
@@ -1060,8 +1071,20 @@ function HomePage() {
                             }}
                           />
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      <div className="flex-1 flex flex-col items-center justify-center opacity-50">
+                        <div className="p-6 rounded-3xl bg-foreground/5 mb-4">
+                          <Activity size={48} className="text-foreground/40" />
+                        </div>
+                        <h4 className="text-lg font-bold text-foreground/50">
+                          No Attendance Data
+                        </h4>
+                        <p className="text-xs text-foreground/40 mt-1">
+                          Attendance records are currently unavailable.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
