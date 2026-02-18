@@ -140,8 +140,8 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
   );
 };
 const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
-  const isPresent = record.status.includes("P");
-  const isLate = record.status.includes("L");
+   const isPresent = record.status.includes("P");
+   const isLate = record.status.includes("L");
   return (
     <div
       onClick={onToggleMark}
