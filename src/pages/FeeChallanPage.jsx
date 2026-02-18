@@ -81,24 +81,37 @@ function FeeChallanPage() {
           const rows = challanTable.querySelectorAll("tbody tr");
           rows.forEach((row) => {
             const cells = row.querySelectorAll("td");
-            if (cells.length >= 6) {
-              const amountMatch = cells[cells.length - 2]?.textContent
-                .trim()
-                .match(/\d+(,\d+)?(\.\d+)?/);
-              const amount = amountMatch ? amountMatch[0] : "0";
+            if (cells.length >= 5) {
+              const description = cells[1].textContent.trim();
+              const status = cells[4]?.textContent.trim() || "";
+              
+              // Find amount - check if there's a dedicated amount column (index 5 in some tables)
+              // or extract from description (common in Flex)
+              let amount = "0";
+              const amountInCells = cells.length >= 6 ? cells[5]?.textContent.trim() : "";
+              const amountMatchCell = amountInCells.match(/\d+([,]\d+)*([.]\d+)?/);
+              
+              if (amountMatchCell && amountMatchCell[0] !== "0") {
+                amount = amountMatchCell[0];
+              } else {
+                // Fallback: extract amount from description if possible
+                const amountMatchDesc = description.match(/\d+([,]\d+)*([.]\d+)?/);
+                if (amountMatchDesc) {
+                  amount = amountMatchDesc[0];
+                }
+              }
 
               const printBtn = cells[cells.length - 1]?.querySelector("a");
               const onclick = printBtn?.getAttribute("onclick") || "";
-
               const challanNoMatch = onclick.match(/\d+/);
               const challanNo = challanNoMatch ? challanNoMatch[0] : null;
 
               challanList.push({
                 srNo: cells[0].textContent.trim(),
-                description: cells[1].textContent.trim(),
-                issueDate: cells[2].textContent.trim(),
-                dueDate: cells[3].textContent.trim(),
-                status: cells[4].textContent.trim(),
+                description: description,
+                issueDate: cells[2]?.textContent.trim() || "-",
+                dueDate: cells[3]?.textContent.trim() || "-",
+                status: status,
                 amount: amount,
                 challanNo: challanNo,
               });
@@ -132,13 +145,18 @@ function FeeChallanPage() {
   }, []);
 
   const stats = useMemo(() => {
-    const unpaid = challans.filter((c) =>
-      c.status.toLowerCase().includes("unpaid"),
+    const unpaid = challans.filter(
+      (c) =>
+        !c.status.toLowerCase().includes("paid") &&
+        c.status.toLowerCase() !== "",
     ).length;
     const paid = challans.filter((c) =>
       c.status.toLowerCase().includes("paid"),
     ).length;
-    const latestAmount = challans.length > 0 ? challans[0].amount : "0";
+    
+    // Find the latest amount (most recent unpaid, or just most recent)
+    const latestUnpaid = challans.find(c => !c.status.toLowerCase().includes("paid"));
+    const latestAmount = latestUnpaid ? latestUnpaid.amount : (challans.length > 0 ? challans[0].amount : "0");
 
     return { unpaid, paid, latestAmount, total: challans.length };
   }, [challans]);
