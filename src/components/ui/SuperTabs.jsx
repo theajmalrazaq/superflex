@@ -25,7 +25,7 @@ const SuperTabs = ({
             onClick={() => onTabChange(tab.value)}
             className={`
               ${sizeClasses[size] || sizeClasses.md}
-              rounded-full font-bold transition-all duration-300 whitespace-nowrap relative
+              rounded-full font-bold cursor-pointer transition-all duration-300 whitespace-nowrap relative
               ${
                 isActive
                   ? "!text-[var(--accent-foreground)]"

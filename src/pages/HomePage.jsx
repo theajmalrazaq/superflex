@@ -53,7 +53,7 @@ const SectionAccordion = ({ section, isOpen, onToggle }) => {
     <div className=" rounded-xl overflow-hidden bg-secondary/50 backdrop-blur-sm mb-4">
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between p-4 bg-foreground/5 hover:bg-foreground/10 transition-colors"
+        className="w-full flex items-center justify-between p-4 bg-foreground/5 hover:bg-foreground/10 cursor-pointer transition-colors"
       >
         <div className="flex items-center gap-3">
           <span
@@ -766,7 +766,7 @@ function HomePage() {
               <div className="flex items-center backdrop-blur-md p-1.5 bg-foreground/5 border border-foreground/10 rounded-full gap-2 transition-all hover:bg-foreground/10">
                 <button
                   onClick={() => setActiveMainTab("stats")}
-                  className={`px-8 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 ${
+                  className={`px-8 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 cursor-pointer transition-all duration-300 ${
                     activeMainTab === "stats"
                       ? "bg-accent text-[var(--accent-foreground)]"
                       : "text-foreground/50 hover:text-foreground"
@@ -777,7 +777,7 @@ function HomePage() {
                 </button>
                 <button
                   onClick={() => setActiveMainTab("info")}
-                  className={`px-8 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300 ${
+                  className={`px-8 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 cursor-pointer transition-all duration-300 ${
                     activeMainTab === "info"
                       ? "bg-accent text-[var(--accent-foreground)]"
                       : "text-foreground/50 hover:text-foreground"
@@ -876,7 +876,7 @@ function HomePage() {
                               <button
                                 key={course.id}
                                 onClick={() => setActiveCourse(course.id)}
-                                className={`px-5 py-2 rounded-full text-xs font-bold transition-all duration-300 whitespace-nowrap ${
+                                className={`px-5 py-2 rounded-full text-xs font-bold cursor-pointer transition-all duration-300 whitespace-nowrap ${
                                   activeCourse === course.id
                                     ? "bg-accent text-[var(--accent-foreground)]"
                                     : "text-foreground/50 hover:text-foreground"
