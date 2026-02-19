@@ -46,15 +46,25 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      - name: Rename and zip folder
+      - name: Zip extension
         run: |
-          cp -r dist superflex
-          zip -r superflex.zip superflex
-          rm -rf superflex
+          # Zip the contents of the dist directory so manifest.json is at the root
+          cd dist && zip -r ../superflex.zip .
 
       - name: Get current date
         id: date
         run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      - name: Upload to Chrome Web Store
+        if: github.event.inputs.publish == 'true'
+        uses: mnao305/chrome-extension-upload@v5.0.0
+        with:
+          file-path: superflex.zip
+          extension-id: ${{ secrets.EXTENSION_ID }}
+          client-id: ${{ secrets.CLIENT_ID }}
+          client-secret: ${{ secrets.CLIENT_SECRET }}
+          refresh-token: ${{ secrets.REFRESH_TOKEN }}
+          verbose: true
 
       - name: Create Release
         id: create_release
@@ -71,13 +81,3 @@ jobs:
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload to Chrome Web Store
-        if: github.event.inputs.publish == 'true'
-        uses: mnao305/chrome-extension-upload@v5.0.0
-        with:
-          file-path: superflex.zip
-          extension-id: ${{ secrets.EXTENSION_ID }}
-          client-id: ${{ secrets.CLIENT_ID }}
-          client-secret: ${{ secrets.CLIENT_SECRET }}
-          refresh-token: ${{ secrets.REFRESH_TOKEN }}
