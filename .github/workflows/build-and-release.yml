@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version (e.g. 5.0.0)"
+        description: "Release version (e.g. 6.0.0)"
         required: true
-        default: "5.0.0"
+        default: "6.0.0"
       updates:
         description: "Release notes / What's changed"
         required: true
@@ -74,7 +74,7 @@ jobs:
 
       - name: Upload to Chrome Web Store
         if: github.event.inputs.publish == 'true'
-        uses: mnao305/chrome-extension-upload@v5.0.0
+        uses: mnao305/chrome-extension-upload@v6.0.0
         with:
           file-path: superflex.zip
           extension-id: ${{ secrets.EXTENSION_ID }}
