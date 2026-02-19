@@ -826,7 +826,7 @@ function LoginPageStyles() {
               </svg>
               <span class="rounded-full size-11 absolute opacity-30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-lg" style="animation: 14s ease-in-out 0s infinite alternate none running star-shine; background: var(--accent);"></span>
             </span>
-            <span id="version-text" class="bg-gradient-to-b ml-1.5 from-foreground to-foreground/50 bg-clip-text text-xs text-transparent mt-[1px] uppercase font-bold">
+            <span id="version-text" class="bg-gradient-to-b ml-1.5 from-foreground to-foreground/50 bg-clip-text text-xs text-transparent mt-[2px] uppercase font-bold">
               SuperFlex v${CURRENT_VERSION}
             </span>
           </span>
