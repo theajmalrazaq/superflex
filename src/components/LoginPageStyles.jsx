@@ -161,6 +161,32 @@ function LoginPageStyles() {
         "!transition-all"
       );
       button.style.fontFamily = "'Google Sans Flex', sans-serif";
+
+      button.addEventListener("click", () => {
+        if (
+          !button.querySelector(".animate-spin") &&
+          (button.id === "m_login_signin_submit" ||
+            button.innerText.toLowerCase().includes("sign in"))
+        ) {
+          const originalContent = button.innerHTML;
+          const buttonText = button.innerText.trim();
+          button.innerHTML = `
+            <div class="flex items-center justify-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+              </svg>
+              <span>${buttonText}</span>
+            </div>
+          `;
+          button.classList.add("!opacity-80", "!pointer-events-none");
+
+          // Restore if page doesn't reload or redirect
+          setTimeout(() => {
+            button.innerHTML = originalContent;
+            button.classList.remove("!opacity-80", "!pointer-events-none");
+          }, 3000);
+        }
+      });
     });
 
     const signInIcon = document.querySelector(".la-sign-in");
@@ -449,10 +475,24 @@ function LoginPageStyles() {
             forgotPasswordSection.querySelector("input[type='email']") ||
             forgotPasswordSection.querySelector("input[name='Email']");
           if (emailInput && emailInput.value.trim().length > 0) {
+            const originalContent = requestButton.innerHTML;
+            requestButton.innerHTML = `
+              <div class="flex items-center justify-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                </svg>
+                <span>${requestButton.innerText}</span>
+              </div>
+            `;
+            requestButton.classList.add("!opacity-80", "!pointer-events-none");
+
             setTimeout(() => {
               showToast("Password reset link sent to your email!");
               setTimeout(() => {
                 if (cancelButton) cancelButton.click();
+                // Restore button for next time
+                requestButton.innerHTML = originalContent;
+                requestButton.classList.remove("!opacity-80", "!pointer-events-none");
               }, 1500);
             }, 1000);
           }
@@ -525,17 +565,33 @@ function LoginPageStyles() {
       e.preventDefault();
       e.stopPropagation();
 
-      backdrop.classList.remove("!hidden");
-      setTimeout(() => {
-        backdrop.classList.remove("!opacity-0");
-        backdrop.classList.add("!opacity-100");
-      }, 10);
+      const originalContent = signInButton.innerHTML;
+      signInButton.innerHTML = `
+        <div class="flex items-center justify-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
+            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+          </svg>
+          <span class="text-sm font-medium">Please wait...</span>
+        </div>
+      `;
+      signInButton.classList.add("!opacity-80", "!pointer-events-none");
 
-      bglogin.classList.remove("!hidden");
       setTimeout(() => {
-        bglogin.classList.remove("!opacity-0");
-        bglogin.classList.add("!opacity-100", "!scale-100");
-      }, 10);
+        signInButton.innerHTML = originalContent;
+        signInButton.classList.remove("!opacity-80", "!pointer-events-none");
+
+        backdrop.classList.remove("!hidden");
+        setTimeout(() => {
+          backdrop.classList.remove("!opacity-0");
+          backdrop.classList.add("!opacity-100");
+        }, 10);
+
+        bglogin.classList.remove("!hidden");
+        setTimeout(() => {
+          bglogin.classList.remove("!opacity-0");
+          bglogin.classList.add("!opacity-100", "!scale-100");
+        }, 10);
+      }, 500);
     });
 
     backdrop.addEventListener("click", (e) => {
@@ -784,7 +840,7 @@ function LoginPageStyles() {
           <div class="h-24 w-24 bg-background border-8 border-foreground/10 bg-cover rounded-[32px] flex items-center justify-center relative z-10 ">
                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="96" height="96" fill="none">
                   <style>@keyframes splash{0%{transform:scale(.2);opacity:.8}80%{transform:scale(1.2);opacity:0}to{transform:scale(2.2);opacity:0}}</style>
-                  <path fill="var(--accent)" d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z" style="animation:splash 1.5s cubic-bezier(.165,.84,.44,1) infinite both;transform-origin:center center"/>
+                  <path fill="var(--accent)" d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" style="animation:splash 1.5s cubic-bezier(.165,.84,.44,1) infinite both;transform-origin:center center"/>
                </svg>
           </div>
         </div>
