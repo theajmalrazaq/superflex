@@ -21,7 +21,7 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
     if (isFullScreen) {
       const timer = setTimeout(() => {
         setLoading(false);
-      }, 2000);
+      }, 1000);
 
       const handleLoad = () => {
         setLoading(false);
