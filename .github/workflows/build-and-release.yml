@@ -43,8 +43,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Update manifest version
+        if: github.event.inputs.version != ''
+        run: |
+          sed -i 's/"version": ".*"/"version": "${{ github.event.inputs.version }}"/' manifest.json
+
       - name: Build
         run: pnpm run build
+
+      - name: Debug dist content
+        run: |
+          echo "Listing dist directory:"
+          ls -F dist/
+          echo "Checking manifest.json in dist:"
+          cat dist/manifest.json
 
       - name: Zip extension
         run: |
@@ -64,7 +76,6 @@ jobs:
           client-id: ${{ secrets.CLIENT_ID }}
           client-secret: ${{ secrets.CLIENT_SECRET }}
           refresh-token: ${{ secrets.REFRESH_TOKEN }}
-          verbose: true
 
       - name: Create Release
         id: create_release
