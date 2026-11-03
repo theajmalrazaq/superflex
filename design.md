@@ -1,7 +1,7 @@
 # SuperFlex Modern Design System Specification ("Sky & Midnight")
 
-> **Version**: 1.0.0  
-> **Aesthetic Philosophy**: Atmospheric Minimalist Flat (Sky Gradient, Photorealistic Cloudscapes, Crisp Zero-Shadow Cards, Midnight Plum Primary & Soft Lilac Secondary Accents).
+> **Version**: 1.1.0
+> **Aesthetic Philosophy**: Atmospheric minimalism: a soft sky gradient, white content surfaces, deep plum actions, and lilac accents. The login screen follows the onboarding reference; account screens use the same tokens with cards.
 
 ---
 
@@ -25,9 +25,9 @@ The **"Sky & Midnight"** design language is an ultra-clean, high-contrast, moder
 
 | Token Name             | Hex / Value                 | Tailwind / CSS Equivalent      | Purpose                                         |
 | :--------------------- | :-------------------------- | :----------------------------- | :---------------------------------------------- |
-| `sky-gradient-start`   | `#3b8fe6`                   | `from-[#3b8fe6]`               | Sky top atmospheric deep azure                  |
-| `sky-gradient-mid`     | `#7abdf0`                   | `via-[#7abdf0]`                | Transition mid-sky blue                         |
-| `sky-gradient-end`     | `#ddedf9`                   | `to-[#ddedf9]`                 | Lower horizon soft mist blue                    |
+| `sky-gradient-start`   | `#62abe0`                   | `from-[#62abe0]`               | Bright blue at the top of the login sky band    |
+| `sky-gradient-mid`     | `#9ac7e8`                   | `via-[#9ac7e8]`                | Soft blue through the center                    |
+| `sky-gradient-end`     | `#e4eff7`                   | `to-[#e4eff7]`                 | Pale horizon fading into white                  |
 | `sky-glass-pill`       | `rgba(255, 255, 255, 0.35)` | `bg-white/35 backdrop-blur-sm` | Translucent pills (e.g. Rate pill, version tag) |
 | `sky-glass-pill-hover` | `rgba(255, 255, 255, 0.45)` | `hover:bg-white/45`            | Hover state for translucent sky pills           |
 
@@ -35,12 +35,12 @@ The **"Sky & Midnight"** design language is an ultra-clean, high-contrast, moder
 
 | Token Name                | Hex / Value | Tailwind / CSS Equivalent         | Purpose                                                      |
 | :------------------------ | :---------- | :-------------------------------- | :----------------------------------------------------------- |
-| `primary-midnight`        | `#1e0838`   | `bg-[#1e0838]` / `text-[#1e0838]` | Primary button fill, FAB, headline brand accents             |
+| `primary-midnight`        | `#230052`   | `bg-[#230052]` / `text-[#230052]` | Login primary action and brand accents                       |
 | `primary-midnight-hover`  | `#2a0c4f`   | `hover:bg-[#2a0c4f]`              | Hover state for primary buttons                              |
 | `primary-midnight-active` | `#150428`   | `active:bg-[#150428]`             | Active/pressed state for primary buttons                     |
 | `secondary-lilac`         | `#dfc8fc`   | `bg-[#dfc8fc]` / `text-[#1e0838]` | Secondary pill action buttons (e.g. "Share", "I understand") |
 | `secondary-lilac-hover`   | `#d2afff`   | `hover:bg-[#d2afff]`              | Hover state for secondary lilac buttons                      |
-| `badge-lavender`          | `#e9ddff`   | `bg-[#e9ddff]`                    | Squircle logo containers, feature badges                     |
+| `badge-lavender`          | `#cfa7f5`   | `bg-[#cfa7f5]`                    | Lavender accent badges elsewhere in the app                  |
 | `callout-lilac-bg`        | `#f2ecfc`   | `bg-[#f2ecfc]`                    | In-card callout banners and notice highlights                |
 
 ### 2.3 Surface & Neutral Colors
@@ -49,11 +49,37 @@ The **"Sky & Midnight"** design language is an ultra-clean, high-contrast, moder
 | :---------------- | :---------------------- | :---------------------------------------------------------- |
 | `surface-card`    | `#ffffff` (Solid)       | Flat main cards, sheets, dialog surfaces (zero drop-shadow) |
 | `surface-input`   | `#f8f9fa` or `#ffffff`  | Input field background with `border-slate-200`              |
-| `text-primary`    | `#0f172a` (Slate 900)   | Main titles, card headlines, monetary figures               |
-| `text-secondary`  | `#64748b` (Slate 500)   | Subtitles, descriptive paragraphs                           |
+| `text-primary`    | `#080808`               | Login headline and main titles                              |
+| `text-secondary`  | `#626262`               | Login body copy and secondary descriptions                  |
 | `text-muted`      | `#94a3b8` (Slate 400)   | Placeholders, inactive tab labels, borders                  |
 | `status-positive` | `#16a34a` (Emerald 600) | Positive growth percentages (`+2.05% ↗`)                    |
 | `status-negative` | `#dc2626` (Red 600)     | Negative decline percentages (`-3.51% ↘`)                   |
+
+---
+
+## Login screen: onboarding reference
+
+The second supplied screenshot guides the login palette, rounded controls, white surface, and restrained typography. Use SuperFlex branding and student portal language. Keep the university portal's real username, password, and password reset behavior; the sample email field is a visual reference for the control shape.
+
+### Composition and spacing
+
+1. **Sky fade:** Apply the gradient to the full page background: `#62abe0` at the top, blue through roughly the upper two-fifths, pale blue near the midpoint, and white by `57%` of the viewport. Keep the page containers transparent so the fade reaches the viewport edges. Do not insert an empty hero or spacer element; center the card with the wrapper's flex layout.
+2. **Sign-in card:** Center a flat white card and the quiet footer as one vertical group against the page gradient. Use a `480px` maximum card width, `32px` corner radius, and responsive `14px`–`28px` vertical / `20px`–`32px` horizontal padding. Keep a small gap before the footer. The card has no border or shadow and must not rely on an empty hero element for placement.
+3. **Form introduction:** Show the existing black squircle favicon with its purple lightning bolt at `52px`, with “Superflex” beside it in the same row. Place “Welcome back! Enter your FLEX details and let's get you signed in.” beneath the full row. Use about `30px` for the heading, weight `500`, line height near `1.03`; body copy is `15px` with `1.35` line height. Keep a `12px` gap between the icon and heading and about `10px` below the row.
+4. **Controls:** White outlined pill fields `50px` tall with `22px` horizontal inset. Use a crisp plum focus outline. Keep `6px`–`8px` between field groups, then a `52px` plum pill submit button with a white right arrow. Center the existing Cloudflare Turnstile widget inside the card and set `data-theme="light"` before its implicit render. Labels and reset link stay visible and keyboard accessible. Hide the redundant roll number helper text when the label and placeholder already show the format.
+5. **Footer and updates:** Show the original version button above the card in the current rate-capsule style: a translucent white outer pill, a solid white inner chip with the lavender check icon and installed version in plum, and white status text reading “SuperFlex Active.” When GitHub reports a newer release, change the status text to “New Update Available: v…” and link the pill to the release. Keep Privacy Policy and Star on GitHub links beneath the form in quiet gray text. Add an icon button in that row to switch between light and dark mode; label it for screen readers and save the choice as `superflex-theme-mode`. Keep the login light by default. In dark mode, fade from `#000C22` at the top to `#000000` near the lower half; use black cards with a subtle border and white field labels. Dark input pills use `#D9D9D9` at 8% opacity for their fill and a 6px inside stroke of `#F9F9F9` at 23% opacity. Do not show “Made for FLEX.”
+
+### Sign-in and password reset alignment
+
+Both states use the same `480px` card width, responsive padding, `32px` radius, and centered position. Both headers use a two-column row: sign-in shows the black and purple favicon beside “Superflex”; reset shows a `52px` circular navy back button with a white arrow beside “Forgot your password?”. Supporting text spans the full width below the row. The reset card uses the measured height of the sign-in card, including the Turnstile widget, so the card edges and footer do not jump. Measure the space below the Sign In button, including its reset link, and reserve the same space below Request Reset Link so both primary buttons occupy the same position. Keep the email field below the description. Give the back button a clear accessible name.
+
+### UX writing
+
+- Use **Superflex** as the sign-in heading and **FLEX** for the university system.
+- Keep login copy conversational and focused on entering FLEX credentials. Avoid broad platform marketing claims.
+- Keep actions direct: “Sign in”, “Forgot your password?”, and “Request Reset Link”. The reset explanation should refer to the email linked to the user's FLEX account.
+
+The login shell is `100dvh` tall with page scrolling disabled. Center the card and footer together while keeping the form, CAPTCHA, submit action, and footer visible. Reduce card padding and form spacing on short displays. Terms modal content may scroll inside its own dialog. Never hide CAPTCHA, validation, or password reset to force the fit. On desktop, keep the card centered at a maximum width of `480px`.
 
 ---
 
@@ -113,7 +139,7 @@ flowchart TD
 | Element                   | Size          | Weight            | Tracking / Leading                             | Example                                  |
 | :------------------------ | :------------ | :---------------- | :--------------------------------------------- | :--------------------------------------- |
 | **Hero Numeric Balance**  | `48px`–`56px` | `800` (Extrabold) | `tracking-tight leading-none text-white`       | `$3.13` or `$0`                          |
-| **Card Hero Heading**     | `28px`–`32px` | `800` (Extrabold) | `tracking-tight leading-[1.18] text-slate-900` | `"Your portal moves with you."`          |
+| **Card Hero Heading**     | `28px`–`32px` | `800` (Extrabold) | `tracking-tight leading-[1.18] text-slate-900` | `"Superflex"`                            |
 | **Modal / Section Title** | `20px`–`24px` | `800` (Bold)      | `tracking-tight text-slate-900`                | `"All stocks"`, `"U.S. markets run..."`  |
 | **Card Subtitle / Body**  | `13px`–`14px` | `400` / `500`     | `leading-relaxed text-slate-500`               | Feature descriptions                     |
 | **Section Label / Tag**   | `11px`–`12px` | `700` (Bold)      | `tracking-wide uppercase text-slate-400`       | `"CHECKING ACCOUNT"`, `"BASE"`           |
@@ -265,7 +291,7 @@ As seen in the **All / Stocks / ETFs / Commodities** and **BASE / SOLANA** selec
 
 ### 5.5 Form Inputs & Inline Action Controls
 
-As seen in the login card reference:
+As seen in the onboarding login control and account action pills:
 
 - **Geometry**: Pill-shaped (`rounded-full h-[52px] px-6`).
 - **Background**: Soft off-white (`#f8f9fa`) or crisp white (`#ffffff`).
@@ -278,9 +304,9 @@ As seen in the login card reference:
 ## 6. Iconography & Badges
 
 - **SuperFlex Lightning Favicon**:
-  - Embedded as flat vector in squircle badges (`w-12 h-12 rounded-2xl bg-[#e9ddff]`).
+  - Use `assets/favicon.svg` for the sign-in card mark, displayed at `52px` without a separate colored badge background.
   - Path: `M247.227 185.616L282.286 69L133 216L186.861 231.146L133 363L298 208.65L247.227 185.616Z`.
-  - Fill: `#1e0838` (Midnight Plum).
+  - Black squircle background with a `#A098FF` lightning bolt.
 - **Navigation & Status Icons**:
   - Lucide / Clean SVG line icons, `stroke-width="2"` or `2.5`.
   - Rounded stroke ends (`stroke-linecap="round" stroke-linejoin="round"`).
@@ -289,11 +315,11 @@ As seen in the login card reference:
 
 ## 7. Responsive Breakpoint Rules
 
-| Breakpoint                    | Card Max Width                    | Padding        | Border Radius    |
-| :---------------------------- | :-------------------------------- | :------------- | :--------------- |
-| **Mobile (`< 640px`)**        | `92vw`                            | `p-6` to `p-7` | `rounded-[28px]` |
-| **Tablet (`640px`–`1024px`)** | `430px` (Login) / `520px` (Modal) | `p-8`          | `rounded-[32px]` |
-| **Desktop (`> 1024px`)**      | Responsive container              | `p-10`         | `rounded-[36px]` |
+| Breakpoint                    | Card Max Width                              | Padding                                      | Border Radius                           |
+| :---------------------------- | :------------------------------------------ | :------------------------------------------- | :-------------------------------------- |
+| **Mobile (`< 640px`)**        | Login: viewport minus `64px`; cards: `92vw` | Login: `32px` gutters; cards: `p-6` to `p-7` | Login: no card; cards: `rounded-[28px]` |
+| **Tablet (`640px`–`1024px`)** | `480px` (Login content) / `520px` (Modal)   | Login: centered column; cards: `p-8`         | Login: no card; cards: `rounded-[32px]` |
+| **Desktop (`> 1024px`)**      | Responsive container                        | `p-10`                                       | `rounded-[36px]`                        |
 
 ---
 
@@ -303,7 +329,7 @@ When creating or redesigning components under this system, verify:
 
 - [ ] **Zero Drop Shadows**: No `shadow-lg`, `shadow-md`, or custom box-shadows. Use contrast against the sky gradient for depth.
 - [ ] **No Fuzzy Glow Halos**: No blur glows behind cards or inputs. Focus states use crisp border lines.
-- [ ] **Smooth Sky Backdrop**: Vertical linear gradient (`#3b8fe6` to `#ddedf9`) with photorealistic cloud sprites.
+- [ ] **Smooth Sky Backdrop**: Login hero fades from `#62abe0` through `#9ac7e8` into white; account screens may use cloud sprites.
 - [ ] **Midnight Plum Primary**: Primary CTAs use `#1e0838` with white text and right-facing arrow `->`.
 - [ ] **Soft Lilac Secondary**: Secondary CTAs use `#dfc8fc` / `#e9ddff` with `#1e0838` text.
 - [ ] **Pill & Squircle Geometry**: Interactive elements are pills (`rounded-full`); icon containers are squircles (`rounded-2xl`).

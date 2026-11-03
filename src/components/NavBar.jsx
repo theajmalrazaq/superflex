@@ -350,6 +350,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       document.documentElement.classList.remove("dark");
     }
     window.dispatchEvent(new CustomEvent("superflex-theme-mode-changed", { detail: mode }));
+    document.dispatchEvent(new CustomEvent("superflex-theme-mode-changed", { detail: mode }));
   };
 
   const [bgUrl, setBgUrl] = useState(

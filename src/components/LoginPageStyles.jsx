@@ -1,14 +1,14 @@
 import { useEffect } from "react";
+import "../styles/login.css";
 
 function LoginPageStyles() {
   useEffect(() => {
     localStorage.removeItem("superflex_ai_messages");
 
-    // Full screen clean sky-blue vertical gradient background matching screenshot aesthetic
+    // Keep the reference palette while giving sign-in a product-specific layout.
+    document.body.classList.add("superflex-login-page");
     document.body.classList.add("!min-h-screen", "!overflow-x-hidden");
-    document.body.style.background =
-      "linear-gradient(180deg, #3b8fe6 0%, #6cb3ed 32%, #a8d5f6 68%, #dceefb 100%)";
-    document.body.style.color = "#ffffff";
+    document.body.style.color = "#101010";
 
     document
       .querySelectorAll(
@@ -37,21 +37,19 @@ function LoginPageStyles() {
       aside.classList.add("!w-full", "!p-0");
     }
 
-    // Main viewport container: perfectly centered with generous atmospheric breathing room
+    // Let the login shell manage its own full-height spacing.
     const mainContainer = document.querySelector(".m-stack__item.m-stack__item--fluid");
     if (mainContainer) {
       mainContainer.classList.add(
         "!flex",
         "!flex-col",
         "!items-center",
-        "!justify-center",
+        "!justify-start",
         "!min-h-screen",
         "!w-full",
         "!bg-transparent",
         "!relative",
         "!z-[50]",
-        "!py-8",
-        "!px-4",
       );
     }
 
@@ -63,7 +61,6 @@ function LoginPageStyles() {
         "!justify-center",
         "!w-full",
         "!max-w-full",
-        "!p-0",
       );
     });
 
@@ -71,13 +68,13 @@ function LoginPageStyles() {
     document
       .querySelectorAll(".m-login__signin .form-group, .m-login__form .form-group")
       .forEach((group) => {
-        group.classList.add("!mb-4", "!w-full", "!p-0");
+        group.classList.add("!w-full", "!p-0");
       });
 
     document
       .querySelectorAll(".input-group.m-input-group.m-input-group--square, .input-group")
       .forEach((element) => {
-        element.classList.add("!flex", "!flex-col", "!gap-1.5", "!w-full", "!mb-4");
+        element.classList.add("!flex", "!flex-col", "!gap-1.5", "!w-full");
       });
 
     document
@@ -86,7 +83,6 @@ function LoginPageStyles() {
       )
       .forEach((label) => {
         label.classList.add(
-          "!text-slate-700",
           "!font-bold",
           "!text-[11px]",
           "!tracking-wider",
@@ -104,20 +100,12 @@ function LoginPageStyles() {
     document.querySelectorAll(".form-control.m-input").forEach((element) => {
       element.classList.add(
         "!rounded-full",
-        "!bg-[#f8f9fa]",
-        "!border",
-        "!border-slate-200",
-        "!text-slate-900",
-        "!placeholder:text-slate-400",
         "!placeholder:font-normal",
         "!placeholder:text-sm",
         "!h-[52px]",
         "!px-6",
         "!w-full",
         "!text-sm",
-        "focus:!border-[#1e0838]",
-        "focus:!bg-white",
-        "focus:!outline-none",
         "focus:!ring-0",
         "!transition-colors",
         "!duration-200",
@@ -144,15 +132,14 @@ function LoginPageStyles() {
     // Form actions container
     const formActions = document.querySelector(".m-form__actions");
     if (formActions) {
-      formActions.classList.add("!p-0", "!mt-5", "!w-full", "!flex", "!flex-col", "!items-center");
+      formActions.classList.add("!p-0", "!w-full", "!flex", "!flex-col", "!items-center");
     }
 
-    // Primary action submit button: Deep midnight purple pill with white arrow, flat with no shadow
+    // Primary action: colors live in login.css so dark mode can switch to a white pill.
+    const loginButtonObservers = [];
     document.querySelectorAll(".btn-primary").forEach((button) => {
       button.classList.add(
-        "!bg-[#1e0838]",
-        "hover:!bg-[#2a0c4f]",
-        "!text-white",
+        "login-primary-btn",
         "!cursor-pointer",
         "!border-none",
         "!rounded-full",
@@ -183,25 +170,80 @@ function LoginPageStyles() {
         </svg>
       `;
 
-      button.addEventListener("click", () => {
-        if (!button.querySelector(".animate-spin")) {
-          const originalContent = button.innerHTML;
+      const isLoginSubmit = button.closest(".m-login__signin") !== null;
+      const originalContent = button.innerHTML;
+      const loginForm = isLoginSubmit ? button.closest("form") : null;
+      let isSubmitting = false;
+      let loadingStartedAt = 0;
+      let resetTimer;
+
+      const updateLoginButtonState = () => {
+        if (!isLoginSubmit || isSubmitting) return;
+        const username = loginForm?.querySelector('input[name="username"], #m_inputmask_4');
+        const password = loginForm?.querySelector('input[name="password"], #pass');
+        const canSubmit = Boolean(username?.value.trim() && password?.value.trim());
+        button.disabled = !canSubmit;
+        button.setAttribute("aria-disabled", String(!canSubmit));
+      };
+
+      if (isLoginSubmit) {
+        loginForm?.addEventListener("input", updateLoginButtonState);
+        loginForm?.addEventListener("change", updateLoginButtonState);
+        loginForm?.addEventListener("keyup", updateLoginButtonState);
+        updateLoginButtonState();
+        setTimeout(updateLoginButtonState, 0);
+        setTimeout(updateLoginButtonState, 500);
+      }
+
+      const resetLoginButton = () => {
+        clearTimeout(resetTimer);
+        isSubmitting = false;
+        button.innerHTML = originalContent;
+        button.classList.remove("superflex-login-submitting");
+        updateLoginButtonState();
+      };
+
+      const scheduleLoginButtonReset = () => {
+        clearTimeout(resetTimer);
+        const remaining = Math.max(0, 800 - (performance.now() - loadingStartedAt));
+        resetTimer = setTimeout(() => {
+          if (isSubmitting && !button.classList.contains("m-loader") && !button.disabled) {
+            resetLoginButton();
+          }
+        }, remaining);
+      };
+
+      if (isLoginSubmit) {
+        const loginButtonObserver = new MutationObserver(() => {
+          if (isSubmitting && !button.classList.contains("m-loader") && !button.disabled) {
+            scheduleLoginButtonReset();
+          }
+        });
+        loginButtonObserver.observe(button, {
+          attributes: true,
+          attributeFilter: ["class", "disabled"],
+        });
+        loginButtonObservers.push(loginButtonObserver);
+      }
+
+      button.addEventListener(
+        "click",
+        () => {
+          if (!isLoginSubmit || button.disabled || isSubmitting) return;
+          isSubmitting = true;
+          loadingStartedAt = performance.now();
           button.innerHTML = `
             <div class="flex items-center justify-center gap-3">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
                 <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
               </svg>
-              <span>Please wait...</span>
+              <span>Logging in...</span>
             </div>
           `;
-          button.classList.add("!opacity-80", "!pointer-events-none");
-
-          setTimeout(() => {
-            button.innerHTML = originalContent;
-            button.classList.remove("!opacity-80", "!pointer-events-none");
-          }, 3000);
-        }
-      });
+          button.classList.add("superflex-login-submitting");
+        },
+        { capture: true },
+      );
     });
 
     const signInIcon = document.querySelector(".la-sign-in");
@@ -212,21 +254,15 @@ function LoginPageStyles() {
       logintitle.style.display = "none";
     }
 
-    // Direct Login Card: Crisp solid white card directly visible in center, completely flat with no shadow or glow
+    // Centered white login card over the sky-to-white page background.
     const bglogin = document.querySelector(".m-login__signin");
     if (bglogin) {
       bglogin.classList.add(
-        "!bg-white",
-        "!p-8",
-        "sm:!p-10",
-        "!rounded-[32px]",
-        "sm:!rounded-[36px]",
         "!shadow-none",
         "!border-none",
         "!flex",
         "!flex-col",
         "!w-full",
-        "!max-w-[420px]",
         "!relative",
         "!z-[50]",
         "!text-slate-900",
@@ -234,48 +270,52 @@ function LoginPageStyles() {
         "!duration-300",
       );
       bglogin.setAttribute("id", "login-popup");
+      bglogin.style.setProperty("background", "var(--login-card-bg)", "important");
+      bglogin.style.setProperty("border-radius", "32px", "important");
+      bglogin.style.setProperty(
+        "padding",
+        "clamp(14px, 3dvh, 28px) clamp(20px, 3vw, 32px)",
+        "important",
+      );
+      bglogin.style.setProperty("width", "min(480px, calc(100% - 32px))", "important");
+      bglogin.style.setProperty("max-width", "480px", "important");
+      bglogin.style.setProperty("height", "auto", "important");
+      bglogin.style.setProperty("min-height", "0", "important");
 
       const existingHeader = bglogin.querySelector(".login-header");
       if (existingHeader) existingHeader.remove();
 
-      // Card Header: Pastel lilac squircle logo badge + typography with critical spacing
+      // Card header: use the same black and purple mark as the extension favicon.
       const header = document.createElement("div");
       header.className = "login-header w-full text-left mb-6";
       header.innerHTML = `
-        <!-- Pastel Lavender Squircle Logo Badge with SuperFlex Favicon Logo (Flat, No Shadow) -->
-        <div class="w-12 h-12 rounded-2xl bg-[#e9ddff] flex items-center justify-center mb-5 select-none">
-          <svg viewBox="0 0 432 432" width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M247.227 185.616L282.286 69L133 216L186.861 231.146L133 363L298 208.65L247.227 185.616Z" fill="#1e0838" />
+        <!-- Superflex favicon: black squircle with a purple lightning bolt -->
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 select-none">
+          <svg class="login-mark" viewBox="0 0 432 432" aria-hidden="true" focusable="false">
+            <path d="M247.227 185.616L282.286 69L133 216L186.861 231.146L133 363L298 208.65L247.227 185.616Z" />
           </svg>
         </div>
 
         <!-- Headline & Subtitle -->
         <h1 class="text-[30px] sm:text-[34px] font-black text-slate-900 tracking-tight leading-[1.14] mb-2.5">
-          Your portal moves with you.
+          Superflex
         </h1>
         <p class="text-slate-500 text-xs sm:text-[13px] font-normal leading-relaxed">
-          A modern, intelligent overlay for Flex. Fast, clean, and built for Fastians.
+         Aaja bhai, trauma tera wait kar raha hai 😭
         </p>
       `;
       bglogin.insertBefore(header, bglogin.firstChild);
     }
 
-    // Forgot Password Card: Solid flat white card, no shadow, no glow
+    // Reset uses the same card shell and header positions as sign-in.
     const forgotPasswordSection = document.querySelector(".m-login__forget-password");
     if (forgotPasswordSection) {
       forgotPasswordSection.classList.add(
-        "!bg-white",
-        "!p-8",
-        "sm:!p-10",
-        "!rounded-[32px]",
-        "sm:!rounded-[36px]",
         "!border-none",
         "!shadow-none",
         "!flex",
         "!flex-col",
-        "!gap-5",
         "!w-full",
-        "!max-w-[420px]",
         "!hidden",
         "!relative",
         "!z-[50]",
@@ -284,58 +324,65 @@ function LoginPageStyles() {
         "!duration-300",
       );
       forgotPasswordSection.setAttribute("id", "forgot-password-popup");
+      forgotPasswordSection.style.setProperty("background", "var(--login-card-bg)", "important");
+      forgotPasswordSection.style.setProperty("border-radius", "32px", "important");
+      forgotPasswordSection.style.setProperty(
+        "padding",
+        "clamp(14px, 3dvh, 28px) clamp(20px, 3vw, 32px)",
+        "important",
+      );
+      forgotPasswordSection.style.setProperty(
+        "width",
+        "min(480px, calc(100% - 32px))",
+        "important",
+      );
+      forgotPasswordSection.style.setProperty("max-width", "480px", "important");
+      forgotPasswordSection.style.setProperty(
+        "height",
+        "var(--login-card-height, auto)",
+        "important",
+      );
 
       const forgotHead = forgotPasswordSection.querySelector(".m-login__head");
       if (forgotHead) {
-        forgotHead.classList.add("!flex", "!flex-col", "!gap-2", "!w-full");
-
-        const existingForgotHeader = forgotHead.querySelector(".forgot-badge");
-        if (!existingForgotHeader) {
-          const forgotBadge = document.createElement("div");
-          forgotBadge.className =
-            "forgot-badge w-12 h-12 rounded-2xl bg-[#e9ddff] flex items-center justify-center mb-4 select-none";
-          forgotBadge.innerHTML = `
-            <svg viewBox="0 0 432 432" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M247.227 185.616L282.286 69L133 216L186.861 231.146L133 363L298 208.65L247.227 185.616Z" fill="#1e0838" />
-            </svg>
-          `;
-          forgotHead.insertBefore(forgotBadge, forgotHead.firstChild);
-        }
+        forgotHead.classList.add("!w-full");
+        forgotHead.querySelector(".forgot-badge")?.remove();
       }
 
       const forgotTitle = forgotPasswordSection.querySelector(".m-login__title");
       if (forgotTitle) {
         forgotTitle.style.display = "block";
-        forgotTitle.classList.add(
-          "!text-slate-900",
-          "!text-2xl",
-          "!font-black",
-          "!tracking-tight",
-          "!mb-0",
-        );
         forgotTitle.textContent = "Forgot your password?";
       }
 
       const forgotDesc = forgotPasswordSection.querySelector(".m-login__desc");
       if (forgotDesc) {
-        forgotDesc.classList.add("!text-slate-500", "!text-xs", "!leading-relaxed", "!mb-0");
         forgotDesc.textContent =
-          "Enter your university email to receive password reset instructions.";
+          "Enter the email linked to your FLEX account to receive reset instructions.";
       }
 
       const forgotForm = forgotPasswordSection.querySelector(".m-login__form");
       if (forgotForm) {
-        forgotForm.classList.add("!flex", "!flex-col", "!gap-4", "!w-full");
+        forgotForm.classList.add("!flex", "!flex-col", "!w-full");
       }
 
       const emailInputGroup = forgotPasswordSection.querySelector(".m-input-icon");
       if (emailInputGroup) {
         emailInputGroup.classList.add("!w-full");
+        const emailInput = emailInputGroup.querySelector("input");
+        if (emailInput && !forgotForm?.querySelector("label")) {
+          if (!emailInput.id) emailInput.id = "superflex-reset-email";
+          const emailLabel = document.createElement("label");
+          emailLabel.className = "forgot-email-label";
+          emailLabel.htmlFor = emailInput.id;
+          emailLabel.textContent = "FLEX email";
+          emailInputGroup.parentNode.insertBefore(emailLabel, emailInputGroup);
+        }
       }
 
       const forgotFormAction = forgotPasswordSection.querySelector(".m-login__form-action");
       if (forgotFormAction) {
-        forgotFormAction.classList.add("!flex", "!flex-col", "!gap-3", "!w-full", "!mt-3");
+        forgotFormAction.classList.add("!flex", "!flex-col", "!w-full");
       }
     }
 
@@ -390,22 +437,19 @@ function LoginPageStyles() {
 
       const cancelButton = forgotPasswordSection.querySelector("#m_login_forget_password_cancel");
       if (cancelButton) {
-        cancelButton.classList.add(
-          "!bg-[#e9ddff]",
-          "hover:!bg-[#dfc8fc]",
-          "!text-[#1e0838]",
-          "!cursor-pointer",
-          "!border-none",
-          "!rounded-full",
-          "!py-3",
-          "!px-6",
-          "!font-bold",
-          "!text-xs",
-          "!shadow-none",
-          "!transition-all",
-          "!w-full",
-          "!h-[48px]",
-        );
+        cancelButton.type = "button";
+        cancelButton.className = "forgot-back-button";
+        cancelButton.removeAttribute("style");
+        cancelButton.setAttribute("aria-label", "Back to sign in");
+        cancelButton.title = "Back to sign in";
+        cancelButton.innerHTML = `
+          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 19-7-7 7-7" />
+            <path d="M5 12h14" />
+          </svg>
+        `;
+        const forgotHead = forgotPasswordSection.querySelector(".m-login__head");
+        forgotHead?.insertBefore(cancelButton, forgotHead.firstChild);
         cancelButton.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -422,9 +466,7 @@ function LoginPageStyles() {
         forgotPasswordSection.querySelector("button[type='submit']");
       if (requestButton) {
         requestButton.classList.add(
-          "!bg-[#1e0838]",
-          "hover:!bg-[#2a0c4f]",
-          "!text-white",
+          "login-primary-btn",
           "!font-bold",
           "!text-sm",
           "cursor-pointer",
@@ -512,84 +554,25 @@ function LoginPageStyles() {
       }
     }
 
-    // Atmospheric sky background container with photorealistic floating clouds
-    let rightImage = document.getElementById("login-background-image");
-    if (!rightImage) {
-      rightImage = document.createElement("div");
-      rightImage.id = "login-background-image";
-      rightImage.className =
-        "fixed inset-0 w-full h-full -z-10 pointer-events-none overflow-hidden select-none";
-      rightImage.style.background =
-        "linear-gradient(180deg, #3b8fe6 0%, #6cb3ed 32%, #a8d5f6 68%, #dceefb 100%)";
+    // Remove the previous all-screen decorative background when navigating back to login.
+    const rightImage = document.getElementById("login-background-image");
+    if (rightImage) rightImage.remove();
 
-      // Atmospheric Cumulus Cloud Layers
-      rightImage.innerHTML = `
-        <!-- Top-Right Fluffy Cumulus Cloud Billow -->
-        <svg viewBox="0 0 520 320" class="absolute -top-12 -right-14 w-[340px] sm:w-[500px] pointer-events-none select-none opacity-90" fill="none">
-          <defs>
-            <radialGradient id="cloud-puff-tr-1" cx="50%" cy="35%" r="55%">
-              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.98" />
-              <stop offset="65%" stop-color="#ffffff" stop-opacity="0.85" />
-              <stop offset="90%" stop-color="#eaf4fd" stop-opacity="0.4" />
-              <stop offset="100%" stop-color="#d9ebf9" stop-opacity="0" />
-            </radialGradient>
-            <radialGradient id="cloud-puff-tr-2" cx="45%" cy="30%" r="50%">
-              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
-              <stop offset="70%" stop-color="#ffffff" stop-opacity="0.75" />
-              <stop offset="100%" stop-color="#d9ebf9" stop-opacity="0" />
-            </radialGradient>
-          </defs>
-          <ellipse cx="400" cy="110" rx="120" ry="85" fill="url(#cloud-puff-tr-1)" />
-          <ellipse cx="300" cy="130" rx="95" ry="75" fill="url(#cloud-puff-tr-1)" />
-          <ellipse cx="340" cy="85" rx="85" ry="65" fill="url(#cloud-puff-tr-1)" />
-          <ellipse cx="230" cy="150" rx="80" ry="60" fill="url(#cloud-puff-tr-2)" />
-          <ellipse cx="450" cy="165" rx="95" ry="70" fill="url(#cloud-puff-tr-1)" />
-          <ellipse cx="350" cy="170" rx="130" ry="65" fill="url(#cloud-puff-tr-1)" />
-          <ellipse cx="170" cy="170" rx="65" ry="45" fill="url(#cloud-puff-tr-2)" />
-          <path d="M160 180 C 160 135, 210 120, 240 145 C 265 100, 325 90, 355 115 C 385 70, 460 80, 485 125 C 515 135, 530 170, 515 205 C 495 225, 170 225, 160 180 Z" fill="#ffffff" fill-opacity="0.75" />
-        </svg>
-
-        <!-- Mid-Left Floating Cumulus Cloud -->
-        <svg viewBox="0 0 340 190" class="absolute top-20 sm:top-24 left-3 sm:left-12 w-[160px] sm:w-[240px] pointer-events-none select-none opacity-85" fill="none">
-          <defs>
-            <radialGradient id="cloud-puff-ml-1" cx="45%" cy="35%" r="55%">
-              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.96" />
-              <stop offset="70%" stop-color="#ffffff" stop-opacity="0.75" />
-              <stop offset="100%" stop-color="#ddedf9" stop-opacity="0" />
-            </radialGradient>
-          </defs>
-          <ellipse cx="170" cy="100" rx="80" ry="48" fill="url(#cloud-puff-ml-1)" />
-          <ellipse cx="125" cy="95" rx="60" ry="42" fill="url(#cloud-puff-ml-1)" />
-          <ellipse cx="205" cy="90" rx="55" ry="40" fill="url(#cloud-puff-ml-1)" />
-          <ellipse cx="160" cy="72" rx="48" ry="36" fill="url(#cloud-puff-ml-1)" />
-          <ellipse cx="90" cy="110" rx="38" ry="28" fill="url(#cloud-puff-ml-1)" />
-          <ellipse cx="240" cy="105" rx="42" ry="28" fill="url(#cloud-puff-ml-1)" />
-          <path d="M85 115 C 85 90, 115 80, 135 90 C 150 65, 185 65, 200 80 C 220 75, 245 90, 245 110 C 245 130, 85 130, 85 115 Z" fill="#ffffff" fill-opacity="0.65" />
-        </svg>
-      `;
-      document.body.appendChild(rightImage);
-    }
-
-    const CURRENT_VERSION = "6.0.0";
-
-    // Clean, flat top badge styled identically to "USD 1 = PKR 275.12 Today" rate capsule
-    const headerWrapper = document.createElement("div");
-    headerWrapper.className =
-      "login-outer-header flex flex-col items-center justify-center text-center w-full mb-6 relative z-10";
-    headerWrapper.innerHTML = `
-      <a href="https://theajmalrazaq.github.io/superflex" target="_blank" class="inline-block select-none">
-        <div class="inline-flex items-center gap-2.5 p-1.5 pr-4 rounded-full bg-white/30 hover:bg-white/40 backdrop-blur-md border border-white/25 transition-all duration-200 cursor-pointer text-white shadow-none">
-          <span class="bg-white text-[#1e0838] font-black text-[11px] px-3 py-1 rounded-full uppercase tracking-wider shadow-none">
-            v${CURRENT_VERSION}
-          </span>
-          <span id="version-text" class="text-xs font-bold tracking-wide">
-            SuperFlex Active
-          </span>
-        </div>
-      </a>
+    // Real cloud sprites in the sky half of the page (behind the card, non-interactive).
+    document.getElementById("login-clouds")?.remove();
+    const cloudLayer = document.createElement("div");
+    cloudLayer.id = "login-clouds";
+    cloudLayer.className = "login-clouds";
+    cloudLayer.setAttribute("aria-hidden", "true");
+    cloudLayer.innerHTML = `
+      <img class="login-cloud-right" src="${chrome.runtime.getURL("assets/clouds/cloud-2.webp")}" alt="" decoding="async" />
+      <img class="login-cloud-left" src="${chrome.runtime.getURL("assets/clouds/cloud-2.webp")}" alt="" decoding="async" />
     `;
+    document.body.prepend(cloudLayer);
 
-    // Clean, flat bottom links matching reference UI secondary pills
+    const CURRENT_VERSION = chrome.runtime.getManifest().version;
+
+    // Keep only the useful links below the card.
     const footerWrapper = document.createElement("div");
     footerWrapper.className =
       "login-outer-footer flex items-center justify-center gap-3 text-center w-full mt-7 relative z-10 flex-wrap select-none";
@@ -601,15 +584,79 @@ function LoginPageStyles() {
         Privacy Policy
       </a>
       <span class="text-white/40 text-xs">•</span>
-      <a href="https://instagram.com/superflex.fr" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/25 hover:bg-white/35 backdrop-blur-sm border border-white/20 text-[11px] font-semibold text-white transition-all shadow-none">
+      <a href="https://github.com/theajmalrazaq/superflex" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/25 hover:bg-white/35 backdrop-blur-sm border border-white/20 text-[11px] font-semibold text-white transition-all shadow-none">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+          <path d="m12 2 3.09 6.26 6.91 1.01-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/>
         </svg>
-        Follow on Instagram
+        Star on GitHub
       </a>
+      <button type="button" class="login-theme-toggle" aria-label="Switch to dark mode" title="Switch to dark mode">
+        <span class="login-theme-icon" aria-hidden="true"></span>
+        <span class="login-theme-label">Dark mode</span>
+      </button>
     `;
+
+    const themeToggle = footerWrapper.querySelector(".login-theme-toggle");
+    const turnstileBridgeId = "superflex-turnstile-theme-bridge";
+    if (!document.getElementById(turnstileBridgeId)) {
+      const turnstileBridge = document.createElement("script");
+      turnstileBridge.id = turnstileBridgeId;
+      turnstileBridge.src = chrome.runtime.getURL("scripts/turnstile-theme.js");
+      document.head.appendChild(turnstileBridge);
+    }
+
+    const applyLoginTheme = (mode) => {
+      const isDark = mode === "dark";
+      document.documentElement.dataset.superflexTheme = isDark ? "dark" : "light";
+      document.body.classList.toggle("superflex-login-dark", isDark);
+      document.documentElement.classList.toggle("dark", isDark);
+      document
+        .querySelectorAll(
+          "#login-popup label, #login-popup h5, #forgot-password-popup label, #forgot-password-popup h5",
+        )
+        .forEach((label) => {
+          if (isDark) {
+            label.style.setProperty("color", "#fff", "important");
+          } else {
+            label.style.removeProperty("color");
+          }
+        });
+      themeToggle.setAttribute("aria-pressed", String(isDark));
+      themeToggle.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
+      themeToggle.title = `Switch to ${isDark ? "light" : "dark"} mode`;
+      themeToggle.querySelector(".login-theme-label").textContent = isDark
+        ? "Dark mode"
+        : "Light mode";
+      themeToggle.querySelector(".login-theme-icon").innerHTML = isDark
+        ? `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>`
+        : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.985 12.486A9 9 0 1 1 11.514 3.015a7 7 0 0 0 9.471 9.471Z"/></svg>`;
+      document.dispatchEvent(new CustomEvent("superflex-theme-mode-changed", { detail: mode }));
+    };
+    applyLoginTheme(localStorage.getItem("superflex-theme-mode") || "light");
+    themeToggle.addEventListener("click", () => {
+      const nextMode = document.body.classList.contains("superflex-login-dark") ? "light" : "dark";
+      localStorage.setItem("superflex-theme-mode", nextMode);
+      applyLoginTheme(nextMode);
+    });
+
+    const versionPill = document.createElement("a");
+    versionPill.className = "login-version-pill";
+    versionPill.href = "https://theajmalrazaq.github.io/superflex";
+    versionPill.target = "_blank";
+    versionPill.rel = "noopener noreferrer";
+    const versionChip = document.createElement("span");
+    versionChip.className = "login-version-chip";
+    versionChip.innerHTML = `
+      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#A098FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <path d="m9 12 2 2 4-4" />
+      </svg>
+    `;
+    versionChip.append(`v${CURRENT_VERSION}`);
+    const versionStatus = document.createElement("span");
+    versionStatus.className = "login-version-status";
+    versionStatus.textContent = "SuperFlex Active";
+    versionPill.append(versionChip, versionStatus);
 
     const checkForUpdates = async () => {
       try {
@@ -636,10 +683,10 @@ function LoginPageStyles() {
           }
 
           if (isNewer) {
-            const versionText = document.getElementById("version-text");
-            if (versionText) {
-              versionText.innerHTML = `New Update Available: v${latestVer}`;
-            }
+            versionStatus.textContent = `New Update Available: v${latestVer}`;
+            versionPill.classList.add("has-update");
+            versionPill.href =
+              data.html_url || "https://github.com/theajmalrazaq/superflex/releases/latest";
           }
         }
       } catch (error) {
@@ -647,10 +694,9 @@ function LoginPageStyles() {
       }
     };
 
-    checkForUpdates();
-
-    if (bglogin && bglogin.parentNode) {
-      const wrapper = bglogin.parentNode;
+    const cardWrapper = bglogin?.parentNode;
+    if (cardWrapper) {
+      const wrapper = cardWrapper;
 
       const existingOuterHeader = wrapper.querySelector(".login-outer-header");
       if (existingOuterHeader) existingOuterHeader.remove();
@@ -658,12 +704,44 @@ function LoginPageStyles() {
       const existingOuterFooter = wrapper.querySelector(".login-outer-footer");
       if (existingOuterFooter) existingOuterFooter.remove();
 
+      const existingVersionPill = wrapper.querySelector(".login-version-pill");
+      if (existingVersionPill) existingVersionPill.remove();
+
+      const existingUpdateNotice = wrapper.querySelector(".login-update-notice");
+      if (existingUpdateNotice) existingUpdateNotice.remove();
+
       const existingHero = wrapper.querySelector(".hero-section-injected");
       if (existingHero) existingHero.remove();
 
-      wrapper.insertBefore(headerWrapper, bglogin);
+      wrapper.insertBefore(versionPill, bglogin);
       wrapper.appendChild(footerWrapper);
     }
+
+    checkForUpdates();
+
+    const loginHeader = bglogin?.querySelector(".login-header");
+    const syncCardMeasurements = () => {
+      if (!cardWrapper || !bglogin || bglogin.classList.contains("!hidden")) return;
+      const cardRect = bglogin.getBoundingClientRect();
+      const cardHeight = cardRect.height;
+      const headerHeight = loginHeader?.getBoundingClientRect().height || 0;
+      if (cardHeight > 0) cardWrapper.style.setProperty("--login-card-height", `${cardHeight}px`);
+      if (headerHeight > 0)
+        cardWrapper.style.setProperty("--login-header-height", `${headerHeight}px`);
+      const signInButton = bglogin.querySelector(".btn-primary");
+      if (signInButton) {
+        const bottomPadding = Number.parseFloat(getComputedStyle(bglogin).paddingBottom) || 0;
+        const trailingSpace = Math.max(
+          0,
+          cardRect.bottom - signInButton.getBoundingClientRect().bottom - bottomPadding,
+        );
+        cardWrapper.style.setProperty("--login-action-trailing-space", `${trailingSpace}px`);
+      }
+    };
+    syncCardMeasurements();
+    const cardResizeObserver = new ResizeObserver(syncCardMeasurements);
+    if (bglogin) cardResizeObserver.observe(bglogin);
+    if (loginHeader) cardResizeObserver.observe(loginHeader);
 
     const hasAcceptedTerms = localStorage.getItem("superflex_terms_accepted");
 
@@ -774,36 +852,29 @@ function LoginPageStyles() {
       '.m-input-icon--right input[type="password"], input[type="password"]',
     );
     passwordInputs.forEach((input) => {
-      input.classList.add("!pr-14");
+      input.classList.add("login-password-input");
 
       const toggleButton = document.createElement("button");
       toggleButton.type = "button";
+      toggleButton.className = "login-password-toggle";
+      toggleButton.setAttribute("aria-label", "Show password");
+      toggleButton.setAttribute("aria-pressed", "false");
 
       const icon = document.createElement("span");
-      icon.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      const eyeIcon = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
           <circle cx="12" cy="12" r="3"/>
-        </svg>
-      `;
+        </svg>`;
+      const eyeOffIcon = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m3 3 18 18"/>
+          <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/>
+          <path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c7 0 10 7 10 7a16 16 0 0 1-4.1 4.9"/>
+          <path d="M6.2 6.2C3.5 8 2 12 2 12s3 7 10 7a10 10 0 0 0 3-.5"/>
+        </svg>`;
+      icon.innerHTML = input.type === "password" ? eyeOffIcon : eyeIcon;
       toggleButton.appendChild(icon);
-
-      toggleButton.classList.add(
-        "absolute",
-        "right-4",
-        "top-1/2",
-        "transform",
-        "-translate-y-1/2",
-        "text-slate-400",
-        "hover:text-slate-700",
-        "focus:outline-none",
-        "z-10",
-        "p-1",
-        "flex",
-        "items-center",
-        "justify-center",
-        "cursor-pointer",
-      );
 
       const inputGroup = input.closest(".input-group") || input.parentElement;
       if (inputGroup) {
@@ -815,34 +886,35 @@ function LoginPageStyles() {
           e.stopPropagation();
           const type = input.getAttribute("type") === "password" ? "text" : "password";
           input.setAttribute("type", type);
+          const isVisible = type === "text";
+          toggleButton.setAttribute("aria-label", isVisible ? "Hide password" : "Show password");
+          toggleButton.setAttribute("aria-pressed", String(isVisible));
 
-          icon.innerHTML =
-            type === "password"
-              ? `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-                <circle cx="12" cy="12" r="3"/>
-              </svg>`
-              : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-10-7-10-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                <line x1="1" y1="23" x2="23" y2="23"/>
-              </svg>`;
+          icon.innerHTML = isVisible ? eyeIcon : eyeOffIcon;
         });
       }
     });
 
     return () => {
+      loginButtonObservers.forEach((observer) => observer.disconnect());
+      cardResizeObserver.disconnect();
+      cloudLayer.remove();
+      cardWrapper?.style.removeProperty("--login-card-height");
+      cardWrapper?.style.removeProperty("--login-header-height");
+      cardWrapper?.style.removeProperty("--login-action-trailing-space");
+      document.body.classList.remove("superflex-login-page");
+      document.body.classList.remove("superflex-login-dark");
+      delete document.documentElement.dataset.superflexTheme;
       document.body.classList.remove("!min-h-screen", "!overflow-x-hidden");
       document.body.style.background = "";
       document.body.style.color = "";
       if (rightImage && rightImage.parentNode) {
         rightImage.remove();
       }
-      if (headerWrapper && headerWrapper.parentNode) {
-        headerWrapper.remove();
-      }
       if (footerWrapper && footerWrapper.parentNode) {
         footerWrapper.remove();
       }
+      versionPill.remove();
     };
   }, []);
 

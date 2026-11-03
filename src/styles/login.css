@@ -1,0 +1,829 @@
+/* Compact FLEX sign-in with a blue upper half and white lower half. */
+html:has(body.superflex-login-page) {
+  height: 100dvh;
+  overflow: hidden !important;
+}
+
+body.superflex-login-page {
+  --login-card-bg: #fff;
+  height: 100dvh !important;
+  overflow: hidden !important;
+  background: linear-gradient(
+    180deg,
+    #62abe0 0%,
+    #73b3e1 24%,
+    #9ac7e8 38%,
+    #dcebf5 49%,
+    #fff 57%
+  ) !important;
+  background-attachment: fixed !important;
+  color: #101010 !important;
+}
+
+body.superflex-login-page .m-login.m-login--1,
+body.superflex-login-page .m-login__aside {
+  width: 100% !important;
+  height: 100dvh !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  overflow: hidden !important;
+}
+
+body.superflex-login-page .m-grid.m-grid--hor {
+  background: transparent !important;
+}
+
+body.superflex-login-page .m-stack__item.m-stack__item--fluid,
+body.superflex-login-page .m-login__wrapper {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 100dvh !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  align-items: stretch !important;
+  background: transparent !important;
+}
+
+body.superflex-login-page .m-login__wrapper {
+  height: 100dvh !important;
+  min-height: 0 !important;
+  padding: 12px 0 !important;
+  gap: 10px;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+body.superflex-login-page #login-popup,
+body.superflex-login-page #forgot-password-popup {
+  width: min(100% - 32px, 480px) !important;
+  max-width: 480px !important;
+  margin: 0 auto !important;
+  padding: clamp(14px, 3dvh, 28px) clamp(20px, 3vw, 32px) !important;
+  border: 0 !important;
+  border-radius: 32px !important;
+  box-shadow: none !important;
+  background: var(--login-card-bg) !important;
+  color: #101010 !important;
+  position: relative;
+  top: 0;
+}
+
+body.superflex-login-page #forgot-password-popup {
+  min-height: var(--login-card-height, 0px) !important;
+  box-sizing: border-box;
+}
+
+body.superflex-login-page #forgot-password-popup .forgot-back-button {
+  position: static !important;
+  display: grid !important;
+  place-items: center;
+  flex: none;
+  width: 52px !important;
+  height: 52px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: #230052 !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+
+body.superflex-login-page #forgot-password-popup .forgot-back-button:hover {
+  background: #370c72 !important;
+}
+
+body.superflex-login-page #login-popup .login-header,
+body.superflex-login-page #forgot-password-popup .m-login__head {
+  margin-bottom: 16px !important;
+  display: grid !important;
+  grid-template-columns: 52px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  row-gap: 10px;
+  text-align: left !important;
+  align-items: center;
+  align-content: start;
+}
+
+body.superflex-login-page #forgot-password-popup .m-login__head {
+  height: var(--login-header-height, auto) !important;
+  padding: 0 !important;
+  margin-top: 0 !important;
+  flex: none;
+}
+
+body.superflex-login-page #login-popup .login-header p,
+body.superflex-login-page #forgot-password-popup .m-login__desc {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+
+body.superflex-login-page #login-popup .login-header > div:first-child {
+  grid-column: 1;
+  grid-row: 1;
+  width: 52px !important;
+  height: 52px !important;
+  margin-bottom: 0 !important;
+  border-radius: 16px !important;
+  background: #000 !important;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.superflex-login-page #login-popup .login-header .login-mark {
+  display: block;
+  width: 38px;
+  height: 38px;
+  fill: #a098ff;
+}
+
+body.superflex-login-page #login-popup .login-header h1,
+body.superflex-login-page #forgot-password-popup .m-login__title {
+  margin-bottom: 8px !important;
+  color: #080808 !important;
+  font-size: clamp(32px, 6vw, 40px) !important;
+  font-weight: 500 !important;
+  line-height: 1.03 !important;
+  letter-spacing: -0.055em !important;
+}
+
+body.superflex-login-page #login-popup .login-header h1,
+body.superflex-login-page #forgot-password-popup .m-login__title {
+  grid-column: 2;
+  grid-row: 1;
+  margin-bottom: 0 !important;
+  font-size: clamp(26px, 3vw, 30px) !important;
+}
+
+body.superflex-login-page #login-popup .login-header p,
+body.superflex-login-page #forgot-password-popup .m-login__desc {
+  color: #626262 !important;
+  font-size: 15px !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.015em;
+}
+
+/* Sign-in header: favicon mark centered above the title and subtitle */
+body.superflex-login-page #login-popup .login-header {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  text-align: center !important;
+}
+
+body.superflex-login-page #login-popup .login-header > div:first-child {
+  margin: 0 auto 14px !important;
+}
+
+body.superflex-login-page #login-popup .login-header h1 {
+  margin-bottom: 6px !important;
+  text-align: center !important;
+}
+
+body.superflex-login-page #login-popup .login-header p {
+  max-width: 34ch;
+  margin-inline: auto !important;
+  text-align: center !important;
+}
+
+/* Decorative cloud sprites floating in the blue upper half of the page */
+.login-clouds {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.login-clouds img {
+  position: absolute;
+  height: auto;
+  max-width: none;
+  -webkit-user-drag: none;
+}
+
+.login-clouds .login-cloud-right {
+  top: -4dvh;
+  right: -9vw;
+  width: clamp(300px, 42vw, 680px);
+  opacity: 0.95;
+  animation: login-cloud-drift 60s ease-in-out infinite alternate;
+}
+
+.login-clouds .login-cloud-left {
+  top: 9dvh;
+  left: -5vw;
+  width: clamp(200px, 26vw, 420px);
+  opacity: 0.85;
+  transform: scaleX(-1);
+  animation: login-cloud-drift-left 80s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes login-cloud-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(4vw);
+  }
+}
+
+@keyframes login-cloud-drift-left {
+  from {
+    transform: scaleX(-1) translateX(0);
+  }
+  to {
+    transform: scaleX(-1) translateX(4vw);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-clouds img {
+    animation: none;
+  }
+
+  .login-clouds .login-cloud-left {
+    transform: scaleX(-1);
+  }
+}
+
+body.superflex-login-page.superflex-login-dark .login-clouds img {
+  opacity: 0.12;
+}
+
+body.superflex-login-page .m-login.m-login--1 {
+  position: relative;
+  z-index: 1;
+}
+
+body.superflex-login-page #login-popup .input-group,
+body.superflex-login-page #forgot-password-popup .input-group {
+  margin-bottom: 6px !important;
+  gap: 3px !important;
+}
+
+body.superflex-login-page #login-popup .form-group {
+  margin-bottom: 8px !important;
+}
+
+body.superflex-login-page #forgot-password-popup .m-login__form {
+  flex: 1;
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 8px !important;
+}
+
+body.superflex-login-page #forgot-password-popup .m-login__form-action {
+  width: 100%;
+  margin-top: auto !important;
+  margin-bottom: var(--login-action-trailing-space, 0px) !important;
+  padding: 0 !important;
+  gap: 8px !important;
+}
+
+body.superflex-login-page #login-popup .m-form__help {
+  display: none !important;
+}
+
+body.superflex-login-page #login-popup .input-group label,
+body.superflex-login-page #login-popup .form-group label,
+body.superflex-login-page #login-popup .m-form__label,
+body.superflex-login-page #login-popup .input-group h5,
+body.superflex-login-page #forgot-password-popup .input-group label,
+body.superflex-login-page #forgot-password-popup .form-group label,
+body.superflex-login-page #forgot-password-popup .input-group h5,
+body.superflex-login-page #forgot-password-popup .forgot-email-label {
+  display: block;
+  margin-left: 4px !important;
+  color: #555 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.03em !important;
+  text-transform: uppercase;
+}
+
+body.superflex-login-page #login-popup .form-control.m-input,
+body.superflex-login-page #forgot-password-popup .form-control.m-input {
+  min-height: 50px !important;
+  height: 50px !important;
+  padding: 0 22px !important;
+  border: 2px solid #e0e0e0 !important;
+  border-radius: 999px !important;
+  background: #fff !important;
+  color: #111 !important;
+  font-size: 17px !important;
+  box-shadow: none !important;
+}
+
+body.superflex-login-page #login-popup .form-control.m-input.login-password-input {
+  padding-right: 58px !important;
+}
+
+body.superflex-login-page #login-popup .form-control.m-input::placeholder,
+body.superflex-login-page #forgot-password-popup .form-control.m-input::placeholder {
+  color: #9ca3af !important;
+}
+
+body.superflex-login-page #login-popup .form-control.m-input:focus,
+body.superflex-login-page #forgot-password-popup .form-control.m-input:focus {
+  border-color: #230052 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+body.superflex-login-page .login-password-toggle {
+  position: absolute !important;
+  top: 50% !important;
+  right: 14px !important;
+  z-index: 2;
+  display: grid !important;
+  place-items: center;
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  translate: none !important;
+  transform: translateY(-50%);
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  color: #686868 !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+body.superflex-login-page .login-password-toggle:hover {
+  background: rgb(35 0 82 / 8%) !important;
+  color: #230052 !important;
+}
+
+body.superflex-login-page .login-password-toggle > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.superflex-login-page .login-password-toggle svg {
+  display: block;
+  width: 19px;
+  height: 19px;
+  flex: none;
+}
+
+body.superflex-login-page.superflex-login-dark .login-password-toggle {
+  color: #d3d9e6 !important;
+}
+
+body.superflex-login-page.superflex-login-dark .login-password-toggle:hover {
+  background: rgb(255 255 255 / 12%) !important;
+  color: #fff !important;
+}
+
+body.superflex-login-page #login-popup .m-form__actions {
+  margin-top: 8px !important;
+}
+
+/* Cloudflare Turnstile captcha: full-width row with the widget iframe centered inside it */
+body.superflex-login-page .cf-turnstile {
+  display: flex !important;
+  width: 100% !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin-inline: auto !important;
+  float: none !important;
+}
+
+body.superflex-login-page .cf-turnstile > div,
+body.superflex-login-page .cf-turnstile iframe {
+  display: block !important;
+  margin-inline: auto !important;
+  float: none !important;
+}
+
+body.superflex-login-page #login-popup .btn-primary,
+body.superflex-login-page #login-popup .login-primary-btn,
+body.superflex-login-page #forgot-password-popup button[type="submit"],
+body.superflex-login-page #forgot-password-popup .login-primary-btn {
+  min-height: 52px !important;
+  height: 52px !important;
+  border-radius: 999px !important;
+  background: #230052 !important;
+  background-color: #230052 !important;
+  background-image: none !important;
+  color: #fff !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+
+body.superflex-login-page #login-popup .btn-primary:hover,
+body.superflex-login-page #login-popup .login-primary-btn:hover,
+body.superflex-login-page #forgot-password-popup button[type="submit"]:hover,
+body.superflex-login-page #forgot-password-popup .login-primary-btn:hover {
+  background: #370c72 !important;
+  background-color: #370c72 !important;
+}
+
+body.superflex-login-page #login-popup .login-primary-btn:disabled {
+  background: #d1d5db !important;
+  background-color: #d1d5db !important;
+  color: #6b7280 !important;
+  cursor: not-allowed !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+}
+
+body.superflex-login-page #login-popup .login-primary-btn.superflex-login-submitting:disabled {
+  background: #230052 !important;
+  background-color: #230052 !important;
+  color: #fff !important;
+}
+
+body.superflex-login-page
+  #login-popup
+  .login-primary-btn.superflex-login-submitting.m-loader::before {
+  display: none !important;
+}
+
+body.superflex-login-page #login-popup button:focus-visible,
+body.superflex-login-page #forgot-password-popup button:focus-visible,
+body.superflex-login-page #forgot-password-popup .forgot-back-button:focus-visible,
+body.superflex-login-page .login-outer-footer a:focus-visible,
+body.superflex-login-page .login-theme-toggle:focus-visible,
+body.superflex-login-page .login-version-pill:focus-visible {
+  outline: 2px solid #230052 !important;
+  outline-offset: 3px;
+}
+
+body.superflex-login-page .login-outer-footer {
+  width: min(100% - 32px, 480px) !important;
+  margin: 0 auto !important;
+  flex: none;
+  gap: 4px !important;
+  color: #777 !important;
+}
+
+body.superflex-login-page .login-outer-footer a {
+  border: 0 !important;
+  background: transparent !important;
+  color: #686868 !important;
+  font-size: 12px !important;
+}
+
+body.superflex-login-page .login-outer-footer span.text-white\/40 {
+  color: #aaa !important;
+}
+
+body.superflex-login-page .login-theme-toggle {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  margin: 0;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 35%);
+  color: #686868;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  backdrop-filter: blur(12px);
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+body.superflex-login-page .login-theme-toggle:hover {
+  background: rgb(255 255 255 / 55%);
+  color: #230052;
+}
+
+body.superflex-login-page .login-theme-icon {
+  display: inline-flex;
+  flex: none;
+}
+
+body.superflex-login-page .login-theme-label {
+  white-space: nowrap;
+}
+
+body.superflex-login-page .login-version-pill {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100% - 32px);
+  padding: 7px 18px 7px 7px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 35%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+}
+
+body.superflex-login-page .login-version-chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #fff;
+  color: #230052;
+  font-weight: 600;
+}
+
+body.superflex-login-page .login-version-chip svg {
+  flex: none;
+}
+
+body.superflex-login-page .login-version-status {
+  min-width: 0;
+  text-align: left;
+}
+
+body.superflex-login-page .login-version-pill.has-update .login-version-status {
+  font-size: 12px;
+}
+
+body.superflex-login-page .login-version-pill:hover {
+  background: rgb(255 255 255 / 45%);
+}
+
+body.superflex-login-page.superflex-login-dark {
+  --login-card-bg: #000;
+  color-scheme: dark;
+  background: linear-gradient(
+    180deg,
+    #1f689d 0%,
+    #1e5e8c 24%,
+    #174465 38%,
+    #0a1923 49%,
+    #000 57%
+  ) !important;
+  color: #f5f6fb !important;
+}
+
+body.superflex-login-page.superflex-login-dark #login-popup,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup {
+  background: var(--login-card-bg) !important;
+  border: 1px solid rgb(255 255 255 / 14%) !important;
+  color: #f5f6fb !important;
+}
+
+body.superflex-login-page.superflex-login-dark #login-popup .login-header h1,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .m-login__title {
+  color: #f5f6fb !important;
+}
+
+body.superflex-login-page.superflex-login-dark #login-popup .login-header > div:first-child {
+  background: #fff !important;
+}
+
+body.superflex-login-page.superflex-login-dark #login-popup .login-header p,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .m-login__desc {
+  color: #c4cad6 !important;
+}
+
+body.superflex-login-page.superflex-login-dark #login-popup .input-group label,
+body.superflex-login-page.superflex-login-dark #login-popup .form-group label,
+body.superflex-login-page.superflex-login-dark #login-popup .m-form__label,
+body.superflex-login-page.superflex-login-dark #login-popup h5,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .input-group label,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .form-group label,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup h5,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .forgot-email-label {
+  color: #fff !important;
+}
+
+body.superflex-login-page.superflex-login-dark #login-popup .form-control.m-input,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .form-control.m-input {
+  box-sizing: border-box;
+  border: 2px solid rgb(255 255 255 / 12%) !important;
+  background: rgb(217 217 217 / 4%) !important;
+  color: #f9f9f9 !important;
+}
+
+body.superflex-login-page.superflex-login-dark #login-popup .form-control.m-input::placeholder,
+body.superflex-login-page.superflex-login-dark
+  #forgot-password-popup
+  .form-control.m-input::placeholder {
+  color: rgb(249 249 249 / 64%) !important;
+}
+
+body.superflex-login-page.superflex-login-dark #login-popup .form-control.m-input:focus,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .form-control.m-input:focus {
+  border-color: #a098ff !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+html.dark body.superflex-login-page #login-popup .btn-primary,
+html.dark body.superflex-login-page #login-popup .login-primary-btn,
+html.dark body.superflex-login-page #forgot-password-popup button[type="submit"],
+html.dark body.superflex-login-page #forgot-password-popup .login-primary-btn,
+html.dark body.superflex-login-page #forgot-password-popup .forgot-back-button,
+body.superflex-login-page.superflex-login-dark #login-popup .btn-primary,
+body.superflex-login-page.superflex-login-dark #login-popup .login-primary-btn,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup button[type="submit"],
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .login-primary-btn,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .forgot-back-button {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #0a192f !important;
+}
+
+html.dark body.superflex-login-page #login-popup .login-primary-btn:disabled,
+body.superflex-login-page.superflex-login-dark #login-popup .login-primary-btn:disabled {
+  background: #3a3a3a !important;
+  background-color: #3a3a3a !important;
+  color: #a1a1aa !important;
+  cursor: not-allowed !important;
+}
+
+html.dark
+  body.superflex-login-page
+  #login-popup
+  .login-primary-btn.superflex-login-submitting:disabled,
+body.superflex-login-page.superflex-login-dark
+  #login-popup
+  .login-primary-btn.superflex-login-submitting:disabled {
+  background: #fff !important;
+  background-color: #fff !important;
+  color: #0a192f !important;
+}
+
+html.dark body.superflex-login-page #login-popup .btn-primary svg,
+html.dark body.superflex-login-page #login-popup .login-primary-btn svg,
+html.dark body.superflex-login-page #forgot-password-popup button[type="submit"] svg,
+html.dark body.superflex-login-page #forgot-password-popup .login-primary-btn svg,
+html.dark body.superflex-login-page #forgot-password-popup .forgot-back-button svg,
+body.superflex-login-page.superflex-login-dark #login-popup .btn-primary svg,
+body.superflex-login-page.superflex-login-dark #login-popup .login-primary-btn svg,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup button[type="submit"] svg,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .login-primary-btn svg,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .forgot-back-button svg {
+  stroke: #0a192f !important;
+}
+
+html.dark body.superflex-login-page #login-popup .login-primary-btn:disabled svg,
+body.superflex-login-page.superflex-login-dark #login-popup .login-primary-btn:disabled svg {
+  stroke: currentColor !important;
+}
+
+html.dark body.superflex-login-page #login-popup .btn-primary:hover,
+html.dark body.superflex-login-page #login-popup .login-primary-btn:hover,
+html.dark body.superflex-login-page #forgot-password-popup button[type="submit"]:hover,
+html.dark body.superflex-login-page #forgot-password-popup .login-primary-btn:hover,
+html.dark body.superflex-login-page #forgot-password-popup .forgot-back-button:hover,
+body.superflex-login-page.superflex-login-dark #login-popup .btn-primary:hover,
+body.superflex-login-page.superflex-login-dark #login-popup .login-primary-btn:hover,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup button[type="submit"]:hover,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .login-primary-btn:hover,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .forgot-back-button:hover {
+  background: #f1f5f9 !important;
+  background-color: #f1f5f9 !important;
+  color: #040d1a !important;
+}
+
+body.superflex-login-page.superflex-login-dark #login-popup .m-form__actions a,
+body.superflex-login-page.superflex-login-dark #login-popup .input-group button {
+  color: #c1baff !important;
+}
+
+body.superflex-login-page.superflex-login-dark .login-outer-footer a,
+body.superflex-login-page.superflex-login-dark .login-theme-toggle {
+  color: #d3d9e6 !important;
+}
+
+body.superflex-login-page.superflex-login-dark .login-outer-footer span.text-white\/40 {
+  color: #929bac !important;
+}
+
+body.superflex-login-page.superflex-login-dark .login-theme-toggle:hover {
+  background: rgb(255 255 255 / 12%);
+  color: #fff !important;
+}
+
+body.superflex-login-page.superflex-login-dark .login-theme-toggle {
+  background: rgb(255 255 255 / 8%);
+}
+
+html.dark body.superflex-login-page .login-version-pill,
+body.superflex-login-page.superflex-login-dark .login-version-pill {
+  background: rgb(255 255 255 / 8%);
+  color: #e8eef8;
+}
+
+html.dark body.superflex-login-page .login-version-pill:hover,
+body.superflex-login-page.superflex-login-dark .login-version-pill:hover {
+  background: rgb(255 255 255 / 12%);
+}
+
+html.dark body.superflex-login-page .login-version-chip,
+body.superflex-login-page.superflex-login-dark .login-version-chip {
+  background: #121212;
+  color: #f5f6fb;
+}
+
+body.superflex-login-page.superflex-login-dark #terms-modal > div {
+  background: #000 !important;
+  color: #f5f6fb !important;
+}
+
+body.superflex-login-page.superflex-login-dark #terms-modal > div > div:first-child,
+body.superflex-login-page.superflex-login-dark #terms-modal > div > div:last-child,
+body.superflex-login-page.superflex-login-dark #terms-modal .p-4.rounded-2xl {
+  background: #2c3344 !important;
+  border-color: #465064 !important;
+}
+
+body.superflex-login-page.superflex-login-dark #terms-modal h2,
+body.superflex-login-page.superflex-login-dark #terms-modal h3,
+body.superflex-login-page.superflex-login-dark #terms-modal strong {
+  color: #f5f6fb !important;
+}
+
+body.superflex-login-page.superflex-login-dark #terms-modal p {
+  color: #c4cad6 !important;
+}
+
+body.superflex-login-page.superflex-login-dark #terms-accept-btn {
+  background: #a098ff !important;
+  color: #180a31 !important;
+}
+
+@media (max-height: 740px) {
+  body.superflex-login-page #login-popup .login-header,
+  body.superflex-login-page #forgot-password-popup .m-login__head {
+    margin-bottom: 12px !important;
+  }
+
+  body.superflex-login-page #login-popup .login-header > div:first-child {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  body.superflex-login-page #forgot-password-popup .forgot-back-button {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  body.superflex-login-page #login-popup .login-header,
+  body.superflex-login-page #forgot-password-popup .m-login__head {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+
+  body.superflex-login-page #login-popup .login-header h1,
+  body.superflex-login-page #forgot-password-popup .m-login__title {
+    font-size: 32px !important;
+  }
+
+  body.superflex-login-page #login-popup .login-header h1,
+  body.superflex-login-page #forgot-password-popup .m-login__title {
+    font-size: 26px !important;
+  }
+
+  body.superflex-login-page #login-popup .login-header p,
+  body.superflex-login-page #forgot-password-popup .m-login__desc {
+    font-size: 14px !important;
+  }
+
+  body.superflex-login-page #login-popup .form-control.m-input,
+  body.superflex-login-page #forgot-password-popup .form-control.m-input {
+    min-height: 46px !important;
+    height: 46px !important;
+  }
+
+  body.superflex-login-page #login-popup .btn-primary,
+  body.superflex-login-page #forgot-password-popup button[type="submit"] {
+    min-height: 48px !important;
+    height: 48px !important;
+  }
+}
+
+@media (max-height: 600px) {
+  body.superflex-login-page .login-outer-footer {
+    font-size: 11px;
+  }
+}
