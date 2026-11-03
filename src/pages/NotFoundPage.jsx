@@ -12,10 +12,7 @@ const NotFoundPage = () => {
     });
 
     document.querySelectorAll("style").forEach((style) => {
-      if (
-        style.textContent.includes("Verdana") &&
-        style.textContent.includes("maroon")
-      ) {
+      if (style.textContent.includes("Verdana") && style.textContent.includes("maroon")) {
         style.remove();
       }
     });
@@ -34,8 +31,8 @@ const NotFoundPage = () => {
               Page <span className="!text-rose-500">Not Found</span>
             </h1>
             <p className="!text-foreground/50 text-sm leading-relaxed">
-              The page you are looking for doesn't exist, has been moved, or is
-              currently unavailable in the SuperFlex universe.
+              The page you are looking for doesn't exist, has been moved, or is currently
+              unavailable in the SuperFlex universe.
             </p>
           </div>
 

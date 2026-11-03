@@ -126,11 +126,7 @@ h6 {
   width: 350px !important;
   border-radius: 20px !important;
   padding: 16px 20px !important;
-  background-color: color-mix(
-    in srgb,
-    var(--secondary),
-    transparent 40%
-  ) !important;
+  background-color: color-mix(in srgb, var(--secondary), transparent 40%) !important;
   backdrop-filter: blur(16px) !important;
   border: 1px solid color-mix(in srgb, var(--foreground), transparent 90%) !important;
   color: var(--foreground) !important;

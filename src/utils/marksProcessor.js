@@ -17,8 +17,7 @@ export const processCourseMarks = (course) => {
   let globalStdDev = 0;
 
   const sectionsExceptTotal = course.sections.filter(
-    (s) =>
-      !s.id?.endsWith("Grand_Total_Marks") && s.title !== "Grand Total Marks",
+    (s) => !s.id?.endsWith("Grand_Total_Marks") && s.title !== "Grand Total Marks",
   );
 
   const processedSections = sectionsExceptTotal.map((section) => {
@@ -52,11 +51,7 @@ export const processCourseMarks = (course) => {
     const EPSILON = 0.001;
 
     if (isSimMode) {
-      if (
-        section.itemLimit &&
-        section.itemLimit > 0 &&
-        section.itemLimit < sorted.length
-      ) {
+      if (section.itemLimit && section.itemLimit > 0 && section.itemLimit < sorted.length) {
         sorted.sort((a, b) => b._performanceRatio - a._performanceRatio);
 
         secWeight = 0;
@@ -74,19 +69,9 @@ export const processCourseMarks = (course) => {
         sorted.forEach((item) => includedIndices.add(item._originalIdx));
       }
     } else {
-      if (
-        section.itemLimit &&
-        section.itemLimit > 0 &&
-        section.itemLimit < sorted.length
-      ) {
-        secWeight = sorted
-          .slice(0, section.itemLimit)
-          .reduce((acc, item) => acc + item.weight, 0);
-      } else if (
-        secWeight === undefined ||
-        secWeight === null ||
-        secWeight <= 0
-      ) {
+      if (section.itemLimit && section.itemLimit > 0 && section.itemLimit < sorted.length) {
+        secWeight = sorted.slice(0, section.itemLimit).reduce((acc, item) => acc + item.weight, 0);
+      } else if (secWeight === undefined || secWeight === null || secWeight <= 0) {
         secWeight = rowsWeightSum;
       }
 
@@ -96,10 +81,7 @@ export const processCourseMarks = (course) => {
       const itemLimit = section.itemLimit || 999;
 
       for (let item of sorted) {
-        if (
-          currentAccWeight < secWeight - EPSILON &&
-          includedIndices.size < itemLimit
-        ) {
+        if (currentAccWeight < secWeight - EPSILON && includedIndices.size < itemLimit) {
           currentAccWeight += item.weight;
           includedIndices.add(item._originalIdx);
         }
@@ -124,9 +106,7 @@ export const processCourseMarks = (course) => {
       tempSumStd = 0,
       usedWeightBudget = 0;
 
-    const sortedIncluded = sorted.filter((s) =>
-      includedIndices.has(s._originalIdx),
-    );
+    const sortedIncluded = sorted.filter((s) => includedIndices.has(s._originalIdx));
 
     if (!isSimMode) {
       sortedIncluded.sort((a, b) => b._performanceRatio - a._performanceRatio);
@@ -136,9 +116,7 @@ export const processCourseMarks = (course) => {
       const remaining = secWeight - usedWeightBudget;
       if (remaining <= EPSILON && !isSimMode) return;
 
-      const takenWeight = isSimMode
-        ? item.weight
-        : Math.min(item.weight, remaining);
+      const takenWeight = isSimMode ? item.weight : Math.min(item.weight, remaining);
       const weightageFactor = item.total > 0 ? takenWeight / item.total : 0;
 
       calculatedSecObtained += (item.obtained || 0) * weightageFactor;
@@ -193,8 +171,7 @@ export const processCourseMarks = (course) => {
     grandTotalStats: {
       weight: globalWeightage,
       obtained: globalObtained,
-      percentage:
-        globalWeightage > 0 ? (globalObtained / globalWeightage) * 100 : 0,
+      percentage: globalWeightage > 0 ? (globalObtained / globalWeightage) * 100 : 0,
     },
   };
 };

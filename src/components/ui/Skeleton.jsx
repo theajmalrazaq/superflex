@@ -1,11 +1,7 @@
 import React from "react";
 
 const Skeleton = ({ className }) => {
-  return (
-    <div
-      className={`animate-pulse bg-tertiary/50 rounded-lg ${className}`}
-    ></div>
-  );
+  return <div className={`animate-pulse bg-tertiary/50 rounded-lg ${className}`}></div>;
 };
 
 export const MarksSkeleton = () => {

@@ -29,10 +29,7 @@ import {
 } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import StatsCard from "../components/ui/StatsCard";
-import Skeleton, {
-  MarksSkeleton,
-  AttendanceSkeleton,
-} from "../components/ui/Skeleton";
+import Skeleton, { MarksSkeleton, AttendanceSkeleton } from "../components/ui/Skeleton";
 
 ChartJS.register(
   CategoryScale,
@@ -61,19 +58,14 @@ const SectionAccordion = ({ section, isOpen, onToggle }) => {
           >
             {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </span>
-          <span className="font-semibold text-foreground text-sm">
-            {section.title}
-          </span>
+          <span className="font-semibold text-foreground text-sm">{section.title}</span>
           <span className="text-xs text-foreground/50 bg-secondary px-2 py-0.5 rounded ">
             {rows.length}
           </span>
         </div>
         <div className="text-xs text-foreground/60 font-medium">
           <span className="text-foreground">{section.obtained.toFixed(1)}</span>
-          <span className="text-foreground/40">
-            {" "}
-            / {section.weight.toFixed(1)}
-          </span>
+          <span className="text-foreground/40"> / {section.weight.toFixed(1)}</span>
         </div>
       </button>
 
@@ -95,16 +87,13 @@ const SectionAccordion = ({ section, isOpen, onToggle }) => {
             </thead>
             <tbody className="divide-y divide-foreground/5">
               {rows.map((row, idx) => {
-                const perc =
-                  row.total > 0 ? (row.obtained / row.total) * 100 : 0;
+                const perc = row.total > 0 ? (row.obtained / row.total) * 100 : 0;
                 return (
                   <tr
                     key={idx}
                     className={`hover:bg-foreground/[0.02] transition-colors group ${!row.included ? "opacity-40" : ""}`}
                   >
-                    <td className="p-3 text-sm text-foreground/70 font-medium">
-                      {row.title}
-                    </td>
+                    <td className="p-3 text-sm text-foreground/70 font-medium">{row.title}</td>
                     <td className="p-3 text-right">
                       <div className="flex flex-col items-end">
                         <span className="text-sm text-foreground font-bold">
@@ -153,10 +142,7 @@ function HomePage() {
 
   useEffect(() => {
     const handleStorage = () => {
-      setProfileImage(
-        localStorage.getItem("superflex_user_custom_image") ||
-          "/Login/GetImage",
-      );
+      setProfileImage(localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage");
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
@@ -263,13 +249,9 @@ function HomePage() {
     styleElement.textContent = scrollbarStyle;
     document.head.appendChild(styleElement);
 
-    const targetElement = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
+    const targetElement = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
     if (targetElement) {
-      targetElement
-        .querySelectorAll("script")
-        .forEach((script) => script.remove());
+      targetElement.querySelectorAll("script").forEach((script) => script.remove());
       targetElement.querySelector("#NotificationDetail")?.remove();
       document.querySelector(".m-scroll-top")?.remove();
 
@@ -288,9 +270,7 @@ function HomePage() {
         const clone = textContainer.cloneNode(true);
 
         clone
-          .querySelectorAll(
-            ".m-alert__close, button, a, strong, .m-alert__icon",
-          )
+          .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
           .forEach((el) => el.remove());
 
         let message = clone.textContent
@@ -317,30 +297,21 @@ function HomePage() {
 
       const rows = targetElement.querySelectorAll(".row");
       rows.forEach((row) => {
-        const portletTitle = row
-          .querySelector(".m-portlet__head-text")
-          ?.textContent.trim();
+        const portletTitle = row.querySelector(".m-portlet__head-text")?.textContent.trim();
 
         if (portletTitle) {
           const sectionData = {};
           row.querySelectorAll(".col-md-4 p").forEach((p) => {
-            const label = p
-              .querySelector(".m--font-boldest")
-              ?.textContent.trim()
-              .replace(":", "");
-            const value = p
-              .querySelector("span:not(.m--font-boldest)")
-              ?.textContent.trim();
+            const label = p.querySelector(".m--font-boldest")?.textContent.trim().replace(":", "");
+            const value = p.querySelector("span:not(.m--font-boldest)")?.textContent.trim();
             if (label && value) sectionData[label] = value;
           });
 
           if (Object.keys(sectionData).length > 0) {
             allSections.push({ title: portletTitle, data: sectionData });
 
-            if (portletTitle === "University Information")
-              uniInfo = sectionData;
-            if (portletTitle === "Personal Information")
-              personalData = sectionData;
+            if (portletTitle === "University Information") uniInfo = sectionData;
+            if (portletTitle === "Personal Information") personalData = sectionData;
           }
         }
       });
@@ -397,8 +368,7 @@ function HomePage() {
     const linkMap = {};
     foundLinks.forEach((l) => {
       if (l.text.includes("Attendance")) linkMap.attendance = l.href;
-      if (l.text.includes("Marks") && !l.text.includes("PLO"))
-        linkMap.marks = l.href;
+      if (l.text.includes("Marks") && !l.text.includes("PLO")) linkMap.marks = l.href;
       if (l.text.includes("Study Plan")) linkMap.studyPlan = l.href;
     });
     setLinks(linkMap);
@@ -407,9 +377,7 @@ function HomePage() {
   useEffect(() => {
     if (links.attendance) {
       setLoadingAttendance(true);
-      fetchAttendance(links.attendance).finally(() =>
-        setLoadingAttendance(false),
-      );
+      fetchAttendance(links.attendance).finally(() => setLoadingAttendance(false));
     }
     if (links.marks) {
       setLoadingMarks(true);
@@ -428,14 +396,11 @@ function HomePage() {
       const doc = parser.parseFromString(html, "text/html");
 
       const summaryData = [];
-      const tables = doc.querySelectorAll(
-        ".table.table-bordered.table-responsive",
-      );
+      const tables = doc.querySelectorAll(".table.table-bordered.table-responsive");
 
       tables.forEach((table) => {
         const tabPane = table.closest(".tab-pane");
-        let title =
-          tabPane?.querySelector("h5")?.textContent.trim() || "Course";
+        let title = tabPane?.querySelector("h5")?.textContent.trim() || "Course";
         const titleParts = title.split("-");
         if (titleParts.length > 1) {
           const rawTitle = titleParts.slice(1).join("-").trim();
@@ -496,8 +461,7 @@ function HomePage() {
 
       tabPanes.forEach((pane) => {
         const courseId = pane.id;
-        let courseTitle =
-          pane.querySelector("h5")?.textContent.trim() || courseId;
+        let courseTitle = pane.querySelector("h5")?.textContent.trim() || courseId;
         const titleParts = courseTitle.split("-");
         if (titleParts.length > 1) {
           const rawTitle = titleParts.slice(1).join("-").trim();
@@ -508,18 +472,13 @@ function HomePage() {
 
         const cards = pane.querySelectorAll(".card");
         cards.forEach((card) => {
-          const header = card
-            .querySelector(".card-header button")
-            ?.textContent.trim();
+          const header = card.querySelector(".card-header button")?.textContent.trim();
           if (!header || header.includes("Grand Total")) return;
 
           const rows = [];
           const cardRows = card.querySelectorAll("tbody tr");
           cardRows.forEach((tr) => {
-            if (
-              tr.classList.contains("totalColumn_1471") ||
-              tr.querySelector(".totalColweightage")
-            )
+            if (tr.classList.contains("totalColumn_1471") || tr.querySelector(".totalColweightage"))
               return;
 
             const tds = tr.querySelectorAll("td");
@@ -557,8 +516,7 @@ function HomePage() {
           });
 
           const footerRow =
-            card.querySelector("tfoot tr") ||
-            card.querySelector("tr[class*='totalColumn']");
+            card.querySelector("tfoot tr") || card.querySelector("tr[class*='totalColumn']");
           let categoryWeight = 0;
           if (footerRow) {
             categoryWeight = parseFloat(
@@ -570,8 +528,7 @@ function HomePage() {
             sections.push({
               id: `${courseId}-${header.replace(/\s+/g, "_")}`,
               title: header,
-              weight:
-                categoryWeight || rows.reduce((acc, r) => acc + r.weight, 0),
+              weight: categoryWeight || rows.reduce((acc, r) => acc + r.weight, 0),
               rows: rows,
             });
           }
@@ -595,9 +552,7 @@ function HomePage() {
       }
 
       const currentPerc =
-        semesterTotalWeight > 0
-          ? (semesterTotalObtained / semesterTotalWeight) * 100
-          : 0;
+        semesterTotalWeight > 0 ? (semesterTotalObtained / semesterTotalWeight) * 100 : 0;
       setCurrentAggregate({
         obtained: semesterTotalObtained,
         total: semesterTotalWeight,
@@ -676,18 +631,12 @@ function HomePage() {
 
     window.addEventListener("superflex-theme-changed", handleThemeChange);
     window.addEventListener("superflex-bg-changed", handleBgChange);
-    window.addEventListener(
-      "superflex-bg-enabled-changed",
-      handleBgEnabledChange,
-    );
+    window.addEventListener("superflex-bg-enabled-changed", handleBgEnabledChange);
 
     return () => {
       window.removeEventListener("superflex-theme-changed", handleThemeChange);
       window.removeEventListener("superflex-bg-changed", handleBgChange);
-      window.removeEventListener(
-        "superflex-bg-enabled-changed",
-        handleBgEnabledChange,
-      );
+      window.removeEventListener("superflex-bg-enabled-changed", handleBgEnabledChange);
     };
   }, []);
 
@@ -869,7 +818,7 @@ function HomePage() {
 
                     {coursesData.length > 0 ? (
                       <>
-                        {/* Tabs */}
+                        {}
                         <div className="w-full overflow-x-auto scrollbar-hide scrollbar-hide">
                           <div className="flex gap-2 bg-background/40 p-1.5 rounded-full border border-foreground/10 backdrop-blur-sm w-fit">
                             {coursesData.map((course) => (
@@ -888,7 +837,7 @@ function HomePage() {
                           </div>
                         </div>
 
-                        {/* Content */}
+                        {}
                         {activeCourseData && (
                           <div key={activeCourse} className="">
                             <div className="flex flex-col gap-2 mb-4">
@@ -901,14 +850,11 @@ function HomePage() {
                                 </span>
                                 <span className="text-xs text-foreground/50">
                                   {(() => {
-                                    const examSections =
-                                      activeCourseData.sections.filter(
-                                        (s) =>
-                                          !s.id.endsWith("Grand_Total_Marks"),
-                                      );
+                                    const examSections = activeCourseData.sections.filter(
+                                      (s) => !s.id.endsWith("Grand_Total_Marks"),
+                                    );
                                     return examSections.reduce(
-                                      (acc, sec) =>
-                                        acc + (sec.rows?.length || 0),
+                                      (acc, sec) => acc + (sec.rows?.length || 0),
                                       0,
                                     );
                                   })()}{" "}
@@ -920,18 +866,14 @@ function HomePage() {
                             {}
                             <div className="space-y-3">
                               {activeCourseData.sections
-                                .filter(
-                                  (s) => !s.id.endsWith("Grand_Total_Marks"),
-                                )
+                                .filter((s) => !s.id.endsWith("Grand_Total_Marks"))
                                 .map((section, idx) => (
                                   <SectionAccordion
                                     key={idx}
                                     section={section}
                                     isOpen={openCategoryIdx === idx}
                                     onToggle={() =>
-                                      setOpenCategoryIdx(
-                                        openCategoryIdx === idx ? null : idx,
-                                      )
+                                      setOpenCategoryIdx(openCategoryIdx === idx ? null : idx)
                                     }
                                   />
                                 ))}
@@ -989,10 +931,7 @@ function HomePage() {
                             data={{
                               labels: attendanceData.map((d) => {
                                 const t = d.title;
-                                const trunc =
-                                  t.length > 15
-                                    ? t.substring(0, 15) + "..."
-                                    : t;
+                                const trunc = t.length > 15 ? t.substring(0, 15) + "..." : t;
                                 return `${trunc} (P:${d.present} A:${d.absent})`;
                               }),
                               datasets: [
@@ -1014,9 +953,7 @@ function HomePage() {
                                 },
                                 {
                                   label: "Remaining",
-                                  data: attendanceData.map(
-                                    (d) => 100 - d.percentage,
-                                  ),
+                                  data: attendanceData.map((d) => 100 - d.percentage),
                                   backgroundColor: chartPattern,
                                   barPercentage: 0.6,
                                   categoryPercentage: 0.8,
@@ -1077,9 +1014,7 @@ function HomePage() {
                         <div className="p-6 rounded-3xl bg-foreground/5 mb-4">
                           <Activity size={48} className="text-foreground/40" />
                         </div>
-                        <h4 className="text-lg font-bold text-foreground/50">
-                          No Attendance Data
-                        </h4>
+                        <h4 className="text-lg font-bold text-foreground/50">No Attendance Data</h4>
                         <p className="text-xs text-foreground/40 mt-1">
                           Attendance records are currently unavailable.
                         </p>
@@ -1092,9 +1027,7 @@ function HomePage() {
           )}
 
           {}
-          {activeMainTab === "info" && (
-            <ProfileInfoTabs profileSections={profileSections} />
-          )}
+          {activeMainTab === "info" && <ProfileInfoTabs profileSections={profileSections} />}
         </div>
       </div>
     </PageLayout>
@@ -1123,9 +1056,7 @@ const ProfileInfoTabs = ({ profileSections }) => {
                 return <Activity size={24} />;
               })()}
             </div>
-            <h3 className="text-2xl font-bold text-foreground tracking-tight">
-              {section.title}
-            </h3>
+            <h3 className="text-2xl font-bold text-foreground tracking-tight">{section.title}</h3>
           </div>
 
           {}

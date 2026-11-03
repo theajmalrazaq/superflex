@@ -1,12 +1,6 @@
 import React from "react";
 
-const SuperTabs = ({
-  tabs,
-  activeTab,
-  onTabChange,
-  className = "",
-  size = "md",
-}) => {
+const SuperTabs = ({ tabs, activeTab, onTabChange, className = "", size = "md" }) => {
   const sizeClasses = {
     sm: "px-3 py-1.5 text-[11px]",
     md: "px-5 py-2 text-xs",

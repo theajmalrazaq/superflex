@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 
-import LoadingOverlay, {
-  LoadingSpinner,
-} from "../components/ui/LoadingOverlay";
+import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
 import PageLayout from "../components/layouts/PageLayout";
 import {
   CheckCircle2,
@@ -140,8 +138,8 @@ const CourseSelector = ({ courses, selectedId, onSelect }) => {
   );
 };
 const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
-   const isPresent = record.status.includes("P");
-   const isLate = record.status.includes("L");
+  const isPresent = record.status.includes("P");
+  const isLate = record.status.includes("L");
   return (
     <div
       onClick={onToggleMark}
@@ -176,9 +174,7 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
         </div>
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <span className="text-foreground font-medium text-sm">
-              {record.date}
-            </span>
+            <span className="text-foreground font-medium text-sm">{record.date}</span>
             <span className="text-foreground/50 text-xs px-2 py-0.5 rounded-full bg-foreground/5">
               {record.day}
             </span>
@@ -263,18 +259,13 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
         }`}
         title="View Bookmarks"
       >
-        <Bookmark
-          size={20}
-          fill={bookmarkedDetails.length > 0 ? "currentColor" : "none"}
-        />
+        <Bookmark size={20} fill={bookmarkedDetails.length > 0 ? "currentColor" : "none"} />
       </button>
 
       {isOpen && (
         <div className="absolute top-full right-0 mt-2 w-80 md:w-96 bg-background/95 backdrop-blur-xl border border-foreground/10 rounded-2xl  overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           <div className="p-4 border-b border-foreground/10 bg-foreground/5 flex justify-between items-center">
-            <h3 className="font-bold text-foreground flex items-center gap-2">
-              Bookmarked Items
-            </h3>
+            <h3 className="font-bold text-foreground flex items-center gap-2">Bookmarked Items</h3>
           </div>
 
           <div className="max-h-[60vh] overflow-y-auto scrollbar-hide p-2 space-y-1">
@@ -282,8 +273,7 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
               <div className="p-8 text-center text-foreground/50 text-sm">
                 <p>No bookmarks yet.</p>
                 <p className="text-xs mt-1 opacity-50">
-                  Click the bookmark icon on any attendance record to save it
-                  here.
+                  Click the bookmark icon on any attendance record to save it here.
                 </p>
               </div>
             ) : (
@@ -317,9 +307,7 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-[10px] text-foreground/50 font-medium Cap">
-                    <span className="truncate max-w-[200px]">
-                      {item.courseTitle}
-                    </span>
+                    <span className="truncate max-w-[200px]">{item.courseTitle}</span>
                   </div>
                 </button>
               ))
@@ -345,16 +333,11 @@ function AttendancePage() {
   });
 
   useEffect(() => {
-    window.dispatchEvent(
-      new CustomEvent("superflex-update-loading", { detail: true }),
-    );
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(
-      "superflex_marked_attendance",
-      JSON.stringify([...markedRecords]),
-    );
+    localStorage.setItem("superflex_marked_attendance", JSON.stringify([...markedRecords]));
   }, [markedRecords]);
 
   const [semesters, setSemesters] = useState([]);
@@ -363,9 +346,7 @@ function AttendancePage() {
   useEffect(() => {
     const parseData = () => {
       try {
-        const root = document.querySelector(
-          ".m-grid.m-grid--hor.m-grid--root.m-page",
-        );
+        const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
         if (!root) return;
 
         const parsedAlerts = [];
@@ -377,16 +358,12 @@ function AttendancePage() {
             : alertEl.textContent.replace("Close", "").trim();
           message = message.replace(/\s+/g, " ");
 
-          const type = alertEl.classList.contains("alert-danger")
-            ? "error"
-            : "info";
+          const type = alertEl.classList.contains("alert-danger") ? "error" : "info";
           parsedAlerts.push({ type, message });
         });
         setAlerts(parsedAlerts);
 
-        const legacyForm = document.querySelector(
-          'form[action="/Student/StudentAttendance"]',
-        );
+        const legacyForm = document.querySelector('form[action="/Student/StudentAttendance"]');
         if (legacyForm) {
           const select = legacyForm.querySelector("select");
           if (select) {
@@ -414,9 +391,7 @@ function AttendancePage() {
           title = title.replace(/\(.*\)/, "").trim();
 
           const prog = pane.querySelector(".progress-bar");
-          const percentage = prog
-            ? parseFloat(prog.getAttribute("aria-valuenow") || 0)
-            : 0;
+          const percentage = prog ? parseFloat(prog.getAttribute("aria-valuenow") || 0) : 0;
 
           const records = [];
           const rows = pane.querySelectorAll("tbody tr");
@@ -431,8 +406,7 @@ function AttendancePage() {
                 const parts = dateStr.split("-");
                 if (parts.length === 3) {
                   const d = new Date(`${parts[1]} ${parts[0]}, ${parts[2]}`);
-                  if (!isNaN(d))
-                    day = d.toLocaleDateString("en-US", { weekday: "short" });
+                  if (!isNaN(d)) day = d.toLocaleDateString("en-US", { weekday: "short" });
                 }
               } catch (e) {}
 
@@ -461,15 +435,11 @@ function AttendancePage() {
         if (parsedCourses.length > 0) setSelectedCourseId(parsedCourses[0].id);
 
         root.style.display = "none";
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
         setLoading(false);
       } catch (e) {
         console.error("Attendance Parsing Error", e);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
         setLoading(false);
       }
     };
@@ -483,10 +453,7 @@ function AttendancePage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-4 md:p-8 space-y-8">
         {}
-        <PageHeader
-          title="Attendance"
-          subtitle="Track your presence and schedule"
-        >
+        <PageHeader title="Attendance" subtitle="Track your presence and schedule">
           <div className="flex flex-col lg:flex-row md:items-center gap-4">
             <SuperTabs
               tabs={semesters}
@@ -564,9 +531,7 @@ function AttendancePage() {
                 {}
                 <div className="bg-secondary/50 border border-foreground/10 rounded-[2rem] p-6 backdrop-blur-xl">
                   <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-bold text-foreground">
-                      History Log
-                    </h3>
+                    <h3 className="text-xl font-bold text-foreground">History Log</h3>
                     <div className="px-3 py-1 rounded-lg bg-foreground/5 text-xs text-foreground/60 font-medium">
                       Session History
                     </div>
@@ -614,11 +579,7 @@ function AttendancePage() {
                   const hasNoRecord = alerts.some((a) =>
                     a.message.toLowerCase().includes("no record"),
                   );
-                  if (
-                    hasNoRecord &&
-                    alert.message.includes("Attendance Update")
-                  )
-                    return false;
+                  if (hasNoRecord && alert.message.includes("Attendance Update")) return false;
                   return true;
                 })}
               />
@@ -627,9 +588,7 @@ function AttendancePage() {
                 <div className="p-4 rounded-full bg-secondary mb-4 ring-1 ring-white/10">
                   <BookOpen size={32} className="text-foreground/40" />
                 </div>
-                <div className="text-xl font-bold text-foreground/50">
-                  No attendance data found
-                </div>
+                <div className="text-xl font-bold text-foreground/50">No attendance data found</div>
                 <p className="text-sm text-foreground/40 mt-2">
                   Try selecting a different semester
                 </p>

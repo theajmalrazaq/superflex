@@ -9,9 +9,7 @@ function ChangePasswordPage() {
 
   useEffect(() => {
     const parse = () => {
-      const targetElement = document.querySelector(
-        ".m-grid.m-grid--hor.m-grid--root.m-page",
-      );
+      const targetElement = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
 
       if (!targetElement) {
         setTimeout(parse, 100);
@@ -31,9 +29,7 @@ function ChangePasswordPage() {
         const clone = textContainer.cloneNode(true);
 
         clone
-          .querySelectorAll(
-            ".m-alert__close, button, a, strong, .m-alert__icon",
-          )
+          .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
           .forEach((el) => el.remove());
 
         let message = clone.textContent
@@ -91,11 +87,7 @@ function ChangePasswordPage() {
 
     const portletBody = element.querySelector(".m-portlet__body");
     if (portletBody) {
-      portletBody.classList.add(
-        "!p-0",
-        "!text-foreground/70",
-        "bg-transparent",
-      );
+      portletBody.classList.add("!p-0", "!text-foreground/70", "bg-transparent");
     }
 
     const legacyButtons = element.querySelectorAll("#success, #error");
@@ -104,8 +96,7 @@ function ChangePasswordPage() {
     const form = element.querySelector("#ChangePassword");
     if (form) {
       const gridContainer = document.createElement("div");
-      gridContainer.className =
-        "grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24";
+      gridContainer.className = "grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24";
 
       const formColumn = document.createElement("div");
       formColumn.className = "space-y-8";
@@ -134,9 +125,7 @@ function ChangePasswordPage() {
         const label = row.querySelector("label");
 
         if (inputContainer) {
-          const iconSpans = inputContainer.querySelectorAll(
-            ".m-input-icon__icon",
-          );
+          const iconSpans = inputContainer.querySelectorAll(".m-input-icon__icon");
           iconSpans.forEach((span) => span.remove());
 
           const input = inputContainer.querySelector("input");
@@ -169,8 +158,7 @@ function ChangePasswordPage() {
               "form-control",
               "m-input",
             );
-            if (clonedInput.hasAttribute("style"))
-              clonedInput.removeAttribute("style");
+            if (clonedInput.hasAttribute("style")) clonedInput.removeAttribute("style");
 
             const inputWrapper = document.createElement("div");
             inputWrapper.classList.add("relative", "w-full", "group");
@@ -224,9 +212,7 @@ function ChangePasswordPage() {
         buttonRow.remove();
 
         clonedBtnRow.classList.add("!mt-8", "flex");
-        clonedBtnRow
-          .querySelectorAll(".col-lg-12")
-          .forEach((col) => (col.className = "w-full"));
+        clonedBtnRow.querySelectorAll(".col-lg-12").forEach((col) => (col.className = "w-full"));
 
         const submitButton = clonedBtnRow.querySelector("button#submit");
         if (submitButton) {
@@ -269,9 +255,7 @@ function ChangePasswordPage() {
         formColumn.appendChild(clonedBtnRow);
       }
 
-      form
-        .querySelectorAll('[data-to-remove="true"]')
-        .forEach((row) => row.remove());
+      form.querySelectorAll('[data-to-remove="true"]').forEach((row) => row.remove());
 
       gridContainer.appendChild(formColumn);
 
@@ -323,12 +307,7 @@ function ChangePasswordPage() {
 
       const feedbackElements = form.querySelectorAll(".matcherror");
       feedbackElements.forEach((element) => {
-        element.classList.add(
-          "!text-rose-400",
-          "!mt-2",
-          "!text-xs",
-          "!font-medium",
-        );
+        element.classList.add("!text-rose-400", "!mt-2", "!text-xs", "!font-medium");
       });
     }
   };

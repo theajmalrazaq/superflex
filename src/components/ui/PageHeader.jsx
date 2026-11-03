@@ -13,9 +13,7 @@ const PageHeader = ({ title, subtitle, children, className = "" }) => {
           {title}
         </h1>
         {subtitle && (
-          <p className="text-foreground/50 font-medium text-sm md:text-lg">
-            {subtitle}
-          </p>
+          <p className="text-foreground/50 font-medium text-sm md:text-lg">{subtitle}</p>
         )}
       </div>
       <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto justify-start lg:justify-end">

@@ -83,14 +83,12 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   }, []);
 
   const [profileImage, setProfileImage] = useState(
-    localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage"
+    localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage",
   );
 
   useEffect(() => {
     const handleStorage = () => {
-      setProfileImage(
-        localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage"
-      );
+      setProfileImage(localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage");
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
@@ -154,9 +152,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
     if (links.length > 0) {
       setMenuLinks(links);
-      const attendanceLink = links.find(
-        (link) => link.text.trim() === "Attendance"
-      );
+      const attendanceLink = links.find((link) => link.text.trim() === "Attendance");
 
       if (attendanceLink && onAttendanceLinkFound) {
         onAttendanceLinkFound(attendanceLink.href);
@@ -171,21 +167,17 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       element.remove();
     });
 
-    document
-      .querySelectorAll(".m-aside-left.m-aside-left--skin-dark")
-      .forEach((element) => {
-        element.remove();
-      });
+    document.querySelectorAll(".m-aside-left.m-aside-left--skin-dark").forEach((element) => {
+      element.remove();
+    });
 
-    document
-      .querySelectorAll(".m-aside-left--fixed .m-body")
-      .forEach((element) => {
-        element.classList.add("!p-0");
-      });
+    document.querySelectorAll(".m-aside-left--fixed .m-body").forEach((element) => {
+      element.classList.add("!p-0");
+    });
 
     document
       .querySelectorAll(
-        ".m-grid__item.m-grid__item--fluid.m-grid.m-grid--ver-desktop.m-grid--desktop.m-body"
+        ".m-grid__item.m-grid__item--fluid.m-grid.m-grid--ver-desktop.m-grid--desktop.m-body",
       )
       .forEach((element) => {
         element.classList.remove("m-grid--desktop", "m-body");
@@ -246,7 +238,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
   const isCategoryActive = (categoryLinks) => {
     return categoryLinks.some(
-      (link) => link.path && currentPage && currentPage.includes(link.path)
+      (link) => link.path && currentPage && currentPage.includes(link.path),
     );
   };
 
@@ -293,9 +285,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       <div>
         <div
           className={`text-sm font-medium mb-0.5 ${
-            isActive
-              ? "text-foreground "
-              : "text-foreground/80 group-hover:text-foreground"
+            isActive ? "text-foreground " : "text-foreground/80 group-hover:text-foreground"
           }`}
         >
           {link.text}
@@ -316,7 +306,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
   useEffect(() => {
     const activeCategory = ["Academics", "Finance", "Services", "More"].find(
-      (cat) => groupedLinks[cat] && isCategoryActive(groupedLinks[cat])
+      (cat) => groupedLinks[cat] && isCategoryActive(groupedLinks[cat]),
     );
     if (activeCategory) {
       setOpenMobileCategories((prev) => ({ ...prev, [activeCategory]: true }));
@@ -334,11 +324,11 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   }, []);
 
   const [themeColor, setThemeColor] = useState(
-    localStorage.getItem("superflex-theme-color") || "#a098ff"
+    localStorage.getItem("superflex-theme-color") || "#a098ff",
   );
 
   const [themeMode, setThemeMode] = useState(
-    localStorage.getItem("superflex-theme-mode") || "dark"
+    localStorage.getItem("superflex-theme-mode") || "dark",
   );
 
   useEffect(() => {
@@ -359,44 +349,32 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     } else {
       document.documentElement.classList.remove("dark");
     }
-    window.dispatchEvent(
-      new CustomEvent("superflex-theme-mode-changed", { detail: mode })
-    );
+    window.dispatchEvent(new CustomEvent("superflex-theme-mode-changed", { detail: mode }));
   };
 
   const [bgUrl, setBgUrl] = useState(
     localStorage.getItem("superflex-bg-url") ||
-      "https://motionbgs.com/media/6867/omen-valorant2.960x540.mp4"
+      "https://motionbgs.com/media/6867/omen-valorant2.960x540.mp4",
   );
 
   const [bgEnabled, setBgEnabled] = useState(
-    localStorage.getItem("superflex-bg-enabled") !== "false"
+    localStorage.getItem("superflex-bg-enabled") !== "false",
   );
 
   const handleBgChange = (url) => {
     setBgUrl(url);
     localStorage.setItem("superflex-bg-url", url);
-    window.dispatchEvent(
-      new CustomEvent("superflex-bg-changed", { detail: url })
-    );
+    window.dispatchEvent(new CustomEvent("superflex-bg-changed", { detail: url }));
   };
 
   const handleBgToggle = () => {
     const newState = !bgEnabled;
     setBgEnabled(newState);
     localStorage.setItem("superflex-bg-enabled", newState);
-    window.dispatchEvent(
-      new CustomEvent("superflex-bg-enabled-changed", { detail: newState })
-    );
+    window.dispatchEvent(new CustomEvent("superflex-bg-enabled-changed", { detail: newState }));
   };
 
-  const themeColors = [
-    "#a098ff",
-    "#F77FBE",
-    "#ff3838ff",
-    "#ff6a00ff",
-    "#ffb83eff",
-  ];
+  const themeColors = ["#a098ff", "#F77FBE", "#ff3838ff", "#ff6a00ff", "#ffb83eff"];
 
   const updateThemeColors = (hex) => {
     if (!hex) return;
@@ -406,10 +384,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
-    document.documentElement.style.setProperty(
-      "--accent-rgb",
-      `${r}, ${g}, ${b}`
-    );
+    document.documentElement.style.setProperty("--accent-rgb", `${r}, ${g}, ${b}`);
 
     const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
     const contrast = luminance > 0.5 ? "#000000" : "#ffffff";
@@ -417,8 +392,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   };
 
   useEffect(() => {
-    const savedColor =
-      localStorage.getItem("superflex-theme-color") || "#a098ff";
+    const savedColor = localStorage.getItem("superflex-theme-color") || "#a098ff";
     updateThemeColors(savedColor);
     setThemeColor(savedColor);
   }, []);
@@ -427,9 +401,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     setThemeColor(color);
     localStorage.setItem("superflex-theme-color", color);
     updateThemeColors(color);
-    window.dispatchEvent(
-      new CustomEvent("superflex-theme-changed", { detail: color })
-    );
+    window.dispatchEvent(new CustomEvent("superflex-theme-changed", { detail: color }));
     if (shouldClose) {
       setOpenDropdown(null);
     }
@@ -461,8 +433,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
             <div className="flex items-center gap-1">
               {}
               {groupedLinks.root?.map((link, index) => {
-                const isActive =
-                  currentPage === "/" || currentPage.startsWith("/?dump=");
+                const isActive = currentPage === "/" || currentPage.startsWith("/?dump=");
                 return <NavItem key={index} link={link} isActive={isActive} />;
               })}
 
@@ -502,16 +473,8 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                           <div className="grid grid-cols-2 gap-2 max-h-[70vh] overflow-y-auto scrollbar-hide p-1">
                             {links.map((link, idx) => {
                               const isLinkActive =
-                                link.path &&
-                                currentPage &&
-                                currentPage.includes(link.path);
-                              return (
-                                <DropdownItem
-                                  key={idx}
-                                  link={link}
-                                  isActive={isLinkActive}
-                                />
-                              );
+                                link.path && currentPage && currentPage.includes(link.path);
+                              return <DropdownItem key={idx} link={link} isActive={isLinkActive} />;
                             })}
                           </div>
                         </div>
@@ -545,11 +508,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <div className="w-10 h-10 rounded-full bg-tertiary border-2 border-foreground/10 overflow-hidden shrink-0">
-                      <img
-                        src={profileImage}
-                        alt="User"
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={profileImage} alt="User" className="w-full h-full object-cover" />
                     </div>
                     <div className="absolute -bottom-1 -right-1 p-0.5 bg-accent text-[var(--accent-foreground)] rounded-full border border-background">
                       <User size={8} />
@@ -575,9 +534,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
               <div
                 className={`overflow-y-auto transition-all duration-300 scrollbar-hide ${
-                  isProfileExpanded
-                    ? "max-h-60 border-t border-foreground/10"
-                    : "max-h-0"
+                  isProfileExpanded ? "max-h-60 border-t border-foreground/10" : "max-h-0"
                 }`}
               >
                 <div className="p-4 flex flex-col gap-2">
@@ -627,9 +584,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
             <div className="bg-secondary/40 border border-foreground/10 rounded-3xl overflow-hidden transition-all duration-300">
               <button
                 onClick={() =>
-                  setOpenDropdown(
-                    openDropdown === "mobile-aura" ? null : "mobile-aura"
-                  )
+                  setOpenDropdown(openDropdown === "mobile-aura" ? null : "mobile-aura")
                 }
                 className="w-full !cursor-pointer flex items-center justify-between p-5 hover:bg-foreground/5 transition-colors"
               >
@@ -661,9 +616,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                   <div className="bg-foreground/5 h-px w-full"></div>
 
                   <div className="space-y-3">
-                    <p className="text-[11px] text-foreground/60 font-medium px-1">
-                      Appearance
-                    </p>
+                    <p className="text-[11px] text-foreground/60 font-medium px-1">Appearance</p>
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         onClick={() => handleThemeModeChange("light")}
@@ -674,9 +627,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         }`}
                       >
                         <Sun size={14} />
-                        <span className="text-xs font-bold md:mt-2">
-                          Light
-                        </span>
+                        <span className="text-xs font-bold md:mt-2">Light</span>
                       </button>
                       <button
                         onClick={() => handleThemeModeChange("dark")}
@@ -687,9 +638,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         }`}
                       >
                         <Moon size={14} />
-                        <span className="text-xs font-medium md:mt-2">
-                          Dark
-                        </span>
+                        <span className="text-xs font-medium md:mt-2">Dark</span>
                       </button>
                     </div>
                   </div>
@@ -714,10 +663,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                           style={{ backgroundColor: color }}
                         >
                           {themeColor === color && (
-                            <Check
-                              size={14}
-                              className="text-[var(--accent-foreground)]"
-                            />
+                            <Check size={14} className="text-[var(--accent-foreground)]" />
                           )}
                         </button>
                       ))}
@@ -732,9 +678,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                           type="color"
                           className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                           value={themeColor}
-                          onChange={(e) =>
-                            handleColorChange(e.target.value, false)
-                          }
+                          onChange={(e) => handleColorChange(e.target.value, false)}
                         />
                       </div>
                     </div>
@@ -758,9 +702,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                             ? "bg-accent/10 text-accent"
                             : "bg-foreground/5 text-foreground/40"
                         }`}
-                        title={
-                          bgEnabled ? "Hide Background" : "Show Background"
-                        }
+                        title={bgEnabled ? "Hide Background" : "Show Background"}
                       >
                         {bgEnabled ? <Eye size={16} /> : <EyeOff size={16} />}
                       </button>
@@ -789,8 +731,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
             <div className="grid grid-cols-2 gap-2">
               {groupedLinks.root?.map((link, index) => {
-                const isActive =
-                  currentPage === "/" || currentPage.startsWith("/?dump=");
+                const isActive = currentPage === "/" || currentPage.startsWith("/?dump=");
                 const isHome = link.text.trim() === "Home";
                 return (
                   <button
@@ -806,11 +747,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         : "bg-secondary/50 text-foreground/60 hover:bg-foreground/10 hover:text-foreground border border-foreground/10"
                     }`}
                   >
-                    <div
-                      className={
-                        isActive ? "text-accent" : "text-foreground/50"
-                      }
-                    >
+                    <div className={isActive ? "text-accent" : "text-foreground/50"}>
                       {React.cloneElement(getIcon(link), { size: 24 })}
                     </div>
                     <span className="font-bold md:text-xs">{link.text}</span>
@@ -843,9 +780,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                       <span>{category}</span>
                       <div
                         className={`p-1 rounded-full bg-foreground/5 transition-transform duration-300 ${
-                          isExpanded
-                            ? "rotate-180 bg-foreground/10 text-foreground"
-                            : ""
+                          isExpanded ? "rotate-180 bg-foreground/10 text-foreground" : ""
                         }`}
                       >
                         <ChevronDown size={14} />
@@ -856,9 +791,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                       <div className="grid grid-cols-2 gap-2 p-2 pt-0 animate-in slide-in-from-top-2 duration-200">
                         {links.map((link, idx) => {
                           const isActive =
-                            link.path &&
-                            currentPage &&
-                            currentPage.includes(link.path);
+                            link.path && currentPage && currentPage.includes(link.path);
                           return (
                             <button
                               key={idx}
@@ -901,9 +834,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       {}
       <div className="shrink-0 flex items-center gap-3">
         <button
-          onClick={() =>
-            window.dispatchEvent(new CustomEvent("superflex-toggle-ai"))
-          }
+          onClick={() => window.dispatchEvent(new CustomEvent("superflex-toggle-ai"))}
           className="flex items-center !cursor-pointer gap-2 px-4 py-2.5 rounded-full bg-accent/10 text-accent hover:bg-accent/20 transition-all duration-300 group animate-border-beam"
         >
           <div className="border-beam-element" />
@@ -925,9 +856,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
               strokeOpacity="0.03"
             />
           </svg>
-          <span className="text-xs font-bold   hidden sm:inline-block">
-            Ask AI
-          </span>
+          <span className="text-xs font-bold   hidden sm:inline-block">Ask AI</span>
         </button>
 
         <div className="relative dropdown-container hidden md:block">
@@ -950,9 +879,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                 {}
                 <div className="p-4 space-y-4">
                   <div className="px-1">
-                    <h3 className="text-sm font-medium mb-0.5 text-foreground/80 ">
-                      Appearance
-                    </h3>
+                    <h3 className="text-sm font-medium mb-0.5 text-foreground/80 ">Appearance</h3>
                     <p className="text-[11px] text-foreground/50 font-medium">
                       Choice of interface
                     </p>
@@ -989,9 +916,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                 {}
                 <div className="p-4 flex flex-col items-start gap-3">
                   <div className="px-1">
-                    <h3 className="text-sm font-bold mb-0.5 text-foreground/80 ">
-                      Accent Color
-                    </h3>
+                    <h3 className="text-sm font-bold mb-0.5 text-foreground/80 ">Accent Color</h3>
                     <p className="text-[11px] text-foreground/50 font-medium">
                       Personalize your aura
                     </p>
@@ -1006,10 +931,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         style={{ backgroundColor: color }}
                       >
                         {themeColor === color && (
-                          <Check
-                            size={14}
-                            className="text-[var(--accent-foreground)]"
-                          />
+                          <Check size={14} className="text-[var(--accent-foreground)]" />
                         )}
                       </button>
                     ))}
@@ -1024,9 +946,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                         type="color"
                         className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                         value={themeColor}
-                        onChange={(e) =>
-                          handleColorChange(e.target.value, false)
-                        }
+                        onChange={(e) => handleColorChange(e.target.value, false)}
                       />
                     </div>
                   </div>

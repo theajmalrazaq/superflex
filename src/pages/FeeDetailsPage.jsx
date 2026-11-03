@@ -17,8 +17,7 @@ import StatsCard from "../components/ui/StatsCard";
 
 const SemesterAccordion = ({ semester }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const hasDetails =
-    semester.feeItems.length > 0 || semester.courses.length > 0;
+  const hasDetails = semester.feeItems.length > 0 || semester.courses.length > 0;
 
   return (
     <div className="group border border-foreground/10 bg-secondary/40 rounded-[2.5rem] overflow-hidden transition-all duration-300 hover:border-foreground/10">
@@ -83,9 +82,7 @@ const SemesterAccordion = ({ semester }) => {
                         <span className="text-foreground/60 font-bold font-sans text-xs Cap tracking-tight">
                           {item.name}
                         </span>
-                        <span className="text-foreground font-black font-sans">
-                          Rs. {item.val}
-                        </span>
+                        <span className="text-foreground font-black font-sans">Rs. {item.val}</span>
                       </div>
                     </div>
                   ))}
@@ -153,10 +150,7 @@ const SemesterAccordion = ({ semester }) => {
                   </thead>
                   <tbody className="divide-y divide-foreground/5">
                     {semester.courses.map((course, idx) => (
-                      <tr
-                        key={idx}
-                        className="group/course hover:bg-foreground/[0.02]"
-                      >
+                      <tr key={idx} className="group/course hover:bg-foreground/[0.02]">
                         <td className="p-5">
                           <p className="text-xs font-black text-foreground font-sans tracking-tight">
                             {course.title}
@@ -204,14 +198,10 @@ function FeeDetailsPage() {
   const [totalPaid, setTotalPaid] = useState("0");
 
   useEffect(() => {
-    window.dispatchEvent(
-      new CustomEvent("superflex-update-loading", { detail: true }),
-    );
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const bootstrapAndHydrate = () => {
-      const root = document.querySelector(
-        ".m-grid.m-grid--hor.m-grid--root.m-page",
-      );
+      const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
       if (!root) {
         setTimeout(bootstrapAndHydrate, 500);
         return;
@@ -231,9 +221,7 @@ function FeeDetailsPage() {
           const clone = textContainer.cloneNode(true);
 
           clone
-            .querySelectorAll(
-              ".m-alert__close, button, a, strong, .m-alert__icon",
-            )
+            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
             .forEach((el) => el.remove());
 
           let message = clone.textContent
@@ -262,9 +250,7 @@ function FeeDetailsPage() {
 
         blocks.forEach((block, idx) => {
           setTimeout(() => {
-            const btn = block.querySelector(
-              "button[id^='BtnhideshowInternal']",
-            );
+            const btn = block.querySelector("button[id^='BtnhideshowInternal']");
             const icon = btn?.querySelector(".fa-angle-right");
             if (icon) btn.click();
           }, idx * 300);
@@ -278,9 +264,7 @@ function FeeDetailsPage() {
             return label && label.textContent.trim() !== "";
           });
 
-          const allHydrated = hydrationStatus.every(
-            (status) => status === true,
-          );
+          const allHydrated = hydrationStatus.every((status) => status === true);
 
           if (allHydrated || checks > 25) {
             clearInterval(checkCycle);
@@ -296,8 +280,7 @@ function FeeDetailsPage() {
 
     const finishMapping = (root, semesterIds) => {
       const cleanT = (el) => el?.textContent.trim() || "";
-      const cleanN = (el) =>
-        el?.textContent.replace(/[^\d.()-]/g, "").trim() || "0";
+      const cleanN = (el) => el?.textContent.replace(/[^\d.()-]/g, "").trim() || "0";
 
       const mappedSemesters = semesterIds.map((id) => {
         const block = root.querySelector(`#tablerow_${id}`);
@@ -306,24 +289,21 @@ function FeeDetailsPage() {
         const feeItems = [];
         block.querySelectorAll(`#tblDueInSem_${id} li`).forEach((li) => {
           const parts = li.textContent.split(":");
-          if (parts.length >= 2)
-            feeItems.push({ name: parts[0].trim(), val: parts[1].trim() });
+          if (parts.length >= 2) feeItems.push({ name: parts[0].trim(), val: parts[1].trim() });
         });
 
         const courses = [];
-        block
-          .querySelectorAll(`#tblRegisteredCoursesDetail_${id} tbody tr`)
-          .forEach((tr) => {
-            const td = tr.querySelectorAll("td");
-            if (td.length >= 4) {
-              courses.push({
-                title: cleanT(td[1]),
-                type: cleanT(td[2]),
-                status: cleanT(td[3]),
-                date: cleanT(td[4]),
-              });
-            }
-          });
+        block.querySelectorAll(`#tblRegisteredCoursesDetail_${id} tbody tr`).forEach((tr) => {
+          const td = tr.querySelectorAll("td");
+          if (td.length >= 4) {
+            courses.push({
+              title: cleanT(td[1]),
+              type: cleanT(td[2]),
+              status: cleanT(td[3]),
+              date: cleanT(td[4]),
+            });
+          }
+        });
 
         return {
           id,
@@ -343,40 +323,34 @@ function FeeDetailsPage() {
       });
 
       const txHistory = [];
-      root
-        .querySelectorAll("#sample_CollectionDetail tbody tr")
-        .forEach((tr, i) => {
-          const td = tr.querySelectorAll("td");
-          if (td.length >= 10) {
-            txHistory.push({
-              sNo: cleanT(td[0]),
-              semester: cleanT(td[1]),
-              challanNo: cleanT(td[2]),
-              instrumentType: cleanT(td[3]),
-              instrumentNo: cleanT(td[4]),
-              amount: cleanN(td[5]),
-              dueDate: cleanT(td[6]),
-              paymentDate: cleanT(td[7]),
-              enteredBy: cleanT(td[8]),
-              status: cleanT(td[9]),
-            });
-          }
-        });
+      root.querySelectorAll("#sample_CollectionDetail tbody tr").forEach((tr, i) => {
+        const td = tr.querySelectorAll("td");
+        if (td.length >= 10) {
+          txHistory.push({
+            sNo: cleanT(td[0]),
+            semester: cleanT(td[1]),
+            challanNo: cleanT(td[2]),
+            instrumentType: cleanT(td[3]),
+            instrumentNo: cleanT(td[4]),
+            amount: cleanN(td[5]),
+            dueDate: cleanT(td[6]),
+            paymentDate: cleanT(td[7]),
+            enteredBy: cleanT(td[8]),
+            status: cleanT(td[9]),
+          });
+        }
+      });
 
       setSemesters(mappedSemesters);
       setTransactions(txHistory);
 
       let totalAmount = 0;
-      txHistory.forEach(
-        (t) => (totalAmount += parseFloat(t.amount.replace(/,/g, "")) || 0),
-      );
+      txHistory.forEach((t) => (totalAmount += parseFloat(t.amount.replace(/,/g, "")) || 0));
       setTotalPaid(totalAmount.toLocaleString());
 
       root.style.display = "none";
       setLoading(false);
-      window.dispatchEvent(
-        new CustomEvent("superflex-update-loading", { detail: false }),
-      );
+      window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
     };
 
     bootstrapAndHydrate();
@@ -400,9 +374,7 @@ function FeeDetailsPage() {
               <p className="text-[10px] font-black text-foreground/50 Cap tracking-[0px] leading-none mb-2">
                 Total Paid
               </p>
-              <h4 className="text-3xl font-black text-foreground">
-                Rs. {totalPaid}
-              </h4>
+              <h4 className="text-3xl font-black text-foreground">Rs. {totalPaid}</h4>
             </div>
             <div className="p-4 rounded-2xl bg-accent/10 text-accent group-hover:scale-110 transition-transform duration-300">
               <CreditCard size={24} />
@@ -435,9 +407,7 @@ function FeeDetailsPage() {
           <StatsCard
             icon={History}
             label="Last Entry"
-            value={
-              transactions[0]?.amount ? `Rs. ${transactions[0].amount}` : "N/A"
-            }
+            value={transactions[0]?.amount ? `Rs. ${transactions[0].amount}` : "N/A"}
             subValue={transactions[0]?.paymentDate}
             delay={400}
           />
@@ -511,13 +481,8 @@ function FeeDetailsPage() {
                   </thead>
                   <tbody className="divide-y divide-foreground/5">
                     {transactions.map((t, idx) => (
-                      <tr
-                        key={idx}
-                        className="group hover:bg-foreground/[0.02] transition-colors"
-                      >
-                        <td className="p-5 text-[10px] text-foreground/40 font-black">
-                          {t.sNo}
-                        </td>
+                      <tr key={idx} className="group hover:bg-foreground/[0.02] transition-colors">
+                        <td className="p-5 text-[10px] text-foreground/40 font-black">{t.sNo}</td>
                         <td className="p-5 text-[10px] text-foreground font-black Cap tracking-tight">
                           {t.semester}
                         </td>

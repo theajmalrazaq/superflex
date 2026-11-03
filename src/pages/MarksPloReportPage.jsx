@@ -5,9 +5,7 @@ import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
-import LoadingOverlay, {
-  LoadingSpinner,
-} from "../components/ui/LoadingOverlay";
+import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
 
 function MarksPloReportPage() {
   const [loading, setLoading] = useState(true);
@@ -19,25 +17,18 @@ function MarksPloReportPage() {
   const hiddenContentRef = useRef(null);
 
   useEffect(() => {
-    window.dispatchEvent(
-      new CustomEvent("superflex-update-loading", { detail: true }),
-    );
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseData = () => {
       try {
         let root = document.querySelector(".m-wrapper");
 
         if (!root || root.children.length === 0) {
-          if (
-            hiddenContentRef.current &&
-            hiddenContentRef.current.children.length > 0
-          ) {
+          if (hiddenContentRef.current && hiddenContentRef.current.children.length > 0) {
             root = hiddenContentRef.current;
           } else {
             setLoading(false);
-            window.dispatchEvent(
-              new CustomEvent("superflex-update-loading", { detail: false }),
-            );
+            window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
             return;
           }
         }
@@ -55,9 +46,7 @@ function MarksPloReportPage() {
           const clone = textContainer.cloneNode(true);
 
           clone
-            .querySelectorAll(
-              ".m-alert__close, button, a, strong, .m-alert__icon",
-            )
+            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
             .forEach((el) => el.remove());
 
           let message = clone.textContent
@@ -78,8 +67,7 @@ function MarksPloReportPage() {
         });
         setAlerts(alertList);
 
-        const legacyForm =
-          root.querySelector("form") || root.querySelector(".row");
+        const legacyForm = root.querySelector("form") || root.querySelector(".row");
         if (legacyForm) {
           const select = legacyForm.querySelector("select#SemId");
           if (select) {
@@ -97,16 +85,12 @@ function MarksPloReportPage() {
           const lastRow = table.querySelector("tr:last-child");
           if (lastRow) {
             const boldCells = lastRow.querySelectorAll("td.bold.text-center");
-            const percentageCell =
-              boldCells.length > 0 ? boldCells[boldCells.length - 1] : null;
+            const percentageCell = boldCells.length > 0 ? boldCells[boldCells.length - 1] : null;
 
             if (percentageCell) {
-              const percentage =
-                parseFloat(percentageCell.textContent.trim()) || 0;
+              const percentage = parseFloat(percentageCell.textContent.trim()) || 0;
 
-              const allCenterCells = Array.from(
-                lastRow.querySelectorAll("td.text-center"),
-              );
+              const allCenterCells = Array.from(lastRow.querySelectorAll("td.text-center"));
 
               const ploValues = [];
 
@@ -141,20 +125,10 @@ function MarksPloReportPage() {
 
           const thead = clonedTable.querySelector("thead");
           if (thead) {
-            thead.classList.add(
-              "bg-secondary/50",
-              "text-xs",
-              "font-bold",
-              "text-foreground/60",
-            );
+            thead.classList.add("bg-secondary/50", "text-xs", "font-bold", "text-foreground/60");
             const ths = thead.querySelectorAll("th");
             ths.forEach((th) => {
-              th.classList.add(
-                "p-3",
-                "border",
-                "border-foreground/10",
-                "text-center",
-              );
+              th.classList.add("p-3", "border", "border-foreground/10", "text-center");
               th.removeAttribute("style");
             });
           }
@@ -185,14 +159,11 @@ function MarksPloReportPage() {
                 if (/^\d+(\.\d+)?$/.test(txt)) {
                   const val = parseFloat(txt);
                   if (val < 30) td.classList.add("text-rose-400", "font-bold");
-                  else if (val < 60)
-                    td.classList.add("text-amber-400", "font-bold");
-                  else if (val >= 60)
-                    td.classList.add("text-emerald-400", "font-bold");
+                  else if (val < 60) td.classList.add("text-amber-400", "font-bold");
+                  else if (val >= 60) td.classList.add("text-emerald-400", "font-bold");
                 }
 
-                if (td.classList.contains("bold"))
-                  td.classList.add("font-bold", "text-foreground");
+                if (td.classList.contains("bold")) td.classList.add("font-bold", "text-foreground");
               });
             });
 
@@ -216,15 +187,11 @@ function MarksPloReportPage() {
         }
 
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (e) {
         console.error("Marks PLO Parsing Error", e);
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 
@@ -245,8 +212,7 @@ function MarksPloReportPage() {
   };
 
   const getStatus = (pct) => {
-    if (pct < 30)
-      return { label: "Poor", color: "text-rose-400", bg: "bg-rose-500/20" };
+    if (pct < 30) return { label: "Poor", color: "text-rose-400", bg: "bg-rose-500/20" };
     if (pct < 60)
       return {
         label: "Average",
@@ -348,9 +314,7 @@ function MarksPloReportPage() {
                   <div className="p-2 bg-accent/10 rounded-lg text-accent">
                     <Layout size={20} />
                   </div>
-                  <h3 className="font-bold text-lg text-foreground">
-                    Detailed Result
-                  </h3>
+                  <h3 className="font-bold text-lg text-foreground">Detailed Result</h3>
                 </div>
                 {}
                 <div className="overflow-x-auto scrollbar-hide p-0">
@@ -363,12 +327,9 @@ function MarksPloReportPage() {
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center opacity-50 border border-foreground/10 rounded-3xl bg-secondary/20">
                 <Info size={48} className="mb-4 text-foreground/50" />
-                <p className="text-xl font-bold text-foreground">
-                  No PLO Report Available
-                </p>
+                <p className="text-xl font-bold text-foreground">No PLO Report Available</p>
                 <p className="text-foreground/60 mt-2">
-                  There is no PLO attainment data available for the selected
-                  semester.
+                  There is no PLO attainment data available for the selected semester.
                 </p>
                 <p className="text-foreground/50 text-sm mt-1">
                   Please select a different semester.

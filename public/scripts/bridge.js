@@ -117,9 +117,7 @@
     try {
       const isSignedIn = await window.puter.auth.isSignedIn();
 
-      document.dispatchEvent(
-        new CustomEvent("superflex-auth-status", { detail: { isSignedIn } }),
-      );
+      document.dispatchEvent(new CustomEvent("superflex-auth-status", { detail: { isSignedIn } }));
     } catch (e) {
       console.error("Failed to check auth status:", e);
     }
@@ -131,9 +129,7 @@
       const usage = await window.puter.auth.getMonthlyUsage();
 
       if (usage) {
-        document.dispatchEvent(
-          new CustomEvent("superflex-usage-data", { detail: usage }),
-        );
+        document.dispatchEvent(new CustomEvent("superflex-usage-data", { detail: usage }));
       }
     } catch (e) {
       console.error("Failed to get monthly usage:", e);

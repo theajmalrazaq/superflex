@@ -4,9 +4,7 @@ import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
-import LoadingOverlay, {
-  LoadingSpinner,
-} from "../components/ui/LoadingOverlay";
+import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
 import {
   History,
   CheckCircle2,
@@ -90,11 +88,7 @@ const GradeChangeModal = ({ isOpen, onClose, onSubmit }) => {
         />
 
         <div className="pt-2">
-          <Button
-            onClick={handleSubmit}
-            className="w-full"
-            icon={<Send size={18} />}
-          >
+          <Button onClick={handleSubmit} className="w-full" icon={<Send size={18} />}>
             Submit Request
           </Button>
         </div>
@@ -179,9 +173,7 @@ const GradeChangeCard = ({ req, isSelected, onToggle, index }) => {
           }`}
         >
           {isSelected && <CheckCircle2 size={14} strokeWidth={3} />}
-          {!isSelected && !req.checkboxId && (
-            <Search size={10} className="text-foreground/20" />
-          )}
+          {!isSelected && !req.checkboxId && <Search size={10} className="text-foreground/20" />}
         </div>
       </div>
     </div>
@@ -243,9 +235,7 @@ function GradeChangePage() {
     `;
     document.head.appendChild(hiderStyle);
 
-    window.dispatchEvent(
-      new CustomEvent("superflex-update-loading", { detail: true }),
-    );
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseData = () => {
       try {
@@ -274,9 +264,7 @@ function GradeChangePage() {
           const textContainer = alert.querySelector(".m-alert__text") || alert;
           const clone = textContainer.cloneNode(true);
           clone
-            .querySelectorAll(
-              ".m-alert__close, button, a, strong, .m-alert__icon",
-            )
+            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
             .forEach((el) => el.remove());
 
           let message = clone.textContent
@@ -319,12 +307,7 @@ function GradeChangePage() {
               const code = cells[1]?.textContent.trim();
               const course = cells[2]?.textContent.trim();
 
-              if (
-                !code ||
-                !course ||
-                code.toLowerCase().includes("course code") ||
-                code.length < 2
-              )
+              if (!code || !course || code.toLowerCase().includes("course code") || code.length < 2)
                 return;
 
               let grade = cells[5]?.textContent.trim();
@@ -332,12 +315,8 @@ function GradeChangePage() {
                 grade = "N/A";
               }
 
-              let status =
-                cells[7]?.textContent.trim() ||
-                cells[6]?.textContent.trim() ||
-                "N/A";
-              if (status.toLowerCase().includes("initiate"))
-                status = "Eligible";
+              let status = cells[7]?.textContent.trim() || cells[6]?.textContent.trim() || "N/A";
+              if (status.toLowerCase().includes("initiate")) status = "Eligible";
 
               requestList.push({
                 id: idx,
@@ -347,8 +326,7 @@ function GradeChangePage() {
                 credits: cells[4]?.textContent.trim(),
                 grade: grade,
                 status: status,
-                checkboxId: cells[6]?.querySelector('input[type="checkbox"]')
-                  ?.id,
+                checkboxId: cells[6]?.querySelector('input[type="checkbox"]')?.id,
                 fullRowHtml: row.innerHTML,
               });
             }
@@ -385,15 +363,11 @@ function GradeChangePage() {
         root.style.zIndex = "-1";
 
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (err) {
         console.error("Grade Change Parser Error:", err);
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 
@@ -433,9 +407,7 @@ function GradeChangePage() {
 
   const handleSelectAll = (checked) => {
     const root = document.getElementById("superflex-grade-change-original");
-    const legacyCheckboxes = root?.querySelectorAll(
-      'input[name="OfferIdCheckBox"]:not(:disabled)',
-    );
+    const legacyCheckboxes = root?.querySelectorAll('input[name="OfferIdCheckBox"]:not(:disabled)');
     const ids = [];
     legacyCheckboxes?.forEach((cb) => {
       cb.checked = checked;
@@ -530,24 +502,9 @@ function GradeChangePage() {
 
         {}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatsCard
-            icon={History}
-            label="Applications"
-            value={stats.total}
-            delay={100}
-          />
-          <StatsCard
-            icon={Clock}
-            label="In Review"
-            value={stats.pending}
-            delay={200}
-          />
-          <StatsCard
-            icon={CheckCircle2}
-            label="Processed"
-            value={stats.processed}
-            delay={300}
-          />
+          <StatsCard icon={History} label="Applications" value={stats.total} delay={100} />
+          <StatsCard icon={Clock} label="In Review" value={stats.pending} delay={200} />
+          <StatsCard icon={CheckCircle2} label="Processed" value={stats.processed} delay={300} />
           <StatsCard
             icon={AlertTriangle}
             label="Status"
@@ -569,14 +526,12 @@ function GradeChangePage() {
                   <button
                     onClick={() =>
                       handleSelectAll(
-                        selectedIds.length !==
-                          requests.filter((r) => r.checkboxId).length,
+                        selectedIds.length !== requests.filter((r) => r.checkboxId).length,
                       )
                     }
                     className="text-[10px] font-black text-accent Cap tracking-[0px] hover:opacity-80 transition-opacity"
                   >
-                    {selectedIds.length ===
-                    requests.filter((r) => r.checkboxId).length
+                    {selectedIds.length === requests.filter((r) => r.checkboxId).length
                       ? "Deselect All"
                       : "Select All"}
                   </button>
@@ -633,17 +588,13 @@ function GradeChangePage() {
                       <span className="text-foreground/50 font-bold Cap tracking-[0px] text-[10px]">
                         Pending
                       </span>
-                      <span className="text-foreground font-black">
-                        {stats.pending}
-                      </span>
+                      <span className="text-foreground font-black">{stats.pending}</span>
                     </div>
                     <div className="pt-3 border-t border-foreground/10 flex justify-between items-center">
                       <span className="text-foreground/60 text-[10px] font-black Cap tracking-[0px]">
                         Total Applications
                       </span>
-                      <span className="text-accent font-black text-xs">
-                        {stats.total}
-                      </span>
+                      <span className="text-accent font-black text-xs">{stats.total}</span>
                     </div>
                   </div>
                 </div>
@@ -664,13 +615,11 @@ function GradeChangePage() {
               <div className="pt-4 border-t border-foreground/10 space-y-4">
                 <div className="flex items-center gap-3 px-1 text-accent">
                   <AlertTriangle size={14} />
-                  <span className="text-[10px] font-black Cap tracking-[0px]">
-                    Important Note
-                  </span>
+                  <span className="text-[10px] font-black Cap tracking-[0px]">Important Note</span>
                 </div>
                 <p className="text-[10px] text-foreground/50 font-medium leading-relaxed px-1 italic">
-                  Grade change requests are only reviewed and processed by the
-                  respective course teacher.
+                  Grade change requests are only reviewed and processed by the respective course
+                  teacher.
                 </p>
               </div>
             </div>

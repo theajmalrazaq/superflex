@@ -76,17 +76,9 @@ const ProfileImageModal = ({ isOpen, onClose, currentImage }) => {
           <div className="absolute -inset-4 bg-accent/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
           <div className="w-40 h-40 rounded-[2.5rem] border-4 border-foreground/10 overflow-hidden bg-secondary flex items-center justify-center relative z-10">
             {preview ? (
-              <img
-                src={preview.url}
-                alt="Preview"
-                className="w-full h-full object-cover"
-              />
+              <img src={preview.url} alt="Preview" className="w-full h-full object-cover" />
             ) : currentImage ? (
-              <img
-                src={currentImage}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
+              <img src={currentImage} alt="Profile" className="w-full h-full object-cover" />
             ) : (
               <User size={64} className="text-foreground/30" />
             )}
@@ -158,9 +150,8 @@ const ProfileImageModal = ({ isOpen, onClose, currentImage }) => {
             Privacy Note
           </h4>
           <p className="text-[11px] text-foreground/50 leading-relaxed font-bold">
-            Your profile picture is processed locally and stored in your
-            browser's local storage. SuperFlex does not upload it to any
-            external servers.
+            Your profile picture is processed locally and stored in your browser's local storage.
+            SuperFlex does not upload it to any external servers.
           </p>
         </div>
 

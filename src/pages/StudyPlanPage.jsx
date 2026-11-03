@@ -4,16 +4,8 @@ import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
-import LoadingOverlay, {
-  LoadingSpinner,
-} from "../components/ui/LoadingOverlay";
-import {
-  BookOpen,
-  Layers,
-  CheckCircle2,
-  TrendingUp,
-  GraduationCap,
-} from "lucide-react";
+import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import { BookOpen, Layers, CheckCircle2, TrendingUp, GraduationCap } from "lucide-react";
 
 function StudyPlanPage() {
   const [loading, setLoading] = useState(true);
@@ -22,20 +14,14 @@ function StudyPlanPage() {
   const [activeSemIdx, setActiveSemIdx] = useState(0);
 
   useEffect(() => {
-    window.dispatchEvent(
-      new CustomEvent("superflex-update-loading", { detail: true }),
-    );
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseData = () => {
       try {
-        const root = document.querySelector(
-          ".m-grid.m-grid--hor.m-grid--root.m-page",
-        );
+        const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
         if (!root) {
           setLoading(false);
-          window.dispatchEvent(
-            new CustomEvent("superflex-update-loading", { detail: false }),
-          );
+          window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
           return;
         }
 
@@ -52,9 +38,7 @@ function StudyPlanPage() {
           const clone = textContainer.cloneNode(true);
 
           clone
-            .querySelectorAll(
-              ".m-alert__close, button, a, strong, .m-alert__icon",
-            )
+            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
             .forEach((el) => el.remove());
 
           let message = clone.textContent
@@ -112,15 +96,11 @@ function StudyPlanPage() {
         root.style.display = "none";
 
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (e) {
         console.error("Study Plan Parsing Error", e);
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 
@@ -170,18 +150,13 @@ function StudyPlanPage() {
         <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
-        <PageHeader
-          title="Study Plan"
-          subtitle="Degree requirements and course roadmaps"
-        >
+        <PageHeader title="Study Plan" subtitle="Degree requirements and course roadmaps">
           <div className="flex items-center gap-4 bg-secondary/50 px-6 py-3 rounded-2xl border border-foreground/10 backdrop-blur-xl">
             <div className="text-right">
               <p className="text-[10px] font-bold text-foreground/50 Cap tracking-[0px]">
                 Graduation Path
               </p>
-              <h4 className="text-lg font-bold text-foreground">
-                4 Year Degree
-              </h4>
+              <h4 className="text-lg font-bold text-foreground">4 Year Degree</h4>
             </div>
             <div className="w-px h-8 bg-foreground/10 mx-2"></div>
             <GraduationCap className="text-accent" size={24} />
@@ -244,9 +219,7 @@ function StudyPlanPage() {
                     </p>
                     <span className="text-xl font-bold text-accent font-sans">
                       {activeSemData.crHrs}{" "}
-                      <span className="text-xs text-foreground/50 Cap ml-1">
-                        Courses
-                      </span>
+                      <span className="text-xs text-foreground/50 Cap ml-1">Courses</span>
                     </span>
                   </div>
                 </div>
@@ -291,10 +264,7 @@ function StudyPlanPage() {
                   </thead>
                   <tbody className="divide-y divide-foreground/5">
                     {activeSemData.courses.map((course, cIdx) => (
-                      <tr
-                        key={cIdx}
-                        className="group hover:bg-foreground/[0.02] transition-colors"
-                      >
+                      <tr key={cIdx} className="group hover:bg-foreground/[0.02] transition-colors">
                         <td className="px-6 py-5">
                           <span className="px-2.5 py-1 rounded-lg bg-tertiary text-foreground/60 text-[10px] font-bold tracking-tight border border-foreground/10">
                             {course.code}

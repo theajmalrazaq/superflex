@@ -4,9 +4,7 @@ import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
-import LoadingOverlay, {
-  LoadingSpinner,
-} from "../components/ui/LoadingOverlay";
+import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
 import {
   AlertCircle,
   BookOpen,
@@ -136,9 +134,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
                 key={i}
                 className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2 hover:bg-foreground/[0.04] transition-colors"
               >
-                <h4 className="text-[11px] font-bold text-accent Cap">
-                  {item.title}
-                </h4>
+                <h4 className="text-[11px] font-bold text-accent Cap">{item.title}</h4>
                 <p className="text-[10px] text-foreground/50 leading-relaxed font-bold">
                   {item.desc}
                 </p>
@@ -168,9 +164,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
                 <div className="w-6 h-6 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-accent text-[10px] font-black shrink-0 group-hover:scale-110 transition-transform">
                   {i + 1}
                 </div>
-                <p className="text-xs text-foreground/60 font-bold leading-relaxed">
-                  {step}
-                </p>
+                <p className="text-xs text-foreground/60 font-bold leading-relaxed">{step}</p>
               </div>
             ))}
           </div>
@@ -336,14 +330,10 @@ function RetakeExamPage() {
   const hiddenFormRef = useRef(null);
 
   useEffect(() => {
-    window.dispatchEvent(
-      new CustomEvent("superflex-update-loading", { detail: true }),
-    );
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseRetakeData = () => {
-      const root = document.querySelector(
-        ".m-grid.m-grid--hor.m-grid--root.m-page",
-      );
+      const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
       if (!root) {
         setTimeout(parseRetakeData, 500);
         return;
@@ -363,9 +353,7 @@ function RetakeExamPage() {
           const clone = textContainer.cloneNode(true);
 
           clone
-            .querySelectorAll(
-              ".m-alert__close, button, a, strong, .m-alert__icon",
-            )
+            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
             .forEach((el) => el.remove());
 
           let message = clone.textContent
@@ -425,9 +413,7 @@ function RetakeExamPage() {
           rows.forEach((row, idx) => {
             const cells = row.querySelectorAll("td");
             if (cells.length >= 6) {
-              const checkbox = cells[5]?.querySelector(
-                'input[type="checkbox"]',
-              );
+              const checkbox = cells[5]?.querySelector('input[type="checkbox"]');
               const isDisabled = checkbox?.disabled;
               const isChecked = checkbox?.checked;
 
@@ -455,15 +441,11 @@ function RetakeExamPage() {
         root.style.zIndex = "-1";
 
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (err) {
         console.error("Retake Parser Error:", err);
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 
@@ -471,9 +453,7 @@ function RetakeExamPage() {
   }, []);
 
   const handleSemesterChange = (val) => {
-    const root = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
+    const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
     const select = root?.querySelector("#SemId");
     if (select) {
       select.value = val;
@@ -484,9 +464,7 @@ function RetakeExamPage() {
   };
 
   const handleExamTypeChange = (val) => {
-    const root = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
+    const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
     const select = root?.querySelector("#EvalTypeId");
     if (select) {
       select.value = val;
@@ -498,9 +476,7 @@ function RetakeExamPage() {
 
   const handleReasonChange = (val) => {
     setSelectedReason(val);
-    const root = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
+    const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
     const select = root?.querySelector("#DrpDwnRetakeReason");
     if (select) {
       select.value = val;
@@ -554,9 +530,7 @@ function RetakeExamPage() {
     if (typeof window.fn_SubmitStdRemarks === "function") {
       window.fn_SubmitStdRemarks();
     } else {
-      const legacyBtn = document.querySelector(
-        '#remrksbtn input[type="button"]',
-      );
+      const legacyBtn = document.querySelector('#remrksbtn input[type="button"]');
       if (legacyBtn) legacyBtn.click();
     }
 
@@ -622,10 +596,7 @@ function RetakeExamPage() {
         {}
         <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
 
-        <PageHeader
-          title="Retake Exam"
-          subtitle="Manage your examination retake applications"
-        >
+        <PageHeader title="Retake Exam" subtitle="Manage your examination retake applications">
           <div className="flex flex-col md:flex-row items-center gap-4">
             {}
             <SuperTabs
@@ -645,12 +616,7 @@ function RetakeExamPage() {
 
         {}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatsCard
-            icon={Layout}
-            label="Total Courses"
-            value={courses.length}
-            delay={100}
-          />
+          <StatsCard icon={Layout} label="Total Courses" value={courses.length} delay={100} />
           <StatsCard
             icon={CheckCircle2}
             label="Selected"
@@ -679,19 +645,14 @@ function RetakeExamPage() {
         </div>
 
         {}
-        <NotificationBanner
-          alerts={alerts}
-          onActionClick={() => setIsInstructionsOpen(true)}
-        />
+        <NotificationBanner alerts={alerts} onActionClick={() => setIsInstructionsOpen(true)} />
 
         {}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           <div className="xl:col-span-2 space-y-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between px-2">
-                <h3 className="text-xl font-bold text-foreground">
-                  Eligible Courses
-                </h3>
+                <h3 className="text-xl font-bold text-foreground">Eligible Courses</h3>
                 <div className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px] bg-foreground/5 px-3 py-1 rounded-lg">
                   {courses.length} Total
                 </div>
@@ -754,27 +715,19 @@ function RetakeExamPage() {
                     <div className="p-2 bg-accent/10 rounded-lg text-accent">
                       <ShieldCheck size={18} />
                     </div>
-                    <h4 className="text-sm font-bold text-foreground">
-                      Order Summary
-                    </h4>
+                    <h4 className="text-sm font-bold text-foreground">Order Summary</h4>
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs font-medium">
-                      <span className="text-foreground/50">
-                        Selected Papers
-                      </span>
-                      <span className="text-foreground">
-                        {selectedCourses.size}
-                      </span>
+                      <span className="text-foreground/50">Selected Papers</span>
+                      <span className="text-foreground">{selectedCourses.size}</span>
                     </div>
                     <div className="flex justify-between text-xs font-medium">
                       <span className="text-foreground/50">Processing Fee</span>
                       <span className="text-foreground">Rs. 2,000 / paper</span>
                     </div>
                     <div className="pt-3 border-t border-foreground/10 flex justify-between items-center">
-                      <span className="text-xs font-bold text-foreground/60">
-                        Total Charged
-                      </span>
+                      <span className="text-xs font-bold text-foreground/60">Total Charged</span>
                       <span className="text-lg font-black text-foreground">
                         Rs. {selectedCourses.size * 2000}
                       </span>

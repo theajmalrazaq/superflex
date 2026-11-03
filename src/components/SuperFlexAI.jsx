@@ -126,18 +126,14 @@ const SuperFlexAI = () => {
   const [usageData, setUsageData] = useState(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [userImage, setUserImage] = useState(
-    () =>
-      localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage",
+    () => localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage",
   );
   const scrollRef = useRef(null);
   const activeRequestIdRef = useRef(null);
 
   useEffect(() => {
     const handleStorage = () => {
-      setUserImage(
-        localStorage.getItem("superflex_user_custom_image") ||
-          "/Login/GetImage",
-      );
+      setUserImage(localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage");
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
@@ -148,8 +144,7 @@ const SuperFlexAI = () => {
       setUsageData(e.detail);
     };
     document.addEventListener("superflex-usage-data", handleUsage);
-    return () =>
-      document.removeEventListener("superflex-usage-data", handleUsage);
+    return () => document.removeEventListener("superflex-usage-data", handleUsage);
   }, []);
 
   useEffect(() => {
@@ -225,8 +220,7 @@ const SuperFlexAI = () => {
   useEffect(() => {
     const handleToggle = () => setIsOpen((prev) => !prev);
     window.addEventListener("superflex-toggle-ai", handleToggle);
-    return () =>
-      window.removeEventListener("superflex-toggle-ai", handleToggle);
+    return () => window.removeEventListener("superflex-toggle-ai", handleToggle);
   }, []);
 
   useEffect(() => {
@@ -279,8 +273,7 @@ const SuperFlexAI = () => {
 
         let errorMsg = "Sorry, I encountered an error.";
         if (error === "auth_required" || error === "auth_canceled") {
-          errorMsg =
-            "Please sign in to Puter to continue. A popup should appear.";
+          errorMsg = "Please sign in to Puter to continue. A popup should appear.";
 
           if (error === "auth_required") {
             document.dispatchEvent(new CustomEvent("superflex-auth-trigger"));
@@ -333,8 +326,7 @@ const SuperFlexAI = () => {
     try {
       const chatHistory = messages
         .map((m) => {
-          const role =
-            m.role.charAt(0).toUpperCase() + m.role.slice(1).toLowerCase();
+          const role = m.role.charAt(0).toUpperCase() + m.role.slice(1).toLowerCase();
           return `${role}: ${m.content}`;
         })
         .join("\n");
@@ -360,8 +352,7 @@ const SuperFlexAI = () => {
               : "Missing (Visit Attendance Page)",
         },
         academicHistory: {
-          transcript:
-            dataContext.transcript || "Missing (Visit Transcript Page)",
+          transcript: dataContext.transcript || "Missing (Visit Transcript Page)",
           mcaData: dataContext.mcaData || "Missing (Visit Transcript Page)",
           studyPlan: dataContext.studyPlan || "Missing (Visit Transcript Page)",
         },
@@ -429,8 +420,7 @@ const SuperFlexAI = () => {
         ...prev.slice(0, -1),
         {
           role: "assistant",
-          content:
-            "Sorry, I encountered an internal error setting up the request.",
+          content: "Sorry, I encountered an internal error setting up the request.",
         },
       ]);
       setIsLoading(false);
@@ -449,11 +439,7 @@ const SuperFlexAI = () => {
 
       setMessages((prev) => {
         const lastMessage = prev[prev.length - 1];
-        if (
-          lastMessage &&
-          lastMessage.role === "assistant" &&
-          !lastMessage.content
-        ) {
+        if (lastMessage && lastMessage.role === "assistant" && !lastMessage.content) {
           return prev.slice(0, -1);
         }
         return prev;
@@ -464,9 +450,7 @@ const SuperFlexAI = () => {
   const handlePermission = (status) => {
     setPermissionStatus(status);
     localStorage.setItem("superflex_ai_data_permission", status);
-    window.dispatchEvent(
-      new CustomEvent("superflex-permission-updated", { detail: status }),
-    );
+    window.dispatchEvent(new CustomEvent("superflex-permission-updated", { detail: status }));
   };
 
   const clearChat = () => {
@@ -488,8 +472,7 @@ const SuperFlexAI = () => {
   };
 
   const hasMarks = dataContext.marks && dataContext.marks.length > 0;
-  const hasAttendance =
-    dataContext.attendance && dataContext.attendance.length > 0;
+  const hasAttendance = dataContext.attendance && dataContext.attendance.length > 0;
   const hasTranscript = !!dataContext.transcript;
 
   const StatusCard = ({ label, active, icon: Icon, onClick, description }) => (
@@ -507,9 +490,7 @@ const SuperFlexAI = () => {
       >
         <Icon size={20} className="md:w-[26px] md:h-[26px]" />
       </div>
-      <h4 className="text-foreground font-bold text-xs md:text-sm mb-0.5 md:mb-1">
-        {label}
-      </h4>
+      <h4 className="text-foreground font-bold text-xs md:text-sm mb-0.5 md:mb-1">{label}</h4>
       <p className="text-[9px] md:text-[10px] text-foreground/60 font-medium leading-tight max-w-[90%]">
         {active ? description : "Visit page to sync"}
       </p>
@@ -530,11 +511,7 @@ const SuperFlexAI = () => {
             <div className="flex items-center gap-4">
               {isSignedIn ? (
                 <button
-                  onClick={() =>
-                    document.dispatchEvent(
-                      new CustomEvent("superflex-auth-logout"),
-                    )
-                  }
+                  onClick={() => document.dispatchEvent(new CustomEvent("superflex-auth-logout"))}
                   className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 border border-red-500/20 rounded-full text-red-400 hover:bg-red-500/20 transition-all text-xs font-bold"
                   title="Sign Out"
                 >
@@ -543,11 +520,7 @@ const SuperFlexAI = () => {
                 </button>
               ) : (
                 <button
-                  onClick={() =>
-                    document.dispatchEvent(
-                      new CustomEvent("superflex-auth-trigger"),
-                    )
-                  }
+                  onClick={() => document.dispatchEvent(new CustomEvent("superflex-auth-trigger"))}
                   className="flex items-center gap-2 px-3 py-1.5 bg-accent/10 border border-accent/20 rounded-full text-accent hover:bg-accent/20 transition-all text-xs font-bold"
                   title="Sign In with Puter"
                 >
@@ -580,8 +553,8 @@ const SuperFlexAI = () => {
                   Hi, {dataContext.studentName?.split(" ")[0] || "Student"}
                 </h1>
                 <p className="text-xl text-foreground/60 mb-12 max-w-xl">
-                  Ready to assist you with anything you need, from analyzing
-                  grades to tracking attendance. Let's get started!
+                  Ready to assist you with anything you need, from analyzing grades to tracking
+                  attendance. Let's get started!
                 </p>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-4xl px-2 md:px-0">
@@ -591,9 +564,7 @@ const SuperFlexAI = () => {
                     icon={User}
                     description="View profile summary"
                     onClick={() =>
-                      handleSend(
-                        "Tell me about my student profile based on the synced data.",
-                      )
+                      handleSend("Tell me about my student profile based on the synced data.")
                     }
                   />
                   <StatusCard
@@ -601,9 +572,7 @@ const SuperFlexAI = () => {
                     active={hasMarks}
                     icon={BarChart}
                     description="Analyze performance"
-                    onClick={() =>
-                      handleSend("Analyze my current marks performance.")
-                    }
+                    onClick={() => handleSend("Analyze my current marks performance.")}
                   />
                   <StatusCard
                     label="Attendance"
@@ -652,20 +621,14 @@ const SuperFlexAI = () => {
                             <div className="w-2 h-2 bg-accent rounded-full animate-bounce"></div>
                           </div>
                         ) : (
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                            {m.content}
-                          </ReactMarkdown>
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
                         )}
                       </div>
                     </div>
 
                     {m.role === "user" && (
                       <div className="w-8 h-8 rounded-full bg-accent/20 border border-accent/10 flex items-center justify-center shrink-0 overflow-hidden mt-1">
-                        <img
-                          src={userImage}
-                          alt="Me"
-                          className="w-full h-full object-cover"
-                        />
+                        <img src={userImage} alt="Me" className="w-full h-full object-cover" />
                       </div>
                     )}
                   </div>
@@ -681,9 +644,7 @@ const SuperFlexAI = () => {
                 <div className="flex items-center gap-3 pl-2">
                   <Shield className="text-accent" size={20} />
                   <div className="text-sm">
-                    <span className="text-foreground font-bold block">
-                      Enable AI Access?
-                    </span>
+                    <span className="text-foreground font-bold block">Enable AI Access?</span>
                     <span className="text-foreground/50 text-xs">
                       Access to academic data is required.
                     </span>
@@ -712,20 +673,14 @@ const SuperFlexAI = () => {
                 <div className="flex items-center gap-3 pl-2">
                   <LogIn className="text-accent" size={20} />
                   <div className="text-sm">
-                    <span className="text-foreground font-bold block">
-                      Sign In Required
-                    </span>
+                    <span className="text-foreground font-bold block">Sign In Required</span>
                     <span className="text-foreground/50 text-xs">
                       Please sign in with Puter to chat with SuperFlex.
                     </span>
                   </div>
                 </div>
                 <button
-                  onClick={() =>
-                    document.dispatchEvent(
-                      new CustomEvent("superflex-auth-trigger"),
-                    )
-                  }
+                  onClick={() => document.dispatchEvent(new CustomEvent("superflex-auth-trigger"))}
                   className="px-6 py-2 bg-accent hover:bg-accent/90 text-[var(--accent-foreground)] text-xs font-bold rounded-xl transition-colors"
                 >
                   Sign In
@@ -757,13 +712,11 @@ const SuperFlexAI = () => {
                               </span>
                               <span className="text-xs font-bold text-foreground">
                                 {Math.round(
-                                  (usageData.allowanceInfo.remaining || 0) /
-                                    1000,
+                                  (usageData.allowanceInfo.remaining || 0) / 1000,
                                 ).toLocaleString()}
                                 k /{" "}
                                 {Math.round(
-                                  (usageData.allowanceInfo
-                                    .monthUsageAllowance || 0) / 1000,
+                                  (usageData.allowanceInfo.monthUsageAllowance || 0) / 1000,
                                 ).toLocaleString()}
                                 k left
                               </span>
@@ -773,8 +726,7 @@ const SuperFlexAI = () => {
                                 0,
                                 Math.round(
                                   ((usageData.allowanceInfo.remaining || 0) /
-                                    (usageData.allowanceInfo
-                                      .monthUsageAllowance || 1)) *
+                                    (usageData.allowanceInfo.monthUsageAllowance || 1)) *
                                     100,
                                 ),
                               )}
@@ -878,9 +830,7 @@ const SuperFlexAI = () => {
             <div className="text-center mt-4">
               <p className="text-[10px] text-foreground/40 font-medium">
                 SuperFlex AI uses local data processing.{" "}
-                {getLastSyncTime()
-                  ? `Last synced at ${getLastSyncTime()}`
-                  : "Data not synced yet."}
+                {getLastSyncTime() ? `Last synced at ${getLastSyncTime()}` : "Data not synced yet."}
               </p>
             </div>
           </div>

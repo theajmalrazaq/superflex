@@ -1,12 +1,12 @@
 <div align="center">
   <img src="public/assets/logo.svg" alt="SuperFlex Logo" width="300" />
   <p>A modern interface enhancement extension for university learning management systems</p>
-  
+
 <p>
   <a href="https://github.com/theajmalrazaq/superflex/releases">
     <img src="https://img.shields.io/github/downloads/theajmalrazaq/superflex/total?style=for-the-badge&color=a098ff" alt="GitHub all downloads">
   </a>
-  
+
   <a href="https://github.com/theajmalrazaq/superflex">
     <img src="https://img.shields.io/github/stars/theajmalrazaq/superflex?style=for-the-badge&color=a098ff" alt="GitHub stars">
   </a>
@@ -205,11 +205,13 @@ superflex/
 │   │   └── prompt.png
 │   ├── reviews.json
 │   └── video.mp4
+├── .oxfmtrc.json
+├── .oxlintrc.json
 ├── eslint.config.js
 ├── LICENSE
-├── manifest.json
 ├── package.json
-├── pnpm-lock.yaml
+├── bun.lock
+├── wxt.config.js
 ├── postcss.config.mjs
 ├── public
 │   ├── assets

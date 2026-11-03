@@ -14,7 +14,6 @@ on:
         required: true
         default: "SuperFlex Update"
 
-
 permissions:
   contents: write
 
@@ -26,26 +25,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: "20.x"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 9
+          bun-version: latest
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
-      - name: Update manifest version
+      - name: Update version
         if: github.event.inputs.version != ''
         run: |
-          sed -i 's/"version": ".*"/"version": "${{ github.event.inputs.version }}"/' manifest.json
+          bun pm pkg set version="${{ github.event.inputs.version }}"
 
       - name: Build
-        run: pnpm run build
+        run: bun run build
 
       - name: Debug dist content
         run: |
@@ -62,8 +56,6 @@ jobs:
       - name: Get current date
         id: date
         run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
-
-
 
       - name: Create Release
         id: create_release

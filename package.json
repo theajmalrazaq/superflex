@@ -1,13 +1,17 @@
 {
   "name": "superflex",
-  "private": true,
   "version": "6.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "clean": "node scripts/clean.js --ignore public/scripts/puter.js && npx prettier --write . --ignore-path .prettierignore"
+    "dev": "wxt",
+    "build": "wxt build",
+    "zip": "wxt zip",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "clean": "node scripts/clean.js --ignore public/scripts/puter.js && oxfmt"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.13",
@@ -19,21 +23,22 @@
     "react-dom": "^19.2.3",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
-    "superflex": "link:",
     "tailwindcss": "^4.1.13"
   },
   "devDependencies": {
-    "@crxjs/vite-plugin": "^2.0.0-beta.32",
     "@eslint/js": "^9.21.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.2.1",
+    "@wxt-dev/module-react": "^1.2.2",
     "autoprefixer": "^10.4.21",
-    "react-markdown": "^10.1.0",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
-    "vite": "^4.5.0"
+    "oxfmt": "^0.75.0",
+    "oxlint": "^1.90.0",
+    "vite": "^6.2.0",
+    "wxt": "^0.21.5"
   }
 }

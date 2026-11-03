@@ -4,9 +4,7 @@ import { BookOpen, Layers } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
-import LoadingOverlay, {
-  LoadingSpinner,
-} from "../components/ui/LoadingOverlay";
+import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
 
 function CourseRegistrationPage() {
   const [loading, setLoading] = useState(true);
@@ -14,20 +12,14 @@ function CourseRegistrationPage() {
   const [tables, setTables] = useState([]);
 
   useEffect(() => {
-    window.dispatchEvent(
-      new CustomEvent("superflex-update-loading", { detail: true }),
-    );
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseData = () => {
       try {
-        const root = document.querySelector(
-          ".m-grid.m-grid--hor.m-grid--root.m-page",
-        );
+        const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
         if (!root) {
           setLoading(false);
-          window.dispatchEvent(
-            new CustomEvent("superflex-update-loading", { detail: false }),
-          );
+          window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
           return;
         }
 
@@ -44,9 +36,7 @@ function CourseRegistrationPage() {
           const clone = textContainer.cloneNode(true);
 
           clone
-            .querySelectorAll(
-              ".m-alert__close, button, a, strong, .m-alert__icon",
-            )
+            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
             .forEach((el) => el.remove());
 
           let message = clone.textContent
@@ -70,14 +60,12 @@ function CourseRegistrationPage() {
         const rawTables = root.querySelectorAll("table");
 
         rawTables.forEach((table) => {
-          const headers = Array.from(table.querySelectorAll("thead th")).map(
-            (th) => th.textContent.trim(),
+          const headers = Array.from(table.querySelectorAll("thead th")).map((th) =>
+            th.textContent.trim(),
           );
           const rows = [];
           table.querySelectorAll("tbody tr").forEach((tr) => {
-            const cells = Array.from(tr.querySelectorAll("td")).map(
-              (td) => td.innerHTML,
-            );
+            const cells = Array.from(tr.querySelectorAll("td")).map((td) => td.innerHTML);
             if (cells.length > 0) {
               rows.push(cells);
             }
@@ -99,15 +87,11 @@ function CourseRegistrationPage() {
         root.style.display = "none";
 
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (e) {
         console.error("Course Registration Parsing Error", e);
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 
@@ -142,9 +126,7 @@ function CourseRegistrationPage() {
                       <div className="p-3 bg-accent/10 rounded-xl text-accent">
                         <Layers size={24} />
                       </div>
-                      <h3 className="text-xl font-bold text-foreground">
-                        {table.title}
-                      </h3>
+                      <h3 className="text-xl font-bold text-foreground">{table.title}</h3>
                     </div>
 
                     <div className="overflow-x-auto scrollbar-hide">

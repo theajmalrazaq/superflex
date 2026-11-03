@@ -4,36 +4,15 @@ function LoginPageStyles() {
   useEffect(() => {
     localStorage.removeItem("superflex_ai_messages");
 
-    const setThemeColor = (color) => {
-      document.documentElement.style.setProperty("--accent", color);
-    };
-
-    const setThemeMode = (mode) => {
-      document.documentElement.classList.toggle("dark", mode === "dark");
-    };
-
-    const currentTheme =
-      localStorage.getItem("superflex-theme-color") || "#a098ff";
-    const currentMode = localStorage.getItem("superflex-theme-mode") || "dark";
-
-    setThemeColor(currentTheme);
-    setThemeMode(currentMode);
-
-    const handleThemeChange = (e) => {
-      setThemeColor(e.detail);
-    };
-
-    const handleModeChange = () => {
-      const mode = localStorage.getItem("superflex-theme-mode") || "dark";
-      setThemeMode(mode);
-    };
-
-    window.addEventListener("superflex-theme-changed", handleThemeChange);
-    window.addEventListener("superflex-theme-mode-changed", handleModeChange);
+    // Full screen clean sky-blue vertical gradient background matching screenshot aesthetic
+    document.body.classList.add("!min-h-screen", "!overflow-x-hidden");
+    document.body.style.background =
+      "linear-gradient(180deg, #3b8fe6 0%, #6cb3ed 32%, #a8d5f6 68%, #dceefb 100%)";
+    document.body.style.color = "#ffffff";
 
     document
       .querySelectorAll(
-        ".m-grid.m-grid--hor:not(.m-grid--desktop):not(.m-grid--desktop-and-tablet):not(.m-grid--tablet):not(.m-grid--tablet-and-mobile):not(.m-grid--mobile) > .m-grid__item.m-grid__item--fluid"
+        ".m-grid.m-grid--hor:not(.m-grid--desktop):not(.m-grid--desktop-and-tablet):not(.m-grid--tablet):not(.m-grid--tablet-and-mobile):not(.m-grid--mobile) > .m-grid__item.m-grid__item--fluid",
       )
       .forEach((element) => {
         element.classList.add("!justify-center", "!w-full");
@@ -41,7 +20,7 @@ function LoginPageStyles() {
 
     document
       .querySelectorAll(
-        ".m-grid.m-grid--ver-desktop.m-grid--desktop > .m-grid__item.m-grid__item--fluid"
+        ".m-grid.m-grid--ver-desktop.m-grid--desktop > .m-grid__item.m-grid__item--fluid",
       )
       .forEach((element) => {
         element.classList.add("!hidden", "!w-full");
@@ -51,23 +30,28 @@ function LoginPageStyles() {
       element.remove();
     });
 
-    document
-      .querySelector(
-        ".m-grid__item.m-grid__item--order-tablet-and-mobile-2.m-login__aside"
-      )
-      .classList.add("!w-full", "!p-0");
-    const mainContainer = document.querySelector(
-      ".m-stack__item.m-stack__item--fluid"
+    const aside = document.querySelector(
+      ".m-grid__item.m-grid__item--order-tablet-and-mobile-2.m-login__aside",
     );
+    if (aside) {
+      aside.classList.add("!w-full", "!p-0");
+    }
+
+    // Main viewport container: perfectly centered with generous atmospheric breathing room
+    const mainContainer = document.querySelector(".m-stack__item.m-stack__item--fluid");
     if (mainContainer) {
       mainContainer.classList.add(
         "!flex",
+        "!flex-col",
+        "!items-center",
         "!justify-center",
-        "!h-screen",
+        "!min-h-screen",
         "!w-full",
         "!bg-transparent",
         "!relative",
-        "!z-[50]"
+        "!z-[50]",
+        "!py-8",
+        "!px-4",
       );
     }
 
@@ -76,111 +60,142 @@ function LoginPageStyles() {
         "!flex",
         "!flex-col",
         "!items-center",
+        "!justify-center",
         "!w-full",
         "!max-w-full",
-        "!p-0"
+        "!p-0",
       );
     });
 
+    // Form inputs spacing & layout
     document
-      .querySelector(".m-form__actions.text-center")
-      .classList.add("!p-0");
-
-    const formHelp = document.querySelector(".m-form__help");
-    if (formHelp) formHelp.classList.add("!text-foreground", "!text-xs");
+      .querySelectorAll(".m-login__signin .form-group, .m-login__form .form-group")
+      .forEach((group) => {
+        group.classList.add("!mb-4", "!w-full", "!p-0");
+      });
 
     document
-      .querySelectorAll(".input-group.m-input-group.m-input-group--square")
+      .querySelectorAll(".input-group.m-input-group.m-input-group--square, .input-group")
       .forEach((element) => {
-        element.classList.add("!gap-1.5", "!flex-col", "!w-full");
+        element.classList.add("!flex", "!flex-col", "!gap-1.5", "!w-full", "!mb-4");
       });
 
     document
       .querySelectorAll(
-        ".input-group label, .m-form__label, label, .input-group h5, h5"
+        ".input-group label, .m-form__label, .form-group label, .input-group h5, h5",
       )
       .forEach((label) => {
-        label.classList.add("!text-foreground", "!font-medium");
+        label.classList.add(
+          "!text-slate-700",
+          "!font-bold",
+          "!text-[11px]",
+          "!tracking-wider",
+          "!uppercase",
+          "!ml-4",
+          "!mb-1",
+        );
       });
 
     document.querySelectorAll(".input-group-addon").forEach((element) => {
       element.remove();
     });
 
+    // Pill Inputs: Clean, flat, border-focused pills without glow rings or shadows
     document.querySelectorAll(".form-control.m-input").forEach((element) => {
       element.classList.add(
-        "!rounded-2xl",
-        "!bg-foreground/5",
+        "!rounded-full",
+        "!bg-[#f8f9fa]",
         "!border",
-        "!border-foreground/10",
-        "!text-foreground",
-        "!placeholder:text-foreground/40",
-        "!placeholder:font-medium",
-        "!placeholder:text-xs",
-        "!h-[48px]",
-        "!px-5",
+        "!border-slate-200",
+        "!text-slate-900",
+        "!placeholder:text-slate-400",
+        "!placeholder:font-normal",
+        "!placeholder:text-sm",
+        "!h-[52px]",
+        "!px-6",
         "!w-full",
-        "focus:!border-accent/30",
-        "focus:!bg-foreground/[0.08]",
-        "!transition-all",
-        "!duration-300"
+        "!text-sm",
+        "focus:!border-[#1e0838]",
+        "focus:!bg-white",
+        "focus:!outline-none",
+        "focus:!ring-0",
+        "!transition-colors",
+        "!duration-200",
+        "!shadow-none",
       );
       element.style.fontFamily = "'Google Sans Flex', sans-serif";
     });
 
+    const formHelp = document.querySelector(".m-form__help");
+    if (formHelp) formHelp.classList.add("!text-slate-400", "!text-xs", "!ml-4");
+
     const errorFeedback = document.querySelector("#m_inputmask_4-error");
     if (errorFeedback) {
-      errorFeedback.classList.add("!text-foreground");
+      errorFeedback.classList.add("!text-rose-500", "!text-xs", "!font-medium", "!ml-4", "!mt-1");
     }
 
     document.querySelectorAll(".m-login.m-login--1").forEach((element) => {
-      element.classList.add("!bg-transparent", "!text-foreground");
+      element.classList.add("!bg-transparent", "!text-slate-900");
     });
 
     const oldLogo = document.querySelector(".m-login__logo");
     if (oldLogo) oldLogo.remove();
 
+    // Form actions container
+    const formActions = document.querySelector(".m-form__actions");
+    if (formActions) {
+      formActions.classList.add("!p-0", "!mt-5", "!w-full", "!flex", "!flex-col", "!items-center");
+    }
+
+    // Primary action submit button: Deep midnight purple pill with white arrow, flat with no shadow
     document.querySelectorAll(".btn-primary").forEach((button) => {
       button.classList.add(
-        "!bg-accent",
-        "!text-[var(--accent-foreground)]",
+        "!bg-[#1e0838]",
+        "hover:!bg-[#2a0c4f]",
+        "!text-white",
         "!cursor-pointer",
-        "!Cap",
         "!border-none",
-        "!rounded-2xl",
+        "!rounded-full",
         "!w-full",
-        "!mb-6",
-        "!h-[50px]",
-        "!px-6",
+        "!h-[52px]",
+        "!px-7",
         "!py-3",
         "!text-center",
         "!flex",
         "justify-center",
         "items-center",
-        "hover:!bg-accent/80",
-        "!transition-all"
+        "!gap-3",
+        "!font-bold",
+        "!text-sm",
+        "!shadow-none",
+        "active:!scale-[0.98]",
+        "!transition-all",
+        "!duration-200",
       );
       button.style.fontFamily = "'Google Sans Flex', sans-serif";
 
+      // Render the white right arrow icon matching reference image
+      button.innerHTML = `
+        <span>Sign In</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:translate-x-0.5">
+          <path d="M5 12h14"/>
+          <path d="m12 5 7 7-7 7"/>
+        </svg>
+      `;
+
       button.addEventListener("click", () => {
-        if (
-          !button.querySelector(".animate-spin") &&
-          (button.id === "m_login_signin_submit" ||
-            button.innerText.toLowerCase().includes("sign in"))
-        ) {
+        if (!button.querySelector(".animate-spin")) {
           const originalContent = button.innerHTML;
-          const buttonText = button.innerText.trim();
           button.innerHTML = `
             <div class="flex items-center justify-center gap-3">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
                 <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
               </svg>
-              <span>${buttonText}</span>
+              <span>Please wait...</span>
             </div>
           `;
           button.classList.add("!opacity-80", "!pointer-events-none");
 
-          // Restore if page doesn't reload or redirect
           setTimeout(() => {
             button.innerHTML = originalContent;
             button.classList.remove("!opacity-80", "!pointer-events-none");
@@ -192,110 +207,120 @@ function LoginPageStyles() {
     const signInIcon = document.querySelector(".la-sign-in");
     if (signInIcon) signInIcon.remove();
 
-    let logintitle = document.querySelector(".m-login__title");
+    const logintitle = document.querySelector(".m-login__title");
     if (logintitle) {
       logintitle.style.display = "none";
     }
 
-    let bglogin = document.querySelector(".m-login__signin");
+    // Direct Login Card: Crisp solid white card directly visible in center, completely flat with no shadow or glow
+    const bglogin = document.querySelector(".m-login__signin");
     if (bglogin) {
       bglogin.classList.add(
-        "!bg-secondary/90",
-        "backdrop-blur-2xl",
-        "!p-6",
+        "!bg-white",
+        "!p-8",
         "sm:!p-10",
-        "!rounded-[2.5rem]",
-        "!border",
-        "!border-foreground/10",
+        "!rounded-[32px]",
+        "sm:!rounded-[36px]",
+        "!shadow-none",
+        "!border-none",
         "!flex",
         "!flex-col",
-        "!items-center",
-        "!justify-center",
-        "!w-[90vw]",
-        "!max-w-[355px]",
-        "!hidden",
-        "!fixed",
-        "!top-1/2",
-        "!left-1/2",
-        "!-translate-x-1/2",
-        "!-translate-y-1/2",
-        "!z-[999]",
-        "!opacity-0",
-        "!scale-95",
+        "!w-full",
+        "!max-w-[420px]",
+        "!relative",
+        "!z-[50]",
+        "!text-slate-900",
         "!transition-all",
-        "!duration-500",
-        "!ease-out"
+        "!duration-300",
       );
       bglogin.setAttribute("id", "login-popup");
 
-      if (!bglogin.querySelector(".login-header")) {
-        const header = document.createElement("div");
-        header.className = "login-header w-full text-left mb-8 space-y-1";
-        header.innerHTML = `
-          <h2 class="text-2xl font-black text-foreground">Locked In?</h2>
-          <p class="text-accent text-[10px] font-medium Cap tracking-[0px]">Time to Flex on 'em</p>
-        `;
-        bglogin.insertBefore(header, bglogin.firstChild);
-      }
+      const existingHeader = bglogin.querySelector(".login-header");
+      if (existingHeader) existingHeader.remove();
+
+      // Card Header: Pastel lilac squircle logo badge + typography with critical spacing
+      const header = document.createElement("div");
+      header.className = "login-header w-full text-left mb-6";
+      header.innerHTML = `
+        <!-- Pastel Lavender Squircle Logo Badge with SuperFlex Favicon Logo (Flat, No Shadow) -->
+        <div class="w-12 h-12 rounded-2xl bg-[#e9ddff] flex items-center justify-center mb-5 select-none">
+          <svg viewBox="0 0 432 432" width="28" height="28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M247.227 185.616L282.286 69L133 216L186.861 231.146L133 363L298 208.65L247.227 185.616Z" fill="#1e0838" />
+          </svg>
+        </div>
+
+        <!-- Headline & Subtitle -->
+        <h1 class="text-[30px] sm:text-[34px] font-black text-slate-900 tracking-tight leading-[1.14] mb-2.5">
+          Your portal moves with you.
+        </h1>
+        <p class="text-slate-500 text-xs sm:text-[13px] font-normal leading-relaxed">
+          A modern, intelligent overlay for Flex. Fast, clean, and built for Fastians.
+        </p>
+      `;
+      bglogin.insertBefore(header, bglogin.firstChild);
     }
 
-    const forgotPasswordSection = document.querySelector(
-      ".m-login__forget-password"
-    );
+    // Forgot Password Card: Solid flat white card, no shadow, no glow
+    const forgotPasswordSection = document.querySelector(".m-login__forget-password");
     if (forgotPasswordSection) {
       forgotPasswordSection.classList.add(
-        "!bg-secondary/95",
-        "backdrop-blur-2xl",
-        "!p-6",
+        "!bg-white",
+        "!p-8",
         "sm:!p-10",
-        "!rounded-[2.5rem]",
-        "!border",
-        "!border-foreground/10",
+        "!rounded-[32px]",
+        "sm:!rounded-[36px]",
+        "!border-none",
+        "!shadow-none",
         "!flex",
         "!flex-col",
-        "!gap-8",
-        "!w-[90vw]",
-        "!max-w-[356px]",
+        "!gap-5",
+        "!w-full",
+        "!max-w-[420px]",
         "!hidden",
-        "!fixed",
-        "!top-1/2",
-        "!left-1/2",
-        "!-translate-x-1/2",
-        "!-translate-y-1/2",
-        "!z-[999]",
-        "!opacity-0",
-        "!scale-95",
+        "!relative",
+        "!z-[50]",
+        "!text-slate-900",
         "!transition-all",
-        "!duration-500",
-        "!ease-out"
+        "!duration-300",
       );
       forgotPasswordSection.setAttribute("id", "forgot-password-popup");
 
       const forgotHead = forgotPasswordSection.querySelector(".m-login__head");
       if (forgotHead) {
-        forgotHead.classList.add("!flex", "!flex-col", "!gap-3", "!w-full");
+        forgotHead.classList.add("!flex", "!flex-col", "!gap-2", "!w-full");
+
+        const existingForgotHeader = forgotHead.querySelector(".forgot-badge");
+        if (!existingForgotHeader) {
+          const forgotBadge = document.createElement("div");
+          forgotBadge.className =
+            "forgot-badge w-12 h-12 rounded-2xl bg-[#e9ddff] flex items-center justify-center mb-4 select-none";
+          forgotBadge.innerHTML = `
+            <svg viewBox="0 0 432 432" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M247.227 185.616L282.286 69L133 216L186.861 231.146L133 363L298 208.65L247.227 185.616Z" fill="#1e0838" />
+            </svg>
+          `;
+          forgotHead.insertBefore(forgotBadge, forgotHead.firstChild);
+        }
       }
 
-      const forgotTitle =
-        forgotPasswordSection.querySelector(".m-login__title");
+      const forgotTitle = forgotPasswordSection.querySelector(".m-login__title");
       if (forgotTitle) {
         forgotTitle.style.display = "block";
         forgotTitle.classList.add(
-          "!text-foreground",
+          "!text-slate-900",
           "!text-2xl",
-          "!font-medium",
-          "!mb-0"
+          "!font-black",
+          "!tracking-tight",
+          "!mb-0",
         );
+        forgotTitle.textContent = "Forgot your password?";
       }
 
       const forgotDesc = forgotPasswordSection.querySelector(".m-login__desc");
       if (forgotDesc) {
-        forgotDesc.classList.add(
-          "!text-foreground/70",
-          "!text-sm",
-          "!leading-relaxed",
-          "!mb-0"
-        );
+        forgotDesc.classList.add("!text-slate-500", "!text-xs", "!leading-relaxed", "!mb-0");
+        forgotDesc.textContent =
+          "Enter your university email to receive password reset instructions.";
       }
 
       const forgotForm = forgotPasswordSection.querySelector(".m-login__form");
@@ -303,59 +328,51 @@ function LoginPageStyles() {
         forgotForm.classList.add("!flex", "!flex-col", "!gap-4", "!w-full");
       }
 
-      const emailInputGroup =
-        forgotPasswordSection.querySelector(".m-input-icon");
+      const emailInputGroup = forgotPasswordSection.querySelector(".m-input-icon");
       if (emailInputGroup) {
         emailInputGroup.classList.add("!w-full");
       }
 
-      const forgotFormAction = forgotPasswordSection.querySelector(
-        ".m-login__form-action"
-      );
+      const forgotFormAction = forgotPasswordSection.querySelector(".m-login__form-action");
       if (forgotFormAction) {
-        forgotFormAction.classList.add(
-          "!flex",
-          "!flex-col",
-          "!gap-3",
-          "!w-full",
-          "!mt-2"
-        );
+        forgotFormAction.classList.add("!flex", "!flex-col", "!gap-3", "!w-full", "!mt-3");
       }
-
-      document.body.appendChild(forgotPasswordSection);
     }
 
-    let forgotPasswordLink = document.querySelector(
-      'a[href*="ForgotPassword"]'
-    );
+    let forgotPasswordLink = document.querySelector('a[href*="ForgotPassword"]');
     if (!forgotPasswordLink) {
       forgotPasswordLink = document.createElement("a");
       forgotPasswordLink.href = "#";
       forgotPasswordLink.textContent = "Forgot Password?";
       forgotPasswordLink.classList.add(
-        "!text-accent",
-        "hover:!text-accent",
-        "!text-sm",
+        "!text-slate-400",
+        "hover:!text-slate-700",
+        "!text-xs",
+        "!font-semibold",
         "!cursor-pointer",
-        "!transition-all",
-        "!duration-200"
+        "!transition-colors",
+        "!duration-200",
+        "!mt-3.5",
+        "!text-center",
+        "!block",
       );
 
-      const loginFormAction = document.querySelector(
-        ".m-login__signin .m-form__actions"
-      );
+      const loginFormAction = document.querySelector(".m-login__signin .m-form__actions");
       if (loginFormAction) {
         loginFormAction.appendChild(forgotPasswordLink);
       }
     } else {
       forgotPasswordLink.classList.add(
-        "!text-accent",
-        "hover:!text-accent",
-        "!text-sm",
-        "!mt-4",
+        "!text-slate-400",
+        "hover:!text-slate-700",
+        "!text-xs",
+        "!font-semibold",
+        "!mt-3.5",
+        "!text-center",
+        "!block",
         "!cursor-pointer",
-        "!transition-all",
-        "!duration-200"
+        "!transition-colors",
+        "!duration-200",
       );
     }
 
@@ -365,99 +382,94 @@ function LoginPageStyles() {
         e.stopPropagation();
 
         if (bglogin) {
-          bglogin.classList.add("!hidden", "!opacity-0");
+          bglogin.classList.add("!hidden");
         }
 
         forgotPasswordSection.classList.remove("!hidden");
-        setTimeout(() => {
-          forgotPasswordSection.classList.remove("!opacity-0");
-          forgotPasswordSection.classList.add("!opacity-100");
-        }, 10);
       });
 
-      const cancelButton = forgotPasswordSection.querySelector(
-        "#m_login_forget_password_cancel"
-      );
+      const cancelButton = forgotPasswordSection.querySelector("#m_login_forget_password_cancel");
       if (cancelButton) {
         cancelButton.classList.add(
-          "!bg-tertiary/50",
-          "!text-foreground/60",
-          "hover:!bg-tertiary",
+          "!bg-[#e9ddff]",
+          "hover:!bg-[#dfc8fc]",
+          "!text-[#1e0838]",
           "!cursor-pointer",
-          "hover:!text-foreground",
-          "!border",
-          "!border-foreground/10",
-          "!rounded-2xl",
+          "!border-none",
+          "!rounded-full",
           "!py-3",
           "!px-6",
+          "!font-bold",
+          "!text-xs",
+          "!shadow-none",
           "!transition-all",
-          "!w-full"
+          "!w-full",
+          "!h-[48px]",
         );
         cancelButton.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
 
-          forgotPasswordSection.classList.remove("!opacity-100");
-          forgotPasswordSection.classList.add("!opacity-0");
-
-          setTimeout(() => {
-            forgotPasswordSection.classList.add("!hidden");
-
-            if (bglogin) {
-              bglogin.classList.remove("!hidden");
-              setTimeout(() => {
-                bglogin.classList.remove("!opacity-0");
-                bglogin.classList.add("!opacity-100");
-              }, 10);
-            }
-          }, 300);
+          forgotPasswordSection.classList.add("!hidden");
+          if (bglogin) {
+            bglogin.classList.remove("!hidden");
+          }
         });
       }
 
       const requestButton =
-        forgotPasswordSection.querySelector(
-          "#m_login_forget_password_submit"
-        ) || forgotPasswordSection.querySelector("button[type='submit']");
+        forgotPasswordSection.querySelector("#m_login_forget_password_submit") ||
+        forgotPasswordSection.querySelector("button[type='submit']");
       if (requestButton) {
         requestButton.classList.add(
-          "!bg-accent",
-          "!text-[var(--accent-foreground)]",
-          "!font-medium",
+          "!bg-[#1e0838]",
+          "hover:!bg-[#2a0c4f]",
+          "!text-white",
+          "!font-bold",
+          "!text-sm",
           "cursor-pointer",
-          "!rounded-2xl",
-          "!py-4",
-          "!px-6",
-          "hover:!bg-accent/80",
+          "!rounded-full",
+          "!py-3.5",
+          "!px-7",
+          "!shadow-none",
           "!transition-all",
           "!border-none",
           "!w-full",
-          "!mb-2"
+          "!h-[52px]",
+          "!flex",
+          "!items-center",
+          "!justify-center",
+          "!gap-2",
         );
+        requestButton.innerHTML = `
+          <span>Request Reset Link</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"/>
+            <path d="m12 5 7 7-7 7"/>
+          </svg>
+        `;
       }
 
       const showToast = (message, type = "success") => {
         const toast = document.createElement("div");
-        toast.className = `fixed bottom-10 left-1/2 -translate-x-1/2 z-[99999] px-6 py-3 rounded-2xl backdrop-blur-xl border flex items-center gap-3 animate-in slide-in-from-bottom-10 duration-500 ease-out transition-all`;
+        toast.className =
+          "fixed bottom-10 left-1/2 -translate-x-1/2 z-[99999] px-6 py-3.5 rounded-2xl border flex items-center gap-3 animate-in slide-in-from-bottom-10 duration-300 ease-out transition-all shadow-none";
 
         if (type === "success") {
-          toast.classList.add(
-            "bg-emerald-500/10",
-            "border-emerald-500/20",
-            "text-emerald-400"
-          );
+          toast.classList.add("bg-white", "border-slate-200", "text-slate-900");
           toast.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            <span class="text-[10px] font-medium  tracking-[0px]">${message}</span>
+            <div class="p-1 rounded-full bg-emerald-50 text-emerald-600">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <span class="text-xs font-semibold">${message}</span>
           `;
         } else {
-          toast.classList.add(
-            "bg-rose-500/10",
-            "border-rose-500/20",
-            "text-rose-400"
-          );
+          toast.classList.add("bg-white", "border-rose-200", "text-slate-900");
           toast.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span class="text-[10px] font-medium  tracking-[0px]">${message}</span>
+            <div class="p-1 rounded-full bg-rose-50 text-rose-600">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <span class="text-xs font-semibold">${message}</span>
           `;
         }
 
@@ -465,7 +477,7 @@ function LoginPageStyles() {
 
         setTimeout(() => {
           toast.classList.add("opacity-0", "translate-y-2");
-          setTimeout(() => toast.remove(), 500);
+          setTimeout(() => toast.remove(), 400);
         }, 4000);
       };
 
@@ -481,7 +493,7 @@ function LoginPageStyles() {
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
                   <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
                 </svg>
-                <span>${requestButton.innerText}</span>
+                <span>Sending...</span>
               </div>
             `;
             requestButton.classList.add("!opacity-80", "!pointer-events-none");
@@ -490,7 +502,7 @@ function LoginPageStyles() {
               showToast("Password reset link sent to your email!");
               setTimeout(() => {
                 if (cancelButton) cancelButton.click();
-                // Restore button for next time
+
                 requestButton.innerHTML = originalContent;
                 requestButton.classList.remove("!opacity-80", "!pointer-events-none");
               }, 1500);
@@ -500,407 +512,109 @@ function LoginPageStyles() {
       }
     }
 
-    const signInButton = document.createElement("button");
-    signInButton.id = "show-login-btn";
-    signInButton.className = `
-      !bg-accent 
-      !text-[var(--accent-foreground)]
-      !border-none 
-      !rounded-2xl 
-      !px-8
-      !py-3.5 
-      !cursor-pointer
-      !transition-all 
-      !duration-300
-      !flex
-      !items-center
-      !justify-center
-      !gap-3
-      !z-[50]
-      !w-full
-      !sm:w-auto
-      !whitespace-nowrap
-      !h-[52px]
-    `;
-    signInButton.style.fontFamily = "'Google Sans Flex', sans-serif";
-    signInButton.innerHTML = `<span class="text-sm font-medium">Sign In</span>
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-        <polyline points="10 17 15 12 10 7"/>
-        <line x1="15" y1="12" x2="3" y2="12"/>
-      </svg>
-    `;
-
-    const suggestionButton = document.createElement("a");
-    suggestionButton.href = "https://instagram.com/superflex.fr";
-    suggestionButton.target = "_blank";
-    suggestionButton.className =
-      "group relative cursor-pointer bg-foreground/10 backdrop-blur-sm px-8 py-3.5 rounded-2xl text-foreground hover:bg-foreground/20 hover:border-foreground/40 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto whitespace-nowrap h-[52px]";
-    suggestionButton.style.fontFamily = "'Google Sans Flex', sans-serif";
-    suggestionButton.innerHTML = `
-      <span class="text-sm font-medium">Follow on Insta</span>
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-accent">
-        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-      </svg>
-    `;
-
-    const backdrop = document.createElement("div");
-    backdrop.id = "login-backdrop";
-    backdrop.className = `
-      !fixed
-      !inset-0
-      !bg-background/50
-      backdrop-blur-sm
-      !z-[99]
-      !hidden
-      !opacity-0
-      !transition-all
-      !duration-300
-      !cursor-pointer
-    `;
-
-    signInButton.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      const originalContent = signInButton.innerHTML;
-      signInButton.innerHTML = `
-        <div class="flex items-center justify-center gap-3">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
-            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-          </svg>
-          <span class="text-sm font-medium">Please wait...</span>
-        </div>
-      `;
-      signInButton.classList.add("!opacity-80", "!pointer-events-none");
-
-      setTimeout(() => {
-        signInButton.innerHTML = originalContent;
-        signInButton.classList.remove("!opacity-80", "!pointer-events-none");
-
-        backdrop.classList.remove("!hidden");
-        setTimeout(() => {
-          backdrop.classList.remove("!opacity-0");
-          backdrop.classList.add("!opacity-100");
-        }, 10);
-
-        bglogin.classList.remove("!hidden");
-        setTimeout(() => {
-          bglogin.classList.remove("!opacity-0");
-          bglogin.classList.add("!opacity-100", "!scale-100");
-        }, 10);
-      }, 500);
-    });
-
-    backdrop.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (bglogin && !bglogin.classList.contains("!hidden")) {
-        bglogin.classList.remove("!opacity-100", "!scale-100");
-        bglogin.classList.add("!opacity-0");
-      }
-
-      if (
-        forgotPasswordSection &&
-        !forgotPasswordSection.classList.contains("!hidden")
-      ) {
-        forgotPasswordSection.classList.remove("!opacity-100");
-        forgotPasswordSection.classList.add("!opacity-0");
-      }
-
-      backdrop.classList.remove("!opacity-100");
-      backdrop.classList.add("!opacity-0");
-
-      setTimeout(() => {
-        if (bglogin) bglogin.classList.add("!hidden");
-        if (forgotPasswordSection)
-          forgotPasswordSection.classList.add("!hidden");
-        backdrop.classList.add("!hidden");
-      }, 300);
-    });
-
+    // Atmospheric sky background container with photorealistic floating clouds
     let rightImage = document.getElementById("login-background-image");
     if (!rightImage) {
       rightImage = document.createElement("div");
       rightImage.id = "login-background-image";
-      rightImage.classList.add(
-        "fixed",
-        "inset-0",
-        "w-full",
-        "h-full",
-        "z-0",
-        "overflow-hidden"
-      );
+      rightImage.className =
+        "fixed inset-0 w-full h-full -z-10 pointer-events-none overflow-hidden select-none";
+      rightImage.style.background =
+        "linear-gradient(180deg, #3b8fe6 0%, #6cb3ed 32%, #a8d5f6 68%, #dceefb 100%)";
 
-      const glow1 = document.createElement("div");
-      glow1.className =
-        "fixed top-0 right-0 w-[800px] h-[800px] bg-accent/10 blur-[150px] rounded-full -mr-96 -mt-96 pointer-events-none z-10 animate-pulse";
-      glow1.style.animationDuration = "10s";
+      // Atmospheric Cumulus Cloud Layers
+      rightImage.innerHTML = `
+        <!-- Top-Right Fluffy Cumulus Cloud Billow -->
+        <svg viewBox="0 0 520 320" class="absolute -top-12 -right-14 w-[340px] sm:w-[500px] pointer-events-none select-none opacity-90" fill="none">
+          <defs>
+            <radialGradient id="cloud-puff-tr-1" cx="50%" cy="35%" r="55%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.98" />
+              <stop offset="65%" stop-color="#ffffff" stop-opacity="0.85" />
+              <stop offset="90%" stop-color="#eaf4fd" stop-opacity="0.4" />
+              <stop offset="100%" stop-color="#d9ebf9" stop-opacity="0" />
+            </radialGradient>
+            <radialGradient id="cloud-puff-tr-2" cx="45%" cy="30%" r="50%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+              <stop offset="70%" stop-color="#ffffff" stop-opacity="0.75" />
+              <stop offset="100%" stop-color="#d9ebf9" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+          <ellipse cx="400" cy="110" rx="120" ry="85" fill="url(#cloud-puff-tr-1)" />
+          <ellipse cx="300" cy="130" rx="95" ry="75" fill="url(#cloud-puff-tr-1)" />
+          <ellipse cx="340" cy="85" rx="85" ry="65" fill="url(#cloud-puff-tr-1)" />
+          <ellipse cx="230" cy="150" rx="80" ry="60" fill="url(#cloud-puff-tr-2)" />
+          <ellipse cx="450" cy="165" rx="95" ry="70" fill="url(#cloud-puff-tr-1)" />
+          <ellipse cx="350" cy="170" rx="130" ry="65" fill="url(#cloud-puff-tr-1)" />
+          <ellipse cx="170" cy="170" rx="65" ry="45" fill="url(#cloud-puff-tr-2)" />
+          <path d="M160 180 C 160 135, 210 120, 240 145 C 265 100, 325 90, 355 115 C 385 70, 460 80, 485 125 C 515 135, 530 170, 515 205 C 495 225, 170 225, 160 180 Z" fill="#ffffff" fill-opacity="0.75" />
+        </svg>
 
-      const glow2 = document.createElement("div");
-      glow2.className =
-        "fixed bottom-0 left-0 w-[600px] h-[600px] bg-emerald-500/5 blur-[150px] rounded-full -ml-96 -mb-96 pointer-events-none z-10 animate-pulse";
-      glow2.style.animationDuration = "15s";
-
-      const img = document.createElement("img");
-      img.src = "https://theajmalrazaq.github.io/superflex/res/intro.svg";
-      img.classList.add(
-        "w-full",
-        "h-full",
-        "object-cover",
-        "opacity-20",
-        "mix-blend-luminosity"
-      );
-
-      const blackMask = document.createElement("div");
-      blackMask.className =
-        "absolute inset-0 bg-gradient-to-b from-background/40 via-background/80 to-background z-10";
-
-      rightImage.appendChild(glow1);
-      rightImage.appendChild(glow2);
-      rightImage.appendChild(img);
-      rightImage.appendChild(blackMask);
+        <!-- Mid-Left Floating Cumulus Cloud -->
+        <svg viewBox="0 0 340 190" class="absolute top-20 sm:top-24 left-3 sm:left-12 w-[160px] sm:w-[240px] pointer-events-none select-none opacity-85" fill="none">
+          <defs>
+            <radialGradient id="cloud-puff-ml-1" cx="45%" cy="35%" r="55%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.96" />
+              <stop offset="70%" stop-color="#ffffff" stop-opacity="0.75" />
+              <stop offset="100%" stop-color="#ddedf9" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+          <ellipse cx="170" cy="100" rx="80" ry="48" fill="url(#cloud-puff-ml-1)" />
+          <ellipse cx="125" cy="95" rx="60" ry="42" fill="url(#cloud-puff-ml-1)" />
+          <ellipse cx="205" cy="90" rx="55" ry="40" fill="url(#cloud-puff-ml-1)" />
+          <ellipse cx="160" cy="72" rx="48" ry="36" fill="url(#cloud-puff-ml-1)" />
+          <ellipse cx="90" cy="110" rx="38" ry="28" fill="url(#cloud-puff-ml-1)" />
+          <ellipse cx="240" cy="105" rx="42" ry="28" fill="url(#cloud-puff-ml-1)" />
+          <path d="M85 115 C 85 90, 115 80, 135 90 C 150 65, 185 65, 200 80 C 220 75, 245 90, 245 110 C 245 130, 85 130, 85 115 Z" fill="#ffffff" fill-opacity="0.65" />
+        </svg>
+      `;
       document.body.appendChild(rightImage);
     }
 
-    const heroDiv = document.createElement("div");
-    heroDiv.className =
-      "flex flex-col pt-7 justify-center items-center text-center w-full px-4 sm:px-6 mb-6 relative z-10";
-
-    const styleId = "feature-marquee-styles";
-    let styleElement = document.getElementById(styleId);
-    if (!styleElement) {
-      styleElement = document.createElement("style");
-      styleElement.id = styleId;
-      document.head.appendChild(styleElement);
-    }
-    styleElement.textContent = `
-        @keyframes featureMarquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .feature-marquee-container {
-          overflow: hidden;
-          width: 100vw;
-          margin-left: calc(-50vw + 50%);
-          position: relative;
-          padding: 40px 0;
-          -webkit-mask-image: linear-gradient(to right, transparent, #fff 15%, #fff 85%, transparent);
-          mask-image: linear-gradient(to right, transparent, #fff 15%, #fff 85%, transparent);
-        }
-        .marquee-overlay {
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          width: 20%;
-          z-index: 30;
-          pointer-events: none;
-        }
-        .marquee-overlay-left {
-          left: 0;
-          background: linear-gradient(to right, var(--background) 0%, color-mix(in srgb, var(--background), transparent 10%) 20%, transparent 100%);
-        }
-        .marquee-overlay-right {
-          right: 0;
-          background: linear-gradient(to left, var(--background) 0%, color-mix(in srgb, var(--background), transparent 10%) 20%, transparent 100%);
-        }
-        .feature-marquee-track {
-          display: flex;
-          gap: 24px;
-          width: max-content;
-          animation: featureMarquee 80s linear infinite;
-          position: relative;
-          z-index: 10;
-        }
-        .review-card {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          text-align: left;
-          gap: 12px;
-          background: color-mix(in srgb, var(--foreground), transparent 97%);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid color-mix(in srgb, var(--foreground), transparent 92%);
-          padding: 20px 24px;
-          border-radius: 24px;
-          width: 280px;
-          white-space: normal;
-          transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-          cursor: default;
-        }
-        .review-card:hover {
-          background: color-mix(in srgb, var(--accent), transparent 92%);
-          border-color: color-mix(in srgb, var(--accent), transparent 70%);
-          transform: translateY(-6px) scale(1.02);
-        }
-        .review-header {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 4px;
-          width: 100%;
-        }
-        .review-user-info {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          text-align: left;
-        }
-        .review-name {
-          color: var(--foreground);
-          font-weight: 700;
-          font-size: 13px;
-        }
-        .review-verified {
-          color: var(--accent);
-          font-size: 10px;
-          font-weight: 500;
-          text-transform: none;
-        }
-        .review-comment {
-          color: color-mix(in srgb, var(--foreground), transparent 30%);
-          font-size: 13px;
-          line-height: 1.6;
-          font-weight: 500;
-          text-align: left;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-        .feature-marquee-track:hover {
-          animation-play-state: paused;
-  }
-      `;
-
-    const generateReviewCards = (items) => {
-      return items
-        .map(
-          (item) => `
-        <div class="review-card">
-            <div class="review-header">
-                <div class="review-user-info">
-                    <span class="review-name">${item.name}</span>
-                    <span class="review-verified">Student Verified</span>
-                </div>
-            </div>
-            <p class="review-comment">"${item.comment}"</p>
-        </div>
-      `
-        )
-        .join("");
-    };
-
-    const reviewsUrl = chrome.runtime.getURL("reviews.json");
-
-    fetch(reviewsUrl)
-      .then((res) => {
-        if (!res.ok) return fetch(chrome.runtime.getURL("reviews.json"));
-        return res;
-      })
-      .then((res) => res.json())
-      .then((reviews) => {
-        const track = document.getElementById("review-track");
-        if (track) {
-          const subset = reviews.slice(0, 20);
-          track.innerHTML =
-            generateReviewCards(subset) + generateReviewCards(subset);
-        }
-      })
-      .catch((err) => console.error("Failed to load reviews:", err));
-
     const CURRENT_VERSION = "6.0.0";
 
-    heroDiv.innerHTML = `
-    <!-- Version Display Button -->
-    <a href="https://theajmalrazaq.github.io/superflex" target="_blank" class="mt-4 md:mt-0 mb-6">
-        <button class="group relative bg-foreground/10 rounded-full p-px overflow-hidden cursor-pointer transition-all duration-200 ease-in-out">
-          <span class="flex items-center justify-center gap-1 relative z-[1] bg-secondary/90 rounded-full py-2 px-4 pl-2 w-full">
-            <span class="relative transition-transform duration-500">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
-              </svg>
-              <span class="rounded-full size-11 absolute opacity-30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-lg" style="animation: 14s ease-in-out 0s infinite alternate none running star-shine; background: var(--accent);"></span>
-            </span>
-            <span id="version-text" class="bg-gradient-to-b ml-1.5 from-foreground to-foreground/50 bg-clip-text text-xs text-transparent mt-[2px] uppercase font-bold">
-              SuperFlex v${CURRENT_VERSION}
-            </span>
+    // Clean, flat top badge styled identically to "USD 1 = PKR 275.12 Today" rate capsule
+    const headerWrapper = document.createElement("div");
+    headerWrapper.className =
+      "login-outer-header flex flex-col items-center justify-center text-center w-full mb-6 relative z-10";
+    headerWrapper.innerHTML = `
+      <a href="https://theajmalrazaq.github.io/superflex" target="_blank" class="inline-block select-none">
+        <div class="inline-flex items-center gap-2.5 p-1.5 pr-4 rounded-full bg-white/30 hover:bg-white/40 backdrop-blur-md border border-white/25 transition-all duration-200 cursor-pointer text-white shadow-none">
+          <span class="bg-white text-[#1e0838] font-black text-[11px] px-3 py-1 rounded-full uppercase tracking-wider shadow-none">
+            v${CURRENT_VERSION}
           </span>
-        </button>
-    </a>
-
-    <!-- Logo & Text Section -->
-    <div class="flex flex-col gap-6 justify-center items-center text-center relative z-10">
-        <div class="group relative">
-          <div class="absolute -inset-4 bg-accent/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition duration-700"></div>
-          <div class="h-24 w-24 bg-background border-8 border-foreground/10 bg-cover rounded-[32px] flex items-center justify-center relative z-10 ">
-               <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="96" height="96" fill="none">
-                  <style>@keyframes splash{0%{transform:scale(.2);opacity:.8}80%{transform:scale(1.2);opacity:0}to{transform:scale(2.2);opacity:0}}</style>
-                  <path fill="var(--accent)" d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" style="animation:splash 1.5s cubic-bezier(.165,.84,.44,1) infinite both;transform-origin:center center"/>
-               </svg>
-          </div>
+          <span id="version-text" class="text-xs font-bold tracking-wide">
+            SuperFlex Active
+          </span>
         </div>
-        
-        <div class="space-y-4 flex items-center flex-col gap-2 w-full px-4 sm:px-6">
-          <svg viewBox="0 0 1584 300" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-[280px] sm:max-w-md hero-logo">
-            <path d="M109.001 111.467L142.455 0L0 140.509L51.3965 154.986L0 281.018L157.45 133.484L109.001 111.467Z" fill="var(--accent)" />
-            <path d="M230.977 211.553V164.092L327.656 164.531V215.508H180V45H230.977V211.553ZM378.633 164.092H327.656V45H378.633V164.092Z" fill="var(--foreground)" />
-            <path d="M444.99 215.508V299.883H394.453V46.7578H512.666V96.416L444.99 97.2949V164.971H512.666V96.416H563.203V215.508H444.99Z" fill="var(--foreground)" />
-            <path d="M727.119 92.4609H630.439V110.039H727.119V153.984H630.439V171.562H727.119V215.508H579.023V92.4609H630V48.5156H727.119V92.4609Z" fill="var(--foreground)" />
-            <path d="M793.037 215.508H742.5V97.2949H793.037V215.508ZM888.838 97.2949H793.037V46.7578H888.838V97.2949Z" fill="var(--foreground)" />
-            <path d="M1054.07 92.4609H957.393V110.039H1054.07V153.984H957.393V215.508H905.977V92.4609H956.953V48.5156H1054.07V92.4609Z" fill="var(--accent)" />
-            <path d="M1216.67 164.531V215.508H1120.43V164.531H1216.67ZM1120.43 46.7578V164.531H1069.45V46.7578H1120.43Z" fill="var(--accent)" />
-            <path d="M1381.03 92.4609H1284.35V110.039H1381.03V153.984H1284.35V171.562H1381.03V215.508H1232.93V92.4609H1283.91V48.5156H1381.03V92.4609Z" fill="var(--accent)" />
-            <path d="M1460.13 215.508H1398.16V164.971H1460.13V215.508ZM1583.61 97.2949H1522.09V164.971H1583.61V215.508H1522.09V164.971H1460.13V97.2949H1522.09V46.7578H1583.61V97.2949ZM1460.13 97.2949H1398.16V46.7578H1460.13V97.2949Z" fill="var(--accent)" />
-          </svg>
-          <div class="flex items-center justify-center gap-3 w-full">
-            <span class="w-8 sm:w-12 h-px bg-gradient-to-r from-transparent to-foreground/20"></span>
-            <span class="font-medium text-[8px] sm:text-[10px]  tracking-[0.15em] sm:tracking-[0.4em] uppercase text-accent/80 text-center">Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span>
-            <span class="w-8 sm:w-12 h-px bg-gradient-to-l from-transparent to-foreground/20"></span>
-          </div>
-        </div>
-        
-        <p class="text-foreground/60 text-sm font-medium">
-          Crafted with obsession by <a href="https://github.com/theajmalrazaq" target="_blank" class="text-foreground hover:text-accent transition-colors decoration-accent/30 underline-offset-4 underline">Ajmal Razaq Bhatti</a>
-        </p>
-    </div>
-
-    <!-- Buttons Container -->
-    <div id="login-buttons-container" class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8 hero-buttons px-4 sm:px-6 w-full sm:w-auto">
-    </div>
-
-    <!-- Privacy Policy Link -->
-    <div class="mt-8 relative z-10">
-        <a href="https://theajmalrazaq.github.io/superflex/docs.html?page=privacy" target="_blank" class="text-[10px] font-medium text-foreground/50 hover:text-accent  tracking-[0px] transition-colors flex items-center gap-2">
-            Privacy Policy & Data Transparency
-        </a>
-    </div>
-
-    <!-- Review Marquee -->
-    <div class="feature-marquee-container mt-12 mb-12 relative z-10">
-        <div class="marquee-overlay marquee-overlay-left"></div>
-        <div class="marquee-overlay marquee-overlay-right"></div>
-        <div id="review-track" class="feature-marquee-track">
-            <!-- Dynamically populated -->
-        </div>
-    </div>
-
-
-
-
-
-    </div>
+      </a>
     `;
+
+    // Clean, flat bottom links matching reference UI secondary pills
+    const footerWrapper = document.createElement("div");
+    footerWrapper.className =
+      "login-outer-footer flex items-center justify-center gap-3 text-center w-full mt-7 relative z-10 flex-wrap select-none";
+    footerWrapper.innerHTML = `
+      <a href="https://theajmalrazaq.github.io/superflex/docs.html?page=privacy" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/25 hover:bg-white/35 backdrop-blur-sm border border-white/20 text-[11px] font-semibold text-white transition-all shadow-none">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Privacy Policy
+      </a>
+      <span class="text-white/40 text-xs">•</span>
+      <a href="https://instagram.com/superflex.fr" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/25 hover:bg-white/35 backdrop-blur-sm border border-white/20 text-[11px] font-semibold text-white transition-all shadow-none">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+        Follow on Instagram
+      </a>
+    `;
+
     const checkForUpdates = async () => {
       try {
-        const today = new Date().toDateString();
-
         const response = await fetch(
-          "https://api.github.com/repos/theajmalrazaq/superflex/releases/latest"
+          "https://api.github.com/repos/theajmalrazaq/superflex/releases/latest",
         );
         const data = await response.json();
 
@@ -911,11 +625,7 @@ function LoginPageStyles() {
           const currentParts = CURRENT_VERSION.split(".").map(Number);
           let isNewer = false;
 
-          for (
-            let i = 0;
-            i < Math.max(latestParts.length, currentParts.length);
-            i++
-          ) {
+          for (let i = 0; i < Math.max(latestParts.length, currentParts.length); i++) {
             const latestPart = latestParts[i] || 0;
             const currentPart = currentParts[i] || 0;
             if (latestPart > currentPart) {
@@ -942,26 +652,17 @@ function LoginPageStyles() {
     if (bglogin && bglogin.parentNode) {
       const wrapper = bglogin.parentNode;
 
+      const existingOuterHeader = wrapper.querySelector(".login-outer-header");
+      if (existingOuterHeader) existingOuterHeader.remove();
+
+      const existingOuterFooter = wrapper.querySelector(".login-outer-footer");
+      if (existingOuterFooter) existingOuterFooter.remove();
+
       const existingHero = wrapper.querySelector(".hero-section-injected");
-      if (existingHero) {
-        existingHero.remove();
-      }
+      if (existingHero) existingHero.remove();
 
-      const internalHero = bglogin.querySelector(".hero-section-injected");
-      if (internalHero) {
-        internalHero.remove();
-      }
-
-      heroDiv.classList.add("hero-section-injected");
-      wrapper.insertBefore(heroDiv, bglogin);
-
-      const buttonsContainer = heroDiv.querySelector(
-        "#login-buttons-container"
-      );
-      if (buttonsContainer) {
-        buttonsContainer.appendChild(signInButton);
-        buttonsContainer.appendChild(suggestionButton);
-      }
+      wrapper.insertBefore(headerWrapper, bglogin);
+      wrapper.appendChild(footerWrapper);
     }
 
     const hasAcceptedTerms = localStorage.getItem("superflex_terms_accepted");
@@ -970,33 +671,30 @@ function LoginPageStyles() {
       const termsModal = document.createElement("div");
       termsModal.id = "terms-modal";
       termsModal.className =
-        "fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-background/90 backdrop-blur-md";
+        "fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/40";
 
       termsModal.innerHTML = `
-        <div class="bg-secondary/95 backdrop-blur-2xl border border-foreground/10 rounded-[2rem] w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-500">
+        <div class="bg-white rounded-[32px] w-full max-w-lg max-h-[82vh] overflow-hidden flex flex-col text-slate-900 animate-in zoom-in-95 duration-200 shadow-none border-none">
           <!-- Header -->
-          <div class="p-4 sm:p-5 border-b border-foreground/10 bg-foreground/5">
-            <div class="flex items-center gap-3">
-              <div class="p-2 rounded-xl bg-accent/10 border border-accent/20">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
-                  <line x1="16" y1="13" x2="8" y2="13"/>
-                  <line x1="16" y1="17" x2="8" y2="17"/>
+          <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+            <div class="flex items-center gap-3.5">
+              <div class="w-11 h-11 rounded-2xl bg-[#e9ddff] flex items-center justify-center text-[#1e0838] select-none">
+                <svg viewBox="0 0 432 432" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M247.227 185.616L282.286 69L133 216L186.861 231.146L133 363L298 208.65L247.227 185.616Z" fill="#1e0838" />
                 </svg>
               </div>
               <div>
-                <h2 class="text-lg font-black text-foreground ">Terms & Conditions</h2>
-                <p class="text-[9px] text-accent font-medium  tracking-[0px]">First Time Setup</p>
+                <h2 class="text-lg font-black text-slate-900">Terms & Conditions</h2>
+                <p class="text-[10px] text-purple-700 font-bold uppercase tracking-wider">First Time Setup</p>
               </div>
             </div>
           </div>
 
           <!-- Content -->
-          <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
-            <div class="space-y-2.5">
-              <div class="p-3 rounded-xl bg-foreground/[0.02] border border-foreground/10">
-                <h3 class="text-xs font-medium text-foreground mb-1.5 flex items-center gap-2">
+          <div class="flex-1 overflow-y-auto p-6 space-y-3.5">
+            <div class="space-y-3">
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <h3 class="text-xs font-bold text-slate-900 mb-1 flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"/>
                     <line x1="12" y1="16" x2="12" y2="12"/>
@@ -1004,59 +702,59 @@ function LoginPageStyles() {
                   </svg>
                   Independent Project
                 </h3>
-                <p class="text-[11px] text-foreground/60 leading-relaxed">
-                  SuperFlex is an independent project that redesigns the Flex portal of NUCES university. This extension is <strong class="text-foreground">not affiliated with, endorsed by, or sponsored by</strong> NUCES university.
+                <p class="text-[11px] text-slate-600 leading-relaxed font-medium">
+                  SuperFlex is an independent project that redesigns the Flex portal of NUCES university. This extension is <strong class="text-slate-900 font-bold">not affiliated with, endorsed by, or sponsored by</strong> NUCES university.
                 </p>
               </div>
 
-              <div class="p-3 rounded-xl bg-foreground/[0.02] border border-foreground/10">
-                <h3 class="text-xs font-medium text-foreground mb-1.5 flex items-center gap-2">
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <h3 class="text-xs font-bold text-slate-900 mb-1 flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                   </svg>
                   Security & Privacy
                 </h3>
-                <p class="text-[11px] text-foreground/60 leading-relaxed">
-                  This is a personal project intended to enhance the learning experience. SuperFlex <strong class="text-foreground">only applies cosmetic changes</strong> to the user interface without compromising any security measures or accessing unauthorized data. No hacking involved.
+                <p class="text-[11px] text-slate-600 leading-relaxed font-medium">
+                  This is a personal project intended to enhance the learning experience. SuperFlex <strong class="text-slate-900 font-bold">only applies cosmetic changes</strong> to the user interface without compromising any security measures or accessing unauthorized data. No hacking involved.
                 </p>
               </div>
 
-              <div class="p-3 rounded-xl bg-foreground/[0.02] border border-foreground/10">
-                <h3 class="text-xs font-medium text-foreground mb-1.5 flex items-center gap-2">
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <h3 class="text-xs font-bold text-slate-900 mb-1 flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                   </svg>
                   User Responsibility
                 </h3>
-                <p class="text-[11px] text-foreground/60 leading-relaxed">
-                  You are using this extension at <strong class="text-foreground">your own consent and responsibility</strong>. The creator of SuperFlex is not responsible for any issues that may arise, including but not limited to academic discrepancies, data inaccuracies, or system incompatibilities.
+                <p class="text-[11px] text-slate-600 leading-relaxed font-medium">
+                  You are using this extension at <strong class="text-slate-900 font-bold">your own consent and responsibility</strong>. The creator of SuperFlex is not responsible for any issues that may arise, including but not limited to academic discrepancies, data inaccuracies, or system incompatibilities.
                 </p>
               </div>
 
-              <div class="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
-                <h3 class="text-xs font-medium text-emerald-400 mb-1.5 flex items-center gap-2">
+              <div class="p-4 rounded-2xl bg-[#f2ecfc]">
+                <h3 class="text-xs font-bold text-[#1e0838] mb-1 flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M3 3h18v18H3zM21 9H3M9 21V9"/>
                   </svg>
                   Analytics
                 </h3>
-                <p class="text-[11px] text-foreground/60 leading-relaxed">
-                  We use <strong class="text-emerald-400">Umami Analytics</strong> to track usage patterns and improve the extension. No personal information, grades, or attendance data is collected. Only anonymous usage statistics.
+                <p class="text-[11px] text-slate-600 leading-relaxed font-medium">
+                  We use <strong class="text-[#1e0838] font-bold">Umami Analytics</strong> to track usage patterns and improve the extension. No personal information, grades, or attendance data is collected. Only anonymous usage statistics.
                 </p>
               </div>
             </div>
 
-            <div class="p-3 rounded-xl bg-accent/5 border border-accent/10">
-              <p class="text-[11px] text-foreground/70 leading-relaxed">
-                By clicking <strong class="text-foreground">"Accept & Continue"</strong>, you acknowledge that you are using a third-party modification to the university's official system and do so at your own risk.
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+              <p class="text-[11px] text-slate-600 leading-relaxed font-medium">
+                By clicking <strong class="text-slate-900 font-bold">"Accept & Continue"</strong>, you acknowledge that you are using a third-party modification to the university's official system and do so at your own risk.
               </p>
             </div>
           </div>
 
           <!-- Footer -->
-          <div class="p-4 sm:p-5 border-t border-foreground/10 bg-foreground/5">
-            <button id="terms-accept-btn" class="w-full bg-accent text-foreground border-none rounded-xl py-3 px-6 font-medium text-sm hover:bg-accent/80 transition-all">
+          <div class="p-6 border-t border-slate-100 bg-slate-50/50">
+            <button id="terms-accept-btn" class="w-full bg-[#1e0838] hover:bg-[#2a0c4f] active:scale-[0.98] text-white border-none rounded-full py-3.5 px-6 font-bold text-sm transition-all cursor-pointer shadow-none">
               Accept & Continue
             </button>
           </div>
@@ -1065,24 +763,19 @@ function LoginPageStyles() {
 
       document.body.appendChild(termsModal);
 
-      document
-        .getElementById("terms-accept-btn")
-        .addEventListener("click", () => {
-          localStorage.setItem("superflex_terms_accepted", "true");
-          termsModal.classList.add("opacity-0", "scale-95");
-          setTimeout(() => termsModal.remove(), 300);
-        });
-    }
-
-    document.body.appendChild(backdrop);
-    if (bglogin) {
-      document.body.appendChild(bglogin);
+      document.getElementById("terms-accept-btn").addEventListener("click", () => {
+        localStorage.setItem("superflex_terms_accepted", "true");
+        termsModal.classList.add("opacity-0", "scale-95");
+        setTimeout(() => termsModal.remove(), 200);
+      });
     }
 
     const passwordInputs = document.querySelectorAll(
-      '.m-input-icon--right input[type="password"]'
+      '.m-input-icon--right input[type="password"], input[type="password"]',
     );
     passwordInputs.forEach((input) => {
+      input.classList.add("!pr-14");
+
       const toggleButton = document.createElement("button");
       toggleButton.type = "button";
 
@@ -1097,17 +790,22 @@ function LoginPageStyles() {
 
       toggleButton.classList.add(
         "absolute",
-        "right-3",
+        "right-4",
         "top-1/2",
         "transform",
         "-translate-y-1/2",
-        "text-foreground/50",
-        "hover:text-foreground",
+        "text-slate-400",
+        "hover:text-slate-700",
         "focus:outline-none",
-        "z-10"
+        "z-10",
+        "p-1",
+        "flex",
+        "items-center",
+        "justify-center",
+        "cursor-pointer",
       );
 
-      const inputGroup = input.closest(".input-group");
+      const inputGroup = input.closest(".input-group") || input.parentElement;
       if (inputGroup) {
         inputGroup.style.position = "relative";
         inputGroup.appendChild(toggleButton);
@@ -1115,8 +813,7 @@ function LoginPageStyles() {
         toggleButton.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
-          const type =
-            input.getAttribute("type") === "password" ? "text" : "password";
+          const type = input.getAttribute("type") === "password" ? "text" : "password";
           input.setAttribute("type", type);
 
           icon.innerHTML =
@@ -1127,22 +824,25 @@ function LoginPageStyles() {
               </svg>`
               : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-10-7-10-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                <line x1="1" y1="1" x2="23" y2="23"/>
+                <line x1="1" y1="23" x2="23" y2="23"/>
               </svg>`;
         });
       }
     });
 
-    document.body.classList.add("!h-screen", "!overflow-hidden");
-    document.body.style.backgroundColor = "var(--background)";
-    document.body.style.color = "var(--foreground)";
-
     return () => {
-      window.removeEventListener("superflex-theme-changed", handleThemeChange);
-      window.removeEventListener(
-        "superflex-theme-mode-changed",
-        handleModeChange
-      );
+      document.body.classList.remove("!min-h-screen", "!overflow-x-hidden");
+      document.body.style.background = "";
+      document.body.style.color = "";
+      if (rightImage && rightImage.parentNode) {
+        rightImage.remove();
+      }
+      if (headerWrapper && headerWrapper.parentNode) {
+        headerWrapper.remove();
+      }
+      if (footerWrapper && footerWrapper.parentNode) {
+        footerWrapper.remove();
+      }
     };
   }, []);
 

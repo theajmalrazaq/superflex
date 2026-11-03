@@ -32,18 +32,12 @@ const LoadingOverlay = ({ show = true, isFullScreen = true }) => {
       return () => {
         clearTimeout(timer);
         window.removeEventListener("load", handleLoad);
-        window.removeEventListener(
-          "superflex-update-loading",
-          handleCustomLoading,
-        );
+        window.removeEventListener("superflex-update-loading", handleCustomLoading);
       };
     }
 
     return () => {
-      window.removeEventListener(
-        "superflex-update-loading",
-        handleCustomLoading,
-      );
+      window.removeEventListener("superflex-update-loading", handleCustomLoading);
     };
   }, [isFullScreen]);
 

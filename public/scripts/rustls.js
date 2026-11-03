@@ -16,10 +16,7 @@ if (typeof TextDecoder !== "undefined") {
 let cachedUint8ArrayMemory0 = null;
 
 function getUint8ArrayMemory0() {
-  if (
-    cachedUint8ArrayMemory0 === null ||
-    cachedUint8ArrayMemory0.buffer !== wasm.memory.buffer
-  ) {
+  if (cachedUint8ArrayMemory0 === null || cachedUint8ArrayMemory0.buffer !== wasm.memory.buffer) {
     cachedUint8ArrayMemory0 = new Uint8Array(wasm.memory.buffer);
   }
   return cachedUint8ArrayMemory0;
@@ -97,10 +94,7 @@ function isLikeNone(x) {
 let cachedDataViewMemory0 = null;
 
 function getDataViewMemory0() {
-  if (
-    cachedDataViewMemory0 === null ||
-    cachedDataViewMemory0.buffer !== wasm.memory.buffer
-  ) {
+  if (cachedDataViewMemory0 === null || cachedDataViewMemory0.buffer !== wasm.memory.buffer) {
     cachedDataViewMemory0 = new DataView(wasm.memory.buffer);
   }
   return cachedDataViewMemory0;
@@ -199,11 +193,7 @@ function __wbg_adapter_34(arg0, arg1, arg2) {
 }
 
 export function connect_tls(read, write, host) {
-  const ptr0 = passStringToWasm0(
-    host,
-    wasm.__wbindgen_malloc,
-    wasm.__wbindgen_realloc,
-  );
+  const ptr0 = passStringToWasm0(host, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
   const len0 = WASM_VECTOR_LEN;
   const ret = wasm.connect_tls(read, write, ptr0, len0);
   return ret;
@@ -240,9 +230,7 @@ const __wbindgen_enum_ReadableStreamType = ["bytes"];
 const IntoUnderlyingByteSourceFinalization =
   typeof FinalizationRegistry === "undefined"
     ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry((ptr) =>
-        wasm.__wbg_intounderlyingbytesource_free(ptr >>> 0, 1),
-      );
+    : new FinalizationRegistry((ptr) => wasm.__wbg_intounderlyingbytesource_free(ptr >>> 0, 1));
 
 export class IntoUnderlyingByteSource {
   static __wrap(ptr) {
@@ -279,9 +267,7 @@ export class IntoUnderlyingByteSource {
   }
 
   get autoAllocateChunkSize() {
-    const ret = wasm.intounderlyingbytesource_autoAllocateChunkSize(
-      this.__wbg_ptr,
-    );
+    const ret = wasm.intounderlyingbytesource_autoAllocateChunkSize(this.__wbg_ptr);
     return ret >>> 0;
   }
 
@@ -302,9 +288,7 @@ export class IntoUnderlyingByteSource {
 const IntoUnderlyingSinkFinalization =
   typeof FinalizationRegistry === "undefined"
     ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry((ptr) =>
-        wasm.__wbg_intounderlyingsink_free(ptr >>> 0, 1),
-      );
+    : new FinalizationRegistry((ptr) => wasm.__wbg_intounderlyingsink_free(ptr >>> 0, 1));
 
 export class IntoUnderlyingSink {
   static __wrap(ptr) {
@@ -348,9 +332,7 @@ export class IntoUnderlyingSink {
 const IntoUnderlyingSourceFinalization =
   typeof FinalizationRegistry === "undefined"
     ? { register: () => {}, unregister: () => {} }
-    : new FinalizationRegistry((ptr) =>
-        wasm.__wbg_intounderlyingsource_free(ptr >>> 0, 1),
-      );
+    : new FinalizationRegistry((ptr) => wasm.__wbg_intounderlyingsource_free(ptr >>> 0, 1));
 
 export class IntoUnderlyingSource {
   __destroy_into_raw() {
@@ -452,16 +434,13 @@ function __wbg_get_imports() {
       return ret;
     }, arguments);
   };
-  imports.wbg.__wbg_newwithintounderlyingbytesource_0a89c1aee97aed2b =
-    function () {
-      return handleError(function (arg0) {
-        const ret = new ReadableStream(IntoUnderlyingByteSource.__wrap(arg0));
-        return ret;
-      }, arguments);
-    };
-  imports.wbg.__wbg_newwithintounderlyingsink_270dc053fb7c189e = function (
-    arg0,
-  ) {
+  imports.wbg.__wbg_newwithintounderlyingbytesource_0a89c1aee97aed2b = function () {
+    return handleError(function (arg0) {
+      const ret = new ReadableStream(IntoUnderlyingByteSource.__wrap(arg0));
+      return ret;
+    }, arguments);
+  };
+  imports.wbg.__wbg_newwithintounderlyingsink_270dc053fb7c189e = function (arg0) {
     const ret = new WritableStream(IntoUnderlyingSink.__wrap(arg0));
     return ret;
   };
@@ -636,11 +615,7 @@ function __wbg_get_imports() {
     const ret = arg0.buffer;
     return ret;
   };
-  imports.wbg.__wbg_newwithbyteoffsetandlength_aa4a17c33a06e5cb = function (
-    arg0,
-    arg1,
-    arg2,
-  ) {
+  imports.wbg.__wbg_newwithbyteoffsetandlength_aa4a17c33a06e5cb = function (arg0, arg1, arg2) {
     const ret = new Uint8Array(arg0, arg1 >>> 0, arg2 >>> 0);
     return ret;
   };
@@ -670,11 +645,7 @@ function __wbg_get_imports() {
   };
   imports.wbg.__wbindgen_debug_string = function (arg0, arg1) {
     const ret = debugString(arg1);
-    const ptr1 = passStringToWasm0(
-      ret,
-      wasm.__wbindgen_malloc,
-      wasm.__wbindgen_realloc,
-    );
+    const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len1 = WASM_VECTOR_LEN;
     getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
     getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
@@ -749,11 +720,7 @@ function __wbg_get_imports() {
       typeof URL.createObjectURL === "undefined"
         ? "data:application/javascript," + encodeURIComponent(val)
         : URL.createObjectURL(new Blob([val], { type: "text/javascript" }));
-    const ptr1 = passStringToWasm0(
-      ret,
-      wasm.__wbindgen_malloc,
-      wasm.__wbindgen_realloc,
-    );
+    const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len1 = WASM_VECTOR_LEN;
     getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
     getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
@@ -763,9 +730,7 @@ function __wbg_get_imports() {
     return ret;
   };
   imports.wbg.__wbg_queueMicrotask_481971b0d87f3dd4 =
-    typeof queueMicrotask == "function"
-      ? queueMicrotask
-      : notDefined("queueMicrotask");
+    typeof queueMicrotask == "function" ? queueMicrotask : notDefined("queueMicrotask");
   imports.wbg.__wbg_queueMicrotask_3cbae2ec6b6cd3d6 = function (arg0) {
     const ret = arg0.queueMicrotask;
     return ret;
@@ -870,8 +835,7 @@ function __wbg_get_imports() {
 
 function __wbg_init_memory(imports, memory) {
   imports.wbg.memory =
-    memory ||
-    new WebAssembly.Memory({ initial: 19, maximum: 16384, shared: true });
+    memory || new WebAssembly.Memory({ initial: 19, maximum: 16384, shared: true });
 }
 
 function __wbg_finalize_init(instance, module, thread_stack_size) {
@@ -900,9 +864,7 @@ function initSync(module, memory) {
     if (Object.getPrototypeOf(module) === Object.prototype) {
       ({ module, memory, thread_stack_size } = module);
     } else {
-      console.warn(
-        "using deprecated parameters for `initSync()`; pass a single object instead",
-      );
+      console.warn("using deprecated parameters for `initSync()`; pass a single object instead");
     }
   }
 

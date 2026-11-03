@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import LoadingOverlay, {
-  LoadingSpinner,
-} from "../components/ui/LoadingOverlay";
+import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
 import {
   FileText,
   Clock,
@@ -48,8 +46,7 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
     setFiles((prev) => ({ ...prev, [key]: file }));
   };
 
-  const isFormValid =
-    remarks.trim() && files.withdrawForm && files.cnicFront && files.cnicBack;
+  const isFormValid = remarks.trim() && files.withdrawForm && files.cnicFront && files.cnicBack;
 
   return (
     <Modal
@@ -82,18 +79,14 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
                 </label>
                 <div
                   className="group relative border-2 border-dashed border-foreground/10 hover:border-accent/30 rounded-2xl p-5 transition-all cursor-pointer bg-foreground/[0.02] hover:bg-foreground/[0.04] overflow-hidden"
-                  onClick={() =>
-                    document.getElementById(`file-${input.key}`).click()
-                  }
+                  onClick={() => document.getElementById(`file-${input.key}`).click()}
                 >
                   <input
                     id={`file-${input.key}`}
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={(e) =>
-                      handleFileChange(input.key, e.target.files[0])
-                    }
+                    onChange={(e) => handleFileChange(input.key, e.target.files[0])}
                   />
                   <div className="flex items-center gap-5">
                     <div className="p-4 bg-foreground/5 rounded-2xl text-foreground/60 group-hover:text-accent group-hover:bg-accent/10 transition-all">
@@ -101,9 +94,7 @@ const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
                     </div>
                     <div className="space-y-1 flex-1 min-w-0">
                       <p className="text-sm font-bold text-foreground truncate px-1">
-                        {files[input.key]
-                          ? files[input.key].name
-                          : `Select ${input.label}`}
+                        {files[input.key] ? files[input.key].name : `Select ${input.label}`}
                       </p>
                       <p className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px] px-1">
                         {files[input.key]
@@ -166,9 +157,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
                 key={i}
                 className="p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 space-y-2 hover:bg-foreground/[0.04] transition-colors"
               >
-                <h4 className="text-[11px] font-bold text-accent Cap">
-                  {item.title}
-                </h4>
+                <h4 className="text-[11px] font-bold text-accent Cap">{item.title}</h4>
                 <p className="text-[10px] text-foreground/50 leading-relaxed font-bold">
                   {item.desc}
                 </p>
@@ -198,9 +187,7 @@ const InstructionsModal = ({ isOpen, onClose }) => {
                 <div className="w-6 h-6 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-accent text-[10px] font-black shrink-0 group-hover:scale-110 transition-transform">
                   {i + 1}
                 </div>
-                <p className="text-xs text-foreground/60 font-bold leading-relaxed">
-                  {step}
-                </p>
+                <p className="text-xs text-foreground/60 font-bold leading-relaxed">{step}</p>
               </div>
             ))}
           </div>
@@ -283,9 +270,7 @@ const WithdrawalCourseCard = ({ course, isSelected, onToggle, index }) => {
           }`}
         >
           {isSelected && <CheckCircle2 size={14} strokeWidth={3} />}
-          {!isSelected && !course.canSelect && (
-            <X size={10} className="text-foreground/20" />
-          )}
+          {!isSelected && !course.canSelect && <X size={10} className="text-foreground/20" />}
         </div>
       </div>
     </div>
@@ -303,15 +288,11 @@ function CourseWithdrawPage() {
   const hiddenContentRef = useRef(null);
 
   useEffect(() => {
-    window.dispatchEvent(
-      new CustomEvent("superflex-update-loading", { detail: true }),
-    );
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseWithdrawData = () => {
       try {
-        const root = document.querySelector(
-          ".m-grid.m-grid--hor.m-grid--root.m-page",
-        );
+        const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
         if (!root) {
           setTimeout(parseWithdrawData, 500);
           return;
@@ -335,9 +316,7 @@ function CourseWithdrawPage() {
           const clone = textEl.cloneNode(true);
 
           clone
-            .querySelectorAll(
-              ".m-alert__close, button, a, strong, .m-alert__icon",
-            )
+            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
             .forEach((el) => el.remove());
 
           let message = clone.textContent
@@ -411,15 +390,11 @@ function CourseWithdrawPage() {
         root.style.zIndex = "-1";
 
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (err) {
         console.error("Course Withdraw Parser Error", err);
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 
@@ -427,9 +402,7 @@ function CourseWithdrawPage() {
   }, []);
 
   const handleSemesterChange = (val) => {
-    const root = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
+    const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
     const select = root?.querySelector("select#SemId");
     if (select) {
       select.value = val;
@@ -464,9 +437,7 @@ function CourseWithdrawPage() {
     if (selected.length === 0) return;
 
     setIsSubmitting(true);
-    window.dispatchEvent(
-      new CustomEvent("superflex-update-loading", { detail: true }),
-    );
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     try {
       const formData = new FormData();
@@ -493,10 +464,7 @@ function CourseWithdrawPage() {
         alert("Withdrawal request submitted successfully!");
         window.location.reload();
       } else {
-        alert(
-          "Error: " +
-            (data.msg || "Submission failed. Please check file sizes."),
-        );
+        alert("Error: " + (data.msg || "Submission failed. Please check file sizes."));
       }
     } catch (err) {
       console.error("Submission error", err);
@@ -504,9 +472,7 @@ function CourseWithdrawPage() {
     } finally {
       setIsSubmitting(false);
       setIsModalOpen(false);
-      window.dispatchEvent(
-        new CustomEvent("superflex-update-loading", { detail: false }),
-      );
+      window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
     }
   };
 
@@ -569,18 +535,8 @@ function CourseWithdrawPage() {
 
         {}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatsCard
-            icon={Layout}
-            label="Total Courses"
-            value={courses.length}
-            delay={100}
-          />
-          <StatsCard
-            icon={Trash2}
-            label="Selected"
-            value={selectedCount}
-            delay={200}
-          />
+          <StatsCard icon={Layout} label="Total Courses" value={courses.length} delay={100} />
+          <StatsCard icon={Trash2} label="Selected" value={selectedCount} delay={200} />
           <StatsCard
             icon={ShieldCheck}
             label="Withdrawal Status"
@@ -590,19 +546,13 @@ function CourseWithdrawPage() {
           <StatsCard
             icon={Clock}
             label="Pending Requests"
-            value={
-              courses.filter((c) => c.status.toLowerCase().includes("pending"))
-                .length
-            }
+            value={courses.filter((c) => c.status.toLowerCase().includes("pending")).length}
             delay={400}
           />
         </div>
 
         {}
-        <NotificationBanner
-          alerts={alerts}
-          onActionClick={() => setIsInstructionsOpen(true)}
-        />
+        <NotificationBanner alerts={alerts} onActionClick={() => setIsInstructionsOpen(true)} />
 
         {}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
@@ -660,25 +610,19 @@ function CourseWithdrawPage() {
                       <span className="text-foreground/50 font-bold Cap tracking-[0px] text-[10px]">
                         Selected
                       </span>
-                      <span className="text-foreground font-black">
-                        {selectedCount}
-                      </span>
+                      <span className="text-foreground font-black">{selectedCount}</span>
                     </div>
                     <div className="flex justify-between text-xs font-medium">
                       <span className="text-foreground/50 font-bold Cap tracking-[0px] text-[10px]">
                         Processing
                       </span>
-                      <span className="text-foreground font-black">
-                        Immediate
-                      </span>
+                      <span className="text-foreground font-black">Immediate</span>
                     </div>
                     <div className="pt-3 border-t border-foreground/10 flex justify-between items-center">
                       <span className="text-foreground/60 text-[10px] font-black Cap tracking-[0px]">
                         Permanent Impact
                       </span>
-                      <span className="text-accent font-black text-xs Cap tracking-[0px]">
-                        Yes
-                      </span>
+                      <span className="text-accent font-black text-xs Cap tracking-[0px]">Yes</span>
                     </div>
                   </div>
                 </div>
@@ -709,9 +653,7 @@ function CourseWithdrawPage() {
               <div className="pt-4 border-t border-foreground/10 space-y-4">
                 <div className="flex items-center gap-3 px-1 text-accent">
                   <Zap size={14} />
-                  <span className="text-[10px] font-black Cap tracking-[0px]">
-                    Quick Tool
-                  </span>
+                  <span className="text-[10px] font-black Cap tracking-[0px]">Quick Tool</span>
                 </div>
                 <p className="text-[10px] text-foreground/50 font-medium leading-relaxed px-1">
                   Use{" "}

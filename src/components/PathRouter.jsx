@@ -55,15 +55,9 @@ function PathRouter() {
           fontFamily: "'Google Sans Flex', sans-serif",
         });
         document.body.removeAttribute("bgcolor");
-        document.body.classList.add(
-          "!bg-background",
-          "!overflow-hidden",
-          "!font-sans",
-        );
+        document.body.classList.add("!bg-background", "!overflow-hidden", "!font-sans");
         Array.from(document.body.children).forEach((c) => {
-          if (
-            !["react-chrome-app", "SCRIPT", "LINK"].includes(c.id || c.tagName)
-          )
+          if (!["react-chrome-app", "SCRIPT", "LINK"].includes(c.id || c.tagName))
             c.style.display = "none";
         });
       }

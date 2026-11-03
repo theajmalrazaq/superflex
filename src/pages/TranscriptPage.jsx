@@ -62,12 +62,7 @@ const GRADE_POINTS = {
   F: 0.0,
 };
 
-const CGPAPlannerModal = ({
-  isOpen,
-  onClose,
-  currentCGPA,
-  currentCreditHours,
-}) => {
+const CGPAPlannerModal = ({ isOpen, onClose, currentCGPA, currentCreditHours }) => {
   const [targetCGPA, setTargetCGPA] = useState("");
   const [nextCH, setNextCH] = useState("");
   const [result, setResult] = useState(null);
@@ -80,9 +75,7 @@ const CGPAPlannerModal = ({
     if (isNaN(target) || isNaN(nextHours) || nextHours <= 0) return;
 
     const requiredGPA =
-      (target * (currentCreditHours + nextHours) -
-        currentCGPA * currentCreditHours) /
-      nextHours;
+      (target * (currentCreditHours + nextHours) - currentCGPA * currentCreditHours) / nextHours;
     setResult(requiredGPA);
   };
 
@@ -130,17 +123,11 @@ const CGPAPlannerModal = ({
                   Required SGPA
                 </p>
                 {result > 4.0 ? (
-                  <p className="text-4xl font-bold text-rose-500 ">
-                    {result.toFixed(2)}
-                  </p>
+                  <p className="text-4xl font-bold text-rose-500 ">{result.toFixed(2)}</p>
                 ) : result < 0 ? (
-                  <p className="text-4xl font-bold text-emerald-500 ">
-                    0.00
-                  </p>
+                  <p className="text-4xl font-bold text-emerald-500 ">0.00</p>
                 ) : (
-                  <p className="text-5xl font-bold text-foreground ">
-                    {result.toFixed(2)}
-                  </p>
+                  <p className="text-5xl font-bold text-foreground ">{result.toFixed(2)}</p>
                 )}
               </div>
 
@@ -167,10 +154,7 @@ const CGPAPlannerModal = ({
             {result > 4.0 && (
               <div className="mt-4 flex items-start gap-3 text-[11px] font-medium text-rose-400 bg-rose-500/5 p-4 rounded-2xl border border-rose-500/10 italic">
                 <AlertTriangle size={14} className="shrink-0 mt-0.5" />
-                <span>
-                  Note: This target requires exceeding a 4.00 GPA in a single
-                  term.
-                </span>
+                <span>Note: This target requires exceeding a 4.00 GPA in a single term.</span>
               </div>
             )}
           </div>
@@ -206,19 +190,7 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
 
     let detectedGrade = "F";
     const thresholds = data.thresholds;
-    const sortedGrades = [
-      "D",
-      "D+",
-      "C-",
-      "C",
-      "C+",
-      "B-",
-      "B",
-      "B+",
-      "A-",
-      "A",
-      "A+",
-    ];
+    const sortedGrades = ["D", "D+", "C-", "C", "C+", "B-", "B", "B+", "A-", "A", "A+"];
 
     for (const g of sortedGrades) {
       if (thresholds[g] !== null && marksVal >= thresholds[g]) {
@@ -275,9 +247,7 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
                     <p className="text-[10px] font-medium text-foreground/50  tracking-[0px]">
                       Predicted Grade
                     </p>
-                    <p className="text-4xl font-bold text-foreground ">
-                      {result.grade}
-                    </p>
+                    <p className="text-4xl font-bold text-foreground ">{result.grade}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-[10px] font-bold text-foreground/50  tracking-[0px] mb-2">
@@ -353,9 +323,7 @@ function TranscriptPage() {
   useEffect(() => {
     const parse = () => {
       try {
-        const root = document.querySelector(
-          ".m-grid.m-grid--hor.m-grid--root.m-page",
-        );
+        const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
         if (!root) {
           setTimeout(parse, 500);
           return;
@@ -374,9 +342,7 @@ function TranscriptPage() {
           const clone = textContainer.cloneNode(true);
 
           clone
-            .querySelectorAll(
-              ".m-alert__close, button, a, strong, .m-alert__icon",
-            )
+            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
             .forEach((el) => el.remove());
 
           let message = clone.textContent
@@ -398,13 +364,10 @@ function TranscriptPage() {
         setAlerts(alertList);
 
         const semesterData = [];
-        const semesterCols = root.querySelectorAll(
-          ".m-section__content .row .col-md-6",
-        );
+        const semesterCols = root.querySelectorAll(".m-section__content .row .col-md-6");
 
         semesterCols.forEach((col) => {
-          const title =
-            col.querySelector("h5")?.textContent.trim() || "Untitled Semester";
+          const title = col.querySelector("h5")?.textContent.trim() || "Untitled Semester";
 
           const summarySpans = col.querySelectorAll(".pull-right span");
           const summaryArr = Array.from(summarySpans).map(
@@ -435,8 +398,7 @@ function TranscriptPage() {
               const link = codeCell.querySelector("a");
               if (link) {
                 const title =
-                  link.getAttribute("title") ||
-                  link.getAttribute("data-original-title");
+                  link.getAttribute("title") || link.getAttribute("data-original-title");
                 if (title && title.includes("MCA")) {
                   const mMatch = title.match(/MCA[:\s]+(\d+)/i);
                   if (mMatch) mca = mMatch[1];
@@ -444,9 +406,7 @@ function TranscriptPage() {
 
                 const onclick = link.getAttribute("onclick");
                 if (onclick) {
-                  const match = onclick.match(
-                    /fn_StdGradeSchemeDetail\((\d+)\)/,
-                  );
+                  const match = onclick.match(/fn_StdGradeSchemeDetail\((\d+)\)/);
                   if (match) schemeDetailId = match[1];
                 }
 
@@ -541,8 +501,7 @@ function TranscriptPage() {
   const activeSemData = semesters[activeSemIdx];
 
   const { calculatedStats, originalCGPA } = useMemo(() => {
-    if (semesters.length === 0)
-      return { calculatedStats: null, originalCGPA: 0 };
+    if (semesters.length === 0) return { calculatedStats: null, originalCGPA: 0 };
 
     let cumulativeGradePoints = 0;
     let cumulativeCreditsForGPA = 0;
@@ -572,9 +531,7 @@ function TranscriptPage() {
         const isGraded = gp !== undefined;
 
         const isNonCredit =
-          course.type.toLowerCase().includes("non credit") ||
-          grade === "S" ||
-          grade === "U";
+          course.type.toLowerCase().includes("non credit") || grade === "S" || grade === "U";
 
         if (isNonCredit) return;
 
@@ -609,17 +566,12 @@ function TranscriptPage() {
           totalCreditsAttempted += semCreditsAttempted;
         }
         tempPassedCredits.forEach((ch, code) => {
-          passedUniqueCredits.set(
-            code,
-            Math.max(passedUniqueCredits.get(code) || 0, ch),
-          );
+          passedUniqueCredits.set(code, Math.max(passedUniqueCredits.get(code) || 0, ch));
         });
       }
 
       const cgpa =
-        cumulativeCreditsForGPA > 0
-          ? cumulativeGradePoints / cumulativeCreditsForGPA
-          : 0;
+        cumulativeCreditsForGPA > 0 ? cumulativeGradePoints / cumulativeCreditsForGPA : 0;
 
       if (!isEmptySemester || sIdx === 0) {
         lastNonEmptyCGPA = cgpa;
@@ -647,8 +599,7 @@ function TranscriptPage() {
         totalCreditsEarned: totalCreditsEarned,
         totalCreditsAttempted: totalCreditsAttempted,
         totalCreditsForGPA: cumulativeCreditsForGPA,
-        actualSemestersCount: semesterStats.filter((s) => !s.isEmptySemester)
-          .length,
+        actualSemestersCount: semesterStats.filter((s) => !s.isEmptySemester).length,
         actualCoursesCount: Array.from(courseStatsMap.keys()).length,
       },
       originalCGPA: semesters[semesters.length - 1].summary.cgpa,
@@ -673,10 +624,7 @@ function TranscriptPage() {
     window.addEventListener("superflex-theme-mode-changed", handleModeChange);
     return () => {
       window.removeEventListener("superflex-theme-changed", handleThemeChange);
-      window.removeEventListener(
-        "superflex-theme-mode-changed",
-        handleModeChange,
-      );
+      window.removeEventListener("superflex-theme-mode-changed", handleModeChange);
     };
   }, []);
 
@@ -730,24 +678,18 @@ function TranscriptPage() {
       legend: { display: false },
       tooltip: {
         backgroundColor:
-          themeMode === "dark"
-            ? "rgba(18, 18, 18, 0.9)"
-            : "rgba(255, 255, 255, 0.9)",
+          themeMode === "dark" ? "rgba(18, 18, 18, 0.9)" : "rgba(255, 255, 255, 0.9)",
         titleColor: themeMode === "dark" ? "#fff" : "#000",
         bodyColor: themeMode === "dark" ? "#fff" : "#000",
         titleFont: { size: 13, weight: "bold" },
         bodyFont: { size: 12 },
         padding: 16,
         borderRadius: 16,
-        borderColor:
-          themeMode === "dark"
-            ? "rgba(255, 255, 255, 0.1)"
-            : "rgba(0, 0, 0, 0.1)",
+        borderColor: themeMode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
         borderWidth: 1,
         displayColors: false,
         callbacks: {
-          label: (context) =>
-            `${context.dataset.label}: ${context.parsed.y.toFixed(2)}`,
+          label: (context) => `${context.dataset.label}: ${context.parsed.y.toFixed(2)}`,
         },
       },
     },
@@ -756,26 +698,17 @@ function TranscriptPage() {
         min: 0,
         max: 4,
         ticks: {
-          color:
-            themeMode === "dark"
-              ? "rgba(161, 161, 170, 0.6)"
-              : "rgba(39, 39, 42, 0.6)",
+          color: themeMode === "dark" ? "rgba(161, 161, 170, 0.6)" : "rgba(39, 39, 42, 0.6)",
           stepSize: 1,
           font: { weight: "bold", size: 10 },
         },
         grid: {
-          color:
-            themeMode === "dark"
-              ? "rgba(255, 255, 255, 0.03)"
-              : "rgba(0, 0, 0, 0.03)",
+          color: themeMode === "dark" ? "rgba(255, 255, 255, 0.03)" : "rgba(0, 0, 0, 0.03)",
         },
       },
       x: {
         ticks: {
-          color:
-            themeMode === "dark"
-              ? "rgba(161, 161, 170, 0.6)"
-              : "rgba(39, 39, 42, 0.6)",
+          color: themeMode === "dark" ? "rgba(161, 161, 170, 0.6)" : "rgba(39, 39, 42, 0.6)",
           font: { weight: "bold", size: 10 },
         },
         grid: { display: false },
@@ -800,28 +733,19 @@ function TranscriptPage() {
 
       <div className="w-full p-4 md:p-8 space-y-10 relative z-10">
         {}
-        <PageHeader
-          title="Transcript Report"
-          subtitle="Academic performance and degree analytics"
-        >
+        <PageHeader title="Transcript Report" subtitle="Academic performance and degree analytics">
           <button
             onClick={() => setIsPlannerOpen(true)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-foreground/10 bg-secondary/50 text-xs font-bold text-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all duration-300 group"
           >
-            <Target
-              size={16}
-              className="group-hover:scale-110 transition-transform"
-            />
+            <Target size={16} className="group-hover:scale-110 transition-transform" />
             Strategic Planner
           </button>
           <button
             onClick={() => setIsMCALookupOpen(true)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-foreground/10 bg-secondary/50 text-xs font-bold text-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all duration-300 group"
           >
-            <Scale
-              size={16}
-              className="group-hover:scale-110 transition-transform"
-            />
+            <Scale size={16} className="group-hover:scale-110 transition-transform" />
             MCA Lookup
           </button>
           <button
@@ -835,11 +759,7 @@ function TranscriptPage() {
                 ? "bg-amber-500 text-foreground border-amber-600"
                 : "bg-secondary/50 border-foreground/10 text-foreground/60 hover:text-foreground hover:bg-foreground/5"
             }`}
-            title={
-              simulationMode
-                ? "Exit Simulation Mode"
-                : "Enter Simulation Mode (Edit Grades)"
-            }
+            title={simulationMode ? "Exit Simulation Mode" : "Enter Simulation Mode (Edit Grades)"}
           >
             <Zap size={16} fill={simulationMode ? "currentColor" : "none"} />
             {simulationMode ? "Simulating" : "Simulate"}
@@ -854,9 +774,7 @@ function TranscriptPage() {
             icon={TrendingUp}
             label="Cumulative GPA"
             value={calculatedStats?.currentCGPA.toFixed(2) || "0.00"}
-            subValue={
-              simulationMode ? `(Was ${originalCGPA.toFixed(2)})` : "Current"
-            }
+            subValue={simulationMode ? `(Was ${originalCGPA.toFixed(2)})` : "Current"}
             delay={0}
           />
           <StatsCard
@@ -904,9 +822,7 @@ function TranscriptPage() {
                 <div className="space-y-10 relative z-10">
                   <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-foreground/10 pb-10">
                     <div className="space-y-1">
-                      <h2 className="text-3xl font-bold text-foreground ">
-                        {activeSemData.title}
-                      </h2>
+                      <h2 className="text-3xl font-bold text-foreground ">{activeSemData.title}</h2>
                       <p className="text-xs text-foreground/50 font-bold  tracking-[0px]">
                         Semester Detail Report
                       </p>
@@ -919,9 +835,7 @@ function TranscriptPage() {
                         <span className="text-3xl font-bold font-sans text-foreground ">
                           {activeSemData.courses.reduce((acc, c) => {
                             const grade =
-                              overriddenGrades[
-                                `${activeSemData.title}-${c.code}`
-                              ] || c.grade;
+                              overriddenGrades[`${activeSemData.title}-${c.code}`] || c.grade;
                             const isNonCredit =
                               c.type.toLowerCase().includes("non credit") ||
                               grade === "S" ||
@@ -942,9 +856,8 @@ function TranscriptPage() {
                             )
                           ]
                             ? "0"
-                            : calculatedStats?.history.find(
-                                (h) => h.title === activeSemData.title,
-                              )?.earned || 0}
+                            : calculatedStats?.history.find((h) => h.title === activeSemData.title)
+                                ?.earned || 0}
                         </span>
                       </div>
                       <div className="text-right flex flex-col items-end min-w-[70px]">
@@ -1014,13 +927,10 @@ function TranscriptPage() {
                       <tbody>
                         {activeSemData.courses.map((course, idx) => {
                           const currentGrade =
-                            overriddenGrades[
-                              `${activeSemData.title}-${course.code}`
-                            ] || course.grade;
+                            overriddenGrades[`${activeSemData.title}-${course.code}`] ||
+                            course.grade;
                           const isSimulated =
-                            !!overriddenGrades[
-                              `${activeSemData.title}-${course.code}`
-                            ];
+                            !!overriddenGrades[`${activeSemData.title}-${course.code}`];
 
                           return (
                             <tr
@@ -1039,8 +949,7 @@ function TranscriptPage() {
                                             headers: {
                                               "Content-Type":
                                                 "application/x-www-form-urlencoded; charset=UTF-8",
-                                              "X-Requested-With":
-                                                "XMLHttpRequest",
+                                              "X-Requested-With": "XMLHttpRequest",
                                             },
                                             body: `OfferId=${course.schemeDetailId}`,
                                           },
@@ -1055,38 +964,23 @@ function TranscriptPage() {
                                           }
                                         }
                                       } catch (e) {
-                                        console.error(
-                                          "Grade Scheme Fetch Error:",
-                                          e,
-                                        );
+                                        console.error("Grade Scheme Fetch Error:", e);
                                       }
 
-                                      if (
-                                        typeof window.fn_StdGradeSchemeDetail ===
-                                        "function"
-                                      ) {
-                                        window.fn_StdGradeSchemeDetail(
-                                          course.schemeDetailId,
-                                        );
+                                      if (typeof window.fn_StdGradeSchemeDetail === "function") {
+                                        window.fn_StdGradeSchemeDetail(course.schemeDetailId);
                                       }
 
-                                      const modal =
-                                        document.querySelector(
-                                          "#GradePolicyDetail",
-                                        );
+                                      const modal = document.querySelector("#GradePolicyDetail");
                                       if (modal) {
                                         modal.style.zIndex = "9999";
                                         const $ = window.jQuery || window.$;
-                                        if (
-                                          $ &&
-                                          typeof $.fn.modal === "function"
-                                        ) {
+                                        if ($ && typeof $.fn.modal === "function") {
                                           $(modal).modal("show");
                                         } else {
                                           modal.style.display = "block";
                                           modal.classList.add("show");
-                                          modal.style.backgroundColor =
-                                            "#00000080";
+                                          modal.style.backgroundColor = "#00000080";
                                           modal.onclick = (e) => {
                                             if (e.target === modal) {
                                               modal.style.display = "none";
@@ -1203,10 +1097,7 @@ function TranscriptPage() {
                                   className={`text-sm font-bold font-sans ${isSimulated ? "text-accent" : "text-foreground/70"}`}
                                 >
                                   {isSimulated
-                                    ? (
-                                        (GRADE_POINTS[currentGrade] || 0) *
-                                        course.crHrs
-                                      ).toFixed(1)
+                                    ? ((GRADE_POINTS[currentGrade] || 0) * course.crHrs).toFixed(1)
                                     : course.points.toFixed(2)}
                                 </span>
                               </td>
@@ -1227,9 +1118,7 @@ function TranscriptPage() {
             <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 relative overflow-hidden group">
               <div className="flex items-center justify-between mb-8">
                 <div className="space-y-1">
-                  <h3 className="text-xl font-bold text-foreground ">
-                    Performance Flow
-                  </h3>
+                  <h3 className="text-xl font-bold text-foreground ">Performance Flow</h3>
                   <p className="text-[10px] text-foreground/50 font-bold tracking-[0px]">
                     Historical GPA Trend
                   </p>
@@ -1252,9 +1141,7 @@ function TranscriptPage() {
                   <div className="p-3 bg-accent/10 rounded-xl text-accent">
                     <Zap size={20} />
                   </div>
-                  <h3 className="text-lg font-bold text-foreground ">
-                    Simulation Desk
-                  </h3>
+                  <h3 className="text-lg font-bold text-foreground ">Simulation Desk</h3>
                 </div>
 
                 <div className="space-y-4 flex-1">
@@ -1270,12 +1157,8 @@ function TranscriptPage() {
                         <div
                           className={`flex items-center gap-1 text-xs font-medium font-sans ${calculatedStats.currentCGPA >= originalCGPA ? "text-accent" : "text-rose-400"}`}
                         >
-                          {calculatedStats.currentCGPA >= originalCGPA
-                            ? "+"
-                            : ""}
-                          {(calculatedStats.currentCGPA - originalCGPA).toFixed(
-                            3,
-                          )}
+                          {calculatedStats.currentCGPA >= originalCGPA ? "+" : ""}
+                          {(calculatedStats.currentCGPA - originalCGPA).toFixed(3)}
                         </div>
                       )}
                     </div>
@@ -1288,9 +1171,7 @@ function TranscriptPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-xl font-bold font-sans text-foreground/60">
                         {Object.keys(overriddenGrades).length}{" "}
-                        <span className="text-[10px]  ml-1 opacity-60">
-                          Changes
-                        </span>
+                        <span className="text-[10px]  ml-1 opacity-60">Changes</span>
                       </span>
                       {simulationMode && (
                         <button

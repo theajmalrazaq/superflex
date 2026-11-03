@@ -226,10 +226,7 @@ function isIgnored(filePath, ignorePatterns) {
   const normalizedPath = filePath.replace(/\\/g, "/");
   return ignorePatterns.some((pattern) => {
     const normalizedPattern = pattern.replace(/\\/g, "/");
-    return (
-      normalizedPath.includes(normalizedPattern) ||
-      normalizedPath.endsWith(normalizedPattern)
-    );
+    return normalizedPath.includes(normalizedPattern) || normalizedPath.endsWith(normalizedPattern);
   });
 }
 

@@ -90,8 +90,7 @@
               const n = t[e];
               return (...e) => (a.apply(null, e), n.apply(t, e));
             };
-            ((c.pushState = t(c, "pushState", W)),
-              (c.replaceState = t(c, "replaceState", W)));
+            ((c.pushState = t(c, "pushState", W)), (c.replaceState = t(c, "replaceState", W)));
           })(),
           (() => {
             const t = async (t) => {
@@ -160,8 +159,6 @@
       H = !1;
     T &&
       !B() &&
-      ("complete" === s.readyState
-        ? I()
-        : s.addEventListener("readystatechange", I, !0));
+      ("complete" === s.readyState ? I() : s.addEventListener("readystatechange", I, !0));
   })(window);
 })();

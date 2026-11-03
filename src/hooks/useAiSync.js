@@ -1,12 +1,6 @@
 import { useState, useEffect } from "react";
 
-export const useAiSync = ({
-  data,
-  dataKey,
-  syncKey,
-  isEnabled = true,
-  eventExtras = {},
-}) => {
+export const useAiSync = ({ data, dataKey, syncKey, isEnabled = true, eventExtras = {} }) => {
   const [permissionStatus, setPermissionStatus] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("superflex_ai_data_permission");
@@ -18,15 +12,9 @@ export const useAiSync = ({
     const handlePermissionUpdate = (e) => {
       setPermissionStatus(e.detail);
     };
-    window.addEventListener(
-      "superflex-permission-updated",
-      handlePermissionUpdate,
-    );
+    window.addEventListener("superflex-permission-updated", handlePermissionUpdate);
     return () => {
-      window.removeEventListener(
-        "superflex-permission-updated",
-        handlePermissionUpdate,
-      );
+      window.removeEventListener("superflex-permission-updated", handlePermissionUpdate);
     };
   }, []);
 
@@ -51,10 +39,7 @@ export const useAiSync = ({
         };
 
         window.superflex_ai_context = newContext;
-        localStorage.setItem(
-          "superflex_ai_context",
-          JSON.stringify(newContext),
-        );
+        localStorage.setItem("superflex_ai_context", JSON.stringify(newContext));
 
         window.dispatchEvent(
           new CustomEvent("superflex-data-updated", {

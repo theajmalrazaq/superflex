@@ -198,11 +198,7 @@
       /* Hero Image Gradient Mask */
       .hero-mask {
         mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-        -webkit-mask-image: linear-gradient(
-          to bottom,
-          black 50%,
-          transparent 100%
-        );
+        -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
       }
 
       /* Premium Mobile Menu */
@@ -262,11 +258,7 @@
         right: 0;
         width: 800px;
         height: 800px;
-        background: radial-gradient(
-          circle,
-          rgba(160, 152, 255, 0.15) 0%,
-          transparent 70%
-        );
+        background: radial-gradient(circle, rgba(160, 152, 255, 0.15) 0%, transparent 70%);
         filter: blur(150px);
         margin-right: -400px;
         margin-top: -400px;
@@ -280,11 +272,7 @@
         left: 0;
         width: 600px;
         height: 600px;
-        background: radial-gradient(
-          circle,
-          rgba(16, 185, 129, 0.08) 0%,
-          transparent 70%
-        );
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
         filter: blur(150px);
         margin-left: -300px;
         margin-bottom: -300px;
@@ -320,9 +308,7 @@
         class="fixed inset-0 w-full h-full object-cover opacity-20 mix-blend-luminosity"
         alt="Background"
       />
-      <div
-        class="fixed inset-0 bg-gradient-to-b from-black/40 via-black/80 to-black z-10"
-      ></div>
+      <div class="fixed inset-0 bg-gradient-to-b from-black/40 via-black/80 to-black z-10"></div>
     </div>
 
     <!-- Standard Navbar from Index -->
@@ -371,10 +357,7 @@
             id="mobile-toggle"
             class="lg:hidden relative w-10 h-10 flex items-center justify-center text-zinc-400"
           >
-            <div
-              class="flex flex-col gap-1.5 transition-all duration-300"
-              id="hamburger"
-            >
+            <div class="flex flex-col gap-1.5 transition-all duration-300" id="hamburger">
               <span
                 class="w-5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center"
                 id="line1"
@@ -395,22 +378,14 @@
       class="fixed inset-0 z-[90] bg-black/40 backdrop-blur-3xl lg:hidden flex flex-col items-center justify-center pointer-events-none"
     >
       <div class="flex flex-col gap-8 text-center pointer-events-auto">
-        <a
-          href="index.html"
-          class="mobile-link group"
-          style="transition-delay: 100ms"
-        >
+        <a href="index.html" class="mobile-link group" style="transition-delay: 100ms">
           <span class="text-3xl font-medium text-white block">Home</span>
           <span
             class="text-[#a098ff] text-[10px] uppercase tracking-[0px] font-black opacity-0 group-hover:opacity-100 transition-all"
             >Start Here</span
           >
         </a>
-        <a
-          href="docs.html?page=guide"
-          class="mobile-link group"
-          style="transition-delay: 200ms"
-        >
+        <a href="docs.html?page=guide" class="mobile-link group" style="transition-delay: 200ms">
           <span class="text-3xl font-medium text-zinc-400 block">AI Guide</span>
           <span
             class="text-[#a098ff] text-[10px] uppercase tracking-[0px] font-black opacity-0 group-hover:opacity-100 transition-all"
@@ -422,19 +397,13 @@
           class="mobile-link group"
           style="transition-delay: 300ms"
         >
-          <span class="text-3xl font-medium text-zinc-400 block"
-            >Behind the Scenes</span
-          >
+          <span class="text-3xl font-medium text-zinc-400 block">Behind the Scenes</span>
           <span
             class="text-[#a098ff] text-[10px] uppercase tracking-[0px] font-black opacity-0 group-hover:opacity-100 transition-all"
             >Deep Dive Tech</span
           >
         </a>
-        <a
-          href="docs.html?page=privacy"
-          class="mobile-link group"
-          style="transition-delay: 400ms"
-        >
+        <a href="docs.html?page=privacy" class="mobile-link group" style="transition-delay: 400ms">
           <span class="text-3xl font-medium text-zinc-400 block">Privacy</span>
           <span
             class="text-[#a098ff] text-[10px] uppercase tracking-[0px] font-black opacity-0 group-hover:opacity-100 transition-all"
@@ -480,9 +449,7 @@
     </main>
 
     <!-- Footer from Index -->
-    <footer
-      class="py-24 px-4 sm:px-6 relative z-20 border-t border-white/10 overflow-hidden"
-    >
+    <footer class="py-24 px-4 sm:px-6 relative z-20 border-t border-white/10 overflow-hidden">
       <!-- Large Gradient Text Background -->
       <div
         class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden"
@@ -516,19 +483,14 @@
                     fill="#a098ff"
                     d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
                     style="
-                      animation: splash 1.5s cubic-bezier(0.165, 0.84, 0.44, 1)
-                        infinite both;
+                      animation: splash 1.5s cubic-bezier(0.165, 0.84, 0.44, 1) infinite both;
                       transform-origin: center center;
                     "
                   />
                 </svg>
               </div>
             </div>
-            <img
-              src="res/logo.svg"
-              alt="SuperFlex"
-              class="w-64 filter opacity-90"
-            />
+            <img src="res/logo.svg" alt="SuperFlex" class="w-64 filter opacity-90" />
           </div>
 
           <!-- Tagline -->
@@ -635,17 +597,8 @@
       const setActiveNav = (id) => {
         const el = document.getElementById(id);
         if (el) {
-          el.classList.remove(
-            "text-zinc-400",
-            "hover:text-white",
-            "hover:bg-white/5",
-          );
-          el.classList.add(
-            "bg-[#a098ff]/10",
-            "text-[#a098ff]",
-            "border",
-            "border-white/10",
-          );
+          el.classList.remove("text-zinc-400", "hover:text-white", "hover:bg-white/5");
+          el.classList.add("bg-[#a098ff]/10", "text-[#a098ff]", "border", "border-white/10");
         }
       };
 
@@ -656,8 +609,7 @@
       // Init UI
       document.getElementById("page-tag").textContent = currentPage.tag;
       document.getElementById("hero-title").textContent = currentPage.title;
-      document.getElementById("hero-subtitle").textContent =
-        currentPage.subtitle;
+      document.getElementById("hero-subtitle").textContent = currentPage.subtitle;
 
       // Set Header Background
       if (currentPage.image) {
@@ -735,8 +687,7 @@
           // Clean up frontmatter if exists
           const cleanText = text.replace(/^---[\s\S]*?---\n/, "");
 
-          document.getElementById("markdown-content").innerHTML =
-            marked.parse(cleanText);
+          document.getElementById("markdown-content").innerHTML = marked.parse(cleanText);
 
           requestAnimationFrame(() => {
             generateTOC();

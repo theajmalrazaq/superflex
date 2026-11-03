@@ -1,10 +1,6 @@
 import React from "react";
 import { AlertTriangle, ChevronRight } from "lucide-react";
-const NotificationBanner = ({
-  alerts,
-  onActionClick,
-  actionLabel = "More Instruction",
-}) => {
+const NotificationBanner = ({ alerts, onActionClick, actionLabel = "More Instruction" }) => {
   if (!alerts || alerts.length === 0) return null;
 
   return (
@@ -35,18 +31,14 @@ const NotificationBanner = ({
         >
           <div
             className={`p-3 rounded-xl shrink-0 ${
-              alert.type === "error"
-                ? "bg-error/10 text-error"
-                : "bg-info/10 text-info"
+              alert.type === "error" ? "bg-error/10 text-error" : "bg-info/10 text-info"
             }`}
           >
             <AlertTriangle size={20} />
           </div>
 
           <div className="space-y-0.5 flex-1 min-w-0">
-            <p className="text-xs md:text-sm font-medium leading-relaxed">
-              {alert.message}
-            </p>
+            <p className="text-xs md:text-sm font-medium leading-relaxed">{alert.message}</p>
           </div>
         </div>
       ))}

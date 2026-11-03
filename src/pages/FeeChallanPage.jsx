@@ -14,9 +14,7 @@ import {
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
-import LoadingOverlay, {
-  LoadingSpinner,
-} from "../components/ui/LoadingOverlay";
+import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
 
 function FeeChallanPage() {
   const [loading, setLoading] = useState(true);
@@ -25,15 +23,11 @@ function FeeChallanPage() {
   const [instructions, setInstructions] = useState("");
 
   useEffect(() => {
-    window.dispatchEvent(
-      new CustomEvent("superflex-update-loading", { detail: true }),
-    );
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseData = () => {
       try {
-        const root = document.querySelector(
-          ".m-grid.m-grid--hor.m-grid--root.m-page",
-        );
+        const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
         if (!root) {
           setTimeout(parseData, 500);
           return;
@@ -52,9 +46,7 @@ function FeeChallanPage() {
           const clone = textContainer.cloneNode(true);
 
           clone
-            .querySelectorAll(
-              ".m-alert__close, button, a, strong, .m-alert__icon",
-            )
+            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
             .forEach((el) => el.remove());
 
           let message = clone.textContent
@@ -84,17 +76,14 @@ function FeeChallanPage() {
             if (cells.length >= 5) {
               const description = cells[1].textContent.trim();
               const status = cells[4]?.textContent.trim() || "";
-              
-              // Find amount - check if there's a dedicated amount column (index 5 in some tables)
-              // or extract from description (common in Flex)
+
               let amount = "0";
               const amountInCells = cells.length >= 6 ? cells[5]?.textContent.trim() : "";
               const amountMatchCell = amountInCells.match(/\d+([,]\d+)*([.]\d+)?/);
-              
+
               if (amountMatchCell && amountMatchCell[0] !== "0") {
                 amount = amountMatchCell[0];
               } else {
-                // Fallback: extract amount from description if possible
                 const amountMatchDesc = description.match(/\d+([,]\d+)*([.]\d+)?/);
                 if (amountMatchDesc) {
                   amount = amountMatchDesc[0];
@@ -119,9 +108,7 @@ function FeeChallanPage() {
           });
         }
 
-        const infoPanel = root.querySelector(
-          "td[style*='border-right:solid 1px']",
-        );
+        const infoPanel = root.querySelector("td[style*='border-right:solid 1px']");
         if (infoPanel) {
           setInstructions(infoPanel.innerHTML);
         }
@@ -129,15 +116,11 @@ function FeeChallanPage() {
         setChallans(challanList);
         root.style.display = "none";
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (e) {
         console.error("Fee Challan Parsing Error", e);
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 
@@ -146,36 +129,29 @@ function FeeChallanPage() {
 
   const stats = useMemo(() => {
     const unpaid = challans.filter(
-      (c) =>
-        !c.status.toLowerCase().includes("paid") &&
-        c.status.toLowerCase() !== "",
+      (c) => !c.status.toLowerCase().includes("paid") && c.status.toLowerCase() !== "",
     ).length;
-    const paid = challans.filter((c) =>
-      c.status.toLowerCase().includes("paid"),
-    ).length;
-    
-    // Find the latest amount (most recent unpaid, or just most recent)
-    const latestUnpaid = challans.find(c => !c.status.toLowerCase().includes("paid"));
-    const latestAmount = latestUnpaid ? latestUnpaid.amount : (challans.length > 0 ? challans[0].amount : "0");
+    const paid = challans.filter((c) => c.status.toLowerCase().includes("paid")).length;
+
+    const latestUnpaid = challans.find((c) => !c.status.toLowerCase().includes("paid"));
+    const latestAmount = latestUnpaid
+      ? latestUnpaid.amount
+      : challans.length > 0
+        ? challans[0].amount
+        : "0";
 
     return { unpaid, paid, latestAmount, total: challans.length };
   }, [challans]);
 
   const handlePrint = (challanNo) => {
     if (challanNo) {
-      window.open(
-        `../Student/PrintStdChallanForm?ChallanNo=${challanNo}`,
-        "_blank",
-      );
+      window.open(`../Student/PrintStdChallanForm?ChallanNo=${challanNo}`, "_blank");
     }
   };
 
   const handleOnlinePayment = (challanNo) => {
     if (challanNo) {
-      window.open(
-        `../Student/CardPaymentThroughKuickpay?ChallanNo=${challanNo}`,
-        "_blank",
-      );
+      window.open(`../Student/CardPaymentThroughKuickpay?ChallanNo=${challanNo}`, "_blank");
     }
   };
 
@@ -192,8 +168,7 @@ function FeeChallanPage() {
             text: (
               <>
                 Select Bill Payment / Payments and then select{" "}
-                <span className="text-accent font-bold">'kuickpay'</span> from
-                given categories
+                <span className="text-accent font-bold">'kuickpay'</span> from given categories
               </>
             ),
           },
@@ -201,11 +176,8 @@ function FeeChallanPage() {
             step: "Step 3",
             text: (
               <>
-                Enter the voucher or invoice number & continue. Make sure to
-                enter{" "}
-                <span className="text-emerald-400 font-bold">
-                  Institution ID as prefix
-                </span>{" "}
+                Enter the voucher or invoice number & continue. Make sure to enter{" "}
+                <span className="text-emerald-400 font-bold">Institution ID as prefix</span>{" "}
                 (mentioned on challan)
               </>
             ),
@@ -222,12 +194,8 @@ function FeeChallanPage() {
               </div>
             </div>
             <div className="space-y-1">
-              <p className="text-foreground font-bold tracking-wide">
-                {item.step}
-              </p>
-              <p className="text-foreground/50 text-xs leading-relaxed font-medium">
-                {item.text}
-              </p>
+              <p className="text-foreground font-bold tracking-wide">{item.step}</p>
+              <p className="text-foreground/50 text-xs leading-relaxed font-medium">{item.text}</p>
             </div>
           </div>
         ))}
@@ -235,15 +203,12 @@ function FeeChallanPage() {
 
       <div className="space-y-6 pt-2">
         <div className="space-y-4">
-          <p className="text-[10px] text-accent font-black Cap tracking-[0px]">
-            * Supported Banks
-          </p>
+          <p className="text-[10px] text-accent font-black Cap tracking-[0px]">* Supported Banks</p>
           <p className="text-[11px] text-foreground/50 leading-relaxed font-medium">
-            Allied Bank, Askari Bank, Bank Al Habib, Bank Alfalah, Bank Islami,
-            Bank of Punjab, Dubai Islamic Bank, Faysal Bank, First Women Bank,
-            Habib Metro Bank, Habib Bank Limited, JS Bank, MCB Bank, MCB Islamic
-            Bank, Meezan Bank, National Bank, NRSP Bank, SAMBA Bank, Soneri
-            bank, Summit Bank, UBL and Keenu App.
+            Allied Bank, Askari Bank, Bank Al Habib, Bank Alfalah, Bank Islami, Bank of Punjab,
+            Dubai Islamic Bank, Faysal Bank, First Women Bank, Habib Metro Bank, Habib Bank Limited,
+            JS Bank, MCB Bank, MCB Islamic Bank, Meezan Bank, National Bank, NRSP Bank, SAMBA Bank,
+            Soneri bank, Summit Bank, UBL and Keenu App.
           </p>
         </div>
 
@@ -273,15 +238,11 @@ function FeeChallanPage() {
             <div className="w-1.5 h-1.5 rounded-full bg-amber-500/20"></div>
           </div>
           <div className="space-y-1">
-            <p className="text-foreground font-medium Cap text-xs">
-              Physical Cash Deposit
-            </p>
+            <p className="text-foreground font-medium Cap text-xs">Physical Cash Deposit</p>
             <p className="text-foreground/50 text-xs leading-relaxed font-medium">
               Print the challan form and then visit any nearest{" "}
-              <strong className="text-foreground font-bold">
-                Faysal Bank branch
-              </strong>{" "}
-              for cash deposit.
+              <strong className="text-foreground font-bold">Faysal Bank branch</strong> for cash
+              deposit.
             </p>
           </div>
         </div>
@@ -306,10 +267,7 @@ function FeeChallanPage() {
         <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
-        <PageHeader
-          title="Fee Challans"
-          subtitle="Manage your semester invoices and payments"
-        >
+        <PageHeader title="Fee Challans" subtitle="Manage your semester invoices and payments">
           <div className="flex items-center gap-4 bg-secondary/50 px-6 py-3 rounded-2xl border border-foreground/10 backdrop-blur-xl group hover:bg-secondary/70 transition-all">
             <div className="text-right">
               <p className="text-[10px] font-bold text-foreground/50 Cap tracking-[0px]">
@@ -368,9 +326,7 @@ function FeeChallanPage() {
                   message:
                     "Payments made through the online portal are verified automatically within 24-48 hours. Please keep your receipt until the status is updated.",
                 },
-              ].filter(
-                (v, i, a) => a.findIndex((t) => t.message === v.message) === i,
-              )}
+              ].filter((v, i, a) => a.findIndex((t) => t.message === v.message) === i)}
             />
 
             <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden">
@@ -412,10 +368,7 @@ function FeeChallanPage() {
                   </thead>
                   <tbody className="divide-y divide-foreground/5">
                     {challans.map((c, idx) => (
-                      <tr
-                        key={idx}
-                        className="group hover:bg-foreground/[0.02] transition-colors"
-                      >
+                      <tr key={idx} className="group hover:bg-foreground/[0.02] transition-colors">
                         <td className="px-6 py-5">
                           <span className="text-foreground/50 font-bold font-sans text-xs">
                             {c.srNo}
@@ -431,22 +384,13 @@ function FeeChallanPage() {
                                 <div className="p-1 bg-tertiary/50 rounded-md">
                                   <Clock size={10} className="text-accent" />
                                 </div>
-                                Issued:{" "}
-                                <span className="text-foreground/60">
-                                  {c.issueDate}
-                                </span>
+                                Issued: <span className="text-foreground/60">{c.issueDate}</span>
                               </span>
                               <span className="flex items-center gap-1.5 text-[10px] text-foreground/50 font-bold Cap tracking-tight font-sans whitespace-nowrap">
                                 <div className="p-1 bg-tertiary/50 rounded-md">
-                                  <Calendar
-                                    size={10}
-                                    className="text-emerald-400"
-                                  />
+                                  <Calendar size={10} className="text-emerald-400" />
                                 </div>
-                                Due:{" "}
-                                <span className="text-foreground/60">
-                                  {c.dueDate}
-                                </span>
+                                Due: <span className="text-foreground/60">{c.dueDate}</span>
                               </span>
                             </div>
                           </div>
@@ -465,9 +409,7 @@ function FeeChallanPage() {
                           </div>
                         </td>
                         <td className="px-6 py-5 text-right font-sans">
-                          <span className="text-foreground font-black text-sm">
-                            Rs. {c.amount}
-                          </span>
+                          <span className="text-foreground font-black text-sm">Rs. {c.amount}</span>
                         </td>
                         <td className="px-6 py-5 text-right">
                           <div className="flex items-center justify-end gap-2">
@@ -535,18 +477,14 @@ function FeeChallanPage() {
                           <Clock size={10} className="text-accent" />
                           ISSUED
                         </div>
-                        <p className="text-xs font-bold text-foreground ml-4">
-                          {c.issueDate}
-                        </p>
+                        <p className="text-xs font-bold text-foreground ml-4">{c.issueDate}</p>
                       </div>
                       <div className="space-y-1.5 text-right">
                         <div className="flex items-center justify-end gap-1.5 text-[9px] text-foreground/50 font-black Cap tracking-[0px]">
                           <Calendar size={10} className="text-emerald-400" />
                           DUE
                         </div>
-                        <p className="text-xs font-bold text-foreground mr-4">
-                          {c.dueDate}
-                        </p>
+                        <p className="text-xs font-bold text-foreground mr-4">{c.dueDate}</p>
                       </div>
                     </div>
 
@@ -555,9 +493,7 @@ function FeeChallanPage() {
                         <p className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px]">
                           Total Amount
                         </p>
-                        <p className="text-xl font-black text-foreground">
-                          Rs. {c.amount}
-                        </p>
+                        <p className="text-xl font-black text-foreground">Rs. {c.amount}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         {c.status.toLowerCase().includes("unpaid") && (

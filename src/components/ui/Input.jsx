@@ -35,11 +35,7 @@ const Input = ({
         {}
         <div className="absolute inset-0 rounded-2xl border border-accent/0 group-focus-within:border-accent/30 pointer-events-none transition-all duration-500" />
       </div>
-      {error && (
-        <p className="text-[10px] text-rose-400 font-bold   px-1">
-          {error}
-        </p>
-      )}
+      {error && <p className="text-[10px] text-rose-400 font-bold   px-1">{error}</p>}
     </div>
   );
 };
@@ -75,11 +71,7 @@ export const TextArea = ({
         `}
         {...props}
       />
-      {error && (
-        <p className="text-[10px] text-rose-400 font-bold   px-1">
-          {error}
-        </p>
-      )}
+      {error && <p className="text-[10px] text-rose-400 font-bold   px-1">{error}</p>}
     </div>
   );
 };

@@ -1,20 +1,10 @@
 import React, { useEffect, useState } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import {
-  CheckCircle2,
-  BookOpen,
-  Clock,
-  Layout,
-  MessageSquare,
-  Send,
-  Zap,
-} from "lucide-react";
+import { CheckCircle2, BookOpen, Clock, Layout, MessageSquare, Send, Zap } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
-import LoadingOverlay, {
-  LoadingSpinner,
-} from "../components/ui/LoadingOverlay";
+import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
 
 const FeedbackCard = ({ course, onAction, onQuickAction, index }) => {
   const isPending = course.hasAction;
@@ -79,9 +69,7 @@ const FeedbackCard = ({ course, onAction, onQuickAction, index }) => {
             >
               <Zap
                 size={12}
-                className={
-                  isQuicking ? "animate-pulse" : "group-hover/zap:fill-current"
-                }
+                className={isQuicking ? "animate-pulse" : "group-hover/zap:fill-current"}
               />
               {isQuicking ? "Doing..." : "Quick"}
             </button>
@@ -110,14 +98,10 @@ function CourseFeedbackPage() {
   const [stats, setStats] = useState({ total: 0, pending: 0, submitted: 0 });
 
   useEffect(() => {
-    window.dispatchEvent(
-      new CustomEvent("superflex-update-loading", { detail: true }),
-    );
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseFeedbackData = () => {
-      const root = document.querySelector(
-        ".m-grid.m-grid--hor.m-grid--root.m-page",
-      );
+      const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
       if (!root) {
         setTimeout(parseFeedbackData, 500);
         return;
@@ -137,9 +121,7 @@ function CourseFeedbackPage() {
           const clone = textContainer.cloneNode(true);
 
           clone
-            .querySelectorAll(
-              ".m-alert__close, button, a, strong, .m-alert__icon",
-            )
+            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
             .forEach((el) => el.remove());
 
           let message = clone.textContent
@@ -169,8 +151,7 @@ function CourseFeedbackPage() {
 
             if (cells.length >= 5) {
               const actionBtn =
-                cells[5]?.querySelector("a, button") ||
-                cells[4]?.querySelector("a, button");
+                cells[5]?.querySelector("a, button") || cells[4]?.querySelector("a, button");
               const actionOnClick = actionBtn?.getAttribute("onclick");
               const actionHref = actionBtn?.getAttribute("href");
 
@@ -180,8 +161,7 @@ function CourseFeedbackPage() {
                 code: cells[1]?.textContent.trim(),
                 courseName: cells[2]?.textContent.trim(),
                 credits: cells[3]?.textContent.trim(),
-                status:
-                  cells[4]?.textContent.trim() || cells[3]?.textContent.trim(),
+                status: cells[4]?.textContent.trim() || cells[3]?.textContent.trim(),
                 teacherName: "",
                 hasAction: !!actionBtn,
                 actionOnClick,
@@ -206,15 +186,11 @@ function CourseFeedbackPage() {
         root.style.zIndex = "-1";
 
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (err) {
         console.error("Feedback Parser Error:", err);
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 
@@ -222,9 +198,7 @@ function CourseFeedbackPage() {
   }, []);
 
   const handleFeedbackAction = (course) => {
-    const root = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
+    const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
     if (!root) return;
     const table = root.querySelector(".table");
     if (!table) return;
@@ -240,15 +214,12 @@ function CourseFeedbackPage() {
   };
 
   const handleQuickFeedback = async (course) => {
-    const root = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
+    const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
     if (!root) return;
     const table = root.querySelector(".table");
     const rows = table.querySelectorAll("tbody tr");
     const originalRow = rows[course.id];
-    
-    // Find the form within the row
+
     const originalRowForm = originalRow?.querySelector("form");
     const btn = originalRow?.querySelector("button[name='GiveFeedback']");
     const fbValue = btn?.value;
@@ -259,11 +230,9 @@ function CourseFeedbackPage() {
     }
 
     try {
-      // 1. Fetch Questions Page via POST
-      // We use the form action and data if available, otherwise fallback to the GiveFeedback value
       const actionUrl = originalRowForm?.getAttribute("action") || "/Student/FeedBackQuestions";
-      const initialBody = originalRowForm 
-        ? new URLSearchParams(new FormData(originalRowForm)) 
+      const initialBody = originalRowForm
+        ? new URLSearchParams(new FormData(originalRowForm))
         : `GiveFeedback=${encodeURIComponent(fbValue)}`;
 
       const qPageResp = await fetch(actionUrl, {
@@ -273,7 +242,7 @@ function CourseFeedbackPage() {
       });
 
       if (!qPageResp.ok) throw new Error(`Failed to fetch questions: ${qPageResp.status}`);
-      
+
       const qHtml = await qPageResp.text();
       const parser = new DOMParser();
       const qDoc = parser.parseFromString(qHtml, "text/html");
@@ -283,11 +252,9 @@ function CourseFeedbackPage() {
         throw new Error("Could not find the feedback form on the questions page.");
       }
 
-      // Collect all inputs from the form (including hidden fields like tokens)
       const submissionData = new URLSearchParams();
       const inputs = originalForm.querySelectorAll("input, textarea, select");
-      
-      // Keep track of radio groups we've handled
+
       const handledRadios = new Set();
 
       inputs.forEach((input) => {
@@ -301,15 +268,13 @@ function CourseFeedbackPage() {
             handledRadios.add(input.name);
           }
         } else if (input.type === "submit" || input.type === "button") {
-          // Skip submit buttons unless they are needed (usually not)
         } else if (input.tagName.toLowerCase() === "textarea") {
-          submissionData.append(input.name, ""); // Leave comments empty for quick feedback
+          submissionData.append(input.name, "");
         } else {
           submissionData.append(input.name, input.value);
         }
       });
 
-      // 4. Submit to /Student/SubmitFeedback
       const submitAction = originalForm.getAttribute("action") || "/Student/SubmitFeedback";
       const submitResp = await fetch(submitAction, {
         method: "POST",
@@ -318,13 +283,14 @@ function CourseFeedbackPage() {
       });
 
       if (submitResp.ok) {
-        // Refresh the underlying state or just reload the page to show completion
         window.location.reload();
       } else {
         throw new Error(`Submission failed: ${submitResp.status}`);
       }
     } catch (err) {
-      alert("Quick review failed. This usually happens if the session expired or the portal structure changed. Please try manual review.");
+      alert(
+        "Quick review failed. This usually happens if the session expired or the portal structure changed. Please try manual review.",
+      );
     }
   };
 
@@ -351,24 +317,9 @@ function CourseFeedbackPage() {
         />
 
         <div className="flex flex-wrap gap-4">
-          <StatsCard
-            icon={Layout}
-            label="Total Surveys"
-            value={stats.total}
-            delay={100}
-          />
-          <StatsCard
-            icon={Clock}
-            label="Pending"
-            value={stats.pending}
-            delay={200}
-          />
-          <StatsCard
-            icon={CheckCircle2}
-            label="Completed"
-            value={stats.submitted}
-            delay={300}
-          />
+          <StatsCard icon={Layout} label="Total Surveys" value={stats.total} delay={100} />
+          <StatsCard icon={Clock} label="Pending" value={stats.pending} delay={200} />
+          <StatsCard icon={CheckCircle2} label="Completed" value={stats.submitted} delay={300} />
           <StatsCard
             icon={MessageSquare}
             label="Survey Status"
@@ -385,9 +336,7 @@ function CourseFeedbackPage() {
               <MessageSquare size={20} />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-foreground tracking-tight">
-                Faculty Surveys
-              </h3>
+              <h3 className="text-xl font-bold text-foreground tracking-tight">Faculty Surveys</h3>
               <p className="text-[10px] text-foreground/40 font-medium">
                 Pending faculty evaluations
               </p>
@@ -410,9 +359,7 @@ function CourseFeedbackPage() {
                 <div className="p-6 rounded-full bg-tertiary/50 mb-6">
                   <CheckCircle2 size={40} className="text-foreground/40" />
                 </div>
-                <h3 className="text-xl font-bold text-foreground/50">
-                  No Pending Reviews
-                </h3>
+                <h3 className="text-xl font-bold text-foreground/50">No Pending Reviews</h3>
                 <p className="text-foreground/40 mt-2 text-sm max-w-xs">
                   All your course evaluations are up to date. Excellent work!
                 </p>

@@ -58,21 +58,16 @@ function SubmitFeedbackPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    window.dispatchEvent(
-      new CustomEvent("superflex-update-loading", { detail: true }),
-    );
+    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseFeedbackQuestions = () => {
-      const root = document.querySelector(
-        ".m-grid.m-grid--hor.m-grid--root.m-page",
-      );
+      const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
       if (!root) {
         setTimeout(parseFeedbackQuestions, 500);
         return;
       }
 
       try {
-        // Parse Alerts
         const alertList = [];
         root.querySelectorAll(".m-alert, .alert").forEach((alert) => {
           if (
@@ -85,9 +80,7 @@ function SubmitFeedbackPage() {
           const textContainer = alert.querySelector(".m-alert__text") || alert;
           const clone = textContainer.cloneNode(true);
           clone
-            .querySelectorAll(
-              ".m-alert__close, button, a, strong, .m-alert__icon",
-            )
+            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
             .forEach((el) => el.remove());
 
           let message = clone.textContent.trim();
@@ -100,13 +93,11 @@ function SubmitFeedbackPage() {
         });
         setAlerts(alertList);
 
-        // Parse Course Title
         const titleText = root.querySelector(".m-portlet__head-text");
         if (titleText) {
           setCourseTitle(titleText.textContent.trim());
         }
 
-        // Parse Questions
         const qList = [];
         const items = root.querySelectorAll(".m-list-timeline__item");
         items.forEach((item) => {
@@ -141,37 +132,32 @@ function SubmitFeedbackPage() {
         });
         setQuestions(qList);
 
-        // Parse Textareas (Comments)
         const textareaList = [];
         root.querySelectorAll("textarea").forEach((txt) => {
           const item = txt.closest(".m-list-timeline__item");
           const headingSpan = item?.querySelector(".m-list-timeline__text.m--font-boldest2");
-          
+
           textareaList.push({
             name: txt.name,
             placeholder: txt.placeholder || "Enter your comments here...",
             value: txt.value || "",
             required: txt.required,
-            label: headingSpan ? headingSpan.textContent.trim() : 
-                   txt.closest(".form-group")?.querySelector("label")?.textContent?.trim() || 
-                   "Comments",
+            label: headingSpan
+              ? headingSpan.textContent.trim()
+              : txt.closest(".form-group")?.querySelector("label")?.textContent?.trim() ||
+                "Comments",
           });
         });
         setComments(textareaList);
 
-        // Hide original
         root.style.display = "none";
 
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (err) {
         console.error("Feedback Quesion Parser Error:", err);
         setLoading(false);
-        window.dispatchEvent(
-          new CustomEvent("superflex-update-loading", { detail: false }),
-        );
+        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 
@@ -186,13 +172,9 @@ function SubmitFeedbackPage() {
   };
 
   const syncRadioToDOM = (name, value) => {
-    const root = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
+    const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
     if (root) {
-      const originalInput = root.querySelector(
-        `input[name="${name}"][value="${value}"]`,
-      );
+      const originalInput = root.querySelector(`input[name="${name}"][value="${value}"]`);
       if (originalInput) {
         originalInput.checked = true;
         originalInput.dispatchEvent(new Event("change", { bubbles: true }));
@@ -208,22 +190,18 @@ function SubmitFeedbackPage() {
         value = q.options[Math.floor(Math.random() * q.options.length)].value;
       } else if (type === "agree") {
         value =
-          q.options.find((o) => o.label.toLowerCase().includes("strongly agree"))
-            ?.value ||
+          q.options.find((o) => o.label.toLowerCase().includes("strongly agree"))?.value ||
           q.options.find((o) => o.label.toLowerCase().includes("agree"))?.value ||
           q.options[0].value;
       } else if (type === "disagree") {
         value =
-          q.options.find((o) =>
-            o.label.toLowerCase().includes("strongly disagree"),
-          )?.value ||
-          q.options.find((o) => o.label.toLowerCase().includes("disagree"))
-            ?.value ||
+          q.options.find((o) => o.label.toLowerCase().includes("strongly disagree"))?.value ||
+          q.options.find((o) => o.label.toLowerCase().includes("disagree"))?.value ||
           q.options[q.options.length - 1].value;
       } else if (type === "uncertain") {
         value =
-          q.options.find((o) => o.label.toLowerCase().includes("uncertain"))
-            ?.value || q.options[Math.floor(q.options.length / 2)].value;
+          q.options.find((o) => o.label.toLowerCase().includes("uncertain"))?.value ||
+          q.options[Math.floor(q.options.length / 2)].value;
       }
 
       if (value) {
@@ -239,10 +217,7 @@ function SubmitFeedbackPage() {
     updated[idx].value = value;
     setComments(updated);
 
-    // Sync with original DOM by index (since multiple textareas may have the same name)
-    const root = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
+    const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
     if (root) {
       const allTextareas = root.querySelectorAll("textarea");
       if (allTextareas[idx]) {
@@ -256,18 +231,12 @@ function SubmitFeedbackPage() {
     e.preventDefault();
     setSubmitting(true);
 
-    const root = document.querySelector(
-      ".m-grid.m-grid--hor.m-grid--root.m-page",
-    );
+    const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
     const originalForm = root?.querySelector("form");
-    
+
     if (originalForm) {
-      // The portal expects a standard form post to /Student/SubmitFeedback
-      // We've already synced the inputs, so we can just trigger the form submission.
-      // However, to be absolutely sure it matches the structure:
       const formData = new FormData(originalForm);
-      
-      // Create a temporary form to ensure a clean POST request
+
       const tempForm = document.createElement("form");
       tempForm.method = "POST";
       tempForm.action = "/Student/SubmitFeedback";
@@ -304,8 +273,7 @@ function SubmitFeedbackPage() {
     comments.every((c) => !c.required || c.value);
 
   const progress =
-    ((questions.filter((q) => q.selectedValue).length +
-      comments.filter((c) => c.value).length) /
+    ((questions.filter((q) => q.selectedValue).length + comments.filter((c) => c.value).length) /
       (questions.length + comments.length)) *
     100;
 
@@ -315,24 +283,17 @@ function SubmitFeedbackPage() {
         <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
-        <PageHeader
-          title="Course Feedback"
-          subtitle={courseTitle || "Faculty Evaluation Survey"}
-        />
+        <PageHeader title="Course Feedback" subtitle={courseTitle || "Faculty Evaluation Survey"} />
 
         <NotificationBanner alerts={alerts} />
 
-        {/* Progress Tracker */}
+        {}
         <div className="bg-secondary/30 rounded-3xl p-6 border border-foreground/5 sticky top-4 z-20 backdrop-blur-xl">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex-1 space-y-2">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-foreground/60">
-                  COMPLETION PROGRESS
-                </span>
-                <span className="text-xs font-medium text-accent">
-                  {Math.round(progress)}%
-                </span>
+                <span className="text-xs font-medium text-foreground/60">COMPLETION PROGRESS</span>
+                <span className="text-xs font-medium text-accent">{Math.round(progress)}%</span>
               </div>
               <div className="w-full h-2 bg-foreground/5 rounded-full overflow-hidden">
                 <div
@@ -382,12 +343,7 @@ function SubmitFeedbackPage() {
         <form onSubmit={handleSubmit} className="space-y-8 pb-12">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6">
             {questions.map((q, idx) => (
-              <QuestionCard
-                key={idx}
-                index={idx}
-                question={q}
-                onSelect={handleSelect}
-              />
+              <QuestionCard key={idx} index={idx} question={q} onSelect={handleSelect} />
             ))}
           </div>
 
@@ -397,9 +353,7 @@ function SubmitFeedbackPage() {
                 key={idx}
                 className="bg-secondary/30 rounded-3xl p-6 border border-foreground/5 space-y-4"
               >
-                <h4 className="text-foreground font-medium text-lg leading-relaxed">
-                  {c.label}
-                </h4>
+                <h4 className="text-foreground font-medium text-lg leading-relaxed">{c.label}</h4>
                 <textarea
                   value={c.value}
                   onChange={(e) => handleCommentChange(idx, e.target.value)}
@@ -431,10 +385,7 @@ function SubmitFeedbackPage() {
                 </>
               ) : (
                 <>
-                  <Send
-                    size={20}
-                    className={allAnswered ? "animate-bounce-x" : ""}
-                  />
+                  <Send size={20} className={allAnswered ? "animate-bounce-x" : ""} />
                   Submit Feedback
                 </>
               )}

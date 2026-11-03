@@ -22,28 +22,28 @@ Please be respectful and constructive in discussions, issue reports, and pull re
 
 ### Prerequisites
 
-- **Node.js** (v18 or higher recommended)
-- **pnpm**, **npm**, or **yarn**
+- **Bun** (v1.0 or higher)
 - **Google Chrome** or any Chromium-based browser (Brave, Edge, Arc, etc.)
 
 ### Getting Started
 
 1. **Fork and Clone the Repository**
+
    ```bash
    git clone https://github.com/<your-username>/superflex.git
    cd superflex
    ```
 
 2. **Install Dependencies**
+
    ```bash
-   pnpm install
-   # or npm install / yarn
+   bun install
    ```
 
 3. **Start the Development Server**
+
    ```bash
-   pnpm run dev
-   # or npm run dev
+   bun run dev
    ```
 
 4. **Load the Extension into Chrome**
@@ -51,7 +51,7 @@ Please be respectful and constructive in discussions, issue reports, and pull re
    2. Turn on **Developer mode** in the top right corner.
    3. Click **Load unpacked**.
    4. Select the `dist/` directory generated in your project root.
-   5. Changes made during `pnpm run dev` will automatically trigger rebuilds.
+   5. Changes made during `bun run dev` will automatically trigger rebuilds.
 
 ---
 
@@ -69,12 +69,15 @@ Please be respectful and constructive in discussions, issue reports, and pull re
 ### Code Style & Formatting
 
 - Maintain consistency with the existing codebase (React 19, Tailwind CSS v4, modern ES module syntax).
-- Format and clean your code before submitting:
+- Format your code with oxfmt:
   ```bash
-  pnpm run clean
-  # or npm run clean
+  bun run format
+  # or bun run clean
   ```
-- Make sure ESLint checks pass without errors.
+- Make sure Oxlint checks pass:
+  ```bash
+  bun run lint
+  ```
 
 ### Commits
 
@@ -85,8 +88,7 @@ Please be respectful and constructive in discussions, issue reports, and pull re
 
 1. Ensure the extension builds successfully:
    ```bash
-   pnpm run build
-   # or npm run build
+   bun run build
    ```
 2. Test your changes locally on the relevant LMS pages.
 3. Push your branch to your fork:

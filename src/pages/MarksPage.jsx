@@ -19,9 +19,7 @@ import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
 import PageLayout from "../components/layouts/PageLayout";
-import LoadingOverlay, {
-  LoadingSpinner,
-} from "../components/ui/LoadingOverlay";
+import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
 import Modal from "../components/ui/Modal";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
@@ -155,8 +153,7 @@ const SectionSelector = ({ sections, selectedId, onSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const selectedSection =
-    sections.find((s) => s.id === selectedId) || sections[0];
+  const selectedSection = sections.find((s) => s.id === selectedId) || sections[0];
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -233,9 +230,7 @@ const SectionSelector = ({ sections, selectedId, onSelect }) => {
                       : "text-foreground/60 hover:bg-foreground/5 border border-transparent hover:text-foreground"
                   }`}
                 >
-                  <span className="text-sm font-medium truncate">
-                    {section.title}
-                  </span>
+                  <span className="text-sm font-medium truncate">{section.title}</span>
                 </button>
               ))}
             </div>
@@ -306,18 +301,13 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
         }`}
         title="View Bookmarks"
       >
-        <Bookmark
-          size={20}
-          fill={bookmarkedDetails.length > 0 ? "currentColor" : "none"}
-        />
+        <Bookmark size={20} fill={bookmarkedDetails.length > 0 ? "currentColor" : "none"} />
       </button>
 
       {isOpen && (
         <div className="absolute top-full right-0 mt-2 w-96 md:w-[500px] bg-background/95 backdrop-blur-xl border border-foreground/10 rounded-2xl  overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           <div className="p-4 border-b border-foreground/10 bg-foreground/5 flex justify-between items-center">
-            <h3 className="font-bold text-foreground flex items-center gap-2">
-              Bookmarked Items
-            </h3>
+            <h3 className="font-bold text-foreground flex items-center gap-2">Bookmarked Items</h3>
           </div>
 
           <div className="max-h-[60vh] overflow-y-auto scrollbar-hide p-2 space-y-1">
@@ -325,8 +315,7 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
               <div className="p-8 text-center text-foreground/50 text-sm">
                 <p>No bookmarks yet.</p>
                 <p className="text-xs mt-1 opacity-50">
-                  Click the bookmark icon on any assessment item to save it
-                  here.
+                  Click the bookmark icon on any assessment item to save it here.
                 </p>
               </div>
             ) : (
@@ -356,9 +345,7 @@ const BookmarksMenu = ({ markedItems, courses, onNavigate }) => {
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-[10px] text-foreground/50   font-bold">
-                    <span className="truncate max-w-[120px]">
-                      {item.courseTitle}
-                    </span>
+                    <span className="truncate max-w-[120px]">{item.courseTitle}</span>
                     <span className="w-1 h-1 rounded-full bg-tertiary"></span>
                     <span className="truncate">{item.sectionTitle}</span>
                   </div>
@@ -401,9 +388,7 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount, sectionTitle }) => {
             label={`Number of Best ${itemType}${count > 1 ? (itemType === "Quiz" ? "es" : "s") : ""}`}
             type="number"
             value={count}
-            onChange={(e) =>
-              setCount(e.target.value === "" ? "" : parseInt(e.target.value))
-            }
+            onChange={(e) => setCount(e.target.value === "" ? "" : parseInt(e.target.value))}
             max={itemCount}
             min={1}
             placeholder="e.g. 4"
@@ -415,9 +400,7 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount, sectionTitle }) => {
             type="number"
             value={totalWeight}
             onChange={(e) =>
-              setTotalWeight(
-                e.target.value === "" ? "" : parseFloat(e.target.value),
-              )
+              setTotalWeight(e.target.value === "" ? "" : parseFloat(e.target.value))
             }
             placeholder="e.g. 20"
             className="text-xl font-bold"
@@ -430,10 +413,9 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount, sectionTitle }) => {
           </div>
           <div className="space-y-0.5 flex-1 min-w-0">
             <p className="text-xs md:text-sm font-medium leading-relaxed">
-              This will automatically pick the highest scoring {count}{" "}
-              {itemType}
-              {count > 1 ? (itemType === "Quiz" ? "zes" : "s") : ""} and assign
-              them an equal portion of the {totalWeight}% total weightage.
+              This will automatically pick the highest scoring {count} {itemType}
+              {count > 1 ? (itemType === "Quiz" ? "zes" : "s") : ""} and assign them an equal
+              portion of the {totalWeight}% total weightage.
             </p>
           </div>
         </div>
@@ -501,9 +483,7 @@ const AssessmentView = ({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 border-b border-foreground/10">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
-              <h3 className="text-xl font-bold text-foreground">
-                {section.title}
-              </h3>
+              <h3 className="text-xl font-bold text-foreground">{section.title}</h3>
               {isGrandTotal && (
                 <span className="px-2 py-0.5 rounded-md bg-accent/20 text-accent text-[10px] font-bold">
                   Final
@@ -537,10 +517,7 @@ const AssessmentView = ({
                     : "Enter Simulation Mode (Custom Weights)"
                 }
               >
-                <Zap
-                  size={16}
-                  fill={isSimulationMode ? "currentColor" : "none"}
-                />
+                <Zap size={16} fill={isSimulationMode ? "currentColor" : "none"} />
                 {isSimulationMode ? "Simulating" : "Simulate"}
               </button>
             )}
@@ -640,9 +617,7 @@ const AssessmentView = ({
                       className={`group transition-all duration-300 border-b border-foreground/10 ${
                         !row.included ? "opacity-40 grayscale-[0.8]" : ""
                       } ${
-                        isMarked
-                          ? "bg-accent/10"
-                          : "hover:bg-foreground/5 border-foreground/10"
+                        isMarked ? "bg-accent/10" : "hover:bg-foreground/5 border-foreground/10"
                       }`}
                     >
                       <td className="px-6 py-4 font-medium text-foreground/90">
@@ -655,10 +630,7 @@ const AssessmentView = ({
                                 : "bg-secondary/50 text-foreground/40 border-foreground/10 hover:text-foreground/60 hover:bg-foreground/10"
                             }`}
                           >
-                            <Bookmark
-                              size={16}
-                              fill={isMarked ? "currentColor" : "none"}
-                            />
+                            <Bookmark size={16} fill={isMarked ? "currentColor" : "none"} />
                           </button>
                           <div className="flex items-center gap-2">
                             {row.included ? (
@@ -679,9 +651,7 @@ const AssessmentView = ({
                         <input
                           type="text"
                           value={row.weight}
-                          onChange={(e) =>
-                            onUpdate(idx, "weight", e.target.value)
-                          }
+                          onChange={(e) => onUpdate(idx, "weight", e.target.value)}
                           className="bg-transparent text-center w-16 focus:outline-none focus:border focus:border-accent hover:bg-foreground/5 rounded transition-colors"
                         />
                       </td>
@@ -689,9 +659,7 @@ const AssessmentView = ({
                         <input
                           type="text"
                           value={row.total}
-                          onChange={(e) =>
-                            onUpdate(idx, "total", e.target.value)
-                          }
+                          onChange={(e) => onUpdate(idx, "total", e.target.value)}
                           className="bg-transparent text-center w-16 focus:outline-none focus:border focus:border-accent hover:bg-foreground/5 rounded transition-colors"
                         />
                       </td>
@@ -699,9 +667,7 @@ const AssessmentView = ({
                         <input
                           type="text"
                           value={row.obtained !== null ? row.obtained : ""}
-                          onChange={(e) =>
-                            onUpdate(idx, "obtained", e.target.value)
-                          }
+                          onChange={(e) => onUpdate(idx, "obtained", e.target.value)}
                           className={`font-bold text-base text-center w-16 bg-transparent focus:outline-none focus:border focus:border-accent hover:bg-foreground/5 rounded transition-colors ${
                             (row.obtained / row.total) * 100 >= 80
                               ? "text-emerald-400"
@@ -712,10 +678,7 @@ const AssessmentView = ({
                         />
                       </td>
                       <td className="px-6 py-4 text-center font-bold text-accent bg-accent/5">
-                        {(row.total > 0
-                          ? (row.obtained / row.total) * row.weight
-                          : 0
-                        ).toFixed(2)}
+                        {(row.total > 0 ? (row.obtained / row.total) * row.weight : 0).toFixed(2)}
                       </td>
                       <td className="px-6 py-4 text-center text-foreground/50">
                         ~{row.avg.toFixed(2)}
@@ -736,13 +699,9 @@ const AssessmentView = ({
               <tfoot className="bg-secondary/50 border-t-2 border-foreground/10 font-bold backdrop-blur-sm">
                 <tr>
                   <td className="px-6 py-5 text-foreground">Total Summary</td>
-                  <td className="px-6 py-5 text-center text-foreground">
-                    {weight.toFixed(2)}
-                  </td>
+                  <td className="px-6 py-5 text-center text-foreground">{weight.toFixed(2)}</td>
                   <td className="px-6 py-5 text-center">-</td>
-                  <td className="px-6 py-5 text-center text-foreground/60">
-                    -
-                  </td>
+                  <td className="px-6 py-5 text-center text-foreground/60">-</td>
                   <td className="px-6 py-5 text-center text-accent text-lg">
                     {obtained.toFixed(2)}
                   </td>
@@ -825,10 +784,7 @@ function MarksPage() {
   }, [courses]);
 
   useEffect(() => {
-    localStorage.setItem(
-      "superflex_marked_marks",
-      JSON.stringify([...markedItems]),
-    );
+    localStorage.setItem("superflex_marked_marks", JSON.stringify([...markedItems]));
   }, [markedItems]);
 
   const handleToggleMark = (id) => {
@@ -841,9 +797,7 @@ function MarksPage() {
   useEffect(() => {
     const parseData = () => {
       try {
-        const root = document.querySelector(
-          ".m-grid.m-grid--hor.m-grid--root.m-page",
-        );
+        const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
         if (!root) return;
 
         const alertList = [];
@@ -859,9 +813,7 @@ function MarksPage() {
           const clone = textContainer.cloneNode(true);
 
           clone
-            .querySelectorAll(
-              ".m-alert__close, button, a, strong, .m-alert__icon",
-            )
+            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
             .forEach((el) => el.remove());
 
           let message = clone.textContent
@@ -882,9 +834,7 @@ function MarksPage() {
         });
         setAlerts(alertList);
 
-        const legacyForm = document.querySelector(
-          'form[action="/Student/StudentMarks"]',
-        );
+        const legacyForm = document.querySelector('form[action="/Student/StudentMarks"]');
         if (legacyForm) {
           const select = legacyForm.querySelector("select");
           if (select) {
@@ -905,8 +855,7 @@ function MarksPage() {
         const tabPanes = root.querySelectorAll(".tab-pane");
 
         tabPanes.forEach((pane) => {
-          let courseTitle =
-            pane.querySelector("h5")?.textContent.trim() || pane.id;
+          let courseTitle = pane.querySelector("h5")?.textContent.trim() || pane.id;
           courseTitle = courseTitle.replace(/\(.*\)/, "").trim();
 
           const sections = [];
@@ -918,9 +867,7 @@ function MarksPage() {
           let globalMaximum = 0;
           let globalStdDev = 0;
 
-          const allCourseDivs = Array.from(
-            pane.querySelectorAll(`div[id^="${pane.id}"]`),
-          );
+          const allCourseDivs = Array.from(pane.querySelectorAll(`div[id^="${pane.id}"]`));
 
           allCourseDivs.forEach((secDiv) => {
             const secId = secDiv.id;
@@ -932,34 +879,19 @@ function MarksPage() {
               secDiv.previousElementSibling?.querySelector(".btn-link") ||
               secDiv.querySelector(".card-header button");
             let secTitle = secTitleBtn?.textContent.trim();
-            if (!secTitle)
-              secTitle = secId.replace(pane.id + "-", "").replace(/_/g, " ");
+            if (!secTitle) secTitle = secId.replace(pane.id + "-", "").replace(/_/g, " ");
 
             const rowsData = [];
             const calcRows = secDiv.querySelectorAll(".calculationrow");
 
             calcRows.forEach((row) => {
-              const weight = parseFloatOrZero(
-                row.querySelector(".weightage")?.textContent,
-              );
-              const grandTotal = parseFloatOrZero(
-                row.querySelector(".GrandTotal")?.textContent,
-              );
-              const obtMarks = parseFloatOrZero(
-                row.querySelector(".ObtMarks")?.textContent,
-              );
-              const avg = parseFloatOrZero(
-                row.querySelector(".AverageMarks")?.textContent,
-              );
-              const min = parseFloatOrZero(
-                row.querySelector(".MinMarks")?.textContent,
-              );
-              const max = parseFloatOrZero(
-                row.querySelector(".MaxMarks")?.textContent,
-              );
-              let stdDev = parseFloatOrZero(
-                row.querySelector(".StdDev")?.textContent,
-              );
+              const weight = parseFloatOrZero(row.querySelector(".weightage")?.textContent);
+              const grandTotal = parseFloatOrZero(row.querySelector(".GrandTotal")?.textContent);
+              const obtMarks = parseFloatOrZero(row.querySelector(".ObtMarks")?.textContent);
+              const avg = parseFloatOrZero(row.querySelector(".AverageMarks")?.textContent);
+              const min = parseFloatOrZero(row.querySelector(".MinMarks")?.textContent);
+              const max = parseFloatOrZero(row.querySelector(".MaxMarks")?.textContent);
+              let stdDev = parseFloatOrZero(row.querySelector(".StdDev")?.textContent);
 
               if (stdDev === 0 && (max > 0 || min > 0)) {
                 stdDev = (max - min) / 4;
@@ -981,9 +913,7 @@ function MarksPage() {
             let secWeight = 0,
               secObtained = 0;
 
-            const totalRows = secDiv.querySelectorAll(
-              "[class*='totalColumn_']",
-            );
+            const totalRows = secDiv.querySelectorAll("[class*='totalColumn_']");
             let footerRow = null;
             if (totalRows.length > 0) {
               footerRow = totalRows[totalRows.length - 1];
@@ -1003,10 +933,7 @@ function MarksPage() {
               secObtained = rowsData.reduce((acc, r) => acc + r.obtained, 0);
             }
 
-            const rowsWeightSum = rowsData.reduce(
-              (acc, r) => acc + (r.weight || 0),
-              0,
-            );
+            const rowsWeightSum = rowsData.reduce((acc, r) => acc + (r.weight || 0), 0);
 
             const useSecWeight = secWeight > 0 ? secWeight : rowsWeightSum;
 
@@ -1084,10 +1011,7 @@ function MarksPage() {
           const courseGrandTotalStats = {
             weight: globalWeightage,
             obtained: globalObtained,
-            percentage:
-              globalWeightage > 0
-                ? (globalObtained / globalWeightage) * 100
-                : 0,
+            percentage: globalWeightage > 0 ? (globalObtained / globalWeightage) * 100 : 0,
           };
 
           if (sections.length > 0) {
@@ -1232,14 +1156,10 @@ function MarksPage() {
   const handleResetSection = (sectionId) => {
     if (!selectedCourseId || !initialCoursesRef.current.length) return;
 
-    const initialCourse = initialCoursesRef.current.find(
-      (c) => c.id === selectedCourseId,
-    );
+    const initialCourse = initialCoursesRef.current.find((c) => c.id === selectedCourseId);
     if (!initialCourse) return;
 
-    const initialSection = initialCourse.sections.find(
-      (s) => s.id === sectionId,
-    );
+    const initialSection = initialCourse.sections.find((s) => s.id === sectionId);
     if (!initialSection) return;
 
     setCourses((prevCourses) => {
@@ -1273,9 +1193,7 @@ function MarksPage() {
 
       let newCourse;
       if (!nextSimMode) {
-        const initialCourse = initialCoursesRef.current.find(
-          (c) => c.id === selectedCourseId,
-        );
+        const initialCourse = initialCoursesRef.current.find((c) => c.id === selectedCourseId);
         if (initialCourse) {
           newCourse = {
             ...JSON.parse(JSON.stringify(initialCourse)),
@@ -1301,10 +1219,7 @@ function MarksPage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-4 md:p-8 space-y-8 pb-24">
         {}
-        <PageHeader
-          title="Marks & Grades"
-          subtitle="Academic performance details"
-        >
+        <PageHeader title="Marks & Grades" subtitle="Academic performance details">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full xl:w-auto">
             <SuperTabs
               tabs={semesters}
@@ -1366,21 +1281,16 @@ function MarksPage() {
             {}
             <div className="flex flex-col gap-6">
               {}
-              {activeSectionId &&
-              selectedCourse.sections.find((s) => s.id === activeSectionId) ? (
+              {activeSectionId && selectedCourse.sections.find((s) => s.id === activeSectionId) ? (
                 <AssessmentView
-                  section={selectedCourse.sections.find(
-                    (s) => s.id === activeSectionId,
-                  )}
+                  section={selectedCourse.sections.find((s) => s.id === activeSectionId)}
                   onUpdate={(rowIndex, field, value) =>
                     handleRowUpdate(activeSectionId, rowIndex, field, value)
                   }
                   markedItems={markedItems}
                   onToggleMark={handleToggleMark}
                   courseId={selectedCourse.id}
-                  onBestOf={(count, weight) =>
-                    handleBestOfUpdate(activeSectionId, count, weight)
-                  }
+                  onBestOf={(count, weight) => handleBestOfUpdate(activeSectionId, count, weight)}
                   onReset={() => handleResetSection(activeSectionId)}
                   onToggleSimulation={handleToggleSimulation}
                   isSimulationMode={selectedCourse.simulationMode}
@@ -1389,26 +1299,15 @@ function MarksPage() {
                 <AssessmentView
                   section={selectedCourse.sections[0]}
                   onUpdate={(rowIndex, field, value) =>
-                    handleRowUpdate(
-                      selectedCourse.sections[0].id,
-                      rowIndex,
-                      field,
-                      value,
-                    )
+                    handleRowUpdate(selectedCourse.sections[0].id, rowIndex, field, value)
                   }
                   markedItems={markedItems}
                   onToggleMark={handleToggleMark}
                   courseId={selectedCourse.id}
                   onBestOf={(count, weight) =>
-                    handleBestOfUpdate(
-                      selectedCourse.sections[0].id,
-                      count,
-                      weight,
-                    )
+                    handleBestOfUpdate(selectedCourse.sections[0].id, count, weight)
                   }
-                  onReset={() =>
-                    handleResetSection(selectedCourse.sections[0].id)
-                  }
+                  onReset={() => handleResetSection(selectedCourse.sections[0].id)}
                   onToggleSimulation={handleToggleSimulation}
                   isSimulationMode={selectedCourse.simulationMode}
                 />
@@ -1421,8 +1320,7 @@ function MarksPage() {
                     No Assessment Available
                   </h4>
                   <p className="text-foreground/40 max-w-xs mx-auto text-sm font-medium">
-                    The university hasn't uploaded any evaluation data for this
-                    course yet.
+                    The university hasn't uploaded any evaluation data for this course yet.
                   </p>
                 </div>
               )}

@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "react"],
+  "env": {
+    "browser": true,
+    "webextensions": true,
+    "builtin": true
+  },
+  "ignorePatterns": ["dist/**", "public/scripts/**"],
+  "categories": {
+    "correctness": "warn"
+  },
+  "rules": {
+    "no-unused-vars": [
+      "warn",
+      {
+        "varsIgnorePattern": "^[A-Z_]",
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "react/no-unknown-property": "off"
+  }
+}

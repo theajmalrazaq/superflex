@@ -56,13 +56,13 @@ I chose React for several reasons:
 - **Component Reusability**: Common UI patterns (stat cards, loading states) can be encapsulated and reused.
 - **Ecosystem Maturity**: Libraries like react-chartjs-2 integrate seamlessly.
 
-**Vite 4.5.0 + CRXJS Vite Plugin**
-Traditional webpack configurations for Chrome extensions are notoriously complex. Vite changed the game:
+**Vite + WXT (Web Extension Framework)**
+Traditional webpack configurations for Chrome extensions are notoriously complex. Modern extension tooling changed the game:
 
 - **Hot Module Replacement (HMR)**: Changes reflect in <50ms during development, essential for rapid UI iteration.
 - **ESM-First**: Native support for ES modules eliminates transpilation overhead during development.
 - **Rollup-Based Production**: Optimized bundling with tree-shaking and code splitting.
-- **CRXJS Magical Integration**: Automatically processes manifest.json, handles resource bundling, and enables extension auto-reload.
+- **WXT Framework Integration**: Automatically generates manifest.json, handles resource bundling, and enables extension auto-reload.
 
 The development experience went from "save → wait 10s → reload extension → navigate to page" to "save → instant update." This 10x improvement in feedback loop was transformative.
 
@@ -183,12 +183,8 @@ These stylesheets define global styles that conflict catastrophically with moder
 
 ```javascript
 // Remove legacy CSS and UI, inject React root
-document
-  .querySelectorAll('link[href*="bundle.css"]')
-  .forEach((el) => el.remove());
-document
-  .querySelectorAll("header, .m-aside-left, .m-footer")
-  .forEach((el) => el.remove());
+document.querySelectorAll('link[href*="bundle.css"]').forEach((el) => el.remove());
+document.querySelectorAll("header, .m-aside-left, .m-footer").forEach((el) => el.remove());
 
 const root = document.createElement("div");
 root.id = "react-chrome-app";
@@ -390,9 +386,9 @@ The AI needs context to be useful. I construct a structured prompt that includes
 
 ## 9. Build System & Bundling
 
-### Vite + CRXJS Configuration
+### WXT Configuration
 
-I use Vite with CRXJS for automated manifest processing and code splitting. Heavy libraries like Chart.js are bundled separately to optimize initial load time.
+I use WXT for automated manifest processing, Vite-based builds, and code splitting. Heavy libraries like Chart.js are bundled separately to optimize initial load time.
 
 ### Dynamic Import Issues
 
