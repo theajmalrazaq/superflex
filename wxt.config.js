@@ -33,7 +33,6 @@ export default defineConfig({
           "scripts/polyfill.js",
           "scripts/rustls.js",
           "scripts/bridge.js",
-          "scripts/turnstile-theme.js",
         ],
         matches: ["<all_urls>"],
       },

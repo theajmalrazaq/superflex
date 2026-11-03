@@ -597,14 +597,6 @@ function LoginPageStyles() {
     `;
 
     const themeToggle = footerWrapper.querySelector(".login-theme-toggle");
-    const turnstileBridgeId = "superflex-turnstile-theme-bridge";
-    if (!document.getElementById(turnstileBridgeId)) {
-      const turnstileBridge = document.createElement("script");
-      turnstileBridge.id = turnstileBridgeId;
-      turnstileBridge.src = chrome.runtime.getURL("scripts/turnstile-theme.js");
-      document.head.appendChild(turnstileBridge);
-    }
-
     const applyLoginTheme = (mode) => {
       const isDark = mode === "dark";
       document.documentElement.dataset.superflexTheme = isDark ? "dark" : "light";
