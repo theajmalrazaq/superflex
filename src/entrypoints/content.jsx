@@ -8,6 +8,8 @@ import "../styles/tailwind.css";
 export default defineContentScript({
   matches: ["https://flexstudent.nu.edu.pk/*"],
   main() {
+    chrome.runtime.sendMessage({ type: "SUPERFLEX_APPLY_DEFAULT_ZOOM" });
+
     (() => {
       const scriptUmami = document.createElement("script");
       scriptUmami.src = chrome.runtime.getURL("scripts/umami.js");
@@ -99,18 +101,14 @@ export default defineContentScript({
       button.style.fontFamily = "'Google Sans Flex', sans-serif";
     });
 
-    const savedColor = localStorage.getItem("superflex-theme-color") || "#a098ff";
-    document.documentElement.style.setProperty("--accent", savedColor);
-
     if (!isLoginPage) {
-      const savedMode = localStorage.getItem("superflex-theme-mode") || "dark";
+      const savedMode = localStorage.getItem("superflex-theme-mode") || "light";
       if (savedMode === "dark") {
         document.documentElement.classList.add("dark");
-        document.body.style.backgroundColor = "black";
       } else {
         document.documentElement.classList.remove("dark");
-        document.body.style.backgroundColor = "white";
       }
+      document.body.style.backgroundColor = "transparent";
     }
 
     root.render(

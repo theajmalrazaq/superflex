@@ -17,6 +17,7 @@ import ChangePasswordPage from "../pages/ChangePasswordPage";
 import SessionExpirePage from "../pages/SessionExpirePage";
 import NotFoundPage from "../pages/NotFoundPage";
 import SuperFlexAI from "./SuperFlexAI";
+import TeacherSettingsController from "./TeacherSettingsController";
 
 function PathRouter() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
@@ -146,6 +147,7 @@ function PathRouter() {
     <>
       {renderComponent()}
       <SuperFlexAI />
+      <TeacherSettingsController />
     </>
   );
 }

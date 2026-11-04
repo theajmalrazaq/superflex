@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 /* stylelint-disable-next-line at-rule-no-unknown */
 @theme {
   --color-accent: var(--accent);
@@ -34,12 +35,47 @@
 }
 
 :root {
-  --accent: #a098ff;
-  --accent-foreground: #000000;
+  --superflex-account-gradient: #e4eff7;
+  --accent: #230052;
+  --accent-foreground: #ffffff;
   --background: #ffffff;
-  --foreground: #000000;
+  --foreground: #101010;
   --secondary: #f4f4f5;
   --tertiary: #e4e4e7;
+}
+
+.superflex-account-backdrop {
+  background: var(--superflex-account-gradient);
+}
+
+:root.cloud-mode:not(.dark) {
+  --superflex-account-gradient: linear-gradient(180deg, #62abe0 0%, #62abe0 40%, #73b3e1 62%, #9ac7e8 80%, #dcebf5 91%, #fff 100%);
+}
+
+.dark.cloud-mode {
+  --superflex-account-gradient: linear-gradient(180deg, #124568 0%, #124568 40%, #103a57 62%, #0b2b40 80%, #061821 91%, #000 100%);
+}
+
+.superflex-account-cloud {
+  opacity: 0 !important;
+}
+
+.cloud-mode:not(.dark) .superflex-account-cloud {
+  opacity: 0.8 !important;
+}
+
+.dark.cloud-mode .superflex-account-cloud {
+  opacity: 0.12 !important;
+}
+
+@keyframes dashboard-bar-fill {
+  0% { width: 18%; }
+  65% { width: 82%; }
+  100% { width: 38%; }
+}
+
+.animate-dashboard-bar-fill {
+  animation: dashboard-bar-fill 1.8s ease-in-out infinite alternate;
 }
 
 .Cap {
@@ -47,10 +83,26 @@
 }
 
 .dark {
+  --superflex-account-gradient: #000000;
+  --accent: #a098ff;
+  --accent-foreground: #0a192f;
   --background: #000000;
-  --foreground: #ffffff;
+  --foreground: #f5f6fb;
   --secondary: #18181b;
   --tertiary: #27272a;
+}
+
+html.custom-accent [class~="text-[#230052]"],
+html.custom-accent [class~="dark:text-[#a098ff]"] {
+  color: var(--accent) !important;
+}
+
+html.custom-accent [class~="bg-[#230052]"],
+html.custom-accent [class~="dark:bg-[#a098ff]"],
+html.custom-accent [class~="hover:bg-[#370c72]"],
+html.custom-accent [class~="dark:hover:bg-[#b7b0ff]"] {
+  background-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
 }
 
 html {
@@ -96,6 +148,25 @@ html::-webkit-scrollbar {
 button:focus {
   outline: none !important;
 }
+
+button:not(:disabled),
+a[href],
+[role="button"],
+summary,
+label[for],
+input[type="checkbox"],
+input[type="radio"],
+input[type="submit"],
+select {
+  cursor: pointer;
+}
+
+button:disabled,
+input:disabled,
+select:disabled {
+  cursor: not-allowed;
+}
+
 .border {
   border-width: 1px !important;
   border-style: solid !important;

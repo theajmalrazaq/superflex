@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 
-import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import { LoadingSpinner } from "../components/ui/LoadingOverlay";
 import PageLayout from "../components/layouts/PageLayout";
 import {
   CheckCircle2,
@@ -8,209 +8,85 @@ import {
   Calendar,
   Clock,
   BookOpen,
-  BarChart2,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   Bookmark,
+  Percent,
+  Mail,
 } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
-import PageHeader from "../components/ui/PageHeader";
-import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
+import AttendanceReviewModal from "../components/AttendanceReviewModal";
 
-const CourseSelector = ({ courses, selectedId, onSelect }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  const selectedCourse = courses.find((c) => c.id === selectedId) || courses[0];
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const currentIndex = courses.findIndex((c) => c.id === selectedId);
-  const handlePrev = () => {
-    if (currentIndex > 0) {
-      onSelect(courses[currentIndex - 1].id);
-    }
-  };
-  const handleNext = () => {
-    if (currentIndex < courses.length - 1) {
-      onSelect(courses[currentIndex + 1].id);
-    }
-  };
-
-  return (
-    <div className="flex items-center gap-2 w-full md:w-auto z-50">
-      <button
-        onClick={handlePrev}
-        disabled={currentIndex <= 0}
-        className={`p-2 rounded-full border transition-all shrink-0 ${
-          currentIndex <= 0
-            ? "opacity-30 cursor-not-allowed border-transparent text-foreground"
-            : "bg-secondary/50 border-foreground/10 text-foreground hover:bg-foreground/5"
-        }`}
-      >
-        <ChevronLeft size={16} />
-      </button>
-
-      <div className="relative flex-1 md:flex-none" ref={dropdownRef}>
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-full md:w-[300px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-secondary/50 border border-foreground/10 text-foreground hover:bg-foreground/5 transition-all group"
-        >
-          <div className="flex items-center gap-3 overflow-hidden">
-            <div className="p-2 rounded-xl bg-accent/10 text-accent">
-              <BookOpen size={16} />
-            </div>
-            <div className="flex flex-col items-start truncate">
-              <span className="text-sm font-bold truncate w-full text-left leading-none">
-                {selectedCourse?.title}
-              </span>
-            </div>
-          </div>
-          <ChevronDown
-            size={16}
-            className={`text-foreground/50 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
-          />
-        </button>
-
-        {isOpen && (
-          <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-background/50 backdrop-blur-2xl border border-foreground/10  max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex flex-col gap-3">
-              {courses.map((course) => (
-                <button
-                  key={course.id}
-                  onClick={() => {
-                    onSelect(course.id);
-                    setIsOpen(false);
-                  }}
-                  className={`w-full flex bg-secondary items-center justify-between p-3 rounded-xl transition-all ${
-                    selectedId === course.id
-                      ? "bg-accent/10 border border-accent/20"
-                      : "hover:bg-foreground/5 border border-transparent"
-                  }`}
-                >
-                  <div className="flex items-center gap-3 text-left overflow-hidden">
-                    <span
-                      className={`text-sm font-medium truncate ${selectedId === course.id ? "text-foreground" : "text-foreground/60"}`}
-                    >
-                      {course.title}
-                    </span>
-                  </div>
-                  <span
-                    className={`text-xs font-bold px-2 py-1 rounded-lg ${
-                      course.percentage >= 75
-                        ? "bg-emerald-500/20 text-emerald-400"
-                        : course.percentage >= 60
-                          ? "bg-amber-500/20 text-amber-400"
-                          : "bg-rose-500/20 text-rose-400"
-                    }`}
-                  >
-                    {course.percentage.toFixed(0)}%
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <button
-        onClick={handleNext}
-        disabled={currentIndex >= courses.length - 1}
-        className={`p-2 rounded-full border transition-all shrink-0 ${
-          currentIndex >= courses.length - 1
-            ? "opacity-30 cursor-not-allowed border-transparent text-foreground"
-            : "bg-secondary/50 border-foreground/10 text-foreground hover:bg-foreground/5"
-        }`}
-      >
-        <ChevronRight size={16} />
-      </button>
-    </div>
-  );
+const parseSessionDate = (value) => {
+  const input = String(value || "").trim();
+  const iso = input.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+  if (iso) return new Date(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]));
+  const monthFirst = input.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+  if (monthFirst) return new Date(Number(monthFirst[3]), Number(monthFirst[1]) - 1, Number(monthFirst[2]));
+  const parsed = new Date(input);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
-const AttendanceCard = ({ record, index, isMarked, onToggleMark }) => {
-  const isPresent = record.status.includes("P");
-  const isLate = record.status.includes("L");
+
+const AttendanceCourseTabs = ({ courses, selectedId, onSelect }) => (
+  <div className="inline-flex w-fit max-w-full gap-2 overflow-x-auto rounded-full border-0 bg-white/55 p-1.5 shadow-sm shadow-black/[0.03] backdrop-blur-xl scrollbar-hide dark:bg-black/25 dark:shadow-none" aria-label="Select course">
+    {courses.map((course) => (
+      <button
+        key={course.id}
+        type="button"
+        onClick={() => onSelect(course.id)}
+        aria-pressed={selectedId === course.id}
+        title={course.title}
+        className={`flex min-w-[116px] shrink-0 items-center justify-between gap-3 rounded-full px-4 py-2.5 text-xs font-bold transition-colors ${selectedId === course.id ? "bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]" : "text-slate-600 hover:bg-white/80 hover:text-[#230052] dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white"}`}
+      >
+        <span className="truncate">{course.title.match(/[A-Z]{2,5}\s?-?\d{3,4}/i)?.[0] || course.id}</span>
+        <span className="shrink-0 text-[10px] opacity-70">{course.percentage.toFixed(0)}%</span>
+      </button>
+    ))}
+  </div>
+);
+
+const AttendanceMetric = ({ icon: Icon, label, value, tone = "text-[#230052] dark:text-[#a098ff]" }) => (
+  <div className="flex min-h-[88px] min-w-0 items-center gap-3 rounded-[22px] border border-black/[0.06] bg-white px-5 py-4 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]">
+    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]"><Icon size={19} /></span>
+    <div className="min-w-0">
+      <p className="truncate text-[10px] font-semibold uppercase tracking-wide text-[#626262] dark:text-[#c4cad6]">{label}</p>
+      <p className={`mt-0.5 truncate text-xl font-bold leading-none ${tone}`}>{value}</p>
+    </div>
+  </div>
+);
+
+const AttendanceCard = ({ record, index, isMarked, onToggleMark, onRequestReview }) => {
+  const status = String(record.status || "").trim();
+  const isPresent = /^p$|present/i.test(status);
+  const isLate = /^l$|late/i.test(status);
+  const isAbsent = !isPresent && !isLate;
+  const stateLabel = isPresent ? "Present" : isLate ? "Late" : "Absent";
+  const stateColor = isPresent ? "text-emerald-700 bg-emerald-500/10 dark:text-emerald-300" : isLate ? "text-amber-700 bg-amber-500/10 dark:text-amber-300" : "text-rose-700 bg-rose-500/10 dark:text-rose-300";
   return (
-    <div
-      onClick={onToggleMark}
-      className={`group cursor-pointer flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${
-        isMarked
-          ? "bg-accent/10 border-accent/50"
-          : "bg-secondary/30 border-transparent hover:bg-secondary/50 hover:border-foreground/10"
-      }`}
-    >
-      <div className="flex items-center gap-4">
-        <span
-          className={`font-bold text-sm min-w-[1.5rem] ${isMarked ? "text-accent" : "text-foreground/40"}`}
-        >
-          {index}.
-        </span>
-        <div
-          className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
-            isPresent
-              ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-              : isLate
-                ? "bg-amber-500/10 border-amber-500/20 text-amber-400"
-                : "bg-rose-500/10 border-rose-500/20 text-rose-400"
-          }`}
-        >
-          {isPresent ? (
-            <CheckCircle2 size={20} />
-          ) : isLate ? (
-            <Clock size={20} />
-          ) : (
-            <XCircle size={20} />
-          )}
+    <div className="grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 border-b border-black/[0.05] px-3 py-2.5 last:border-b-0 dark:border-white/[0.08]">
+      <span className="w-6 text-center text-[10px] font-semibold text-foreground/35">{index}</span>
+      <div className="min-w-0">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="truncate text-sm font-semibold text-foreground">{record.date}</span>
+          <span className="shrink-0 text-[10px] text-foreground/45">{record.day}</span>
         </div>
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
-            <span className="text-foreground font-medium text-sm">{record.date}</span>
-            <span className="text-foreground/50 text-xs px-2 py-0.5 rounded-full bg-foreground/5">
-              {record.day}
-            </span>
-          </div>
-          <div className="flex items-center gap-3 text-xs text-foreground/50">
-            <span className="flex items-center gap-1">
-              <Clock size={12} /> {record.time || "N/A"}
-            </span>
-            <span className="flex items-center gap-1">
-              <BookOpen size={12} /> {record.type || "Lecture"}
-            </span>
-          </div>
+        <div className="mt-0.5 flex min-w-0 items-center gap-3 text-[10px] text-foreground/50">
+          <span className="flex shrink-0 items-center gap-1"><Clock size={11} />{record.time || "N/A"}</span>
+          <span className="truncate">{record.type || "Lecture"}</span>
         </div>
       </div>
-      <div className="flex flex-col items-end gap-2">
-        <div
-          className={`px-3 py-1.5 rounded-lg text-xs font-bold border ${
-            isPresent
-              ? "bg-emerald-500/5 text-emerald-400 border-emerald-500/10"
-              : isLate
-                ? "bg-amber-500/5 text-amber-400 border-amber-500/10"
-                : "bg-rose-500/5 text-rose-400 border-rose-500/10"
-          }`}
-        >
-          {isPresent ? "Present" : isLate ? "Late" : "Absent"}
-        </div>
-        <div
-          className={`p-2 rounded-full shrink-0 transition-all duration-300 border ${
-            isMarked
-              ? "text-accent bg-accent/10 border-accent/30"
-              : "text-foreground/30 bg-secondary/50 border-foreground/10 group-hover:text-foreground/50 hover:bg-foreground/10"
-          }`}
-        >
-          <Bookmark size={18} fill={isMarked ? "currentColor" : "none"} />
-        </div>
+      <div className="flex items-center gap-1.5">
+        <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${stateColor}`}>{stateLabel}</span>
+        {isAbsent && <button type="button" onClick={onRequestReview} aria-label={`Request attendance review for ${record.date}`} title="Draft an email to request an attendance review" className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/45 hover:bg-[#230052]/10 hover:text-[#230052] dark:hover:bg-[#a098ff]/15 dark:hover:text-[#a098ff]"><Mail size={15} /></button>}
       </div>
+      <button
+        type="button"
+        onClick={onToggleMark}
+        aria-label={isMarked ? `Remove bookmark for ${record.date}` : `Bookmark ${record.date}`}
+        title={isMarked ? "Remove bookmark" : "Bookmark session"}
+        className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${isMarked ? "bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]" : "text-foreground/40 hover:bg-black/5 hover:text-[#230052] dark:hover:bg-white/10 dark:hover:text-[#a098ff]"}`}
+      >
+        <Bookmark size={15} fill={isMarked ? "currentColor" : "none"} />
+      </button>
     </div>
   );
 };
@@ -323,7 +199,13 @@ function AttendancePage() {
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState([]);
   const [selectedCourseId, setSelectedCourseId] = useState(null);
+  const [recordFilter, setRecordFilter] = useState("all");
   const [alerts, setAlerts] = useState([]);
+  const [teacherAssignments, setTeacherAssignments] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("superflex_course_teachers_v1") || "{}"); }
+    catch { return {}; }
+  });
+  const [reviewRequest, setReviewRequest] = useState(null);
   const [markedRecords, setMarkedRecords] = useState(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("superflex_marked_attendance");
@@ -340,6 +222,12 @@ function AttendancePage() {
     localStorage.setItem("superflex_marked_attendance", JSON.stringify([...markedRecords]));
   }, [markedRecords]);
 
+  useEffect(() => {
+    const syncTeachers = (event) => setTeacherAssignments(event.detail || {});
+    window.addEventListener("superflex-teachers-updated", syncTeachers);
+    return () => window.removeEventListener("superflex-teachers-updated", syncTeachers);
+  }, []);
+
   const [semesters, setSemesters] = useState([]);
   const hiddenFormRef = useRef(null);
 
@@ -347,7 +235,11 @@ function AttendancePage() {
     const parseData = () => {
       try {
         const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
-        if (!root) return;
+        if (!root) {
+          setLoading(false);
+          window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
+          return;
+        }
 
         const parsedAlerts = [];
         const alertNodes = root.querySelectorAll(".alert");
@@ -448,155 +340,167 @@ function AttendancePage() {
   }, []);
 
   const selectedCourseData = courses.find((c) => c.id === selectedCourseId);
+  const getTeacherForCourse = (course) => {
+    if (!course) return null;
+    const courseCode = `${course.id} ${course.title}`.match(/[A-Z]{2,5}\s?-?\d{3,4}/i)?.[0]?.replace(/\s|-/g, "").toLowerCase();
+    const direct = teacherAssignments[course.id];
+    if (direct) return direct;
+    return Object.entries(teacherAssignments).find(([id]) => {
+      const savedCode = id.match(/[A-Z]{2,5}\s?-?\d{3,4}/i)?.[0]?.replace(/\s|-/g, "").toLowerCase();
+      return courseCode && savedCode === courseCode;
+    })?.[1] || null;
+  };
+  const filteredRecords = selectedCourseData?.records.filter((record) => {
+    if (recordFilter === "all") return true;
+    if (recordFilter === "absent") return /^a$|absent/i.test(String(record.status || "").trim());
+    const date = parseSessionDate(record.date);
+    if (!date) return false;
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    if (recordFilter === "week") {
+      const weekStart = new Date(today);
+      weekStart.setHours(0, 0, 0, 0);
+      weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
+      return date >= weekStart && date <= today;
+    }
+    if (recordFilter === "month") {
+      const monthStart = new Date(today);
+      monthStart.setDate(monthStart.getDate() - 29);
+      monthStart.setHours(0, 0, 0, 0);
+      return date >= monthStart && date <= today;
+    }
+    return true;
+  }) || [];
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-4 md:p-8 space-y-8">
-        {}
-        <PageHeader title="Attendance" subtitle="Track your presence and schedule">
-          <div className="flex flex-col lg:flex-row md:items-center gap-4">
-            <SuperTabs
-              tabs={semesters}
-              activeTab={semesters.find((s) => s.selected)?.value}
-              onTabChange={(value) => {
-                if (hiddenFormRef.current) {
-                  const select = hiddenFormRef.current.querySelector("select");
-                  if (select) {
-                    select.value = value;
-                    const form = hiddenFormRef.current.querySelector("form");
-                    if (form) form.submit();
-                  }
-                }
-              }}
-            />
-            <div className="flex items-center gap-4">
-              {courses.length > 0 && (
-                <CourseSelector
-                  courses={courses}
-                  selectedId={selectedCourseId}
-                  onSelect={setSelectedCourseId}
-                />
-              )}
-              <BookmarksMenu
-                markedRecords={markedRecords}
-                courses={courses}
-                onNavigate={(courseId) => setSelectedCourseId(courseId)}
-              />
-              <div ref={hiddenFormRef} className="hidden"></div>
-            </div>
+      <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-4">
+        <header className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
+          <div className="space-y-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#230052]/70 dark:text-[#a098ff]">Academics</p>
+            <h1 className="text-3xl font-bold tracking-tight text-[#101010] dark:text-[#f5f6fb]">Attendance</h1>
+            <p className="text-sm text-[#626262] dark:text-[#c4cad6]">A quick view of your class presence and session history.</p>
           </div>
-        </PageHeader>
+          <div className="flex flex-wrap items-center gap-3">
+            {semesters.length > 1 && (
+              <SuperTabs
+                tabs={semesters}
+                activeTab={semesters.find((semester) => semester.selected)?.value}
+                size="sm"
+                className="!border-0 !bg-white/55 !backdrop-blur-xl dark:!bg-black/25 dark:!backdrop-blur-xl"
+                onTabChange={(value) => {
+                  const select = hiddenFormRef.current?.querySelector("select");
+                  if (!select) return;
+                  select.value = value;
+                  hiddenFormRef.current?.querySelector("form")?.submit();
+                }}
+              />
+            )}
+            <BookmarksMenu markedRecords={markedRecords} courses={courses} onNavigate={setSelectedCourseId} />
+            <div ref={hiddenFormRef} className="hidden" />
+          </div>
+        </header>
 
         {loading ? (
-          <LoadingSpinner />
+          <div className="flex flex-1 items-center justify-center"><LoadingSpinner /></div>
         ) : courses.length > 0 ? (
           <>
-            {}
+            <AttendanceCourseTabs courses={courses} selectedId={selectedCourseId} onSelect={setSelectedCourseId} />
             {selectedCourseData && (
-              <div key={selectedCourseId} className="space-y-16">
-                {}
-                <div className="flex flex-wrap gap-4">
-                  <StatsCard
-                    icon={BarChart2}
-                    label="Percentage"
-                    value={`${selectedCourseData.percentage}%`}
-                    delay={100}
-                  />
-                  <StatsCard
-                    icon={CheckCircle2}
-                    label="Present"
-                    value={selectedCourseData.present}
-                    delay={200}
-                  />
-                  <StatsCard
-                    icon={Clock}
-                    label="Late"
-                    value={selectedCourseData.late}
-                    delay={250}
-                  />
-                  <StatsCard
-                    icon={XCircle}
-                    label="Absent"
-                    value={selectedCourseData.absent}
-                    delay={300}
-                  />
-                  <StatsCard
-                    icon={Calendar}
-                    label="Total Classes"
-                    value={selectedCourseData.records.length}
-                    delay={400}
-                  />
+              <div key={selectedCourseId} className="flex min-h-0 flex-1 flex-col gap-4">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
+                  <AttendanceMetric icon={Percent} label="Attendance" value={`${selectedCourseData.percentage}%`} />
+                  <AttendanceMetric icon={CheckCircle2} label="Present" value={selectedCourseData.present} tone="text-emerald-700 dark:text-emerald-300" />
+                  <AttendanceMetric icon={Clock} label="Late" value={selectedCourseData.late} tone="text-amber-700 dark:text-amber-300" />
+                  <AttendanceMetric icon={XCircle} label="Absent" value={selectedCourseData.absent} tone="text-rose-700 dark:text-rose-300" />
+                  <AttendanceMetric icon={Calendar} label="Sessions" value={selectedCourseData.records.length} />
                 </div>
 
-                {}
-                <div className="bg-secondary/50 border border-foreground/10 rounded-[2rem] p-6 backdrop-blur-xl">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-bold text-foreground">History Log</h3>
-                    <div className="px-3 py-1 rounded-lg bg-foreground/5 text-xs text-foreground/60 font-medium">
-                      Session History
+                <div className="-mb-1">
+                  <h2 className="text-lg font-bold tracking-tight text-[#101010] dark:text-[#f5f6fb]">{selectedCourseData.title}</h2>
+                  <p className="mt-0.5 text-[11px] text-[#626262] dark:text-[#9ca3b3]">Class session history</p>
+                </div>
+                <section className="flex min-h-[240px] flex-1 flex-col overflow-hidden rounded-[24px] border border-black/[0.06] bg-white p-4 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-5">
+                  <div className="mb-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                    <p className="text-[11px] text-[#626262] dark:text-[#9ca3b3]">Showing {filteredRecords.length} of {selectedCourseData.records.length} sessions</p>
+                    <div className="flex max-w-full gap-1 overflow-x-auto rounded-full bg-white/55 p-1 scrollbar-hide dark:bg-black/25">
+                      {[
+                        ["all", "All"],
+                        ["week", "This week"],
+                        ["month", "30 days"],
+                        ["absent", "Absences"],
+                      ].map(([filter, label]) => (
+                        <button
+                          key={filter}
+                          type="button"
+                          onClick={() => setRecordFilter(filter)}
+                          aria-pressed={recordFilter === filter}
+                          className={`shrink-0 rounded-full px-3 py-1.5 text-[10px] font-bold transition-colors ${recordFilter === filter ? "bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]" : "text-foreground/55 hover:bg-white/70 dark:hover:bg-white/10"}`}
+                        >
+                          {label}
+                        </button>
+                      ))}
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {selectedCourseData.records.map((record, idx) => {
-                      const recordId = `${selectedCourseId}-${idx}`;
+                  <div className="max-h-[calc(100dvh-390px)] min-h-[180px] flex-1 overflow-y-auto rounded-2xl bg-transparent px-2">
+                    {filteredRecords.map((record) => {
+                      const originalIndex = selectedCourseData.records.indexOf(record);
+                      const recordId = `${selectedCourseId}-${originalIndex}`;
                       return (
                         <AttendanceCard
-                          key={idx}
+                          key={recordId}
                           record={record}
-                          index={idx + 1}
+                          index={originalIndex + 1}
                           isMarked={markedRecords.has(recordId)}
-                          onToggleMark={() => {
-                            const newSet = new Set(markedRecords);
-                            if (newSet.has(recordId)) newSet.delete(recordId);
-                            else newSet.add(recordId);
-                            setMarkedRecords(newSet);
-                          }}
+                          onRequestReview={() => setReviewRequest({
+                            course: selectedCourseData,
+                            record,
+                            teacher: getTeacherForCourse(selectedCourseData),
+                          })}
+                          onToggleMark={() => setMarkedRecords((previous) => {
+                            const next = new Set(previous);
+                            if (next.has(recordId)) next.delete(recordId);
+                            else next.add(recordId);
+                            return next;
+                          })}
                         />
                       );
                     })}
+                    {filteredRecords.length === 0 && (
+                      <div className="flex h-full min-h-[180px] flex-col items-center justify-center text-center text-sm text-foreground/50">
+                        <BookOpen size={24} className="mb-2 text-foreground/35" />
+                        <p>{selectedCourseData.records.length ? "No sessions match this filter." : "No attendance sessions are available for this course."}</p>
+                        {selectedCourseData.records.length > 0 && recordFilter !== "all" && <button type="button" onClick={() => setRecordFilter("all")} className="mt-2 font-semibold text-[#230052] hover:underline dark:text-[#a098ff]">Show all sessions</button>}
+                      </div>
+                    )}
                   </div>
-
-                  {selectedCourseData.records.length === 0 && (
-                    <div className="text-center py-12 text-foreground/50">
-                      No attendance records found.
-                    </div>
-                  )}
-                </div>
+                </section>
               </div>
             )}
           </>
         ) : (
-          <div
-            className={`flex flex-col gap-4 py-12 justify-center mx-auto ${
-              alerts.some((a) => a.message.toLowerCase().includes("no record"))
-                ? "w-full"
-                : "max-w-2xl"
-            }`}
-          >
-            {alerts.length > 0 ? (
-              <NotificationBanner
-                alerts={alerts.filter((alert) => {
-                  const hasNoRecord = alerts.some((a) =>
-                    a.message.toLowerCase().includes("no record"),
-                  );
-                  if (hasNoRecord && alert.message.includes("Attendance Update")) return false;
-                  return true;
-                })}
-              />
-            ) : (
-              <div className="flex flex-col items-center justify-center opacity-50 py-12">
-                <div className="p-4 rounded-full bg-secondary mb-4 ring-1 ring-white/10">
-                  <BookOpen size={32} className="text-foreground/40" />
-                </div>
-                <div className="text-xl font-bold text-foreground/50">No attendance data found</div>
-                <p className="text-sm text-foreground/40 mt-2">
-                  Try selecting a different semester
-                </p>
-              </div>
-            )}
-          </div>
+          <section className="flex min-h-[300px] flex-1 flex-col items-center justify-center rounded-[24px] border border-black/[0.06] bg-white px-6 py-10 text-center dark:border-white/[0.14] dark:bg-black">
+            <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]"><BookOpen size={24} /></span>
+            <h2 className="text-xl font-bold text-[#101010] dark:text-[#f5f6fb]">No attendance data available</h2>
+            <p className="mt-2 max-w-lg text-sm text-[#626262] dark:text-[#c4cad6]">{alerts[0]?.message || "Attendance records will appear here when they are available."}</p>
+            {semesters.length > 1 && <div className="mt-5"><SuperTabs tabs={semesters} activeTab={semesters.find((semester) => semester.selected)?.value} size="sm" className="!border-0 !bg-white/55 !backdrop-blur-xl dark:!bg-black/25 dark:!backdrop-blur-xl" onTabChange={(value) => {
+              const select = hiddenFormRef.current?.querySelector("select");
+              if (!select) return;
+              select.value = value;
+              hiddenFormRef.current?.querySelector("form")?.submit();
+            }} /></div>}
+            <div ref={hiddenFormRef} className="hidden" />
+            {alerts.length > 1 && <div className="mt-4 w-full max-w-2xl"><NotificationBanner alerts={alerts.slice(1)} /></div>}
+          </section>
         )}
       </div>
+      <AttendanceReviewModal
+        open={Boolean(reviewRequest)}
+        course={reviewRequest?.course}
+        record={reviewRequest?.record}
+        teacher={reviewRequest?.teacher}
+        onClose={() => setReviewRequest(null)}
+      />
     </PageLayout>
   );
 }

@@ -20,6 +20,14 @@ body.superflex-login-page {
   color: #101010 !important;
 }
 
+body.superflex-login-page.superflex-login-dark,
+html.dark body.superflex-login-page {
+  --login-card-bg: #000;
+  background: #000 !important;
+  background-image: none !important;
+  color: #f5f6fb !important;
+}
+
 body.superflex-login-page .m-login.m-login--1,
 body.superflex-login-page .m-login__aside {
   width: 100% !important;
@@ -255,8 +263,9 @@ body.superflex-login-page #login-popup .login-header p {
   }
 }
 
-body.superflex-login-page.superflex-login-dark .login-clouds img {
-  opacity: 0.12;
+body.superflex-login-page.superflex-login-dark .login-clouds img,
+html.dark body.superflex-login-page .login-clouds img {
+  opacity: 0;
 }
 
 body.superflex-login-page .m-login.m-login--1 {
@@ -647,8 +656,8 @@ body.superflex-login-page.superflex-login-dark #login-popup .login-primary-btn,
 body.superflex-login-page.superflex-login-dark #forgot-password-popup button[type="submit"],
 body.superflex-login-page.superflex-login-dark #forgot-password-popup .login-primary-btn,
 body.superflex-login-page.superflex-login-dark #forgot-password-popup .forgot-back-button {
-  background: #ffffff !important;
-  background-color: #ffffff !important;
+  background: #a098ff !important;
+  background-color: #a098ff !important;
   background-image: none !important;
   color: #0a192f !important;
 }
@@ -668,8 +677,8 @@ html.dark
 body.superflex-login-page.superflex-login-dark
   #login-popup
   .login-primary-btn.superflex-login-submitting:disabled {
-  background: #fff !important;
-  background-color: #fff !important;
+  background: #a098ff !important;
+  background-color: #a098ff !important;
   color: #0a192f !important;
 }
 
@@ -701,8 +710,8 @@ body.superflex-login-page.superflex-login-dark #login-popup .login-primary-btn:h
 body.superflex-login-page.superflex-login-dark #forgot-password-popup button[type="submit"]:hover,
 body.superflex-login-page.superflex-login-dark #forgot-password-popup .login-primary-btn:hover,
 body.superflex-login-page.superflex-login-dark #forgot-password-popup .forgot-back-button:hover {
-  background: #f1f5f9 !important;
-  background-color: #f1f5f9 !important;
+  background: #b7b0ff !important;
+  background-color: #b7b0ff !important;
   color: #040d1a !important;
 }
 

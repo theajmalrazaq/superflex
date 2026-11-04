@@ -607,23 +607,14 @@ function TranscriptPage() {
   }, [semesters, overriddenGrades]);
 
   const [themeMode, setThemeMode] = useState(
-    localStorage.getItem("superflex-theme-mode") || "dark",
+    localStorage.getItem("superflex-theme-mode") || "light",
   );
-  const [themeColor, setThemeColor] = useState(
-    localStorage.getItem("superflex-theme-color") || "#a098ff",
-  );
-
   useEffect(() => {
-    const handleThemeChange = (e) => {
-      setThemeColor(e.detail);
-    };
     const handleModeChange = () => {
-      setThemeMode(localStorage.getItem("superflex-theme-mode") || "dark");
+      setThemeMode(localStorage.getItem("superflex-theme-mode") || "light");
     };
-    window.addEventListener("superflex-theme-changed", handleThemeChange);
     window.addEventListener("superflex-theme-mode-changed", handleModeChange);
     return () => {
-      window.removeEventListener("superflex-theme-changed", handleThemeChange);
       window.removeEventListener("superflex-theme-mode-changed", handleModeChange);
     };
   }, []);
@@ -636,17 +627,17 @@ function TranscriptPage() {
         {
           label: "SGPA",
           data: calculatedStats.history.map((h) => h.sgpa),
-          borderColor: themeColor,
+          borderColor: "#230052",
           backgroundColor: (context) => {
             const ctx = context.chart.ctx;
             const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, themeColor.slice(0, 7) + "26");
-            gradient.addColorStop(1, themeColor.slice(0, 7) + "00");
+            gradient.addColorStop(0, "#23005226");
+            gradient.addColorStop(1, "#23005200");
             return gradient;
           },
           tension: 0.45,
           fill: true,
-          pointBackgroundColor: themeColor,
+          pointBackgroundColor: "#230052",
           pointBorderWidth: 4,
           pointBorderColor: "var(--background)",
           pointRadius: 4,
@@ -656,10 +647,10 @@ function TranscriptPage() {
         {
           label: "CGPA",
           data: calculatedStats.history.map((h) => h.cgpa),
-          borderColor: themeColor,
+          borderColor: "#230052",
           tension: 0.45,
           fill: false,
-          pointBackgroundColor: themeColor,
+          pointBackgroundColor: "#230052",
           pointBorderWidth: 4,
           pointBorderColor: "var(--background)",
           pointRadius: 4,
@@ -669,7 +660,7 @@ function TranscriptPage() {
         },
       ],
     };
-  }, [calculatedStats, themeColor]);
+  }, [calculatedStats]);
 
   const chartOptions = {
     responsive: true,

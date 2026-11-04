@@ -6,29 +6,18 @@ const Skeleton = ({ className }) => {
 
 export const MarksSkeleton = () => {
   return (
-    <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden flex flex-col gap-8 h-full w-full">
-      <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-        <div className="space-y-2">
-          <Skeleton className="h-6 w-48" />
-          <Skeleton className="h-4 w-32" />
-        </div>
-        <Skeleton className="h-8 w-24 rounded-lg" />
+    <div className="flex flex-1 flex-col gap-7" aria-label="Loading course performance" role="status">
+      <div className="flex gap-2 overflow-hidden">
+        {[0, 1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-9 w-20 shrink-0 rounded-full" />
+        ))}
       </div>
-
-      <div className="flex gap-2">
-        <Skeleton className="h-10 w-20 rounded-full" />
-        <Skeleton className="h-10 w-20 rounded-full" />
-        <Skeleton className="h-10 w-20 rounded-full" />
-      </div>
-
       <div className="space-y-4">
-        <div className="flex flex-col gap-2">
-          <Skeleton className="h-8 w-64" />
-          <Skeleton className="h-4 w-24" />
-        </div>
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-14 w-full rounded-xl" />
+        <Skeleton className="h-6 w-56" />
+        <Skeleton className="h-3 w-28" />
+        <div className="space-y-3 pt-2">
+          {[0, 1, 2].map((i) => (
+            <Skeleton key={i} className="h-14 w-full rounded-2xl" />
           ))}
         </div>
       </div>
@@ -38,25 +27,21 @@ export const MarksSkeleton = () => {
 
 export const AttendanceSkeleton = () => {
   return (
-    <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 h-full flex flex-col w-full">
-      <div className="flex justify-between items-start mb-8">
-        <div className="space-y-2">
-          <Skeleton className="h-6 w-48" />
-          <Skeleton className="h-4 w-32" />
-        </div>
-        <Skeleton className="h-8 w-24 rounded-lg" />
-      </div>
-      <div className="flex-1 space-y-6">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="flex flex-col gap-2">
-            <div className="flex justify-between">
-              <Skeleton className="h-4 w-40" />
-              <Skeleton className="h-4 w-12" />
-            </div>
-            <Skeleton className="h-4 w-full rounded-full" />
+    <div className="flex flex-1 flex-col justify-around gap-6 py-2" aria-label="Loading attendance" role="status">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <div key={i} className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-3 w-32" />
+            <Skeleton className="h-3 w-10" />
           </div>
-        ))}
-      </div>
+          <div className="h-5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
+            <div
+              className="h-full w-1/3 origin-left rounded-full bg-[#230052] animate-dashboard-bar-fill dark:bg-[#a098ff]"
+              style={{ animationDelay: `${i * 180}ms` }}
+            />
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

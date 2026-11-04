@@ -5,33 +5,33 @@ const NotificationBanner = ({ alerts, onActionClick, actionLabel = "More Instruc
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between px-2">
-        {onActionClick && (
+      {onActionClick && (
+        <div className="flex justify-end">
           <button
             onClick={onActionClick}
-            className="group/btn flex items-center gap-2 px-4 py-1.5 bg-foreground/5 hover:bg-foreground/10 text-foreground rounded-full text-[9px] font-black Cap border border-foreground/10"
+            className="group/btn flex items-center gap-2 rounded-full border border-foreground/10 bg-white/80 px-4 py-1.5 text-[10px] font-bold text-foreground transition-colors hover:bg-white dark:bg-white/[0.08] dark:hover:bg-white/[0.12]"
           >
             {actionLabel}
             <ChevronRight
-              size={10}
-              className="group-hover/btn:translate-x-1 transition-transform"
+              size={12}
+              className="transition-transform group-hover/btn:translate-x-1"
             />
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {alerts.map((alert, idx) => (
         <div
           key={idx}
-          className={`p-4 rounded-[2rem] border backdrop-blur-2xl flex items-center gap-5 relative overflow-hidden group ${
-            alert.type === "error"
-              ? "bg-error/5 border-error/10 text-error"
-              : "bg-info/5 border-info/10 text-info"
+          className={`relative flex items-center gap-4 overflow-hidden rounded-[24px] border bg-white p-4 text-slate-900 dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] ${
+            alert.type === "error" ? "border-rose-500/20" : "border-blue-500/20"
           }`}
         >
           <div
-            className={`p-3 rounded-xl shrink-0 ${
-              alert.type === "error" ? "bg-error/10 text-error" : "bg-info/10 text-info"
+            className={`shrink-0 rounded-xl p-3 ${
+              alert.type === "error"
+                ? "bg-rose-500/10 text-rose-600 dark:text-rose-300"
+                : "bg-blue-500/10 text-blue-600 dark:text-blue-300"
             }`}
           >
             <AlertTriangle size={20} />

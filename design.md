@@ -1,7 +1,7 @@
 # SuperFlex Modern Design System Specification ("Sky & Midnight")
 
 > **Version**: 1.1.0
-> **Aesthetic Philosophy**: Atmospheric minimalism: a soft sky gradient, white content surfaces, deep plum actions, and lilac accents. The login screen follows the onboarding reference; account screens use the same tokens with cards.
+> **Aesthetic Philosophy**: Atmospheric minimalism: a sky gradient, solid white account cards, deep plum actions, and lilac accents. The login uses its compact gradient; the homepage keeps blue through roughly 80% of the viewport before fading to white.
 
 ---
 
@@ -10,7 +10,7 @@
 The **"Sky & Midnight"** design language is an ultra-clean, high-contrast, modern UI system inspired by next-generation financial and mobile applications. It replaces outdated dark skeuomorphism and heavy blurred drop-shadows with:
 
 1. **Atmospheric Sky Backdrops**: Silky, vibrant sky-blue vertical gradients complemented by gentle, photorealistic cumulus clouds.
-2. **Zero-Shadow Geometric Surfaces**: Pure flat white cards (`#ffffff`) with generous corner radiuses (`28px`–`36px`), creating crisp elevation solely through background contrast rather than artificial drop shadows or heavy blur halos.
+2. **Solid Geometric Surfaces**: Homepage dashboard cards use solid white in light mode and solid black with a fine border in dark mode. Keep a consistent `32px` radius and no shadows. The login form stays flat with its own `32px` card radius.
 3. **The "Midnight & Lilac" Action Hierarchy**:
    - **Primary Action**: Deep Midnight Plum / Purple (`#1e0838`) with pure white icons and text.
    - **Secondary Action**: Soft Pastel Lilac / Lavender (`#dfc8fc` / `#e9ddff`) with midnight purple text (`#1e0838`).
@@ -30,6 +30,8 @@ The **"Sky & Midnight"** design language is an ultra-clean, high-contrast, moder
 | `sky-gradient-end`     | `#e4eff7`                   | `to-[#e4eff7]`                 | Pale horizon fading into white                  |
 | `sky-glass-pill`       | `rgba(255, 255, 255, 0.35)` | `bg-white/35 backdrop-blur-sm` | Translucent pills (e.g. Rate pill, version tag) |
 | `sky-glass-pill-hover` | `rgba(255, 255, 255, 0.45)` | `hover:bg-white/45`            | Hover state for translucent sky pills           |
+
+The login gradient ends at white/black at `57%`. The homepage uses its own longer gradient: retain rich sky blue through about `80%`, then fade into white from `80%` to `100%`. In dark mode, retain the blue night sky through `80%` and fade to black over the final `20%`.
 
 ### 2.2 Brand & Interactive Colors
 
@@ -79,6 +81,21 @@ Both states use the same `480px` card width, responsive padding, `32px` radius, 
 - Keep login copy conversational and focused on entering FLEX credentials. Avoid broad platform marketing claims.
 - Keep actions direct: “Sign in”, “Forgot your password?”, and “Request Reset Link”. The reset explanation should refer to the email linked to the user's FLEX account.
 
+## Account screens: match the login theme
+
+The homepage, sidebar, and account pages use the same light and dark color rules as the login screen. Read the saved `superflex-theme-mode` value and apply the `.dark` class to the document root. All `dark:` styles must follow that class so the interface does not change when the operating system theme differs from the saved app theme.
+
+| Surface           | Light mode                                                                 | Dark mode                                                                                 |
+| :---------------- | :------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
+| Page backdrop     | Solid pale blue when Cloud mode is off; blue sky gradient when on | Solid black (`#000000`) when Cloud mode is off; night sky gradient when on |
+| Main dashboard cards | Solid white, fine `rgba(0,0,0,0.06)` border, no shadow | Solid black, fine `rgba(255,255,255,0.14)` border, no shadow |
+| Main text         | `#101010`                                                                  | `#f5f6fb`; supporting copy `#c4cad6`                                                      |
+| Primary buttons   | `#230052` with white text; hover `#370c72`                                 | Accent lavender `#a098ff` with `#0a192f` text; hover `#b7b0ff`                           |
+| Secondary buttons | Lilac `#dfc8fc` with `#230052` text; hover `#d2afff`                       | Accent lavender `#a098ff` with `#0a192f` text, or translucent white for neutral controls |
+| Cloud artwork     | Hidden when Cloud mode is off; visible over the sky when on                | Hidden when Cloud mode is off; `12%` opacity over the night sky when on                  |
+
+The homepage greeting is a transparent masthead over the sky backdrop; keep it separate from content cards. Use solid dashboard cards in both themes with `rounded-[32px]` corners. Keep the four overview stat cards in equal-width columns on wide screens and two columns on tablet screens. Align the Course Performance and Attendance Overview panels to equal heights with consistent padding and icon-led headers. Course Performance shows course tabs and expandable assessment categories. Attendance Overview shows a row for each subject with one square per class session; use the theme accent for present sessions, rose for absent sessions, and a neutral fill when status is unknown. Keep the login form card flat and separate from dashboard cards.
+
 The login shell is `100dvh` tall with page scrolling disabled. Center the card and footer together while keeping the form, CAPTCHA, submit action, and footer visible. Reduce card padding and form spacing on short displays. Terms modal content may scroll inside its own dialog. Never hide CAPTCHA, validation, or password reset to force the fit. On desktop, keep the card centered at a maximum width of `480px`.
 
 ---
@@ -89,10 +106,10 @@ As seen in the primary checking screen, the background combines a rich vertical 
 
 ```mermaid
 flowchart TD
-    A["Screen Viewport"] --> B["Layer 0: Sky Gradient Background (#3b8fe6 -> #ddedf9)"]
+    A["Screen Viewport"] --> B["Layer 0: Homepage Sky Gradient (blue through 80%, white at 100%)"]
     B --> C["Layer 1: Floating Photorealistic Cloud Sprites (Top Left / Top Right)"]
     C --> D["Layer 2: Glassy Atmospheric Indicators (Rate Pills, Hero Balance)"]
-    D --> E["Layer 3: Solid Flat White Cards (Z-Index 20+, rounded-[32px])"]
+    D --> E["Layer 3: Solid White Dashboard Cards (Z-Index 20+, rounded-[32px])"]
     E --> F["Layer 4: Interactive Floating Elements (Bottom Navigation, Midnight FAB)"]
 ```
 
@@ -329,8 +346,9 @@ When creating or redesigning components under this system, verify:
 
 - [ ] **Zero Drop Shadows**: No `shadow-lg`, `shadow-md`, or custom box-shadows. Use contrast against the sky gradient for depth.
 - [ ] **No Fuzzy Glow Halos**: No blur glows behind cards or inputs. Focus states use crisp border lines.
-- [ ] **Smooth Sky Backdrop**: Login hero fades from `#62abe0` through `#9ac7e8` into white; account screens may use cloud sprites.
+- [ ] **Sky Backdrop**: Login keeps its compact gradient; the homepage stays blue through roughly 80% of the viewport, then fades to white.
 - [ ] **Midnight Plum Primary**: Primary CTAs use `#1e0838` with white text and right-facing arrow `->`.
 - [ ] **Soft Lilac Secondary**: Secondary CTAs use `#dfc8fc` / `#e9ddff` with `#1e0838` text.
 - [ ] **Pill & Squircle Geometry**: Interactive elements are pills (`rounded-full`); icon containers are squircles (`rounded-2xl`).
-- [ ] **Flat Pure White Surfaces**: Content containers are `#ffffff` with high corner radiuses (`28px`–`36px`).
+- [ ] **Solid Dashboard Cards**: Homepage cards use solid white in light mode and solid black in dark mode, fine borders, no shadows, and a `32px` radius. Keep the login form card flat.
+- [ ] **Theme Parity**: Homepage and account pages use the login light/dark gradients, cards, text, and button colors; `dark:` styles follow the saved app theme class.

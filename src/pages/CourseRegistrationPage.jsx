@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react";
 import PageLayout from "../components/layouts/PageLayout";
 import { BookOpen, Layers } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
-import PageHeader from "../components/ui/PageHeader";
-import StatsCard from "../components/ui/StatsCard";
-import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import { LoadingSpinner } from "../components/ui/LoadingOverlay";
 
 function CourseRegistrationPage() {
   const [loading, setLoading] = useState(true);
@@ -100,64 +98,63 @@ function CourseRegistrationPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-4 md:p-8 space-y-8">
-        <PageHeader
-          title="Course Registration"
-          subtitle="Manage your semester course enrollments"
-        />
+      <div className="mx-auto w-full max-w-[1600px] space-y-7">
+        <header className="space-y-1">
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#230052]/70 dark:text-[#a098ff]">Academics</p>
+          <h1 className="text-3xl font-bold tracking-tight text-[#101010] dark:text-[#f5f6fb] sm:text-4xl">Course Registration</h1>
+          <p className="text-sm text-[#626262] dark:text-[#c4cad6]">Manage your semester course enrollments.</p>
+        </header>
 
         {loading ? (
           <div className="flex justify-center py-20">
             <LoadingSpinner />
           </div>
         ) : (
-          <div className="space-y-8">
-            {}
-            <NotificationBanner alerts={alerts} />
-
-            {}
-            {tables.length > 0
-              ? tables.map((table, tIdx) => (
+          <div className="space-y-6">
+            {tables.length > 0 ? (
+              <>
+                <NotificationBanner alerts={alerts} />
+                {tables.map((table, tIdx) => (
                   <div
                     key={tIdx}
-                    className="bg-secondary/40 rounded-[2.5rem] p-8 backdrop-blur-xl border border-foreground/10"
+                    className="rounded-[32px] border border-black/[0.06] bg-white p-5 text-[#101010] shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-7 xl:p-8"
                   >
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-3 bg-accent/10 rounded-xl text-accent">
-                        <Layers size={24} />
+                    <div className="mb-6 flex items-center gap-3">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]">
+                        <Layers size={21} />
                       </div>
-                      <h3 className="text-xl font-bold text-foreground">{table.title}</h3>
+                      <h2 className="text-xl font-bold tracking-tight">{table.title}</h2>
                     </div>
 
                     <div className="overflow-x-auto scrollbar-hide">
                       <table className="w-full min-w-[800px]">
                         <thead>
-                          <tr className="border-b border-foreground/10">
+                          <tr className="border-b border-black/[0.08] dark:border-white/[0.12]">
                             {table.headers.map((h, i) => (
                               <th
                                 key={i}
-                                className="text-left py-4 px-4 text-xs font-bold text-foreground/50 Cap"
+                                className="px-4 py-4 text-left text-xs font-bold uppercase tracking-wide text-foreground/50"
                               >
                                 {h}
                               </th>
                             ))}
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-foreground/5">
+                        <tbody className="divide-y divide-black/[0.05] dark:divide-white/[0.08]">
                           {table.rows.map((row, rIdx) => (
                             <tr
                               key={rIdx}
-                              className="hover:bg-foreground/5 transition-colors group"
+                              className="group transition-colors hover:bg-black/[0.025] dark:hover:bg-white/[0.04]"
                             >
                               {row.map((cell, cIdx) => (
                                 <td
                                   key={cIdx}
-                                  className="py-4 px-4 text-sm text-foreground/70 group-hover:text-foreground transition-colors"
+                                  className="px-4 py-4 text-sm text-foreground/70 transition-colors group-hover:text-foreground"
                                 >
                                   {}
                                   <div
                                     dangerouslySetInnerHTML={{ __html: cell }}
-                                    className="[&>a]:text-accent [&>a]:hover:underline [&>button]:bg-accent [&>button]:text-foreground [&>button]:px-3 [&>button]:py-1 [&>button]:rounded-lg [&>button]:text-xs [&>button]:font-bold"
+                                    className="[&>a]:font-semibold [&>a]:text-accent [&>a]:hover:underline [&>button]:rounded-full [&>button]:bg-[#230052] [&>button]:px-3 [&>button]:py-1 [&>button]:text-xs [&>button]:font-bold [&>button]:text-white dark:[&>button]:bg-[#a098ff] dark:[&>button]:text-[#0a192f]"
                                   />
                                 </td>
                               ))}
@@ -167,21 +164,20 @@ function CourseRegistrationPage() {
                       </table>
                     </div>
                   </div>
-                ))
-              : !loading &&
-                alerts.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-20 opacity-50">
-                    <div className="p-6 rounded-full bg-tertiary/50 mb-4">
-                      <BookOpen size={40} className="text-foreground/40" />
-                    </div>
-                    <h3 className="text-xl font-bold text-foreground/50">
-                      No Information Available
-                    </h3>
-                    <p className="text-foreground/40 mt-2">
-                      Registration might be closed or data is unavailable.
-                    </p>
-                  </div>
-                )}
+                ))}
+              </>
+            ) : (
+              <section className="flex min-h-[260px] flex-col items-center justify-center rounded-[32px] border border-black/[0.06] bg-white px-6 py-12 text-center dark:border-white/[0.14] dark:bg-black sm:min-h-[320px]">
+                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]">
+                  <BookOpen size={25} />
+                </div>
+                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#230052]/70 dark:text-[#a098ff]">Registration status</p>
+                <h2 className="text-xl font-bold tracking-tight text-[#101010] dark:text-[#f5f6fb] sm:text-2xl">Course registration is not active</h2>
+                <p className="mt-2 max-w-lg text-sm leading-relaxed text-[#626262] dark:text-[#c4cad6]">
+                  {alerts[0]?.message || "Registration may be closed right now. Course options will appear here when enrollment opens."}
+                </p>
+              </section>
+            )}
           </div>
         )}
       </div>

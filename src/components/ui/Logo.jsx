@@ -41,13 +41,14 @@ export const LOGO_SVG_PATHS = (
   </>
 );
 
-export const Logo = ({ className = "h-8 w-auto" }) => {
+export const Logo = ({ className = "h-8 w-auto", style }) => {
   return (
     <svg
       viewBox="0 0 1584 300"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
+      style={style}
     >
       {LOGO_SVG_PATHS}
     </svg>

@@ -1,0 +1,91 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
+import { Mail, X, UserRound, Clipboard } from "lucide-react";
+
+export default function AttendanceReviewModal({ open, course, record, teacher, onClose }) {
+  const [reason, setReason] = useState("");
+  const [section, setSection] = useState("");
+  const [copied, setCopied] = useState(false);
+  const subject = `Attendance review request — ${course?.title || "Course"} — ${record?.date || "Session"}`;
+
+  useEffect(() => {
+    if (open) {
+      setReason("");
+      setSection("");
+      setCopied(false);
+    }
+  }, [open, course?.id, record?.date]);
+
+  const body = useMemo(() => {
+    const recipient = teacher?.name || "Instructor";
+    return `Dear ${recipient},\n\nI’m writing to request a review of my attendance record for ${course?.title || "this course"} on ${record?.date || "the session date"}. The portal currently lists my status as absent.\n\nSection: ${section.trim()}\n\n${reason.trim()}\n\nIf the class records confirm that I attended, could you please update my status to Present? If the absence is correct, please let me know whether there is an appeal or documentation process I should follow.\n\nThank you for your time.\n${localStorage.getItem("superflex_student_roll_number_v1") || "Student"}`;
+  }, [course?.title, record?.date, reason, section, teacher?.name]);
+
+  if (!open) return null;
+
+  const copyDraft = async () => {
+    try {
+      await navigator.clipboard.writeText(`To: ${teacher?.email || ""}\nSubject: ${subject}\n\n${body}`);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  const mailto = teacher?.email
+    ? `mailto:${teacher.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    : "#";
+
+  return createPortal(
+    <div className="fixed inset-0 z-[2147483647] flex items-end justify-center bg-slate-950/60 px-3 pb-3 pt-3 backdrop-blur-md" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <section role="dialog" aria-modal="true" aria-labelledby="attendance-review-title" className="relative flex max-h-[76dvh] w-full max-w-2xl flex-col overflow-hidden rounded-[34px] bg-white text-slate-900 shadow-[0_18px_60px_rgba(35,0,82,.24)] dark:bg-[#090909] dark:text-[#f5f6fb]">
+        <div className="flex shrink-0 justify-center pt-3"><span className="h-1.5 w-14 rounded-full bg-[#ded9e5] dark:bg-white/20" /></div>
+        <button type="button" onClick={onClose} aria-label="Close" className="absolute right-4 top-6 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"><X size={20} /></button>
+        <header className="flex shrink-0 flex-col items-center px-6 pb-3 pt-3 text-center sm:px-8">
+          <span className="mb-2 flex h-11 w-11 items-center justify-center rounded-[16px] bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#101027]"><Mail size={21} /></span>
+          <p className="text-[10px] font-bold uppercase tracking-[.15em] text-[#230052]/65 dark:text-[#a098ff]">Attendance</p>
+          <h2 id="attendance-review-title" className="mt-1 text-xl font-bold">Request an attendance review</h2>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{course?.title} · {record?.date}</p>
+        </header>
+
+        <div className="min-h-0 space-y-3 overflow-y-auto px-5 pb-3 pt-1 sm:px-8">
+          {teacher?.email ? (
+            <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3 dark:bg-white/[.06]">
+              {teacher.image ? <img src={teacher.image} alt="" className="h-10 w-10 rounded-xl object-cover" /> : <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#230052]/10 text-sm font-bold text-[#230052] dark:bg-[#a098ff]/15 dark:text-[#a098ff]">{teacher.name?.slice(0, 1) || <UserRound size={16} />}</span>}
+              <div className="min-w-0"><p className="truncate text-sm font-bold">{teacher.name}</p><p className="truncate text-xs text-slate-500 dark:text-slate-400">{teacher.email}</p></div>
+            </div>
+          ) : (
+            <div className="rounded-2xl bg-amber-50 p-4 text-sm text-amber-900 dark:bg-amber-400/10 dark:text-amber-200">
+              No instructor email is saved for this course yet. Set the course teacher first, then return here to open a pre-addressed email.
+              <button type="button" onClick={() => { onClose(); window.dispatchEvent(new CustomEvent("superflex-open-teacher-settings")); }} className="ml-1 font-bold underline">Choose teacher</button>
+            </div>
+          )}
+
+          <label className="block text-sm font-semibold">
+            Section for this course
+            <input value={section} onChange={(event) => setSection(event.target.value)} maxLength={40} placeholder="Enter your section for this course" className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-3.5 py-3 text-sm font-normal outline-none focus:border-[#230052] dark:border-white/15 dark:bg-white/[.04] dark:focus:border-[#a098ff]" />
+          </label>
+
+          <label className="block text-sm font-semibold">
+            Reason <span className="font-normal text-slate-500">(use accurate details)</span>
+            <textarea value={reason} onChange={(event) => setReason(event.target.value)} rows={3} maxLength={1200} placeholder="Write the reason you want included in the email…" className="mt-2 w-full resize-y rounded-2xl border border-slate-200 bg-white px-3.5 py-3 text-sm font-normal outline-none focus:border-[#230052] dark:border-white/15 dark:bg-white/[.04] dark:focus:border-[#a098ff]" />
+          </label>
+
+          <div className="rounded-2xl bg-slate-50 p-3 dark:bg-white/[.05]">
+            <p className="text-xs font-bold text-slate-600 dark:text-slate-300">Email preview</p>
+            <p className="mt-1 truncate text-xs text-slate-500 dark:text-slate-400">Subject: {subject}</p>
+            <p className="mt-2 whitespace-pre-wrap text-xs leading-relaxed text-slate-600 dark:text-slate-300">{body}</p>
+          </div>
+        </div>
+
+        <footer className="flex shrink-0 items-center gap-2 border-t border-slate-100 bg-white/95 px-5 pb-3 pt-2.5 dark:border-white/10 dark:bg-[#090909]/95 sm:px-8">
+          <a href={mailto} aria-disabled={!teacher?.email || !section.trim() || reason.trim().length < 8} onClick={(event) => { if (!teacher?.email || !section.trim() || reason.trim().length < 8) event.preventDefault(); }} className={`inline-flex min-h-12 min-w-0 flex-[1.7] items-center justify-center gap-2 rounded-full bg-[#230052] px-3 py-2.5 text-sm font-bold text-white dark:bg-[#a098ff] dark:text-[#101027] ${!teacher?.email || !section.trim() || reason.trim().length < 8 ? "cursor-not-allowed opacity-40" : ""}`}><Mail size={16} />Open email app</a>
+          <button type="button" onClick={copyDraft} className="inline-flex min-h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-full border border-slate-200 px-3 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 dark:border-white/15 dark:text-slate-300 dark:hover:bg-white/[.06]"><Clipboard size={15} />{copied ? "Copied" : "Copy draft"}</button>
+        </footer>
+        <p className="shrink-0 pb-2 text-center text-[10px] text-slate-400">Review the draft before sending it from your email app.</p>
+      </section>
+    </div>,
+    document.body,
+  );
+}
