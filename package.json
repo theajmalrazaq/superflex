@@ -9,6 +9,7 @@
     "zip": "wxt zip",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
+    "typecheck:parsers": "tsc -p tsconfig.parsers.json",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "clean": "node scripts/clean.js --ignore public/scripts/puter.js && oxfmt"
@@ -38,6 +39,7 @@
     "globals": "^15.15.0",
     "oxfmt": "^0.75.0",
     "oxlint": "^1.90.0",
+    "typescript": "^7.0.2",
     "vite": "^6.2.0",
     "wxt": "^0.21.5"
   }

@@ -1,9 +1,8 @@
 import { useEffect, useState, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import PageLayout from "../components/layouts/PageLayout";
 import {
   Award,
-  BookOpen,
-  Calendar,
   Target,
   Info,
   RefreshCw,
@@ -12,14 +11,16 @@ import {
   Scale,
   TrendingUp,
   X,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import { MCA_DATA } from "../constants/mcaData";
 import NotificationBanner from "../components/ui/NotificationBanner";
-import PageHeader from "../components/ui/PageHeader";
+import { parseTranscriptPage } from "../parsers/transcript";
+import { findFlexPageRoot } from "../parsers/dom";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
-import Modal from "../components/ui/Modal";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import { useAiSync } from "../hooks/useAiSync";
@@ -62,6 +63,83 @@ const GRADE_POINTS = {
   F: 0.0,
 };
 
+const GradeSelector = ({ value, grades, onChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectorRef = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const closeOutside = (event) => {
+      if (!selectorRef.current?.contains(event.target)) setIsOpen(false);
+    };
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setIsOpen(false);
+    };
+    document.addEventListener("mousedown", closeOutside);
+    document.addEventListener("touchstart", closeOutside);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("mousedown", closeOutside);
+      document.removeEventListener("touchstart", closeOutside);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [isOpen]);
+
+  return (
+    <div ref={selectorRef} className="relative inline-block">
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((open) => !open)}
+        className="flex min-w-16 cursor-pointer items-center justify-between gap-2 rounded-xl border border-black/[0.08] bg-white px-3 py-2 text-xs font-bold text-slate-900 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#230052]/30 dark:border-white/[0.12] dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1] dark:focus-visible:ring-white/30"
+      >
+        <span>{value}</span>
+        <ChevronDown size={14} className={`text-slate-500 transition-transform dark:text-slate-400 ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+      {isOpen && (
+        <div role="listbox" aria-label="Simulation grade" className="absolute left-1/2 top-full z-50 mt-2 max-h-64 w-36 -translate-x-1/2 overflow-y-auto rounded-2xl border border-black/[0.08] bg-white p-1.5 text-slate-900 shadow-[0_12px_32px_rgba(15,23,42,.16)] dark:border-white/[0.12] dark:bg-[#111] dark:text-white dark:shadow-black/40">
+          {grades.map((grade) => {
+            const selected = grade === value;
+            return (
+              <button
+                key={grade}
+                type="button"
+                role="option"
+                aria-selected={selected}
+                onClick={() => { onChange(grade); setIsOpen(false); }}
+                className={`flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-semibold transition-colors ${selected ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/[0.08]"}`}
+              >
+                {grade}{selected && <Check size={14} />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const TranscriptBottomSheet = ({ isOpen, onClose, title, subtitle, icon, children }) => {
+  if (!isOpen) return null;
+  return createPortal(
+    <div className="fixed inset-0 z-[2147483647] flex items-end justify-center bg-slate-950/60 px-3 pb-3 pt-3 backdrop-blur-md" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <section role="dialog" aria-modal="true" aria-label={title} className="relative flex max-h-[76dvh] w-full max-w-2xl flex-col overflow-hidden rounded-[34px] bg-white text-slate-900 shadow-[0_18px_60px_rgba(35,0,82,.24)] dark:bg-[#090909] dark:text-[#f5f6fb]">
+        <div className="flex shrink-0 justify-center pt-3"><span className="h-1.5 w-14 rounded-full bg-[#ded9e5] dark:bg-white" /></div>
+        <button type="button" onClick={onClose} aria-label="Close" className="absolute right-4 top-6 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"><X size={20} /></button>
+        <header className="flex shrink-0 flex-col items-center px-6 pb-3 pt-3 text-center sm:px-8">
+          <span className="mb-2 flex h-11 w-11 items-center justify-center rounded-[16px] bg-[#230052] text-white dark:bg-white dark:text-[#101027]">{icon}</span>
+          <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#230052]/65 dark:text-white">Transcript tools</p>
+          <h2 className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">{title}</h2>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
+        </header>
+        <div className="min-h-0 overflow-y-auto px-5 pb-5 pt-1 sm:px-8">{children}</div>
+      </section>
+    </div>,
+    document.body,
+  );
+};
+
 const CGPAPlannerModal = ({ isOpen, onClose, currentCGPA, currentCreditHours }) => {
   const [targetCGPA, setTargetCGPA] = useState("");
   const [nextCH, setNextCH] = useState("");
@@ -80,13 +158,12 @@ const CGPAPlannerModal = ({ isOpen, onClose, currentCGPA, currentCreditHours }) 
   };
 
   return (
-    <Modal
+    <TranscriptBottomSheet
       isOpen={isOpen}
       onClose={onClose}
       title="CGPA Planner"
       subtitle="Strategize your target CGPA"
       icon={<Target size={24} />}
-      maxWidth="max-w-[420px]"
     >
       <div className="space-y-8 pt-4">
         <form onSubmit={calculate} className="space-y-6">
@@ -160,7 +237,7 @@ const CGPAPlannerModal = ({ isOpen, onClose, currentCGPA, currentCreditHours }) 
           </div>
         )}
       </div>
-    </Modal>
+    </TranscriptBottomSheet>
   );
 };
 
@@ -202,7 +279,7 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
   };
 
   return (
-    <Modal
+    <TranscriptBottomSheet
       isOpen={isOpen}
       onClose={onClose}
       title="Relative Grade Lookup"
@@ -305,7 +382,7 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
           </div>
         )}
       </div>
-    </Modal>
+    </TranscriptBottomSheet>
   );
 };
 
@@ -319,142 +396,22 @@ function TranscriptPage() {
   const [alerts, setAlerts] = useState([]);
   const [simulationMode, setSimulationMode] = useState(false);
   const [overriddenGrades, setOverriddenGrades] = useState({});
+  const [hoveredHistoryIndex, setHoveredHistoryIndex] = useState(null);
 
   useEffect(() => {
     const parse = () => {
       try {
-        const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
+        const root = findFlexPageRoot(document);
         if (!root) {
           setTimeout(parse, 500);
           return;
         }
 
-        const alertList = [];
-        root.querySelectorAll(".m-alert, .alert").forEach((alert) => {
-          if (
-            alert.style.display === "none" ||
-            alert.id === "DataErrormsgdiv" ||
-            alert.closest(".modal")
-          )
-            return;
-
-          const textContainer = alert.querySelector(".m-alert__text") || alert;
-          const clone = textContainer.cloneNode(true);
-
-          clone
-            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
-            .forEach((el) => el.remove());
-
-          let message = clone.textContent
-            .replace(/Alert!/gi, "")
-            .replace(/Close/gi, "")
-            .replace(/&nbsp;/g, " ")
-            .replace(/\s+/g, " ")
-            .trim();
-
-          if (message && message.length > 3) {
-            const type =
-              alert.classList.contains("alert-danger") ||
-              alert.classList.contains("m-alert--outline-danger")
-                ? "error"
-                : "info";
-            alertList.push({ type, message });
-          }
-        });
-        setAlerts(alertList);
-
-        const semesterData = [];
-        const semesterCols = root.querySelectorAll(".m-section__content .row .col-md-6");
-
-        semesterCols.forEach((col) => {
-          const title = col.querySelector("h5")?.textContent.trim() || "Untitled Semester";
-
-          const summarySpans = col.querySelectorAll(".pull-right span");
-          const summaryArr = Array.from(summarySpans).map(
-            (s) => s.textContent.split(":")[1]?.trim() || "0",
-          );
-
-          const summary = {
-            crRegistered: parseInt(summaryArr[0]),
-            crEarned: parseInt(summaryArr[1]),
-            cgpa: parseFloat(summaryArr[2]),
-            sgpa: parseFloat(summaryArr[3]),
-          };
-
-          const courses = [];
-          const rows = col.querySelectorAll("tbody tr");
-          rows.forEach((row) => {
-            const cells = row.querySelectorAll("td");
-            if (cells.length >= 7) {
-              const ch = parseFloat(cells[3].textContent.trim()) || 0;
-              const pts = parseFloat(cells[5].textContent.trim()) || 0;
-              const codeCell = cells[0];
-              const codeText = codeCell.textContent.trim();
-
-              let mca = null;
-              let gradingScheme = null;
-              let schemeDetailId = null;
-
-              const link = codeCell.querySelector("a");
-              if (link) {
-                const title =
-                  link.getAttribute("title") || link.getAttribute("data-original-title");
-                if (title && title.includes("MCA")) {
-                  const mMatch = title.match(/MCA[:\s]+(\d+)/i);
-                  if (mMatch) mca = mMatch[1];
-                }
-
-                const onclick = link.getAttribute("onclick");
-                if (onclick) {
-                  const match = onclick.match(/fn_StdGradeSchemeDetail\((\d+)\)/);
-                  if (match) schemeDetailId = match[1];
-                }
-
-                const target = link.getAttribute("data-target");
-                if (target) {
-                  const modal = document.querySelector(target);
-                  if (modal) {
-                    const table = modal.querySelector("#tblGradeDetailmodal");
-                    if (table) {
-                      const rows = table.querySelectorAll("tr");
-                      if (rows.length > 1) {
-                        const dataRow = rows[1];
-                        const dataCells = dataRow.querySelectorAll("td");
-                        if (dataCells.length >= 2) {
-                          gradingScheme = dataCells[0].textContent.trim();
-                          mca = dataCells[1].textContent.trim();
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-
-              courses.push({
-                code: codeText,
-                description: cells[1].textContent.trim(),
-                section: cells[2].textContent.trim(),
-                crHrs: ch,
-                grade: cells[4].textContent.trim(),
-                points: pts,
-                type: cells[6].textContent.trim(),
-                mca: mca,
-                gradingScheme: gradingScheme,
-                schemeDetailId: schemeDetailId,
-              });
-            }
-          });
-
-          semesterData.push({
-            title,
-            summary,
-            courses,
-          });
-        });
-
-        if (semesterData.length > 0) {
-          setSemesters(semesterData);
-          setActiveSemIdx(semesterData.length - 1);
+        const parsed = parseTranscriptPage(root, document);
+        setAlerts(parsed.alerts);
+        if (parsed.semesters.length > 0) {
+          setSemesters(parsed.semesters);
+          setActiveSemIdx(parsed.semesters.length - 1);
         }
 
         root.style.display = "none";
@@ -505,15 +462,15 @@ function TranscriptPage() {
 
     let cumulativeGradePoints = 0;
     let cumulativeCreditsForGPA = 0;
-    let totalCreditsAttempted = 0;
+    const attemptedUniqueCredits = new Map();
 
     const passedUniqueCredits = new Map();
+    const recordedPassedUniqueCredits = new Map();
     const courseStatsMap = new Map();
 
     let lastNonEmptyCGPA = 0;
 
     const semesterStats = semesters.map((sem, sIdx) => {
-      const isSummer = sem.title.toLowerCase().includes("summer");
       let semGradePoints = 0;
       let semCreditsForGPA = 0;
       let semCreditsAttempted = 0;
@@ -526,6 +483,22 @@ function TranscriptPage() {
         const key = `${sem.title}-${course.code}`;
         if (overriddenGrades[key]) hasOverriddenGrade = true;
 
+        const recordedGrade = course.grade;
+        const isRecordedCreditCourse =
+          !course.type.toLowerCase().includes("non credit") &&
+          recordedGrade !== "S" &&
+          recordedGrade !== "U" &&
+          GRADE_POINTS[recordedGrade] !== undefined;
+        if (isRecordedCreditCourse && recordedGrade !== "F") {
+          const courseCode = String(course.code || "").trim().toUpperCase();
+          if (courseCode) {
+            recordedPassedUniqueCredits.set(
+              courseCode,
+              Math.max(recordedPassedUniqueCredits.get(courseCode) || 0, course.crHrs),
+            );
+          }
+        }
+
         const grade = overriddenGrades[key] || course.grade;
         const gp = GRADE_POINTS[grade];
         const isGraded = gp !== undefined;
@@ -536,6 +509,10 @@ function TranscriptPage() {
         if (isNonCredit) return;
 
         semCreditsAttempted += course.crHrs;
+        // Count a course once across the full transcript, including summer
+        // terms, even when it has a failed attempt followed by a retake.
+        const courseCode = String(course.code || "").trim().toUpperCase();
+        if (courseCode) attemptedUniqueCredits.set(courseCode, course.crHrs);
 
         if (isGraded) {
           semGradePoints += gp * course.crHrs;
@@ -562,9 +539,6 @@ function TranscriptPage() {
       const isEmptySemester = semCreditsForGPA === 0 && !hasOverriddenGrade;
 
       if (!isEmptySemester) {
-        if (!isSummer) {
-          totalCreditsAttempted += semCreditsAttempted;
-        }
         tempPassedCredits.forEach((ch, code) => {
           passedUniqueCredits.set(code, Math.max(passedUniqueCredits.get(code) || 0, ch));
         });
@@ -591,13 +565,34 @@ function TranscriptPage() {
       (sum, ch) => sum + ch,
       0,
     );
+    const totalRecordedCreditsEarned = Array.from(recordedPassedUniqueCredits.values()).reduce(
+      (sum, ch) => sum + ch,
+      0,
+    );
+    const totalCreditsAttempted = Array.from(attemptedUniqueCredits.values()).reduce(
+      (sum, ch) => sum + ch,
+      0,
+    );
+    const latestSemester = semesters[semesters.length - 1];
+    const hasGradeOverrides = Object.keys(overriddenGrades).length > 0;
+    // FLEX reports cumulative credits in each semester summary. Use the newest
+    // summary even when that term contains only in-progress courses; the
+    // simulated change is applied as a delta to this portal-reported baseline.
+    const reportedCreditsEarned = Number(latestSemester?.summary.crEarned);
+    const reportedCreditsAttempted = Number(latestSemester?.summary.crRegistered);
+    const creditsEarned = Number.isFinite(reportedCreditsEarned)
+      ? reportedCreditsEarned + (hasGradeOverrides ? totalCreditsEarned - totalRecordedCreditsEarned : 0)
+      : totalCreditsEarned;
+    const creditsAttempted = Number.isFinite(reportedCreditsAttempted)
+      ? reportedCreditsAttempted
+      : totalCreditsAttempted;
 
     return {
       calculatedStats: {
         history: semesterStats.filter((s, idx) => !s.isEmptySemester),
         currentCGPA: lastNonEmptyCGPA,
-        totalCreditsEarned: totalCreditsEarned,
-        totalCreditsAttempted: totalCreditsAttempted,
+        totalCreditsEarned: creditsEarned,
+        totalCreditsAttempted: creditsAttempted,
         totalCreditsForGPA: cumulativeCreditsForGPA,
         actualSemestersCount: semesterStats.filter((s) => !s.isEmptySemester).length,
         actualCoursesCount: Array.from(courseStatsMap.keys()).length,
@@ -621,91 +616,81 @@ function TranscriptPage() {
 
   const chartData = useMemo(() => {
     if (!calculatedStats) return null;
-    return {
+    const lineColor = themeMode === "dark" ? "#ffffff" : "#230052";
+    const createDataset = (label, data) => ({
       labels: calculatedStats.history.map((h) => h.title.split(" ")[0]),
-      datasets: [
-        {
-          label: "SGPA",
-          data: calculatedStats.history.map((h) => h.sgpa),
-          borderColor: "#230052",
-          backgroundColor: (context) => {
-            const ctx = context.chart.ctx;
-            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, "#23005226");
-            gradient.addColorStop(1, "#23005200");
-            return gradient;
-          },
-          tension: 0.45,
-          fill: true,
-          pointBackgroundColor: "#230052",
-          pointBorderWidth: 4,
-          pointBorderColor: "var(--background)",
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          borderWidth: 3,
-        },
-        {
-          label: "CGPA",
-          data: calculatedStats.history.map((h) => h.cgpa),
-          borderColor: "#230052",
-          tension: 0.45,
-          fill: false,
-          pointBackgroundColor: "#230052",
-          pointBorderWidth: 4,
-          pointBorderColor: "var(--background)",
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          borderWidth: 3,
-          borderDash: [5, 5],
-        },
-      ],
+      datasets: [{
+        label,
+        data,
+        borderColor: lineColor,
+        backgroundColor: "transparent",
+        tension: 0,
+        fill: false,
+        pointBackgroundColor: lineColor,
+        pointBorderWidth: 0,
+        pointRadius: 1.5,
+        pointHoverRadius: 5,
+        borderWidth: 3,
+      }],
+    });
+    return {
+      sgpa: createDataset("SGPA", calculatedStats.history.map((h) => h.sgpa)),
+      cgpa: createDataset("CGPA", calculatedStats.history.map((h) => h.cgpa)),
     };
-  }, [calculatedStats]);
+  }, [calculatedStats, themeMode]);
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor:
-          themeMode === "dark" ? "rgba(18, 18, 18, 0.9)" : "rgba(255, 255, 255, 0.9)",
-        titleColor: themeMode === "dark" ? "#fff" : "#000",
-        bodyColor: themeMode === "dark" ? "#fff" : "#000",
-        titleFont: { size: 13, weight: "bold" },
-        bodyFont: { size: 12 },
-        padding: 16,
-        borderRadius: 16,
-        borderColor: themeMode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
-        borderWidth: 1,
-        displayColors: false,
-        callbacks: {
-          label: (context) => `${context.dataset.label}: ${context.parsed.y.toFixed(2)}`,
+  const shownHistory = hoveredHistoryIndex == null
+    ? calculatedStats?.history.at(-1)
+    : calculatedStats?.history[hoveredHistoryIndex];
+  const previousHistory = hoveredHistoryIndex == null
+    ? calculatedStats?.history.at(-2)
+    : calculatedStats?.history[hoveredHistoryIndex - 1];
+  const sgpaDelta = shownHistory && previousHistory ? shownHistory.sgpa - previousHistory.sgpa : null;
+  const cgpaDelta = shownHistory && previousHistory ? shownHistory.cgpa - previousHistory.cgpa : null;
+  const valueRange = (values = []) => ({
+    min: values.length ? Math.max(0, Math.min(...values) - 0.18) : 0,
+    max: values.length ? Math.min(4, Math.max(...values) + 0.18) : 4,
+  });
+  const sgpaRange = valueRange(calculatedStats?.history.map((semester) => semester.sgpa));
+  const cgpaRange = valueRange(calculatedStats?.history.map((semester) => semester.cgpa));
+
+  const createChartOptions = ({ min, max }) => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "nearest", intersect: false },
+      onHover: (_event, activeElements) => {
+        const nextIndex = activeElements.length ? activeElements[0].index : null;
+        setHoveredHistoryIndex((current) => current === nextIndex ? current : nextIndex);
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: themeMode === "dark" ? "rgba(18, 18, 18, 0.9)" : "rgba(255, 255, 255, 0.9)",
+          titleColor: themeMode === "dark" ? "#fff" : "#000",
+          bodyColor: themeMode === "dark" ? "#fff" : "#000",
+          titleFont: { size: 13, weight: "bold" },
+          bodyFont: { size: 12 },
+          padding: 16,
+          borderRadius: 16,
+          borderColor: themeMode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
+          borderWidth: 1,
+          displayColors: false,
+          callbacks: { label: (context) => `${context.dataset.label}: ${context.parsed.y.toFixed(2)}` },
         },
       },
-    },
-    scales: {
-      y: {
-        min: 0,
-        max: 4,
-        ticks: {
-          color: themeMode === "dark" ? "rgba(161, 161, 170, 0.6)" : "rgba(39, 39, 42, 0.6)",
-          stepSize: 1,
-          font: { weight: "bold", size: 10 },
+      scales: {
+        y: {
+          min,
+          max: max > min ? max : min + 0.7,
+          ticks: { display: false },
+          grid: { display: false },
+          border: { display: false },
         },
-        grid: {
-          color: themeMode === "dark" ? "rgba(255, 255, 255, 0.03)" : "rgba(0, 0, 0, 0.03)",
-        },
+        x: { ticks: { display: false }, grid: { display: false }, border: { display: false } },
       },
-      x: {
-        ticks: {
-          color: themeMode === "dark" ? "rgba(161, 161, 170, 0.6)" : "rgba(39, 39, 42, 0.6)",
-          font: { weight: "bold", size: 10 },
-        },
-        grid: { display: false },
-      },
-    },
-  };
+    });
+  const sgpaChartOptions = createChartOptions(sgpaRange);
+  const cgpaChartOptions = createChartOptions(cgpaRange);
 
   const handleGradeChange = (semTitle, courseCode, newGrade) => {
     setOverriddenGrades((prev) => ({
@@ -717,88 +702,59 @@ function TranscriptPage() {
   if (loading) return <LoadingOverlay />;
 
   return (
-    <PageLayout currentPage={window.location.pathname}>
-      {}
-      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
-      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
-
-      <div className="w-full p-4 md:p-8 space-y-10 relative z-10">
-        {}
-        <PageHeader title="Transcript Report" subtitle="Academic performance and degree analytics">
-          <button
-            onClick={() => setIsPlannerOpen(true)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-foreground/10 bg-secondary/50 text-xs font-bold text-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all duration-300 group"
-          >
-            <Target size={16} className="group-hover:scale-110 transition-transform" />
-            Strategic Planner
-          </button>
-          <button
-            onClick={() => setIsMCALookupOpen(true)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-foreground/10 bg-secondary/50 text-xs font-bold text-foreground/60 hover:text-foreground hover:bg-foreground/5 transition-all duration-300 group"
-          >
-            <Scale size={16} className="group-hover:scale-110 transition-transform" />
-            MCA Lookup
-          </button>
-          <button
-            onClick={() =>
-              simulationMode
-                ? (setOverriddenGrades({}), setSimulationMode(false))
-                : setSimulationMode(true)
-            }
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-full transition-all font-bold text-xs border ${
-              simulationMode
-                ? "bg-amber-500 text-foreground border-amber-600"
-                : "bg-secondary/50 border-foreground/10 text-foreground/60 hover:text-foreground hover:bg-foreground/5"
-            }`}
-            title={simulationMode ? "Exit Simulation Mode" : "Enter Simulation Mode (Edit Grades)"}
-          >
-            <Zap size={16} fill={simulationMode ? "currentColor" : "none"} />
-            {simulationMode ? "Simulating" : "Simulate"}
-          </button>
-        </PageHeader>
+    <PageLayout currentPage={window.location.pathname} fullWidth>
+      <div className="relative z-10 mx-auto w-full max-w-[1680px] space-y-7 px-4 py-6 pb-24 sm:px-6 lg:px-8 lg:py-8">
+        <header className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
+          <div className="space-y-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p>
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Transcript &amp; degree progress</h1>
+            <p className="text-sm text-white/80">Review your semester results and track your GPA over time.</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="button" onClick={() => setIsPlannerOpen(true)} className="flex items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"><Target size={15} />Strategic planner</button>
+            <button type="button" onClick={() => setIsMCALookupOpen(true)} className="flex items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"><Scale size={15} />MCA lookup</button>
+            <button type="button" onClick={() => simulationMode ? (setOverriddenGrades({}), setSimulationMode(false)) : setSimulationMode(true)} className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold transition-colors ${simulationMode ? "bg-amber-500 text-white" : "bg-white/55 text-[#230052] hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"}`} title={simulationMode ? "Exit simulation and restore grades" : "Enable grade simulation"}><Zap size={15} fill={simulationMode ? "currentColor" : "none"} />{simulationMode ? "Simulating" : "Simulate"}</button>
+          </div>
+        </header>
 
         <NotificationBanner alerts={alerts} />
 
-        {}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsCard
-            icon={TrendingUp}
-            label="Cumulative GPA"
-            value={calculatedStats?.currentCGPA.toFixed(2) || "0.00"}
-            subValue={simulationMode ? `(Was ${originalCGPA.toFixed(2)})` : "Current"}
-            delay={0}
-          />
-          <StatsCard
-            icon={Award}
-            label="Credits Cleared"
-            value={calculatedStats?.totalCreditsEarned || "0"}
-            subValue={`of ${calculatedStats?.totalCreditsAttempted || 0} attempted`}
-            delay={100}
-          />
-          <StatsCard
-            icon={Calendar}
-            label="Semesters"
-            value={calculatedStats?.actualSemestersCount || 0}
-            subValue="Completed"
-            delay={200}
-          />
-          <StatsCard
-            icon={BookOpen}
-            label="Degree Progress"
-            value={calculatedStats?.actualCoursesCount || 0}
-            subValue="Graded Courses"
-            delay={300}
-          />
-        </div>
+        <section aria-labelledby="transcript-overview-heading" className="space-y-4">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Overview</p><h2 id="transcript-overview-heading" className="text-xl font-bold tracking-tight text-white">Academic snapshot</h2></div>
+            <p className="text-xs text-white/75">Current GPA, cleared credits, and semester trends.</p>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
+            <StatsCard icon={TrendingUp} label="Cumulative GPA" value={calculatedStats?.currentCGPA.toFixed(2) || "0.00"} subValue={simulationMode ? `(Was ${originalCGPA.toFixed(2)})` : "Current"} variant="dashboard" />
+            <StatsCard icon={Award} label="Credits Cleared" value={calculatedStats?.totalCreditsEarned || "0"} subValue={`of ${calculatedStats?.totalCreditsAttempted || 0} attempted`} variant="dashboard" />
+            <div className="flex min-h-[156px] min-w-0 flex-col rounded-[32px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6" onMouseLeave={() => setHoveredHistoryIndex(null)}>
+              <p className="text-sm font-semibold text-[#40404a] dark:text-[#c4cad6]">Semester GPA</p>
+              <div className="mt-auto flex items-end justify-between gap-2">
+                <span className="text-[28px] font-bold leading-none tracking-tight text-foreground">{shownHistory?.sgpa.toFixed(2) || "0.00"}</span>
+                <span className="truncate text-right text-[10px] font-medium text-foreground/55">{shownHistory?.title || ""}{sgpaDelta != null && <> · {sgpaDelta >= 0 ? "+" : ""}{sgpaDelta.toFixed(2)}</>}</span>
+              </div>
+              <div className="mt-2 h-11 w-full">{chartData && <Line data={chartData.sgpa} options={sgpaChartOptions} />}</div>
+            </div>
+            <div className="flex min-h-[156px] min-w-0 flex-col rounded-[32px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6" onMouseLeave={() => setHoveredHistoryIndex(null)}>
+              <p className="text-sm font-semibold text-[#40404a] dark:text-[#c4cad6]">Cumulative GPA</p>
+              <div className="mt-auto flex items-end justify-between gap-2">
+                <span className="text-[28px] font-bold leading-none tracking-tight text-foreground">{shownHistory?.cgpa.toFixed(2) || "0.00"}</span>
+                <span className="truncate text-right text-[10px] font-medium text-foreground/55">{shownHistory?.title || ""}{cgpaDelta != null && <> · {cgpaDelta >= 0 ? "+" : ""}{cgpaDelta.toFixed(2)}</>}</span>
+              </div>
+              <div className="mt-2 h-11 w-full">{chartData && <Line data={chartData.cgpa} options={cgpaChartOptions} />}</div>
+            </div>
+          </div>
+        </section>
 
-        {}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
-          {}
-          <div className="xl:col-span-2 space-y-8">
-            <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 flex flex-col gap-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-accent/5 blur-[100px] rounded-full -mr-48 -mt-48 pointer-events-none"></div>
+        <section aria-labelledby="semester-report-heading" className="space-y-4">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academic record</p><h2 id="semester-report-heading" className="text-xl font-bold tracking-tight text-white">Semester results</h2></div>
+            <p className="text-xs text-white/75">Choose a semester to review courses, grades, and credit hours.</p>
+          </div>
+          <div>
+            <div className="flex flex-col gap-5 overflow-hidden rounded-[24px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6">
 
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+              <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
                 <SuperTabs
                   tabs={semesters.map((s, idx) => ({
                     value: idx,
@@ -806,12 +762,14 @@ function TranscriptPage() {
                   }))}
                   activeTab={activeSemIdx}
                   onTabChange={setActiveSemIdx}
+                  size="sm"
+                  className="!border-0 !bg-slate-100 dark:!bg-white/[.06]"
                 />
               </div>
 
               {activeSemData && (
-                <div className="space-y-10 relative z-10">
-                  <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-foreground/10 pb-10">
+                <div className="space-y-5">
+                  <div className="flex flex-col justify-between gap-5 border-b border-slate-100 pb-5 dark:border-white/10 md:flex-row md:items-end">
                     <div className="space-y-1">
                       <h2 className="text-3xl font-bold text-foreground ">{activeSemData.title}</h2>
                       <p className="text-xs text-foreground/50 font-bold  tracking-[0px]">
@@ -889,7 +847,7 @@ function TranscriptPage() {
                   </div>
 
                   <div className="overflow-x-auto scrollbar-hide -mx-2">
-                    <table className="w-full text-left border-collapse">
+                    <table className="sf-data-table w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-foreground/[0.02]">
                           <th className="px-6 py-4 text-[11px] font-bold text-foreground/50   border-b border-foreground/10">
@@ -1029,35 +987,11 @@ function TranscriptPage() {
                               </td>
                               <td className="px-6 py-4 text-center">
                                 {simulationMode ? (
-                                  <select
+                                  <GradeSelector
                                     value={currentGrade}
-                                    onChange={(e) =>
-                                      handleGradeChange(
-                                        activeSemData.title,
-                                        course.code,
-                                        e.target.value,
-                                      )
-                                    }
-                                    className={`text-xs font-bold px-3 py-1.5 rounded-lg bg-secondary border border-foreground/10 text-center cursor-pointer hover:border-accent/50 transition-all outline-none appearance-none ${
-                                      currentGrade.startsWith("A")
-                                        ? "text-accent"
-                                        : currentGrade.startsWith("B")
-                                          ? "text-blue-400"
-                                          : currentGrade.startsWith("C")
-                                            ? "text-amber-400"
-                                            : currentGrade === "F"
-                                              ? "text-rose-400"
-                                              : "text-foreground/50"
-                                    }`}
-                                  >
-                                    {Object.keys(GRADE_POINTS)
-                                      .concat(["I", "S", "U", "W"])
-                                      .map((g) => (
-                                        <option key={g} value={g}>
-                                          {g}
-                                        </option>
-                                      ))}
-                                  </select>
+                                    grades={Object.keys(GRADE_POINTS).concat(["I", "S", "U", "W"])}
+                                    onChange={(grade) => handleGradeChange(activeSemData.title, course.code, grade)}
+                                  />
                                 ) : (
                                   <div className="flex justify-center">
                                     <span
@@ -1103,82 +1037,7 @@ function TranscriptPage() {
             </div>
           </div>
 
-          {}
-          <div className="space-y-10">
-            {}
-            <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 relative overflow-hidden group">
-              <div className="flex items-center justify-between mb-8">
-                <div className="space-y-1">
-                  <h3 className="text-xl font-bold text-foreground ">Performance Flow</h3>
-                  <p className="text-[10px] text-foreground/50 font-bold tracking-[0px]">
-                    Historical GPA Trend
-                  </p>
-                </div>
-                <div className="p-3 bg-accent/10 rounded-2xl text-accent">
-                  <TrendingUp size={18} />
-                </div>
-              </div>
-              <div className="h-[280px] w-full transition-all duration-700">
-                {chartData && <Line data={chartData} options={chartOptions} />}
-              </div>
-            </div>
-
-            {}
-            <div className="bg-secondary/80 border border-accent/20 rounded-[2.5rem] p-7 relative overflow-hidden ">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 blur-[80px] rounded-full -mr-32 -mt-32"></div>
-
-              <div className="relative z-10 flex flex-col h-full">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-3 bg-accent/10 rounded-xl text-accent">
-                    <Zap size={20} />
-                  </div>
-                  <h3 className="text-lg font-bold text-foreground ">Simulation Desk</h3>
-                </div>
-
-                <div className="space-y-4 flex-1">
-                  <div className="p-5 rounded-[1.5rem] bg-secondary/40 border border-foreground/10  transition-colors">
-                    <p className="text-[10px] font-bold text-foreground/40  tracking-[0px] mb-1">
-                      Projected CGPA
-                    </p>
-                    <div className="flex items-end justify-between">
-                      <span className="text-4xl font-bold font-sans text-foreground ">
-                        {calculatedStats?.currentCGPA.toFixed(2)}
-                      </span>
-                      {simulationMode && (
-                        <div
-                          className={`flex items-center gap-1 text-xs font-medium font-sans ${calculatedStats.currentCGPA >= originalCGPA ? "text-accent" : "text-rose-400"}`}
-                        >
-                          {calculatedStats.currentCGPA >= originalCGPA ? "+" : ""}
-                          {(calculatedStats.currentCGPA - originalCGPA).toFixed(3)}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="p-5 rounded-[1.5rem] bg-secondary/40 border border-foreground/10  transition-colors">
-                    <p className="text-[10px] font-bold text-foreground/40  tracking-[0px] mb-1">
-                      Simulation Impact
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xl font-bold font-sans text-foreground/60">
-                        {Object.keys(overriddenGrades).length}{" "}
-                        <span className="text-[10px]  ml-1 opacity-60">Changes</span>
-                      </span>
-                      {simulationMode && (
-                        <button
-                          onClick={() => setOverriddenGrades({})}
-                          className="p-1.5 text-foreground/40 hover:text-foreground transition-colors"
-                        >
-                          <RefreshCw size={12} />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        </section>
       </div>
 
       <CGPAPlannerModal

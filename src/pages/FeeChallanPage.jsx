@@ -10,11 +10,17 @@ import {
   Clock,
   ExternalLink,
   Receipt,
+  ChevronDown,
+  Landmark,
 } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
-import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
-import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import { LoadingSpinner } from "../components/ui/LoadingOverlay";
+
+const isPaidStatus = (status) => {
+  const normalized = String(status || "").trim();
+  return /\bpaid\b/i.test(normalized) && !/\bunpaid\b/i.test(normalized);
+};
 
 function FeeChallanPage() {
   const [loading, setLoading] = useState(true);
@@ -128,12 +134,10 @@ function FeeChallanPage() {
   }, []);
 
   const stats = useMemo(() => {
-    const unpaid = challans.filter(
-      (c) => !c.status.toLowerCase().includes("paid") && c.status.toLowerCase() !== "",
-    ).length;
-    const paid = challans.filter((c) => c.status.toLowerCase().includes("paid")).length;
+    const unpaid = challans.filter((challan) => challan.status.trim() && !isPaidStatus(challan.status)).length;
+    const paid = challans.filter((challan) => isPaidStatus(challan.status)).length;
 
-    const latestUnpaid = challans.find((c) => !c.status.toLowerCase().includes("paid"));
+    const latestUnpaid = challans.find((challan) => challan.status.trim() && !isPaidStatus(challan.status));
     const latestAmount = latestUnpaid
       ? latestUnpaid.amount
       : challans.length > 0
@@ -156,95 +160,61 @@ function FeeChallanPage() {
   };
 
   const PaymentInstructions = () => (
-    <div className="space-y-10 text-sm font-sans">
-      <div className="space-y-8">
+    <div className="space-y-4 font-sans">
+      <div className="flex items-center justify-between rounded-2xl bg-[#f2ecfc] px-4 py-3 dark:bg-white/[0.08]">
+        <div>
+          <p className="text-sm font-bold text-[#230052] dark:text-white">Pay online with Kuickpay</p>
+          <p className="mt-0.5 text-[11px] text-slate-600 dark:text-slate-400">Use your bank app or internet banking.</p>
+        </div>
+        <span className="rounded-full bg-white px-2.5 py-1 text-[10px] font-bold text-[#230052] dark:bg-white/10 dark:text-white">Online</span>
+      </div>
+
+      <ol className="divide-y divide-black/[0.06] dark:divide-white/[0.1]">
         {[
-          {
-            step: "Step 1",
-            text: "Sign in to your Internet Banking, Mobile Banking or visit an ATM machine",
-          },
-          {
-            step: "Step 2",
-            text: (
-              <>
-                Select Bill Payment / Payments and then select{" "}
-                <span className="text-accent font-bold">'kuickpay'</span> from given categories
-              </>
-            ),
-          },
-          {
-            step: "Step 3",
-            text: (
-              <>
-                Enter the voucher or invoice number & continue. Make sure to enter{" "}
-                <span className="text-emerald-400 font-bold">Institution ID as prefix</span>{" "}
-                (mentioned on challan)
-              </>
-            ),
-          },
-          {
-            step: "Step 4",
-            text: "Confirm your voucher details and proceed to payment. Payment alerts will be received accordingly.",
-          },
-        ].map((item, idx) => (
-          <div key={idx} className="flex gap-4">
-            <div className="mt-1">
-              <div className="w-5 h-5 rounded-full border border-accent/50 flex items-center justify-center shrink-0">
-                <div className="w-1.5 h-1.5 rounded-full bg-accent/20"></div>
-              </div>
+          { title: "Open your banking app", text: "Sign in to mobile or internet banking, or use an ATM." },
+          { title: "Choose bill payment", text: <>Select <strong className="text-[#230052] dark:text-white">Kuickpay</strong> from the bill payment categories.</> },
+          { title: "Enter the voucher number", text: <>Use the invoice number shown on your challan, including the <strong className="text-emerald-700 dark:text-emerald-300">Institution ID prefix</strong>.</> },
+          { title: "Review and pay", text: "Confirm the voucher details, then complete the payment." },
+        ].map((step, index) => (
+          <li key={step.title} className="flex gap-3 py-3 first:pt-1 last:pb-1">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-[11px] font-bold text-white dark:bg-white dark:text-[#0a192f]">{index + 1}</span>
+            <div className="min-w-0 pt-0.5">
+              <p className="text-xs font-bold text-slate-900 dark:text-white">{step.title}</p>
+              <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">{step.text}</p>
             </div>
-            <div className="space-y-1">
-              <p className="text-foreground font-bold tracking-wide">{item.step}</p>
-              <p className="text-foreground/50 text-xs leading-relaxed font-medium">{item.text}</p>
-            </div>
-          </div>
+          </li>
         ))}
+      </ol>
+
+      <div className="flex items-center gap-3 rounded-2xl bg-emerald-50 px-4 py-3 dark:bg-emerald-300/10">
+        <CheckCircle2 size={18} className="shrink-0 text-emerald-700 dark:text-emerald-300" />
+        <p className="text-xs font-semibold text-emerald-900 dark:text-emerald-200">EasyPaisa and JazzCash are supported through Kuickpay.</p>
       </div>
 
-      <div className="space-y-6 pt-2">
-        <div className="space-y-4">
-          <p className="text-[10px] text-accent font-black Cap tracking-[0px]">* Supported Banks</p>
-          <p className="text-[11px] text-foreground/50 leading-relaxed font-medium">
-            Allied Bank, Askari Bank, Bank Al Habib, Bank Alfalah, Bank Islami, Bank of Punjab,
-            Dubai Islamic Bank, Faysal Bank, First Women Bank, Habib Metro Bank, Habib Bank Limited,
-            JS Bank, MCB Bank, MCB Islamic Bank, Meezan Bank, National Bank, NRSP Bank, SAMBA Bank,
-            Soneri bank, Summit Bank, UBL and Keenu App.
-          </p>
-        </div>
+      <details className="group rounded-2xl bg-slate-50 px-4 py-3 dark:bg-white/[0.05]">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-xs font-bold text-slate-800 dark:text-slate-200">
+          Supported banks and apps
+          <ChevronDown size={15} className="shrink-0 transition-transform group-open:rotate-180" />
+        </summary>
+        <p className="mt-3 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+          Allied Bank, Askari Bank, Bank Al Habib, Bank Alfalah, Bank Islami, Bank of Punjab, Dubai Islamic Bank, Faysal Bank, First Women Bank, Habib Metro Bank, Habib Bank Limited, JS Bank, MCB Bank, MCB Islamic Bank, Meezan Bank, National Bank, NRSP Bank, SAMBA Bank, Soneri Bank, Summit Bank, UBL, and Keenu App.
+        </p>
+      </details>
 
-        <div className="py-3.5 px-5 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 flex items-center gap-3">
-          <div className="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></div>
-          <p className="text-[10px] text-emerald-400 font-black Cap tracking-[0px] leading-none">
-            EasyPaisa & JazzCash Supported via Kuickpay
-          </p>
-        </div>
+      <a
+        href="https://app.kuickpay.com/PaymentsBillPayment"
+        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#230052] px-4 py-3 text-xs font-bold text-white transition-colors hover:bg-[#35106a] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/90"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <ExternalLink size={14} /> Kuickpay help
+      </a>
 
-        <div className="pt-2">
-          <a
-            href="https://app.kuickpay.com/PaymentsBillPayment"
-            className="flex items-center justify-center gap-2 w-full p-4 rounded-2xl bg-foreground/5 border border-foreground/10 hover:bg-foreground/10 text-foreground transition-all text-xs font-bold"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <ExternalLink size={14} />
-            Kuickpay Help & Clarification
-          </a>
-        </div>
-      </div>
-
-      <div className="pt-6 border-t border-foreground/10">
-        <div className="flex gap-4">
-          <div className="w-5 h-5 rounded-full border border-amber-500/50 flex items-center justify-center shrink-0">
-            <div className="w-1.5 h-1.5 rounded-full bg-amber-500/20"></div>
-          </div>
-          <div className="space-y-1">
-            <p className="text-foreground font-medium Cap text-xs">Physical Cash Deposit</p>
-            <p className="text-foreground/50 text-xs leading-relaxed font-medium">
-              Print the challan form and then visit any nearest{" "}
-              <strong className="text-foreground font-bold">Faysal Bank branch</strong> for cash
-              deposit.
-            </p>
-          </div>
+      <div className="flex gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-200/10 dark:bg-amber-300/[0.08]">
+        <Landmark size={17} className="mt-0.5 shrink-0 text-amber-800 dark:text-amber-200" />
+        <div>
+          <p className="text-xs font-bold text-slate-900 dark:text-white">Pay by cash at a branch</p>
+          <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">Print the challan and deposit it at any Faysal Bank branch.</p>
         </div>
       </div>
     </div>
@@ -262,179 +232,153 @@ function FeeChallanPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-4 md:p-8 space-y-10 relative z-10">
-        {}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
-        <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
-
-        <PageHeader title="Fee Challans" subtitle="Manage your semester invoices and payments">
-          <div className="flex items-center gap-4 bg-secondary/50 px-6 py-3 rounded-2xl border border-foreground/10 backdrop-blur-xl group hover:bg-secondary/70 transition-all">
-            <div className="text-right">
-              <p className="text-[10px] font-bold text-foreground/50 Cap tracking-[0px]">
-                Payment Status
-              </p>
-              <h4
-                className={`text-lg font-bold font-sans ${stats.unpaid > 0 ? "text-amber-400" : "text-emerald-400"}`}
-              >
-                {stats.unpaid > 0 ? `${stats.unpaid} Outstanding` : "All Paid"}
-              </h4>
-            </div>
-            <div className="w-px h-8 bg-foreground/10 mx-2"></div>
-            <Receipt className="text-accent" size={24} />
+      <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-5 pb-24">
+        <header className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
+          <div className="space-y-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Finance</p>
+            <h1 className="text-3xl font-bold tracking-tight text-white">Fee Challans</h1>
+            <p className="text-sm text-white/80">Review your invoices, payment status, and due dates.</p>
           </div>
-        </PageHeader>
+          <div className="flex w-fit items-center gap-3 rounded-full bg-white/15 px-4 py-2.5 text-[#101010] dark:bg-white/10 dark:text-white">
+            <Receipt size={19} />
+            <span className="text-sm font-semibold">
+              {stats.unpaid > 0 ? `${stats.unpaid} outstanding` : "All paid"}
+            </span>
+          </div>
+        </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
           <StatsCard
             icon={AlertCircle}
             label="Outstanding"
             value={stats.unpaid}
-            subValue="Challans"
-            delay={100}
+            subValue="unpaid challans"
+            variant="dashboard"
           />
           <StatsCard
             icon={CheckCircle2}
             label="Paid"
             value={stats.paid}
-            subValue="Total"
-            delay={200}
+            subValue="paid challans"
+            variant="dashboard"
           />
           <StatsCard
             icon={DollarSign}
             label="Latest Amount"
             value={`Rs. ${stats.latestAmount}`}
-            delay={300}
+            subValue="latest unpaid"
+            variant="dashboard"
           />
           <StatsCard
             icon={Calendar}
             label="Total Generated"
             value={stats.total}
-            subValue="Invoices"
-            delay={400}
+            subValue="all invoices"
+            variant="dashboard"
           />
         </div>
 
-        {}
-        <div className="flex md:flex-row flex-col gap-8">
-          <div className="space-y-6">
-            {}
-            <NotificationBanner
-              alerts={[
-                ...alerts,
-                {
-                  type: "info",
-                  message:
-                    "Payments made through the online portal are verified automatically within 24-48 hours. Please keep your receipt until the status is updated.",
-                },
-              ].filter((v, i, a) => a.findIndex((t) => t.message === v.message) === i)}
-            />
+        <NotificationBanner
+          alerts={[
+            ...alerts,
+            {
+              type: "info",
+              message: "Payments made through the online portal are verified automatically within 24-48 hours. Please keep your receipt until the status is updated.",
+            },
+          ].filter((value, index, all) => all.findIndex((item) => item.message === value.message) === index)}
+        />
 
-            <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden">
-              <div className="flex items-center gap-3 mb-10 border-b border-foreground/10 pb-8">
-                <div className="p-3 bg-tertiary rounded-xl text-foreground/60">
-                  <FileText size={20} />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-foreground tracking-tight font-sans">
-                    Invoice History
-                  </h3>
-                  <p className="text-[10px] text-foreground/40 font-bold Cap tracking-[0px] font-sans">
-                    Download and proof of payment
-                  </p>
-                </div>
+        <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)]">
+          <section className="min-w-0 overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]">
+            <div className="flex items-center gap-3 border-b border-black/[0.06] px-5 py-4 dark:border-white/[0.1] sm:px-6">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+                <FileText size={20} />
               </div>
+              <div>
+                <h2 className="text-lg font-bold tracking-tight">Invoice history</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">View status, payment, and print options.</p>
+              </div>
+            </div>
 
-              {}
+            <div>
               <div className="hidden md:block overflow-x-auto scrollbar-hide">
-                <table className="w-full text-left border-collapse border-spacing-0">
-                  <thead>
-                    <tr className="border-b border-foreground/10">
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 font-sans Cap">
+                <table className="sf-data-table w-full text-left border-collapse border-spacing-0">
+                  <thead className="bg-slate-50 dark:bg-white/[0.04]">
+                    <tr className="border-b border-black/[0.06] dark:border-white/[0.1]">
+                      <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 sm:px-6">
                         Sr.
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 font-sans w-full Cap">
+                      <th className="w-full px-5 py-3 text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                         Description
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 font-sans Cap">
+                      <th className="px-5 py-3 text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                         Status
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 text-right font-sans Cap">
+                      <th className="px-5 py-3 text-right text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                         Amount
                       </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 text-right font-sans Cap">
+                      <th className="px-5 py-3 text-right text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 sm:px-6">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-foreground/5">
+                  <tbody className="divide-y divide-black/[0.05] dark:divide-white/[0.08]">
                     {challans.map((c, idx) => (
-                      <tr key={idx} className="group hover:bg-foreground/[0.02] transition-colors">
-                        <td className="px-6 py-5">
-                          <span className="text-foreground/50 font-bold font-sans text-xs">
+                      <tr key={idx} className="group transition-colors hover:bg-slate-50 dark:hover:bg-white/[0.025]">
+                        <td className="px-5 py-4 sm:px-6">
+                          <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
                             {c.srNo}
                           </span>
                         </td>
-                        <td className="px-6 py-5">
+                        <td className="px-5 py-4">
                           <div className="flex flex-col">
-                            <span className="text-foreground font-bold group-hover:text-accent transition-colors font-sans">
+                            <span className="font-bold text-slate-900 transition-colors group-hover:text-[#230052] dark:text-white dark:group-hover:text-white">
                               {c.description}
                             </span>
                             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
-                              <span className="flex items-center gap-1.5 text-[10px] text-foreground/50 font-bold Cap tracking-tight font-sans whitespace-nowrap">
-                                <div className="p-1 bg-tertiary/50 rounded-md">
-                                  <Clock size={10} className="text-accent" />
-                                </div>
-                                Issued: <span className="text-foreground/60">{c.issueDate}</span>
+                              <span className="flex items-center gap-1.5 whitespace-nowrap text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                                <Clock size={12} /> Issued: <span className="text-slate-700 dark:text-slate-300">{c.issueDate}</span>
                               </span>
-                              <span className="flex items-center gap-1.5 text-[10px] text-foreground/50 font-bold Cap tracking-tight font-sans whitespace-nowrap">
-                                <div className="p-1 bg-tertiary/50 rounded-md">
-                                  <Calendar size={10} className="text-emerald-400" />
-                                </div>
-                                Due: <span className="text-foreground/60">{c.dueDate}</span>
+                              <span className="flex items-center gap-1.5 whitespace-nowrap text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                                <Calendar size={12} /> Due: <span className="text-slate-700 dark:text-slate-300">{c.dueDate}</span>
                               </span>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-5">
+                        <td className="px-5 py-4">
                           <div className="flex justify-center w-full">
                             <span
-                              className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black Cap tracking-[0px] font-sans ${
-                                c.status.toLowerCase().includes("paid")
-                                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                  : "bg-rose-500/10 text-rose-400 border border-rose-500/20 animate-pulse"
+                              className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-[10px] font-bold ${
+                                isPaidStatus(c.status)
+                                  ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-300/10 dark:text-emerald-200"
+                                  : "bg-rose-50 text-rose-800 dark:bg-rose-300/10 dark:text-rose-200"
                               }`}
                             >
                               {c.status}
                             </span>
                           </div>
                         </td>
-                        <td className="px-6 py-5 text-right font-sans">
-                          <span className="text-foreground font-black text-sm">Rs. {c.amount}</span>
+                        <td className="px-5 py-4 text-right">
+                          <span className="whitespace-nowrap text-sm font-bold">Rs. {c.amount}</span>
                         </td>
-                        <td className="px-6 py-5 text-right">
+                        <td className="px-5 py-4 text-right sm:px-6">
                           <div className="flex items-center justify-end gap-2">
                             {c.status.toLowerCase().includes("unpaid") && (
                               <button
                                 onClick={() => handleOnlinePayment(c.challanNo)}
-                                className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-foreground transition-all group/pay"
+                                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl bg-emerald-700 text-white transition-colors hover:bg-emerald-800 dark:bg-emerald-300/15 dark:text-emerald-200 dark:hover:bg-emerald-300/25"
                                 title="Pay Online (KuickPay)"
                               >
-                                <ExternalLink
-                                  size={18}
-                                  className="group-hover/pay:scale-110 transition-transform"
-                                />
+                                <ExternalLink size={17} />
                               </button>
                             )}
                             <button
                               onClick={() => handlePrint(c.challanNo)}
-                              className="p-2.5 rounded-xl bg-foreground/5 border border-foreground/10 text-foreground/60 hover:text-foreground hover:bg-accent hover:border-accent transition-all group/btn disabled:opacity-30 disabled:cursor-not-allowed"
+                              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl bg-slate-100 text-slate-700 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-30 dark:bg-white/[0.08] dark:text-slate-200 dark:hover:bg-white/[0.14]"
                               title="Download/Print Challan"
                               disabled={!c.challanNo}
                             >
-                              <Printer
-                                size={18}
-                                className="group-hover/btn:scale-110 transition-transform"
-                              />
+                              <Printer size={17} />
                             </button>
                           </div>
                         </td>
@@ -444,69 +388,62 @@ function FeeChallanPage() {
                 </table>
               </div>
 
-              {}
-              <div className="md:hidden space-y-4">
+              <div className="space-y-3 p-4 md:hidden">
                 {challans.map((c, idx) => (
                   <div
                     key={idx}
-                    className="p-6 rounded-[2rem] bg-secondary/50 border border-foreground/10 space-y-6"
+                    className="space-y-4 rounded-[20px] border border-black/[0.06] bg-white p-4 dark:border-white/[0.1] dark:bg-black"
                   >
                     <div className="flex justify-between items-start">
                       <div className="space-y-1">
-                        <p className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px]">
-                          DESCRIPTION
-                        </p>
-                        <h4 className="text-lg font-black text-accent leading-tight">
+                        <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Description</p>
+                        <h4 className="text-base font-bold leading-tight text-slate-900 dark:text-white">
                           {c.description}
                         </h4>
                       </div>
                       <span
-                        className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black Cap tracking-[0px] font-sans ${
-                          c.status.toLowerCase().includes("paid")
-                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                            : "bg-rose-500/10 text-rose-400 border border-rose-500/20 animate-pulse"
+                          className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-[10px] font-bold ${
+                          isPaidStatus(c.status)
+                              ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-300/10 dark:text-emerald-200"
+                              : "bg-rose-50 text-rose-800 dark:bg-rose-300/10 dark:text-rose-200"
                         }`}
                       >
                         {c.status}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-foreground/10">
+                    <div className="grid grid-cols-2 gap-4 border-t border-black/[0.06] pt-4 dark:border-white/[0.1]">
                       <div className="space-y-1.5">
-                        <div className="flex items-center gap-1.5 text-[9px] text-foreground/50 font-black Cap tracking-[0px]">
-                          <Clock size={10} className="text-accent" />
-                          ISSUED
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                          <Clock size={12} /> Issued
                         </div>
-                        <p className="text-xs font-bold text-foreground ml-4">{c.issueDate}</p>
+                        <p className="ml-5 text-xs font-semibold text-slate-800 dark:text-slate-200">{c.issueDate}</p>
                       </div>
                       <div className="space-y-1.5 text-right">
-                        <div className="flex items-center justify-end gap-1.5 text-[9px] text-foreground/50 font-black Cap tracking-[0px]">
-                          <Calendar size={10} className="text-emerald-400" />
-                          DUE
+                        <div className="flex items-center justify-end gap-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                          <Calendar size={12} /> Due
                         </div>
-                        <p className="text-xs font-bold text-foreground mr-4">{c.dueDate}</p>
+                        <p className="mr-5 text-xs font-semibold text-slate-800 dark:text-slate-200">{c.dueDate}</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-foreground/10">
+                    <div className="flex items-center justify-between border-t border-black/[0.06] pt-4 dark:border-white/[0.1]">
                       <div className="space-y-0.5">
-                        <p className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px]">
-                          Total Amount
-                        </p>
-                        <p className="text-xl font-black text-foreground">Rs. {c.amount}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Total amount</p>
+                        <p className="text-xl font-bold text-slate-900 dark:text-white">Rs. {c.amount}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         {c.status.toLowerCase().includes("unpaid") && (
                           <button
                             onClick={() => handleOnlinePayment(c.challanNo)}
-                            className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 active:scale-95 transition-all"
+                            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl bg-emerald-700 text-white transition-colors hover:bg-emerald-800 dark:bg-emerald-300/15 dark:text-emerald-200"
                           >
                             <ExternalLink size={20} />
                           </button>
                         )}
                         <button
                           onClick={() => handlePrint(c.challanNo)}
-                          className="p-3.5 rounded-2xl bg-accent/10 border border-accent/20 text-accent active:scale-95 transition-all disabled:opacity-30"
+                          className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl bg-slate-100 text-slate-700 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-30 dark:bg-white/[0.08] dark:text-slate-200 dark:hover:bg-white/[0.14]"
                           disabled={!c.challanNo}
                         >
                           <Printer size={20} />
@@ -518,38 +455,31 @@ function FeeChallanPage() {
               </div>
 
               {challans.length === 0 && (
-                <div className="px-6 py-20 text-center">
-                  <div className="flex flex-col items-center gap-4 opacity-50">
-                    <Receipt size={48} className="text-foreground/50" />
-                    <p className="text-foreground/60 font-medium font-sans">
-                      No challans found in the records.
-                    </p>
+                <div className="flex flex-col items-center gap-3 px-6 py-14 text-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-[36%] bg-[#f2ecfc] text-[#230052] dark:bg-white/[0.1] dark:text-white">
+                    <Receipt size={22} />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-900 dark:text-white">No challans found</p>
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Generated fee invoices will appear here.</p>
                   </div>
                 </div>
               )}
             </div>
-          </div>
+          </section>
 
-          {}
-          <div className="space-y-6">
-            <div className="bg-accent/5 border border-accent/10 backdrop-blur-2xl rounded-[2.5rem] p-8">
-              <div className="flex items-center gap-3 mb-8 border-b border-foreground/10 pb-6">
-                <div className="p-3 bg-accent/10 rounded-xl text-accent">
-                  <Printer size={20} />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-foreground tracking-tight font-sans">
-                    Payment Portal
-                  </h3>
-                  <p className="text-[10px] text-accent font-bold Cap tracking-[0px] font-sans underline decoration-x/30 underline-offset-4">
-                    Legal Roadmap
-                  </p>
-                </div>
+          <section className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6">
+            <div className="mb-5 flex items-center gap-3 border-b border-black/[0.06] pb-4 dark:border-white/[0.1]">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+                <Printer size={19} />
               </div>
-
-              <PaymentInstructions />
+              <div>
+                <h2 className="text-lg font-bold tracking-tight">Payment instructions</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Online and branch payment options.</p>
+              </div>
             </div>
-          </div>
+            <PaymentInstructions />
+          </section>
         </div>
       </div>
 
@@ -572,22 +502,5 @@ function FeeChallanPage() {
     </PageLayout>
   );
 }
-
-const ChevronRight = ({ size, className }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="m9 18 6-6-6-6" />
-  </svg>
-);
 
 export default FeeChallanPage;

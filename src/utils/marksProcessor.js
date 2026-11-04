@@ -50,32 +50,28 @@ export const processCourseMarks = (course) => {
     const includedIndices = new Set();
     const EPSILON = 0.001;
 
+    sorted.sort((a, b) => b._performanceRatio - a._performanceRatio);
+
     if (isSimMode) {
       if (section.itemLimit && section.itemLimit > 0 && section.itemLimit < sorted.length) {
-        sorted.sort((a, b) => b._performanceRatio - a._performanceRatio);
-
-        secWeight = 0;
-        let count = 0;
-
-        for (let item of sorted) {
-          if (count < section.itemLimit) {
-            includedIndices.add(item._originalIdx);
-            secWeight += item.weight;
-            count++;
-          }
-        }
+        const configuredWeight = parseFloatOrZero(section.weight);
+        secWeight = configuredWeight > 0
+          ? configuredWeight
+          : sorted.slice(0, section.itemLimit).reduce((sum, item) => sum + item.weight, 0);
+        sorted.slice(0, section.itemLimit).forEach((item) => includedIndices.add(item._originalIdx));
       } else {
         secWeight = rowsWeightSum;
         sorted.forEach((item) => includedIndices.add(item._originalIdx));
       }
     } else {
       if (section.itemLimit && section.itemLimit > 0 && section.itemLimit < sorted.length) {
-        secWeight = sorted.slice(0, section.itemLimit).reduce((acc, item) => acc + item.weight, 0);
+        const configuredWeight = parseFloatOrZero(section.weight);
+        secWeight = configuredWeight > 0
+          ? configuredWeight
+          : sorted.slice(0, section.itemLimit).reduce((sum, item) => sum + item.weight, 0);
       } else if (secWeight === undefined || secWeight === null || secWeight <= 0) {
         secWeight = rowsWeightSum;
       }
-
-      sorted.sort((a, b) => b._performanceRatio - a._performanceRatio);
 
       let currentAccWeight = 0;
       const itemLimit = section.itemLimit || 999;
@@ -108,15 +104,11 @@ export const processCourseMarks = (course) => {
 
     const sortedIncluded = sorted.filter((s) => includedIndices.has(s._originalIdx));
 
-    if (!isSimMode) {
-      sortedIncluded.sort((a, b) => b._performanceRatio - a._performanceRatio);
-    }
-
     sortedIncluded.forEach((item) => {
       const remaining = secWeight - usedWeightBudget;
-      if (remaining <= EPSILON && !isSimMode) return;
+      if (remaining <= EPSILON) return;
 
-      const takenWeight = isSimMode ? item.weight : Math.min(item.weight, remaining);
+      const takenWeight = Math.min(item.weight, remaining);
       const weightageFactor = item.total > 0 ? takenWeight / item.total : 0;
 
       calculatedSecObtained += (item.obtained || 0) * weightageFactor;

@@ -5,8 +5,6 @@ import {
   BarChart3,
   BookOpen,
   CalendarDays,
-  Cloud,
-  ChevronDown,
   DollarSign,
   FileText,
   GraduationCap,
@@ -17,8 +15,6 @@ import {
   Menu,
   MessageSquare,
   Moon,
-  Palette,
-  Pipette,
   Receipt,
   RefreshCw,
   Sun,
@@ -28,6 +24,7 @@ import {
 } from "lucide-react";
 import { Logo } from "./ui/Logo";
 import ProfileImageModal from "./ui/ProfileImageModal";
+import { getExtensionUrl } from "../utils/extensionApi";
 
 const LINK_GROUPS = {
   Home: "Overview",
@@ -102,8 +99,8 @@ function SidebarLink({ link, active, onNavigate, compact = false }) {
       aria-current={active ? "page" : undefined}
       className={`flex w-full items-center gap-3 rounded-full px-3.5 py-2.5 text-left text-[13px] font-semibold transition-colors ${
         active
-          ? "bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]"
-          : "text-slate-700 hover:bg-white/60 hover:text-[#230052] dark:text-slate-200 dark:hover:bg-white/10 dark:hover:text-white"
+          ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"
+          : "text-white/90 hover:bg-white/15 hover:text-white dark:text-white/90 dark:hover:bg-white/10 dark:hover:text-white"
       } ${compact ? "justify-center px-2" : ""}`}
       title={compact ? link.text : undefined}
     >
@@ -126,10 +123,6 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     const saved = localStorage.getItem("superflex-cloud-mode");
     return saved ? saved === "on" : (localStorage.getItem("superflex-theme-mode") || "light") === "light";
   });
-  const [customAccent, setCustomAccent] = useState(() => localStorage.getItem("superflex-theme-color") || "");
-  const [customBackgroundEnabled, setCustomBackgroundEnabled] = useState(() => localStorage.getItem("superflex-bg-enabled") === "true");
-  const [customBackgroundUrl, setCustomBackgroundUrl] = useState(() => localStorage.getItem("superflex-bg-url") || "");
-  const [appearanceOpen, setAppearanceOpen] = useState(false);
   const callbacksRef = useRef({ onAttendanceLinkFound, onLinksFound });
   callbacksRef.current = { onAttendanceLinkFound, onLinksFound };
 
@@ -150,27 +143,6 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     localStorage.setItem("superflex-theme-mode", mode);
     window.dispatchEvent(new CustomEvent("superflex-theme-mode-changed", { detail: mode }));
     document.dispatchEvent(new CustomEvent("superflex-theme-mode-changed", { detail: mode }));
-  };
-
-  const changeCloudMode = () => {
-    const next = !cloudMode;
-    setCloudMode(next);
-    document.documentElement.classList.toggle("cloud-mode", next);
-    localStorage.setItem("superflex-cloud-mode", next ? "on" : "off");
-  };
-
-  const setAccentColor = (color) => {
-    setCustomAccent(color);
-    if (color) localStorage.setItem("superflex-theme-color", color);
-    else localStorage.removeItem("superflex-theme-color");
-  };
-
-  const updateCustomBackground = (enabled, url = customBackgroundUrl) => {
-    setCustomBackgroundEnabled(enabled);
-    setCustomBackgroundUrl(url);
-    localStorage.setItem("superflex-bg-enabled", String(enabled));
-    localStorage.setItem("superflex-bg-url", url);
-    window.dispatchEvent(new CustomEvent("superflex-custom-background-changed", { detail: { enabled, url } }));
   };
 
   const sidebarLogoColor = themeMode === "light" && !cloudMode ? "#000000" : "#ffffff";
@@ -266,21 +238,11 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
   useEffect(() => {
     const root = document.documentElement;
-    if (customAccent) {
-      const hex = customAccent.replace("#", "");
-      const rgb = hex.length === 3
-        ? hex.split("").map((digit) => parseInt(digit + digit, 16))
-        : [0, 2, 4].map((index) => parseInt(hex.slice(index, index + 2), 16));
-      const brightness = (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000;
-      root.style.setProperty("--accent", customAccent);
-      root.style.setProperty("--accent-foreground", brightness > 150 ? "#0a192f" : "#ffffff");
-      root.classList.add("custom-accent");
-    } else {
-      root.style.removeProperty("--accent");
-      root.style.removeProperty("--accent-foreground");
-      root.classList.remove("custom-accent");
-    }
-  }, [customAccent, themeMode]);
+    localStorage.removeItem("superflex-theme-color");
+    root.style.removeProperty("--accent");
+    root.style.removeProperty("--accent-foreground");
+    root.classList.remove("custom-accent");
+  }, []);
 
   const navigate = (href, action) => {
     setMobileOpen(false);
@@ -298,7 +260,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         if (!links.length) return null;
         return (
           <div key={group}>
-            <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">
+            <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.14em] text-white/70 dark:text-white/70">
               {group}
             </p>
             <div className="space-y-1">
@@ -314,7 +276,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           </div>
         );
       })}
-      {!menuLinks.length && <p className="px-3 text-xs text-slate-500">Loading navigation…</p>}
+      {!menuLinks.length && <p className="px-3 text-xs text-white/75">Loading navigation…</p>}
     </nav>
   );
 
@@ -342,19 +304,19 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         <button
           type="button"
           onClick={() => window.dispatchEvent(new CustomEvent("superflex-toggle-ai"))}
-          className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#230052] px-4 text-sm font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-[#a098ff] dark:text-[#0a192f] dark:hover:bg-[#b7b0ff]"
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#230052] px-4 text-sm font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80"
         >
           <Activity size={17} /> Ask AI
         </button>
 
-        <div className="space-y-2">
+        <div>
           <div className="rounded-2xl bg-white/30 p-3 dark:bg-white/[0.04]">
-            <div className="grid grid-cols-3 gap-1.5">
+            <div className="grid grid-cols-2 gap-1.5">
               <button
                 type="button"
                 onClick={() => changeThemeMode("light")}
                 aria-pressed={themeMode === "light"}
-                className={`flex items-center justify-center gap-1 rounded-full px-2 py-2 text-xs font-bold ${themeMode === "light" ? "bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]" : "bg-white/70 text-slate-700 dark:bg-white/10 dark:text-slate-200"}`}
+                className={`flex items-center justify-center gap-1 rounded-full px-2 py-2 text-xs font-bold ${themeMode === "light" ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "bg-white/70 text-slate-700 dark:bg-white/10 dark:text-slate-200"}`}
               >
                 <Sun size={14} /> Light
               </button>
@@ -362,70 +324,12 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                 type="button"
                 onClick={() => changeThemeMode("dark")}
                 aria-pressed={themeMode === "dark"}
-                className={`flex items-center justify-center gap-1 rounded-full px-2 py-2 text-xs font-bold ${themeMode === "dark" ? "bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]" : "bg-white/70 text-slate-700 dark:bg-white/10 dark:text-slate-200"}`}
+                className={`flex items-center justify-center gap-1 rounded-full px-2 py-2 text-xs font-bold ${themeMode === "dark" ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "bg-white/70 text-slate-700 dark:bg-white/10 dark:text-slate-200"}`}
               >
                 <Moon size={14} /> Dark
               </button>
-              <button
-                type="button"
-                onClick={changeCloudMode}
-                aria-pressed={cloudMode}
-                title="Toggle cloud background"
-                className={`flex items-center justify-center gap-1 rounded-full px-2 py-2 text-xs font-bold ${cloudMode ? "bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]" : "bg-white/70 text-slate-700 dark:bg-white/10 dark:text-slate-200"}`}
-              >
-                <Cloud size={14} /> Clouds
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={() => setAppearanceOpen((open) => !open)}
-              aria-expanded={appearanceOpen}
-              className="mt-2 flex w-full items-center justify-between px-1 pt-1 text-[11px] font-semibold text-slate-600 hover:text-[#230052] dark:text-slate-300 dark:hover:text-[#a098ff]"
-            >
-              Customize appearance <ChevronDown size={14} className={`transition-transform ${appearanceOpen ? "rotate-180" : ""}`} />
-            </button>
-          </div>
-          {appearanceOpen && <>
-          <div className="space-y-3 rounded-2xl bg-white/30 p-3 dark:bg-white/[0.04]">
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
-              <Palette size={15} /> Accent color
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                {["#230052", "#a098ff", "#ec4899", "#f97316", "#fbbf24"].map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    onClick={() => setAccentColor(color)}
-                    aria-label={`Use accent color ${color}`}
-                    aria-pressed={customAccent.toLowerCase() === color}
-                    className={`h-5 w-5 rounded-full border-2 ${customAccent.toLowerCase() === color ? "border-white ring-2 ring-slate-500/50" : "border-white/70"}`}
-                    style={{ backgroundColor: color }}
-                  />
-                ))}
-                <button type="button" onClick={() => setAccentColor("")} aria-label="Use theme default accent" title="Theme default" className="flex h-5 w-5 items-center justify-center rounded-full border border-slate-400 bg-white text-slate-600"><X size={12} /></button>
-              </div>
-              <label className="relative flex h-7 w-7 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-white/70 bg-white text-slate-700" title="Choose custom accent">
-                <Pipette size={14} />
-                <input type="color" value={customAccent || (themeMode === "dark" ? "#a098ff" : "#230052")} onChange={(event) => setAccentColor(event.target.value)} aria-label="Choose custom accent color" className="absolute inset-0 cursor-pointer opacity-0" />
-              </label>
             </div>
           </div>
-          <div className="space-y-2 rounded-2xl bg-white/30 p-3 dark:bg-white/[0.04]">
-            <label className="flex cursor-pointer items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
-              <input type="checkbox" checked={customBackgroundEnabled} onChange={(event) => updateCustomBackground(event.target.checked)} className="h-4 w-4 accent-[#230052] dark:accent-[#a098ff]" />
-              Custom background
-            </label>
-            <input
-              type="url"
-              value={customBackgroundUrl}
-              onChange={(event) => updateCustomBackground(customBackgroundEnabled, event.target.value)}
-              placeholder="Image or video URL"
-              aria-label="Custom background image or video URL"
-              className="h-9 w-full rounded-full border border-black/5 bg-white/70 px-3 text-xs text-slate-800 placeholder:text-slate-400 dark:border-white/10 dark:bg-black/30 dark:text-white"
-            />
-          </div>
-          </>}
         </div>
 
         <div className="flex items-center gap-3 rounded-2xl bg-white/30 p-2.5 dark:bg-white/[0.04]">
@@ -440,7 +344,9 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
               alt="Profile"
               className="h-10 w-10 rounded-full object-cover"
               onError={(event) => {
-                event.currentTarget.src = chrome.runtime.getURL("assets/favicon.png");
+                const fallbackUrl = getExtensionUrl("assets/favicon.png");
+                if (fallbackUrl) event.currentTarget.src = fallbackUrl;
+                else event.currentTarget.hidden = true;
               }}
             />
           </button>

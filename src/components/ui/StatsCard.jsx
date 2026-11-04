@@ -9,12 +9,13 @@ const StatsCard = ({
   className = "",
   variant = "default",
   iconTone = "lavender",
+  valueClassName = "",
 }) => {
   const dashboardStyle = variant === "dashboard";
   const dashboardIconTones = {
-    plum: "bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]",
-    lavender: "bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]",
-    neutral: "bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]",
+    plum: "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]",
+    lavender: "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]",
+    neutral: "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]",
   };
 
   if (dashboardStyle) {
@@ -30,7 +31,7 @@ const StatsCard = ({
             {label}
           </p>
         </div>
-        <h3 className="mt-auto truncate pt-5 font-sans text-[28px] font-bold leading-none tracking-[-0.04em] text-[#101010] dark:text-[#f5f6fb] sm:text-[32px]">
+        <h3 className={`mt-auto truncate pt-5 font-sans text-[28px] font-bold leading-none tracking-[-0.04em] text-[#101010] dark:text-[#f5f6fb] sm:text-[32px] ${valueClassName}`}>
           {value}
         </h3>
         {subValue && (

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import TeacherSelectionModal from "./TeacherSelectionModal";
 import { getCampusFromRollNumber } from "../data/facultyDirectories";
 import { parseFacultyPages } from "../utils/facultyDirectory";
+import { sendExtensionMessage } from "../utils/extensionApi";
 
 const SELECTIONS_KEY = "superflex_course_teachers_v1";
 const COURSES_KEY = "superflex_cached_courses_v1";
@@ -60,8 +61,8 @@ export default function TeacherSettingsController() {
     setLoading(true);
     setError(false);
 
-    chrome.runtime.sendMessage({ type: "SUPERFLEX_GET_CAMPUS_FACULTY", campusId: campus.id }, (response) => {
-      if (chrome.runtime.lastError || !response?.pages) {
+    sendExtensionMessage({ type: "SUPERFLEX_GET_CAMPUS_FACULTY", campusId: campus.id }, (response, error) => {
+      if (error || !response?.pages) {
         setError(true);
         setLoading(false);
         return;

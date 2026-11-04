@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import PageLayout from "../components/layouts/PageLayout";
 import NotificationBanner from "../components/ui/NotificationBanner";
-import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
-import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import Skeleton from "../components/ui/Skeleton";
 import {
   History,
   CheckCircle2,
@@ -17,10 +16,43 @@ import {
   Send,
   ChevronDown,
   ChevronRight,
+  Check,
 } from "lucide-react";
 import Modal from "../components/ui/Modal";
 import Button from "../components/ui/Button";
 import { TextArea } from "../components/ui/Input";
+
+const GradeChangeSkeleton = () => (
+  <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8" role="status" aria-label="Loading grade change details">
+    <header className="space-y-2"><Skeleton className="h-3 w-20" /><Skeleton className="h-9 w-64" /><Skeleton className="h-4 w-80 max-w-full" /></header>
+    <Skeleton className="h-10 w-72 max-w-full rounded-full" />
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">{[0, 1, 2, 3].map((item) => <div key={item} className="flex min-h-[156px] flex-col rounded-[24px] bg-white p-5 dark:bg-black sm:p-6"><Skeleton className="h-12 w-12 rounded-[36%]" /><Skeleton className="mt-auto h-7 w-28" /><Skeleton className="mt-2 h-3 w-20" /></div>)}</div>
+    <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,.8fr)]"><section className="space-y-3 rounded-[24px] bg-white p-5 dark:bg-black sm:p-6"><Skeleton className="h-5 w-44" />{[0, 1, 2, 3].map((item) => <div key={item} className="flex items-center gap-4 border-t border-black/[0.05] py-4 dark:border-white/[0.08]"><Skeleton className="h-10 w-10 rounded-[36%]" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-56 max-w-full" /><Skeleton className="h-3 w-32" /></div><Skeleton className="h-6 w-6 rounded-full" /></div>)}</section><section className="space-y-4 rounded-[24px] bg-white p-5 dark:bg-black sm:p-6"><Skeleton className="h-5 w-36" /><Skeleton className="h-24 w-full rounded-2xl" /><Skeleton className="h-11 w-full rounded-full" /></section></div>
+  </main>
+);
+
+const ReasonSelector = ({ value, options, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const selectorRef = useRef(null);
+  useEffect(() => {
+    if (!open) return undefined;
+    const closeOutside = (event) => { if (!selectorRef.current?.contains(event.target)) setOpen(false); };
+    const closeEscape = (event) => { if (event.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", closeOutside);
+    document.addEventListener("touchstart", closeOutside);
+    document.addEventListener("keydown", closeEscape);
+    return () => {
+      document.removeEventListener("mousedown", closeOutside);
+      document.removeEventListener("touchstart", closeOutside);
+      document.removeEventListener("keydown", closeEscape);
+    };
+  }, [open]);
+  const label = options.find((option) => option.value === value)?.label || "Select a reason";
+  return <div className="relative" ref={selectorRef}>
+    <button type="button" aria-haspopup="listbox" aria-expanded={open} onClick={() => setOpen((current) => !current)} className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-900 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#230052]/30 dark:border-white/[0.12] dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1] dark:focus-visible:ring-white/30"><span>{label}</span><ChevronDown size={16} className={`text-slate-500 transition-transform dark:text-slate-400 ${open ? "rotate-180" : ""}`} /></button>
+    {open && <div role="listbox" aria-label="Reason for grade change" className="absolute inset-x-0 top-full z-40 mt-2 rounded-2xl border border-black/[0.08] bg-white p-1.5 text-slate-900 shadow-[0_12px_32px_rgba(15,23,42,.16)] dark:border-white/[0.12] dark:bg-[#111] dark:text-white dark:shadow-black/40">{options.map((option) => <button key={option.value} type="button" role="option" aria-selected={value === option.value} onClick={() => { onChange(option.value); setOpen(false); }} className={`flex w-full cursor-pointer items-center justify-between rounded-xl px-3.5 py-2.5 text-left text-sm transition-colors ${value === option.value ? "bg-[#230052] font-semibold text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/[0.08]"}`}>{option.label}{value === option.value && <Check size={15} />}</button>)}</div>}
+  </div>;
+};
 
 const GradeChangeModal = ({ isOpen, onClose, onSubmit }) => {
   const [reason, setReason] = useState("");
@@ -54,29 +86,10 @@ const GradeChangeModal = ({ isOpen, onClose, onSubmit }) => {
     >
       <div className="space-y-6 pt-4">
         <div className="space-y-3">
-          <label className="text-[10px] font-black text-foreground/50 Cap tracking-[0px] px-1">
+          <label className="text-xs font-semibold text-slate-600 dark:text-slate-300">
             Reason for Rectification
           </label>
-          <div className="relative group">
-            <select
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              className="w-full appearance-none bg-secondary border border-foreground/10 text-foreground px-5 py-4 rounded-2xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-x/50 transition-all cursor-pointer pr-12"
-            >
-              <option value="" disabled>
-                Select a reason
-              </option>
-              {REASONS.map((r) => (
-                <option key={r.value} value={r.value}>
-                  {r.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              size={16}
-              className="absolute right-5 top-1/2 -translate-y-1/2 text-foreground/50 pointer-events-none group-hover:text-foreground transition-colors"
-            />
-          </div>
+          <ReasonSelector value={reason} options={REASONS} onChange={setReason} />
         </div>
 
         <TextArea
@@ -98,85 +111,18 @@ const GradeChangeModal = ({ isOpen, onClose, onSubmit }) => {
 };
 
 const GradeChangeCard = ({ req, isSelected, onToggle, index }) => {
+  const status = req.status || "N/A";
+  const canSelect = Boolean(req.checkboxId);
   return (
-    <div
-      onClick={() => req.checkboxId && onToggle(req.checkboxId)}
-      className={`group flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border transition-all duration-300 gap-4 ${
-        req.checkboxId ? "cursor-pointer" : "cursor-not-allowed opacity-60"
-      } ${
-        isSelected
-          ? "bg-accent/10 border-accent/50"
-          : "bg-secondary/30 border-transparent hover:bg-secondary/50 hover:border-foreground/10"
-      }`}
-    >
+    <button type="button" onClick={() => canSelect && onToggle(req.checkboxId)} disabled={!canSelect} aria-pressed={isSelected} className={`group flex w-full cursor-pointer flex-col gap-3 px-1 py-4 text-left transition-colors sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-5 ${canSelect ? "hover:bg-slate-50 dark:hover:bg-white/[0.025]" : "cursor-not-allowed opacity-60"}`}>
       <div className="flex items-center gap-3 min-w-0 flex-1">
-        <span
-          className={`font-bold text-xs min-w-[1.2rem] ${isSelected ? "text-accent" : "text-foreground/40"}`}
-        >
-          {index}.
-        </span>
-
-        <div
-          className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 transition-all duration-300 ${
-            isSelected
-              ? "bg-accent/20 border-accent/30 text-accent scale-105"
-              : "bg-tertiary/50 border-foreground/10 text-foreground/50"
-          }`}
-        >
-          <FileText size={18} />
-        </div>
-
-        <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-[10px] font-black text-accent Cap tracking-tighter opacity-80 shrink-0">
-              {req.code}
-            </span>
-            <h4 className="text-foreground font-bold text-sm leading-tight truncate">
-              {req.course}
-            </h4>
-          </div>
-
-          <div className="flex items-center gap-2.5 text-[10px] text-foreground/50 font-bold Cap tracking-[0px] leading-none">
-            <span className="shrink-0">{req.credits} Credits</span>
-            <span className="w-1 h-1 rounded-full bg-tertiary shrink-0"></span>
-            <span className="truncate">Section {req.section}</span>
-          </div>
-        </div>
+        <span className="hidden w-7 shrink-0 text-right text-xs font-semibold tabular-nums text-slate-400 sm:block">{index}</span>
+        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[36%] ${isSelected ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "bg-slate-100 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300"}`}><FileText size={18} /></span>
+        <span className="min-w-0 flex-1"><span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1"><span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 dark:bg-white/[0.08] dark:text-slate-300">{req.code}</span><span className="truncate text-sm font-bold text-slate-900 dark:text-white">{req.course}</span></span><span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400"><span>{req.credits} credits</span><span>Section {req.section}</span></span></span>
       </div>
 
-      <div className="flex flex-row items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-foreground/10">
-        <div className="flex items-center gap-4">
-          <div className="flex flex-col items-end gap-1">
-            <span className="px-2.5 py-1 rounded-lg bg-accent/10 text-accent font-black text-[10px]">
-              Grade: {req.grade}
-            </span>
-          </div>
-
-          <div
-            className={`px-3 py-1 rounded-lg border text-[9px] font-black Cap tracking-[0px] ${
-              req.status.toLowerCase().includes("pending")
-                ? "bg-amber-500/10 border-amber-500/20 text-amber-500"
-                : req.status.toLowerCase().includes("rejected")
-                  ? "bg-rose-500/10 border-rose-500/20 text-rose-400"
-                  : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-            }`}
-          >
-            {req.status}
-          </div>
-        </div>
-
-        <div
-          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 shrink-0 ${
-            isSelected
-              ? "bg-accent border-accent text-[var(--accent-foreground)] scale-110"
-              : "border-tertiary bg-transparent"
-          }`}
-        >
-          {isSelected && <CheckCircle2 size={14} strokeWidth={3} />}
-          {!isSelected && !req.checkboxId && <Search size={10} className="text-foreground/20" />}
-        </div>
-      </div>
-    </div>
+      <span className="flex w-full items-center justify-between gap-3 border-t border-black/[0.05] pt-3 dark:border-white/[0.08] sm:w-auto sm:justify-end sm:border-0 sm:pt-0"><span className="flex items-center gap-2"><span className="rounded-full bg-slate-100 px-3 py-1.5 text-[11px] font-bold text-slate-700 dark:bg-white/[0.08] dark:text-slate-200">Grade {req.grade}</span><span className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${status.toLowerCase().includes("pending") ? "bg-amber-50 text-amber-700 dark:bg-amber-300/10 dark:text-amber-200" : status.toLowerCase().includes("rejected") ? "bg-rose-50 text-rose-700 dark:bg-rose-300/10 dark:text-rose-200" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-300/10 dark:text-emerald-200"}`}>{status}</span></span><span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition-colors ${isSelected ? "border-[#230052] bg-[#230052] text-white dark:border-white dark:bg-white dark:text-[#0a192f]" : "border-slate-300 text-transparent dark:border-white/25"}`}>{isSelected && <Check size={15} strokeWidth={3} />}{!isSelected && !canSelect && <Search size={13} className="text-slate-400 dark:text-slate-500" />}</span></span>
+    </button>
   );
 };
 
@@ -188,6 +134,7 @@ function GradeChangePage() {
   const [selectedIds, setSelectedIds] = useState([]);
   const [stats, setStats] = useState({ total: 0, pending: 0, processed: 0 });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [requestFilter, setRequestFilter] = useState("all");
 
   const hiddenContentRef = useRef(null);
 
@@ -461,174 +408,47 @@ function GradeChangePage() {
   };
 
   const hasAvailableRequests = requests.some((r) => r.checkboxId);
+  const filteredRequests = requests.filter((request) => {
+    if (requestFilter === "eligible") return Boolean(request.checkboxId);
+    if (requestFilter === "selected") return selectedIds.includes(request.checkboxId);
+    if (requestFilter === "pending") return request.status.toLowerCase().includes("pending");
+    return true;
+  });
 
   if (loading)
     return (
-      <PageLayout currentPage={window.location.pathname}>
-        <div className="w-full min-h-screen p-4 md:p-8 space-y-8">
-          <div className="flex justify-center py-20">
-            <LoadingSpinner />
-          </div>
-        </div>
+      <PageLayout currentPage={window.location.pathname} fullWidth>
+        <GradeChangeSkeleton />
       </PageLayout>
     );
 
   return (
-    <PageLayout currentPage={window.location.pathname}>
+    <PageLayout currentPage={window.location.pathname} fullWidth>
       <GradeChangeModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={submitGradeChange}
       />
-      <div className="w-full min-h-screen p-4 md:p-8 space-y-8 relative z-10">
-        {}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
-        <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
+      <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8">
+        <header className="flex flex-wrap items-end justify-between gap-4"><div className="space-y-1"><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p><h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Grade change</h1><p className="text-sm text-white/80">Request a review for incorrect or missing grades.</p></div><p className="max-w-sm text-xs text-white/75">Requests are reviewed by the respective course instructor.</p></header>
 
-        <PageHeader
-          title="Grade Change"
-          subtitle="Apply for rectification of marks or missing assessment data"
-        >
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            {semesters.length > 0 && (
-              <SuperTabs
-                tabs={semesters}
-                activeTab={semesters.find((s) => s.selected)?.value}
-                onTabChange={handleSemesterChange}
-              />
-            )}
-          </div>
-        </PageHeader>
+        {semesters.length > 0 && <section aria-label="Select semester" className="flex flex-col gap-2 sm:flex-row sm:items-center"><span className="w-20 shrink-0 text-xs font-semibold text-white/85">Semester</span><SuperTabs tabs={semesters} activeTab={semesters.find((semester) => semester.selected)?.value} onTabChange={handleSemesterChange} size="sm" className="!border-0 !bg-white/55 !backdrop-blur-xl dark:!bg-black/25 dark:!backdrop-blur-xl" /></section>}
 
-        {}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatsCard icon={History} label="Applications" value={stats.total} delay={100} />
-          <StatsCard icon={Clock} label="In Review" value={stats.pending} delay={200} />
-          <StatsCard icon={CheckCircle2} label="Processed" value={stats.processed} delay={300} />
-          <StatsCard
-            icon={AlertTriangle}
-            label="Status"
-            value={requests.length > 0 ? "ACTIVE" : "CLOSED"}
-            delay={400}
-          />
+        <section aria-labelledby="grade-change-overview" className="space-y-4"><div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Overview</p><h2 id="grade-change-overview" className="text-xl font-bold tracking-tight text-white">Application summary</h2></div><p className="text-xs text-white/75">Select eligible courses to start one request.</p></div><div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5"><StatsCard variant="dashboard" icon={History} label="Applications" value={stats.total} /><StatsCard variant="dashboard" icon={Clock} label="In review" value={stats.pending} subValue="Awaiting decision" /><StatsCard variant="dashboard" icon={CheckCircle2} label="Processed" value={stats.processed} subValue="Reviewed requests" /><StatsCard variant="dashboard" icon={AlertTriangle} label="Eligible courses" value={requests.filter((request) => request.checkboxId).length} subValue="Available to request" /></div></section>
+
+        {alerts.length > 0 && <NotificationBanner alerts={alerts} />}
+
+        <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,.8fr)]">
+          <section aria-labelledby="grade-change-courses" className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]">
+            <header className="flex flex-col gap-3 border-b border-black/[0.06] px-4 py-4 dark:border-white/[0.1] sm:flex-row sm:items-center sm:justify-between sm:px-6"><div><h2 id="grade-change-courses" className="text-base font-bold">Courses and requests</h2><p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Showing {filteredRequests.length} of {requests.length} records</p></div><div className="flex flex-wrap items-center gap-2"><div className="flex items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/[0.06]" role="group" aria-label="Filter grade change courses">{[{ value: "all", label: "All" }, { value: "eligible", label: "Eligible" }, { value: "selected", label: "Selected" }, { value: "pending", label: "Pending" }].map((filter) => <button key={filter.value} type="button" onClick={() => setRequestFilter(filter.value)} aria-pressed={requestFilter === filter.value} className={`cursor-pointer rounded-full px-3 py-2 text-xs font-bold transition-colors ${requestFilter === filter.value ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"}`}>{filter.label}</button>)}</div>{hasAvailableRequests && <button type="button" onClick={() => handleSelectAll(selectedIds.length !== requests.filter((request) => request.checkboxId).length)} className="cursor-pointer rounded-full bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-white/[0.08] dark:text-slate-200 dark:hover:bg-white/[0.12]">{selectedIds.length === requests.filter((request) => request.checkboxId).length ? "Deselect all" : "Select all"}</button>}</div></header>
+            {filteredRequests.length ? <div className="divide-y divide-black/[0.05] px-4 dark:divide-white/[0.08] sm:px-6">{filteredRequests.map((request, index) => <GradeChangeCard key={request.id} req={request} index={index + 1} isSelected={selectedIds.includes(request.checkboxId)} onToggle={handleCheckboxToggle} />)}</div> : <div className="flex min-h-[220px] flex-col items-center justify-center px-6 py-10 text-center"><span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[36%] bg-slate-100 text-slate-500 dark:bg-white/[0.08] dark:text-slate-300"><Search size={22} /></span><h3 className="text-base font-bold">{requestFilter === "selected" ? "No courses selected" : "No matching records"}</h3><p className="mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">{requestFilter === "selected" ? "Select an eligible course to start a grade change request." : "There are no grade change records for this filter and semester."}</p></div>}
+          </section>
+
+          <aside className="rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] xl:sticky xl:top-6"><header className="border-b border-black/[0.06] px-5 py-4 dark:border-white/[0.1] sm:px-6"><h2 className="text-base font-bold">Request details</h2><p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Review your selection before continuing.</p></header><div className="space-y-5 p-5 sm:p-6"><div className="rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.05]"><div className="mb-4 flex items-center gap-2"><span className="flex h-9 w-9 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><ClipboardEdit size={17} /></span><h3 className="text-sm font-bold">Selection summary</h3></div><div className="space-y-3 text-xs"><div className="flex justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Selected courses</span><span className="font-semibold">{selectedIds.length}</span></div><div className="flex justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Pending requests</span><span className="font-semibold">{stats.pending}</span></div><div className="flex justify-between gap-3 border-t border-black/[0.06] pt-3 text-sm dark:border-white/[0.1]"><span className="font-bold">Request status</span><span className="font-bold">{hasAvailableRequests ? "Available" : "Closed"}</span></div></div></div><Button disabled={selectedIds.length === 0} onClick={handleOpenRequestModal} className="w-full rounded-full" variant="primary" icon={<ChevronRight size={16} />}>Continue request</Button><p className="flex items-start gap-2 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400"><AlertTriangle size={15} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-300" />Include the assessment details and reason so the instructor can review your request.</p></div></aside>
         </div>
 
-        <NotificationBanner alerts={alerts} />
-
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          <div className="xl:col-span-2 space-y-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between px-2">
-                <h3 className="text-xl font-bold text-foreground tracking-tight">
-                  Eligible Courses
-                </h3>
-                {hasAvailableRequests && (
-                  <button
-                    onClick={() =>
-                      handleSelectAll(
-                        selectedIds.length !== requests.filter((r) => r.checkboxId).length,
-                      )
-                    }
-                    className="text-[10px] font-black text-accent Cap tracking-[0px] hover:opacity-80 transition-opacity"
-                  >
-                    {selectedIds.length === requests.filter((r) => r.checkboxId).length
-                      ? "Deselect All"
-                      : "Select All"}
-                  </button>
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 gap-3">
-                {requests.map((req, idx) => (
-                  <GradeChangeCard
-                    key={idx}
-                    req={req}
-                    index={idx + 1}
-                    isSelected={selectedIds.includes(req.checkboxId)}
-                    onToggle={handleCheckboxToggle}
-                  />
-                ))}
-              </div>
-
-              {requests.length === 0 && (
-                <div className="text-center py-20 bg-secondary/30 rounded-[2rem] border border-dashed border-foreground/10">
-                  <div className="flex flex-col items-center gap-4 opacity-50">
-                    <Search size={48} className="text-foreground/40" />
-                    <p className="text-foreground/50 font-medium Cap tracking-[0px] text-xs">
-                      No records available for this semester
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <div className="bg-secondary/50 border border-foreground/10 backdrop-blur-xl rounded-[2.5rem] p-8 space-y-8 sticky top-8">
-              <div className="space-y-6">
-                <div className="p-5 rounded-2xl bg-accent/5 border border-accent/10 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-accent/10 rounded-lg text-accent">
-                      <Layout size={18} />
-                    </div>
-                    <h4 className="text-sm font-bold text-foreground tracking-tight">
-                      Action Summary
-                    </h4>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs font-medium">
-                      <span className="text-foreground/50 font-bold Cap tracking-[0px] text-[10px]">
-                        Selected
-                      </span>
-                      <span className="text-foreground font-black">
-                        {selectedIds.length} Courses
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-xs font-medium">
-                      <span className="text-foreground/50 font-bold Cap tracking-[0px] text-[10px]">
-                        Pending
-                      </span>
-                      <span className="text-foreground font-black">{stats.pending}</span>
-                    </div>
-                    <div className="pt-3 border-t border-foreground/10 flex justify-between items-center">
-                      <span className="text-foreground/60 text-[10px] font-black Cap tracking-[0px]">
-                        Total Applications
-                      </span>
-                      <span className="text-accent font-black text-xs">{stats.total}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  <Button
-                    disabled={selectedIds.length === 0}
-                    onClick={handleOpenRequestModal}
-                    className="w-full"
-                    variant="primary"
-                    icon={<ChevronRight size={16} />}
-                  >
-                    Initiate Request
-                  </Button>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-foreground/10 space-y-4">
-                <div className="flex items-center gap-3 px-1 text-accent">
-                  <AlertTriangle size={14} />
-                  <span className="text-[10px] font-black Cap tracking-[0px]">Important Note</span>
-                </div>
-                <p className="text-[10px] text-foreground/50 font-medium leading-relaxed px-1 italic">
-                  Grade change requests are only reviewed and processed by the respective course
-                  teacher.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {}
         <div ref={hiddenContentRef} />
-      </div>
+      </main>
     </PageLayout>
   );
 }

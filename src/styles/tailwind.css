@@ -68,15 +68,6 @@
   opacity: 0.12 !important;
 }
 
-@keyframes dashboard-bar-fill {
-  0% { width: 18%; }
-  65% { width: 82%; }
-  100% { width: 38%; }
-}
-
-.animate-dashboard-bar-fill {
-  animation: dashboard-bar-fill 1.8s ease-in-out infinite alternate;
-}
 
 .Cap {
   text-transform: capitalize !important;
@@ -84,26 +75,14 @@
 
 .dark {
   --superflex-account-gradient: #000000;
-  --accent: #a098ff;
-  --accent-foreground: #0a192f;
+  --accent: #ffffff;
+  --accent-foreground: #000000;
   --background: #000000;
   --foreground: #f5f6fb;
   --secondary: #18181b;
   --tertiary: #27272a;
 }
 
-html.custom-accent [class~="text-[#230052]"],
-html.custom-accent [class~="dark:text-[#a098ff]"] {
-  color: var(--accent) !important;
-}
-
-html.custom-accent [class~="bg-[#230052]"],
-html.custom-accent [class~="dark:bg-[#a098ff]"],
-html.custom-accent [class~="hover:bg-[#370c72]"],
-html.custom-accent [class~="dark:hover:bg-[#b7b0ff]"] {
-  background-color: var(--accent) !important;
-  color: var(--accent-foreground) !important;
-}
 
 html {
   font-size: 80%; /* Scale down to approx 14.4px base */
@@ -292,4 +271,73 @@ h6 {
   offset-path: inset(1px round 9999px);
   offset-anchor: 50% 50%;
   animation: border-beam 4s linear infinite;
+}
+
+/* Shared table treatment: compact list rows, quiet dividers, and stable header styling. */
+.sf-data-table,
+.sf-data-table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.sf-data-table thead,
+.sf-data-table-wrapper thead {
+  background: transparent;
+}
+
+.sf-data-table th,
+.sf-data-table-wrapper th {
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid rgb(15 23 42 / 6%);
+  color: #64748b;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.sf-data-table td,
+.sf-data-table-wrapper td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgb(15 23 42 / 5%);
+  vertical-align: middle;
+}
+
+.sf-data-table tbody tr:last-child td,
+.sf-data-table-wrapper tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.sf-data-table tbody tr,
+.sf-data-table-wrapper tbody tr {
+  transition: background-color 150ms ease;
+}
+
+.sf-data-table tbody tr:hover,
+.sf-data-table-wrapper tbody tr:hover {
+  background: rgb(15 23 42 / 2.5%);
+}
+
+.dark .sf-data-table thead,
+.dark .sf-data-table-wrapper thead {
+  background: transparent;
+}
+
+.dark .sf-data-table th,
+.dark .sf-data-table-wrapper th {
+  border-bottom-color: rgb(255 255 255 / 10%);
+  color: #9ca3af;
+}
+
+.dark .sf-data-table td,
+.dark .sf-data-table-wrapper td {
+  border-bottom-color: rgb(255 255 255 / 8%);
+}
+
+.dark .sf-data-table tbody tr:hover,
+.dark .sf-data-table-wrapper tbody tr:hover {
+  background: rgb(255 255 255 / 2.5%);
 }

@@ -27,21 +27,24 @@ export const MarksSkeleton = () => {
 
 export const AttendanceSkeleton = () => {
   return (
-    <div className="flex flex-1 flex-col justify-around gap-6 py-2" aria-label="Loading attendance" role="status">
-      {[0, 1, 2, 3, 4].map((i) => (
-        <div key={i} className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-3 w-32" />
-            <Skeleton className="h-3 w-10" />
+    <div className="flex-1 space-y-4 overflow-hidden py-1" aria-label="Loading attendance heatmap" role="status">
+      <div className="flex items-center justify-between gap-3">
+        <Skeleton className="h-3 w-48" />
+        <div className="flex gap-3"><Skeleton className="h-3 w-12" /><Skeleton className="h-3 w-12" /></div>
+      </div>
+      <div className="grid grid-cols-2 gap-x-4 gap-y-5 md:grid-cols-3 xl:grid-cols-5">
+        {[0, 1, 2, 3, 4].map((subject) => (
+          <div key={subject} className="flex min-w-0 flex-col items-start py-1">
+            <div className="mb-2 flex h-[154px] max-h-[180px] flex-col flex-wrap content-start gap-1 overflow-hidden py-1">
+              {Array.from({ length: 28 }, (_, dot) => (
+                <Skeleton key={dot} className="h-3.5 w-3.5 shrink-0 rounded-[3px]" />
+              ))}
+            </div>
+            <Skeleton className="h-3 w-4/5" />
+            <Skeleton className="mt-1 h-2.5 w-2/3" />
           </div>
-          <div className="h-5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
-            <div
-              className="h-full w-1/3 origin-left rounded-full bg-[#230052] animate-dashboard-bar-fill dark:bg-[#a098ff]"
-              style={{ animationDelay: `${i * 180}ms` }}
-            />
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

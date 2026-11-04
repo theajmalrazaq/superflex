@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useMemo } from "react";
 import PageLayout from "../components/layouts/PageLayout";
 import NotificationBanner from "../components/ui/NotificationBanner";
-import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
-import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import { LoadingSpinner } from "../components/ui/LoadingOverlay";
 import { BookOpen, Layers, CheckCircle2, TrendingUp, GraduationCap } from "lucide-react";
+import { parseStudyPlanPage } from "../parsers/studyPlan";
+import { findFlexPageRoot } from "../parsers/dom";
 
 function StudyPlanPage() {
   const [loading, setLoading] = useState(true);
@@ -18,80 +19,16 @@ function StudyPlanPage() {
 
     const parseData = () => {
       try {
-        const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
+        const root = findFlexPageRoot(document);
         if (!root) {
           setLoading(false);
           window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
           return;
         }
 
-        const alertList = [];
-        root.querySelectorAll(".m-alert, .alert").forEach((alert) => {
-          if (
-            alert.style.display === "none" ||
-            alert.id === "DataErrormsgdiv" ||
-            alert.closest(".modal")
-          )
-            return;
-
-          const textContainer = alert.querySelector(".m-alert__text") || alert;
-          const clone = textContainer.cloneNode(true);
-
-          clone
-            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
-            .forEach((el) => el.remove());
-
-          let message = clone.textContent
-            .replace(/Alert!/gi, "")
-            .replace(/Close/gi, "")
-            .replace(/&nbsp;/g, " ")
-            .replace(/\s+/g, " ")
-            .trim();
-
-          if (message && message.length > 3) {
-            const type =
-              alert.classList.contains("alert-danger") ||
-              alert.classList.contains("m-alert--outline-danger")
-                ? "error"
-                : "info";
-            alertList.push({ type, message });
-          }
-        });
-        setAlerts(alertList);
-
-        const parsedSemesters = [];
-        const semesterCols = root.querySelectorAll(".col-md-6");
-
-        semesterCols.forEach((col) => {
-          const h4 = col.querySelector("h4");
-          if (!h4) return;
-
-          const title = h4.textContent
-            .replace(h4.querySelector("small")?.textContent || "", "")
-            .trim();
-          const crHrsText = h4.querySelector("small")?.textContent || "";
-          const crHrs = parseInt(crHrsText.match(/\d+/)?.[0] || "0");
-
-          const courses = [];
-          const table = col.querySelector("table");
-          if (table) {
-            table.querySelectorAll("tbody tr").forEach((tr) => {
-              const cells = tr.querySelectorAll("td");
-              if (cells.length >= 4) {
-                courses.push({
-                  code: cells[0].textContent.trim(),
-                  title: cells[1].textContent.trim(),
-                  crHrs: parseInt(cells[2].textContent.trim()),
-                  type: cells[3].textContent.trim(),
-                });
-              }
-            });
-          }
-
-          parsedSemesters.push({ title, crHrs, courses });
-        });
-
-        setSemesters(parsedSemesters);
+        const parsed = parseStudyPlanPage(root);
+        setAlerts(parsed.alerts);
+        setSemesters(parsed.semesters);
 
         root.style.display = "none";
 
@@ -122,7 +59,7 @@ function StudyPlanPage() {
         if (!isNC) {
           totalCredits += course.crHrs;
           totalCourses++;
-          if (course.type === "Core") coreCourses++;
+          if (course.type.toLowerCase().includes("core")) coreCourses++;
           else if (course.type.toLowerCase().includes("elective")) electives++;
         }
       });
@@ -145,160 +82,123 @@ function StudyPlanPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-4 md:p-8 space-y-10 relative z-10">
-        {}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
-        <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
-
-        <PageHeader title="Study Plan" subtitle="Degree requirements and course roadmaps">
-          <div className="flex items-center gap-4 bg-secondary/50 px-6 py-3 rounded-2xl border border-foreground/10 backdrop-blur-xl">
-            <div className="text-right">
-              <p className="text-[10px] font-bold text-foreground/50 Cap tracking-[0px]">
-                Graduation Path
-              </p>
-              <h4 className="text-lg font-bold text-foreground">4 Year Degree</h4>
-            </div>
-            <div className="w-px h-8 bg-foreground/10 mx-2"></div>
-            <GraduationCap className="text-accent" size={24} />
+      <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-5 pb-24">
+        <header className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
+          <div className="space-y-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p>
+            <h1 className="text-3xl font-bold tracking-tight text-white">Tentative Study Plan</h1>
+            <p className="text-sm text-white/80">Explore your planned courses and credit load by semester.</p>
           </div>
-        </PageHeader>
+          <div className="flex w-fit items-center gap-3 rounded-full bg-white/15 px-4 py-2.5 text-[#101010] dark:bg-white/10 dark:text-white">
+            <GraduationCap size={19} />
+            <span className="text-sm font-semibold">{semesters.length} planned semesters</span>
+          </div>
+        </header>
 
         <NotificationBanner alerts={alerts} />
 
-        {}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
           <StatsCard
             icon={BookOpen}
             label="Total Credits"
             value={stats.totalCredits}
-            subValue="to Graduate"
-            delay={100}
+            subValue="planned"
+            variant="dashboard"
           />
           <StatsCard
             icon={Layers}
+            label="Planned Courses"
+            value={stats.totalCourses}
+            subValue="across semesters"
+            variant="dashboard"
+          />
+          <StatsCard
+            icon={CheckCircle2}
             label="Core Courses"
             value={stats.coreCourses}
-            subValue=""
-            delay={200}
+            subValue="in plan"
+            variant="dashboard"
           />
           <StatsCard
             icon={TrendingUp}
             label="Electives"
             value={stats.electives}
-            subValue=""
-            delay={300}
-          />
-          <StatsCard
-            icon={CheckCircle2}
-            label="Semesters"
-            value={semesters.length}
-            subValue="Planned"
-            delay={400}
+            subValue="in plan"
+            variant="dashboard"
           />
         </div>
 
-        {}
-        <div className="space-y-8">
-          {}
-          <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+        {semesters.length > 0 ? (
+          <section className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]">
+            <div className="flex flex-col gap-4 border-b border-black/[0.06] p-4 dark:border-white/[0.1] sm:p-5 xl:flex-row xl:items-center xl:justify-between">
               <SuperTabs
-                tabs={semesters.map((s, idx) => ({
-                  value: idx,
-                  label: s.title,
-                }))}
+                tabs={semesters.map((semester, index) => ({ value: index, label: semester.title }))}
                 activeTab={activeSemIdx}
                 onTabChange={setActiveSemIdx}
+                size="sm"
+                className="w-fit max-w-full border-0 bg-slate-100/80 dark:bg-white/[0.08]"
               />
-
               {activeSemData && (
-                <div className="flex items-center gap-6 pr-4">
-                  <div className="text-right">
-                    <p className="text-[10px] font-bold text-foreground/40 Cap tracking-[0px] mb-1">
-                      Year
-                    </p>
-                    <span className="text-xl font-bold text-accent font-sans">
-                      {activeSemData.crHrs}{" "}
-                      <span className="text-xs text-foreground/50 Cap ml-1">Courses</span>
-                    </span>
-                  </div>
+                <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
+                  <span className="rounded-full bg-slate-100 px-3 py-2 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300">
+                    {activeSemData.courses.length} courses
+                  </span>
+                  <span className="rounded-full bg-[#f2ecfc] px-3 py-2 text-[#230052] dark:bg-white/[0.12] dark:text-white">
+                    {activeSemData.crHrs} credits
+                  </span>
                 </div>
               )}
             </div>
-          </div>
 
-          {}
-          {activeSemData && (
-            <div className="bg-secondary/40 border border-foreground/10 backdrop-blur-2xl rounded-[2.5rem] p-8 overflow-hidden">
-              <div className="flex items-center gap-3 mb-10 border-b border-foreground/10 pb-8">
-                <div className="p-3 bg-tertiary rounded-xl text-foreground/60">
-                  <BookOpen size={20} />
+            {activeSemData && (
+              <>
+                <div className="flex items-center gap-3 px-4 pb-3 pt-5 sm:px-6">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+                    <BookOpen size={21} />
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="truncate text-lg font-bold tracking-tight">{activeSemData.title}</h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Semester course plan</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-foreground tracking-tight">
-                    {activeSemData.title} Timeline
-                  </h3>
-                  <p className="text-[10px] text-foreground/40 font-bold Cap tracking-[0px]">
-                    Curriculum Roadmap
-                  </p>
-                </div>
-              </div>
-
-              <div className="overflow-x-auto scrollbar-hide">
-                <table className="w-full text-left order-collapse border-spacing-0">
-                  <thead>
-                    <tr className="border-b border-foreground/10">
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap">
-                        Code
-                      </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 Cap">
-                        Course Title
-                      </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 text-center Cap">
-                        Cr.H
-                      </th>
-                      <th className="px-6 py-4 text-[11px] font-bold text-foreground/50 text-right Cap">
-                        Category
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-foreground/5">
-                    {activeSemData.courses.map((course, cIdx) => (
-                      <tr key={cIdx} className="group hover:bg-foreground/[0.02] transition-colors">
-                        <td className="px-6 py-5">
-                          <span className="px-2.5 py-1 rounded-lg bg-tertiary text-foreground/60 text-[10px] font-bold tracking-tight border border-foreground/10">
-                            {course.code}
-                          </span>
-                        </td>
-                        <td className="px-6 py-5">
-                          <span className="text-foreground font-medium group-hover:text-accent transition-colors">
-                            {course.title}
-                          </span>
-                        </td>
-                        <td className="px-6 py-5 text-center">
-                          <span className="text-foreground/60 font-bold font-sans">
-                            {course.crHrs}
-                          </span>
-                        </td>
-                        <td className="px-6 py-5 text-right">
-                          <span
-                            className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black Cap tracking-[0px] ${
-                              course.type === "Core"
-                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                            }`}
-                          >
-                            {course.type}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-        </div>
+                {activeSemData.courses.length ? (
+                  <div className="overflow-x-auto">
+                    <table className="sf-data-table w-full min-w-[620px] text-left">
+                      <thead className="bg-slate-50 text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:bg-white/[0.04] dark:text-slate-400">
+                        <tr>
+                          <th className="px-5 py-3 sm:px-6">Course</th>
+                          <th className="px-5 py-3">Course title</th>
+                          <th className="px-5 py-3 text-center">Credits</th>
+                          <th className="px-5 py-3 text-right sm:px-6">Category</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {activeSemData.courses.map((course, index) => (
+                          <tr key={`${course.code}-${index}`} className="border-t border-black/[0.05] dark:border-white/[0.08]">
+                            <td className="px-5 py-4 sm:px-6">
+                              <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-bold text-slate-700 dark:bg-white/[0.08] dark:text-slate-200">{course.code}</span>
+                            </td>
+                            <td className="max-w-[520px] truncate px-5 py-4 text-sm font-semibold">{course.title}</td>
+                            <td className="px-5 py-4 text-center text-sm font-bold">{course.crHrs}</td>
+                            <td className="px-5 py-4 text-right sm:px-6">
+                              <span className="rounded-full bg-[#f2ecfc] px-3 py-1.5 text-[11px] font-bold text-[#230052] dark:bg-white/[0.1] dark:text-white">{course.type}</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="px-6 pb-6 text-sm text-slate-500 dark:text-slate-400">No courses are listed for this semester.</p>
+                )}
+              </>
+            )}
+          </section>
+        ) : (
+          <section className="rounded-[24px] border border-black/[0.06] bg-white p-8 text-center text-sm text-slate-500 dark:border-white/[0.14] dark:bg-black dark:text-slate-400">
+            No tentative study plan is available.
+          </section>
+        )}
       </div>
     </PageLayout>
   );

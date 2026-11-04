@@ -15,6 +15,10 @@ import {
 import NotificationBanner from "../components/ui/NotificationBanner";
 import SuperTabs from "../components/ui/SuperTabs";
 import AttendanceReviewModal from "../components/AttendanceReviewModal";
+import StatsCard from "../components/ui/StatsCard";
+import BookmarksModal from "../components/ui/BookmarksModal";
+import { findAttendanceForm, parseAttendancePage } from "../parsers/attendance";
+import { findFlexPageRoot } from "../parsers/dom";
 
 const parseSessionDate = (value) => {
   const input = String(value || "").trim();
@@ -35,7 +39,7 @@ const AttendanceCourseTabs = ({ courses, selectedId, onSelect }) => (
         onClick={() => onSelect(course.id)}
         aria-pressed={selectedId === course.id}
         title={course.title}
-        className={`flex min-w-[116px] shrink-0 items-center justify-between gap-3 rounded-full px-4 py-2.5 text-xs font-bold transition-colors ${selectedId === course.id ? "bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]" : "text-slate-600 hover:bg-white/80 hover:text-[#230052] dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white"}`}
+        className={`flex min-w-[116px] shrink-0 items-center justify-between gap-3 rounded-full px-4 py-2.5 text-xs font-bold transition-colors ${selectedId === course.id ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-600 hover:bg-white/80 hover:text-[#230052] dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white"}`}
       >
         <span className="truncate">{course.title.match(/[A-Z]{2,5}\s?-?\d{3,4}/i)?.[0] || course.id}</span>
         <span className="shrink-0 text-[10px] opacity-70">{course.percentage.toFixed(0)}%</span>
@@ -44,14 +48,8 @@ const AttendanceCourseTabs = ({ courses, selectedId, onSelect }) => (
   </div>
 );
 
-const AttendanceMetric = ({ icon: Icon, label, value, tone = "text-[#230052] dark:text-[#a098ff]" }) => (
-  <div className="flex min-h-[88px] min-w-0 items-center gap-3 rounded-[22px] border border-black/[0.06] bg-white px-5 py-4 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]">
-    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]"><Icon size={19} /></span>
-    <div className="min-w-0">
-      <p className="truncate text-[10px] font-semibold uppercase tracking-wide text-[#626262] dark:text-[#c4cad6]">{label}</p>
-      <p className={`mt-0.5 truncate text-xl font-bold leading-none ${tone}`}>{value}</p>
-    </div>
-  </div>
+const AttendanceMetric = ({ icon, label, value, subValue, tone }) => (
+  <StatsCard icon={icon} label={label} value={value} subValue={subValue} valueClassName={tone} variant="dashboard" />
 );
 
 const AttendanceCard = ({ record, index, isMarked, onToggleMark, onRequestReview }) => {
@@ -76,14 +74,14 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark, onRequestReview
       </div>
       <div className="flex items-center gap-1.5">
         <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${stateColor}`}>{stateLabel}</span>
-        {isAbsent && <button type="button" onClick={onRequestReview} aria-label={`Request attendance review for ${record.date}`} title="Draft an email to request an attendance review" className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/45 hover:bg-[#230052]/10 hover:text-[#230052] dark:hover:bg-[#a098ff]/15 dark:hover:text-[#a098ff]"><Mail size={15} /></button>}
+        {isAbsent && <button type="button" onClick={onRequestReview} aria-label={`Request attendance review for ${record.date}`} title="Draft an email to request an attendance review" className="flex h-8 w-8 items-center justify-center rounded-full text-foreground/45 hover:bg-[#230052]/10 hover:text-[#230052] dark:hover:bg-white/15 dark:hover:text-white"><Mail size={15} /></button>}
       </div>
       <button
         type="button"
         onClick={onToggleMark}
         aria-label={isMarked ? `Remove bookmark for ${record.date}` : `Bookmark ${record.date}`}
         title={isMarked ? "Remove bookmark" : "Bookmark session"}
-        className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${isMarked ? "bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]" : "text-foreground/40 hover:bg-black/5 hover:text-[#230052] dark:hover:bg-white/10 dark:hover:text-[#a098ff]"}`}
+        className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors ${isMarked ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-foreground/40 hover:bg-black/5 hover:text-[#230052] dark:hover:bg-white/10 dark:hover:text-white"}`}
       >
         <Bookmark size={15} fill={isMarked ? "currentColor" : "none"} />
       </button>
@@ -93,31 +91,22 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark, onRequestReview
 
 const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   const bookmarkedDetails = [];
   if (markedRecords.size > 0 && courses.length > 0) {
     courses.forEach((course) => {
       course.records.forEach((record, idx) => {
         const uniqueId = `${course.id}-${idx}`;
         if (markedRecords.has(uniqueId)) {
+          const status = String(record.status || "");
+          const isPresent = /^p$|present/i.test(status);
+          const isLate = /^l$|late/i.test(status);
           bookmarkedDetails.push({
-            uniqueId,
-            courseTitle: course.title,
-            date: record.date,
-            status: record.status,
+            id: uniqueId,
+            title: record.date,
+            subtitle: course.title,
+            badge: isPresent ? "Present" : isLate ? "Late" : "Absent",
+            badgeClass: isPresent ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : isLate ? "bg-amber-500/10 text-amber-700 dark:text-amber-300" : "bg-rose-500/10 text-rose-700 dark:text-rose-300",
             courseId: course.id,
-            idx: idx,
           });
         }
       });
@@ -125,73 +114,12 @@ const BookmarksMenu = ({ markedRecords, courses, onNavigate }) => {
   }
 
   return (
-    <div className="relative z-30" ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`p-3 rounded-full border transition-all ${
-          isOpen
-            ? "bg-accent/20 text-accent border-accent/20"
-            : "bg-secondary/50 text-foreground/60 border-foreground/10 hover:text-foreground hover:bg-foreground/10"
-        }`}
-        title="View Bookmarks"
-      >
+    <>
+      <button type="button" onClick={() => setIsOpen(true)} aria-label="View bookmarks" title="View Bookmarks" className="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-white/55 text-[#230052] shadow-sm backdrop-blur-xl transition-colors hover:bg-white/80 dark:border-white/10 dark:bg-black/25 dark:text-white dark:hover:bg-white/10">
         <Bookmark size={20} fill={bookmarkedDetails.length > 0 ? "currentColor" : "none"} />
       </button>
-
-      {isOpen && (
-        <div className="absolute top-full right-0 mt-2 w-80 md:w-96 bg-background/95 backdrop-blur-xl border border-foreground/10 rounded-2xl  overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-          <div className="p-4 border-b border-foreground/10 bg-foreground/5 flex justify-between items-center">
-            <h3 className="font-bold text-foreground flex items-center gap-2">Bookmarked Items</h3>
-          </div>
-
-          <div className="max-h-[60vh] overflow-y-auto scrollbar-hide p-2 space-y-1">
-            {bookmarkedDetails.length === 0 ? (
-              <div className="p-8 text-center text-foreground/50 text-sm">
-                <p>No bookmarks yet.</p>
-                <p className="text-xs mt-1 opacity-50">
-                  Click the bookmark icon on any attendance record to save it here.
-                </p>
-              </div>
-            ) : (
-              bookmarkedDetails.map((item) => (
-                <button
-                  key={item.uniqueId}
-                  onClick={() => {
-                    onNavigate(item.courseId);
-                    setIsOpen(false);
-                  }}
-                  className="w-full text-left p-3 rounded-xl hover:bg-foreground/5 border border-transparent hover:border-foreground/10 transition-all group"
-                >
-                  <div className="flex justify-between items-start mb-1">
-                    <div className="font-bold text-sm text-foreground group-hover:text-accent transition-colors truncate w-full pr-2">
-                      {item.date}
-                    </div>
-                    <span
-                      className={`text-xs font-bold whitespace-nowrap ${
-                        (item.status || "").includes("P")
-                          ? "text-emerald-600 dark:text-emerald-400"
-                          : (item.status || "").includes("L")
-                            ? "text-amber-600 dark:text-amber-400"
-                            : "text-rose-600 dark:text-rose-400"
-                      }`}
-                    >
-                      {(item.status || "").includes("P")
-                        ? "Present"
-                        : (item.status || "").includes("L")
-                          ? "Late"
-                          : "Absent"}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-[10px] text-foreground/50 font-medium Cap">
-                    <span className="truncate max-w-[200px]">{item.courseTitle}</span>
-                  </div>
-                </button>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-    </div>
+      <BookmarksModal open={isOpen} onClose={() => setIsOpen(false)} items={bookmarkedDetails} emptyHint="Bookmark an attendance session to find it here." onSelect={(item) => onNavigate(item.courseId)} />
+    </>
   );
 };
 
@@ -234,97 +162,24 @@ function AttendancePage() {
   useEffect(() => {
     const parseData = () => {
       try {
-        const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
+        const root = findFlexPageRoot(document);
         if (!root) {
           setLoading(false);
           window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
           return;
         }
 
-        const parsedAlerts = [];
-        const alertNodes = root.querySelectorAll(".alert");
-        alertNodes.forEach((alertEl) => {
-          const textEl = alertEl.querySelector(".m-alert__text");
-          let message = textEl
-            ? textEl.textContent.trim()
-            : alertEl.textContent.replace("Close", "").trim();
-          message = message.replace(/\s+/g, " ");
-
-          const type = alertEl.classList.contains("alert-danger") ? "error" : "info";
-          parsedAlerts.push({ type, message });
-        });
-        setAlerts(parsedAlerts);
-
-        const legacyForm = document.querySelector('form[action="/Student/StudentAttendance"]');
-        if (legacyForm) {
-          const select = legacyForm.querySelector("select");
-          if (select) {
-            const opts = Array.from(select.options).map((o) => ({
-              label: o.text.trim(),
-              value: o.value,
-              selected: o.selected,
-            }));
-            setSemesters(opts);
-
-            if (hiddenFormRef.current) {
-              hiddenFormRef.current.innerHTML = "";
-              const formClone = legacyForm.cloneNode(true);
-              hiddenFormRef.current.appendChild(formClone);
-            }
-          }
+        const legacyForm = findAttendanceForm(document);
+        const parsed = parseAttendancePage(root, legacyForm);
+        setAlerts(parsed.alerts);
+        setSemesters(parsed.semesters);
+        if (legacyForm && parsed.semesters.length && hiddenFormRef.current) {
+          hiddenFormRef.current.innerHTML = "";
+          hiddenFormRef.current.appendChild(legacyForm.cloneNode(true));
         }
 
-        const parsedCourses = [];
-        const tabPanes = root.querySelectorAll(".tab-pane");
-
-        tabPanes.forEach((pane) => {
-          let title = pane.querySelector("h5")?.textContent.trim() || pane.id;
-
-          title = title.replace(/\(.*\)/, "").trim();
-
-          const prog = pane.querySelector(".progress-bar");
-          const percentage = prog ? parseFloat(prog.getAttribute("aria-valuenow") || 0) : 0;
-
-          const records = [];
-          const rows = pane.querySelectorAll("tbody tr");
-
-          rows.forEach((row) => {
-            const cols = row.querySelectorAll("td");
-            if (cols.length >= 4) {
-              const dateStr = cols[1]?.textContent.trim();
-
-              let day = "";
-              try {
-                const parts = dateStr.split("-");
-                if (parts.length === 3) {
-                  const d = new Date(`${parts[1]} ${parts[0]}, ${parts[2]}`);
-                  if (!isNaN(d)) day = d.toLocaleDateString("en-US", { weekday: "short" });
-                }
-              } catch (e) {}
-
-              records.push({
-                date: dateStr,
-                day: day,
-                time: cols[2]?.textContent.trim(),
-                status: cols[3]?.textContent.trim(),
-                type: cols[4]?.textContent.trim() || "Lecture",
-              });
-            }
-          });
-
-          parsedCourses.push({
-            id: pane.id,
-            title,
-            percentage,
-            records,
-            present: records.filter((r) => r.status.includes("P")).length,
-            late: records.filter((r) => r.status.includes("L")).length,
-            absent: records.filter((r) => r.status.includes("A")).length,
-          });
-        });
-
-        setCourses(parsedCourses);
-        if (parsedCourses.length > 0) setSelectedCourseId(parsedCourses[0].id);
+        setCourses(parsed.courses);
+        if (parsed.courses.length > 0) setSelectedCourseId(parsed.courses[0].id);
 
         root.style.display = "none";
         window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
@@ -377,9 +232,9 @@ function AttendancePage() {
       <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-4">
         <header className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
           <div className="space-y-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#230052]/70 dark:text-[#a098ff]">Academics</p>
-            <h1 className="text-3xl font-bold tracking-tight text-[#101010] dark:text-[#f5f6fb]">Attendance</h1>
-            <p className="text-sm text-[#626262] dark:text-[#c4cad6]">A quick view of your class presence and session history.</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p>
+            <h1 className="text-3xl font-bold tracking-tight text-white">Attendance</h1>
+            <p className="text-sm text-white/80">A quick view of your class presence and session history.</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             {semesters.length > 1 && (
@@ -409,11 +264,11 @@ function AttendancePage() {
             {selectedCourseData && (
               <div key={selectedCourseId} className="flex min-h-0 flex-1 flex-col gap-4">
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
-                  <AttendanceMetric icon={Percent} label="Attendance" value={`${selectedCourseData.percentage}%`} />
-                  <AttendanceMetric icon={CheckCircle2} label="Present" value={selectedCourseData.present} tone="text-emerald-700 dark:text-emerald-300" />
-                  <AttendanceMetric icon={Clock} label="Late" value={selectedCourseData.late} tone="text-amber-700 dark:text-amber-300" />
-                  <AttendanceMetric icon={XCircle} label="Absent" value={selectedCourseData.absent} tone="text-rose-700 dark:text-rose-300" />
-                  <AttendanceMetric icon={Calendar} label="Sessions" value={selectedCourseData.records.length} />
+                  <AttendanceMetric icon={Percent} label="Attendance" value={`${selectedCourseData.percentage}%`} subValue="Overall attendance" />
+                  <AttendanceMetric icon={CheckCircle2} label="Present" value={selectedCourseData.present} subValue="Classes attended" tone="text-emerald-700 dark:text-emerald-300" />
+                  <AttendanceMetric icon={Clock} label="Late" value={selectedCourseData.late} subValue="Late arrivals" tone="text-amber-700 dark:text-amber-300" />
+                  <AttendanceMetric icon={XCircle} label="Absent" value={selectedCourseData.absent} subValue="Missed classes" tone="text-rose-700 dark:text-rose-300" />
+                  <AttendanceMetric icon={Calendar} label="Sessions" value={selectedCourseData.records.length} subValue="Total sessions" />
                 </div>
 
                 <div className="-mb-1">
@@ -435,7 +290,7 @@ function AttendancePage() {
                           type="button"
                           onClick={() => setRecordFilter(filter)}
                           aria-pressed={recordFilter === filter}
-                          className={`shrink-0 rounded-full px-3 py-1.5 text-[10px] font-bold transition-colors ${recordFilter === filter ? "bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]" : "text-foreground/55 hover:bg-white/70 dark:hover:bg-white/10"}`}
+                          className={`shrink-0 rounded-full px-3 py-1.5 text-[10px] font-bold transition-colors ${recordFilter === filter ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-foreground/55 hover:bg-white/70 dark:hover:bg-white/10"}`}
                         >
                           {label}
                         </button>
@@ -470,7 +325,7 @@ function AttendancePage() {
                       <div className="flex h-full min-h-[180px] flex-col items-center justify-center text-center text-sm text-foreground/50">
                         <BookOpen size={24} className="mb-2 text-foreground/35" />
                         <p>{selectedCourseData.records.length ? "No sessions match this filter." : "No attendance sessions are available for this course."}</p>
-                        {selectedCourseData.records.length > 0 && recordFilter !== "all" && <button type="button" onClick={() => setRecordFilter("all")} className="mt-2 font-semibold text-[#230052] hover:underline dark:text-[#a098ff]">Show all sessions</button>}
+                        {selectedCourseData.records.length > 0 && recordFilter !== "all" && <button type="button" onClick={() => setRecordFilter("all")} className="mt-2 font-semibold text-[#230052] hover:underline dark:text-white">Show all sessions</button>}
                       </div>
                     )}
                   </div>
@@ -480,7 +335,7 @@ function AttendancePage() {
           </>
         ) : (
           <section className="flex min-h-[300px] flex-1 flex-col items-center justify-center rounded-[24px] border border-black/[0.06] bg-white px-6 py-10 text-center dark:border-white/[0.14] dark:bg-black">
-            <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]"><BookOpen size={24} /></span>
+            <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><BookOpen size={24} /></span>
             <h2 className="text-xl font-bold text-[#101010] dark:text-[#f5f6fb]">No attendance data available</h2>
             <p className="mt-2 max-w-lg text-sm text-[#626262] dark:text-[#c4cad6]">{alerts[0]?.message || "Attendance records will appear here when they are available."}</p>
             {semesters.length > 1 && <div className="mt-5"><SuperTabs tabs={semesters} activeTab={semesters.find((semester) => semester.selected)?.value} size="sm" className="!border-0 !bg-white/55 !backdrop-blur-xl dark:!bg-black/25 dark:!backdrop-blur-xl" onTabChange={(value) => {

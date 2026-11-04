@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import NavBar from "../NavBar";
+import { getExtensionUrl } from "../../utils/extensionApi";
 
 function PageLayout({
   children,
@@ -28,6 +29,7 @@ function PageLayout({
     }
   })();
   const customVideo = /\.(mp4|webm|ogg)(?:$|\?)/i.test(customUrl);
+  const cloudAssetUrl = getExtensionUrl("assets/clouds/cloud-2.webp");
 
   return (
     <div className="relative min-h-screen overflow-x-clip bg-[#e4eff7] font-sans text-slate-900 transition-colors duration-300 dark:bg-black dark:text-[#f5f6fb]">
@@ -40,16 +42,20 @@ function PageLayout({
         ) : (
           <img src={customUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
         ))}
-        <img
-          src={chrome.runtime.getURL("assets/clouds/cloud-2.webp")}
-          alt=""
-          className="superflex-account-cloud absolute -right-10 -top-6 w-72 select-none opacity-80 sm:w-96"
-        />
-        <img
-          src={chrome.runtime.getURL("assets/clouds/cloud-2.webp")}
-          alt=""
-          className="superflex-account-cloud absolute left-[4%] top-32 w-44 -scale-x-100 select-none opacity-70 sm:w-56"
-        />
+        {cloudAssetUrl && (
+          <>
+            <img
+              src={cloudAssetUrl}
+              alt=""
+              className="superflex-account-cloud absolute -right-10 -top-6 w-72 select-none opacity-80 sm:w-96"
+            />
+            <img
+              src={cloudAssetUrl}
+              alt=""
+              className="superflex-account-cloud absolute left-[4%] top-32 w-44 -scale-x-100 select-none opacity-70 sm:w-56"
+            />
+          </>
+        )}
       </div>
 
       <NavBar

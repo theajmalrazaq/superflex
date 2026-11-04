@@ -1,90 +1,72 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import { CheckCircle2, BookOpen, Clock, Layout, MessageSquare, Send, Zap } from "lucide-react";
+import { CheckCircle2, BookOpen, Clock, Layout, MessageSquare, Send, Zap, CircleCheck } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
-import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
-import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import Skeleton from "../components/ui/Skeleton";
+
+const CourseFeedbackSkeleton = () => (
+  <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8" role="status" aria-label="Loading course feedback">
+    <header className="space-y-2"><Skeleton className="h-3 w-20" /><Skeleton className="h-9 w-64" /><Skeleton className="h-4 w-80 max-w-full" /></header>
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">{[0, 1, 2, 3].map((item) => <div key={item} className="flex min-h-[156px] flex-col rounded-[32px] bg-white p-5 dark:bg-black sm:p-6"><Skeleton className="h-12 w-12 rounded-[36%]" /><Skeleton className="mt-auto h-7 w-28" /><Skeleton className="mt-2 h-3 w-20" /></div>)}</div>
+    <div className="space-y-3 rounded-[24px] bg-white p-5 dark:bg-black sm:p-6"><div className="flex justify-between gap-4"><Skeleton className="h-4 w-40" /><Skeleton className="h-9 w-64 max-w-[55%] rounded-full" /></div>{[0, 1, 2, 3].map((item) => <div key={item} className="flex items-center gap-4 border-t border-black/[0.05] py-4 dark:border-white/[0.08]"><Skeleton className="h-10 w-10 rounded-[36%]" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-56 max-w-full" /><Skeleton className="h-3 w-32" /></div><Skeleton className="h-8 w-24 rounded-full" /></div>)}</div>
+  </main>
+);
 
 const FeedbackCard = ({ course, onAction, onQuickAction, index }) => {
   const isPending = course.hasAction;
   const [isQuicking, setIsQuicking] = useState(false);
 
   return (
-    <div className="group cursor-default flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-[2rem] border transition-all duration-300 bg-secondary/30 border-foreground/5 hover:bg-secondary/50 hover:border-foreground/10 gap-6">
-      <div className="flex items-center gap-6 flex-1 min-w-0">
-        <span className="hidden sm:flex font-bold text-sm min-w-[1.5rem] text-foreground/20 group-hover:text-foreground/40 transition-colors">
-          {index.toString().padStart(2, "0")}
+    <div className="flex flex-col gap-4 px-1 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-5">
+      <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
+        <span className="hidden w-7 shrink-0 text-right text-xs font-semibold tabular-nums text-slate-400 sm:block">{index}</span>
+        <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[36%] ${isPending ? "bg-amber-50 text-amber-700 dark:bg-amber-300/10 dark:text-amber-200" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-300/10 dark:text-emerald-200"}`}>
+          {isPending ? <Clock size={19} /> : <CircleCheck size={19} />}
         </span>
-
-        <div
-          className={`w-12 h-12 flex-none rounded-2xl flex items-center justify-center border transition-all duration-300 ${
-            isPending
-              ? "bg-amber-500/10 border-amber-500/20 text-amber-500 group-hover:scale-105"
-              : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 group-hover:scale-105"
-          }`}
-        >
-          {isPending ? <Clock size={24} /> : <CheckCircle2 size={24} />}
-        </div>
-
-        <div className="flex flex-col gap-1.5 min-w-0 flex-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] font-medium text-accent bg-accent/10 px-2 py-0.5 rounded-md">
-              {course.code}
-            </span>
-            <span className="text-foreground font-medium text-base leading-tight truncate">
-              {course.courseName}
-            </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 dark:bg-white/[0.08] dark:text-slate-300">{course.code || "Course"}</span>
+            <span className="truncate text-sm font-bold text-slate-900 dark:text-white">{course.courseName}</span>
           </div>
-
-          <div className="flex items-center gap-4 text-[10px] text-foreground/50 font-medium leading-none">
-            <span className="flex items-center gap-1.5 group-hover:text-foreground/70 transition-colors">
-              <BookOpen size={12} className="text-foreground/40" />
-              {course.credits} Credits
-            </span>
-            <span className="w-1 h-1 rounded-full bg-foreground/10"></span>
-            <span className="flex items-center gap-1.5 group-hover:text-foreground/70 transition-colors">
-              Faculty Feedback
-            </span>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+            <span className="inline-flex items-center gap-1.5"><BookOpen size={13} />{course.credits} credits</span>
+            <span>Faculty feedback</span>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex shrink-0 items-center justify-end gap-2 pl-14 sm:pl-0">
         {isPending ? (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             <button
+              type="button"
               onClick={async () => {
                 if (isQuicking) return;
                 setIsQuicking(true);
-                await onQuickAction(course);
-                setIsQuicking(false);
+                try { await onQuickAction(course); } finally { setIsQuicking(false); }
               }}
               disabled={isQuicking}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border border-amber-500/20 font-medium text-[10px] transition-all group/zap ${
+              className={`flex cursor-pointer items-center gap-2 rounded-full px-3.5 py-2 text-xs font-bold transition-colors ${
                 isQuicking
-                  ? "bg-amber-500/50 text-white cursor-wait"
-                  : "bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white"
+                  ? "cursor-wait bg-amber-100 text-amber-800 dark:bg-amber-300/10 dark:text-amber-200"
+                  : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-white/[0.08] dark:text-slate-200 dark:hover:bg-white/[0.12]"
               }`}
             >
-              <Zap
-                size={12}
-                className={isQuicking ? "animate-pulse" : "group-hover/zap:fill-current"}
-              />
-              {isQuicking ? "Doing..." : "Quick"}
+              <Zap size={14} className={isQuicking ? "animate-pulse" : ""} />
+              {isQuicking ? "Submitting…" : "Quick submit"}
             </button>
             <button
+              type="button"
               onClick={() => onAction(course)}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-accent text-foreground font-medium text-[10px] hover:scale-105 hover:shadow-lg hover:shadow-accent/20 transition-all active:scale-95"
+              className="flex cursor-pointer items-center gap-2 rounded-full bg-[#230052] px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/85"
             >
-              Review Now
-              <Send size={12} />
+              Review
+              <Send size={14} />
             </button>
           </div>
         ) : (
-          <div className="px-4 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium text-[10px]">
-            {course.status}
-          </div>
+          <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-800 dark:bg-emerald-300/10 dark:text-emerald-200">{course.status || "Completed"}</span>
         )}
       </div>
     </div>
@@ -96,6 +78,13 @@ function CourseFeedbackPage() {
   const [courses, setCourses] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [stats, setStats] = useState({ total: 0, pending: 0, submitted: 0 });
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const filteredCourses = useMemo(() => courses.filter((course) => {
+    if (statusFilter === "pending") return course.hasAction;
+    if (statusFilter === "completed") return !course.hasAction;
+    return true;
+  }), [courses, statusFilter]);
 
   useEffect(() => {
     window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
@@ -297,94 +286,64 @@ function CourseFeedbackPage() {
   if (loading)
     return (
       <PageLayout currentPage={window.location.pathname}>
-        <div className="w-full min-h-screen p-4 md:p-8 space-y-8">
-          <div className="flex justify-center py-20">
-            <LoadingSpinner />
-          </div>
-        </div>
+        <CourseFeedbackSkeleton />
       </PageLayout>
     );
 
   return (
-    <PageLayout currentPage={window.location.pathname}>
-      <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
-      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
-
-      <div className="w-full min-h-screen p-4 md:p-8 space-y-10 relative z-10 animate-in fade-in duration-500">
-        <PageHeader
-          title="Faculty Evaluation"
-          subtitle="Share your feedback for course instructors and faculty"
-        />
-
-        <div className="flex flex-wrap gap-4">
-          <StatsCard icon={Layout} label="Total Surveys" value={stats.total} delay={100} />
-          <StatsCard icon={Clock} label="Pending" value={stats.pending} delay={200} />
-          <StatsCard icon={CheckCircle2} label="Completed" value={stats.submitted} delay={300} />
-          <StatsCard
-            icon={MessageSquare}
-            label="Survey Status"
-            value={stats.pending === 0 ? "Finished" : "Pending"}
-            delay={400}
-          />
-        </div>
+    <PageLayout currentPage={window.location.pathname} fullWidth>
+      <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8">
+        <header className="space-y-1">
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Services</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Course feedback</h1>
+          <p className="text-sm text-white/80">Review course evaluations and see which surveys still need your response.</p>
+        </header>
 
         <NotificationBanner alerts={alerts} />
 
-        <div className="bg-secondary/40 rounded-[2.5rem] p-4 md:p-8 backdrop-blur-2xl border border-foreground/10 space-y-8">
-          <div className="flex items-center gap-4 px-2">
-            <div className="p-3 bg-accent/10 rounded-2xl text-accent border border-accent/20 flex-none">
-              <MessageSquare size={20} />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-foreground tracking-tight">Faculty Surveys</h3>
-              <p className="text-[10px] text-foreground/40 font-medium">
-                Pending faculty evaluations
-              </p>
-            </div>
+        <section aria-labelledby="feedback-overview-heading" className="space-y-4">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Overview</p><h2 id="feedback-overview-heading" className="text-xl font-bold tracking-tight text-white">Survey summary</h2></div>
+            <p className="text-xs text-white/75">Your evaluation progress for this semester.</p>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
+            <StatsCard variant="dashboard" icon={Layout} label="Total surveys" value={stats.total} />
+            <StatsCard variant="dashboard" icon={Clock} label="Pending" value={stats.pending} subValue="Waiting for your review" />
+            <StatsCard variant="dashboard" icon={CheckCircle2} label="Completed" value={stats.submitted} subValue="Feedback submitted" />
+            <StatsCard variant="dashboard" icon={MessageSquare} label="Progress" value={stats.total ? `${Math.round((stats.submitted / stats.total) * 100)}%` : "0%"} subValue="Surveys completed" />
+          </div>
+        </section>
+
+        <section aria-labelledby="feedback-courses-heading" className="space-y-4">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Course list</p><h2 id="feedback-courses-heading" className="text-xl font-bold tracking-tight text-white">Faculty surveys</h2></div>
+            <p className="text-xs text-white/75">Select a course to review its instructor feedback form.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {courses.length > 0 ? (
-              courses.map((course, idx) => (
-                <FeedbackCard
-                  key={course.id}
-                  course={course}
-                  index={idx + 1}
-                  onAction={handleFeedbackAction}
-                  onQuickAction={handleQuickFeedback}
-                />
-              ))
+          <div className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]">
+            <div className="flex flex-col gap-3 border-b border-black/[0.06] px-4 py-4 dark:border-white/[0.1] sm:flex-row sm:items-center sm:justify-between sm:px-6">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Showing {filteredCourses.length} of {courses.length} surveys</p>
+              <div className="flex items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/[0.06]" role="group" aria-label="Filter course feedback">
+                {[{ id: "all", label: "All" }, { id: "pending", label: "Pending" }, { id: "completed", label: "Completed" }].map((filter) => (
+                  <button key={filter.id} type="button" onClick={() => setStatusFilter(filter.id)} aria-pressed={statusFilter === filter.id} className={`cursor-pointer rounded-full px-3 py-2 text-xs font-bold transition-colors ${statusFilter === filter.id ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"}`}>{filter.label}</button>
+                ))}
+              </div>
+            </div>
+
+            {filteredCourses.length ? (
+              <div className="divide-y divide-black/[0.05] px-4 dark:divide-white/[0.08] sm:px-6">
+                {filteredCourses.map((course, index) => <FeedbackCard key={course.id} course={course} index={index + 1} onAction={handleFeedbackAction} onQuickAction={handleQuickFeedback} />)}
+              </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-24 opacity-50 bg-foreground/5 rounded-[2rem] border border-dashed border-foreground/10 text-center">
-                <div className="p-6 rounded-full bg-tertiary/50 mb-6">
-                  <CheckCircle2 size={40} className="text-foreground/40" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground/50">No Pending Reviews</h3>
-                <p className="text-foreground/40 mt-2 text-sm max-w-xs">
-                  All your course evaluations are up to date. Excellent work!
-                </p>
+              <div className="flex min-h-[220px] flex-col items-center justify-center px-6 py-10 text-center">
+                <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[36%] bg-emerald-50 text-emerald-700 dark:bg-emerald-300/10 dark:text-emerald-200"><CheckCircle2 size={22} /></span>
+                <h3 className="text-base font-bold">{statusFilter === "all" ? "No course surveys available" : statusFilter === "pending" ? "No pending reviews" : "No completed surveys yet"}</h3>
+                <p className="mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">{statusFilter === "all" ? "Course evaluations will appear here when the university makes them available." : statusFilter === "pending" ? "All available course evaluations are complete." : "Your submitted course evaluations will appear here."}</p>
               </div>
             )}
           </div>
-        </div>
-      </div>
-
-      <style>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          height: 6px;
-          width: 6px;
-        }
-        .scrollbar-hide::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .scrollbar-hide::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 10px;
-        }
-        .scrollbar-hide::-webkit-scrollbar-thumb:hover {
-          background: rgba(255, 255, 255, 0.2);
-        }
-      `}</style>
+        </section>
+      </main>
     </PageLayout>
   );
 }

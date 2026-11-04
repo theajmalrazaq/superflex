@@ -1,12 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
 import {
   FileText,
   Clock,
   CheckCircle2,
   Trash2,
-  Printer,
   Info,
   Layers,
   Zap,
@@ -14,18 +12,27 @@ import {
   X,
   CreditCard,
   BookOpen,
-  Layout,
   ShieldCheck,
   Download,
   ChevronRight,
+  Check,
 } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
-import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
 import Modal from "../components/ui/Modal";
 import Button from "../components/ui/Button";
 import { TextArea } from "../components/ui/Input";
+import Skeleton from "../components/ui/Skeleton";
+
+const CourseWithdrawSkeleton = () => (
+  <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8" role="status" aria-label="Loading course withdrawal details">
+    <header className="space-y-2"><Skeleton className="h-3 w-20" /><Skeleton className="h-9 w-64" /><Skeleton className="h-4 w-80 max-w-full" /></header>
+    <Skeleton className="h-10 w-72 max-w-full rounded-full" />
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">{[0, 1, 2, 3].map((item) => <div key={item} className="flex min-h-[156px] flex-col rounded-[24px] bg-white p-5 dark:bg-black sm:p-6"><Skeleton className="h-12 w-12 rounded-[36%]" /><Skeleton className="mt-auto h-7 w-28" /><Skeleton className="mt-2 h-3 w-20" /></div>)}</div>
+    <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,.8fr)]"><section className="space-y-3 rounded-[24px] bg-white p-5 dark:bg-black sm:p-6"><Skeleton className="h-5 w-44" />{[0, 1, 2, 3].map((item) => <div key={item} className="flex items-center gap-4 border-t border-black/[0.05] py-4 dark:border-white/[0.08]"><Skeleton className="h-10 w-10 rounded-[36%]" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-56 max-w-full" /><Skeleton className="h-3 w-32" /></div><Skeleton className="h-6 w-6 rounded-full" /></div>)}</section><section className="space-y-4 rounded-[24px] bg-white p-5 dark:bg-black sm:p-6"><Skeleton className="h-5 w-36" /><Skeleton className="h-24 w-full rounded-2xl" /><Skeleton className="h-11 w-full rounded-full" /><Skeleton className="h-11 w-full rounded-full" /></section></div>
+  </main>
+);
 
 const RemarksModal = ({ isOpen, onClose, onSubmit }) => {
   const [remarks, setRemarks] = useState("");
@@ -203,77 +210,21 @@ const InstructionsModal = ({ isOpen, onClose }) => {
 
 const WithdrawalCourseCard = ({ course, isSelected, onToggle, index }) => {
   return (
-    <div
-      onClick={() => course.canSelect && onToggle(course.id)}
-      className={`group flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border transition-all duration-300 gap-4 ${
-        course.canSelect ? "cursor-pointer" : "cursor-not-allowed opacity-60"
-      } ${
-        isSelected
-          ? "bg-accent/10 border-accent/50"
-          : "bg-secondary/30 border-transparent hover:bg-secondary/50 hover:border-foreground/10"
-      }`}
-    >
+    <button type="button" onClick={onToggle} disabled={!course.canSelect} aria-pressed={isSelected} className={`group flex w-full cursor-pointer flex-col gap-3 px-1 py-4 text-left transition-colors sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-5 ${course.canSelect ? "hover:bg-slate-50 dark:hover:bg-white/[0.025]" : "cursor-not-allowed opacity-60"}`}>
       <div className="flex items-center gap-3 min-w-0 flex-1">
-        <span
-          className={`font-bold text-xs min-w-[1.2rem] ${isSelected ? "text-accent" : "text-foreground/40"}`}
-        >
-          {index}.
+        <span className="hidden w-7 shrink-0 text-right text-xs font-semibold tabular-nums text-slate-400 sm:block">{index}</span>
+        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[36%] ${isSelected ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "bg-slate-100 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300"}`}><BookOpen size={18} /></span>
+        <span className="min-w-0 flex-1">
+          <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1"><span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 dark:bg-white/[0.08] dark:text-slate-300">{course.code}</span><span className="truncate text-sm font-bold text-slate-900 dark:text-white">{course.name}</span></span>
+          <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400"><span>{course.credits} credits</span><span>{course.type}</span></span>
         </span>
-
-        <div
-          className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 transition-all duration-300 ${
-            isSelected
-              ? "bg-accent/20 border-accent/30 text-accent scale-105"
-              : "bg-tertiary/50 border-foreground/10 text-foreground/50"
-          }`}
-        >
-          <BookOpen size={18} />
-        </div>
-
-        <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-[10px] font-black text-accent Cap tracking-tighter opacity-80 shrink-0">
-              {course.code}
-            </span>
-            <h4 className="text-foreground font-bold text-sm leading-tight truncate">
-              {course.name}
-            </h4>
-          </div>
-
-          <div className="flex items-center gap-2.5 text-[10px] text-foreground/50 font-bold Cap tracking-[0px] leading-none">
-            <span className="shrink-0">{course.credits} Credits</span>
-            <span className="w-1 h-1 rounded-full bg-tertiary shrink-0"></span>
-            <span className="capitalize truncate">{course.type}</span>
-          </div>
-        </div>
       </div>
 
-      <div className="flex flex-row sm:flex-row items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-foreground/10">
-        {course.status && (
-          <div
-            className={`px-3 py-1 rounded-lg border text-[10px] font-black Cap tracking-[0px] ${
-              course.status.toLowerCase().includes("withdraw")
-                ? "bg-rose-500/10 border-rose-500/20 text-rose-400"
-                : course.status.toLowerCase().includes("not applied")
-                  ? "bg-foreground/5 border-foreground/10 text-foreground/50"
-                  : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-            }`}
-          >
-            {course.status}
-          </div>
-        )}
-        <div
-          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
-            isSelected
-              ? "bg-accent border-accent text-[var(--accent-foreground)] scale-110"
-              : "border-tertiary bg-transparent"
-          }`}
-        >
-          {isSelected && <CheckCircle2 size={14} strokeWidth={3} />}
-          {!isSelected && !course.canSelect && <X size={10} className="text-foreground/20" />}
-        </div>
-      </div>
-    </div>
+      <span className="flex w-full items-center justify-between gap-3 border-t border-black/[0.05] pt-3 dark:border-white/[0.08] sm:w-auto sm:justify-end sm:border-0 sm:pt-0">
+        {course.status && <span className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${course.status.toLowerCase().includes("withdraw") ? "bg-rose-50 text-rose-700 dark:bg-rose-300/10 dark:text-rose-200" : course.status.toLowerCase().includes("not applied") ? "bg-slate-100 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-300/10 dark:text-emerald-200"}`}>{course.status}</span>}
+        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition-colors ${isSelected ? "border-[#230052] bg-[#230052] text-white dark:border-white dark:bg-white dark:text-[#0a192f]" : "border-slate-300 text-transparent dark:border-white/25"}`}>{isSelected && <Check size={15} strokeWidth={3} />}{!isSelected && !course.canSelect && <X size={13} className="text-slate-400 dark:text-slate-500" />}</span>
+      </span>
+    </button>
   );
 };
 
@@ -285,6 +236,7 @@ function CourseWithdrawPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [courseFilter, setCourseFilter] = useState("all");
   const hiddenContentRef = useRef(null);
 
   useEffect(() => {
@@ -490,21 +442,23 @@ function CourseWithdrawPage() {
 
   if (loading)
     return (
-      <PageLayout currentPage={window.location.pathname}>
-        <div className="w-full min-h-screen p-4 md:p-8 space-y-8">
-          <div className="flex justify-center py-20">
-            <LoadingSpinner />
-          </div>
-        </div>
+      <PageLayout currentPage={window.location.pathname} fullWidth>
+        <CourseWithdrawSkeleton />
       </PageLayout>
     );
 
   const isWithdrawActive = courses.some((c) => c.canSelect);
   const selectedCount = courses.filter((c) => c.isSelected).length;
+  const filteredCourses = courses.filter((course) => {
+    if (courseFilter === "eligible") return course.canSelect;
+    if (courseFilter === "selected") return course.isSelected;
+    if (courseFilter === "processed") return !course.canSelect;
+    return true;
+  });
 
   return (
-    <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-4 md:p-8 space-y-8 relative z-10">
+    <PageLayout currentPage={window.location.pathname} fullWidth>
+      <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8">
         <RemarksModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
@@ -516,162 +470,34 @@ function CourseWithdrawPage() {
           onClose={() => setIsInstructionsOpen(false)}
         />
 
-        {}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
+        <header className="flex flex-wrap items-end justify-between gap-4">
+          <div className="space-y-1"><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p><h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Course withdrawal</h1><p className="text-sm text-white/80">Review eligible courses and manage withdrawal requests.</p></div>
+          <button type="button" onClick={() => setIsInstructionsOpen(true)} className="flex cursor-pointer items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"><ShieldCheck size={15} /> Rules &amp; procedures</button>
+        </header>
 
-        <PageHeader
-          title="Course Withdraw"
-          subtitle="Academic withdrawal management and status tracking"
-        >
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            {}
-            <SuperTabs
-              tabs={semesters}
-              activeTab={semesters.find((s) => s.selected)?.value}
-              onTabChange={handleSemesterChange}
-            />
-          </div>
-        </PageHeader>
+        {semesters.length > 0 && <section aria-label="Select semester" className="flex flex-col gap-2 sm:flex-row sm:items-center"><span className="w-20 shrink-0 text-xs font-semibold text-white/85">Semester</span><SuperTabs tabs={semesters} activeTab={semesters.find((semester) => semester.selected)?.value} onTabChange={handleSemesterChange} size="sm" className="!border-0 !bg-white/55 !backdrop-blur-xl dark:!bg-black/25 dark:!backdrop-blur-xl" /></section>}
 
-        {}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatsCard icon={Layout} label="Total Courses" value={courses.length} delay={100} />
-          <StatsCard icon={Trash2} label="Selected" value={selectedCount} delay={200} />
-          <StatsCard
-            icon={ShieldCheck}
-            label="Withdrawal Status"
-            value={isWithdrawActive ? "Open" : "Locked"}
-            delay={300}
-          />
-          <StatsCard
-            icon={Clock}
-            label="Pending Requests"
-            value={courses.filter((c) => c.status.toLowerCase().includes("pending")).length}
-            delay={400}
-          />
-        </div>
+        <section aria-labelledby="withdraw-overview-heading" className="space-y-4"><div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Overview</p><h2 id="withdraw-overview-heading" className="text-xl font-bold tracking-tight text-white">Withdrawal summary</h2></div><p className="text-xs text-white/75">{isWithdrawActive ? "Choose eligible courses to prepare a request." : "No withdrawal window is currently open."}</p></div><div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5"><StatsCard variant="dashboard" icon={BookOpen} label="Total courses" value={courses.length} /><StatsCard variant="dashboard" icon={Trash2} label="Selected" value={selectedCount} subValue="For this request" /><StatsCard variant="dashboard" icon={ShieldCheck} label="Withdrawal status" value={isWithdrawActive ? "Open" : "Closed"} /><StatsCard variant="dashboard" icon={Clock} label="Pending requests" value={courses.filter((course) => course.status.toLowerCase().includes("pending")).length} subValue="Awaiting review" /></div></section>
 
-        {}
-        <NotificationBanner alerts={alerts} onActionClick={() => setIsInstructionsOpen(true)} />
+        {alerts.length > 0 && <NotificationBanner alerts={alerts} onActionClick={() => setIsInstructionsOpen(true)} />}
 
-        {}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          <div className="xl:col-span-2 space-y-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between px-2">
-                <h3 className="text-xl font-bold text-foreground tracking-tight">
-                  Available Courses
-                </h3>
-                <div className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px] bg-foreground/5 px-3 py-1 rounded-lg">
-                  {courses.length} Records
-                </div>
-              </div>
+        <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,.8fr)]">
+          <section aria-labelledby="withdraw-courses-heading" className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]">
+            <header className="flex flex-col gap-3 border-b border-black/[0.06] px-4 py-4 dark:border-white/[0.1] sm:flex-row sm:items-center sm:justify-between sm:px-6"><div><h2 id="withdraw-courses-heading" className="text-base font-bold">Courses</h2><p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Showing {filteredCourses.length} of {courses.length} courses</p></div><div className="flex items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/[0.06]" role="group" aria-label="Filter courses">{[{ value: "all", label: "All" }, { value: "eligible", label: "Eligible" }, { value: "selected", label: "Selected" }, { value: "processed", label: "Unavailable" }].map((filter) => <button key={filter.value} type="button" onClick={() => setCourseFilter(filter.value)} aria-pressed={courseFilter === filter.value} className={`cursor-pointer rounded-full px-3 py-2 text-xs font-bold transition-colors ${courseFilter === filter.value ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"}`}>{filter.label}</button>)}</div></header>
+            {filteredCourses.length ? <div className="divide-y divide-black/[0.05] px-4 dark:divide-white/[0.08] sm:px-6">{filteredCourses.map((course, index) => <WithdrawalCourseCard key={course.id} course={course} index={index + 1} isSelected={course.isSelected} onToggle={() => toggleCourseSelection(course.id)} />)}</div> : <div className="flex min-h-[220px] flex-col items-center justify-center px-6 py-10 text-center"><span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[36%] bg-slate-100 text-slate-500 dark:bg-white/[0.08] dark:text-slate-300"><Layers size={22} /></span><h3 className="text-base font-bold">{courseFilter === "selected" ? "No courses selected" : "No courses found"}</h3><p className="mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">{courseFilter === "selected" ? "Select an eligible course to begin a withdrawal request." : "There are no courses in this semester for the selected filter."}</p></div>}
+          </section>
 
-              <div className="grid grid-cols-1 gap-3">
-                {courses.map((course, idx) => (
-                  <WithdrawalCourseCard
-                    key={course.id}
-                    course={course}
-                    index={idx + 1}
-                    isSelected={course.isSelected}
-                    onToggle={toggleCourseSelection}
-                  />
-                ))}
-              </div>
-
-              {courses.length === 0 && (
-                <div className="text-center py-20 bg-secondary/30 rounded-[2rem] border border-dashed border-foreground/10">
-                  <div className="flex flex-col items-center gap-4 opacity-50">
-                    <Layers size={48} className="text-foreground/40" />
-                    <p className="text-foreground/50 font-medium Cap tracking-[0px] text-xs">
-                      No courses found for this semester
-                    </p>
-                  </div>
-                </div>
-              )}
+          <aside className="rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] xl:sticky xl:top-6">
+            <header className="border-b border-black/[0.06] px-5 py-4 dark:border-white/[0.1] sm:px-6"><h2 className="text-base font-bold">Request details</h2><p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Check your selection before continuing.</p></header>
+            <div className="space-y-5 p-5 sm:p-6">
+              <div className="rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.05]"><div className="mb-4 flex items-center gap-2"><span className="flex h-9 w-9 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><ShieldCheck size={17} /></span><h3 className="text-sm font-bold">Action summary</h3></div><div className="space-y-3 text-xs"><div className="flex justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Selected courses</span><span className="font-semibold">{selectedCount}</span></div><div className="flex justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Request status</span><span className="font-semibold">{isWithdrawActive ? "Available" : "Closed"}</span></div><div className="flex justify-between gap-3 border-t border-black/[0.06] pt-3 text-sm dark:border-white/[0.1]"><span className="font-bold">Transcript impact</span><span className="font-bold">W grade</span></div></div></div>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-1"><Button variant="secondary" onClick={handlePrintForm} disabled={selectedCount === 0} className="w-full rounded-full" icon={<Download size={16} />}>Download form</Button><Button variant="primary" onClick={handleWithdrawAction} disabled={selectedCount === 0 || isSubmitting} isLoading={isSubmitting} className="w-full rounded-full" icon={<ChevronRight size={16} />}>Continue request</Button></div>
+              <p className="flex items-start gap-2 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400"><Info size={15} className="mt-0.5 shrink-0 text-[#230052] dark:text-white" />A ‘W’ grade will appear on the transcript. Withdrawal does not refund tuition fees.</p>
+              <div className="border-t border-black/[0.06] pt-4 dark:border-white/[0.1]"><div className="mb-2 flex items-center gap-2 text-slate-600 dark:text-slate-300"><Zap size={14} /><span className="text-xs font-bold">File size help</span></div><p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">Each uploaded image must be under 650 KB. Use an <a href="https://imageresizer.com/" target="_blank" rel="noreferrer" className="font-semibold text-[#230052] underline-offset-2 hover:underline dark:text-white">image resizer</a> if needed.</p></div>
             </div>
-          </div>
-
-          {}
-          <div className="space-y-6">
-            <div className="bg-secondary/50 border border-foreground/10 backdrop-blur-xl rounded-[2.5rem] p-8 space-y-8 sticky top-8">
-              <div className="space-y-6">
-                <div className="p-5 rounded-2xl bg-accent/5 border border-accent/10 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-accent/10 rounded-lg text-accent">
-                      <ShieldCheck size={18} />
-                    </div>
-                    <h4 className="text-sm font-bold text-foreground tracking-tight">
-                      Action Summary
-                    </h4>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs font-medium">
-                      <span className="text-foreground/50 font-bold Cap tracking-[0px] text-[10px]">
-                        Selected
-                      </span>
-                      <span className="text-foreground font-black">{selectedCount}</span>
-                    </div>
-                    <div className="flex justify-between text-xs font-medium">
-                      <span className="text-foreground/50 font-bold Cap tracking-[0px] text-[10px]">
-                        Processing
-                      </span>
-                      <span className="text-foreground font-black">Immediate</span>
-                    </div>
-                    <div className="pt-3 border-t border-foreground/10 flex justify-between items-center">
-                      <span className="text-foreground/60 text-[10px] font-black Cap tracking-[0px]">
-                        Permanent Impact
-                      </span>
-                      <span className="text-accent font-black text-xs Cap tracking-[0px]">Yes</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  <Button
-                    variant="secondary"
-                    onClick={handlePrintForm}
-                    disabled={selectedCount === 0}
-                    className="w-full"
-                    icon={<Download size={16} />}
-                  >
-                    Download Form
-                  </Button>
-                  <Button
-                    variant="primary"
-                    onClick={handleWithdrawAction}
-                    disabled={selectedCount === 0 || isSubmitting}
-                    isLoading={isSubmitting}
-                    className="w-full"
-                    icon={<ChevronRight size={16} />}
-                  >
-                    Initiate Withdraw
-                  </Button>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-foreground/10 space-y-4">
-                <div className="flex items-center gap-3 px-1 text-accent">
-                  <Zap size={14} />
-                  <span className="text-[10px] font-black Cap tracking-[0px]">Quick Tool</span>
-                </div>
-                <p className="text-[10px] text-foreground/50 font-medium leading-relaxed px-1">
-                  Use{" "}
-                  <a
-                    href="https://imageresizer.com/"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-foreground hover:underline"
-                  >
-                    Image Resizer
-                  </a>{" "}
-                  to meet the strict 650KB limit for all uploads.
-                </p>
-              </div>
-            </div>
-          </div>
+          </aside>
         </div>
-      </div>
+      </main>
 
       <div ref={hiddenContentRef} className="hidden" />
     </PageLayout>

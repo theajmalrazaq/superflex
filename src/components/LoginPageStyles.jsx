@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import "../styles/login.css";
+import { getExtensionUrl, getExtensionVersion } from "../utils/extensionApi";
 
 function LoginPageStyles() {
   useEffect(() => {
@@ -353,6 +354,17 @@ function LoginPageStyles() {
       if (forgotTitle) {
         forgotTitle.style.display = "block";
         forgotTitle.textContent = "Forgot your password?";
+        if (!forgotPasswordSection.querySelector(".forgot-password-mark")) {
+          const mark = document.createElement("div");
+          mark.className = "forgot-password-mark";
+          mark.setAttribute("aria-hidden", "true");
+          mark.innerHTML = `
+            <svg viewBox="0 0 432 432" focusable="false">
+              <path d="M247.227 185.616L282.286 69L133 216L186.861 231.146L133 363L298 208.65L247.227 185.616Z" />
+            </svg>
+          `;
+          forgotTitle.parentNode.insertBefore(mark, forgotTitle);
+        }
       }
 
       const forgotDesc = forgotPasswordSection.querySelector(".m-login__desc");
@@ -565,12 +577,12 @@ function LoginPageStyles() {
     cloudLayer.className = "login-clouds";
     cloudLayer.setAttribute("aria-hidden", "true");
     cloudLayer.innerHTML = `
-      <img class="login-cloud-right" src="${chrome.runtime.getURL("assets/clouds/cloud-2.webp")}" alt="" decoding="async" />
-      <img class="login-cloud-left" src="${chrome.runtime.getURL("assets/clouds/cloud-2.webp")}" alt="" decoding="async" />
+      <img class="login-cloud-right" src="${getExtensionUrl("assets/clouds/cloud-2.webp")}" alt="" decoding="async" />
+      <img class="login-cloud-left" src="${getExtensionUrl("assets/clouds/cloud-2.webp")}" alt="" decoding="async" />
     `;
     document.body.prepend(cloudLayer);
 
-    const CURRENT_VERSION = chrome.runtime.getManifest().version;
+    const CURRENT_VERSION = getExtensionVersion("6.0.0");
 
     // Keep only the useful links below the card.
     const footerWrapper = document.createElement("div");
@@ -639,7 +651,7 @@ function LoginPageStyles() {
     const versionChip = document.createElement("span");
     versionChip.className = "login-version-chip";
     versionChip.innerHTML = `
-      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#A098FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#a098ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10" />
         <path d="m9 12 2 2 4-4" />
       </svg>

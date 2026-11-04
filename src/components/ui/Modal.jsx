@@ -4,59 +4,46 @@ import { X } from "lucide-react";
 
 const Modal = ({ isOpen, onClose, title, subtitle, children, maxWidth = "max-w-lg", icon }) => {
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    if (!isOpen) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = previousOverflow;
     };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
+  const widthClass = maxWidth === "max-w-lg" ? "max-w-2xl" : maxWidth;
+
   return createPortal(
-    <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4">
-      {}
-      <div
-        className="absolute inset-0 bg-background/60 backdrop-blur-sm animate-in fade-in duration-300"
-        onClick={onClose}
-      />
-
-      {}
-      <div
-        className={`relative w-full ${maxWidth} bg-background border border-foreground/10 rounded-[2.5rem] overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]`}
+    <div
+      className="fixed inset-0 z-[2147483647] flex items-end justify-center bg-slate-950/60 px-3 pb-3 pt-3 backdrop-blur-md"
+      role="presentation"
+      onMouseDown={(event) => event.target === event.currentTarget && onClose()}
+    >
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="superflex-modal-title"
+        className={`relative flex max-h-[76dvh] w-full ${widthClass} flex-col overflow-hidden rounded-[34px] bg-white text-slate-900 shadow-[0_18px_60px_rgba(35,0,82,.24)] animate-in slide-in-from-bottom-8 duration-300 dark:bg-[#090909] dark:text-[#f5f6fb]`}
       >
-        {}
-        <div className="p-6 md:p-8 flex justify-between items-start shrink-0">
-          <div className="flex items-start gap-4">
-            {icon && (
-              <div className="p-3 bg-accent/10 text-accent rounded-2xl shrink-0">{icon}</div>
-            )}
-            <div className="space-y-1">
-              <h3 className="text-xl md:text-2xl font-bold text-foreground tracking-tight leading-tight">
-                {title}
-              </h3>
-              {subtitle && (
-                <p className="text-accent text-[10px] font-black Cap tracking-[0px] opacity-80">
-                  {subtitle}
-                </p>
-              )}
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2.5 bg-foreground/5 hover:bg-foreground/10 rounded-2xl text-foreground/50 hover:text-foreground transition-all duration-300 group"
-            aria-label="Close modal"
-          >
-            <X size={20} className="group-hover:rotate-90 transition-transform duration-300" />
-          </button>
-        </div>
-
-        {}
-        <div className="px-6 md:px-8 pb-8 overflow-y-auto scrollbar-hide flex-1">{children}</div>
-      </div>
+        <div className="flex shrink-0 justify-center pt-3"><span className="h-1.5 w-14 rounded-full bg-[#ded9e5] dark:bg-white" /></div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-6 z-10 rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"
+          aria-label="Close modal"
+        >
+          <X size={20} />
+        </button>
+        <header className="flex shrink-0 flex-col items-center px-6 pb-3 pt-3 text-center sm:px-8">
+          {icon && <span className="mb-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-[#230052] text-white dark:bg-white dark:text-[#101027]">{icon}</span>}
+          {subtitle && <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#230052]/65 dark:text-white">{subtitle}</p>}
+          <h2 id="superflex-modal-title" className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">{title}</h2>
+        </header>
+        <div className="min-h-0 overflow-y-auto px-5 pb-5 pt-1 sm:px-8">{children}</div>
+      </section>
     </div>,
     document.body,
   );

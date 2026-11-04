@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import PageLayout from "../components/layouts/PageLayout";
 import NotificationBanner from "../components/ui/NotificationBanner";
-import PageHeader from "../components/ui/PageHeader";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
-import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import Skeleton from "../components/ui/Skeleton";
 import {
   AlertCircle,
   BookOpen,
@@ -16,14 +15,83 @@ import {
   ChevronRight,
   ShieldCheck,
   Upload,
-  X,
   CheckCircle2,
   Check,
   Shield,
+  ChevronUp,
 } from "lucide-react";
 import Modal from "../components/ui/Modal";
 import Button from "../components/ui/Button";
-import Input, { TextArea } from "../components/ui/Input";
+import { TextArea } from "../components/ui/Input";
+
+const RetakeExamSkeleton = () => (
+  <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8" role="status" aria-label="Loading retake exam details">
+    <header className="space-y-2"><Skeleton className="h-3 w-20" /><Skeleton className="h-9 w-56" /><Skeleton className="h-4 w-72 max-w-full" /></header>
+    <div className="flex flex-wrap gap-3"><Skeleton className="h-10 w-72 rounded-full" /><Skeleton className="h-10 w-64 rounded-full" /></div>
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">{[0, 1, 2, 3].map((item) => <div key={item} className="flex min-h-[156px] flex-col rounded-[32px] bg-white p-5 dark:bg-black sm:p-6"><Skeleton className="h-12 w-12 rounded-[36%]" /><Skeleton className="mt-auto h-7 w-28" /><Skeleton className="mt-2 h-3 w-20" /></div>)}</div>
+    <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)]"><div className="space-y-3 rounded-[24px] bg-white p-5 dark:bg-black sm:p-6"><Skeleton className="h-4 w-44" />{[0, 1, 2, 3].map((item) => <div key={item} className="flex items-center gap-4 border-t border-black/[0.05] py-4 dark:border-white/[0.08]"><Skeleton className="h-10 w-10 rounded-[36%]" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-56 max-w-full" /><Skeleton className="h-3 w-32" /></div><Skeleton className="h-6 w-6 rounded-full" /></div>)}</div><div className="space-y-5 rounded-[24px] bg-white p-5 dark:bg-black sm:p-6"><Skeleton className="h-5 w-36" /><Skeleton className="h-12 w-full rounded-xl" /><Skeleton className="h-32 w-full rounded-2xl" /><Skeleton className="h-11 w-full rounded-full" /><Skeleton className="h-11 w-full rounded-full" /></div></div>
+  </main>
+);
+
+const ReasonSelector = ({ reasons, selectedReason, onChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectorRef = useRef(null);
+  const selectedLabel = reasons.find((reason) => reason.value === selectedReason)?.label || "Choose a reason";
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const handlePointerDown = (event) => {
+      if (!selectorRef.current?.contains(event.target)) setIsOpen(false);
+    };
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setIsOpen(false);
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
+
+  return (
+    <div ref={selectorRef} className="relative">
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-controls="retake-reason-options"
+        onClick={() => setIsOpen((open) => !open)}
+        className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-black/[0.08] bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-900 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#230052]/30 dark:border-white/[0.12] dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1] dark:focus-visible:ring-white/30"
+      >
+        <span className="truncate">{selectedLabel}</span>
+        <ChevronDown size={16} className={`shrink-0 text-slate-500 transition-transform dark:text-slate-400 ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+      {isOpen && (
+        <div id="retake-reason-options" role="listbox" aria-label="Retake situation" className="absolute inset-x-0 top-full z-40 mt-2 max-h-60 overflow-y-auto rounded-2xl border border-black/[0.08] bg-white p-1.5 text-slate-900 shadow-[0_12px_32px_rgba(15,23,42,.16)] dark:border-white/[0.12] dark:bg-[#111] dark:text-white dark:shadow-black/40">
+          {reasons.map((reason, index) => {
+            const isSelected = reason.value === selectedReason;
+            return (
+              <button
+                key={`${reason.value}-${index}`}
+                type="button"
+                role="option"
+                aria-selected={isSelected}
+                onClick={() => { onChange(reason.value); setIsOpen(false); }}
+                className={`flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-left text-sm transition-colors ${isSelected ? "bg-[#230052] font-semibold text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/[0.08]"}`}
+              >
+                <span className="min-w-0 truncate">{reason.label}</span>
+                {isSelected && <Check size={15} className="shrink-0" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
   const [file, setFile] = useState(null);
@@ -180,132 +248,24 @@ const InstructionsModal = ({ isOpen, onClose }) => {
 
 const RetakeCourseCard = ({ course, isSelected, onToggle, index }) => {
   return (
-    <div
+    <button
+      type="button"
       onClick={onToggle}
-      className={`group cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-2xl border transition-all duration-300 gap-4 ${
-        isSelected
-          ? "bg-accent/10 border-accent/50"
-          : "bg-secondary/30 border-transparent hover:bg-secondary/50 hover:border-foreground/10"
-      }`}
+      disabled={course.isDisabled}
+      aria-pressed={isSelected}
+      className={`group flex w-full cursor-pointer flex-col gap-4 px-1 py-4 text-left transition-colors sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-5 ${course.isDisabled ? "cursor-not-allowed opacity-55" : "hover:bg-slate-50 dark:hover:bg-white/[0.025]"}`}
     >
-      <div className="flex items-center gap-3 min-w-0 flex-1">
-        <span
-          className={`font-bold text-xs min-w-[1.2rem] ${isSelected ? "text-accent" : "text-foreground/40"}`}
-        >
-          {index}.
+      <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
+        <span className="hidden w-7 shrink-0 text-right text-xs font-semibold tabular-nums text-slate-400 sm:block">{index}</span>
+        <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[36%] ${isSelected ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "bg-slate-100 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300"}`}><BookOpen size={19} /></span>
+        <span className="min-w-0 flex-1">
+          <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1"><span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 dark:bg-white/[0.08] dark:text-slate-300">{course.code}</span><span className="truncate text-sm font-bold text-slate-900 dark:text-white">{course.courseName}</span></span>
+          <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400"><span>{course.credits} credits</span><span>Section {course.section}</span>{course.status && <span>{course.status}</span>}</span>
         </span>
-
-        <div
-          className={`w-9 h-9 rounded-xl flex items-center justify-center border shrink-0 transition-all duration-300 ${
-            isSelected
-              ? "bg-accent/20 border-accent/30 text-accent scale-105"
-              : "bg-tertiary/50 border-foreground/10 text-foreground/50"
-          }`}
-        >
-          <BookOpen size={18} />
-        </div>
-
-        <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-[10px] font-black text-accent Cap tracking-tighter opacity-80 shrink-0">
-              {course.code}
-            </span>
-            <h4 className="text-foreground font-bold text-sm leading-tight truncate">
-              {course.courseName}
-            </h4>
-          </div>
-
-          <div className="flex items-center gap-2.5 text-[10px] text-foreground/50 font-bold Cap tracking-[0px] leading-none">
-            <span className="shrink-0">{course.credits} Credits</span>
-            <span className="w-1 h-1 rounded-full bg-tertiary shrink-0"></span>
-            <span className="truncate">Section {course.section}</span>
-          </div>
-        </div>
       </div>
 
-      <div className="flex flex-row items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-t-0 border-foreground/10">
-        {course.status && (
-          <div className="px-3 py-1 rounded-lg bg-foreground/5 border border-foreground/10 text-[9px] font-black text-foreground/60 Cap tracking-[0px]">
-            {course.status}
-          </div>
-        )}
-        <div
-          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
-            isSelected
-              ? "bg-accent border-accent text-[var(--accent-foreground)] scale-110"
-              : "border-tertiary bg-transparent"
-          }`}
-        >
-          {isSelected && <CheckCircle2 size={14} strokeWidth={3} />}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const ExamTypeSelector = ({ types, selectedValue, onSelect }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  const selectedType = types.find((t) => t.value === selectedValue) || types[0];
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  return (
-    <div className="relative w-full md:w-auto z-50" ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full md:w-[280px] flex items-center justify-between px-3 py-2 rounded-[2rem] bg-secondary/50 border border-foreground/10 text-foreground hover:bg-foreground/5 transition-all group"
-      >
-        <div className="flex items-center gap-3 overflow-hidden">
-          <div className="p-2 rounded-xl bg-accent/10 text-accent">
-            <Layout size={16} />
-          </div>
-          <span className="text-sm font-bold truncate">
-            {selectedType?.label || "Select Exam Type"}
-          </span>
-        </div>
-        <ChevronDown
-          size={16}
-          className={`text-foreground/50 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
-        />
-      </button>
-
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 rounded-xl bg-background/50 backdrop-blur-2xl border border-foreground/10 max-h-[60vh] overflow-y-auto scrollbar-hide animate-in fade-in zoom-in-95 duration-200">
-          <div className="flex flex-col gap-3">
-            {types.map((type, idx) => (
-              <button
-                key={idx}
-                onClick={() => {
-                  onSelect(type.value);
-                  setIsOpen(false);
-                }}
-                className={`w-full flex bg-secondary items-center justify-between p-3 rounded-xl transition-all ${
-                  selectedValue === type.value
-                    ? "bg-accent/10 border border-accent/20"
-                    : "hover:bg-foreground/5 border border-transparent"
-                }`}
-              >
-                <span
-                  className={`text-sm font-medium truncate ${selectedValue === type.value ? "text-foreground" : "text-foreground/60"}`}
-                >
-                  {type.label}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+      <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition-colors ${isSelected ? "border-[#230052] bg-[#230052] text-white dark:border-white dark:bg-white dark:text-[#0a192f]" : "border-slate-300 text-transparent dark:border-white/25"}`}>{isSelected && <Check size={15} strokeWidth={3} />}</span>
+    </button>
   );
 };
 
@@ -320,14 +280,14 @@ function RetakeExamPage() {
   const [selectedReason, setSelectedReason] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
-  const [stats, setStats] = useState({
-    total: 0,
-    sessional1: 0,
-    sessional2: 0,
-    final: 0,
+  const [areAlertsExpanded, setAreAlertsExpanded] = useState(false);
+  const [courseFilter, setCourseFilter] = useState("all");
+  const filteredCourses = courses.filter((course) => {
+    if (courseFilter === "selected") return selectedCourses.has(course.id);
+    if (courseFilter === "available") return !course.isDisabled;
+    return true;
   });
-
-  const hiddenFormRef = useRef(null);
+  const visibleAlerts = areAlertsExpanded ? alerts : alerts.slice(0, 1);
 
   useEffect(() => {
     window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
@@ -569,17 +529,13 @@ function RetakeExamPage() {
   if (loading)
     return (
       <PageLayout currentPage={window.location.pathname}>
-        <div className="w-full min-h-screen p-4 md:p-8 space-y-8">
-          <div className="flex justify-center py-20">
-            <LoadingSpinner />
-          </div>
-        </div>
+        <RetakeExamSkeleton />
       </PageLayout>
     );
 
   return (
-    <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-4 md:p-8 space-y-8 relative z-10">
+    <PageLayout currentPage={window.location.pathname} fullWidth>
+      <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8">
         <RetakeModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
@@ -593,183 +549,69 @@ function RetakeExamPage() {
           onClose={() => setIsInstructionsOpen(false)}
         />
 
-        {}
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
-
-        <PageHeader title="Retake Exam" subtitle="Manage your examination retake applications">
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            {}
-            <SuperTabs
-              tabs={semesters}
-              activeTab={semesters.find((s) => s.selected)?.value}
-              onTabChange={handleSemesterChange}
-            />
-
-            {}
-            <ExamTypeSelector
-              types={examTypes}
-              selectedValue={examTypes.find((e) => e.selected)?.value || ""}
-              onSelect={handleExamTypeChange}
-            />
+        <header className="flex flex-wrap items-end justify-between gap-4">
+          <div className="space-y-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p>
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Retake exam</h1>
+            <p className="text-sm text-white/80">Choose eligible papers and prepare your retake application.</p>
           </div>
-        </PageHeader>
+          <button type="button" onClick={() => setIsInstructionsOpen(true)} className="flex cursor-pointer items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"><Shield size={15} /> Rules &amp; procedures</button>
+        </header>
 
-        {}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatsCard icon={Layout} label="Total Courses" value={courses.length} delay={100} />
-          <StatsCard
-            icon={CheckCircle2}
-            label="Selected"
-            value={selectedCourses.size}
-            delay={200}
-          />
-          <StatsCard
-            icon={ShieldCheck}
-            label="Processed"
-            value={
-              courses.filter(
-                (c) =>
-                  c.status &&
-                  c.status.trim().length > 0 &&
-                  c.status.trim().toLowerCase() === "processed",
-              ).length
-            }
-            delay={300}
-          />
-          <StatsCard
-            icon={AlertCircle}
-            label="Total Fee"
-            value={`Rs. ${selectedCourses.size * 2000}`}
-            delay={400}
-          />
-        </div>
+        {alerts.length > 0 && (
+          <section aria-label="Retake exam notifications" className="space-y-2">
+            <NotificationBanner alerts={visibleAlerts} />
+            {alerts.length > 1 && (
+              <button
+                type="button"
+                onClick={() => setAreAlertsExpanded((expanded) => !expanded)}
+                aria-expanded={areAlertsExpanded}
+                className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white/45 px-3 py-1.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/65 dark:bg-black/20 dark:text-white dark:hover:bg-black/35"
+              >
+                {areAlertsExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                {areAlertsExpanded ? "Show fewer notifications" : `Show ${alerts.length - 1} more notification${alerts.length > 2 ? "s" : ""}`}
+              </button>
+            )}
+          </section>
+        )}
 
-        {}
-        <NotificationBanner alerts={alerts} onActionClick={() => setIsInstructionsOpen(true)} />
+        <section aria-label="Request period" className="space-y-3">
+          {semesters.length > 0 && <div className="flex flex-col gap-2 sm:flex-row sm:items-center"><span className="w-20 shrink-0 text-xs font-semibold text-white/85">Semester</span><SuperTabs tabs={semesters} activeTab={semesters.find((semester) => semester.selected)?.value} onTabChange={handleSemesterChange} size="sm" className="!border-0 !bg-white/55 !backdrop-blur-xl dark:!bg-black/25 dark:!backdrop-blur-xl" /></div>}
+          {examTypes.length > 0 && <div className="flex flex-col gap-2 sm:flex-row sm:items-center"><span className="w-20 shrink-0 text-xs font-semibold text-white/85">Exam type</span><SuperTabs tabs={examTypes} activeTab={examTypes.find((type) => type.selected)?.value} onTabChange={handleExamTypeChange} size="sm" className="!border-0 !bg-white/55 !backdrop-blur-xl dark:!bg-black/25 dark:!backdrop-blur-xl" /></div>}
+        </section>
 
-        {}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          <div className="xl:col-span-2 space-y-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between px-2">
-                <h3 className="text-xl font-bold text-foreground">Eligible Courses</h3>
-                <div className="text-[10px] text-foreground/50 font-bold Cap tracking-[0px] bg-foreground/5 px-3 py-1 rounded-lg">
-                  {courses.length} Total
-                </div>
+        <section aria-labelledby="retake-overview-heading" className="space-y-4">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Overview</p><h2 id="retake-overview-heading" className="text-xl font-bold tracking-tight text-white">Application summary</h2></div><p className="text-xs text-white/75">Select papers to calculate the application fee.</p></div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
+            <StatsCard variant="dashboard" icon={Layout} label="Total courses" value={courses.length} />
+            <StatsCard variant="dashboard" icon={CheckCircle2} label="Selected papers" value={selectedCourses.size} subValue="For this application" />
+            <StatsCard variant="dashboard" icon={ShieldCheck} label="Processed" value={courses.filter((course) => course.status?.trim().toLowerCase() === "processed").length} subValue="Already processed" />
+            <StatsCard variant="dashboard" icon={AlertCircle} label="Application fee" value={`Rs. ${(selectedCourses.size * 2000).toLocaleString()}`} subValue="Rs. 2,000 per paper" />
+          </div>
+        </section>
+
+        <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.8fr)]">
+          <section aria-labelledby="retake-courses-heading" className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]">
+            <header className="flex flex-col gap-3 border-b border-black/[0.06] px-4 py-4 dark:border-white/[0.1] sm:flex-row sm:items-center sm:justify-between sm:px-6">
+              <div><h2 id="retake-courses-heading" className="text-base font-bold">Available papers</h2><p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Showing {filteredCourses.length} of {courses.length} courses</p></div>
+              <div className="flex items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/[0.06]" role="group" aria-label="Filter retake courses">
+                {[{ value: "all", label: "All" }, { value: "available", label: "Selectable" }, { value: "selected", label: "Selected" }].map((filter) => <button key={filter.value} type="button" onClick={() => setCourseFilter(filter.value)} aria-pressed={courseFilter === filter.value} className={`cursor-pointer rounded-full px-3 py-2 text-xs font-bold transition-colors ${courseFilter === filter.value ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"}`}>{filter.label}</button>)}
               </div>
+            </header>
+            {filteredCourses.length ? <div className="divide-y divide-black/[0.05] px-4 dark:divide-white/[0.08] sm:px-6">{filteredCourses.map((course, index) => <RetakeCourseCard key={course.id} course={course} index={index + 1} isSelected={selectedCourses.has(course.id)} onToggle={() => toggleCourse(course.id)} />)}</div> : <div className="flex min-h-[220px] flex-col items-center justify-center px-6 py-10 text-center"><span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[36%] bg-slate-100 text-slate-500 dark:bg-white/[0.08] dark:text-slate-300"><FileText size={22} /></span><h3 className="text-base font-bold">{courseFilter === "selected" ? "No papers selected" : "No courses eligible for retake"}</h3><p className="mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">{courseFilter === "selected" ? "Select one or more available papers to start an application." : "No retake papers are available for this exam type and semester."}</p></div>}
+          </section>
 
-              <div className="grid grid-cols-1 gap-4">
-                {courses.map((course, idx) => (
-                  <RetakeCourseCard
-                    key={course.id}
-                    course={course}
-                    index={idx + 1}
-                    isSelected={selectedCourses.has(course.id)}
-                    onToggle={() => toggleCourse(course.id)}
-                  />
-                ))}
-              </div>
-
-              {courses.length === 0 && (
-                <div className="text-center py-20 bg-secondary/30 rounded-[2rem] border border-dashed border-foreground/10">
-                  <div className="flex flex-col items-center gap-4 opacity-50">
-                    <FileText size={48} className="text-foreground/40" />
-                    <p className="text-foreground/50 font-medium Cap tracking-[0px] text-xs">
-                      No courses eligible for retake
-                    </p>
-                  </div>
-                </div>
-              )}
+          <aside className="relative rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] xl:sticky xl:top-6">
+            <div className="border-b border-black/[0.06] px-5 py-4 dark:border-white/[0.1] sm:px-6"><h2 className="text-base font-bold">Request details</h2><p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Review the reason and fee before continuing.</p></div>
+            <div className="space-y-5 p-5 sm:p-6">
+              <div className="space-y-2"><p className="text-xs font-semibold text-slate-600 dark:text-slate-300">Retake situation</p><ReasonSelector reasons={reasons} selectedReason={selectedReason} onChange={handleReasonChange} /></div>
+              <div className="rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.05]"><div className="mb-4 flex items-center gap-2"><span className="flex h-9 w-9 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><ShieldCheck size={17} /></span><h3 className="text-sm font-bold">Fee summary</h3></div><div className="space-y-3 text-xs"><div className="flex justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Selected papers</span><span className="font-semibold">{selectedCourses.size}</span></div><div className="flex justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Fee per paper</span><span className="font-semibold">Rs. 2,000</span></div><div className="flex justify-between gap-3 border-t border-black/[0.06] pt-3 text-sm dark:border-white/[0.1]"><span className="font-bold">Total fee</span><span className="font-bold">Rs. {(selectedCourses.size * 2000).toLocaleString()}</span></div></div></div>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-1"><Button variant="secondary" disabled={selectedCourses.size === 0} onClick={handleDownloadForm} className="w-full rounded-full" icon={<Download size={16} />}>Download form</Button><Button disabled={selectedCourses.size === 0} onClick={handleInitiateRequest} className="w-full rounded-full" variant="primary" icon={<ChevronRight size={16} />}>Continue request</Button></div>
+              <p className="flex items-start gap-2 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400"><AlertTriangle size={15} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-300" />A processing fee of Rs. 2,000 applies to each selected paper.</p>
             </div>
-          </div>
-
-          {}
-          <div className="space-y-6">
-            <div className="bg-secondary/50 border border-foreground/10 backdrop-blur-xl rounded-[2.5rem] p-8 space-y-8 sticky top-8">
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <label className="text-[10px] font-black text-foreground/50 Cap tracking-[0px] px-1">
-                    Retake Situation
-                  </label>
-                  <div className="relative group">
-                    <select
-                      value={selectedReason}
-                      onChange={(e) => handleReasonChange(e.target.value)}
-                      className="w-full appearance-none bg-tertiary/50 border border-foreground/10 text-foreground px-5 py-4 rounded-2xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-x/50 transition-all cursor-pointer pr-12"
-                    >
-                      {reasons.map((reason, idx) => (
-                        <option key={idx} value={reason.value}>
-                          {reason.label}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown
-                      size={16}
-                      className="absolute right-5 top-1/2 -translate-y-1/2 text-foreground/50 pointer-events-none group-hover:text-foreground transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-accent/5 border border-accent/10 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-accent/10 rounded-lg text-accent">
-                      <ShieldCheck size={18} />
-                    </div>
-                    <h4 className="text-sm font-bold text-foreground">Order Summary</h4>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-xs font-medium">
-                      <span className="text-foreground/50">Selected Papers</span>
-                      <span className="text-foreground">{selectedCourses.size}</span>
-                    </div>
-                    <div className="flex justify-between text-xs font-medium">
-                      <span className="text-foreground/50">Processing Fee</span>
-                      <span className="text-foreground">Rs. 2,000 / paper</span>
-                    </div>
-                    <div className="pt-3 border-t border-foreground/10 flex justify-between items-center">
-                      <span className="text-xs font-bold text-foreground/60">Total Charged</span>
-                      <span className="text-lg font-black text-foreground">
-                        Rs. {selectedCourses.size * 2000}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <Button
-                  variant="secondary"
-                  disabled={selectedCourses.size === 0}
-                  onClick={handleDownloadForm}
-                  className="w-full"
-                  icon={<Download size={16} />}
-                >
-                  Download Form
-                </Button>
-                <Button
-                  disabled={selectedCourses.size === 0}
-                  onClick={handleInitiateRequest}
-                  className="w-full"
-                  variant="primary"
-                  icon={<ChevronRight size={16} />}
-                >
-                  Initiate Request
-                </Button>
-              </div>
-            </div>
-          </div>
+          </aside>
         </div>
-      </div>
-
-      <style>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
+      </main>
     </PageLayout>
   );
 }

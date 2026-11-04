@@ -3,29 +3,54 @@ import { createRoot } from "react-dom/client";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import LoginPageStyles from "../components/LoginPageStyles";
 import PathRouter from "../components/PathRouter";
+import { getExtensionUrl, sendExtensionMessage } from "../utils/extensionApi";
 import "../styles/tailwind.css";
 
 export default defineContentScript({
   matches: ["https://flexstudent.nu.edu.pk/*"],
   main() {
-    chrome.runtime.sendMessage({ type: "SUPERFLEX_APPLY_DEFAULT_ZOOM" });
+    sendExtensionMessage({ type: "SUPERFLEX_APPLY_DEFAULT_ZOOM" });
 
     (() => {
       const scriptUmami = document.createElement("script");
-      scriptUmami.src = chrome.runtime.getURL("scripts/umami.js");
+      scriptUmami.src = getExtensionUrl("scripts/umami.js");
       scriptUmami.defer = true;
       scriptUmami.dataset.websiteId = "17490ccf-0b15-4d8a-a908-5e774ad648de";
-      document.head.appendChild(scriptUmami);
+      if (scriptUmami.src) document.head.appendChild(scriptUmami);
 
-      const scriptPuter = document.createElement("script");
-      scriptPuter.src = chrome.runtime.getURL("scripts/puter.js");
-      scriptPuter.defer = true;
-      document.head.appendChild(scriptPuter);
+      let puterScriptState = "idle";
+      const loadPuter = () => {
+        if (puterScriptState === "ready") {
+          document.dispatchEvent(new CustomEvent("superflex-puter-loaded"));
+          return;
+        }
+        if (puterScriptState === "loading") return;
+
+        puterScriptState = "loading";
+        const scriptPuter = document.createElement("script");
+        scriptPuter.src = getExtensionUrl("scripts/puter.js");
+        if (!scriptPuter.src) {
+          puterScriptState = "idle";
+          document.dispatchEvent(new CustomEvent("superflex-puter-load-failed"));
+          return;
+        }
+        scriptPuter.dataset.superflexPuter = "true";
+        scriptPuter.onload = () => {
+          puterScriptState = "ready";
+          document.dispatchEvent(new CustomEvent("superflex-puter-loaded"));
+        };
+        scriptPuter.onerror = () => {
+          puterScriptState = "idle";
+          document.dispatchEvent(new CustomEvent("superflex-puter-load-failed"));
+        };
+        document.head.appendChild(scriptPuter);
+      };
+      document.addEventListener("superflex-load-ai", loadPuter);
 
       const scriptBridge = document.createElement("script");
-      scriptBridge.src = chrome.runtime.getURL("scripts/bridge.js");
+      scriptBridge.src = getExtensionUrl("scripts/bridge.js");
       scriptBridge.defer = true;
-      document.head.appendChild(scriptBridge);
+      if (scriptBridge.src) document.head.appendChild(scriptBridge);
     })();
 
     const fontLinks = [
@@ -72,7 +97,8 @@ export default defineContentScript({
       document.head.appendChild(favicon);
     }
 
-    favicon.href = chrome.runtime.getURL("assets/favicon.svg");
+    const faviconUrl = getExtensionUrl("assets/favicon.svg");
+    if (faviconUrl) favicon.href = faviconUrl;
     document.title = "Superflex";
 
     if (document.querySelector(".m-grid__item.m-footer")) {

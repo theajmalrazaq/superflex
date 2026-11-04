@@ -1,11 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import PageLayout from "../components/layouts/PageLayout";
-import { TrendingUp, Target, FileBarChart, Layout, Info } from "lucide-react";
+import { TrendingUp, Target, FileBarChart, Info } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
-import PageHeader from "../components/ui/PageHeader";
-import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
-import LoadingOverlay, { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import { LoadingSpinner } from "../components/ui/LoadingOverlay";
 
 function MarksPloReportPage() {
   const [loading, setLoading] = useState(true);
@@ -114,21 +112,14 @@ function MarksPloReportPage() {
 
           const clonedTable = table.cloneNode(true);
 
-          clonedTable.classList.add("w-full", "border-collapse");
-          clonedTable.classList.remove(
-            "table-bordered",
-            "table-striped",
-            "table-responsive",
-            "m-table",
-            "sum_table",
-          );
+          clonedTable.className = "w-full min-w-[680px] border-collapse text-left";
 
           const thead = clonedTable.querySelector("thead");
           if (thead) {
-            thead.classList.add("bg-secondary/50", "text-xs", "font-bold", "text-foreground/60");
+            thead.className = "bg-slate-50 text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:bg-white/[.04] dark:text-slate-400";
             const ths = thead.querySelectorAll("th");
             ths.forEach((th) => {
-              th.classList.add("p-3", "border", "border-foreground/10", "text-center");
+              th.className = "border-b border-slate-100 px-4 py-3 text-left dark:border-white/10 sm:px-5";
               th.removeAttribute("style");
             });
           }
@@ -137,41 +128,29 @@ function MarksPloReportPage() {
           if (tbody) {
             const trs = tbody.querySelectorAll("tr");
             trs.forEach((tr) => {
-              tr.classList.add(
-                "border-b",
-                "border-foreground/10",
-                "hover:bg-foreground/5",
-                "transition-colors",
-              );
+              tr.className = "border-b border-slate-100 transition-colors last:border-b-0 hover:bg-slate-50 dark:border-white/[.08] dark:hover:bg-white/[.025]";
               tr.removeAttribute("style");
 
               const tds = tr.querySelectorAll("td");
               tds.forEach((td) => {
-                td.classList.add(
-                  "p-3",
-                  "text-sm",
-                  "border-accent",
-                  "border-foreground/10",
-                  "text-foreground/70",
-                );
+                const isBold = td.classList.contains("bold");
+                td.className = `px-4 py-3.5 text-sm text-slate-700 dark:text-slate-300 sm:px-5 ${isBold ? "font-bold text-slate-900 dark:text-white" : ""}`;
 
                 const txt = td.textContent.trim();
                 if (/^\d+(\.\d+)?$/.test(txt)) {
                   const val = parseFloat(txt);
-                  if (val < 30) td.classList.add("text-rose-400", "font-bold");
-                  else if (val < 60) td.classList.add("text-amber-400", "font-bold");
-                  else if (val >= 60) td.classList.add("text-emerald-400", "font-bold");
+                  if (val < 30) td.classList.add("!font-bold", "!text-rose-700", "dark:!text-rose-300");
+                  else if (val < 60) td.classList.add("!font-bold", "!text-amber-700", "dark:!text-amber-300");
+                  else if (val >= 60) td.classList.add("!font-bold", "!text-emerald-700", "dark:!text-emerald-300");
                 }
-
-                if (td.classList.contains("bold")) td.classList.add("font-bold", "text-foreground");
               });
             });
 
             const lastTr = tbody.querySelector("tr:last-child");
             if (lastTr) {
-              lastTr.classList.add("bg-foreground/5", "!font-bold");
+              lastTr.classList.add("bg-slate-50", "font-bold", "dark:bg-white/[.04]");
               const tds = lastTr.querySelectorAll("td");
-              tds.forEach((td) => td.classList.add("!text-foreground"));
+              tds.forEach((td) => td.classList.add("!text-slate-900", "dark:!text-white"));
             }
           }
 
@@ -212,134 +191,87 @@ function MarksPloReportPage() {
   };
 
   const getStatus = (pct) => {
-    if (pct < 30) return { label: "Poor", color: "text-rose-400", bg: "bg-rose-500/20" };
+    if (pct < 30) return { label: "Poor", color: "text-rose-700 dark:text-rose-300" };
     if (pct < 60)
       return {
         label: "Average",
-        color: "text-amber-400",
-        bg: "bg-amber-500/20",
+        color: "text-amber-700 dark:text-amber-300",
       };
     return {
       label: "Excellent",
-      color: "text-emerald-400",
-      bg: "bg-emerald-500/20",
+      color: "text-emerald-700 dark:text-emerald-300",
     };
   };
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="w-full min-h-screen p-4 md:p-8 space-y-8 print:p-0 print:bg-foreground">
-        <PageHeader
-          className="print:hidden"
-          title="PLO Report"
-          subtitle="Program Learning Outcomes attainment analysis"
-        >
+      <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-5 pb-24 print:p-0">
+        <header className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end print:hidden">
+          <div className="space-y-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p>
+            <h1 className="text-3xl font-bold tracking-tight text-white">Marks PLO Report</h1>
+            <p className="text-sm text-white/80">Program learning outcomes and course attainment.</p>
+          </div>
           {semesters.length > 0 && (
             <SuperTabs
               tabs={semesters}
               activeTab={semesters.find((s) => s.selected)?.value}
               onTabChange={handleSemesterChange}
+              size="sm"
+              className="!border-0 !bg-white/55 !backdrop-blur-xl dark:!bg-black/25"
             />
           )}
-        </PageHeader>
+        </header>
 
         {loading ? (
-          <div className="flex justify-center py-20">
+          <div className="flex flex-1 justify-center py-20">
             <LoadingSpinner />
           </div>
         ) : (
-          <div className="space-y-8">
-            {}
+          <div className="space-y-5">
             <NotificationBanner alerts={alerts} />
 
-            {}
             {summaryData && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 print:gap-4">
-                <StatsCard
-                  icon={Target}
-                  label="Overall Attainment"
-                  value={`${summaryData.percentage}%`}
-                  subValue="Based on CLO mapping"
-                  delay={100}
-                  className={`print:border-gray-200 print:bg-foreground ${getStatus(summaryData.percentage).color}`}
-                />
-                <StatsCard
-                  icon={TrendingUp}
-                  label="Performance Status"
-                  value={getStatus(summaryData.percentage).label}
-                  subValue="Performance Level"
-                  delay={200}
-                  className={`print:border-gray-200 print:bg-foreground ${getStatus(summaryData.percentage).color}`}
-                />
-
-                {}
-                <div className="flex-1 min-w-[140px] p-6 rounded-[2rem] border bg-secondary/50 backdrop-blur-xl hover:bg-secondary/70 transition-all duration-300 hover:-translate-y-1 group print:border-gray-200 print:bg-foreground">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="p-3.5 rounded-2xl bg-accent/10 text-accent group-hover:scale-110 transition-transform duration-300">
-                      <FileBarChart size={24} />
-                    </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 print:gap-3">
+                {[
+                  { icon: Target, label: "Overall attainment", value: `${summaryData.percentage}%`, detail: "Based on CLO mapping", valueClass: getStatus(summaryData.percentage).color },
+                  { icon: TrendingUp, label: "Performance status", value: getStatus(summaryData.percentage).label, detail: "Current semester", valueClass: getStatus(summaryData.percentage).color },
+                ].map(({ icon: Icon, label, value, detail, valueClass }) => (
+                  <div key={label} className="flex min-h-[150px] flex-col rounded-[24px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6 print:border-gray-200">
+                    <div className="flex items-center gap-3"><span className="flex h-12 w-12 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><Icon size={22} /></span><span className="text-sm font-semibold text-[#40404a] dark:text-[#c4cad6]">{label}</span></div>
+                    <p className={`mt-auto pt-5 text-3xl font-bold leading-none tracking-tight ${valueClass}`}>{value}</p>
+                    <p className="mt-2 text-[11px] text-[#777780] dark:text-[#9ca3b3]">{detail}</p>
                   </div>
-                  <div className="space-y-4">
-                    <p className="text-foreground/50 text-xs  tracking-[0px] font-bold mb-1 print:text-foreground">
-                      PLO Breakdown
-                    </p>
-                    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2">
-                      {summaryData.ploBreakdown.map((plo, i) => (
-                        <div
-                          key={i}
-                          className="flex flex-col items-center bg-background/20 rounded-lg p-2 border border-foreground/10 hover:border-foreground/10 transition-colors print:border-gray-200 print:bg-transparent"
-                        >
-                          <span className="text-[9px] text-foreground/50  font-bold tracking-[0px] print:text-foreground leading-none mb-1">
-                            PLO{plo.id}
-                          </span>
-                          <span
-                            className={`text-[11px] font-bold text-accent print:text-foreground`}
-                          >
-                            {plo.value}%
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                ))}
+                <div className="rounded-[24px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6 print:border-gray-200">
+                  <div className="mb-4 flex items-center gap-3"><span className="flex h-12 w-12 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><FileBarChart size={22} /></span><h2 className="text-sm font-semibold">PLO breakdown</h2></div>
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                    {summaryData.ploBreakdown.map((plo) => <div key={plo.id} className="flex flex-col items-center rounded-xl bg-slate-50 px-2 py-2.5 dark:bg-white/[.06]"><span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">PLO{plo.id}</span><span className="mt-1 text-xs font-bold text-[#230052] dark:text-white">{plo.value}%</span></div>)}
                   </div>
                 </div>
               </div>
             )}
 
-            {}
-
-            {}
             {reportHtml ? (
-              <div className="bg-secondary/50 border border-foreground/10 rounded-3xl overflow-hidden">
-                <div className="p-6 border-b border-foreground/10 flex items-center gap-3 bg-foreground/5">
-                  <div className="p-2 bg-accent/10 rounded-lg text-accent">
-                    <Layout size={20} />
-                  </div>
-                  <h3 className="font-bold text-lg text-foreground">Detailed Result</h3>
+              <section className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] print:border-gray-200">
+                <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4 dark:border-white/10 sm:px-6">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><FileBarChart size={20} /></span>
+                  <div><h2 className="text-base font-bold">Detailed results</h2><p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Course learning outcome attainment by assessment.</p></div>
                 </div>
-                {}
-                <div className="overflow-x-auto scrollbar-hide p-0">
-                  <div
-                    className="legacy-table-wrapper w-full [&_table]:w-full [&_table]:border-collapse [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap"
-                    dangerouslySetInnerHTML={{ __html: reportHtml }}
-                  />
+                <div className="sf-data-table-wrapper overflow-x-auto scrollbar-hide">
+                  <div className="legacy-table-wrapper [&_table]:w-full [&_table]:border-collapse [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap" dangerouslySetInnerHTML={{ __html: reportHtml }} />
                 </div>
-              </div>
+              </section>
             ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-center opacity-50 border border-foreground/10 rounded-3xl bg-secondary/20">
-                <Info size={48} className="mb-4 text-foreground/50" />
-                <p className="text-xl font-bold text-foreground">No PLO Report Available</p>
-                <p className="text-foreground/60 mt-2">
-                  There is no PLO attainment data available for the selected semester.
-                </p>
-                <p className="text-foreground/50 text-sm mt-1">
-                  Please select a different semester.
-                </p>
+              <div className="flex min-h-[300px] flex-col items-center justify-center rounded-[24px] border border-black/[0.06] bg-white px-6 py-12 text-center dark:border-white/[0.14] dark:bg-black">
+                <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><Info size={25} /></span>
+                <p className="text-xl font-bold text-[#101010] dark:text-[#f5f6fb]">No PLO report available</p>
+                <p className="mt-2 max-w-lg text-sm text-slate-500 dark:text-slate-400">There is no PLO attainment data for the selected semester. Try another semester if one is available.</p>
               </div>
             )}
           </div>
         )}
 
-        {}
         <div ref={hiddenContentRef} className="hidden" />
       </div>
     </PageLayout>

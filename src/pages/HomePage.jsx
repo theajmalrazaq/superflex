@@ -16,6 +16,14 @@ import {
 import NotificationBanner from "../components/ui/NotificationBanner";
 import StatsCard from "../components/ui/StatsCard";
 import Skeleton, { MarksSkeleton, AttendanceSkeleton } from "../components/ui/Skeleton";
+import {
+  parseHomeAttendanceReport,
+  parseHomeMarksReport,
+  parseHomeProfile,
+  parseHomeStudyPlan,
+} from "../parsers/home";
+import { findFlexPageRoot } from "../parsers/dom";
+import { getExtensionUrl } from "../utils/extensionApi";
 
 const TEACHER_SELECTIONS_KEY = "superflex_course_teachers_v1";
 const TEACHER_COURSES_KEY = "superflex_cached_courses_v1";
@@ -46,7 +54,7 @@ const SectionAccordion = ({ section, isOpen, onToggle }) => {
       >
         <div className="flex min-w-0 items-center gap-3">
           <span
-            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${isOpen ? "bg-[#dfc8fc] text-[#230052] dark:bg-[#a098ff] dark:text-[#0a192f]" : "bg-white text-slate-500 dark:bg-white/10 dark:text-slate-300"}`}
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${isOpen ? "bg-[#dfc8fc] text-[#230052] dark:bg-white dark:text-[#0a192f]" : "bg-white text-slate-500 dark:bg-white/10 dark:text-slate-300"}`}
           >
             {isOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
           </span>
@@ -62,7 +70,7 @@ const SectionAccordion = ({ section, isOpen, onToggle }) => {
       </button>
       {isOpen && (
         <div className="border-t border-foreground/10">
-          <table className="w-full border-collapse text-left">
+          <table className="sf-data-table w-full border-collapse text-left">
             <thead>
               <tr className="bg-foreground/[0.02]">
                 <th className="w-16 border-b border-foreground/10 p-3 text-[11px] font-bold text-foreground/50">Assessment</th>
@@ -100,7 +108,7 @@ const AttendanceHeatmap = ({ subjects }) => (
     <div className="flex flex-wrap items-center justify-between gap-3 text-[10px] text-foreground/50">
       <span>Each square represents one class session</span>
       <div className="flex items-center gap-3">
-        <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[3px] bg-[#230052] dark:bg-[#a098ff]" /> Present</span>
+        <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[3px] bg-[#230052] dark:bg-white" /> Present</span>
         <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[3px] bg-rose-500" /> Absent</span>
       </div>
     </div>
@@ -112,7 +120,7 @@ const AttendanceHeatmap = ({ subjects }) => (
             <div className="mb-2 flex max-h-[180px] min-w-0 flex-col flex-wrap content-start gap-1 overflow-hidden py-1" role="list" aria-label={`${subject.title} class sessions`}>
               {records.map((record, recordIndex) => {
                 const status = String(record.status || "").trim();
-                const color = /\bp\b|present/i.test(status) ? "bg-[#230052] dark:bg-[#a098ff]" : /\ba\b|absent/i.test(status) ? "bg-rose-500" : "bg-slate-200 dark:bg-white/15";
+                const color = /\bp\b|present/i.test(status) ? "bg-[#230052] dark:bg-white" : /\ba\b|absent/i.test(status) ? "bg-rose-500" : "bg-slate-200 dark:bg-white/15";
                 return <span key={`${record.date}-${recordIndex}`} role="listitem" title={`${record.date} · ${status || "Unknown"} · ${record.type || "Class"}`} aria-label={`${record.date}: ${status || "Unknown attendance status"}`} className={`h-3.5 w-3.5 shrink-0 rounded-[3px] ${color}`} />;
               })}
             </div>
@@ -208,76 +216,18 @@ function HomePage() {
     styleElement.textContent = scrollbarStyle;
     document.head.appendChild(styleElement);
 
-    const targetElement = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
+    const targetElement = findFlexPageRoot(document);
     if (targetElement) {
       targetElement.querySelectorAll("script").forEach((script) => script.remove());
       targetElement.querySelector("#NotificationDetail")?.remove();
       document.querySelector(".m-scroll-top")?.remove();
 
       document.querySelector(".m-scroll-top")?.remove();
-
-      const alertList = [];
-      targetElement.querySelectorAll(".m-alert, .alert").forEach((alert) => {
-        if (
-          alert.style.display === "none" ||
-          alert.id === "DataErrormsgdiv" ||
-          alert.closest(".modal")
-        )
-          return;
-
-        const textContainer = alert.querySelector(".m-alert__text") || alert;
-        const clone = textContainer.cloneNode(true);
-
-        clone
-          .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
-          .forEach((el) => el.remove());
-
-        let message = clone.textContent
-          .replace(/Alert!/gi, "")
-          .replace(/Close/gi, "")
-          .replace(/&nbsp;/g, " ")
-          .replace(/\s+/g, " ")
-          .trim();
-
-        if (message && message.length > 3) {
-          const type =
-            alert.classList.contains("alert-danger") ||
-            alert.classList.contains("m-alert--outline-danger")
-              ? "error"
-              : "info";
-          alertList.push({ type, message });
-        }
-      });
-      setAlerts(alertList);
-
-      let uniInfo = {};
-      let personalData = {};
-      const allSections = [];
-
-      const rows = targetElement.querySelectorAll(".row");
-      rows.forEach((row) => {
-        const portletTitle = row.querySelector(".m-portlet__head-text")?.textContent.trim();
-
-        if (portletTitle) {
-          const sectionData = {};
-          row.querySelectorAll(".col-md-4 p").forEach((p) => {
-            const label = p.querySelector(".m--font-boldest")?.textContent.trim().replace(":", "");
-            const value = p.querySelector("span:not(.m--font-boldest)")?.textContent.trim();
-            if (label && value) sectionData[label] = value;
-          });
-
-          if (Object.keys(sectionData).length > 0) {
-            allSections.push({ title: portletTitle, data: sectionData });
-
-            if (portletTitle === "University Information") uniInfo = sectionData;
-            if (portletTitle === "Personal Information") personalData = sectionData;
-          }
-        }
-      });
-
-      setProfileSections(allSections);
-      setUniversityInfo(uniInfo);
-      setPersonalInfo(personalData);
+      const profile = parseHomeProfile(targetElement);
+      setAlerts(profile.alerts);
+      setProfileSections(profile.sections);
+      setUniversityInfo(profile.universityInfo);
+      setPersonalInfo(profile.personalInfo);
 
       targetElement.remove();
     }
@@ -353,53 +303,7 @@ function HomePage() {
       const html = await res.text();
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, "text/html");
-
-      const summaryData = [];
-      const tables = doc.querySelectorAll(".table.table-bordered.table-responsive");
-
-      tables.forEach((table) => {
-        const tabPane = table.closest(".tab-pane");
-        let title = tabPane?.querySelector("h5")?.textContent.trim() || "Course";
-        const titleParts = title.split("-");
-        if (titleParts.length > 1) {
-          const rawTitle = titleParts.slice(1).join("-").trim();
-          title = rawTitle.replace(/\(.*\)/, "").trim();
-        }
-        const rows = table.querySelectorAll("tbody tr");
-        let present = 0,
-          absent = 0;
-        const records = [];
-        rows.forEach((r) => {
-          const cols = r.querySelectorAll("td");
-          if (cols.length >= 4) {
-            records.push({
-              date: cols[1]?.textContent.trim(),
-              time: cols[2]?.textContent.trim(),
-              status: cols[3]?.textContent.trim(),
-              type: cols[4]?.textContent.trim() || "Lecture",
-            });
-          }
-          const marker = r.querySelector("td:nth-child(4)")?.textContent.trim();
-          if (marker?.includes("P")) present++;
-          if (marker?.includes("A")) absent++;
-        });
-
-        let percentage = 0;
-        const progress = tabPane?.querySelector(".progress-bar");
-        if (progress) {
-          percentage = parseFloat(progress.getAttribute("aria-valuenow") || 0);
-        }
-
-        summaryData.push({
-          title,
-          present,
-          absent,
-          total: rows.length,
-          percentage,
-          records,
-        });
-      });
-      setAttendanceData(summaryData);
+      setAttendanceData(parseHomeAttendanceReport(doc));
     } catch (e) {
       console.error("Attendance fetch error", e);
     }
@@ -411,94 +315,7 @@ function HomePage() {
       const html = await res.text();
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, "text/html");
-
-      const parsedCourses = [];
-
-      const tabPanes = doc.querySelectorAll(".tab-pane");
-
-      tabPanes.forEach((pane) => {
-        const courseId = pane.id;
-        let courseTitle = pane.querySelector("h5")?.textContent.trim() || courseId;
-        const titleParts = courseTitle.split("-");
-        if (titleParts.length > 1) {
-          const rawTitle = titleParts.slice(1).join("-").trim();
-          courseTitle = rawTitle.replace(/\(.*\)/, "").trim();
-        }
-
-        const sections = [];
-
-        const cards = pane.querySelectorAll(".card");
-        cards.forEach((card) => {
-          const header = card.querySelector(".card-header button")?.textContent.trim();
-          if (!header || header.includes("Grand Total")) return;
-
-          const rows = [];
-          const cardRows = card.querySelectorAll("tbody tr");
-          cardRows.forEach((tr) => {
-            if (tr.classList.contains("totalColumn_1471") || tr.querySelector(".totalColweightage"))
-              return;
-
-            const tds = tr.querySelectorAll("td");
-            if (tds.length < 4) return;
-
-            const name = tds[0]?.textContent.trim();
-            const weight = parseFloat(tds[1]?.textContent.trim() || "0");
-            const obtainedStr = tds[2]?.textContent.trim();
-            const totalStr = tds[3]?.textContent.trim();
-            const avg = parseFloat(tds[4]?.textContent.trim() || "0");
-            const stdDev = parseFloat(tds[5]?.textContent.trim() || "0");
-            const min = parseFloat(tds[6]?.textContent.trim() || "0");
-            const max = parseFloat(tds[7]?.textContent.trim() || "0");
-
-            if (name === "Total" || name === "Grand Total") return;
-
-            if (obtainedStr && obtainedStr !== "-" && obtainedStr !== "") {
-              const obtained = parseFloat(obtainedStr);
-              const total = parseFloat(totalStr);
-
-              if (!isNaN(obtained)) {
-                rows.push({
-                  title: name,
-                  weight,
-                  obtained,
-                  total: isNaN(total) ? 0 : total,
-                  avg,
-                  stdDev,
-                  min,
-                  max,
-                  included: true,
-                });
-              }
-            }
-          });
-
-          const footerRow =
-            card.querySelector("tfoot tr") || card.querySelector("tr[class*='totalColumn']");
-          let categoryWeight = 0;
-          if (footerRow) {
-            categoryWeight = parseFloat(
-              footerRow.querySelector(".totalColweightage")?.textContent || "0",
-            );
-          }
-
-          if (rows.length > 0) {
-            sections.push({
-              id: `${courseId}-${header.replace(/\s+/g, "_")}`,
-              title: header,
-              weight: categoryWeight || rows.reduce((acc, r) => acc + r.weight, 0),
-              rows: rows,
-            });
-          }
-        });
-
-        const processedCourse = processCourseMarks({
-          id: courseId,
-          title: courseTitle,
-          sections: sections,
-        });
-
-        parsedCourses.push(processedCourse);
-      });
+      const parsedCourses = parseHomeMarksReport(doc).map((course) => processCourseMarks(course));
 
       setCoursesData(parsedCourses);
       if (parsedCourses.length) setActiveCourse(parsedCourses[0].id);
@@ -513,38 +330,7 @@ function HomePage() {
       const html = await res.text();
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, "text/html");
-
-      const parsedSemesters = [];
-      const semesterCols = doc.querySelectorAll(".col-md-6");
-
-      semesterCols.forEach((col) => {
-        const h4 = col.querySelector("h4");
-        if (!h4) return;
-
-        const title = h4.textContent
-          .replace(h4.querySelector("small")?.textContent || "", "")
-          .trim();
-        const crHrsText = h4.querySelector("small")?.textContent || "";
-        const crHrs = parseInt(crHrsText.match(/\d+/)?.[0] || "0");
-
-        const courses = [];
-        const table = col.querySelector("table");
-        if (table) {
-          table.querySelectorAll("tbody tr").forEach((tr) => {
-            const cells = tr.querySelectorAll("td");
-            if (cells.length >= 4) {
-              courses.push({
-                code: cells[0].textContent.trim(),
-                title: cells[1].textContent.trim(),
-                crHrs: parseInt(cells[2].textContent.trim()),
-                type: cells[3].textContent.trim(),
-              });
-            }
-          });
-        }
-        parsedSemesters.push({ title, crHrs, courses });
-      });
-      setStudyPlanData(parsedSemesters);
+      setStudyPlanData(parseHomeStudyPlan(doc));
     } catch (e) {
       console.error("Study Plan fetch error", e);
     }
@@ -565,17 +351,19 @@ function HomePage() {
                 alt=""
                 className="h-12 w-12 shrink-0 rounded-full border-2 border-white/80 bg-white object-cover sm:h-14 sm:w-14"
                 onError={(event) => {
-                  event.currentTarget.src = chrome.runtime.getURL("assets/favicon.png");
+                  const fallbackUrl = getExtensionUrl("assets/favicon.png");
+                  if (fallbackUrl) event.currentTarget.src = fallbackUrl;
+                  else event.currentTarget.hidden = true;
                 }}
               />
               <div className="min-w-0">
-                <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#230052]/75 dark:text-[#c4cad6]">
+                <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-white/80 dark:text-white/80">
                   Student dashboard
                 </p>
-                <h1 className="truncate text-[28px] font-bold leading-tight tracking-[-0.045em] text-[#101010] dark:text-[#f5f6fb] sm:text-4xl">
+                <h1 className="truncate text-[28px] font-bold leading-tight tracking-[-0.045em] text-white sm:text-4xl">
                   {greetingMessage}, {personalInfo?.Name?.split(" ")[0] || "Student"}
                 </h1>
-                <p className="mt-1 text-sm text-[#40404a]/75 dark:text-[#c4cad6]">
+                <p className="mt-1 text-sm text-white/80">
                   Your academic snapshot at a glance.
                 </p>
               </div>
@@ -587,7 +375,7 @@ function HomePage() {
                 onClick={() => setActiveMainTab("stats")}
                 className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold transition-colors sm:px-5 sm:text-sm ${
                   activeMainTab === "stats"
-                    ? "bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]"
+                    ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"
                     : "text-slate-600 hover:text-[#230052] dark:text-slate-300 dark:hover:text-white"
                 }`}
               >
@@ -599,7 +387,7 @@ function HomePage() {
                 onClick={() => setActiveMainTab("info")}
                 className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold transition-colors sm:px-5 sm:text-sm ${
                   activeMainTab === "info"
-                    ? "bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]"
+                    ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"
                     : "text-slate-600 hover:text-[#230052] dark:text-slate-300 dark:hover:text-white"
                 }`}
               >
@@ -617,17 +405,17 @@ function HomePage() {
               <section aria-labelledby="overview-heading" className="space-y-4">
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#230052]/65 dark:text-[#a098ff]">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
                       Overview
                     </p>
                     <h2
                       id="overview-heading"
-                      className="text-xl font-bold tracking-tight text-[#101010] dark:text-[#f5f6fb]"
+                      className="text-xl font-bold tracking-tight text-white"
                     >
                       Academic snapshot
                     </h2>
                   </div>
-                  <p className="text-xs text-[#626262] dark:text-[#9ca3b3]">
+                  <p className="text-xs text-white/75">
                     Live metrics from your marks and attendance records.
                   </p>
                 </div>
@@ -652,19 +440,19 @@ function HomePage() {
                 <div className="flex h-full flex-col gap-6 overflow-hidden rounded-[24px] border border-black/[0.06] bg-white p-5 text-slate-900 shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-7 xl:p-8">
                   <div className="flex min-h-[52px] flex-col items-start justify-between gap-4 sm:flex-row">
                     <div className="flex items-center gap-3">
-                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]"><Award size={22} /></span>
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><Award size={22} /></span>
                       <div className="space-y-1">
                         <h3 className="text-lg font-bold tracking-tight text-foreground">Course Performance</h3>
                         <p className="text-xs text-foreground/50">Detailed marks and assessments</p>
                       </div>
                     </div>
-                    {links.marks && <a href={links.marks} className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#230052] px-4 text-xs font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-[#a098ff] dark:text-[#0a192f] dark:hover:bg-[#b7b0ff]">View Details <ArrowRight size={12} /></a>}
+                    {links.marks && <a href={links.marks} className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#230052] px-4 text-xs font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80">View Details <ArrowRight size={12} /></a>}
                   </div>
                   {loadingMarks ? <MarksSkeleton /> : coursesData.length ? (
                     <>
                       <div className="w-full overflow-x-auto scrollbar-hide">
                         <div className="flex w-fit gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/[0.08]">
-                          {coursesData.map((course) => <button key={course.id} type="button" onClick={() => setActiveCourse(course.id)} className={`whitespace-nowrap rounded-full px-5 py-2 text-xs font-bold transition-all ${activeCourse === course.id ? "bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]" : "text-slate-600 hover:text-[#230052] dark:text-slate-300 dark:hover:text-white"}`}>{course.id}</button>)}
+                          {coursesData.map((course) => <button key={course.id} type="button" onClick={() => setActiveCourse(course.id)} className={`whitespace-nowrap rounded-full px-5 py-2 text-xs font-bold transition-all ${activeCourse === course.id ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-600 hover:text-[#230052] dark:text-slate-300 dark:hover:text-white"}`}>{course.id}</button>)}
                         </div>
                       </div>
                       {activeCourseData && (
@@ -672,7 +460,7 @@ function HomePage() {
                           <div className="mb-4 flex flex-col gap-2">
                             <h2 className="text-xl font-bold leading-tight text-foreground">{activeCourseData.title}</h2>
                             {teacherSelections[activeCourseData.id] && <div className="flex items-center gap-2 text-xs text-foreground/60">
-                              {teacherSelections[activeCourseData.id].image ? <img src={teacherSelections[activeCourseData.id].image} alt="" className="h-6 w-6 rounded-full object-cover" /> : <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#230052]/10 text-[9px] font-bold text-[#230052] dark:bg-[#a098ff]/15 dark:text-[#a098ff]">{teacherSelections[activeCourseData.id].name.slice(0, 1)}</span>}
+                              {teacherSelections[activeCourseData.id].image ? <img src={teacherSelections[activeCourseData.id].image} alt="" className="h-6 w-6 rounded-full object-cover" /> : <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#230052]/10 text-[9px] font-bold text-[#230052] dark:bg-white/15 dark:text-white">{teacherSelections[activeCourseData.id].name.slice(0, 1)}</span>}
                               <span>Instructor: <span className="font-semibold text-foreground">{teacherSelections[activeCourseData.id].name}</span></span>
                             </div>}
                             <div className="flex items-center gap-2">
@@ -696,13 +484,13 @@ function HomePage() {
                 <div className="flex h-full flex-col gap-6 rounded-[24px] border border-black/[0.06] bg-white p-5 text-slate-900 shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-7 xl:p-8">
                   <div className="flex min-h-[52px] items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]"><Activity size={22} /></span>
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><Activity size={22} /></span>
                       <div className="space-y-1">
                         <h3 className="text-lg font-bold tracking-tight text-foreground">Attendance Overview</h3>
                         <p className="text-xs text-foreground/50">Presence and absence analytics</p>
                       </div>
                     </div>
-                    {links.attendance && <a href={links.attendance} className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#230052] px-4 text-xs font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-[#a098ff] dark:text-[#0a192f] dark:hover:bg-[#b7b0ff]">View Details <ArrowRight size={12} /></a>}
+                    {links.attendance && <a href={links.attendance} className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#230052] px-4 text-xs font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80">View Details <ArrowRight size={12} /></a>}
                   </div>
                   {loadingAttendance ? <AttendanceSkeleton /> : attendanceData?.length ? <AttendanceHeatmap subjects={attendanceData} /> : <div className="flex flex-1 flex-col items-center justify-center text-center">
                     <div className="mb-4 rounded-3xl bg-foreground/5 p-6"><Activity size={40} className="text-foreground/40" /></div>
@@ -740,7 +528,7 @@ const ProfileInfoTabs = ({ profileSections }) => {
         >
           {}
           <div className="mb-6 flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-[#a098ff] dark:text-[#0a192f]">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
               {(() => {
                 const title = section.title.toLowerCase();
                 if (title.includes("personal")) return <User size={24} />;
@@ -760,7 +548,7 @@ const ProfileInfoTabs = ({ profileSections }) => {
                 key={i}
                 className="flex min-h-[84px] flex-col justify-center rounded-[20px] bg-[#f6f6f8] p-4 transition-colors hover:bg-[#eeeeF2] dark:bg-black dark:hover:bg-black"
               >
-                <span className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-[#230052]/70 dark:text-[#a098ff]">
+                <span className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-[#230052]/70 dark:text-white">
                   {key}
                 </span>
                 <span className="break-words text-sm font-semibold leading-relaxed text-[#101010] dark:text-[#f5f6fb]">
