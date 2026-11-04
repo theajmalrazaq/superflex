@@ -306,7 +306,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
           onClick={() => window.dispatchEvent(new CustomEvent("superflex-toggle-ai"))}
           className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#230052] px-4 text-sm font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80"
         >
-          <Activity size={17} /> Ask AI
+          <KeyRound size={17} /> GroqCloud
         </button>
 
         <div>

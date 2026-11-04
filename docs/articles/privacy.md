@@ -27,10 +27,10 @@ To provide the dashboard, calculators, and AI features, SuperFlex reads:
 
 ### AI Context Sync
 
-When you use the AI Academic Assistant, the data listed above is sent to AI model providers (like OpenAI, Anthropic, or Google) via the Puter.ai API. This is necessary for the AI to understand your academic context and provide personalized advice.
+When you use the AI Academic Assistant, your message and the selected academic context are sent directly to GroqCloud using the API key you provide. The key is stored in the browser extension's local storage. SuperFlex does not proxy these requests or store the key on its servers.
 
 - **Opt-in Only:** AI data access is only enabled if you explicitly grant permission.
-- **No Training:** We request that providers do not use this data to train their models.
+- **Provider policies:** Data handling follows GroqCloud's policies and your account settings.
 
 ## 3. Information We Collect
 
@@ -52,7 +52,7 @@ We prioritize your anonymity. We use **Umami Analytics**, a privacy-focused, coo
 
 We use a few trusted partners to provide core functionality:
 
-- **Puter.ai:** Used to securely connect to AI models. Data transmitted is strictly for chat processing.
+- **GroqCloud:** Used for AI chat when you provide and configure an API key.
 - **Google Fonts:** Used to provide the Google Sans Flex typography.
 - **Github/Vercel:** Used for project hosting and documentation.
 
@@ -60,7 +60,7 @@ We use a few trusted partners to provide core functionality:
 
 - **No Backend:** SuperFlex has no central database. If our website were compromised, your academic data would still be safe because it lives only on your computer.
 - **Local Encryption:** We rely on browser sandbox security to protect the data stored in `localStorage`.
-- **HTTPS Only:** All communications with third-party APIs (Puter, Umami) are encrypted via TLS.
+- **HTTPS Only:** All communications with third-party APIs (GroqCloud, Umami) are encrypted via TLS.
 
 ## 6. Your Rights
 

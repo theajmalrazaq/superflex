@@ -12,7 +12,7 @@
     "typecheck:parsers": "tsc -p tsconfig.parsers.json",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "clean": "node scripts/clean.js --ignore public/scripts/puter.js && oxfmt"
+    "clean": "node scripts/clean.js && oxfmt"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.13",

@@ -104,7 +104,7 @@ If the AI says "I don't have transcript data":
 
 ## Privacy & Reliability
 
-- **Data Transmission**: While SuperFlex logic runs locally in your browser, your specific query and relevant context are sent to the **Puter.js** AI infrastructure to generate responses from your selected model (e.g., Google, OpenAI, etc).
+- **Data Transmission**: Your message and the academic context used to answer it are sent to GroqCloud with the API key you provide. The key is stored in the extension's local storage and is not sent to SuperFlex servers.
 - **Estimation**: AI provides **estimates**. Always verify critical calculations with your coordinator.
 
 _Developed for the dreamers, the grinders, and the ones who just want to Flex._

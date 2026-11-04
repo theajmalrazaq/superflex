@@ -74,13 +74,8 @@ CSS-in-JS solutions like styled-components introduce runtime overhead. Tailwind 
 - **Dark Mode**: Built-in dark:{class} utilities make theming trivial.
 - **No Style Bleeding**: Since I purge legacy CSS, there are no specificity conflicts.
 
-**Puter.js**
-For AI integration, I evaluated OpenAI API, Anthropic Claude, and Google Gemini. All require API key management. Puter.js was chosen because:
-
-- **OAuth Authentication**: Users sign in once; no API keys to secure or rotate.
-- **Multi-Model Access**: One interface for GPT-4o, Claude 3.5, Gemini 2.0.
-- **Free Tier**: Students can use AI features without credit card requirements.
-- **Streaming Support**: Token-by-token responses provide better UX than waiting for full completion.
+**GroqCloud API**
+The AI assistant connects directly to GroqCloud using an API key supplied by the user. The extension stores the key in `chrome.storage.local`, retrieves the models available to that key, and sends chat requests through the extension background service worker. The key is never placed in the page DOM or sent to SuperFlex servers.
 
 **Umami Analytics**
 Traditional analytics (Google Analytics) violate Chrome's CSP. Umami is:
@@ -98,7 +93,7 @@ Traditional analytics (Google Analytics) violate Chrome's CSP. Umami is:
 Chrome extensions operate in three isolated JavaScript execution contexts, each with different capabilities and restrictions. Understanding this is critical to comprehending Super Flex's architecture.
 
 **1. Main World (Original Page Context)**
-This is the JavaScript environment where the original Flex portal's scripts execute. When I inject Puter.js here, it becomes accessible as `window.puter`. Legacy jQuery code also lives here.
+This is the JavaScript environment where the original Flex portal's scripts execute. Legacy jQuery code lives here; SuperFlex does not inject an AI provider into this context.
 
 _Capabilities:_ Full access to window object, can modify global variables, can load external libraries.  
 _Restrictions:_ Chrome extension APIs are not available.
@@ -107,7 +102,7 @@ _Restrictions:_ Chrome extension APIs are not available.
 This is where my React application runs. Chrome deliberately isolates this environment to prevent malicious extensions from tampering with page scripts.
 
 _Capabilities:_ Full React, DOM manipulation, chrome.runtime APIs.  
-_Restrictions:_ Cannot access `window` variables from Main World (e.g., cannot directly call `window.puter.ai.chat()`).
+_Restrictions:_ Cannot access `window` variables from Main World.
 
 **3. Background Service Worker**
 A persistent background script that handles cross-tab messaging and can intercept network requests.
@@ -146,7 +141,7 @@ _Capabilities:_ chrome.* APIs, persistent state, network interception.
 │                    BRIDGE LAYER                               │
 │  Main World ↔ Isolated World Communication                    │
 │  • CustomEvent-based messaging                                │
-│  • Handles Puter.js AI requests/responses                     │
+│  • Stores the user API key and calls GroqCloud                │
 │  • Usage data and Authentication management                   │
 └───────────────────────────────────────────────────────────────┘
 ```
@@ -200,23 +195,7 @@ createRoot(root).render(<App />);
 
 ### Script Injection Pipeline
 
-I need to inject multiple dependencies in a specific order:
-
-```javascript
-// Inject scripts in specific order: polyfill → puter → bridge → analytics
-["polyfill.js", "puter.js", "bridge.js", "umami.js"].forEach((file) => {
-  const script = document.createElement("script");
-  script.src = chrome.runtime.getURL(file);
-  document.head.appendChild(script);
-});
-```
-
-**Critical Ordering:**
-
-1. **polyfill.js first** → Defines `ReadableStream` global
-2. **puter.js second** → Reads polyfilled APIs during initialization
-3. **bridge.js third** → Assumes `window.puter` exists
-4. **umami.js** → Can load anytime (independent)
+The content script injects the analytics script and a small compatibility patch for the portal's jQuery scrollbar plugin. AI requests do not cross into the page's Main World; the extension sends them from the background service worker to GroqCloud.
 
 ---
 
@@ -296,91 +275,11 @@ This means:
 
 ---
 
-## 8. AI Integration with Puter.js
+## 8. AI Integration with GroqCloud
 
-### The Bridge Communication Pattern
+The React assistant collects the user's question and, when permitted, relevant academic context. It sends a runtime message to the extension background service worker. The worker reads the API key from `chrome.storage.local` and calls GroqCloud's OpenAI-compatible chat completions endpoint. Model options are loaded from GroqCloud's models endpoint using the saved key.
 
-This was the most complex technical challenge. My React app needs to call `window.puter.ai.chat()`, but due to Chrome's isolation model, `window.puter` is undefined in the content script context.
-
-**Architecture:**
-
-```
-┌──────────────────────────────────────────────────────┐
-│  ISOLATED WORLD (Content Script - React App)         │
-│                                                      │
-│  document.dispatchEvent(                             │
-│    new CustomEvent('superflex-ai-query', {           │
-│      detail: { id: '123', prompt: 'Calculate CGPA' } │
-│    })                                                │
-│  );                                                  │
-└──────────────────────────────────────────────────────┘
-                        │
-                        │ DOM Event Boundary
-                        ▼
-┌──────────────────────────────────────────────────────┐
-│  MAIN WORLD (bridge.js - Injected Script)            │
-│                                                      │
-│  document.addEventListener('superflex-ai-query',     │
-│    async (e) => {                                    │
-│      const response = await window.puter.ai.chat(    │
-│        e.detail.prompt                               │
-│      );                                              │
-│      document.dispatchEvent(                         │
-│        new CustomEvent('superflex-ai-response', {    │
-│          detail: { id: e.detail.id, text: response } │
-│        })                                            │
-│      );                                              │
-│    }                                                 │
-│  );                                                  │
-└──────────────────────────────────────────────────────┘
-                        │
-                        │ DOM Event Boundary
-                        ▼
-┌──────────────────────────────────────────────────────┐
-│  ISOLATED WORLD (Content Script - React App)         │
-│                                                      │
-│  document.addEventListener('superflex-ai-response',  │
-│    (e) => {                                          │
-│      if (e.detail.id === '123') {                    │
-│        setAiResponse(e.detail.text);                 │
-│      }                                               │
-│    }                                                 │
-│  );                                                  │
-└──────────────────────────────────────────────────────┘
-```
-
-**Bridge Implementation (public/bridge.js):**
-
-```javascript
-// Bridge: Listen for AI queries from React, call Puter.js, stream responses back
-document.addEventListener("superflex-ai-query", async (e) => {
-  const { id, prompt, model } = e.detail;
-
-  const stream = await window.puter.ai.chat(prompt, {
-    model: model || "gpt-4o-mini",
-    stream: true,
-  });
-
-  for await (const chunk of stream) {
-    if (activeRequestId === id) {
-      // Verify request still active
-      document.dispatchEvent(
-        new CustomEvent("superflex-ai-response", {
-          detail: { id, text: chunk.text },
-        }),
-      );
-    }
-  }
-});
-```
-
-**React Component:** Generates a unique request ID, sets up a response listener that accumulates streamed tokens, handles errors (including auth triggers), and dispatches the AI query event with the constructed context.
-
-### Context Assembly
-
-The AI needs academic data to be useful. I construct a structured context:
-
-The AI needs context to be useful. I construct a structured prompt that includes student profile, current marks, attendance, transcript history, and the user's query, all formatted as JSON within a system message.
+The API key stays in extension storage and is not exposed to the portal page's JavaScript or inserted into the DOM. Chat prompts and selected academic context are sent to GroqCloud for inference.
 
 ---
 
@@ -390,11 +289,9 @@ The AI needs context to be useful. I construct a structured prompt that includes
 
 I use WXT for automated manifest processing, Vite-based builds, and code splitting. Heavy libraries like Chart.js are bundled separately to optimize initial load time.
 
-### Dynamic Import Issues
+### Provider Requests
 
-One major hurdle was Puter.js's dependency on `web-streams-polyfill` and `rustls`. The library originally tried to dynamically import these from a CDN, which violates Chrome Extension CSP.
-
-**Solution:** I downloaded these dependencies locally to the `/public/scripts/` directory, bundled them with the extension, and patched `puter.js` to import them from the same directory using relative paths. This makes the extension fully self-contained and compliant with strict security policies.
+The background service worker calls the GroqCloud REST API using the extension's `api.groq.com` host permission. This avoids loading a provider SDK or injecting provider code into the Flex portal page.
 
 ---
 
@@ -413,9 +310,10 @@ Session expiry is detected by scanning the page text for error keywords like "se
 
 ### Data Storage
 
-**What I Store in localStorage:**
+**What I Store in browser storage:**
 
-- AI chat history (messages array)
+- AI chat history and selected model in `localStorage`
+- GroqCloud API key and available models in `chrome.storage.local`
 - User preferences (theme, selected AI model)
 - Permission status (whether user allowed data sharing with AI)
 - Last sync timestamps (to avoid redundant fetches)
@@ -428,7 +326,7 @@ Session expiry is detected by scanning the page text for error keywords like "se
 
 ### CSP Compliance
 
-By self-hosting all dependencies (Umami, Puter, polyfills), I ensure:
+The extension avoids injecting third-party AI scripts into the portal page:
 
 - No external script loads (violates CSP)
 - No eval() usage (blocked in extensions)

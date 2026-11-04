@@ -18,35 +18,6 @@ export default defineContentScript({
       scriptUmami.dataset.websiteId = "17490ccf-0b15-4d8a-a908-5e774ad648de";
       if (scriptUmami.src) document.head.appendChild(scriptUmami);
 
-      let puterScriptState = "idle";
-      const loadPuter = () => {
-        if (puterScriptState === "ready") {
-          document.dispatchEvent(new CustomEvent("superflex-puter-loaded"));
-          return;
-        }
-        if (puterScriptState === "loading") return;
-
-        puterScriptState = "loading";
-        const scriptPuter = document.createElement("script");
-        scriptPuter.src = getExtensionUrl("scripts/puter.js");
-        if (!scriptPuter.src) {
-          puterScriptState = "idle";
-          document.dispatchEvent(new CustomEvent("superflex-puter-load-failed"));
-          return;
-        }
-        scriptPuter.dataset.superflexPuter = "true";
-        scriptPuter.onload = () => {
-          puterScriptState = "ready";
-          document.dispatchEvent(new CustomEvent("superflex-puter-loaded"));
-        };
-        scriptPuter.onerror = () => {
-          puterScriptState = "idle";
-          document.dispatchEvent(new CustomEvent("superflex-puter-load-failed"));
-        };
-        document.head.appendChild(scriptPuter);
-      };
-      document.addEventListener("superflex-load-ai", loadPuter);
-
       const scriptBridge = document.createElement("script");
       scriptBridge.src = getExtensionUrl("scripts/bridge.js");
       scriptBridge.defer = true;

@@ -9,57 +9,14 @@ import {
   BarChart,
   GraduationCap,
   User,
-  LogOut,
-  LogIn,
+  KeyRound,
+  LoaderCircle,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Logo } from "./ui/Logo";
-
-const AVAILABLE_MODELS = [
-  {
-    id: "gpt-4o-mini",
-    name: "GPT-4o Mini",
-    short: "GPT-4o Mini",
-    provider: "OpenAI",
-    domain: "openai.com",
-  },
-  {
-    id: "claude-haiku-4-5-20251001",
-    name: "Claude Haiku",
-    short: "Claude Haiku",
-    provider: "Anthropic",
-    domain: "anthropic.com",
-  },
-  {
-    id: "gemini-2.0-flash",
-    name: "Gemini 2.0 Flash",
-    short: "Gemini 2.0",
-    provider: "Google",
-    domain: "google.com",
-  },
-  {
-    id: "google/gemini-3-pro-preview",
-    name: "Gemini 3 Pro",
-    short: "Gemini 3",
-    provider: "Google",
-    domain: "google.com",
-  },
-  {
-    id: "gemini-3-flash-preview",
-    name: "Gemini 3 Flash",
-    short: "Gemini 3",
-    provider: "Google",
-    domain: "google.com",
-  },
-  {
-    id: "grok-2",
-    name: "Grok 2",
-    short: "Grok 2",
-    provider: "xAI",
-    domain: "x.ai",
-  },
-];
+import { sendExtensionMessage } from "../utils/extensionApi";
+import { buildGroqMessages } from "../utils/aiPrompt";
 
 const AnimatedLogo = ({ size = 24, animated = true, className = "" }) => (
   <div
@@ -119,23 +76,40 @@ const SuperFlexAI = () => {
   const [permissionStatus, setPermissionStatus] = useState(
     () => localStorage.getItem("superflex_ai_data_permission") || "pending",
   );
-  const [selectedModel, setSelectedModel] = useState(
-    () => localStorage.getItem("superflex_ai_model") || "gpt-4o-mini",
-  );
+  const [selectedModel, setSelectedModel] = useState(() => localStorage.getItem("superflex_ai_model") || "");
   const [showModelPicker, setShowModelPicker] = useState(false);
-  const [usageData, setUsageData] = useState(null);
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [availableModels, setAvailableModels] = useState([]);
+  const [hasApiKey, setHasApiKey] = useState(false);
+  const [apiKeyInput, setApiKeyInput] = useState("");
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [connectionError, setConnectionError] = useState("");
   const [userImage, setUserImage] = useState(
     () => localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage",
   );
   const scrollRef = useRef(null);
   const activeRequestIdRef = useRef(null);
-  const triggerPuterSignIn = () => {
-    const handlePuterLoaded = () => {
-      document.dispatchEvent(new CustomEvent("superflex-auth-trigger"));
-    };
-    document.addEventListener("superflex-puter-loaded", handlePuterLoaded, { once: true });
-    document.dispatchEvent(new CustomEvent("superflex-load-ai"));
+  const runtimeMessage = (message) =>
+    new Promise((resolve) => {
+      sendExtensionMessage(message, (response, error) =>
+        resolve(error ? { error: error.message } : response || { error: "Extension connection failed." }),
+      );
+    });
+
+  const connectGroqCloud = async () => {
+    setIsConnecting(true);
+    setConnectionError("");
+    const result = await runtimeMessage({ type: "SUPERFLEX_GROQ_SAVE_KEY", apiKey: apiKeyInput });
+    setIsConnecting(false);
+    if (result.error) {
+      setConnectionError(result.error);
+      return;
+    }
+    setHasApiKey(true);
+    setAvailableModels(result.models || []);
+    setSelectedModel((current) =>
+      result.models?.some((model) => model.id === current) ? current : result.models?.[0]?.id || "",
+    );
+    setApiKeyInput("");
   };
 
   useEffect(() => {
@@ -147,46 +121,15 @@ const SuperFlexAI = () => {
   }, []);
 
   useEffect(() => {
-    const handleUsage = (e) => {
-      setUsageData(e.detail);
-    };
-    document.addEventListener("superflex-usage-data", handleUsage);
-    return () => document.removeEventListener("superflex-usage-data", handleUsage);
+    runtimeMessage({ type: "SUPERFLEX_GROQ_CONFIG" }).then((result) => {
+      if (result.error) return;
+      setHasApiKey(result.configured);
+      setAvailableModels(result.models || []);
+      setSelectedModel((current) =>
+        result.models?.some((model) => model.id === current) ? current : result.models?.[0]?.id || "",
+      );
+    });
   }, []);
-
-  useEffect(() => {
-    const handleAuthStatus = (e) => {
-      if (e.detail?.isSignedIn !== undefined) {
-        setIsSignedIn(e.detail.isSignedIn);
-      }
-    };
-    document.addEventListener("superflex-auth-status", handleAuthStatus);
-
-    let interval;
-    if (isOpen) {
-      const checkAuth = () => document.dispatchEvent(new CustomEvent("superflex-check-auth"));
-      if (localStorage.getItem("puter.auth.token")) {
-        document.addEventListener("superflex-puter-loaded", checkAuth, { once: true });
-        document.dispatchEvent(new CustomEvent("superflex-load-ai"));
-      }
-      checkAuth();
-      interval = setInterval(() => {
-        checkAuth();
-      }, 5000);
-    }
-
-    return () => {
-      document.removeEventListener("superflex-auth-status", handleAuthStatus);
-      if (interval) clearInterval(interval);
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (showModelPicker) {
-      document.dispatchEvent(new CustomEvent("superflex-get-usage"));
-      document.dispatchEvent(new CustomEvent("superflex-check-auth"));
-    }
-  }, [showModelPicker]);
 
   useEffect(() => {
     if (!window.superflex_ai_context) {
@@ -236,7 +179,7 @@ const SuperFlexAI = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("superflex_ai_model", selectedModel);
+    if (selectedModel) localStorage.setItem("superflex_ai_model", selectedModel);
   }, [selectedModel]);
 
   useEffect(() => {
@@ -267,185 +210,37 @@ const SuperFlexAI = () => {
 
     const requestId = crypto.randomUUID();
     activeRequestIdRef.current = requestId;
-    let responseText = "";
-
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
-
-    const responseHandler = (e) => {
-      const { id, text, error, done } = e.detail;
-      if (id !== requestId || !activeRequestIdRef.current) {
-        document.removeEventListener("superflex-ai-response", responseHandler);
-        return;
-      }
-
-      if (error) {
-        document.removeEventListener("superflex-ai-response", responseHandler);
-        setIsLoading(false);
-        activeRequestIdRef.current = null;
-
-        let errorMsg = "Sorry, I encountered an error.";
-        if (error === "auth_required" || error === "auth_canceled") {
-          errorMsg = "Please sign in to Puter to continue. A popup should appear.";
-
-          if (error === "auth_required") {
-            document.dispatchEvent(new CustomEvent("superflex-auth-trigger"));
-          }
-        } else {
-          errorMsg = `Error: ${error}`;
-        }
-
-        setMessages((prev) => {
-          const last = prev[prev.length - 1];
-          if (last && last.role === "assistant") {
-            const others = prev.slice(0, -1);
-            return [...others, { role: "assistant", content: errorMsg }];
-          }
-          return prev;
-        });
-        return;
-      }
-
-      if (text) {
-        responseText += text;
-        setMessages((prev) => {
-          const last = prev[prev.length - 1];
-          if (last && last.role === "assistant") {
-            const others = prev.slice(0, -1);
-            return [...others, { ...last, content: responseText }];
-          }
-          return prev;
-        });
-      }
-
-      if (done) {
-        document.removeEventListener("superflex-ai-response", responseHandler);
-        setIsLoading(false);
-        activeRequestIdRef.current = null;
-        if (!responseText) {
-          setMessages((prev) => {
-            const last = prev[prev.length - 1];
-            if (last && last.role === "assistant" && !last.content) {
-              return prev.slice(0, -1);
-            }
-            return prev;
-          });
-        }
-      }
-    };
-
-    document.addEventListener("superflex-ai-response", responseHandler);
-
     try {
-      const chatHistory = messages
-        .map((m) => {
-          const role = m.role.charAt(0).toUpperCase() + m.role.slice(1).toLowerCase();
-          return `${role}: ${m.content}`;
-        })
-        .join("\n");
-
-      const academicData = {
-        student: {
-          name: dataContext.studentName || "Student",
-          rollNo: dataContext.universityInfo?.["Roll No"] || "Unknown",
-          degree: dataContext.universityInfo?.["Degree"] || "Unknown",
-          section: dataContext.universityInfo?.["Section"] || "Unknown",
-          campus: dataContext.universityInfo?.["Campus"] || "Unknown",
-        },
-        profile: dataContext.profileSections || [],
-        university: dataContext.universityInfo || {},
-        currentPerformance: {
-          marks:
-            dataContext.marks && dataContext.marks.length > 0
-              ? dataContext.marks
-              : "Missing (Visit Marks Page)",
-          attendance:
-            dataContext.attendance && dataContext.attendance.length > 0
-              ? dataContext.attendance
-              : "Missing (Visit Attendance Page)",
-        },
-        academicHistory: {
-          transcript: dataContext.transcript || "Missing (Visit Transcript Page)",
-          mcaData: dataContext.mcaData || "Missing (Visit Transcript Page)",
-          studyPlan: dataContext.studyPlan || "Missing (Visit Transcript Page)",
-        },
-        syncStatus: dataContext.lastSync || {},
-        systemAlerts: [],
-      };
-
-      if (permissionStatus !== "granted") {
-        academicData.student = { name: "Student", cmsId: "N/A" };
-        academicData.currentPerformance = {
-          marks: "Permission denied",
-          attendance: "Permission denied",
-        };
-        academicData.academicHistory = {
-          transcript: "Permission denied",
-          studyPlan: "Permission denied",
-        };
-        academicData.systemAlerts = ["Permission denied"];
-      }
-
-      const prompt = `
-        You are "SuperFlex AI", the intelligent, human-like academic advisor.
-        
-        ### PERSONALITY:
-        - Empathetic, encouraging, and clear.
-        - NO technical jargon or code unless asked.
-        
-        ### STUDENT PROFILE:
-        - Name: ${academicData.student.name}
-        - Roll No: ${academicData.student.rollNo}
-        - Degree: ${academicData.student.degree}
-        - Section: ${academicData.student.section}
-        - Campus: ${academicData.student.campus}
-        
-        ### DATA METADATA:
-        - Marks Available: ${academicData.currentPerformance.marks !== "Missing" ? "Yes" : "No"}
-        - Attendance Available: ${academicData.currentPerformance.attendance !== "Missing" ? "Yes" : "No"}
-        - Transcript Available: ${academicData.academicHistory.transcript !== "Missing" ? "Yes" : "No"}
-
-        ### DATA CONTEXT:
-        ${JSON.stringify(academicData, null, 2)}
-        
-        ### CHAT HISTORY:
-        ${chatHistory}
-        
-        ### USER MESSAGE:
-        ${userMessage}
-        
-        Answer helpfuly and concisely. If data is missing (Status: No), ask the user to visit that page to sync it.
-      `;
-
-      document.dispatchEvent(
-        new CustomEvent("superflex-ai-query", {
-          detail: {
-            id: requestId,
-            prompt: prompt,
-            model: selectedModel,
-          },
-        }),
-      );
+      if (!hasApiKey || !selectedModel) throw new Error("Connect GroqCloud and choose a model first.");
+      const result = await runtimeMessage({
+        type: "SUPERFLEX_GROQ_CHAT",
+        messages: buildGroqMessages({ question: userMessage, dataContext, history: messages }),
+        model: selectedModel,
+      });
+      if (activeRequestIdRef.current !== requestId) return;
+      if (result.error) throw new Error(result.error);
+      setMessages((prev) => {
+        const withoutPending = prev.slice(0, -1);
+        return [...withoutPending, { role: "assistant", content: result.text || "GroqCloud returned an empty response." }];
+      });
     } catch (e) {
-      document.removeEventListener("superflex-ai-response", responseHandler);
-      console.error("AI Setup Error:", e);
-      setMessages((prev) => [
-        ...prev.slice(0, -1),
-        {
-          role: "assistant",
-          content: "Sorry, I encountered an internal error setting up the request.",
-        },
-      ]);
-      setIsLoading(false);
+      if (activeRequestIdRef.current === requestId) {
+        setMessages((prev) => [
+          ...prev.slice(0, -1),
+          { role: "assistant", content: `GroqCloud error: ${e.message}` },
+        ]);
+      }
+    } finally {
+      if (activeRequestIdRef.current === requestId) {
+        activeRequestIdRef.current = null;
+        setIsLoading(false);
+      }
     }
   };
 
   const handleInterrupt = () => {
     if (activeRequestIdRef.current) {
-      document.dispatchEvent(
-        new CustomEvent("superflex-ai-interrupt", {
-          detail: { id: activeRequestIdRef.current },
-        }),
-      );
       activeRequestIdRef.current = null;
       setIsLoading(false);
 
@@ -521,25 +316,14 @@ const SuperFlexAI = () => {
             </div>
 
             <div className="flex items-center gap-4">
-              {isSignedIn ? (
-                <button
-                  onClick={() => document.dispatchEvent(new CustomEvent("superflex-auth-logout"))}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 border border-red-500/20 rounded-full text-red-400 hover:bg-red-500/20 transition-all text-xs font-bold"
-                  title="Sign Out"
-                >
-                  <LogOut size={16} />
-                  <span className="hidden md:inline">Sign Out</span>
-                </button>
-              ) : (
-                <button
-                  onClick={triggerPuterSignIn}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-accent/10 border border-accent/20 rounded-full text-accent hover:bg-accent/20 transition-all text-xs font-bold"
-                  title="Sign In with Puter"
-                >
-                  <LogIn size={16} />
-                  <span className="hidden md:inline">Sign In</span>
-                </button>
-              )}
+              <button
+                onClick={() => setShowModelPicker((visible) => !visible)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-accent/10 border border-accent/20 rounded-full text-accent hover:bg-accent/20 transition-all text-xs font-bold"
+                title="GroqCloud settings"
+              >
+                <KeyRound size={15} />
+                <span className="hidden md:inline">{hasApiKey ? "GroqCloud" : "Connect Groq"}</span>
+              </button>
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-2.5 text-foreground/50 hover:text-foreground hover:bg-foreground/5 rounded-full transition-all duration-300"
@@ -652,14 +436,14 @@ const SuperFlexAI = () => {
           {/* Floating Input Bar */}
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2 w-full max-w-2xl px-6 z-50">
             {permissionStatus !== "granted" ? (
-              <div className="bg-secondary/90 backdrop-blur-xl border border-foreground/10 p-4 rounded-[2rem] flex items-center justify-between gap-4">
+              <div className="bg-secondary/90 backdrop-blur-xl border border-foreground/10 p-4 rounded-[2rem] flex flex-col gap-3">
                 <div className="flex items-center gap-3 pl-2">
                   <Shield className="text-accent" size={20} />
                   <div className="text-sm">
                     <span className="text-foreground font-bold block">Enable AI Access?</span>
-                    <span className="text-foreground/50 text-xs">
-                      Access to academic data is required.
-                    </span>
+                <span className="text-foreground/50 text-xs">
+                  Chat sends your message and selected academic data to GroqCloud.
+                </span>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -680,23 +464,37 @@ const SuperFlexAI = () => {
                   </button>
                 </div>
               </div>
-            ) : !isSignedIn ? (
+            ) : !hasApiKey ? (
               <div className="bg-secondary/90 backdrop-blur-xl border border-foreground/10 p-4 rounded-[2rem] flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 pl-2">
-                  <LogIn className="text-accent" size={20} />
+                  <KeyRound className="text-accent" size={20} />
                   <div className="text-sm">
-                    <span className="text-foreground font-bold block">Sign In Required</span>
+                    <span className="text-foreground font-bold block">Connect GroqCloud</span>
                     <span className="text-foreground/50 text-xs">
-                      Please sign in with Puter to chat with SuperFlex.
+                      Add your GroqCloud API key and choose a model available to your account.
                     </span>
                   </div>
                 </div>
-                <button
-                  onClick={triggerPuterSignIn}
-                  className="px-6 py-2 bg-accent hover:bg-accent/90 text-[var(--accent-foreground)] text-xs font-bold rounded-xl transition-colors"
-                >
-                  Sign In
-                </button>
+                <div className="flex gap-2">
+                  <input
+                    type="password"
+                    value={apiKeyInput}
+                    onChange={(event) => setApiKeyInput(event.target.value)}
+                    placeholder="Paste your GroqCloud API key"
+                    className="min-w-0 flex-1 rounded-xl border border-foreground/10 bg-background px-4 py-3 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-accent/30"
+                  />
+                  <button
+                    onClick={connectGroqCloud}
+                    disabled={!apiKeyInput.trim() || isConnecting}
+                    className="flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-xs font-bold text-[var(--accent-foreground)] disabled:opacity-50"
+                  >
+                    {isConnecting ? <LoaderCircle size={15} className="animate-spin" /> : "Connect"}
+                  </button>
+                </div>
+                <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer" className="px-2 text-xs font-semibold text-accent hover:underline">
+                  Create a GroqCloud API key
+                </a>
+                {connectionError && <p className="px-2 text-xs text-rose-500">{connectionError}</p>}
               </div>
             ) : (
               <div className="group relative bg-secondary/80 backdrop-blur-2xl border border-foreground/10 rounded-full transition-all focus-within:bg-secondary focus-within:border-accent/30 focus-within:ring-4 focus-within:ring-accent/10 flex items-center">
@@ -706,65 +504,41 @@ const SuperFlexAI = () => {
                     className="w-10 h-10 rounded-full bg-tertiary/50 border border-foreground/10 flex items-center justify-center hover:bg-tertiary transition-colors shrink-0 overflow-hidden group/btn"
                     title="Select Model"
                   >
-                    <img
-                      src={`https://www.google.com/s2/favicons?domain=${AVAILABLE_MODELS.find((m) => m.id === selectedModel)?.domain}&sz=64`}
-                      className="w-5 h-5 grayscale opacity-70 group-hover/btn:grayscale-0 rounded-full group-hover/btn:opacity-100 transition-all"
-                      alt="icon"
-                    />
+                    <AnimatedLogo size={20} animated={false} />
                   </button>
 
                   {showModelPicker && (
-                    <div className="absolute bottom-full left-0 mb-4 w-72 bg-background border border-foreground/10 rounded-2xl overflow-hidden z-[1000] animate-in fade-in slide-in-from-bottom-2 duration-200">
-                      {usageData && usageData.allowanceInfo ? (
-                        <div className="p-4 border-b border-foreground/10 bg-foreground/[0.02]">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex flex-col">
-                              <span className="text-[10px] font-bold Cap tracking-[0px] text-foreground/50">
-                                Monthly Credits
-                              </span>
-                              <span className="text-xs font-bold text-foreground">
-                                {Math.round(
-                                  (usageData.allowanceInfo.remaining || 0) / 1000,
-                                ).toLocaleString()}
-                                k /{" "}
-                                {Math.round(
-                                  (usageData.allowanceInfo.monthUsageAllowance || 0) / 1000,
-                                ).toLocaleString()}
-                                k left
-                              </span>
-                            </div>
-                            <span className="text-xs font-bold text-accent px-2 py-0.5 bg-accent/10 rounded-full border border-accent/20">
-                              {Math.max(
-                                0,
-                                Math.round(
-                                  ((usageData.allowanceInfo.remaining || 0) /
-                                    (usageData.allowanceInfo.monthUsageAllowance || 1)) *
-                                    100,
-                                ),
-                              )}
-                              %
-                            </span>
-                          </div>
-                          <div className="h-1.5 bg-tertiary rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-accent transition-all duration-1000"
-                              style={{
-                                width: `${Math.max(0, ((usageData.allowanceInfo.remaining || 0) / (usageData.allowanceInfo.monthUsageAllowance || 1)) * 100)}%`,
-                              }}
-                            ></div>
-                          </div>
+                    <div className="absolute bottom-full left-0 mb-4 w-[min(360px,calc(100vw-2rem))] bg-background border border-foreground/10 rounded-2xl overflow-hidden z-[1000] animate-in fade-in slide-in-from-bottom-2 duration-200">
+                      <div className="p-3 border-b border-foreground/10 bg-foreground/[0.02]">
+                        <div className="mb-2 flex items-center gap-2 text-xs font-bold text-foreground">
+                          <KeyRound size={14} className="text-accent" /> GroqCloud API key
                         </div>
-                      ) : (
-                        <div className="p-4 border-b border-foreground/10 bg-foreground/[0.02] text-center">
-                          <span className="text-[10px] font-bold text-foreground/50 Cap">
-                            Usage data loading...
-                          </span>
-                        </div>
-                      )}
-                      <div className="max-h-64 overflow-y-auto p-2 space-y-1 custom-scrollbar">
-                        {AVAILABLE_MODELS.map((m, idx) => (
+                        <div className="flex gap-2">
+                          <input
+                            type="password"
+                            value={apiKeyInput}
+                            onChange={(event) => setApiKeyInput(event.target.value)}
+                            placeholder={hasApiKey ? "Enter a new key to replace" : "Paste your GroqCloud API key"}
+                            className="min-w-0 flex-1 rounded-xl border border-foreground/10 bg-background px-3 py-2 text-xs text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-accent/30"
+                          />
                           <button
-                            key={idx}
+                            type="button"
+                            onClick={connectGroqCloud}
+                            disabled={!apiKeyInput.trim() || isConnecting}
+                            className="rounded-xl bg-accent px-3 py-2 text-xs font-bold text-[var(--accent-foreground)] disabled:opacity-50"
+                          >
+                            {isConnecting ? <LoaderCircle size={15} className="animate-spin" /> : "Save"}
+                          </button>
+                        </div>
+                        <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer" className="mt-2 inline-block text-[11px] font-semibold text-accent hover:underline">
+                          Create a GroqCloud API key
+                        </a>
+                        {connectionError && <p className="mt-2 text-[11px] text-rose-500">{connectionError}</p>}
+                      </div>
+                      <div className="max-h-64 overflow-y-auto p-2 space-y-1 custom-scrollbar">
+                        {availableModels.length ? availableModels.map((m) => (
+                          <button
+                            key={m.id}
                             onClick={() => {
                               setSelectedModel(m.id);
                               setShowModelPicker(false);
@@ -776,12 +550,8 @@ const SuperFlexAI = () => {
                             }`}
                           >
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-foreground/5 flex items-center justify-center shrink-0">
-                                <img
-                                  src={`https://www.google.com/s2/favicons?domain=${m.domain}&sz=64`}
-                                  className="w-5 h-5 opacity-80"
-                                  alt={m.provider}
-                                />
+                              <div className="w-8 h-8 rounded-lg bg-foreground/5 flex items-center justify-center shrink-0 text-accent">
+                                <AnimatedLogo size={18} animated={false} />
                               </div>
                               <div className="flex flex-col gap-0.5">
                                 <span
@@ -795,7 +565,11 @@ const SuperFlexAI = () => {
                               </div>
                             </div>
                           </button>
-                        ))}
+                        )) : (
+                          <p className="px-3 py-4 text-center text-xs text-foreground/50">
+                            Add a GroqCloud API key to load the models available to your account.
+                          </p>
+                        )}
                       </div>
                     </div>
                   )}
@@ -841,7 +615,7 @@ const SuperFlexAI = () => {
 
             <div className="text-center mt-4">
               <p className="text-[10px] text-foreground/40 font-medium">
-                SuperFlex AI uses local data processing.{" "}
+                Chats are sent to GroqCloud with your API key. Your key is stored in extension storage.{" "}
                 {getLastSyncTime() ? `Last synced at ${getLastSyncTime()}` : "Data not synced yet."}
               </p>
             </div>

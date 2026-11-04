@@ -8,7 +8,7 @@ export default defineConfig({
   manifest: {
     name: "SuperFlex",
     description: "A modern UI overlay and AI academic assistant for the Flex Student Portal.",
-    permissions: ["tabs"],
+    permissions: ["tabs", "storage"],
     icons: {
       16: "assets/favicon.png",
       32: "assets/favicon.png",
@@ -23,7 +23,7 @@ export default defineConfig({
       "https://cfd.nu.edu.pk/*",
       "https://mtn.nu.edu.pk/*",
       "https://pwr.nu.edu.pk/*",
-      "https://*.puter.site/*",
+      "https://api.groq.com/*",
       "https://api-gateway.umami.dev/*",
     ],
     web_accessible_resources: [
@@ -36,9 +36,6 @@ export default defineConfig({
           "assets/clouds/cloud-2.webp",
           "reviews.json",
           "scripts/umami.js",
-          "scripts/puter.js",
-          "scripts/polyfill.js",
-          "scripts/rustls.js",
           "scripts/bridge.js",
         ],
         matches: ["<all_urls>"],

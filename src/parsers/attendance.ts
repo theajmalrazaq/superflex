@@ -11,6 +11,12 @@ export function findAttendanceForm(document: Document): HTMLFormElement | null {
   return document.querySelector<HTMLFormElement>('form[action="/Student/StudentAttendance"]');
 }
 
+function hasStatus(record: { status: string }, expected: "P" | "L" | "A"): boolean {
+  const status = record.status.trim().toUpperCase();
+  const labels = { P: "PRESENT", L: "LATE", A: "ABSENT" };
+  return status === expected || status === labels[expected];
+}
+
 export function parseAttendancePage(root: ParentNode, form: ParentNode | null): ParsedAttendancePage {
   const courses = Array.from(root.querySelectorAll<HTMLElement>(".tab-pane")).map((pane) => {
     const title = readText(pane.querySelector("h5"), pane.id)
@@ -43,9 +49,9 @@ export function parseAttendancePage(root: ParentNode, form: ParentNode | null): 
       title,
       percentage,
       records,
-      present: records.filter((record) => record.status.includes("P")).length,
-      late: records.filter((record) => record.status.includes("L")).length,
-      absent: records.filter((record) => record.status.includes("A")).length,
+      present: records.filter((record) => hasStatus(record, "P")).length,
+      late: records.filter((record) => hasStatus(record, "L")).length,
+      absent: records.filter((record) => hasStatus(record, "A")).length,
     };
   });
 

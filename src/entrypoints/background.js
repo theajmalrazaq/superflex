@@ -30,6 +30,71 @@ const CAMPUS_DIRECTORY_URLS = {
 
 export default defineBackground(() => {
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+    if (message?.type === "SUPERFLEX_GROQ_CONFIG") {
+      chrome.storage.local.get(["superflex_groq_api_key", "superflex_groq_models"], (saved) => {
+        sendResponse({
+          configured: Boolean(saved.superflex_groq_api_key),
+          models: saved.superflex_groq_models || [],
+        });
+      });
+      return true;
+    }
+
+    if (message?.type === "SUPERFLEX_GROQ_SAVE_KEY") {
+      const apiKey = String(message.apiKey || "").trim();
+      if (!apiKey) {
+        sendResponse({ error: "Enter a GroqCloud API key first." });
+        return undefined;
+      }
+      fetch("https://api.groq.com/openai/v1/models", {
+        headers: { Authorization: `Bearer ${apiKey}` },
+      })
+        .then(async (response) => {
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(data.error?.message || `API returned ${response.status}`);
+          const models = (data.data || [])
+            .filter((model) => model.id && model.active !== false && !/(whisper|guard|embedding|tts|speech|transcription)/i.test(model.id))
+            .map((model) => ({ id: model.id, name: model.id, provider: model.owned_by || "GroqCloud" }))
+            .sort((a, b) => a.name.localeCompare(b.name));
+          if (!models.length) throw new Error("No chat models were returned for this GroqCloud API key.");
+          chrome.storage.local.set(
+            { superflex_groq_api_key: apiKey, superflex_groq_models: models },
+            () => sendResponse({ configured: true, models }),
+          );
+        })
+        .catch((error) => sendResponse({ error: error.message || "Could not connect to GroqCloud." }));
+      return true;
+    }
+
+    if (message?.type === "SUPERFLEX_GROQ_CHAT") {
+      chrome.storage.local.get("superflex_groq_api_key", async ({ superflex_groq_api_key: apiKey }) => {
+        if (!apiKey) {
+          sendResponse({ error: "Add your GroqCloud API key to connect." });
+          return;
+        }
+        try {
+          const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: message.model,
+              messages: message.messages,
+              max_completion_tokens: 600,
+            }),
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(data.error?.message || `API returned ${response.status}`);
+          sendResponse({ text: data.choices?.[0]?.message?.content || "" });
+        } catch (error) {
+          sendResponse({ error: error.message || "GroqCloud request failed." });
+        }
+      });
+      return true;
+    }
+
     if (message?.type === "SUPERFLEX_APPLY_DEFAULT_ZOOM") {
       const tabId = _sender.tab?.id;
       if (tabId == null) {

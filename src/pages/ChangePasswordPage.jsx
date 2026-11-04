@@ -4,9 +4,8 @@ import NotificationBanner from "../components/ui/NotificationBanner";
 import Skeleton from "../components/ui/Skeleton";
 
 const ChangePasswordSkeleton = () => (
-  <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8" role="status" aria-label="Loading security settings">
-    <header className="space-y-2"><Skeleton className="h-3 w-20" /><Skeleton className="h-9 w-64" /><Skeleton className="h-4 w-80 max-w-full" /></header>
-    <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,.8fr)]"><div className="space-y-5 rounded-[24px] bg-white p-6 dark:bg-black sm:p-8"><Skeleton className="h-6 w-48" /><Skeleton className="h-4 w-72 max-w-full" />{[0, 1, 2].map((item) => <div key={item} className="space-y-2"><Skeleton className="h-3 w-28" /><Skeleton className="h-12 w-full rounded-full" /></div>)}<Skeleton className="h-12 w-full rounded-full" /></div><div className="space-y-4 rounded-[24px] bg-white p-6 dark:bg-black sm:p-8"><Skeleton className="h-5 w-48" />{[0, 1, 2, 3].map((item) => <Skeleton key={item} className="h-4 w-full" />)}<Skeleton className="mt-6 h-28 w-full rounded-2xl" /></div></div>
+  <main className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1680px] flex-col justify-center gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8" role="status" aria-label="Loading security settings">
+    <div className="mx-auto w-full max-w-[480px] space-y-5 rounded-[32px] bg-white p-6 dark:bg-black sm:p-8"><Skeleton className="h-12 w-12 rounded-2xl" /><Skeleton className="h-6 w-48" /><Skeleton className="h-4 w-72 max-w-full" />{[0, 1, 2].map((item) => <div key={item} className="space-y-2"><Skeleton className="h-3 w-28" /><Skeleton className="h-12 w-full rounded-full" /></div>)}<Skeleton className="h-12 w-full rounded-full" /></div>
   </main>
 );
 
@@ -72,10 +71,10 @@ function ChangePasswordPage() {
       portlet.classList.add(
         "!bg-white",
         "dark:!bg-black",
-        "!border",
-        "!border-black/[0.06]",
+        "!border-0",
+        "dark:!border",
         "dark:!border-white/[0.14]",
-        "!rounded-[24px]",
+        "!rounded-[32px]",
         "!p-0",
         "!text-[#101010]",
         "dark:!text-[#f5f6fb]",
@@ -89,7 +88,7 @@ function ChangePasswordPage() {
         "m-portlet",
       );
       portlet.style.setProperty("width", "100%", "important");
-      portlet.style.setProperty("max-width", "1120px", "important");
+      portlet.style.setProperty("max-width", "480px", "important");
       portlet.style.setProperty("margin-inline", "auto", "important");
     }
 
@@ -110,8 +109,7 @@ function ChangePasswordPage() {
     if (form) {
       const isDarkMode = document.documentElement.classList.contains("dark");
       const gridContainer = document.createElement("div");
-      gridContainer.className = "grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(280px,.85fr)] lg:gap-8";
-      gridContainer.style.setProperty("grid-template-columns", "minmax(0, 1fr) minmax(280px, .85fr)", "important");
+      gridContainer.className = "flex w-full flex-col items-center gap-6";
 
       const formColumn = document.createElement("div");
       formColumn.className = "w-full max-w-[416px] space-y-5";
@@ -119,11 +117,11 @@ function ChangePasswordPage() {
       formColumn.style.setProperty("max-width", "416px", "important");
 
       const headerDiv = document.createElement("div");
-      headerDiv.className = "space-y-1.5";
+      headerDiv.className = "space-y-1.5 text-center";
       headerDiv.innerHTML = `
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-3">
-              <div class="h-10 w-10 rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <h3 class="text-xl font-bold text-slate-900 dark:text-white flex flex-col items-center gap-3">
+              <div class="h-12 w-12 rounded-2xl bg-black flex items-center justify-center dark:bg-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 432 432" fill="#a098ff"><path d="M247.227 185.616L282.286 69L133 216L186.861 231.146L133 363L298 208.65L247.227 185.616Z"/></svg>
               </div>
               Update Password
           </h3>
@@ -168,8 +166,8 @@ function ChangePasswordPage() {
               "!w-full",
               "!h-[46px]",
               "!min-h-[46px]",
-              "!text-[17px]",
-              "!font-medium",
+              "!text-[14px]",
+              "!font-normal",
               "placeholder:!text-slate-400",
               "dark:placeholder:!text-white/60",
             );
@@ -188,8 +186,10 @@ function ChangePasswordPage() {
             clonedInput.style.setProperty("min-height", "50px", "important");
             clonedInput.style.setProperty("padding", "0 22px", "important");
             clonedInput.style.setProperty("border-radius", "999px", "important");
-            clonedInput.style.setProperty("font-size", "17px", "important");
-            clonedInput.style.setProperty("font-weight", "500", "important");
+            clonedInput.style.setProperty("font-size", "14px", "important");
+            clonedInput.style.setProperty("font-weight", "400", "important");
+            clonedInput.style.setProperty("font-family", "'Google Sans Flex', sans-serif", "important");
+            clonedInput.style.setProperty("line-height", "normal", "important");
             clonedInput.style.setProperty("background-color", isDarkMode ? "rgb(217 217 217 / 4%)" : "#fff", "important");
             clonedInput.style.setProperty("border", isDarkMode ? "2px solid rgba(255,255,255,.12)" : "2px solid #e0e0e0", "important");
             clonedInput.style.setProperty("color", isDarkMode ? "#f9f9f9" : "#111", "important");
@@ -304,46 +304,6 @@ function ChangePasswordPage() {
 
       gridContainer.appendChild(formColumn);
 
-      const infoColumn = document.createElement("div");
-      infoColumn.className = "flex flex-col gap-4";
-      infoColumn.innerHTML = `
-      <div class="p-5 rounded-2xl bg-slate-50 dark:bg-white/[0.05] space-y-4">
-            <h4 class="text-slate-900 dark:text-white font-bold flex items-center gap-2">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-                Password Requirements
-            </h4>
-            <ul class="space-y-3">
-                <li class="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300">
-                    <div class="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#230052] dark:bg-white shrink-0"></div>
-                    Minimum 8 characters long
-                </li>
-                 <li class="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300">
-                    <div class="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#230052] dark:bg-white shrink-0"></div>
-                    At least one Cap letter
-                </li>
-                 <li class="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300">
-                    <div class="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#230052] dark:bg-white shrink-0"></div>
-                    At least one number
-                </li>
-                 <li class="flex items-start gap-3 text-sm text-slate-600 dark:text-slate-300">
-                    <div class="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#230052] dark:bg-white shrink-0"></div>
-                    At least one special character
-                </li>
-            </ul>
-        </div>
-
-         <div class="p-5 rounded-2xl bg-slate-50 dark:bg-white/[0.05] space-y-3">
-            <h4 class="text-slate-900 dark:text-white font-bold flex items-center gap-2 text-sm Cap">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                Security Tip
-            </h4>
-            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                Regularly updating your password helps protect your academic records and personal information from unauthorized access.
-            </p>
-        </div>
-      `;
-      gridContainer.appendChild(infoColumn);
-
       if (form.firstChild) {
         form.insertBefore(gridContainer, form.firstChild);
       } else {
@@ -359,12 +319,11 @@ function ChangePasswordPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname} fullWidth>
-      <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8">
-        <header className="space-y-1"><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Settings</p><h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Change password</h1><p className="text-sm text-white/80">Update your FLEX account password and review security guidance.</p></header>
+      <main className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1680px] flex-col justify-center gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8">
         {alerts.length > 0 && <NotificationBanner alerts={alerts} />}
         {elemContent ? (
           <div
-            className="mx-auto w-full max-w-[1080px] animate-in fade-in duration-500"
+            className="mx-auto w-full max-w-[480px] animate-in fade-in duration-500"
             dangerouslySetInnerHTML={{ __html: elemContent }}
           />
         ) : (

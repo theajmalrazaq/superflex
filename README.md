@@ -39,12 +39,7 @@ This bad boy works by sneaking React components into the boring old LMS pages, b
 
 ### 🤖 AI-Powered Academic Assistant
 
-- **Multi-Model Support**: Chat with multiple AI models including:
-  - Google Gemini 2.0 Flash & Gemini 3 Pro/Flash
-  - OpenAI GPT-4o Mini
-  - Anthropic Claude Haiku
-  - xAI Grok 2
-  - And more cutting-edge models
+- **GroqCloud Model Support**: Add your own GroqCloud API key and choose from the chat models available to your account.
 - **Context-Aware Responses**: AI understands your academic data (CGPA, attendance, marks, study plan)
 - **Intelligent Predictions**: Get grade forecasts, attendance warnings, and study recommendations
 - **Auto Data Sync**: Automatically fetches and syncs your academic records for AI context
@@ -224,9 +219,6 @@ superflex/
 │   ├── reviews.json
 │   └── scripts
 │       ├── bridge.js
-│       ├── polyfill.js
-│       ├── puter.js
-│       ├── rustls.js
 │       └── umami.js
 ├── README.md
 ├── scripts
