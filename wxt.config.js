@@ -23,7 +23,7 @@ export default defineConfig({
       "https://cfd.nu.edu.pk/*",
       "https://mtn.nu.edu.pk/*",
       "https://pwr.nu.edu.pk/*",
-      "https://api.groq.com/*",
+      "https://generativelanguage.googleapis.com/*",
       "https://api-gateway.umami.dev/*",
     ],
     web_accessible_resources: [

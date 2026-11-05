@@ -28,94 +28,440 @@ const CAMPUS_DIRECTORY_URLS = {
   ],
 };
 
-const GROQ_MODELS_URL = "https://api.groq.com/openai/v1/models";
-const FREE_GROQ_MODEL_ID = "openai/gpt-oss-20b";
-const FREE_TIER_MAX_COMPLETION_TOKENS = 1000;
+const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
-const fetchFreeContextModel = async (apiKey) => {
-  const response = await fetch(GROQ_MODELS_URL, { headers: { Authorization: `Bearer ${apiKey}` } });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error?.message || `API returned ${response.status}`);
-  const model = (data.data || []).find((item) => item.id === FREE_GROQ_MODEL_ID && item.active !== false);
-  if (!model) throw new Error(`${FREE_GROQ_MODEL_ID} is not available to this GroqCloud organization.`);
-  return {
-    id: model.id,
-    name: model.id,
-    provider: model.owned_by || "OpenAI",
-    contextWindow: Number(model.context_window) || 131072,
-    maxCompletionTokens: Number(model.max_completion_tokens) || 65536,
-    tier: "free",
-  };
+const fetchAvailableGeminiModels = async (apiKey) => {
+  const listUrl = `${GEMINI_API_BASE}?key=${encodeURIComponent(apiKey)}`;
+  const listRes = await fetch(listUrl);
+  const listData = await listRes.json().catch(() => ({}));
+  if (!listRes.ok) {
+    throw new Error(listData.error?.message || `Failed to fetch Gemini models (status ${listRes.status})`);
+  }
+
+  const rawModels = listData.models || [];
+  const supported = rawModels.filter((m) => {
+    const name = m.name || "";
+    const methods = m.supportedGenerationMethods || [];
+    if (!methods.includes("generateContent")) return false;
+    if (
+      name.includes("embedding") ||
+      name.includes("aqa") ||
+      name.includes("bison") ||
+      name.includes("imagen")
+    ) {
+      return false;
+    }
+    // Exclude retired gemini-2.0-flash (except flash-lite)
+    if (name.endsWith("gemini-2.0-flash")) return false;
+    return true;
+  });
+
+  const formatted = supported.map((m) => {
+    const modelId = m.name.replace(/^models\//, "");
+    return {
+      id: modelId,
+      name: m.displayName || modelId,
+      description: m.description || "",
+      contextWindow: m.inputTokenLimit || 1048576,
+      provider: "Google AI",
+      tier: "free",
+      isFlash: modelId.toLowerCase().includes("flash"),
+    };
+  });
+
+  // Prioritize stable, high-capacity Flash models first
+  const priorityOrder = [
+    "gemini-2.5-flash",
+    "gemini-1.5-flash",
+    "gemini-3.8-flash",
+    "gemini-1.5-flash-8b",
+    "gemini-2.0-flash-lite",
+    "gemini-2.5-pro",
+    "gemini-1.5-pro",
+  ];
+
+  formatted.sort((a, b) => {
+    const idxA = priorityOrder.indexOf(a.id);
+    const idxB = priorityOrder.indexOf(b.id);
+    if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+    if (idxA !== -1) return -1;
+    if (idxB !== -1) return 1;
+    if (a.isFlash && !b.isFlash) return -1;
+    if (!a.isFlash && b.isFlash) return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  return formatted;
+};
+
+const isHighDemandOrUnavailable = (status, errMsg = "") => {
+  const msg = String(errMsg).toLowerCase();
+  return (
+    status === 503 ||
+    status === 429 ||
+    msg.includes("high demand") ||
+    msg.includes("overloaded") ||
+    msg.includes("resource has been exhausted") ||
+    msg.includes("temporarily unavailable") ||
+    msg.includes("spikes in demand")
+  );
+};
+
+const callGeminiGenerateContent = async (modelId, apiKey, payload) => {
+  const cleanId = modelId.replace(/^models\//, "");
+  const url = `${GEMINI_API_BASE}/${cleanId}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => ({}));
+  return { ok: res.ok, status: res.status, data };
+};
+
+const streamGeminiContent = async (modelId, apiKey, payload, onChunk) => {
+  const cleanId = modelId.replace(/^models\//, "");
+  const url = `${GEMINI_API_BASE}/${cleanId}:streamGenerateContent?alt=sse&key=${encodeURIComponent(apiKey)}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    return { ok: false, status: res.status, errorData };
+  }
+
+  const reader = res.body?.getReader();
+  if (!reader) {
+    return { ok: false, status: 500, errorData: { error: { message: "Streaming not supported by browser" } } };
+  }
+
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let fullText = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop() || "";
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed.startsWith("data:")) continue;
+      const jsonStr = trimmed.slice(5).trim();
+      if (!jsonStr || jsonStr === "[DONE]") continue;
+
+      try {
+        const parsed = JSON.parse(jsonStr);
+        const chunkText = parsed.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") || "";
+        if (chunkText) {
+          fullText += chunkText;
+          onChunk(chunkText, fullText);
+        }
+      } catch {
+        // partial json, ignore
+      }
+    }
+  }
+
+  if (buffer.trim().startsWith("data:")) {
+    const jsonStr = buffer.trim().slice(5).trim();
+    if (jsonStr && jsonStr !== "[DONE]") {
+      try {
+        const parsed = JSON.parse(jsonStr);
+        const chunkText = parsed.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") || "";
+        if (chunkText) {
+          fullText += chunkText;
+          onChunk(chunkText, fullText);
+        }
+      } catch {}
+    }
+  }
+
+  return { ok: true, status: 200, fullText };
 };
 
 export default defineBackground(() => {
+  chrome.runtime.onConnect.addListener((port) => {
+    if (port.name !== "SUPERFLEX_AI_STREAM") return;
+
+    let isDisconnected = false;
+    port.onDisconnect.addListener(() => {
+      isDisconnected = true;
+    });
+
+    port.onMessage.addListener(async (msg) => {
+      if (msg?.type !== "START") return;
+
+      chrome.storage.local.get(
+        ["superflex_gemini_api_key", "superflex_gemini_model", "superflex_gemini_models"],
+        async (stored) => {
+          if (isDisconnected) return;
+          const apiKey = stored.superflex_gemini_api_key;
+          if (!apiKey) {
+            port.postMessage({ type: "ERROR", error: "Add your Google Gemini API key to connect." });
+            return;
+          }
+
+          let available = stored.superflex_gemini_models;
+          if (!Array.isArray(available) || available.length === 0) {
+            try {
+              available = await fetchAvailableGeminiModels(apiKey);
+              chrome.storage.local.set({ superflex_gemini_models: available });
+            } catch (err) {
+              if (!isDisconnected) port.postMessage({ type: "ERROR", error: err.message || "Failed to list Gemini models." });
+              return;
+            }
+          }
+
+          let currentModel = stored.superflex_gemini_model;
+          if (!currentModel?.id || currentModel.id === "gemini-2.0-flash") {
+            currentModel = available[0] || { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash" };
+            chrome.storage.local.set({ superflex_gemini_model: currentModel });
+          }
+
+          const queue = [
+            currentModel,
+            ...available.filter((m) => m.id !== currentModel.id),
+          ];
+
+          let lastError = null;
+          let usedModel = null;
+          let streamedFullText = "";
+
+          for (let i = 0; i < queue.length; i++) {
+            if (isDisconnected) return;
+            const candidate = queue[i];
+            let candidateText = "";
+
+            const { ok, status, errorData } = await streamGeminiContent(
+              candidate.id,
+              apiKey,
+              msg.payload,
+              (chunk, full) => {
+                if (isDisconnected) return;
+                candidateText = full;
+                port.postMessage({ type: "CHUNK", text: chunk, fullText: full });
+              },
+            );
+
+            if (ok) {
+              streamedFullText = candidateText;
+              usedModel = candidate;
+              break;
+            }
+
+            const errorMsg = errorData?.error?.message || `API error ${status}`;
+            lastError = errorMsg;
+
+            if (
+              isHighDemandOrUnavailable(status, errorMsg) ||
+              status === 404 ||
+              errorMsg.includes("no longer available")
+            ) {
+              console.warn(
+                `[SuperFlex AI Stream] Model ${candidate.id} unavailable (${errorMsg}). Trying fallback candidate...`,
+              );
+              continue;
+            }
+            break;
+          }
+
+          if (isDisconnected) return;
+
+          if (usedModel && streamedFullText !== undefined) {
+            const switched = usedModel.id !== currentModel.id;
+            if (switched) {
+              chrome.storage.local.set({ superflex_gemini_model: usedModel });
+            }
+            port.postMessage({
+              type: "DONE",
+              fullText: streamedFullText,
+              modelSwitched: switched,
+              model: usedModel,
+            });
+          } else {
+            port.postMessage({
+              type: "ERROR",
+              error: lastError || "All Gemini models are currently busy. Please try again shortly.",
+            });
+          }
+        },
+      );
+    });
+  });
+
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-    if (message?.type === "SUPERFLEX_GROQ_CONFIG") {
-      chrome.storage.local.get(["superflex_groq_api_key", "superflex_groq_model"], async (saved) => {
-        if (!saved.superflex_groq_api_key) {
-          sendResponse({ configured: false, model: null });
-          return;
-        }
-        try {
-          const model = await fetchFreeContextModel(saved.superflex_groq_api_key);
-          chrome.storage.local.set({ superflex_groq_model: model });
-          sendResponse({ configured: true, model });
-        } catch (error) {
+    if (message?.type === "SUPERFLEX_AI_CONFIG") {
+      chrome.storage.local.get(
+        ["superflex_gemini_api_key", "superflex_gemini_model", "superflex_gemini_models"],
+        async (saved) => {
+          if (!saved.superflex_gemini_api_key) {
+            sendResponse({ configured: false, model: null, availableModels: [] });
+            return;
+          }
           sendResponse({
             configured: true,
-            model: saved.superflex_groq_model?.id === FREE_GROQ_MODEL_ID ? saved.superflex_groq_model : null,
-            warning: error.message,
+            model: saved.superflex_gemini_model || null,
+            availableModels: saved.superflex_gemini_models || [],
           });
-        }
-      });
+        },
+      );
       return true;
     }
 
-    if (message?.type === "SUPERFLEX_GROQ_SAVE_KEY") {
+    if (message?.type === "SUPERFLEX_AI_SAVE_KEY") {
       const apiKey = String(message.apiKey || "").trim();
       if (!apiKey) {
-        sendResponse({ error: "Enter a GroqCloud API key first." });
+        sendResponse({ error: "Enter a Google Gemini API key first." });
         return undefined;
       }
-      fetchFreeContextModel(apiKey)
-        .then((model) => {
+      fetchAvailableGeminiModels(apiKey)
+        .then((models) => {
+          if (!models.length) {
+            throw new Error("No compatible Gemini model found for this API key.");
+          }
+          const activeModel = models[0];
           chrome.storage.local.set(
-            { superflex_groq_api_key: apiKey, superflex_groq_model: model },
-            () => sendResponse({ configured: true, model }),
+            {
+              superflex_gemini_api_key: apiKey,
+              superflex_gemini_model: activeModel,
+              superflex_gemini_models: models,
+            },
+            () => sendResponse({ configured: true, model: activeModel, availableModels: models }),
           );
         })
-        .catch((error) => sendResponse({ error: error.message || "Could not connect to GroqCloud." }));
+        .catch((error) =>
+          sendResponse({ error: error.message || "Could not validate Google Gemini API key." }),
+        );
       return true;
     }
 
-    if (message?.type === "SUPERFLEX_GROQ_CHAT") {
-      chrome.storage.local.get(["superflex_groq_api_key", "superflex_groq_model"], async ({ superflex_groq_api_key: apiKey, superflex_groq_model: savedModel }) => {
+    if (message?.type === "SUPERFLEX_AI_REFRESH_MODELS") {
+      chrome.storage.local.get(["superflex_gemini_api_key"], async ({ superflex_gemini_api_key: apiKey }) => {
         if (!apiKey) {
-          sendResponse({ error: "Add your GroqCloud API key to connect." });
+          sendResponse({ error: "Add your Google Gemini API key first." });
           return;
         }
         try {
-          const model = savedModel?.id === FREE_GROQ_MODEL_ID ? savedModel : await fetchFreeContextModel(apiKey);
-          if (savedModel?.id !== FREE_GROQ_MODEL_ID) chrome.storage.local.set({ superflex_groq_model: model });
-          const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: model.id,
-              messages: message.messages,
-              max_completion_tokens: Math.min(model.maxCompletionTokens || FREE_TIER_MAX_COMPLETION_TOKENS, FREE_TIER_MAX_COMPLETION_TOKENS),
-            }),
-          });
-          const data = await response.json().catch(() => ({}));
-          if (!response.ok) throw new Error(data.error?.message || `API returned ${response.status}`);
-          sendResponse({ text: data.choices?.[0]?.message?.content || "" });
+          const models = await fetchAvailableGeminiModels(apiKey);
+          chrome.storage.local.set({ superflex_gemini_models: models });
+          sendResponse({ success: true, models });
         } catch (error) {
-          sendResponse({ error: error.message || "GroqCloud request failed." });
+          sendResponse({ error: error.message || "Failed to refresh models." });
         }
       });
+      return true;
+    }
+
+    if (message?.type === "SUPERFLEX_AI_SELECT_MODEL") {
+      const model = message.model;
+      if (!model?.id) {
+        sendResponse({ error: "Invalid model specified." });
+        return undefined;
+      }
+      chrome.storage.local.set({ superflex_gemini_model: model }, () => {
+        sendResponse({ success: true, model });
+      });
+      return true;
+    }
+
+    if (message?.type === "SUPERFLEX_AI_CHAT") {
+      chrome.storage.local.get(
+        ["superflex_gemini_api_key", "superflex_gemini_model", "superflex_gemini_models"],
+        async (stored) => {
+          const apiKey = stored.superflex_gemini_api_key;
+          if (!apiKey) {
+            sendResponse({ error: "Add your Google Gemini API key to connect." });
+            return;
+          }
+
+          let available = stored.superflex_gemini_models;
+          if (!Array.isArray(available) || available.length === 0) {
+            try {
+              available = await fetchAvailableGeminiModels(apiKey);
+              chrome.storage.local.set({ superflex_gemini_models: available });
+            } catch (err) {
+              sendResponse({ error: err.message || "Failed to list Gemini models." });
+              return;
+            }
+          }
+
+          let currentModel = stored.superflex_gemini_model;
+          if (!currentModel?.id || currentModel.id === "gemini-2.0-flash") {
+            currentModel = available[0] || { id: "gemini-2.5-flash", name: "Gemini 2.5 Flash" };
+            chrome.storage.local.set({ superflex_gemini_model: currentModel });
+          }
+
+          // Build queue to try: currentModel first, then other available models as fallback
+          const queue = [
+            currentModel,
+            ...available.filter((m) => m.id !== currentModel.id),
+          ];
+
+          let lastError = null;
+          let usedModel = null;
+          let textResult = null;
+
+          for (let i = 0; i < queue.length; i++) {
+            const candidate = queue[i];
+            const { ok, status, data } = await callGeminiGenerateContent(
+              candidate.id,
+              apiKey,
+              message.payload,
+            );
+
+            if (ok) {
+              const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") || "";
+              textResult = text;
+              usedModel = candidate;
+              break;
+            }
+
+            const errorMsg = data.error?.message || `API error ${status}`;
+            lastError = errorMsg;
+
+            // If it's high demand / rate limit / 503 / 429 / retired model, try next model
+            if (
+              isHighDemandOrUnavailable(status, errorMsg) ||
+              status === 404 ||
+              errorMsg.includes("no longer available")
+            ) {
+              console.warn(
+                `[SuperFlex AI] Model ${candidate.id} unavailable (${errorMsg}). Trying fallback candidate...`,
+              );
+              continue;
+            }
+
+            // For other errors (e.g. invalid request structure), break immediately
+            break;
+          }
+
+          if (textResult !== null && usedModel) {
+            const switched = usedModel.id !== currentModel.id;
+            if (switched) {
+              chrome.storage.local.set({ superflex_gemini_model: usedModel });
+            }
+            sendResponse({
+              text: textResult,
+              modelSwitched: switched,
+              model: usedModel,
+            });
+            return;
+          }
+
+          sendResponse({
+            error:
+              lastError ||
+              "All Gemini models are currently experiencing high demand. Please try again in a few moments or select another model in settings.",
+          });
+        },
+      );
       return true;
     }
 

@@ -25,12 +25,13 @@ import {
 } from "lucide-react";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
-import { move } from "@dnd-kit/helpers";
+import { arrayMove } from "@dnd-kit/helpers";
 import { Logo } from "./ui/Logo";
 import ProfileImageModal from "./ui/ProfileImageModal";
 import { getExtensionUrl } from "../utils/extensionApi";
 import { usePreferencesStore } from "../stores/preferencesStore";
 import { sidebarLinksSchema } from "../stores/preferencesSchemas";
+import { getPendingUpdates } from "../utils/academicSnapshot";
 
 const LINK_GROUPS = {
   Home: "Overview",
@@ -96,7 +97,7 @@ function readSidebarLinks() {
   }
 }
 
-function SidebarLink({ link, active, onNavigate, compact = false }) {
+function SidebarLink({ link, active, onNavigate, compact = false, hasUpdate = false }) {
   const Icon = ICONS[link.text.trim()] || DEFAULT_ICON;
 
   return (
@@ -104,22 +105,37 @@ function SidebarLink({ link, active, onNavigate, compact = false }) {
       type="button"
       onClick={() => onNavigate(link.href, link.action)}
       aria-current={active ? "page" : undefined}
-      className={`flex w-full items-center gap-3 rounded-full px-3.5 py-2.5 text-left text-[13px] font-semibold transition-colors ${
+      className={`relative flex w-full items-center gap-3 rounded-full px-3.5 py-2.5 text-left text-[13px] font-semibold transition-colors ${
         active
           ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"
           : "text-white/90 hover:bg-white/15 hover:text-white dark:text-white/90 dark:hover:bg-white/10 dark:hover:text-white"
       } ${compact ? "justify-center px-2" : ""}`}
-      title={compact ? link.text : undefined}
+      title={compact ? (hasUpdate ? `${link.text} (New updates)` : link.text) : undefined}
     >
-      <Icon size={17} strokeWidth={2} className="shrink-0" />
-      {!compact && <span className="truncate">{link.text}</span>}
+      <div className="relative shrink-0">
+        <Icon size={17} strokeWidth={2} />
+        {hasUpdate && compact && (
+          <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-500 animate-pulse ring-2 ring-emerald-500/30" />
+        )}
+      </div>
+      {!compact && (
+        <span className="flex items-center gap-2 truncate">
+          <span className="truncate">{link.text}</span>
+          {hasUpdate && (
+            <span
+              className="h-2 w-2 shrink-0 rounded-full bg-emerald-500 animate-pulse ring-2 ring-emerald-500/30"
+              title="New updates available"
+            />
+          )}
+        </span>
+      )}
     </button>
   );
 }
 
-const getLinkId = (link) => `${link.action || link.path || link.href || "link"}:${link.text}`;
+const getLinkId = (link) => (link.text || "").trim();
 
-function SortableSidebarLink({ link, active, onNavigate, index, group, disabled }) {
+function SortableSidebarLink({ link, active, onNavigate, index, group, disabled, hasUpdate = false }) {
   const { ref, handleRef, isDragging } = useSortable({
     id: getLinkId(link),
     index,
@@ -129,7 +145,7 @@ function SortableSidebarLink({ link, active, onNavigate, index, group, disabled 
 
   return (
     <div ref={ref} className={`group relative ${isDragging ? "z-10 opacity-70" : ""}`}>
-      <SidebarLink link={link} active={active} onNavigate={onNavigate} />
+      <SidebarLink link={link} active={active} onNavigate={onNavigate} hasUpdate={hasUpdate} />
       {!disabled && (
         <button
           ref={handleRef}
@@ -154,8 +170,28 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const themeMode = usePreferencesStore((state) => state.themeMode);
   const setThemeMode = usePreferencesStore((state) => state.setThemeMode);
-  const navOrder = usePreferencesStore((state) => state.navOrder);
-  const setNavOrder = usePreferencesStore((state) => state.setNavOrder);
+  const [navOrder, setNavOrder] = [
+    usePreferencesStore((state) => state.navOrder),
+    usePreferencesStore((state) => state.setNavOrder),
+  ];
+  const [pendingUpdates, setPendingUpdates] = useState(getPendingUpdates);
+
+  useEffect(() => {
+    const handleUpdates = () => setPendingUpdates(getPendingUpdates());
+    window.addEventListener("superflex-academic-updates-detected", handleUpdates);
+    window.addEventListener("superflex-academic-updates-cleared", handleUpdates);
+    return () => {
+      window.removeEventListener("superflex-academic-updates-detected", handleUpdates);
+      window.removeEventListener("superflex-academic-updates-cleared", handleUpdates);
+    };
+  }, []);
+
+  const checkHasUpdate = (link) => {
+    const text = link.text?.trim();
+    if (text === "Marks" && pendingUpdates?.newMarks?.length > 0) return true;
+    if (text === "Attendance" && pendingUpdates?.newAttendance?.length > 0) return true;
+    return false;
+  };
   const callbacksRef = useRef({ onAttendanceLinkFound, onLinksFound });
   callbacksRef.current = { onAttendanceLinkFound, onLinksFound };
 
@@ -167,11 +203,24 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       if (!["Grade Report", "My Teachers", "Change Password"].includes(name)) groups[group].push(link);
     });
     groups.Settings.push({ text: "My Teachers", path: "/settings/teachers", action: "teachers" });
-    const orderIndex = new Map(navOrder.map((id, index) => [id, index]));
+
+    const orderIndex = new Map();
+    (navOrder || []).forEach((id, index) => {
+      orderIndex.set(id, index);
+      if (id.includes(":")) {
+        const textPart = id.split(":").slice(1).join(":");
+        if (textPart && !orderIndex.has(textPart)) {
+          orderIndex.set(textPart, index);
+        }
+      }
+    });
+
     Object.values(groups).forEach((links) => {
       links.sort((a, b) => {
-        const aIndex = orderIndex.get(getLinkId(a));
-        const bIndex = orderIndex.get(getLinkId(b));
+        const aId = getLinkId(a);
+        const bId = getLinkId(b);
+        const aIndex = orderIndex.has(aId) ? orderIndex.get(aId) : null;
+        const bIndex = orderIndex.has(bId) ? orderIndex.get(bId) : null;
         if (aIndex == null && bIndex == null) return 0;
         if (aIndex == null) return 1;
         if (bIndex == null) return -1;
@@ -286,12 +335,52 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   };
 
   const handleDragEnd = (event) => {
-    if (event.canceled || !event.operation.source || !event.operation.target) return;
-    const groupedIds = Object.fromEntries(
-      GROUP_ORDER.map((group) => [group, groupedLinks[group].map(getLinkId)]),
+    if (event.canceled || !event.operation?.source || !event.operation?.target) return;
+    const sourceId = event.operation.source.id;
+    const targetId = event.operation.target.id;
+    if (!sourceId || !targetId || sourceId === targetId) return;
+
+    let sourceGroup = null;
+    let targetGroup = null;
+
+    for (const group of GROUP_ORDER) {
+      const groupLinkIds = (groupedLinks[group] || []).map(getLinkId);
+      if (groupLinkIds.includes(sourceId)) sourceGroup = group;
+      if (groupLinkIds.includes(targetId)) targetGroup = group;
+    }
+
+    if (!sourceGroup || !targetGroup) return;
+
+    const nextGroupedLinks = Object.fromEntries(
+      GROUP_ORDER.map((group) => [group, [...(groupedLinks[group] || [])]]),
     );
-    const nextGroups = move(groupedIds, event);
-    setNavOrder(GROUP_ORDER.flatMap((group) => nextGroups[group] || []));
+
+    if (sourceGroup === targetGroup) {
+      const links = nextGroupedLinks[sourceGroup];
+      const fromIndex = links.findIndex((l) => getLinkId(l) === sourceId);
+      const toIndex = links.findIndex((l) => getLinkId(l) === targetId);
+      if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
+        nextGroupedLinks[sourceGroup] = arrayMove(links, fromIndex, toIndex);
+      }
+    } else {
+      const srcLinks = nextGroupedLinks[sourceGroup];
+      const tgtLinks = nextGroupedLinks[targetGroup];
+      const fromIndex = srcLinks.findIndex((l) => getLinkId(l) === sourceId);
+      const toIndex = tgtLinks.findIndex((l) => getLinkId(l) === targetId);
+      if (fromIndex !== -1) {
+        const [movedItem] = srcLinks.splice(fromIndex, 1);
+        if (toIndex !== -1) {
+          tgtLinks.splice(toIndex, 0, movedItem);
+        } else {
+          tgtLinks.push(movedItem);
+        }
+      }
+    }
+
+    const newNavOrder = GROUP_ORDER.flatMap((group) =>
+      (nextGroupedLinks[group] || []).map(getLinkId),
+    );
+    setNavOrder(newNavOrder);
   };
 
   const renderGroups = (dragDisabled = false) => (
@@ -315,6 +404,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
                   index={index}
                   group={group}
                   disabled={dragDisabled}
+                  hasUpdate={checkHasUpdate(link)}
                 />
               ))}
             </div>
@@ -347,14 +437,6 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       <div className="min-h-0 flex-1 overflow-y-auto px-3 py-5">{renderGroups(mobile)}</div>
 
       <div className="space-y-3 p-4">
-        <button
-          type="button"
-          onClick={() => window.dispatchEvent(new CustomEvent("superflex-toggle-ai"))}
-          className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#230052] px-4 text-sm font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80"
-        >
-          <KeyRound size={17} /> GroqCloud
-        </button>
-
         <div>
           <div className="rounded-2xl bg-white/30 p-3 dark:bg-white/[0.04]">
             <div className="grid grid-cols-2 gap-1.5">

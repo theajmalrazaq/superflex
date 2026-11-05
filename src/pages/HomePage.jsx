@@ -24,6 +24,12 @@ import {
 } from "../parsers/home";
 import { findFlexPageRoot } from "../parsers/dom";
 import { getExtensionUrl } from "../utils/extensionApi";
+import {
+  checkAndRecordMarksSnapshot,
+  checkAndRecordAttendanceSnapshot,
+  getPendingUpdates,
+  clearPendingUpdates,
+} from "../utils/academicSnapshot";
 
 const TEACHER_SELECTIONS_KEY = "superflex_course_teachers_v1";
 const TEACHER_COURSES_KEY = "superflex_cached_courses_v1";
@@ -103,35 +109,72 @@ const SectionAccordion = ({ section, isOpen, onToggle }) => {
   );
 };
 
-const AttendanceHeatmap = ({ subjects }) => (
-  <div className="flex-1 space-y-4 overflow-hidden" aria-label="Attendance by subject">
-    <div className="flex flex-wrap items-center justify-between gap-3 text-[10px] text-foreground/50">
-      <span>Each square represents one class session</span>
-      <div className="flex items-center gap-3">
-        <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[3px] bg-[#230052] dark:bg-white" /> Present</span>
-        <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[3px] bg-rose-500" /> Absent</span>
+const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
+  const ROWS_PER_COL = 15;
+
+  return (
+    <div className="flex-1 space-y-4 overflow-hidden" aria-label="Attendance by subject">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-[10px] text-foreground/50">
+        <span>Each square represents one class session</span>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[3px] bg-[#230052] dark:bg-white" /> Present</span>
+          <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[3px] bg-rose-500" /> Absent</span>
+        </div>
+      </div>
+      <div className="grid max-h-[390px] grid-cols-2 gap-x-4 gap-y-5 overflow-y-auto pr-1 md:grid-cols-3 xl:grid-cols-5">
+        {subjects.map((subject, index) => {
+          const records = [...(subject.records || [])].sort((a, b) => parseAttendanceDate(a.date) - parseAttendanceDate(b.date));
+          const isUpdated = updatedSubjectKeys.has(subject.title);
+          const columns = [];
+          for (let i = 0; i < records.length; i += ROWS_PER_COL) {
+            columns.push(records.slice(i, i + ROWS_PER_COL));
+          }
+          if (columns.length === 0 && records.length === 0) {
+            columns.push([]);
+          }
+
+          return (
+            <div key={`${subject.title}-${index}`} className="flex min-w-0 flex-col items-start py-1">
+              <div className="mb-2 flex min-h-[180px] min-w-0 items-end gap-1 py-1" role="list" aria-label={`${subject.title} class sessions`}>
+                {columns.map((colRecords, colIndex) => (
+                  <div key={colIndex} className="flex flex-col-reverse gap-1">
+                    {colRecords.map((record, recordIndex) => {
+                      const status = String(record.status || "").trim();
+                      const color = /\bp\b|present/i.test(status)
+                        ? "bg-[#230052] dark:bg-white"
+                        : /\ba\b|absent/i.test(status)
+                          ? "bg-rose-500"
+                          : "bg-slate-200 dark:bg-white/15";
+                      return (
+                        <span
+                          key={`${record.date}-${recordIndex}`}
+                          role="listitem"
+                          title={`${record.date} · ${status || "Unknown"} · ${record.type || "Class"}`}
+                          aria-label={`${record.date}: ${status || "Unknown attendance status"}`}
+                          className={`h-3.5 w-3.5 shrink-0 rounded-[3px] transition-transform hover:scale-125 ${color}`}
+                        />
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center gap-1.5 w-full">
+                {isUpdated && (
+                  <span
+                    className="h-2 w-2 shrink-0 rounded-full bg-emerald-500 animate-pulse ring-2 ring-emerald-500/30"
+                    title="New attendance marked!"
+                  />
+                )}
+                <p className="w-full truncate text-xs font-semibold text-foreground" title={subject.title}>{subject.title}</p>
+              </div>
+              <p className="mt-0.5 text-[10px] text-foreground/50">{subject.percentage.toFixed(0)}% · {subject.present}P / {subject.absent}A</p>
+            </div>
+          );
+        })}
       </div>
     </div>
-    <div className="grid max-h-[390px] grid-cols-2 gap-x-4 gap-y-5 overflow-y-auto pr-1 md:grid-cols-3 xl:grid-cols-5">
-      {subjects.map((subject, index) => {
-        const records = [...(subject.records || [])].sort((a, b) => parseAttendanceDate(a.date) - parseAttendanceDate(b.date));
-        return (
-          <div key={`${subject.title}-${index}`} className="flex min-w-0 flex-col items-start py-1">
-            <div className="mb-2 flex max-h-[180px] min-w-0 flex-col flex-wrap content-start gap-1 overflow-hidden py-1" role="list" aria-label={`${subject.title} class sessions`}>
-              {records.map((record, recordIndex) => {
-                const status = String(record.status || "").trim();
-                const color = /\bp\b|present/i.test(status) ? "bg-[#230052] dark:bg-white" : /\ba\b|absent/i.test(status) ? "bg-rose-500" : "bg-slate-200 dark:bg-white/15";
-                return <span key={`${record.date}-${recordIndex}`} role="listitem" title={`${record.date} · ${status || "Unknown"} · ${record.type || "Class"}`} aria-label={`${record.date}: ${status || "Unknown attendance status"}`} className={`h-3.5 w-3.5 shrink-0 rounded-[3px] ${color}`} />;
-              })}
-            </div>
-            <p className="w-full truncate text-xs font-semibold text-foreground" title={subject.title}>{subject.title}</p>
-            <p className="mt-0.5 text-[10px] text-foreground/50">{subject.percentage.toFixed(0)}% · {subject.present}P / {subject.absent}A</p>
-          </div>
-        );
-      })}
-    </div>
-  </div>
-);
+  );
+};
 
 function HomePage() {
   const [universityInfo, setUniversityInfo] = useState(null);
@@ -162,6 +205,72 @@ function HomePage() {
   const [loadingMarks, setLoadingMarks] = useState(false);
   const [loadingAttendance, setLoadingAttendance] = useState(false);
   const [studyPlanData, setStudyPlanData] = useState(null);
+  const [pendingUpdates, setPendingUpdates] = useState(getPendingUpdates);
+
+  useEffect(() => {
+    const handleUpdates = () => {
+      setPendingUpdates(getPendingUpdates());
+    };
+    window.addEventListener("superflex-academic-updates-detected", handleUpdates);
+    window.addEventListener("superflex-academic-updates-cleared", handleUpdates);
+    return () => {
+      window.removeEventListener("superflex-academic-updates-detected", handleUpdates);
+      window.removeEventListener("superflex-academic-updates-cleared", handleUpdates);
+    };
+  }, []);
+
+  const updatedCourseIds = useMemo(() => {
+    const set = new Set();
+    (pendingUpdates?.newMarks || []).forEach((item) => {
+      if (item.courseId) set.add(item.courseId);
+    });
+    return set;
+  }, [pendingUpdates]);
+
+  const updatedAttendanceSubjectTitles = useMemo(() => {
+    const set = new Set();
+    (pendingUpdates?.newAttendance || []).forEach((item) => {
+      if (item.subjectTitle) set.add(item.subjectTitle);
+      if (item.courseTitle) set.add(item.courseTitle);
+      if (item.subjectKey) set.add(item.subjectKey);
+    });
+    return set;
+  }, [pendingUpdates]);
+
+  const combinedAlerts = useMemo(() => {
+    const dynamic = [];
+    if (pendingUpdates?.newMarks?.length > 0) {
+      dynamic.push({
+        type: "update",
+        title: "New Marks Uploaded",
+        message: pendingUpdates.newMarks
+          .map((m) => `${m.courseTitle || m.courseId}: ${m.newCount} assessment${m.newCount > 1 ? "s" : ""} added`)
+          .join(" • "),
+        dismissible: true,
+        key: "update-marks",
+      });
+    }
+    if (pendingUpdates?.newAttendance?.length > 0) {
+      dynamic.push({
+        type: "update",
+        title: "New Attendance Marked",
+        message: pendingUpdates.newAttendance
+          .map((a) => `${a.subjectTitle}: ${a.newCount} session${a.newCount > 1 ? "s" : ""}`)
+          .join(" • "),
+        dismissible: true,
+        key: "update-attendance",
+      });
+    }
+    return [...dynamic, ...(alerts || [])];
+  }, [pendingUpdates, alerts]);
+
+  const handleDismissAlert = (alertToDismiss) => {
+    if (alertToDismiss.key === "update-marks" || alertToDismiss.key === "update-attendance") {
+      clearPendingUpdates();
+    } else {
+      setAlerts((prev) => prev.filter((a) => a !== alertToDismiss));
+    }
+  };
 
   const activeCourseData = useMemo(
     () => coursesData.find((course) => course.id === activeCourse),
@@ -305,7 +414,9 @@ function HomePage() {
       const html = await res.text();
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, "text/html");
-      setAttendanceData(parseHomeAttendanceReport(doc));
+      const parsedAttendance = parseHomeAttendanceReport(doc);
+      setAttendanceData(parsedAttendance);
+      checkAndRecordAttendanceSnapshot(parsedAttendance);
     } catch (e) {
       console.error("Attendance fetch error", e);
     }
@@ -321,6 +432,7 @@ function HomePage() {
 
       setCoursesData(parsedCourses);
       if (parsedCourses.length) setActiveCourse(parsedCourses[0].id);
+      checkAndRecordMarksSnapshot(parsedCourses);
     } catch (e) {
       console.error("Marks fetch error", e);
     }
@@ -399,7 +511,7 @@ function HomePage() {
             </div>
           </header>
 
-          <NotificationBanner alerts={alerts} />
+          <NotificationBanner alerts={combinedAlerts} onDismissAlert={handleDismissAlert} />
 
           {}
           {activeMainTab === "stats" && (
@@ -453,7 +565,29 @@ function HomePage() {
                     <>
                       <div className="w-full overflow-x-auto scrollbar-hide">
                         <div className="flex w-fit gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/[0.08]">
-                          {coursesData.map((course) => <button key={course.id} type="button" onClick={() => setActiveCourse(course.id)} className={`whitespace-nowrap rounded-full px-5 py-2 text-xs font-bold transition-all ${activeCourse === course.id ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-600 hover:text-[#230052] dark:text-slate-300 dark:hover:text-white"}`}>{course.id}</button>)}
+                          {coursesData.map((course) => {
+                            const hasUpdate = updatedCourseIds.has(course.id);
+                            return (
+                              <button
+                                key={course.id}
+                                type="button"
+                                onClick={() => setActiveCourse(course.id)}
+                                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-5 py-2 text-xs font-bold transition-all ${
+                                  activeCourse === course.id
+                                    ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"
+                                    : "text-slate-600 hover:text-[#230052] dark:text-slate-300 dark:hover:text-white"
+                                }`}
+                              >
+                                {hasUpdate && (
+                                  <span
+                                    className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse ring-2 ring-emerald-500/30"
+                                    title="New marks uploaded for this course"
+                                  />
+                                )}
+                                {course.id}
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
                       {activeCourseData && (
@@ -493,7 +627,7 @@ function HomePage() {
                     </div>
                     {links.attendance && <a href={links.attendance} className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#230052] px-4 text-xs font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80">View Details <ArrowRight size={12} /></a>}
                   </div>
-                  {loadingAttendance ? <AttendanceSkeleton /> : attendanceData?.length ? <AttendanceHeatmap subjects={attendanceData} /> : <div className="flex flex-1 flex-col items-center justify-center text-center">
+                  {loadingAttendance ? <AttendanceSkeleton /> : attendanceData?.length ? <AttendanceHeatmap subjects={attendanceData} updatedSubjectKeys={updatedAttendanceSubjectTitles} /> : <div className="flex flex-1 flex-col items-center justify-center text-center">
                     <div className="mb-4 rounded-3xl bg-foreground/5 p-6"><Activity size={40} className="text-foreground/40" /></div>
                     <h4 className="text-lg font-bold text-foreground/60">No Attendance Data</h4>
                     <p className="mt-1 text-xs text-foreground/40">Attendance records are currently unavailable.</p>

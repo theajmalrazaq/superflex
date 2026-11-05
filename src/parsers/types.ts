@@ -20,6 +20,8 @@ export type AttendanceRecord = {
 export type AttendanceCourse = {
   id: string;
   title: string;
+  creditHours?: number;
+  allowedAbsents?: number;
   percentage: number;
   records: AttendanceRecord[];
   present: number;

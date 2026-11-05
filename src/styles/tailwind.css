@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
+
 /* stylelint-disable-next-line at-rule-no-unknown */
 @theme {
   --color-accent: var(--accent);
@@ -62,7 +63,7 @@
 }
 
 .dark {
-  --superflex-account-gradient: linear-gradient(180deg, #124568 0%, #124568 40%, #103a57 62%, #0b2b40 80%, #061821 91%, #000 100%);
+  --superflex-account-gradient: linear-gradient(180deg, #0f1422 0%, #0f1422 40%, #0b0e17 65%, #06070c 85%, #000000 100%);
   --accent: #ffffff;
   --accent-foreground: #000000;
   --background: #000000;
@@ -241,53 +242,87 @@ h6 {
 }
 
 .markdown-body code {
-  border-radius: 0.4em;
-  background: color-mix(in srgb, var(--foreground), transparent 92%);
-  color: var(--foreground);
-  padding: 0.15em 0.35em;
+  display: inline;
+  vertical-align: baseline;
+  border-radius: 0.35em;
+  background: color-mix(in srgb, var(--foreground), transparent 93%);
+  color: #230052;
+  padding: 0.12em 0.38em;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.88em;
+  font-weight: 600;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.dark .markdown-body code {
+  color: #c4b5fd;
+  background: color-mix(in srgb, #ffffff, transparent 86%);
 }
 
 .markdown-body pre {
   max-width: 100%;
-  margin: 0.9em 0;
+  margin: 0.85em 0;
   overflow-x: auto;
   border: 1px solid color-mix(in srgb, var(--foreground), transparent 88%);
-  border-radius: 0.75rem;
-  background: color-mix(in srgb, var(--foreground), transparent 95%);
-  padding: 0.9rem 1rem;
+  border-radius: 0.85rem;
+  background: #14161f;
+  padding: 0;
+}
+
+.dark .markdown-body pre {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: #0d0f17;
 }
 
 .markdown-body pre code {
+  display: block;
   border-radius: 0;
-  background: transparent;
-  padding: 0;
+  border: none;
+  background: transparent !important;
+  color: #cdd6f4 !important;
+  padding: 0.85rem 1rem;
   font-size: 0.85em;
   white-space: pre;
 }
 
+.markdown-body li > p {
+  margin: 0.2em 0;
+}
+
 .markdown-body table {
-  display: block;
   width: 100%;
   max-width: 100%;
-  margin: 0.9em 0;
-  overflow-x: auto;
-  border-collapse: collapse;
+  margin: 1em 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--foreground), transparent 88%);
 }
 
 .markdown-body th,
 .markdown-body td {
-  border: 1px solid color-mix(in srgb, var(--foreground), transparent 86%);
-  padding: 0.55em 0.7em;
+  padding: 0.65em 0.85em;
   text-align: left;
-  white-space: nowrap;
+  border-bottom: 1px solid color-mix(in srgb, var(--foreground), transparent 90%);
 }
 
 .markdown-body th {
   background: color-mix(in srgb, var(--foreground), transparent 94%);
   color: var(--foreground);
   font-weight: 700;
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.markdown-body tr:last-child td {
+  border-bottom: none;
+}
+
+.markdown-body tr:hover td {
+  background: color-mix(in srgb, var(--foreground), transparent 97%);
 }
 
 .markdown-body hr {

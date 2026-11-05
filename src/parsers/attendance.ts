@@ -17,11 +17,56 @@ function hasStatus(record: { status: string }, expected: "P" | "L" | "A"): boole
   return status === expected || status === labels[expected];
 }
 
+export function getCourseCreditHours(rawTitle: string, id: string = ""): number {
+  const fullText = `${rawTitle} ${id}`;
+  const crMatch =
+    fullText.match(/\b([1-4])\s*(?:cr(?:edit)?(?:\s*hrs?)?|credits?)\b/i) ||
+    fullText.match(/\(\s*([1-4])\s*(?:cr(?:edit)?)?\s*\)/i) ||
+    fullText.match(/\(\s*(\d)\s*\+\s*(\d)\s*\)/i);
+  if (crMatch) {
+    if (crMatch[2] !== undefined) {
+      const c1 = parseInt(crMatch[1], 10);
+      const c2 = parseInt(crMatch[2], 10);
+      return c1 + c2 || 3;
+    }
+    return parseInt(crMatch[1], 10) || 3;
+  }
+  // All Lab courses are 1 credit hour
+  if (/\blab\b/i.test(fullText)) {
+    return 1;
+  }
+  // Standard 2 Credit Hour university subjects (Islamic Studies, Pak Studies, Ethics, Ideology & Constitution)
+  if (
+    /\b(?:pak(?:istan)?\s*studies|islamic\s*(?:studies|ethics)|islamiat|ethics|quranic|ideology|constitution)\b/i.test(
+      fullText,
+    )
+  ) {
+    return 2;
+  }
+  // Standard university lecture is 3 credit hours
+  return 3;
+}
+
+export function getAllowedAbsents(creditHours: number): number {
+  // 80% attendance policy:
+  // 3 credit hours: 6 leaves (absents)
+  // 2 credit hours: 3 leaves (absents)
+  // 1 credit hour: 3 leaves (absents)
+  if (creditHours === 3) return 6;
+  if (creditHours === 2) return 3;
+  if (creditHours === 1) return 3;
+  if (creditHours >= 4) return 8;
+  return 6;
+}
+
 export function parseAttendancePage(root: ParentNode, form: ParentNode | null): ParsedAttendancePage {
   const courses = Array.from(root.querySelectorAll<HTMLElement>(".tab-pane")).map((pane) => {
-    const title = readText(pane.querySelector("h5"), pane.id)
+    const rawHeading = readText(pane.querySelector("h5"), pane.id);
+    const title = rawHeading
       .replace(/\(.*\)/, "")
       .trim();
+    const creditHours = getCourseCreditHours(rawHeading, pane.id);
+    const allowedAbsents = getAllowedAbsents(creditHours);
     const percentage = parseNumber(pane.querySelector(".progress-bar")?.getAttribute("aria-valuenow"));
     const records = Array.from(pane.querySelectorAll("tbody tr")).flatMap((row) => {
       const cells = row.querySelectorAll("td");
@@ -47,6 +92,8 @@ export function parseAttendancePage(root: ParentNode, form: ParentNode | null): 
     return {
       id: pane.id,
       title,
+      creditHours,
+      allowedAbsents,
       percentage,
       records,
       present: records.filter((record) => hasStatus(record, "P")).length,

@@ -22,6 +22,25 @@ const readCustomBackground = () => {
   return parsed.success ? parsed.data : { enabled: false, url: "" };
 };
 
+const readNavOrder = () => {
+  if (typeof localStorage === "undefined") return [];
+  try {
+    const raw = localStorage.getItem("superflex-nav-order");
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+    const legacy = localStorage.getItem("superflex-preferences-v1");
+    if (legacy) {
+      const parsedLegacy = JSON.parse(legacy);
+      if (Array.isArray(parsedLegacy?.state?.navOrder) && parsedLegacy.state.navOrder.length > 0) {
+        return parsedLegacy.state.navOrder;
+      }
+    }
+  } catch {}
+  return [];
+};
+
 const initialThemeMode = readThemeMode();
 
 export const usePreferencesStore = create(
@@ -29,7 +48,7 @@ export const usePreferencesStore = create(
     (set) => ({
       themeMode: initialThemeMode,
       customBackground: readCustomBackground(),
-      navOrder: [],
+      navOrder: readNavOrder(),
       setThemeMode: (themeMode) => {
         const parsed = themeModeSchema.safeParse(themeMode);
         if (parsed.success) set({ themeMode: parsed.data });
@@ -40,7 +59,13 @@ export const usePreferencesStore = create(
       },
       setNavOrder: (navOrder) => {
         const parsed = navOrderSchema.safeParse(navOrder);
-        if (parsed.success) set({ navOrder: [...new Set(parsed.data)] });
+        if (parsed.success) {
+          const unique = [...new Set(parsed.data)];
+          try {
+            localStorage.setItem("superflex-nav-order", JSON.stringify(unique));
+          } catch {}
+          set({ navOrder: unique });
+        }
       },
     }),
     {
@@ -49,7 +74,14 @@ export const usePreferencesStore = create(
       partialize: ({ navOrder }) => ({ navOrder }),
       merge: (persisted, current) => {
         const parsed = persistedPreferencesSchema.safeParse(persisted);
-        return parsed.success ? { ...current, ...parsed.data } : current;
+        const storedOrder = readNavOrder();
+        const mergedOrder =
+          storedOrder.length > 0
+            ? storedOrder
+            : parsed.success && parsed.data.navOrder.length > 0
+              ? parsed.data.navOrder
+              : current.navOrder;
+        return { ...current, navOrder: mergedOrder };
       },
     },
   ),

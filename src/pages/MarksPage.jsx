@@ -24,6 +24,8 @@ import BottomSheet, { BottomSheetClose, BottomSheetDescription, BottomSheetTitle
 import { processCourseMarks } from "../utils/marksProcessor";
 import { findMarksForm, parseMarksPage } from "../parsers/marks";
 import { findFlexPageRoot } from "../parsers/dom";
+import { useAiSync } from "../hooks/useAiSync";
+import { checkAndRecordMarksSnapshot } from "../utils/academicSnapshot";
 
 const MarksCourseTabs = ({ courses, selectedId, onSelect }) => (
   <div className="inline-flex w-fit max-w-full gap-1.5 overflow-x-auto rounded-full bg-white/55 p-1.5 shadow-sm shadow-black/[0.03] scrollbar-hide dark:bg-black/25 dark:shadow-none" aria-label="Select course">
@@ -506,6 +508,7 @@ function MarksPage() {
         setCourses(parsed.courses);
         initialCoursesRef.current = JSON.parse(JSON.stringify(parsed.courses));
         if (parsed.courses.length > 0) setSelectedCourseId(parsed.courses[0].id);
+        checkAndRecordMarksSnapshot(parsed.courses);
 
         root.style.display = "none";
         setLoading(false);
@@ -517,6 +520,13 @@ function MarksPage() {
 
     setTimeout(parseData, 200);
   }, []);
+
+  useAiSync({
+    data: courses,
+    dataKey: "marks",
+    syncKey: "marks",
+    isEnabled: courses && courses.length > 0,
+  });
 
   const handleRowUpdate = (sectionId, rowIndex, field, value) => {
     if (!selectedCourseId) return;

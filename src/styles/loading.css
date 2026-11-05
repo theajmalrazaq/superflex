@@ -1,0 +1,107 @@
+/* Critical anti-FOUC rule: hides raw portal during initial document parse */
+body {
+  visibility: hidden !important;
+  overflow-y: scroll !important;
+  background: var(--background, #ffffff) !important;
+}
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  background: linear-gradient(
+    180deg,
+    #62abe0 0%,
+    #73b3e1 24%,
+    #9ac7e8 40%,
+    #dcebf5 65%,
+    #ffffff 100%
+  );
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0.6s;
+  will-change: opacity, transform;
+  overflow: hidden;
+}
+
+.dark .loading-overlay {
+  background: linear-gradient(
+    180deg,
+    #173d5d 0%,
+    #13314b 24%,
+    #0e2235 45%,
+    #07131e 70%,
+    #050b11 100%
+  );
+}
+
+.loading-overlay.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(1.03);
+  pointer-events: none;
+}
+
+/* Floating animated clouds in overlay */
+@keyframes float-cloud-left {
+  0% {
+    transform: translateX(0) translateY(0);
+  }
+  50% {
+    transform: translateX(25px) translateY(-10px);
+  }
+  100% {
+    transform: translateX(0) translateY(0);
+  }
+}
+
+@keyframes float-cloud-right {
+  0% {
+    transform: translateX(0) translateY(0) scaleX(-1);
+  }
+  50% {
+    transform: translateX(-30px) translateY(12px) scaleX(-1);
+  }
+  100% {
+    transform: translateX(0) translateY(0) scaleX(-1);
+  }
+}
+
+.overlay-cloud-left {
+  animation: float-cloud-left 8s ease-in-out infinite;
+  will-change: transform;
+}
+
+.overlay-cloud-right {
+  animation: float-cloud-right 10s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes splash {
+  0% {
+    transform: scale(0.65);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.65);
+    opacity: 0.9;
+  }
+}
+
+.animate-splash {
+  animation: splash 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite both;
+  transform-origin: center center;
+}
+

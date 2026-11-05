@@ -11,6 +11,8 @@ import {
   Bookmark,
   Percent,
   Mail,
+  AlertTriangle,
+  ShieldCheck,
 } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import SuperTabs from "../components/ui/SuperTabs";
@@ -19,6 +21,8 @@ import StatsCard from "../components/ui/StatsCard";
 import BookmarksModal from "../components/ui/BookmarksModal";
 import { findAttendanceForm, parseAttendancePage } from "../parsers/attendance";
 import { findFlexPageRoot } from "../parsers/dom";
+import { useAiSync } from "../hooks/useAiSync";
+import { checkAndRecordAttendanceSnapshot } from "../utils/academicSnapshot";
 
 const parseSessionDate = (value) => {
   const input = String(value || "").trim();
@@ -32,19 +36,40 @@ const parseSessionDate = (value) => {
 
 const AttendanceCourseTabs = ({ courses, selectedId, onSelect }) => (
   <div className="inline-flex w-fit max-w-full gap-2 overflow-x-auto rounded-full border-0 bg-white/55 p-1.5 shadow-sm shadow-black/[0.03] backdrop-blur-xl scrollbar-hide dark:bg-black/25 dark:shadow-none" aria-label="Select course">
-    {courses.map((course) => (
-      <button
-        key={course.id}
-        type="button"
-        onClick={() => onSelect(course.id)}
-        aria-pressed={selectedId === course.id}
-        title={course.title}
-        className={`flex min-w-[116px] shrink-0 items-center justify-between gap-3 rounded-full px-4 py-2.5 text-xs font-bold transition-colors ${selectedId === course.id ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-600 hover:bg-white/80 hover:text-[#230052] dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white"}`}
-      >
-        <span className="truncate">{course.title.match(/[A-Z]{2,5}\s?-?\d{3,4}/i)?.[0] || course.id}</span>
-        <span className="shrink-0 text-[10px] opacity-70">{course.percentage.toFixed(0)}%</span>
-      </button>
-    ))}
+    {courses.map((course) => {
+      const cr =
+        course.creditHours ||
+        (/\blab\b/i.test(`${course.title} ${course.id}`)
+          ? 1
+          : /\b(?:pak(?:istan)?\s*studies|islamic\s*(?:studies|ethics)|islamiat|ethics|quranic|ideology|constitution)\b/i.test(
+              `${course.title} ${course.id}`,
+            )
+          ? 2
+          : 3);
+      const allowed = course.allowedAbsents || (cr === 3 ? 6 : cr <= 2 ? 3 : 6);
+      const isOver = course.absent > allowed;
+      const isAtLimit = course.absent === allowed;
+      return (
+        <button
+          key={course.id}
+          type="button"
+          onClick={() => onSelect(course.id)}
+          aria-pressed={selectedId === course.id}
+          title={`${course.title} (${cr} Cr Hr · ${course.absent}/${allowed} absents)`}
+          className={`flex min-w-[120px] shrink-0 items-center justify-between gap-3 rounded-full px-4 py-2.5 text-xs font-bold transition-colors ${selectedId === course.id ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-600 hover:bg-white/80 hover:text-[#230052] dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white"}`}
+        >
+          <div className="flex items-center gap-1.5 truncate">
+            {isOver ? (
+              <span className="h-2 w-2 shrink-0 rounded-full bg-rose-500 animate-pulse" title="Debarment limit exceeded" />
+            ) : isAtLimit ? (
+              <span className="h-2 w-2 shrink-0 rounded-full bg-amber-500" title="At absent limit" />
+            ) : null}
+            <span className="truncate">{course.title.match(/[A-Z]{2,5}\s?-?\d{3,4}/i)?.[0] || course.id}</span>
+          </div>
+          <span className="shrink-0 text-[10px] opacity-70">{course.percentage.toFixed(0)}%</span>
+        </button>
+      );
+    })}
   </div>
 );
 
@@ -178,6 +203,7 @@ function AttendancePage() {
 
         setCourses(parsed.courses);
         if (parsed.courses.length > 0) setSelectedCourseId(parsed.courses[0].id);
+        checkAndRecordAttendanceSnapshot(parsed.courses);
 
         root.style.display = "none";
         setLoading(false);
@@ -189,6 +215,13 @@ function AttendancePage() {
     parseData();
     return () => {};
   }, []);
+
+  useAiSync({
+    data: courses,
+    dataKey: "attendance",
+    syncKey: "attendance",
+    isEnabled: courses && courses.length > 0,
+  });
 
   const selectedCourseData = courses.find((c) => c.id === selectedCourseId);
   const getTeacherForCourse = (course) => {
@@ -257,20 +290,127 @@ function AttendancePage() {
         ) : courses.length > 0 ? (
           <>
             <AttendanceCourseTabs courses={courses} selectedId={selectedCourseId} onSelect={setSelectedCourseId} />
-            {selectedCourseData && (
-              <div key={selectedCourseId} className="flex min-h-0 flex-1 flex-col gap-4">
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
-                  <AttendanceMetric icon={Percent} label="Attendance" value={`${selectedCourseData.percentage}%`} subValue="Overall attendance" />
-                  <AttendanceMetric icon={CheckCircle2} label="Present" value={selectedCourseData.present} subValue="Classes attended" tone="text-emerald-700 dark:text-emerald-300" />
-                  <AttendanceMetric icon={Clock} label="Late" value={selectedCourseData.late} subValue="Late arrivals" tone="text-amber-700 dark:text-amber-300" />
-                  <AttendanceMetric icon={XCircle} label="Absent" value={selectedCourseData.absent} subValue="Missed classes" tone="text-rose-700 dark:text-rose-300" />
-                  <AttendanceMetric icon={Calendar} label="Sessions" value={selectedCourseData.records.length} subValue="Total sessions" />
-                </div>
+            {selectedCourseData && (() => {
+              const creditHours =
+                selectedCourseData.creditHours ||
+                (/\blab\b/i.test(`${selectedCourseData.title} ${selectedCourseData.id}`)
+                  ? 1
+                  : /\b(?:pak(?:istan)?\s*studies|islamic\s*(?:studies|ethics)|islamiat|ethics|quranic|ideology|constitution)\b/i.test(
+                      `${selectedCourseData.title} ${selectedCourseData.id}`,
+                    )
+                  ? 2
+                  : 3);
+              const allowedAbsents =
+                selectedCourseData.allowedAbsents || (creditHours === 3 ? 6 : creditHours <= 2 ? 3 : 6);
+              const absentsTaken = selectedCourseData.absent || 0;
+              const absentsRemaining = allowedAbsents - absentsTaken;
 
-                <div className="-mb-1">
-                  <h2 className="text-lg font-bold tracking-tight text-[#101010] dark:text-[#f5f6fb]">{selectedCourseData.title}</h2>
-                  <p className="mt-0.5 text-[11px] text-[#626262] dark:text-[#9ca3b3]">Class session history</p>
-                </div>
+              return (
+                <div key={selectedCourseId} className="flex min-h-0 flex-1 flex-col gap-4">
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+                    <AttendanceMetric icon={Percent} label="Attendance" value={`${selectedCourseData.percentage}%`} subValue="Overall attendance" />
+                    <AttendanceMetric icon={CheckCircle2} label="Present" value={selectedCourseData.present} subValue="Classes attended" tone="text-emerald-700 dark:text-emerald-300" />
+                    <AttendanceMetric icon={Clock} label="Late" value={selectedCourseData.late} subValue="Late arrivals" tone="text-amber-700 dark:text-amber-300" />
+                    <AttendanceMetric
+                      icon={XCircle}
+                      label="Absent"
+                      value={`${absentsTaken} / ${allowedAbsents}`}
+                      subValue={
+                        absentsRemaining > 0
+                          ? `${absentsRemaining} allowed left (${creditHours} Cr)`
+                          : absentsRemaining === 0
+                          ? `Limit reached! (${creditHours} Cr)`
+                          : `${Math.abs(absentsRemaining)} over limit! (${creditHours} Cr)`
+                      }
+                      tone={
+                        absentsRemaining < 0
+                          ? "text-rose-600 font-extrabold dark:text-rose-400"
+                          : absentsRemaining === 0
+                          ? "text-amber-600 font-bold dark:text-amber-400"
+                          : "text-rose-700 dark:text-rose-300"
+                      }
+                    />
+                    <AttendanceMetric
+                      icon={absentsRemaining <= 1 ? AlertTriangle : ShieldCheck}
+                      label="Allowed Left"
+                      value={Math.max(0, absentsRemaining)}
+                      subValue={`${creditHours} Cr course (${allowedAbsents} allowed)`}
+                      tone={
+                        absentsRemaining <= 0
+                          ? "text-rose-600 font-extrabold dark:text-rose-400"
+                          : absentsRemaining <= 1
+                          ? "text-amber-600 font-bold dark:text-amber-400"
+                          : "text-emerald-700 dark:text-emerald-300"
+                      }
+                    />
+                    <AttendanceMetric icon={Calendar} label="Sessions" value={selectedCourseData.records.length} subValue="Total sessions" />
+                  </div>
+
+                  {/* Debarment caution or warning banner */}
+                  {absentsRemaining <= 1 && (
+                    <div
+                      className={`flex items-center gap-3.5 rounded-[20px] border p-3.5 sm:p-4 text-xs font-semibold shadow-sm transition-all bg-white dark:bg-black ${
+                        absentsRemaining < 0
+                          ? "border-rose-500/30 text-rose-700 dark:border-rose-500/40 dark:text-rose-300"
+                          : absentsRemaining === 0
+                          ? "border-amber-500/30 text-amber-800 dark:border-amber-500/40 dark:text-amber-300"
+                          : "border-amber-500/25 text-amber-800 dark:border-amber-500/30 dark:text-amber-300"
+                      }`}
+                    >
+                      <div
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                          absentsRemaining < 0
+                            ? "bg-rose-500/15 text-rose-600 dark:bg-rose-500/20 dark:text-rose-300"
+                            : "bg-amber-500/15 text-amber-600 dark:bg-amber-500/20 dark:text-amber-300"
+                        }`}
+                      >
+                        <AlertTriangle size={18} />
+                      </div>
+                      <div className="min-w-0 flex-1 leading-relaxed">
+                        {absentsRemaining < 0 ? (
+                          <span>
+                            <strong className="font-bold">Debarment Risk:</strong> You have missed {absentsTaken} sessions out of {allowedAbsents} allowed ({creditHours} Cr). You are {Math.abs(absentsRemaining)} absence{Math.abs(absentsRemaining) === 1 ? "" : "s"} over the limit and risk an F grade for short attendance!
+                          </span>
+                        ) : absentsRemaining === 0 ? (
+                          <span>
+                            <strong className="font-bold">Attendance Warning:</strong> You have reached your absent limit ({allowedAbsents} of {allowedAbsents} for {creditHours} Cr). Any further absence will lead to debarment!
+                          </span>
+                        ) : (
+                          <span>
+                            <strong className="font-bold">Caution:</strong> Only 1 allowed absence remaining for this {creditHours} Cr course ({absentsTaken} of {allowedAbsents} taken).
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="-mb-1 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h2 className="text-lg font-bold tracking-tight text-[#101010] dark:text-[#f5f6fb]">
+                          {selectedCourseData.title}
+                        </h2>
+                        <span className="rounded-full bg-[#230052]/10 px-2.5 py-0.5 text-[10px] font-bold text-[#230052] dark:bg-white/10 dark:text-white">
+                          {creditHours} Cr Hr
+                        </span>
+                        <span
+                          className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                            absentsRemaining < 0
+                              ? "bg-rose-500/20 text-rose-600 dark:text-rose-300"
+                              : absentsRemaining === 0
+                              ? "bg-amber-500/20 text-amber-700 dark:text-amber-300"
+                              : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                          }`}
+                        >
+                          {absentsRemaining > 0
+                            ? `${absentsRemaining} of ${allowedAbsents} absents left`
+                            : absentsRemaining === 0
+                            ? `0 of ${allowedAbsents} absents left (At Limit)`
+                            : `Exceeded by ${Math.abs(absentsRemaining)}!`}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 <section className="flex min-h-[240px] flex-1 flex-col overflow-hidden rounded-[24px] border border-black/[0.06] bg-white p-4 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-5">
                   <div className="mb-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                     <p className="text-[11px] text-[#626262] dark:text-[#9ca3b3]">Showing {filteredRecords.length} of {selectedCourseData.records.length} sessions</p>
@@ -327,7 +467,8 @@ function AttendancePage() {
                   </div>
                 </section>
               </div>
-            )}
+            );
+          })()}
           </>
         ) : (
           <section className="flex min-h-[300px] flex-1 flex-col items-center justify-center rounded-[24px] border border-black/[0.06] bg-white px-6 py-10 text-center dark:border-white/[0.14] dark:bg-black">
