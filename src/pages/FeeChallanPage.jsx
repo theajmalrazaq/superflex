@@ -26,10 +26,8 @@ function FeeChallanPage() {
   const [loading, setLoading] = useState(true);
   const [challans, setChallans] = useState([]);
   const [alerts, setAlerts] = useState([]);
-  const [instructions, setInstructions] = useState("");
 
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseData = () => {
       try {
@@ -114,19 +112,12 @@ function FeeChallanPage() {
           });
         }
 
-        const infoPanel = root.querySelector("td[style*='border-right:solid 1px']");
-        if (infoPanel) {
-          setInstructions(infoPanel.innerHTML);
-        }
-
         setChallans(challanList);
         root.style.display = "none";
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (e) {
         console.error("Fee Challan Parsing Error", e);
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 

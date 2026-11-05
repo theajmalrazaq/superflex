@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { createPortal } from "react-dom";
 import { Mail, X, UserRound, Clipboard } from "lucide-react";
+import BottomSheet, { BottomSheetClose, BottomSheetDescription, BottomSheetTitle } from "./ui/BottomSheet";
 
 export default function AttendanceReviewModal({ open, course, record, teacher, onClose }) {
   const [reason, setReason] = useState("");
@@ -21,8 +21,6 @@ export default function AttendanceReviewModal({ open, course, record, teacher, o
     return `Dear ${recipient},\n\nI’m writing to request a review of my attendance record for ${course?.title || "this course"} on ${record?.date || "the session date"}. The portal currently lists my status as absent.\n\nSection: ${section.trim()}\n\n${reason.trim()}\n\nIf the class records confirm that I attended, could you please update my status to Present? If the absence is correct, please let me know whether there is an appeal or documentation process I should follow.\n\nThank you for your time.\n${localStorage.getItem("superflex_student_roll_number_v1") || "Student"}`;
   }, [course?.title, record?.date, reason, section, teacher?.name]);
 
-  if (!open) return null;
-
   const copyDraft = async () => {
     try {
       await navigator.clipboard.writeText(`To: ${teacher?.email || ""}\nSubject: ${subject}\n\n${body}`);
@@ -37,16 +35,15 @@ export default function AttendanceReviewModal({ open, course, record, teacher, o
     ? `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(teacher.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
     : "#";
 
-  return createPortal(
-    <div className="fixed inset-0 z-[2147483647] flex items-end justify-center bg-slate-950/60 px-3 pb-3 pt-3 backdrop-blur-md" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
-      <section role="dialog" aria-modal="true" aria-labelledby="attendance-review-title" className="relative flex max-h-[76dvh] w-full max-w-2xl flex-col overflow-hidden rounded-[34px] bg-white text-slate-900 shadow-[0_18px_60px_rgba(35,0,82,.24)] dark:bg-[#090909] dark:text-[#f5f6fb]">
+  return (
+    <BottomSheet open={open} onClose={onClose}>
         <div className="flex shrink-0 justify-center pt-3"><span className="h-1.5 w-14 rounded-full bg-[#ded9e5] dark:bg-white" /></div>
-        <button type="button" onClick={onClose} aria-label="Close" className="absolute right-4 top-6 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"><X size={20} /></button>
+        <BottomSheetClose asChild><button type="button" aria-label="Close" className="absolute right-4 top-6 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"><X size={20} /></button></BottomSheetClose>
         <header className="flex shrink-0 flex-col items-center px-6 pb-3 pt-3 text-center sm:px-8">
           <span className="mb-2 flex h-11 w-11 items-center justify-center rounded-[16px] bg-[#230052] text-white dark:bg-white dark:text-[#101027]"><Mail size={21} /></span>
           <p className="text-[10px] font-bold uppercase tracking-[.15em] text-[#230052]/65 dark:text-white">Attendance</p>
-          <h2 id="attendance-review-title" className="mt-1 text-xl font-bold">Request an attendance review</h2>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{course?.title} · {record?.date}</p>
+          <BottomSheetTitle className="mt-1 text-xl font-bold">Request an attendance review</BottomSheetTitle>
+          <BottomSheetDescription className="mt-1 text-sm text-slate-500 dark:text-slate-400">{course?.title} · {record?.date}</BottomSheetDescription>
         </header>
 
         <div className="min-h-0 space-y-3 overflow-y-auto px-5 pb-3 pt-1 sm:px-8">
@@ -84,8 +81,6 @@ export default function AttendanceReviewModal({ open, course, record, teacher, o
           <button type="button" onClick={copyDraft} className="inline-flex min-h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-full border border-slate-200 px-3 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50 dark:border-white/15 dark:text-slate-300 dark:hover:bg-white/[.06]"><Clipboard size={15} />{copied ? "Copied" : "Copy draft"}</button>
         </footer>
         <p className="shrink-0 pb-2 text-center text-[10px] text-slate-400">Review the draft before sending it from your email app.</p>
-      </section>
-    </div>,
-    document.body,
+    </BottomSheet>
   );
 }

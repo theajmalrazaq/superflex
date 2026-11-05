@@ -32,7 +32,7 @@ export const processCourseMarks = (course) => {
     const sorted = rows
       .map((r, i) => ({ ...r, _originalIdx: i }))
       .filter((r) => r.title !== "Total")
-      .map((r, i) => {
+      .map((r) => {
         const weight = parseFloatOrZero(r.weight);
         const total = parseFloatOrZero(r.total);
         const obtained = parseFloatOrZero(r.obtained);

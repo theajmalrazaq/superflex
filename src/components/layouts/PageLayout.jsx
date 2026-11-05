@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import NavBar from "../NavBar";
 import { getExtensionUrl } from "../../utils/extensionApi";
+import { usePreferencesStore } from "../../stores/preferencesStore";
 
 function PageLayout({
   children,
@@ -9,16 +10,14 @@ function PageLayout({
   onLinksFound,
   fullWidth = false,
 }) {
-  const [customBackground, setCustomBackground] = useState(() => ({
-    enabled: localStorage.getItem("superflex-bg-enabled") === "true",
-    url: localStorage.getItem("superflex-bg-url") || "",
-  }));
+  const customBackground = usePreferencesStore((state) => state.customBackground);
+  const setCustomBackground = usePreferencesStore((state) => state.setCustomBackground);
 
   useEffect(() => {
     const handleCustomBackground = (event) => setCustomBackground(event.detail);
     window.addEventListener("superflex-custom-background-changed", handleCustomBackground);
     return () => window.removeEventListener("superflex-custom-background-changed", handleCustomBackground);
-  }, []);
+  }, [setCustomBackground]);
 
   const customUrl = (() => {
     try {

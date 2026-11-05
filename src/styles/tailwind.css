@@ -35,7 +35,7 @@
 }
 
 :root {
-  --superflex-account-gradient: #e4eff7;
+  --superflex-account-gradient: linear-gradient(180deg, #62abe0 0%, #62abe0 40%, #73b3e1 62%, #9ac7e8 80%, #dcebf5 91%, #fff 100%);
   --accent: #230052;
   --accent-foreground: #ffffff;
   --background: #ffffff;
@@ -48,23 +48,11 @@
   background: var(--superflex-account-gradient);
 }
 
-:root.cloud-mode:not(.dark) {
-  --superflex-account-gradient: linear-gradient(180deg, #62abe0 0%, #62abe0 40%, #73b3e1 62%, #9ac7e8 80%, #dcebf5 91%, #fff 100%);
-}
-
-.dark.cloud-mode {
-  --superflex-account-gradient: linear-gradient(180deg, #124568 0%, #124568 40%, #103a57 62%, #0b2b40 80%, #061821 91%, #000 100%);
-}
-
 .superflex-account-cloud {
-  opacity: 0 !important;
-}
-
-.cloud-mode:not(.dark) .superflex-account-cloud {
   opacity: 0.8 !important;
 }
 
-.dark.cloud-mode .superflex-account-cloud {
+.dark .superflex-account-cloud {
   opacity: 0.12 !important;
 }
 
@@ -74,7 +62,7 @@
 }
 
 .dark {
-  --superflex-account-gradient: #000000;
+  --superflex-account-gradient: linear-gradient(180deg, #124568 0%, #124568 40%, #103a57 62%, #0b2b40 80%, #061821 91%, #000 100%);
   --accent: #ffffff;
   --accent-foreground: #000000;
   --background: #000000;
@@ -382,7 +370,7 @@ h6 {
   display: none !important;
 }
 
-/* Override legacy positioning if needed to be safe */
+/* Keep portal toasts inside the visible viewport. */
 .toast-top-right {
   top: 12px;
   right: 12px;

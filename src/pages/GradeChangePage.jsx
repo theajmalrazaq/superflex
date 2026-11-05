@@ -14,13 +14,13 @@ import {
   ClipboardEdit,
   FileText,
   Send,
-  ChevronDown,
   ChevronRight,
   Check,
 } from "lucide-react";
 import Modal from "../components/ui/Modal";
 import Button from "../components/ui/Button";
 import { TextArea } from "../components/ui/Input";
+import SelectMenu from "../components/ui/SelectMenu";
 
 const GradeChangeSkeleton = () => (
   <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8" role="status" aria-label="Loading grade change details">
@@ -32,26 +32,17 @@ const GradeChangeSkeleton = () => (
 );
 
 const ReasonSelector = ({ value, options, onChange }) => {
-  const [open, setOpen] = useState(false);
-  const selectorRef = useRef(null);
-  useEffect(() => {
-    if (!open) return undefined;
-    const closeOutside = (event) => { if (!selectorRef.current?.contains(event.target)) setOpen(false); };
-    const closeEscape = (event) => { if (event.key === "Escape") setOpen(false); };
-    document.addEventListener("mousedown", closeOutside);
-    document.addEventListener("touchstart", closeOutside);
-    document.addEventListener("keydown", closeEscape);
-    return () => {
-      document.removeEventListener("mousedown", closeOutside);
-      document.removeEventListener("touchstart", closeOutside);
-      document.removeEventListener("keydown", closeEscape);
-    };
-  }, [open]);
-  const label = options.find((option) => option.value === value)?.label || "Select a reason";
-  return <div className="relative" ref={selectorRef}>
-    <button type="button" aria-haspopup="listbox" aria-expanded={open} onClick={() => setOpen((current) => !current)} className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-900 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#230052]/30 dark:border-white/[0.12] dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1] dark:focus-visible:ring-white/30"><span>{label}</span><ChevronDown size={16} className={`text-slate-500 transition-transform dark:text-slate-400 ${open ? "rotate-180" : ""}`} /></button>
-    {open && <div role="listbox" aria-label="Reason for grade change" className="absolute inset-x-0 top-full z-40 mt-2 rounded-2xl border border-black/[0.08] bg-white p-1.5 text-slate-900 shadow-[0_12px_32px_rgba(15,23,42,.16)] dark:border-white/[0.12] dark:bg-[#111] dark:text-white dark:shadow-black/40">{options.map((option) => <button key={option.value} type="button" role="option" aria-selected={value === option.value} onClick={() => { onChange(option.value); setOpen(false); }} className={`flex w-full cursor-pointer items-center justify-between rounded-xl px-3.5 py-2.5 text-left text-sm transition-colors ${value === option.value ? "bg-[#230052] font-semibold text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/[0.08]"}`}>{option.label}{value === option.value && <Check size={15} />}</button>)}</div>}
-  </div>;
+  return (
+    <SelectMenu
+      value={value}
+      options={options}
+      onChange={onChange}
+      placeholder="Select a reason"
+      ariaLabel="Reason for grade change"
+      triggerClassName="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 transition-colors hover:bg-slate-100 dark:border-white/[0.12] dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1]"
+      contentClassName="w-[var(--radix-select-trigger-width)]"
+    />
+  );
 };
 
 const GradeChangeModal = ({ isOpen, onClose, onSubmit }) => {
@@ -142,13 +133,13 @@ function GradeChangePage() {
     const hiderStyle = document.createElement("style");
     hiderStyle.id = "superflex-grade-change-hide";
     hiderStyle.innerHTML = `
-      .m-grid.m-grid--hor.m-grid--root.m-page:not(#legacy-root-hidden) {
+      .m-grid.m-grid--hor.m-grid--root.m-page:not(#portal-root-hidden) {
         visibility: hidden !important;
         position: absolute !important;
         pointer-events: none !important;
         z-index: -1 !important;
       }
-      #legacy-root-hidden {
+      #portal-root-hidden {
         display: none !important;
       }
       /* Ensure modals and their backdrops stay functional */
@@ -182,18 +173,14 @@ function GradeChangePage() {
     `;
     document.head.appendChild(hiderStyle);
 
-    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseData = () => {
       try {
         const root = document.querySelector(
-          ".m-grid.m-grid--hor.m-grid--root.m-page:not(#legacy-root-hidden)",
+          ".m-grid.m-grid--hor.m-grid--root.m-page:not(#portal-root-hidden)",
         );
         if (!root) {
-          if (document.getElementById("legacy-root-hidden")) {
-          } else {
-            setTimeout(parseData, 500);
-          }
+          if (!document.getElementById("portal-root-hidden")) setTimeout(parseData, 500);
           return;
         }
 
@@ -300,7 +287,7 @@ function GradeChangePage() {
         if (hiddenContentRef.current) {
           hiddenContentRef.current.innerHTML = "";
           const clone = root.cloneNode(true);
-          clone.id = "legacy-root-hidden";
+          clone.id = "portal-root-hidden";
           hiddenContentRef.current.appendChild(clone);
         }
 
@@ -310,11 +297,9 @@ function GradeChangePage() {
         root.style.zIndex = "-1";
 
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (err) {
         console.error("Grade Change Parser Error:", err);
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 
@@ -339,12 +324,12 @@ function GradeChangePage() {
 
   const handleCheckboxToggle = (checkboxId) => {
     const root = document.getElementById("superflex-grade-change-original");
-    const legacyCb = root?.querySelector(`#${checkboxId}`);
-    if (legacyCb && !legacyCb.disabled) {
-      legacyCb.checked = !legacyCb.checked;
-      legacyCb.dispatchEvent(new Event("change", { bubbles: true }));
+    const portalCheckbox = root?.querySelector(`#${checkboxId}`);
+    if (portalCheckbox && !portalCheckbox.disabled) {
+      portalCheckbox.checked = !portalCheckbox.checked;
+      portalCheckbox.dispatchEvent(new Event("change", { bubbles: true }));
 
-      if (legacyCb.checked) {
+      if (portalCheckbox.checked) {
         setSelectedIds((prev) => [...prev, checkboxId]);
       } else {
         setSelectedIds((prev) => prev.filter((id) => id !== checkboxId));
@@ -354,19 +339,19 @@ function GradeChangePage() {
 
   const handleSelectAll = (checked) => {
     const root = document.getElementById("superflex-grade-change-original");
-    const legacyCheckboxes = root?.querySelectorAll('input[name="OfferIdCheckBox"]:not(:disabled)');
+    const portalCheckboxes = root?.querySelectorAll('input[name="OfferIdCheckBox"]:not(:disabled)');
     const ids = [];
-    legacyCheckboxes?.forEach((cb) => {
+    portalCheckboxes?.forEach((cb) => {
       cb.checked = checked;
       cb.dispatchEvent(new Event("change", { bubbles: true }));
       if (checked) ids.push(cb.id);
     });
     setSelectedIds(checked ? ids : []);
 
-    const legacySelectAll = root?.querySelector("#checkall");
-    if (legacySelectAll) {
-      legacySelectAll.checked = checked;
-      legacySelectAll.dispatchEvent(new Event("change", { bubbles: true }));
+    const portalSelectAll = root?.querySelector("#checkall");
+    if (portalSelectAll) {
+      portalSelectAll.checked = checked;
+      portalSelectAll.dispatchEvent(new Event("change", { bubbles: true }));
     }
   };
 
@@ -381,26 +366,26 @@ function GradeChangePage() {
   const submitGradeChange = ({ reason, remarks }) => {
     const root = document.getElementById("superflex-grade-change-original");
 
-    const legacyReason = root?.querySelector("#GradeChangeReason");
-    const legacyRemarks = root?.querySelector("#StdRmktxtarea");
+    const portalReason = root?.querySelector("#GradeChangeReason");
+    const portalRemarks = root?.querySelector("#StdRmktxtarea");
 
-    if (legacyReason) {
-      legacyReason.value = reason;
-      legacyReason.dispatchEvent(new Event("change", { bubbles: true }));
+    if (portalReason) {
+      portalReason.value = reason;
+      portalReason.dispatchEvent(new Event("change", { bubbles: true }));
     }
-    if (legacyRemarks) {
-      legacyRemarks.value = remarks;
-      legacyRemarks.dispatchEvent(new Event("input", { bubbles: true }));
+    if (portalRemarks) {
+      portalRemarks.value = remarks;
+      portalRemarks.dispatchEvent(new Event("input", { bubbles: true }));
     }
 
     if (typeof window.fn_SubmitStdRemarks === "function") {
       window.fn_SubmitStdRemarks();
     } else {
-      const legacyBtn = root?.querySelector('#remrksbtn input[type="button"]');
-      if (legacyBtn) {
-        legacyBtn.click();
+      const portalButton = root?.querySelector('#remrksbtn input[type="button"]');
+      if (portalButton) {
+        portalButton.click();
       } else {
-        alert("Submit function not found. Legacy system may have changed.");
+        alert("Submit function not found. The FLEX portal may have changed.");
       }
     }
 

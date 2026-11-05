@@ -161,7 +161,6 @@ function FeeDetailsPage() {
   const [totalPaid, setTotalPaid] = useState("0");
 
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const bootstrapAndHydrate = () => {
       const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
@@ -313,7 +312,6 @@ function FeeDetailsPage() {
 
       root.style.display = "none";
       setLoading(false);
-      window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
     };
 
     bootstrapAndHydrate();

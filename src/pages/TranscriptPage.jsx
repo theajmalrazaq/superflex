@@ -1,5 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useState, useMemo } from "react";
 import PageLayout from "../components/layouts/PageLayout";
 import {
   Award,
@@ -11,8 +10,6 @@ import {
   Scale,
   TrendingUp,
   X,
-  ChevronDown,
-  Check,
 } from "lucide-react";
 import { MCA_DATA } from "../constants/mcaData";
 import NotificationBanner from "../components/ui/NotificationBanner";
@@ -23,7 +20,10 @@ import SuperTabs from "../components/ui/SuperTabs";
 import { PageSkeleton } from "../components/ui/Skeleton";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
+import BottomSheet, { BottomSheetClose, BottomSheetDescription, BottomSheetTitle } from "../components/ui/BottomSheet";
+import SelectMenu from "../components/ui/SelectMenu";
 import { useAiSync } from "../hooks/useAiSync";
+import { usePreferencesStore } from "../stores/preferencesStore";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -64,79 +64,33 @@ const GRADE_POINTS = {
 };
 
 const GradeSelector = ({ value, grades, onChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const selectorRef = useRef(null);
-
-  useEffect(() => {
-    if (!isOpen) return undefined;
-    const closeOutside = (event) => {
-      if (!selectorRef.current?.contains(event.target)) setIsOpen(false);
-    };
-    const closeOnEscape = (event) => {
-      if (event.key === "Escape") setIsOpen(false);
-    };
-    document.addEventListener("mousedown", closeOutside);
-    document.addEventListener("touchstart", closeOutside);
-    document.addEventListener("keydown", closeOnEscape);
-    return () => {
-      document.removeEventListener("mousedown", closeOutside);
-      document.removeEventListener("touchstart", closeOutside);
-      document.removeEventListener("keydown", closeOnEscape);
-    };
-  }, [isOpen]);
-
   return (
-    <div ref={selectorRef} className="relative inline-block">
-      <button
-        type="button"
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-        onClick={() => setIsOpen((open) => !open)}
-        className="flex min-w-16 cursor-pointer items-center justify-between gap-2 rounded-xl border border-black/[0.08] bg-white px-3 py-2 text-xs font-bold text-slate-900 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#230052]/30 dark:border-white/[0.12] dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1] dark:focus-visible:ring-white/30"
-      >
-        <span>{value}</span>
-        <ChevronDown size={14} className={`text-slate-500 transition-transform dark:text-slate-400 ${isOpen ? "rotate-180" : ""}`} />
-      </button>
-      {isOpen && (
-        <div role="listbox" aria-label="Simulation grade" className="absolute left-1/2 top-full z-50 mt-2 max-h-64 w-36 -translate-x-1/2 overflow-y-auto rounded-2xl border border-black/[0.08] bg-white p-1.5 text-slate-900 shadow-[0_12px_32px_rgba(15,23,42,.16)] dark:border-white/[0.12] dark:bg-[#111] dark:text-white dark:shadow-black/40">
-          {grades.map((grade) => {
-            const selected = grade === value;
-            return (
-              <button
-                key={grade}
-                type="button"
-                role="option"
-                aria-selected={selected}
-                onClick={() => { onChange(grade); setIsOpen(false); }}
-                className={`flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-left text-xs font-semibold transition-colors ${selected ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/[0.08]"}`}
-              >
-                {grade}{selected && <Check size={14} />}
-              </button>
-            );
-          })}
-        </div>
-      )}
-    </div>
+    <SelectMenu
+      value={value}
+      options={grades.map((grade) => ({ value: grade, label: grade }))}
+      onChange={onChange}
+      ariaLabel="Simulation grade"
+      triggerClassName="min-w-16 rounded-xl border border-black/[0.08] bg-white px-3 py-2 text-xs font-bold text-slate-900 transition-colors hover:bg-slate-50 dark:border-white/[0.12] dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1]"
+      contentClassName="w-36"
+      itemClassName="px-3 py-2 text-xs font-semibold"
+      iconSize={14}
+    />
   );
 };
 
 const TranscriptBottomSheet = ({ isOpen, onClose, title, subtitle, icon, children }) => {
-  if (!isOpen) return null;
-  return createPortal(
-    <div className="fixed inset-0 z-[2147483647] flex items-end justify-center bg-slate-950/60 px-3 pb-3 pt-3 backdrop-blur-md" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
-      <section role="dialog" aria-modal="true" aria-label={title} className="relative flex max-h-[76dvh] w-full max-w-2xl flex-col overflow-hidden rounded-[34px] bg-white text-slate-900 shadow-[0_18px_60px_rgba(35,0,82,.24)] dark:bg-[#090909] dark:text-[#f5f6fb]">
+  return (
+    <BottomSheet open={isOpen} onClose={onClose}>
         <div className="flex shrink-0 justify-center pt-3"><span className="h-1.5 w-14 rounded-full bg-[#ded9e5] dark:bg-white" /></div>
-        <button type="button" onClick={onClose} aria-label="Close" className="absolute right-4 top-6 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"><X size={20} /></button>
+        <BottomSheetClose asChild><button type="button" aria-label="Close" className="absolute right-4 top-6 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"><X size={20} /></button></BottomSheetClose>
         <header className="flex shrink-0 flex-col items-center px-6 pb-3 pt-3 text-center sm:px-8">
           <span className="mb-2 flex h-11 w-11 items-center justify-center rounded-[16px] bg-[#230052] text-white dark:bg-white dark:text-[#101027]">{icon}</span>
           <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#230052]/65 dark:text-white">Transcript tools</p>
-          <h2 className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">{title}</h2>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
+          <BottomSheetTitle className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">{title}</BottomSheetTitle>
+          <BottomSheetDescription className="mt-1 text-sm text-slate-500 dark:text-slate-400">{subtitle}</BottomSheetDescription>
         </header>
         <div className="min-h-0 overflow-y-auto px-5 pb-5 pt-1 sm:px-8">{children}</div>
-      </section>
-    </div>,
-    document.body,
+    </BottomSheet>
   );
 };
 
@@ -601,18 +555,7 @@ function TranscriptPage() {
     };
   }, [semesters, overriddenGrades]);
 
-  const [themeMode, setThemeMode] = useState(
-    localStorage.getItem("superflex-theme-mode") || "light",
-  );
-  useEffect(() => {
-    const handleModeChange = () => {
-      setThemeMode(localStorage.getItem("superflex-theme-mode") || "light");
-    };
-    window.addEventListener("superflex-theme-mode-changed", handleModeChange);
-    return () => {
-      window.removeEventListener("superflex-theme-mode-changed", handleModeChange);
-    };
-  }, []);
+  const themeMode = usePreferencesStore((state) => state.themeMode);
 
   const chartData = useMemo(() => {
     if (!calculatedStats) return null;

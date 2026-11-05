@@ -5,7 +5,6 @@ const StatsCard = ({
   label,
   value,
   subValue,
-  delay = 0,
   className = "",
   variant = "default",
   iconTone = "lavender",

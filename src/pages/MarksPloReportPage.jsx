@@ -15,7 +15,6 @@ function MarksPloReportPage() {
   const hiddenContentRef = useRef(null);
 
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseData = () => {
       try {
@@ -26,7 +25,6 @@ function MarksPloReportPage() {
             root = hiddenContentRef.current;
           } else {
             setLoading(false);
-            window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
             return;
           }
         }
@@ -65,9 +63,9 @@ function MarksPloReportPage() {
         });
         setAlerts(alertList);
 
-        const legacyForm = root.querySelector("form") || root.querySelector(".row");
-        if (legacyForm) {
-          const select = legacyForm.querySelector("select#SemId");
+        const portalForm = root.querySelector("form") || root.querySelector(".row");
+        if (portalForm) {
+          const select = portalForm.querySelector("select#SemId");
           if (select) {
             const opts = Array.from(select.options).map((o) => ({
               label: o.text.trim(),
@@ -166,11 +164,9 @@ function MarksPloReportPage() {
         }
 
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (e) {
         console.error("Marks PLO Parsing Error", e);
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 
@@ -257,7 +253,7 @@ function MarksPloReportPage() {
                   <div><h2 className="text-base font-bold">Detailed results</h2><p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Course learning outcome attainment by assessment.</p></div>
                 </div>
                 <div className="sf-data-table-wrapper overflow-x-auto scrollbar-hide">
-                  <div className="legacy-table-wrapper [&_table]:w-full [&_table]:border-collapse [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap" dangerouslySetInnerHTML={{ __html: reportHtml }} />
+                  <div className="portal-table-wrapper [&_table]:w-full [&_table]:border-collapse [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap" dangerouslySetInnerHTML={{ __html: reportHtml }} />
                 </div>
               </section>
             ) : (

@@ -143,7 +143,6 @@ function AttendancePage() {
   });
 
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
   }, []);
 
   useEffect(() => {
@@ -165,28 +164,25 @@ function AttendancePage() {
         const root = findFlexPageRoot(document);
         if (!root) {
           setLoading(false);
-          window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
           return;
         }
 
-        const legacyForm = findAttendanceForm(document);
-        const parsed = parseAttendancePage(root, legacyForm);
+        const portalForm = findAttendanceForm(document);
+        const parsed = parseAttendancePage(root, portalForm);
         setAlerts(parsed.alerts);
         setSemesters(parsed.semesters);
-        if (legacyForm && parsed.semesters.length && hiddenFormRef.current) {
+        if (portalForm && parsed.semesters.length && hiddenFormRef.current) {
           hiddenFormRef.current.innerHTML = "";
-          hiddenFormRef.current.appendChild(legacyForm.cloneNode(true));
+          hiddenFormRef.current.appendChild(portalForm.cloneNode(true));
         }
 
         setCourses(parsed.courses);
         if (parsed.courses.length > 0) setSelectedCourseId(parsed.courses[0].id);
 
         root.style.display = "none";
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
         setLoading(false);
       } catch (e) {
         console.error("Attendance Parsing Error", e);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
         setLoading(false);
       }
     };

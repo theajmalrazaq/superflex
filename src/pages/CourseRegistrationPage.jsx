@@ -12,14 +12,12 @@ function CourseRegistrationPage() {
   const [tables, setTables] = useState([]);
 
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseData = () => {
       try {
         const root = findFlexPageRoot(document);
         if (!root) {
           setLoading(false);
-          window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
           return;
         }
 
@@ -30,11 +28,9 @@ function CourseRegistrationPage() {
         root.style.display = "none";
 
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (e) {
         console.error("Course Registration Parsing Error", e);
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 

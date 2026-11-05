@@ -1,11 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
-import { createPortal } from "react-dom";
 import {
   AlertCircle,
   BookOpen,
   Bookmark,
   Layers,
-  Award,
   Settings,
   X,
   RotateCcw,
@@ -21,6 +19,7 @@ import SuperTabs from "../components/ui/SuperTabs";
 import PageLayout from "../components/layouts/PageLayout";
 import { PageSkeleton } from "../components/ui/Skeleton";
 import BookmarksModal from "../components/ui/BookmarksModal";
+import BottomSheet, { BottomSheetClose, BottomSheetDescription, BottomSheetTitle } from "../components/ui/BottomSheet";
 
 import { processCourseMarks } from "../utils/marksProcessor";
 import { findMarksForm, parseMarksPage } from "../parsers/marks";
@@ -324,22 +323,19 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount, sectionTitle }) => {
 
   const itemType = getItemType();
 
-  if (!isOpen) return null;
-
   const validCount = Number.isInteger(Number(count)) && Number(count) >= 1 && Number(count) <= itemCount;
   const validWeight = Number.isFinite(Number(totalWeight)) && Number(totalWeight) >= 0;
   const plural = count > 1 ? (itemType === "Quiz" ? "zes" : "s") : "";
 
-  return createPortal(
-    <div className="fixed inset-0 z-[2147483647] flex items-end justify-center bg-slate-950/60 px-3 pb-3 pt-3 backdrop-blur-md" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
-      <section role="dialog" aria-modal="true" aria-labelledby="best-of-title" className="relative flex max-h-[76dvh] w-full max-w-2xl flex-col overflow-hidden rounded-[34px] bg-white text-slate-900 shadow-[0_18px_60px_rgba(35,0,82,.24)] dark:bg-[#090909] dark:text-[#f5f6fb]">
+  return (
+    <BottomSheet open={isOpen} onClose={onClose}>
         <div className="flex shrink-0 justify-center pt-3"><span className="h-1.5 w-14 rounded-full bg-[#ded9e5] dark:bg-white" /></div>
-        <button type="button" onClick={onClose} aria-label="Close calculator" className="absolute right-4 top-6 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"><X size={20} /></button>
+        <BottomSheetClose asChild><button type="button" aria-label="Close calculator" className="absolute right-4 top-6 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"><X size={20} /></button></BottomSheetClose>
         <header className="flex shrink-0 flex-col items-center px-6 pb-4 pt-3 text-center sm:px-8">
           <span className="mb-2 flex h-11 w-11 items-center justify-center rounded-[16px] bg-[#230052] text-white dark:bg-white dark:text-[#101027]"><Settings size={21} /></span>
           <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#230052]/65 dark:text-white">Marks simulator</p>
-          <h2 id="best-of-title" className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">Best {itemType} calculator</h2>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{sectionTitle} · Choose how the assessment weight is distributed.</p>
+          <BottomSheetTitle className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">Best {itemType} calculator</BottomSheetTitle>
+          <BottomSheetDescription className="mt-1 text-sm text-slate-500 dark:text-slate-400">{sectionTitle} · Choose how the assessment weight is distributed.</BottomSheetDescription>
         </header>
 
         <div className="min-h-0 space-y-4 overflow-y-auto px-5 pb-4 sm:px-8">
@@ -361,303 +357,11 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount, sectionTitle }) => {
         <footer className="shrink-0 border-t border-slate-100 bg-white/95 px-5 pb-3 pt-3 dark:border-white/10 dark:bg-[#090909]/95 sm:px-8">
           <button type="button" disabled={!validCount || !validWeight} onClick={() => onApply(Number(count), Number(totalWeight))} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#230052] px-5 py-2.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-[#101027]"><Check size={17} />Apply calculation</button>
         </footer>
-      </section>
-    </div>,
-    document.body,
-  );
-};
-
-const LegacyAssessmentView = ({
-  section,
-  onUpdate,
-  markedItems,
-  onToggleMark,
-  courseId,
-  onBestOf,
-  onReset,
-  onToggleSimulation,
-  isSimulationMode,
-}) => {
-  const [isBestOfOpen, setIsBestOfOpen] = useState(false);
-  const isGrandTotal = section.title.includes("Grand Total");
-  const isBestOfEligible =
-    !isGrandTotal &&
-    (section.title.toLowerCase().includes("quiz") ||
-      section.title.toLowerCase().includes("assignment") ||
-      section.title.toLowerCase().includes("lab"));
-  const obtained = section.obtained || 0;
-  const weight = section.weight || 0;
-  const percentage = weight > 0 ? (obtained / weight) * 100 : 0;
-
-  const statusBg =
-    percentage >= 80
-      ? "bg-emerald-500/10"
-      : percentage >= 60
-        ? "bg-amber-500/10"
-        : "bg-rose-500/10";
-
-  const borderColor =
-    percentage >= 80
-      ? "border-emerald-500/20"
-      : percentage >= 60
-        ? "border-amber-500/20"
-        : "border-rose-500/20";
-
-  const assessmentRows = section.rows?.filter((r) => r.title !== "Total") || [];
-  const hasAssessments = assessmentRows.length > 0;
-
-  return (
-    <section id={`marks-section-${section.id}`} className={`group overflow-hidden rounded-[24px] border transition-colors ${isGrandTotal ? "border-[#230052]/15 bg-white dark:border-white dark:bg-black" : "border-black/[0.06] bg-white dark:border-white/[0.14] dark:bg-black"}`}>
-      <div className="w-full">
-        <div className="flex flex-col justify-between gap-4 border-b border-black/[0.06] p-5 dark:border-white/[0.1] sm:flex-row sm:items-center sm:p-6">
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-3">
-              <h3 className="text-xl font-bold text-foreground">{section.title}</h3>
-              {isGrandTotal && (
-                <span className="rounded-full bg-[#230052]/10 px-2.5 py-1 text-[10px] font-bold text-[#230052] dark:bg-white/15 dark:text-white">
-                  Final
-                </span>
-              )}
-              {isSimulationMode && !isGrandTotal && (
-                <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-500 text-[10px] font-bold  flex items-center gap-1">
-                  <Zap size={10} fill="currentColor" /> Simulating
-                </span>
-              )}
-            </div>
-            {hasAssessments && (
-              <p className="text-sm font-medium text-foreground/50">
-                {assessmentRows.length} items &bull; Breakdown & Statistics
-              </p>
-            )}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            {!isGrandTotal && hasAssessments && (
-              <button
-                onClick={onToggleSimulation}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-medium text-sm border ${
-                  isSimulationMode
-                    ? "bg-amber-500 text-foreground border-amber-600"
-                    : "bg-slate-100 text-slate-600 border-black/[0.06] hover:bg-slate-200 dark:bg-white/[0.08] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/[0.12]"
-                }`}
-                title={
-                  isSimulationMode
-                    ? "Exit Simulation Mode"
-                    : "Enter Simulation Mode (Custom Weights)"
-                }
-              >
-                <Zap size={16} fill={isSimulationMode ? "currentColor" : "none"} />
-                {isSimulationMode ? "Simulating" : "Simulate"}
-              </button>
-            )}
-
-            {isBestOfEligible && isSimulationMode && hasAssessments && (
-              <button
-                onClick={() => setIsBestOfOpen(true)}
-                className="flex items-center gap-2 rounded-full border border-[#230052]/15 bg-[#230052]/[.06] px-4 py-2 text-sm font-bold text-[#230052] transition-colors hover:bg-[#230052]/10 dark:border-white dark:bg-white/[.1] dark:text-white dark:hover:bg-white/15"
-              >
-                <Settings size={16} />
-                Best Of
-              </button>
-            )}
-
-            {!isGrandTotal && isSimulationMode && hasAssessments && (
-              <button
-                onClick={onReset}
-                className="flex items-center gap-2 rounded-full border border-black/[0.06] bg-slate-100 px-4 py-2 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-200 dark:border-white/10 dark:bg-white/[0.08] dark:text-slate-300 dark:hover:bg-white/[0.12]"
-                title="Reset to original scores"
-              >
-                <RotateCcw size={16} />
-                Reset
-              </button>
-            )}
-          </div>
-
-          <BestOfModal
-            isOpen={isBestOfOpen}
-            onClose={() => setIsBestOfOpen(false)}
-            itemCount={assessmentRows.length}
-            sectionTitle={section.title}
-            onApply={(count, weight) => {
-              onBestOf(count, weight);
-              setIsBestOfOpen(false);
-            }}
-          />
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3 border-b border-black/[0.06] p-5 dark:border-white/[0.1] sm:p-6">
-          <StatsCard
-            icon={Layers}
-            label="Weight"
-            value={weight.toFixed(2)}
-            delay={100}
-            className="!min-h-[76px] !min-w-[150px] !gap-2 !rounded-[20px] !border !border-black/[0.06] !bg-slate-50 !p-4 dark:!border-white/[0.1] dark:!bg-white/[0.04]"
-          />
-          <StatsCard
-            icon={Award}
-            label="Obtained"
-            value={obtained.toFixed(2)}
-            delay={200}
-            className={`!min-h-[76px] !min-w-[150px] !gap-2 !rounded-[20px] !border !p-4 ${statusBg} ${borderColor}`}
-          />
-        </div>
-
-        <div className="p-4 sm:p-6">
-          <div className="w-full overflow-x-auto rounded-2xl border border-black/[0.06] bg-white scrollbar-hide dark:border-white/[0.1] dark:bg-black">
-            <table className="sf-data-table w-full text-sm text-left border-collapse scrollbar-hide">
-              <thead>
-                <tr className="border-b border-black/[0.06] bg-slate-50 dark:border-white/[0.1] dark:bg-white/[0.05]">
-                  <th className="sticky top-0 z-20 bg-slate-50 px-4 py-3 text-left text-xs font-bold text-foreground/60 dark:bg-[#111] sm:px-5">
-                    Item Name
-                  </th>
-                  <th className="sticky top-0 z-20 bg-slate-50 px-4 py-3 text-center text-xs font-bold text-foreground/60 dark:bg-[#111] sm:px-5">
-                    Weightage
-                  </th>
-                  <th className="sticky top-0 z-20 bg-slate-50 px-4 py-3 text-center text-xs font-bold text-foreground/60 dark:bg-[#111] sm:px-5">
-                    Total Marks
-                  </th>
-                  <th className="sticky top-0 z-20 bg-slate-50 px-4 py-3 text-center text-xs font-bold text-foreground/60 dark:bg-[#111] sm:px-5">
-                    Obtained
-                  </th>
-                  <th className="sticky top-0 z-20 bg-slate-50 px-4 py-3 text-center text-xs font-bold text-[#230052] dark:bg-[#111] dark:text-white sm:px-5">
-                    Obt Weight
-                  </th>
-                  <th className="sticky top-0 z-20 bg-slate-50 px-4 py-3 text-center text-xs font-bold text-foreground/60 dark:bg-[#111] sm:px-5">
-                    Avg
-                  </th>
-                  <th className="sticky top-0 z-20 bg-slate-50 px-4 py-3 text-center text-xs font-bold text-foreground/60 dark:bg-[#111] sm:px-5">
-                    Std Dev
-                  </th>
-                  <th className="sticky top-0 z-20 bg-slate-50 px-4 py-3 text-center text-xs font-bold text-foreground/60 dark:bg-[#111] sm:px-5">
-                    Min
-                  </th>
-                  <th className="sticky top-0 z-20 bg-slate-50 px-4 py-3 text-center text-xs font-bold text-foreground/60 dark:bg-[#111] sm:px-5">
-                    Max
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-foreground/5">
-                {assessmentRows.map((row, idx) => {
-                  const uniqueId = `${courseId}-${section.id}-${row.title}`;
-                  const isMarked = markedItems?.has(uniqueId);
-                  return (
-                    <tr
-                      key={idx}
-                      className={`group border-b border-black/[0.05] transition-colors dark:border-white/[0.08] ${
-                        !row.included ? "opacity-40 grayscale-[0.8]" : ""
-                      } ${
-                        isMarked ? "bg-[#230052]/[.06] dark:bg-white/[.1]" : "hover:bg-slate-50 dark:hover:bg-white/[.04]"
-                      }`}
-                    >
-                      <td className="px-6 py-4 font-medium text-foreground/90">
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={() => onToggleMark?.(uniqueId)}
-                            className={`p-1.5 rounded-full shrink-0 transition-all border ${
-                              isMarked
-                                ? "bg-[#230052] text-white border-[#230052] dark:bg-white dark:text-[#0a192f] dark:border-white"
-                                : "bg-slate-100 text-foreground/40 border-black/[0.06] hover:text-foreground/60 hover:bg-slate-200 dark:bg-white/[0.06] dark:border-white/10 dark:hover:bg-white/[.12]"
-                            }`}
-                          >
-                            <Bookmark size={16} fill={isMarked ? "currentColor" : "none"} />
-                          </button>
-                          <div className="flex items-center gap-2">
-                            {row.included ? (
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#230052] dark:bg-white"></div>
-                            ) : (
-                              <div className="w-1.5 h-1.5 rounded-full bg-tertiary/80"></div>
-                            )}
-                            {row.title}
-                            {!row.included && (
-                              <span className="ml-2 text-[9px] font-bold bg-tertiary text-foreground/60 px-1.5 py-0.5 rounded ">
-                                Dropped
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-center text-foreground/60">
-                        <input
-                          type="text"
-                          value={row.weight}
-                          onChange={(e) => onUpdate(idx, "weight", e.target.value)}
-                          className="w-16 rounded bg-transparent text-center focus:border focus:border-[#230052] focus:outline-none hover:bg-slate-100 dark:focus:border-white dark:hover:bg-white/[.08]"
-                        />
-                      </td>
-                      <td className="px-6 py-4 text-center text-foreground/60">
-                        <input
-                          type="text"
-                          value={row.total}
-                          onChange={(e) => onUpdate(idx, "total", e.target.value)}
-                          className="w-16 rounded bg-transparent text-center focus:border focus:border-[#230052] focus:outline-none hover:bg-slate-100 dark:focus:border-white dark:hover:bg-white/[.08]"
-                        />
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <input
-                          type="text"
-                          value={row.obtained !== null ? row.obtained : ""}
-                          onChange={(e) => onUpdate(idx, "obtained", e.target.value)}
-                          className={`w-16 rounded bg-transparent text-center text-base font-bold focus:border focus:border-[#230052] focus:outline-none hover:bg-slate-100 dark:focus:border-white dark:hover:bg-white/[.08] ${
-                            (row.obtained / row.total) * 100 >= 80
-                            ? "text-emerald-700 dark:text-emerald-300"
-                              : (row.obtained / row.total) * 100 >= 60
-                              ? "text-amber-700 dark:text-amber-300"
-                              : "text-rose-700 dark:text-rose-300"
-                          }`}
-                        />
-                      </td>
-                      <td className="bg-[#230052]/[.04] px-4 py-4 text-center font-bold text-[#230052] dark:bg-white/[.08] dark:text-white sm:px-5">
-                        {(row.total > 0 ? (row.obtained / row.total) * row.weight : 0).toFixed(2)}
-                      </td>
-                      <td className="px-6 py-4 text-center text-foreground/50">
-                        ~{row.avg.toFixed(2)}
-                      </td>
-                      <td className="px-6 py-4 text-center text-foreground/50">
-                        ~{row.stdDev.toFixed(2)}
-                      </td>
-                      <td className="px-6 py-4 text-center text-foreground/50">
-                        {row.min.toFixed(1)}
-                      </td>
-                      <td className="px-6 py-4 text-center text-foreground/50">
-                        {row.max.toFixed(1)}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-              <tfoot className="border-t-2 border-black/[0.08] bg-slate-50 font-bold dark:border-white/[0.1] dark:bg-white/[0.05]">
-                <tr>
-                  <td className="px-6 py-5 text-foreground">Total Summary</td>
-                  <td className="px-6 py-5 text-center text-foreground">{weight.toFixed(2)}</td>
-                  <td className="px-6 py-5 text-center">-</td>
-                  <td className="px-6 py-5 text-center text-foreground/60">-</td>
-                  <td className="px-6 py-5 text-center text-accent text-lg">
-                    {obtained.toFixed(2)}
-                  </td>
-                  <td className="px-6 py-5 text-center text-foreground/60">
-                    ~{section.stats?.weightedAvg.toFixed(2) || "0.00"}
-                  </td>
-                  <td className="px-6 py-5 text-center text-foreground/60">
-                    ~{section.stats?.weightedStdDev.toFixed(2) || "0.00"}
-                  </td>
-                  <td className="px-6 py-5 text-center text-foreground/60 text-xs">
-                    ~{section.stats?.weightedMin.toFixed(2) || "0.00"}
-                  </td>
-                  <td className="px-6 py-5 text-center text-foreground/60 text-xs">
-                    ~{section.stats?.weightedMax.toFixed(2) || "0.00"}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
+    </BottomSheet>
   );
 };
 
 const recalculateCourse = processCourseMarks;
-
 const AssessmentView = ({
   section,
   onUpdate,
@@ -790,13 +494,13 @@ function MarksPage() {
         const root = findFlexPageRoot(document);
         if (!root) return;
 
-        const legacyForm = findMarksForm(document);
-        const parsed = parseMarksPage(root, legacyForm);
+        const portalForm = findMarksForm(document);
+        const parsed = parseMarksPage(root, portalForm);
         setAlerts(parsed.alerts);
         setSemesters(parsed.semesters);
-        if (legacyForm && parsed.semesters.length && hiddenFormRef.current) {
+        if (portalForm && parsed.semesters.length && hiddenFormRef.current) {
           hiddenFormRef.current.innerHTML = "";
-          hiddenFormRef.current.appendChild(legacyForm.cloneNode(true));
+          hiddenFormRef.current.appendChild(portalForm.cloneNode(true));
         }
 
         setCourses(parsed.courses);

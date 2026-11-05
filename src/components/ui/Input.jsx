@@ -1,4 +1,5 @@
 import React from "react";
+import { cn } from "../../utils/cn";
 
 const Input = ({
   label,
@@ -11,7 +12,7 @@ const Input = ({
   ...props
 }) => {
   return (
-    <div className={`space-y-2 w-full ${className}`}>
+    <div className={cn("w-full space-y-2", className)}>
       {label && (
         <label className="text-[10px] font-medium text-foreground/50  tracking-[0px] px-1">
           {label}
@@ -23,13 +24,11 @@ const Input = ({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`
-            w-full bg-foreground/[0.03] border border-foreground/10 text-foreground p-4 rounded-2xl text-sm font-medium 
-            focus:outline-none focus:border-accent/30 focus:bg-foreground/[0.05]
-            placeholder:text-foreground/40 placeholder:text-xs placeholder: placeholder:tracking-[0px]
-            transition-all duration-300
-            ${error ? "border-rose-500/50 focus:border-rose-500" : ""}
-          `}
+          aria-invalid={Boolean(error)}
+          className={cn(
+            "w-full rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-4 text-sm font-medium text-foreground transition-all duration-300 placeholder:text-xs placeholder:tracking-[0px] placeholder:text-foreground/40 focus:border-accent/30 focus:bg-foreground/[0.05] focus:outline-none",
+            error && "border-rose-500/50 focus:border-rose-500",
+          )}
           {...props}
         />
         {}
@@ -51,7 +50,7 @@ export const TextArea = ({
   ...props
 }) => {
   return (
-    <div className={`space-y-2 w-full ${className}`}>
+    <div className={cn("w-full space-y-2", className)}>
       {label && (
         <label className="text-[10px] font-bold text-foreground/50  tracking-[0px] px-1">
           {label}
@@ -62,13 +61,11 @@ export const TextArea = ({
         onChange={onChange}
         placeholder={placeholder}
         rows={rows}
-        className={`
-          w-full bg-foreground/[0.03] border border-foreground/10 text-foreground p-4 rounded-2xl text-sm font-medium 
-          focus:outline-none focus:border-accent/30 focus:bg-foreground/[0.05]
-          placeholder:text-foreground/40 placeholder:text-xs placeholder: placeholder:tracking-[0px]
-          transition-all duration-300 resize-none
-          ${error ? "border-rose-500/50 focus:border-rose-500" : ""}
-        `}
+        aria-invalid={Boolean(error)}
+        className={cn(
+          "w-full resize-none rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-4 text-sm font-medium text-foreground transition-all duration-300 placeholder:text-xs placeholder:tracking-[0px] placeholder:text-foreground/40 focus:border-accent/30 focus:bg-foreground/[0.05] focus:outline-none",
+          error && "border-rose-500/50 focus:border-rose-500",
+        )}
         {...props}
       />
       {error && <p className="text-[10px] text-rose-400 font-bold   px-1">{error}</p>}

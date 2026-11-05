@@ -58,7 +58,6 @@ function SubmitFeedbackPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseFeedbackQuestions = () => {
       const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
@@ -153,11 +152,9 @@ function SubmitFeedbackPage() {
         root.style.display = "none";
 
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (err) {
         console.error("Feedback Quesion Parser Error:", err);
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 
@@ -409,7 +406,7 @@ function SubmitFeedbackPage() {
         }
         .Cap { text-transform: uppercase; }
         
-        /* Eliminate legacy portal focus styles */
+        /* Eliminate conflicting portal focus styles */
         input[type="radio"]:focus + span,
         input[type="radio"]:active + span {
             border-color: transparent !important;

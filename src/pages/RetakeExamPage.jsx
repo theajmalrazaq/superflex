@@ -11,7 +11,6 @@ import {
   FileText,
   Download,
   AlertTriangle,
-  ChevronDown,
   ChevronRight,
   ShieldCheck,
   Upload,
@@ -19,10 +18,12 @@ import {
   Check,
   Shield,
   ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import Modal from "../components/ui/Modal";
 import Button from "../components/ui/Button";
 import { TextArea } from "../components/ui/Input";
+import SelectMenu from "../components/ui/SelectMenu";
 
 const RetakeExamSkeleton = () => (
   <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8" role="status" aria-label="Loading retake exam details">
@@ -34,66 +35,20 @@ const RetakeExamSkeleton = () => (
 );
 
 const ReasonSelector = ({ reasons, selectedReason, onChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const selectorRef = useRef(null);
-  const selectedLabel = reasons.find((reason) => reason.value === selectedReason)?.label || "Choose a reason";
-
-  useEffect(() => {
-    if (!isOpen) return undefined;
-    const handlePointerDown = (event) => {
-      if (!selectorRef.current?.contains(event.target)) setIsOpen(false);
-    };
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") setIsOpen(false);
-    };
-    document.addEventListener("mousedown", handlePointerDown);
-    document.addEventListener("touchstart", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", handlePointerDown);
-      document.removeEventListener("touchstart", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen]);
-
   return (
-    <div ref={selectorRef} className="relative">
-      <button
-        type="button"
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-        aria-controls="retake-reason-options"
-        onClick={() => setIsOpen((open) => !open)}
-        className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border border-black/[0.08] bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-900 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#230052]/30 dark:border-white/[0.12] dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1] dark:focus-visible:ring-white/30"
-      >
-        <span className="truncate">{selectedLabel}</span>
-        <ChevronDown size={16} className={`shrink-0 text-slate-500 transition-transform dark:text-slate-400 ${isOpen ? "rotate-180" : ""}`} />
-      </button>
-      {isOpen && (
-        <div id="retake-reason-options" role="listbox" aria-label="Retake situation" className="absolute inset-x-0 top-full z-40 mt-2 max-h-60 overflow-y-auto rounded-2xl border border-black/[0.08] bg-white p-1.5 text-slate-900 shadow-[0_12px_32px_rgba(15,23,42,.16)] dark:border-white/[0.12] dark:bg-[#111] dark:text-white dark:shadow-black/40">
-          {reasons.map((reason, index) => {
-            const isSelected = reason.value === selectedReason;
-            return (
-              <button
-                key={`${reason.value}-${index}`}
-                type="button"
-                role="option"
-                aria-selected={isSelected}
-                onClick={() => { onChange(reason.value); setIsOpen(false); }}
-                className={`flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-left text-sm transition-colors ${isSelected ? "bg-[#230052] font-semibold text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-white/[0.08]"}`}
-              >
-                <span className="min-w-0 truncate">{reason.label}</span>
-                {isSelected && <Check size={15} className="shrink-0" />}
-              </button>
-            );
-          })}
-        </div>
-      )}
-    </div>
+    <SelectMenu
+      value={selectedReason}
+      options={reasons}
+      onChange={onChange}
+      placeholder="Choose a reason"
+      ariaLabel="Retake situation"
+      triggerClassName="w-full rounded-xl border border-black/[0.08] bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 transition-colors hover:bg-slate-100 dark:border-white/[0.12] dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.1]"
+      contentClassName="w-[var(--radix-select-trigger-width)]"
+    />
   );
 };
 
-const RetakeModal = ({ isOpen, onClose, onSubmit, selectedReason, fee }) => {
+const RetakeModal = ({ isOpen, onClose, onSubmit, fee }) => {
   const [file, setFile] = useState(null);
   const [remarks, setRemarks] = useState("");
   const fileInputRef = useRef(null);
@@ -290,7 +245,6 @@ function RetakeExamPage() {
   const visibleAlerts = areAlertsExpanded ? alerts : alerts.slice(0, 1);
 
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseRetakeData = () => {
       const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
@@ -401,11 +355,9 @@ function RetakeExamPage() {
         root.style.zIndex = "-1";
 
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (err) {
         console.error("Retake Parser Error:", err);
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 
@@ -455,10 +407,10 @@ function RetakeExamPage() {
 
       setSelectedCourses(newSelected);
 
-      const legacyCheckbox = document.getElementById(course.checkboxId);
-      if (legacyCheckbox) {
-        if (legacyCheckbox.checked !== isChecking) {
-          legacyCheckbox.click();
+      const portalCheckbox = document.getElementById(course.checkboxId);
+      if (portalCheckbox) {
+        if (portalCheckbox.checked !== isChecking) {
+          portalCheckbox.click();
         }
       }
     }
@@ -473,25 +425,25 @@ function RetakeExamPage() {
   };
 
   const handleModalSubmit = (file, remarks) => {
-    const legacyFileInput = document.getElementById("RetakeMidFile");
-    if (legacyFileInput) {
+    const portalFileInput = document.getElementById("RetakeMidFile");
+    if (portalFileInput) {
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(file);
-      legacyFileInput.files = dataTransfer.files;
-      legacyFileInput.dispatchEvent(new Event("change", { bubbles: true }));
+      portalFileInput.files = dataTransfer.files;
+      portalFileInput.dispatchEvent(new Event("change", { bubbles: true }));
     }
 
-    const legacyRemarks = document.getElementById("StdRmktxtarea");
-    if (legacyRemarks) {
-      legacyRemarks.value = remarks;
-      legacyRemarks.dispatchEvent(new Event("input", { bubbles: true }));
+    const portalRemarks = document.getElementById("StdRmktxtarea");
+    if (portalRemarks) {
+      portalRemarks.value = remarks;
+      portalRemarks.dispatchEvent(new Event("input", { bubbles: true }));
     }
 
     if (typeof window.fn_SubmitStdRemarks === "function") {
       window.fn_SubmitStdRemarks();
     } else {
-      const legacyBtn = document.querySelector('#remrksbtn input[type="button"]');
-      if (legacyBtn) legacyBtn.click();
+      const portalButton = document.querySelector('#remrksbtn input[type="button"]');
+      if (portalButton) portalButton.click();
     }
 
     setIsModalOpen(false);
@@ -512,17 +464,17 @@ function RetakeExamPage() {
       }
     });
 
-    const legacyReasonSelect = document.getElementById("DrpDwnRetakeReason");
-    if (legacyReasonSelect) {
-      legacyReasonSelect.value = selectedReason;
-      legacyReasonSelect.dispatchEvent(new Event("change", { bubbles: true }));
+    const portalReasonSelect = document.getElementById("DrpDwnRetakeReason");
+    if (portalReasonSelect) {
+      portalReasonSelect.value = selectedReason;
+      portalReasonSelect.dispatchEvent(new Event("change", { bubbles: true }));
     }
 
     if (typeof window.ftn_PrintExamRetakeRequestForm === "function") {
       window.ftn_PrintExamRetakeRequestForm();
     } else {
-      const legacyBtn = document.getElementById("btnDownloadExamRetakForm");
-      if (legacyBtn) legacyBtn.click();
+      const portalButton = document.getElementById("btnDownloadExamRetakForm");
+      if (portalButton) portalButton.click();
     }
   };
 
@@ -540,7 +492,6 @@ function RetakeExamPage() {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleModalSubmit}
-          selectedReason={selectedReason}
           fee={selectedCourses.size * 2000}
         />
 

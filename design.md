@@ -87,12 +87,12 @@ The homepage, sidebar, and account pages use the same light and dark color rules
 
 | Surface           | Light mode                                                                 | Dark mode                                                                                 |
 | :---------------- | :------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
-| Page backdrop     | Solid pale blue when Cloud mode is off; blue sky gradient when on | Solid black (`#000000`) when Cloud mode is off; night sky gradient when on |
+| Page backdrop     | Blue sky gradient beginning at `#62ABE0` | Dark blue-to-black night gradient |
 | Main dashboard cards | Solid white, fine `rgba(0,0,0,0.06)` border, no shadow | Solid black, fine `rgba(255,255,255,0.14)` border, no shadow |
 | Main text         | `#101010`                                                                  | `#f5f6fb`; supporting copy `#c4cad6`                                                      |
 | Primary buttons   | `#230052` with white text; hover `#370c72`                                 | Accent lavender `#a098ff` with `#0a192f` text; hover `#b7b0ff`                           |
 | Secondary buttons | Lilac `#dfc8fc` with `#230052` text; hover `#d2afff`                       | Accent lavender `#a098ff` with `#0a192f` text, or translucent white for neutral controls |
-| Cloud artwork     | Hidden when Cloud mode is off; visible over the sky when on                | Hidden when Cloud mode is off; `12%` opacity over the night sky when on                  |
+| Cloud artwork     | Visible over the sky gradient                | `12%` opacity over the night gradient                  |
 
 The homepage greeting is a transparent masthead over the sky backdrop; keep it separate from content cards. Use solid dashboard cards in both themes with `rounded-[32px]` corners. Keep the four overview stat cards in equal-width columns on wide screens and two columns on tablet screens. Align the Course Performance and Attendance Overview panels to equal heights with consistent padding and icon-led headers. Course Performance shows course tabs and expandable assessment categories. Attendance Overview shows a row for each subject with one square per class session; use the theme accent for present sessions, rose for absent sessions, and a neutral fill when status is unknown. Keep the login form card flat and separate from dashboard cards.
 

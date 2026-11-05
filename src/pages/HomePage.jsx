@@ -423,9 +423,9 @@ function HomePage() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
-                  <StatsCard variant="dashboard" icon={GraduationCap} iconTone="plum" label="Degree Program" value={universityInfo?.Degree || "..."} delay={0} />
-                  <StatsCard variant="dashboard" icon={Users} iconTone="lavender" label="Section" value={universityInfo?.Section || "..."} delay={100} />
-                  <StatsCard variant="dashboard" icon={Award} iconTone="neutral" label="Registered Courses" value={coursesData.length || 0} delay={200} />
+                  <StatsCard variant="dashboard" icon={GraduationCap} iconTone="plum" label="Degree Program" value={universityInfo?.Degree || "..."} />
+                  <StatsCard variant="dashboard" icon={Users} iconTone="lavender" label="Section" value={universityInfo?.Section || "..."} />
+                  <StatsCard variant="dashboard" icon={Award} iconTone="neutral" label="Registered Courses" value={coursesData.length || 0} />
                   <StatsCard
                     variant="dashboard"
                     icon={Activity}
@@ -433,7 +433,6 @@ function HomePage() {
                     label="Critical Attendance"
                     value={loadingAttendance ? <Skeleton className="my-1 h-6 w-24" /> : mostAbsentSubject?.title || "None"}
                     subValue={loadingAttendance ? <Skeleton className="h-3 w-16" /> : mostAbsentSubject ? `${mostAbsentSubject.absent} Absents` : ""}
-                    delay={300}
                   />
                 </div>
               </section>

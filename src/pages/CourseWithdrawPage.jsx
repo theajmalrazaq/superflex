@@ -240,7 +240,6 @@ function CourseWithdrawPage() {
   const hiddenContentRef = useRef(null);
 
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseWithdrawData = () => {
       try {
@@ -342,11 +341,9 @@ function CourseWithdrawPage() {
         root.style.zIndex = "-1";
 
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (err) {
         console.error("Course Withdraw Parser Error", err);
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 
@@ -389,7 +386,6 @@ function CourseWithdrawPage() {
     if (selected.length === 0) return;
 
     setIsSubmitting(true);
-    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     try {
       const formData = new FormData();
@@ -424,7 +420,6 @@ function CourseWithdrawPage() {
     } finally {
       setIsSubmitting(false);
       setIsModalOpen(false);
-      window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
     }
   };
 

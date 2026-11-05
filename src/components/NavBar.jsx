@@ -21,10 +21,16 @@ import {
   X,
   XCircle,
   Clock3,
+  GripVertical,
 } from "lucide-react";
+import { DragDropProvider } from "@dnd-kit/react";
+import { useSortable } from "@dnd-kit/react/sortable";
+import { move } from "@dnd-kit/helpers";
 import { Logo } from "./ui/Logo";
 import ProfileImageModal from "./ui/ProfileImageModal";
 import { getExtensionUrl } from "../utils/extensionApi";
+import { usePreferencesStore } from "../stores/preferencesStore";
+import { sidebarLinksSchema } from "../stores/preferencesSchemas";
 
 const LINK_GROUPS = {
   Home: "Overview",
@@ -72,10 +78,11 @@ function readProfileImage() {
 
 function readSidebarLinks() {
   try {
-    const storedLinks = JSON.parse(localStorage.getItem("superflex-sidebar-links") || "[]");
-    if (!Array.isArray(storedLinks)) return [];
-    return storedLinks.flatMap((link) => {
-      if (!link?.text || !link?.href) return [];
+    const parsed = sidebarLinksSchema.safeParse(
+      JSON.parse(localStorage.getItem("superflex-sidebar-links") || "[]"),
+    );
+    if (!parsed.success) return [];
+    return parsed.data.flatMap((link) => {
       try {
         const url = new URL(link.href, window.location.origin);
         if (url.origin !== window.location.origin || !url.pathname.startsWith("/")) return [];
@@ -110,19 +117,45 @@ function SidebarLink({ link, active, onNavigate, compact = false }) {
   );
 }
 
+const getLinkId = (link) => `${link.action || link.path || link.href || "link"}:${link.text}`;
+
+function SortableSidebarLink({ link, active, onNavigate, index, group, disabled }) {
+  const { ref, handleRef, isDragging } = useSortable({
+    id: getLinkId(link),
+    index,
+    group,
+    disabled,
+  });
+
+  return (
+    <div ref={ref} className={`group relative ${isDragging ? "z-10 opacity-70" : ""}`}>
+      <SidebarLink link={link} active={active} onNavigate={onNavigate} />
+      {!disabled && (
+        <button
+          ref={handleRef}
+          type="button"
+          aria-label={`Reorder ${link.text}`}
+          title="Drag to reorder"
+          onClick={(event) => event.stopPropagation()}
+          className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 cursor-grab rounded-full p-1 text-white opacity-0 transition-opacity focus:pointer-events-auto focus:opacity-70 active:cursor-grabbing group-hover:pointer-events-auto group-hover:opacity-40"
+        >
+          <GripVertical size={13} />
+        </button>
+      )}
+    </div>
+  );
+}
+
 function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   const [menuLinks, setMenuLinks] = useState(readSidebarLinks);
   const [profileImage, setProfileImage] = useState(readProfileImage);
   const [userName, setUserName] = useState("Student Account");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
-  const [themeMode, setThemeMode] = useState(
-    () => localStorage.getItem("superflex-theme-mode") || "light",
-  );
-  const [cloudMode, setCloudMode] = useState(() => {
-    const saved = localStorage.getItem("superflex-cloud-mode");
-    return saved ? saved === "on" : (localStorage.getItem("superflex-theme-mode") || "light") === "light";
-  });
+  const themeMode = usePreferencesStore((state) => state.themeMode);
+  const setThemeMode = usePreferencesStore((state) => state.setThemeMode);
+  const navOrder = usePreferencesStore((state) => state.navOrder);
+  const setNavOrder = usePreferencesStore((state) => state.setNavOrder);
   const callbacksRef = useRef({ onAttendanceLinkFound, onLinksFound });
   callbacksRef.current = { onAttendanceLinkFound, onLinksFound };
 
@@ -134,8 +167,19 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       if (!["Grade Report", "My Teachers", "Change Password"].includes(name)) groups[group].push(link);
     });
     groups.Settings.push({ text: "My Teachers", path: "/settings/teachers", action: "teachers" });
+    const orderIndex = new Map(navOrder.map((id, index) => [id, index]));
+    Object.values(groups).forEach((links) => {
+      links.sort((a, b) => {
+        const aIndex = orderIndex.get(getLinkId(a));
+        const bIndex = orderIndex.get(getLinkId(b));
+        if (aIndex == null && bIndex == null) return 0;
+        if (aIndex == null) return 1;
+        if (bIndex == null) return -1;
+        return aIndex - bIndex;
+      });
+    });
     return groups;
-  }, [menuLinks]);
+  }, [menuLinks, navOrder]);
 
   const changeThemeMode = (mode) => {
     setThemeMode(mode);
@@ -145,7 +189,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     document.dispatchEvent(new CustomEvent("superflex-theme-mode-changed", { detail: mode }));
   };
 
-  const sidebarLogoColor = themeMode === "light" && !cloudMode ? "#000000" : "#ffffff";
+  const sidebarLogoColor = "#ffffff";
   const sidebarLogoBoltColor = themeMode === "dark" ? "#a098ff" : "#0a192f";
 
   const isLinkActive = (link) => {
@@ -232,19 +276,6 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     localStorage.setItem("superflex-theme-mode", themeMode);
   }, [themeMode]);
 
-  useEffect(() => {
-    document.documentElement.classList.toggle("cloud-mode", cloudMode);
-    localStorage.setItem("superflex-cloud-mode", cloudMode ? "on" : "off");
-  }, [cloudMode]);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    localStorage.removeItem("superflex-theme-color");
-    root.style.removeProperty("--accent");
-    root.style.removeProperty("--accent-foreground");
-    root.classList.remove("custom-accent");
-  }, []);
-
   const navigate = (href, action) => {
     setMobileOpen(false);
     if (action === "teachers") {
@@ -254,8 +285,18 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     window.location.href = href;
   };
 
-  const renderGroups = () => (
-    <nav aria-label="Main navigation" className="space-y-5">
+  const handleDragEnd = (event) => {
+    if (event.canceled || !event.operation.source || !event.operation.target) return;
+    const groupedIds = Object.fromEntries(
+      GROUP_ORDER.map((group) => [group, groupedLinks[group].map(getLinkId)]),
+    );
+    const nextGroups = move(groupedIds, event);
+    setNavOrder(GROUP_ORDER.flatMap((group) => nextGroups[group] || []));
+  };
+
+  const renderGroups = (dragDisabled = false) => (
+    <DragDropProvider onDragEnd={handleDragEnd}>
+      <nav aria-label="Main navigation" className="space-y-5">
       {GROUP_ORDER.map((group) => {
         const links = groupedLinks[group];
         if (!links.length) return null;
@@ -265,12 +306,15 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
               {group}
             </p>
             <div className="space-y-1">
-              {links.map((link) => (
-                <SidebarLink
+              {links.map((link, index) => (
+                <SortableSidebarLink
                   key={`${link.path}-${link.text}`}
                   link={link}
                   active={isLinkActive(link)}
                   onNavigate={navigate}
+                  index={index}
+                  group={group}
+                  disabled={dragDisabled}
                 />
               ))}
             </div>
@@ -278,7 +322,8 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         );
       })}
       {!menuLinks.length && <p className="px-3 text-xs text-white/75">Loading navigation…</p>}
-    </nav>
+      </nav>
+    </DragDropProvider>
   );
 
   const sidebarContents = (mobile = false) => (
@@ -299,7 +344,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         )}
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 py-5">{renderGroups()}</div>
+      <div className="min-h-0 flex-1 overflow-y-auto px-3 py-5">{renderGroups(mobile)}</div>
 
       <div className="space-y-3 p-4">
         <button

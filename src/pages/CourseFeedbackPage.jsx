@@ -87,7 +87,6 @@ function CourseFeedbackPage() {
   }), [courses, statusFilter]);
 
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseFeedbackData = () => {
       const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
@@ -175,11 +174,9 @@ function CourseFeedbackPage() {
         root.style.zIndex = "-1";
 
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (err) {
         console.error("Feedback Parser Error:", err);
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 

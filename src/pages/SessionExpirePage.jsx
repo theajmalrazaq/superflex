@@ -6,7 +6,6 @@ const SessionExpirePage = () => {
   useEffect(() => {
     document.body.style.backgroundColor = "black";
     document.body.removeAttribute("bgcolor");
-    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
   }, []);
 
   return (

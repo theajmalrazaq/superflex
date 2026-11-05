@@ -102,8 +102,8 @@ function ChangePasswordPage() {
       portletBody.classList.add("!p-5", "sm:!p-8", "!text-[#101010]", "dark:!text-[#f5f6fb]", "!bg-transparent");
     }
 
-    const legacyButtons = element.querySelectorAll("#success, #error");
-    legacyButtons.forEach((btn) => btn.remove());
+    const portalStatusButtons = element.querySelectorAll("#success, #error");
+    portalStatusButtons.forEach((btn) => btn.remove());
 
     const form = element.querySelector("#ChangePassword");
     if (form) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { createPortal } from "react-dom";
 import { Check, ChevronRight, GraduationCap, Search, UserRound, X } from "lucide-react";
+import BottomSheet, { BottomSheetClose, BottomSheetDescription, BottomSheetTitle } from "./ui/BottomSheet";
 
 const Avatar = ({ teacher }) => teacher.image ? (
   <img src={teacher.image} alt="" className="h-11 w-11 shrink-0 rounded-2xl object-cover" loading="lazy" />
@@ -41,8 +41,6 @@ export default function TeacherSelectionModal({
     }
   }, [open]);
 
-  if (!open) return null;
-
   const addManualTeacher = () => {
     const name = manualName.trim();
     const email = manualEmail.trim();
@@ -59,16 +57,15 @@ export default function TeacherSelectionModal({
     setManualEmail("");
   };
 
-  return createPortal(
-    <div className="fixed inset-0 z-[2147483647] flex items-end justify-center bg-slate-950/60 px-3 pb-3 pt-3 backdrop-blur-md" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onSkip()}>
-      <section role="dialog" aria-modal="true" aria-labelledby="teacher-modal-title" className="relative flex max-h-[76dvh] w-full max-w-2xl flex-col overflow-hidden rounded-[34px] bg-white text-slate-900 shadow-[0_18px_60px_rgba(35,0,82,.24)] dark:bg-[#090909] dark:text-[#f5f6fb]">
+  return (
+    <BottomSheet open={open} onClose={onSkip}>
         <div className="flex shrink-0 justify-center pt-3"><span className="h-1.5 w-14 rounded-full bg-[#ded9e5] dark:bg-white" /></div>
-        <button type="button" onClick={onSkip} aria-label="Close teacher setup" className="absolute right-4 top-6 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"><X size={20} /></button>
+        <BottomSheetClose asChild><button type="button" aria-label="Close teacher setup" className="absolute right-4 top-6 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"><X size={20} /></button></BottomSheetClose>
         <header className="flex shrink-0 flex-col items-center px-6 pb-3 pt-3 text-center sm:px-8">
           <span className="mb-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-[#230052] text-white dark:bg-white dark:text-[#101027]"><GraduationCap size={23} /></span>
           <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#230052]/65 dark:text-white">Personalize your dashboard</p>
-          <h2 id="teacher-modal-title" className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">Who teaches your courses?</h2>
-          <p className="mt-1 max-w-md text-sm text-slate-500 dark:text-slate-400">Choose an instructor for each course. You can change these choices later.</p>
+          <BottomSheetTitle className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">Who teaches your courses?</BottomSheetTitle>
+          <BottomSheetDescription className="mt-1 max-w-md text-sm text-slate-500 dark:text-slate-400">Choose an instructor for each course. You can change these choices later.</BottomSheetDescription>
         </header>
 
         <div className="shrink-0 px-5 pb-2 sm:px-8">
@@ -124,9 +121,7 @@ export default function TeacherSelectionModal({
           {courseIndex < courses.length - 1 ? <button type="button" onClick={() => setCourseIndex((index) => Math.min(courses.length - 1, index + 1))} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#230052] px-5 py-2.5 text-sm font-bold text-white dark:bg-white dark:text-[#101027]">Next course <ChevronRight size={17} /></button> : <button type="button" onClick={onSave} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#230052] px-5 py-2.5 text-sm font-bold text-white dark:bg-white dark:text-[#101027]">Save choices <Check size={17} /></button>}
           <button type="button" onClick={onSkip} className="self-center px-3 py-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">Skip for now</button>
         </footer>
-      </section>
-    </div>,
-    document.body,
+    </BottomSheet>
   );
 }
 

@@ -15,14 +15,12 @@ function StudyPlanPage() {
   const [activeSemIdx, setActiveSemIdx] = useState(0);
 
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: true }));
 
     const parseData = () => {
       try {
         const root = findFlexPageRoot(document);
         if (!root) {
           setLoading(false);
-          window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
           return;
         }
 
@@ -33,11 +31,9 @@ function StudyPlanPage() {
         root.style.display = "none";
 
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       } catch (e) {
         console.error("Study Plan Parsing Error", e);
         setLoading(false);
-        window.dispatchEvent(new CustomEvent("superflex-update-loading", { detail: false }));
       }
     };
 
