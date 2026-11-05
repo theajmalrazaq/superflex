@@ -19,7 +19,7 @@ import NotificationBanner from "../components/ui/NotificationBanner";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
 import PageLayout from "../components/layouts/PageLayout";
-import { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import { PageSkeleton } from "../components/ui/Skeleton";
 import BookmarksModal from "../components/ui/BookmarksModal";
 
 import { processCourseMarks } from "../utils/marksProcessor";
@@ -1008,7 +1008,7 @@ function MarksPage() {
         <NotificationBanner alerts={alerts} />
 
         {loading ? (
-          <div className="flex flex-1 items-center justify-center"><LoadingSpinner /></div>
+          <PageSkeleton label="Loading marks" cards={4} rows={6} showHeader={false} />
         ) : selectedCourse ? (
           <div className="space-y-5">
             <MarksCourseTabs courses={courses} selectedId={selectedCourseId} onSelect={setSelectedCourseId} />

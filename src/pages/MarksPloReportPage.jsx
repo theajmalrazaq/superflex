@@ -3,7 +3,7 @@ import PageLayout from "../components/layouts/PageLayout";
 import { TrendingUp, Target, FileBarChart, Info } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import SuperTabs from "../components/ui/SuperTabs";
-import { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import { PageSkeleton } from "../components/ui/Skeleton";
 
 function MarksPloReportPage() {
   const [loading, setLoading] = useState(true);
@@ -224,9 +224,7 @@ function MarksPloReportPage() {
         </header>
 
         {loading ? (
-          <div className="flex flex-1 justify-center py-20">
-            <LoadingSpinner />
-          </div>
+          <PageSkeleton label="Loading marks PLO report" cards={3} rows={6} showHeader={false} />
         ) : (
           <div className="space-y-5">
             <NotificationBanner alerts={alerts} />

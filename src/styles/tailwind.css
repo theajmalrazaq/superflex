@@ -162,6 +162,156 @@ h6 {
   font-weight: 700;
 }
 
+/* Chat Markdown is explicitly styled because Tailwind's reset removes the
+   browser defaults that distinguish headings, lists, quotes, and code. */
+.markdown-body {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.markdown-body > :first-child {
+  margin-top: 0;
+}
+
+.markdown-body > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body p {
+  margin: 0 0 0.8em;
+  white-space: normal;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  color: var(--foreground);
+  line-height: 1.3;
+  margin: 1.25em 0 0.55em;
+}
+
+.markdown-body h1 {
+  font-size: 1.5em;
+}
+
+.markdown-body h2 {
+  font-size: 1.3em;
+}
+
+.markdown-body h3 {
+  font-size: 1.15em;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0 0 0.9em;
+  padding-left: 1.5em;
+}
+
+.markdown-body ul {
+  list-style: disc outside;
+}
+
+.markdown-body ol {
+  list-style: decimal outside;
+}
+
+.markdown-body li {
+  margin: 0.3em 0;
+  padding-left: 0.15em;
+}
+
+.markdown-body li > ul,
+.markdown-body li > ol {
+  margin: 0.3em 0;
+}
+
+.markdown-body strong {
+  color: var(--foreground);
+  font-weight: 700;
+}
+
+.markdown-body a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.dark .markdown-body a {
+  color: #a78bfa;
+}
+
+.markdown-body blockquote {
+  margin: 0.9em 0;
+  padding: 0.15em 0 0.15em 1em;
+  border-left: 3px solid color-mix(in srgb, var(--accent), transparent 35%);
+  color: color-mix(in srgb, var(--foreground), transparent 25%);
+}
+
+.markdown-body code {
+  border-radius: 0.4em;
+  background: color-mix(in srgb, var(--foreground), transparent 92%);
+  color: var(--foreground);
+  padding: 0.15em 0.35em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.88em;
+}
+
+.markdown-body pre {
+  max-width: 100%;
+  margin: 0.9em 0;
+  overflow-x: auto;
+  border: 1px solid color-mix(in srgb, var(--foreground), transparent 88%);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--foreground), transparent 95%);
+  padding: 0.9rem 1rem;
+}
+
+.markdown-body pre code {
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  font-size: 0.85em;
+  white-space: pre;
+}
+
+.markdown-body table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 0.9em 0;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.markdown-body th,
+.markdown-body td {
+  border: 1px solid color-mix(in srgb, var(--foreground), transparent 86%);
+  padding: 0.55em 0.7em;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.markdown-body th {
+  background: color-mix(in srgb, var(--foreground), transparent 94%);
+  color: var(--foreground);
+  font-weight: 700;
+}
+
+.markdown-body hr {
+  margin: 1.2em 0;
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--foreground), transparent 85%);
+}
+
+.markdown-body input[type="checkbox"] {
+  margin-right: 0.45em;
+}
+
 /* Toast Redesign */
 #toast-container {
   display: flex !important;
@@ -340,4 +490,25 @@ h6 {
 .dark .sf-data-table tbody tr:hover,
 .dark .sf-data-table-wrapper tbody tr:hover {
   background: rgb(255 255 255 / 2.5%);
+}
+
+/* The assistant logo keeps its subtle pulse independently of the retired page loader. */
+@keyframes splash {
+  0% {
+    transform: scale(0.2);
+    opacity: 0.8;
+  }
+  80% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.animate-splash {
+  animation: splash 1.5s cubic-bezier(0.165, 0.84, 0.44, 1) infinite both;
+  transform-origin: center;
 }

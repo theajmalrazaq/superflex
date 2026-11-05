@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import StatsCard from "../components/ui/StatsCard";
-import { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import { PageSkeleton } from "../components/ui/Skeleton";
 
 const isPaidStatus = (status) => {
   const normalized = String(status || "").trim();
@@ -223,9 +223,7 @@ function FeeChallanPage() {
   if (loading) {
     return (
       <PageLayout currentPage={window.location.pathname}>
-        <div className="flex justify-center py-20">
-          <LoadingSpinner />
-        </div>
+        <PageSkeleton label="Loading fee challans" cards={4} rows={5} />
       </PageLayout>
     );
   }

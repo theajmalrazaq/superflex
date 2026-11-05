@@ -20,7 +20,7 @@ import { parseTranscriptPage } from "../parsers/transcript";
 import { findFlexPageRoot } from "../parsers/dom";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
-import LoadingOverlay from "../components/ui/LoadingOverlay";
+import { PageSkeleton } from "../components/ui/Skeleton";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import { useAiSync } from "../hooks/useAiSync";
@@ -699,7 +699,14 @@ function TranscriptPage() {
     }));
   };
 
-  if (loading) return <LoadingOverlay />;
+  if (loading)
+    return (
+      <PageLayout currentPage={window.location.pathname} fullWidth>
+        <div className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          <PageSkeleton label="Loading transcript" cards={4} rows={6} />
+        </div>
+      </PageLayout>
+    );
 
   return (
     <PageLayout currentPage={window.location.pathname} fullWidth>

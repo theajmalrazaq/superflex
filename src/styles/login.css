@@ -847,6 +847,13 @@ body.superflex-login-page.superflex-login-dark #terms-accept-btn {
   }
 }
 
+body.superflex-login-page .form-control-feedback {
+  padding: 5px 0;
+  color: #ef4444 !important;
+  font-family: "Google Sans Flex", sans-serif;
+  font-size: 10px;
+}
+
 /* Change-password controls reuse the login input's placeholder treatment. */
 .superflex-password-input::placeholder {
   color: #9ca3af !important;

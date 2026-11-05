@@ -1,6 +1,5 @@
 import { defineContentScript } from "wxt/utils/define-content-script";
 import { createRoot } from "react-dom/client";
-import LoadingOverlay from "../components/ui/LoadingOverlay";
 import LoginPageStyles from "../components/LoginPageStyles";
 import PathRouter from "../components/PathRouter";
 import { getExtensionUrl, sendExtensionMessage } from "../utils/extensionApi";
@@ -110,13 +109,8 @@ export default defineContentScript({
 
     root.render(
       <>
-        <LoadingOverlay />
         {isLoginPage ? <LoginPageStyles /> : <PathRouter />}
       </>,
     );
-
-    setTimeout(() => {
-      document.body.classList.add("!visible");
-    }, 500);
   },
 });

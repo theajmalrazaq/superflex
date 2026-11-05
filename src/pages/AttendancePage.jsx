@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 
-import { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import { PageSkeleton } from "../components/ui/Skeleton";
 import PageLayout from "../components/layouts/PageLayout";
 import {
   CheckCircle2,
@@ -257,7 +257,7 @@ function AttendancePage() {
         </header>
 
         {loading ? (
-          <div className="flex flex-1 items-center justify-center"><LoadingSpinner /></div>
+          <PageSkeleton label="Loading attendance" cards={5} rows={6} showHeader={false} />
         ) : courses.length > 0 ? (
           <>
             <AttendanceCourseTabs courses={courses} selectedId={selectedCourseId} onSelect={setSelectedCourseId} />

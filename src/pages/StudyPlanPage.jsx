@@ -3,7 +3,7 @@ import PageLayout from "../components/layouts/PageLayout";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import StatsCard from "../components/ui/StatsCard";
 import SuperTabs from "../components/ui/SuperTabs";
-import { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import { PageSkeleton } from "../components/ui/Skeleton";
 import { BookOpen, Layers, CheckCircle2, TrendingUp, GraduationCap } from "lucide-react";
 import { parseStudyPlanPage } from "../parsers/studyPlan";
 import { findFlexPageRoot } from "../parsers/dom";
@@ -73,9 +73,7 @@ function StudyPlanPage() {
   if (loading) {
     return (
       <PageLayout currentPage={window.location.pathname}>
-        <div className="flex justify-center py-20">
-          <LoadingSpinner />
-        </div>
+        <PageSkeleton label="Loading tentative study plan" cards={4} rows={6} />
       </PageLayout>
     );
   }

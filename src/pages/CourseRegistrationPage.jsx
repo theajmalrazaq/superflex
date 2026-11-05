@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import PageLayout from "../components/layouts/PageLayout";
 import { BookOpen, Layers } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
-import { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import { PageSkeleton } from "../components/ui/Skeleton";
 import { parseCourseRegistrationPage } from "../parsers/courseRegistration";
 import { findFlexPageRoot } from "../parsers/dom";
 
@@ -51,9 +51,7 @@ function CourseRegistrationPage() {
         </header>
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <LoadingSpinner />
-          </div>
+          <PageSkeleton label="Loading course registration" cards={0} rows={7} showTabs={false} showHeader={false} />
         ) : (
           <div className="space-y-6">
             {tables.length > 0 ? (

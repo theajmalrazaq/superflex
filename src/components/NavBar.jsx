@@ -146,6 +146,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   };
 
   const sidebarLogoColor = themeMode === "light" && !cloudMode ? "#000000" : "#ffffff";
+  const sidebarLogoBoltColor = themeMode === "dark" ? "#a098ff" : "#0a192f";
 
   const isLinkActive = (link) => {
     if (link.text.trim() === "Home")
@@ -284,7 +285,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     <>
       <div className="flex items-center justify-between px-5 py-5">
         <a href="/" aria-label="SuperFlex home" className="inline-flex items-center gap-2.5 rounded-lg">
-          <Logo className="h-9 w-auto" style={{ "--accent": sidebarLogoColor, "--foreground": sidebarLogoColor }} />
+          <Logo className="h-9 w-auto" style={{ "--accent": sidebarLogoColor, "--foreground": sidebarLogoColor, "--bolt": sidebarLogoBoltColor }} />
         </a>
         {mobile && (
           <button
@@ -383,7 +384,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-white/50 bg-white/55 px-4 py-3 backdrop-blur-xl dark:border-white/[0.14] dark:bg-black lg:hidden">
         <a href="/" aria-label="SuperFlex home">
-          <Logo className="h-6 w-auto" style={{ "--accent": sidebarLogoColor, "--foreground": sidebarLogoColor }} />
+          <Logo className="h-6 w-auto" style={{ "--accent": sidebarLogoColor, "--foreground": sidebarLogoColor, "--bolt": sidebarLogoBoltColor }} />
         </a>
         <button
           type="button"

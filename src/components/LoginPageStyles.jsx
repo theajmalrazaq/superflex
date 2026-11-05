@@ -1,8 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "../styles/login.css";
 import { getExtensionUrl, getExtensionVersion } from "../utils/extensionApi";
+import { LoginSkeleton } from "./ui/Skeleton";
 
 function LoginPageStyles() {
+  const [ready, setReady] = useState(false);
+
   useEffect(() => {
     localStorage.removeItem("superflex_ai_messages");
 
@@ -899,7 +902,10 @@ function LoginPageStyles() {
       }
     });
 
+    const readyFrame = requestAnimationFrame(() => setReady(true));
+
     return () => {
+      cancelAnimationFrame(readyFrame);
       loginButtonObservers.forEach((observer) => observer.disconnect());
       cardResizeObserver.disconnect();
       cloudLayer.remove();
@@ -922,7 +928,7 @@ function LoginPageStyles() {
     };
   }, []);
 
-  return null;
+  return ready ? null : <LoginSkeleton />;
 }
 
 export default LoginPageStyles;

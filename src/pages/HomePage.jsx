@@ -241,10 +241,12 @@ function HomePage() {
     if (!personalInfo || !personalInfo["Name"]) return null;
     return {
       studentName: personalInfo["Name"],
+      personalInfo: personalInfo,
       universityInfo: universityInfo,
       profileSections: profileSections,
+      alerts: alerts,
     };
-  }, [personalInfo, universityInfo, profileSections]);
+  }, [personalInfo, universityInfo, profileSections, alerts]);
 
   useAiSync({
     data: profileData,

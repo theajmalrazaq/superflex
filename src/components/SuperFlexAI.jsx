@@ -64,8 +64,10 @@ const SuperFlexAI = () => {
     attendance: null,
     marks: null,
     studentName: null,
+    personalInfo: null,
     universityInfo: null,
     profileSections: null,
+    alerts: null,
     transcript: null,
     mcaData: null,
     studyPlan: null,
@@ -76,9 +78,8 @@ const SuperFlexAI = () => {
   const [permissionStatus, setPermissionStatus] = useState(
     () => localStorage.getItem("superflex_ai_data_permission") || "pending",
   );
-  const [selectedModel, setSelectedModel] = useState(() => localStorage.getItem("superflex_ai_model") || "");
-  const [showModelPicker, setShowModelPicker] = useState(false);
-  const [availableModels, setAvailableModels] = useState([]);
+  const [activeModel, setActiveModel] = useState(null);
+  const [showGroqSettings, setShowGroqSettings] = useState(false);
   const [hasApiKey, setHasApiKey] = useState(false);
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [isConnecting, setIsConnecting] = useState(false);
@@ -91,7 +92,9 @@ const SuperFlexAI = () => {
   const runtimeMessage = (message) =>
     new Promise((resolve) => {
       sendExtensionMessage(message, (response, error) =>
-        resolve(error ? { error: error.message } : response || { error: "Extension connection failed." }),
+        resolve(
+          error ? { error: error.message } : response || { error: "Extension connection failed." },
+        ),
       );
     });
 
@@ -105,10 +108,7 @@ const SuperFlexAI = () => {
       return;
     }
     setHasApiKey(true);
-    setAvailableModels(result.models || []);
-    setSelectedModel((current) =>
-      result.models?.some((model) => model.id === current) ? current : result.models?.[0]?.id || "",
-    );
+    setActiveModel(result.model || null);
     setApiKeyInput("");
   };
 
@@ -124,10 +124,8 @@ const SuperFlexAI = () => {
     runtimeMessage({ type: "SUPERFLEX_GROQ_CONFIG" }).then((result) => {
       if (result.error) return;
       setHasApiKey(result.configured);
-      setAvailableModels(result.models || []);
-      setSelectedModel((current) =>
-        result.models?.some((model) => model.id === current) ? current : result.models?.[0]?.id || "",
-      );
+      setActiveModel(result.model || null);
+      if (result.warning) setConnectionError(result.warning);
     });
   }, []);
 
@@ -179,10 +177,6 @@ const SuperFlexAI = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedModel) localStorage.setItem("superflex_ai_model", selectedModel);
-  }, [selectedModel]);
-
-  useEffect(() => {
     if (messages.length > 0) {
       localStorage.setItem("superflex_ai_messages", JSON.stringify(messages));
     }
@@ -212,17 +206,21 @@ const SuperFlexAI = () => {
     activeRequestIdRef.current = requestId;
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
     try {
-      if (!hasApiKey || !selectedModel) throw new Error("Connect GroqCloud and choose a model first.");
+      if (!hasApiKey || !activeModel) {
+        throw new Error("Connect GroqCloud so SuperFlex can configure the free-tier model.");
+      }
       const result = await runtimeMessage({
         type: "SUPERFLEX_GROQ_CHAT",
         messages: buildGroqMessages({ question: userMessage, dataContext, history: messages }),
-        model: selectedModel,
       });
       if (activeRequestIdRef.current !== requestId) return;
       if (result.error) throw new Error(result.error);
       setMessages((prev) => {
         const withoutPending = prev.slice(0, -1);
-        return [...withoutPending, { role: "assistant", content: result.text || "GroqCloud returned an empty response." }];
+        return [
+          ...withoutPending,
+          { role: "assistant", content: result.text || "GroqCloud returned an empty response." },
+        ];
       });
     } catch (e) {
       if (activeRequestIdRef.current === requestId) {
@@ -317,7 +315,7 @@ const SuperFlexAI = () => {
 
             <div className="flex items-center gap-4">
               <button
-                onClick={() => setShowModelPicker((visible) => !visible)}
+                onClick={() => setShowGroqSettings((visible) => !visible)}
                 className="flex items-center gap-2 px-3 py-1.5 bg-accent/10 border border-accent/20 rounded-full text-accent hover:bg-accent/20 transition-all text-xs font-bold"
                 title="GroqCloud settings"
               >
@@ -396,20 +394,14 @@ const SuperFlexAI = () => {
                     key={i}
                     className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} items-start gap-3 animate-in fade-in slide-in-from-bottom-4`}
                   >
-                    {m.role === "assistant" && (
-                      <div className="w-8 h-8 rounded-full bg-secondary border border-foreground/10 flex items-center justify-center shrink-0 mt-1">
-                        <AnimatedLogo size={16} animated={false} />
-                      </div>
-                    )}
-
                     <div
-                      className={`max-w-[80%] rounded-2xl px-5 py-3.5 relative group leading-relaxed text-sm md:text-base ${
+                      className={`relative group leading-relaxed text-sm md:text-base ${
                         m.role === "user"
-                          ? "bg-accent/30 text-foreground border border-accent/20 rounded-tr-sm backdrop-blur-sm"
-                          : "bg-secondary border border-foreground/10 text-foreground/70 rounded-tl-sm"
+                          ? "max-w-[80%] rounded-2xl rounded-tr-sm bg-accent/30 px-5 py-3.5 text-foreground border border-accent/20 backdrop-blur-sm"
+                          : "w-full max-w-[85%] px-1 py-1 text-foreground/80"
                       }`}
                     >
-                      <div className="markdown-body">
+                      <div className={`markdown-body ${m.role === "assistant" ? "markdown-body--assistant" : ""}`}>
                         {m.role === "assistant" && !m.content ? (
                           <div className="flex gap-1.5 py-1">
                             <div className="w-2 h-2 bg-accent rounded-full animate-bounce [animation-delay:-0.3s]"></div>
@@ -441,9 +433,9 @@ const SuperFlexAI = () => {
                   <Shield className="text-accent" size={20} />
                   <div className="text-sm">
                     <span className="text-foreground font-bold block">Enable AI Access?</span>
-                <span className="text-foreground/50 text-xs">
-                  Chat sends your message and selected academic data to GroqCloud.
-                </span>
+                    <span className="text-foreground/50 text-xs">
+                      Chat sends your message and complete synced academic snapshot to GroqCloud.
+                    </span>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -471,7 +463,8 @@ const SuperFlexAI = () => {
                   <div className="text-sm">
                     <span className="text-foreground font-bold block">Connect GroqCloud</span>
                     <span className="text-foreground/50 text-xs">
-                      Add your GroqCloud API key and choose a model available to your account.
+                      Add your API key. SuperFlex uses one high-context model configured for the
+                      GroqCloud free tier.
                     </span>
                   </div>
                 </div>
@@ -491,7 +484,12 @@ const SuperFlexAI = () => {
                     {isConnecting ? <LoaderCircle size={15} className="animate-spin" /> : "Connect"}
                   </button>
                 </div>
-                <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer" className="px-2 text-xs font-semibold text-accent hover:underline">
+                <a
+                  href="https://console.groq.com/keys"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2 text-xs font-semibold text-accent hover:underline"
+                >
                   Create a GroqCloud API key
                 </a>
                 {connectionError && <p className="px-2 text-xs text-rose-500">{connectionError}</p>}
@@ -500,14 +498,14 @@ const SuperFlexAI = () => {
               <div className="group relative bg-secondary/80 backdrop-blur-2xl border border-foreground/10 rounded-full transition-all focus-within:bg-secondary focus-within:border-accent/30 focus-within:ring-4 focus-within:ring-accent/10 flex items-center">
                 <div className="relative pl-3 shrink-0">
                   <button
-                    onClick={() => setShowModelPicker(!showModelPicker)}
+                    onClick={() => setShowGroqSettings(!showGroqSettings)}
                     className="w-10 h-10 rounded-full bg-tertiary/50 border border-foreground/10 flex items-center justify-center hover:bg-tertiary transition-colors shrink-0 overflow-hidden group/btn"
-                    title="Select Model"
+                    title="GroqCloud settings"
                   >
                     <AnimatedLogo size={20} animated={false} />
                   </button>
 
-                  {showModelPicker && (
+                  {showGroqSettings && (
                     <div className="absolute bottom-full left-0 mb-4 w-[min(360px,calc(100vw-2rem))] bg-background border border-foreground/10 rounded-2xl overflow-hidden z-[1000] animate-in fade-in slide-in-from-bottom-2 duration-200">
                       <div className="p-3 border-b border-foreground/10 bg-foreground/[0.02]">
                         <div className="mb-2 flex items-center gap-2 text-xs font-bold text-foreground">
@@ -518,7 +516,11 @@ const SuperFlexAI = () => {
                             type="password"
                             value={apiKeyInput}
                             onChange={(event) => setApiKeyInput(event.target.value)}
-                            placeholder={hasApiKey ? "Enter a new key to replace" : "Paste your GroqCloud API key"}
+                            placeholder={
+                              hasApiKey
+                                ? "Enter a new key to replace"
+                                : "Paste your GroqCloud API key"
+                            }
                             className="min-w-0 flex-1 rounded-xl border border-foreground/10 bg-background px-3 py-2 text-xs text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-accent/30"
                           />
                           <button
@@ -527,47 +529,45 @@ const SuperFlexAI = () => {
                             disabled={!apiKeyInput.trim() || isConnecting}
                             className="rounded-xl bg-accent px-3 py-2 text-xs font-bold text-[var(--accent-foreground)] disabled:opacity-50"
                           >
-                            {isConnecting ? <LoaderCircle size={15} className="animate-spin" /> : "Save"}
+                            {isConnecting ? (
+                              <LoaderCircle size={15} className="animate-spin" />
+                            ) : (
+                              "Save"
+                            )}
                           </button>
                         </div>
-                        <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer" className="mt-2 inline-block text-[11px] font-semibold text-accent hover:underline">
+                        <a
+                          href="https://console.groq.com/keys"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mt-2 inline-block text-[11px] font-semibold text-accent hover:underline"
+                        >
                           Create a GroqCloud API key
                         </a>
-                        {connectionError && <p className="mt-2 text-[11px] text-rose-500">{connectionError}</p>}
+                        {connectionError && (
+                          <p className="mt-2 text-[11px] text-rose-500">{connectionError}</p>
+                        )}
                       </div>
-                      <div className="max-h-64 overflow-y-auto p-2 space-y-1 custom-scrollbar">
-                        {availableModels.length ? availableModels.map((m) => (
-                          <button
-                            key={m.id}
-                            onClick={() => {
-                              setSelectedModel(m.id);
-                              setShowModelPicker(false);
-                            }}
-                            className={`w-full text-left p-3 rounded-xl transition-all flex items-center justify-between group/item ${
-                              selectedModel === m.id
-                                ? "bg-accent/10 border border-accent/20"
-                                : "hover:bg-foreground/5 border border-transparent"
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-foreground/5 flex items-center justify-center shrink-0 text-accent">
-                                <AnimatedLogo size={18} animated={false} />
-                              </div>
-                              <div className="flex flex-col gap-0.5">
-                                <span
-                                  className={`text-xs font-bold ${selectedModel === m.id ? "text-foreground" : "text-foreground/60"}`}
-                                >
-                                  {m.name}
-                                </span>
-                                <span className="text-[10px] text-foreground/40 font-medium">
-                                  {m.provider}
-                                </span>
-                              </div>
+                      <div className="p-3">
+                        {activeModel ? (
+                          <div className="flex items-center gap-3 rounded-xl border border-accent/20 bg-accent/10 p-3">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground/5 text-accent">
+                              <AnimatedLogo size={18} animated={false} />
                             </div>
-                          </button>
-                        )) : (
+                            <div className="min-w-0">
+                              <p className="truncate text-xs font-bold text-foreground">
+                                {activeModel.name}
+                              </p>
+                              <p className="text-[10px] font-medium text-foreground/50">
+                                Free-tier model ·{" "}
+                                {activeModel.contextWindow?.toLocaleString() || "Unknown"} token
+                                context
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
                           <p className="px-3 py-4 text-center text-xs text-foreground/50">
-                            Add a GroqCloud API key to load the models available to your account.
+                            Re-save the API key to configure the free-tier model.
                           </p>
                         )}
                       </div>
@@ -615,7 +615,8 @@ const SuperFlexAI = () => {
 
             <div className="text-center mt-4">
               <p className="text-[10px] text-foreground/40 font-medium">
-                Chats are sent to GroqCloud with your API key. Your key is stored in extension storage.{" "}
+                Chats are sent to GroqCloud with your API key. Your key is stored in extension
+                storage.{" "}
                 {getLastSyncTime() ? `Last synced at ${getLastSyncTime()}` : "Data not synced yet."}
               </p>
             </div>

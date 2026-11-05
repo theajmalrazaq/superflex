@@ -28,14 +28,45 @@ const CAMPUS_DIRECTORY_URLS = {
   ],
 };
 
+const GROQ_MODELS_URL = "https://api.groq.com/openai/v1/models";
+const FREE_GROQ_MODEL_ID = "openai/gpt-oss-20b";
+const FREE_TIER_MAX_COMPLETION_TOKENS = 1000;
+
+const fetchFreeContextModel = async (apiKey) => {
+  const response = await fetch(GROQ_MODELS_URL, { headers: { Authorization: `Bearer ${apiKey}` } });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error?.message || `API returned ${response.status}`);
+  const model = (data.data || []).find((item) => item.id === FREE_GROQ_MODEL_ID && item.active !== false);
+  if (!model) throw new Error(`${FREE_GROQ_MODEL_ID} is not available to this GroqCloud organization.`);
+  return {
+    id: model.id,
+    name: model.id,
+    provider: model.owned_by || "OpenAI",
+    contextWindow: Number(model.context_window) || 131072,
+    maxCompletionTokens: Number(model.max_completion_tokens) || 65536,
+    tier: "free",
+  };
+};
+
 export default defineBackground(() => {
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message?.type === "SUPERFLEX_GROQ_CONFIG") {
-      chrome.storage.local.get(["superflex_groq_api_key", "superflex_groq_models"], (saved) => {
-        sendResponse({
-          configured: Boolean(saved.superflex_groq_api_key),
-          models: saved.superflex_groq_models || [],
-        });
+      chrome.storage.local.get(["superflex_groq_api_key", "superflex_groq_model"], async (saved) => {
+        if (!saved.superflex_groq_api_key) {
+          sendResponse({ configured: false, model: null });
+          return;
+        }
+        try {
+          const model = await fetchFreeContextModel(saved.superflex_groq_api_key);
+          chrome.storage.local.set({ superflex_groq_model: model });
+          sendResponse({ configured: true, model });
+        } catch (error) {
+          sendResponse({
+            configured: true,
+            model: saved.superflex_groq_model?.id === FREE_GROQ_MODEL_ID ? saved.superflex_groq_model : null,
+            warning: error.message,
+          });
+        }
       });
       return true;
     }
@@ -46,20 +77,11 @@ export default defineBackground(() => {
         sendResponse({ error: "Enter a GroqCloud API key first." });
         return undefined;
       }
-      fetch("https://api.groq.com/openai/v1/models", {
-        headers: { Authorization: `Bearer ${apiKey}` },
-      })
-        .then(async (response) => {
-          const data = await response.json().catch(() => ({}));
-          if (!response.ok) throw new Error(data.error?.message || `API returned ${response.status}`);
-          const models = (data.data || [])
-            .filter((model) => model.id && model.active !== false && !/(whisper|guard|embedding|tts|speech|transcription)/i.test(model.id))
-            .map((model) => ({ id: model.id, name: model.id, provider: model.owned_by || "GroqCloud" }))
-            .sort((a, b) => a.name.localeCompare(b.name));
-          if (!models.length) throw new Error("No chat models were returned for this GroqCloud API key.");
+      fetchFreeContextModel(apiKey)
+        .then((model) => {
           chrome.storage.local.set(
-            { superflex_groq_api_key: apiKey, superflex_groq_models: models },
-            () => sendResponse({ configured: true, models }),
+            { superflex_groq_api_key: apiKey, superflex_groq_model: model },
+            () => sendResponse({ configured: true, model }),
           );
         })
         .catch((error) => sendResponse({ error: error.message || "Could not connect to GroqCloud." }));
@@ -67,12 +89,14 @@ export default defineBackground(() => {
     }
 
     if (message?.type === "SUPERFLEX_GROQ_CHAT") {
-      chrome.storage.local.get("superflex_groq_api_key", async ({ superflex_groq_api_key: apiKey }) => {
+      chrome.storage.local.get(["superflex_groq_api_key", "superflex_groq_model"], async ({ superflex_groq_api_key: apiKey, superflex_groq_model: savedModel }) => {
         if (!apiKey) {
           sendResponse({ error: "Add your GroqCloud API key to connect." });
           return;
         }
         try {
+          const model = savedModel?.id === FREE_GROQ_MODEL_ID ? savedModel : await fetchFreeContextModel(apiKey);
+          if (savedModel?.id !== FREE_GROQ_MODEL_ID) chrome.storage.local.set({ superflex_groq_model: model });
           const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -80,9 +104,9 @@ export default defineBackground(() => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              model: message.model,
+              model: model.id,
               messages: message.messages,
-              max_completion_tokens: 600,
+              max_completion_tokens: Math.min(model.maxCompletionTokens || FREE_TIER_MAX_COMPLETION_TOKENS, FREE_TIER_MAX_COMPLETION_TOKENS),
             }),
           });
           const data = await response.json().catch(() => ({}));

@@ -3,7 +3,7 @@ import PageLayout from "../components/layouts/PageLayout";
 import { MessageSquare, Send, CheckCircle2, AlertCircle, Zap } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import PageHeader from "../components/ui/PageHeader";
-import { LoadingSpinner } from "../components/ui/LoadingOverlay";
+import { PageSkeleton } from "../components/ui/Skeleton";
 
 const QuestionCard = ({ question, index, total, onSelect }) => {
   return (
@@ -261,9 +261,7 @@ function SubmitFeedbackPage() {
   if (loading) {
     return (
       <PageLayout currentPage={window.location.pathname}>
-        <div className="w-full min-h-screen p-4 md:p-8 space-y-8 flex justify-center py-20">
-          <LoadingSpinner />
-        </div>
+        <PageSkeleton label="Loading feedback form" cards={0} rows={7} showTabs={false} />
       </PageLayout>
     );
   }
