@@ -23,6 +23,7 @@ import { findAttendanceForm, parseAttendancePage } from "../parsers/attendance";
 import { findFlexPageRoot } from "../parsers/dom";
 import { useAiSync } from "../hooks/useAiSync";
 import { checkAndRecordAttendanceSnapshot } from "../utils/academicSnapshot";
+import { getMarkedAttendance, setMarkedAttendance } from "../utils/userDataStorage";
 
 const parseSessionDate = (value) => {
   const input = String(value || "").trim();
@@ -159,20 +160,25 @@ function AttendancePage() {
     catch { return {}; }
   });
   const [reviewRequest, setReviewRequest] = useState(null);
-  const [markedRecords, setMarkedRecords] = useState(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("superflex_marked_attendance");
-      return new Set(saved ? JSON.parse(saved) : []);
-    }
-    return new Set();
-  });
+  const [markedRecords, setMarkedRecords] = useState(new Set());
+  const [markedRecordsLoaded, setMarkedRecordsLoaded] = useState(false);
 
   useEffect(() => {
+    let active = true;
+    getMarkedAttendance().then((items) => {
+      if (active) {
+        setMarkedRecords(new Set(items));
+        setMarkedRecordsLoaded(true);
+      }
+    });
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("superflex_marked_attendance", JSON.stringify([...markedRecords]));
-  }, [markedRecords]);
+    if (markedRecordsLoaded) setMarkedAttendance([...markedRecords]);
+  }, [markedRecords, markedRecordsLoaded]);
 
   useEffect(() => {
     const syncTeachers = (event) => setTeacherAssignments(event.detail || {});
@@ -184,7 +190,7 @@ function AttendancePage() {
   const hiddenFormRef = useRef(null);
 
   useEffect(() => {
-    const parseData = () => {
+    const parseData = async () => {
       try {
         const root = findFlexPageRoot(document);
         if (!root) {
@@ -203,7 +209,7 @@ function AttendancePage() {
 
         setCourses(parsed.courses);
         if (parsed.courses.length > 0) setSelectedCourseId(parsed.courses[0].id);
-        checkAndRecordAttendanceSnapshot(parsed.courses);
+        await checkAndRecordAttendanceSnapshot(parsed.courses);
 
         root.style.display = "none";
         setLoading(false);
@@ -212,7 +218,7 @@ function AttendancePage() {
         setLoading(false);
       }
     };
-    parseData();
+    void parseData();
     return () => {};
   }, []);
 

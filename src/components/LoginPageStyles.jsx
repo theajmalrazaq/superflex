@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import "../styles/login.css";
 import { getExtensionUrl, getExtensionVersion } from "../utils/extensionApi";
 import { LoginSkeleton } from "./ui/Skeleton";
+import { deleteAiMessages } from "../utils/userDataStorage";
 
 function LoginPageStyles() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    localStorage.removeItem("superflex_ai_messages");
+    deleteAiMessages();
 
     // Keep the reference palette while giving sign-in a product-specific layout.
     document.body.classList.add("superflex-login-page");

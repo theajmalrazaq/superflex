@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "agentcomposerui/styles.css";
+@source "../../node_modules/agentcomposerui/dist";
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* stylelint-disable-next-line at-rule-no-unknown */
@@ -36,7 +38,15 @@
 }
 
 :root {
-  --superflex-account-gradient: linear-gradient(180deg, #62abe0 0%, #62abe0 40%, #73b3e1 62%, #9ac7e8 80%, #dcebf5 91%, #fff 100%);
+  --superflex-account-gradient: linear-gradient(
+    180deg,
+    #62abe0 0%,
+    #62abe0 40%,
+    #73b3e1 62%,
+    #9ac7e8 80%,
+    #dcebf5 91%,
+    #fff 100%
+  );
   --accent: #230052;
   --accent-foreground: #ffffff;
   --background: #ffffff;
@@ -57,13 +67,19 @@
   opacity: 0.12 !important;
 }
 
-
 .Cap {
   text-transform: capitalize !important;
 }
 
 .dark {
-  --superflex-account-gradient: linear-gradient(180deg, #0f1422 0%, #0f1422 40%, #0b0e17 65%, #06070c 85%, #000000 100%);
+  --superflex-account-gradient: linear-gradient(
+    180deg,
+    #0f1422 0%,
+    #0f1422 40%,
+    #0b0e17 65%,
+    #06070c 85%,
+    #000000 100%
+  );
   --accent: #ffffff;
   --accent-foreground: #000000;
   --background: #000000;
@@ -71,7 +87,6 @@
   --secondary: #18181b;
   --tertiary: #27272a;
 }
-
 
 html {
   font-size: 80%; /* Scale down to approx 14.4px base */
@@ -534,4 +549,9 @@ h6 {
 .animate-splash {
   animation: splash 1.5s cubic-bezier(0.165, 0.84, 0.44, 1) infinite both;
   transform-origin: center;
+}
+
+/* The outreach library always renders inbox snippet text; student emails do not need it. */
+.superflex-email-composer div:has(> label[for="email-preview-text"]) {
+  display: none;
 }

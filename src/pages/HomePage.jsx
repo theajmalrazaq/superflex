@@ -28,12 +28,12 @@ import {
   checkAndRecordMarksSnapshot,
   checkAndRecordAttendanceSnapshot,
   getPendingUpdates,
-  clearPendingUpdates,
   clearPendingUpdateType,
   isCourseMarksUpdated,
   isSectionMarksUpdated,
   isAssessmentMarksUpdated,
 } from "../utils/academicSnapshot";
+import { getAiContext, getProfileImage } from "../utils/userDataStorage";
 
 const TEACHER_SELECTIONS_KEY = "superflex_course_teachers_v1";
 const TEACHER_COURSES_KEY = "superflex_cached_courses_v1";
@@ -207,9 +207,7 @@ function HomePage() {
     try {
       const saved = localStorage.getItem("superflex_cached_personal_info");
       if (saved) return JSON.parse(saved);
-      const aiCtx =
-        window.superflex_ai_context ||
-        JSON.parse(localStorage.getItem("superflex_ai_context") || "{}");
+      const aiCtx = window.superflex_ai_context;
       if (aiCtx?.personalInfo) return aiCtx.personalInfo;
       if (aiCtx?.studentName) return { Name: aiCtx.studentName };
     } catch {}
@@ -218,16 +216,27 @@ function HomePage() {
   const [profileSections, setProfileSections] = useState([]);
   const [activeMainTab, setActiveMainTab] = useState("stats");
   const [alerts, setAlerts] = useState([]);
-  const [profileImage, setProfileImage] = useState(
-    localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage",
-  );
+  const [profileImage, setProfileImage] = useState("/Login/GetImage");
 
   useEffect(() => {
-    const handleStorage = () => {
-      setProfileImage(localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage");
+    let active = true;
+    const loadStoredData = async (event) => {
+      const [image, aiContext] = await Promise.all([
+        event?.detail || getProfileImage(),
+        getAiContext(),
+      ]);
+      if (!active) return;
+      setProfileImage(image);
+      setPersonalInfo((current) =>
+        current || aiContext.personalInfo || (aiContext.studentName ? { Name: aiContext.studentName } : null),
+      );
     };
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
+    loadStoredData();
+    window.addEventListener("superflex-profile-image-changed", loadStoredData);
+    return () => {
+      active = false;
+      window.removeEventListener("superflex-profile-image-changed", loadStoredData);
+    };
   }, []);
 
   const [attendanceData, setAttendanceData] = useState(null);
@@ -241,15 +250,19 @@ function HomePage() {
   const [loadingMarks, setLoadingMarks] = useState(false);
   const [loadingAttendance, setLoadingAttendance] = useState(false);
   const [studyPlanData, setStudyPlanData] = useState(null);
-  const [pendingUpdates, setPendingUpdates] = useState(getPendingUpdates);
+  const [pendingUpdates, setPendingUpdates] = useState(null);
 
   useEffect(() => {
-    const handleUpdates = () => {
-      setPendingUpdates(getPendingUpdates());
+    let active = true;
+    const handleUpdates = async () => {
+      const updates = await getPendingUpdates();
+      if (active) setPendingUpdates(updates);
     };
+    handleUpdates();
     window.addEventListener("superflex-academic-updates-detected", handleUpdates);
     window.addEventListener("superflex-academic-updates-cleared", handleUpdates);
     return () => {
+      active = false;
       window.removeEventListener("superflex-academic-updates-detected", handleUpdates);
       window.removeEventListener("superflex-academic-updates-cleared", handleUpdates);
     };
@@ -510,7 +523,7 @@ function HomePage() {
       const doc = parser.parseFromString(html, "text/html");
       const parsedAttendance = parseHomeAttendanceReport(doc);
       setAttendanceData(parsedAttendance);
-      checkAndRecordAttendanceSnapshot(parsedAttendance);
+      await checkAndRecordAttendanceSnapshot(parsedAttendance);
     } catch (e) {
       console.error("Attendance fetch error", e);
     }
@@ -526,7 +539,7 @@ function HomePage() {
 
       setCoursesData(parsedCourses);
       if (parsedCourses.length) setActiveCourse(parsedCourses[0].id);
-      checkAndRecordMarksSnapshot(parsedCourses);
+      await checkAndRecordMarksSnapshot(parsedCourses);
     } catch (e) {
       console.error("Marks fetch error", e);
     }

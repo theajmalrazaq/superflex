@@ -32,6 +32,7 @@ import {
   isSectionMarksUpdated,
   isAssessmentMarksUpdated,
 } from "../utils/academicSnapshot";
+import { getMarkedMarks, setMarkedMarks } from "../utils/userDataStorage";
 
 const MarksCourseTabs = ({ courses, selectedId, onSelect, pendingUpdates }) => (
   <div className="inline-flex w-fit max-w-full gap-1.5 overflow-x-auto rounded-full bg-white/55 p-1.5 shadow-sm shadow-black/[0.03] scrollbar-hide dark:bg-black/25 dark:shadow-none" aria-label="Select course">
@@ -504,35 +505,45 @@ function MarksPage() {
   const [selectedCourseId, setSelectedCourseId] = useState(null);
   const [semesters, setSemesters] = useState([]);
   const [alerts, setAlerts] = useState([]);
-  const [pendingUpdates, setPendingUpdates] = useState(getPendingUpdates);
+  const [pendingUpdates, setPendingUpdates] = useState(null);
   const hiddenFormRef = useRef(null);
   const initialCoursesRef = useRef([]);
 
   useEffect(() => {
-    const handleUpdates = () => setPendingUpdates(getPendingUpdates());
+    let active = true;
+    const handleUpdates = async () => {
+      const updates = await getPendingUpdates();
+      if (active) setPendingUpdates(updates);
+    };
+    handleUpdates();
     window.addEventListener("superflex-academic-updates-detected", handleUpdates);
     window.addEventListener("superflex-academic-updates-cleared", handleUpdates);
     return () => {
+      active = false;
       window.removeEventListener("superflex-academic-updates-detected", handleUpdates);
       window.removeEventListener("superflex-academic-updates-cleared", handleUpdates);
     };
   }, []);
 
-  const [markedItems, setMarkedItems] = useState(() => {
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("superflex_marked_marks");
-      try {
-        return new Set(saved ? JSON.parse(saved) : []);
-      } catch {
-        return new Set();
-      }
-    }
-    return new Set();
-  });
+  const [markedItems, setMarkedItems] = useState(new Set());
+  const [markedItemsLoaded, setMarkedItemsLoaded] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("superflex_marked_marks", JSON.stringify([...markedItems]));
-  }, [markedItems]);
+    let active = true;
+    getMarkedMarks().then((items) => {
+      if (active) {
+        setMarkedItems(new Set(items));
+        setMarkedItemsLoaded(true);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (markedItemsLoaded) setMarkedMarks([...markedItems]);
+  }, [markedItems, markedItemsLoaded]);
 
   const handleToggleMark = (id) => {
     const newSet = new Set(markedItems);
@@ -542,7 +553,7 @@ function MarksPage() {
   };
 
   useEffect(() => {
-    const parseData = () => {
+    const parseData = async () => {
       try {
         const root = findFlexPageRoot(document);
         if (!root) return;
@@ -559,7 +570,7 @@ function MarksPage() {
         setCourses(parsed.courses);
         initialCoursesRef.current = JSON.parse(JSON.stringify(parsed.courses));
         if (parsed.courses.length > 0) setSelectedCourseId(parsed.courses[0].id);
-        checkAndRecordMarksSnapshot(parsed.courses);
+        await checkAndRecordMarksSnapshot(parsed.courses);
 
         root.style.display = "none";
         setLoading(false);
@@ -569,7 +580,7 @@ function MarksPage() {
       }
     };
 
-    setTimeout(parseData, 200);
+    setTimeout(() => void parseData(), 200);
   }, []);
 
   useAiSync({

@@ -1,5 +1,44 @@
-const SNAPSHOT_STORAGE_KEY = "superflex_academic_snapshot_v1";
-const UPDATES_STORAGE_KEY = "superflex_academic_updates_v1";
+import {
+  deleteAcademicState,
+  readAcademicState,
+  updateAcademicState,
+  writeAcademicState,
+} from "./academicStorage";
+
+const SNAPSHOT_KEY = "snapshot";
+const UPDATES_KEY = "pending-updates";
+const LEGACY_SNAPSHOT_STORAGE_KEY = "superflex_academic_snapshot_v1";
+const LEGACY_UPDATES_STORAGE_KEY = "superflex_academic_updates_v1";
+
+let migrationPromise;
+
+const migrateLegacyAcademicState = () => {
+  if (migrationPromise) return migrationPromise;
+  migrationPromise = (async () => {
+    const [snapshot, updates] = await Promise.all([
+      readAcademicState(SNAPSHOT_KEY),
+      readAcademicState(UPDATES_KEY),
+    ]);
+
+    try {
+      const legacySnapshot = JSON.parse(
+        localStorage.getItem(LEGACY_SNAPSHOT_STORAGE_KEY) || "null",
+      );
+      const legacyUpdates = JSON.parse(localStorage.getItem(LEGACY_UPDATES_STORAGE_KEY) || "null");
+      if (!snapshot && legacySnapshot) await writeAcademicState(SNAPSHOT_KEY, legacySnapshot);
+      if (!updates && legacyUpdates) await writeAcademicState(UPDATES_KEY, legacyUpdates);
+      localStorage.removeItem(LEGACY_SNAPSHOT_STORAGE_KEY);
+      localStorage.removeItem(LEGACY_UPDATES_STORAGE_KEY);
+    } catch {
+      // Invalid legacy data is intentionally discarded.
+    }
+  })();
+  return migrationPromise;
+};
+
+const dispatchAcademicEvent = (name, detail) => {
+  window.dispatchEvent(new CustomEvent(name, detail === undefined ? undefined : { detail }));
+};
 
 /**
  * Extracts clean display title, removing section codes like "(BCS-7A)" or "(Lab)"
@@ -57,69 +96,71 @@ export const formatCleanDate = (rawDate = "") => {
   return str.replace(/[-/]\d{4}$/, "");
 };
 
-export const getAcademicSnapshot = () => {
+export const getAcademicSnapshot = async () => {
   try {
-    return JSON.parse(localStorage.getItem(SNAPSHOT_STORAGE_KEY) || "null");
+    await migrateLegacyAcademicState();
+    return await readAcademicState(SNAPSHOT_KEY);
   } catch {
     return null;
   }
 };
 
-export const getPendingUpdates = () => {
+export const getPendingUpdates = async () => {
   try {
-    const data = JSON.parse(localStorage.getItem(UPDATES_STORAGE_KEY) || "null");
-    if (!data) return null;
+    await migrateLegacyAcademicState();
+    return await updateAcademicState(UPDATES_KEY, (current) => {
+      if (!current) return null;
+      const data = { ...current };
 
-    // Sanitize any corrupted legacy dump where a course has >= 10 "new sessions" in attendance
-    if (Array.isArray(data.newAttendance)) {
-      data.newAttendance = data.newAttendance.filter((a) => (a.newCount || 0) < 10);
-    }
-
-    // Sanitize any corrupted legacy dump where an entire semester of marks was dumped
-    if (Array.isArray(data.newMarks)) {
-      const totalNew = data.newMarks.reduce((sum, m) => sum + (m.newCount || m.items?.length || 0), 0);
-      if (totalNew > 10) {
-        // Clear whole-semester bulk dump so the UI isn't flooded
-        data.newMarks = [];
-      } else {
-        data.newMarks = data.newMarks.filter((m) => (m.newCount || m.items?.length || 0) < 5);
+      // Sanitize any corrupted legacy dump where a course has >= 10 "new sessions" in attendance
+      if (Array.isArray(data.newAttendance)) {
+        data.newAttendance = data.newAttendance.filter((a) => (a.newCount || 0) < 10);
       }
-    }
 
-    const hasAny = (data.newMarks?.length || 0) > 0 || (data.newAttendance?.length || 0) > 0;
-    if (!hasAny) {
-      localStorage.removeItem(UPDATES_STORAGE_KEY);
-      return null;
-    }
-    return data;
+      // Sanitize any corrupted legacy dump where an entire semester of marks was dumped
+      if (Array.isArray(data.newMarks)) {
+        const totalNew = data.newMarks.reduce(
+          (sum, mark) => sum + (mark.newCount || mark.items?.length || 0),
+          0,
+        );
+        data.newMarks =
+          totalNew > 10
+            ? []
+            : data.newMarks.filter((mark) => (mark.newCount || mark.items?.length || 0) < 5);
+      }
+
+      const hasAny = (data.newMarks?.length || 0) > 0 || (data.newAttendance?.length || 0) > 0;
+      return hasAny ? data : null;
+    });
   } catch {
     return null;
   }
 };
 
-export const clearPendingUpdates = () => {
+export const clearPendingUpdates = async () => {
   try {
-    localStorage.removeItem(UPDATES_STORAGE_KEY);
-    window.dispatchEvent(new CustomEvent("superflex-academic-updates-cleared"));
+    await migrateLegacyAcademicState();
+    await deleteAcademicState(UPDATES_KEY);
+    dispatchAcademicEvent("superflex-academic-updates-cleared");
   } catch {}
 };
 
-export const clearPendingUpdateType = (type) => {
+export const clearPendingUpdateType = async (type) => {
   try {
-    const existing = getPendingUpdates();
-    if (!existing) return;
-    if (type === "marks") {
-      delete existing.newMarks;
-    } else if (type === "attendance") {
-      delete existing.newAttendance;
-    }
-    const hasRemaining = (existing.newMarks?.length || 0) > 0 || (existing.newAttendance?.length || 0) > 0;
-    if (hasRemaining) {
-      localStorage.setItem(UPDATES_STORAGE_KEY, JSON.stringify(existing));
-      window.dispatchEvent(new CustomEvent("superflex-academic-updates-detected", { detail: existing }));
+    await migrateLegacyAcademicState();
+    const existing = await updateAcademicState(UPDATES_KEY, (current) => {
+      if (!current) return null;
+      const next = { ...current };
+      if (type === "marks") delete next.newMarks;
+      else if (type === "attendance") delete next.newAttendance;
+      const hasRemaining =
+        (next.newMarks?.length || 0) > 0 || (next.newAttendance?.length || 0) > 0;
+      return hasRemaining ? next : null;
+    });
+    if (existing) {
+      dispatchAcademicEvent("superflex-academic-updates-detected", existing);
     } else {
-      localStorage.removeItem(UPDATES_STORAGE_KEY);
-      window.dispatchEvent(new CustomEvent("superflex-academic-updates-cleared"));
+      dispatchAcademicEvent("superflex-academic-updates-cleared");
     }
   } catch {}
 };
@@ -131,10 +172,7 @@ export const isCourseMarksUpdated = (pendingUpdates, course) => {
   if (!pendingUpdates?.newMarks?.length || !course) return false;
   const key = getNormalizedCourseKey(course);
   return pendingUpdates.newMarks.some(
-    (m) =>
-      m.courseKey === key ||
-      m.courseId === course.id ||
-      m.courseTitle === course.title,
+    (m) => m.courseKey === key || m.courseId === course.id || m.courseTitle === course.title,
   );
 };
 
@@ -145,16 +183,11 @@ export const isSectionMarksUpdated = (pendingUpdates, course, sectionTitle) => {
   if (!pendingUpdates?.newMarks?.length || !course || !sectionTitle) return false;
   const key = getNormalizedCourseKey(course);
   const courseMatch = pendingUpdates.newMarks.find(
-    (m) =>
-      m.courseKey === key ||
-      m.courseId === course.id ||
-      m.courseTitle === course.title,
+    (m) => m.courseKey === key || m.courseId === course.id || m.courseTitle === course.title,
   );
   if (!courseMatch) return false;
   const target = String(sectionTitle).trim().toLowerCase();
-  return (courseMatch.sections || []).some(
-    (s) => String(s).trim().toLowerCase() === target,
-  );
+  return (courseMatch.sections || []).some((s) => String(s).trim().toLowerCase() === target);
 };
 
 /**
@@ -164,25 +197,21 @@ export const isAssessmentMarksUpdated = (pendingUpdates, course, assessmentTitle
   if (!pendingUpdates?.newMarks?.length || !course || !assessmentTitle) return false;
   const key = getNormalizedCourseKey(course);
   const courseMatch = pendingUpdates.newMarks.find(
-    (m) =>
-      m.courseKey === key ||
-      m.courseId === course.id ||
-      m.courseTitle === course.title,
+    (m) => m.courseKey === key || m.courseId === course.id || m.courseTitle === course.title,
   );
   if (!courseMatch) return false;
   const target = String(assessmentTitle).trim().toLowerCase();
-  return (courseMatch.assessmentNames || []).some(
-    (a) => String(a).trim().toLowerCase() === target,
-  );
+  return (courseMatch.assessmentNames || []).some((a) => String(a).trim().toLowerCase() === target);
 };
 
 /**
  * Compares incoming marks against previous snapshot and records any new assessments
  */
-export const checkAndRecordMarksSnapshot = (currentCourses) => {
+export const checkAndRecordMarksSnapshot = async (currentCourses) => {
   if (!Array.isArray(currentCourses) || currentCourses.length === 0) return { newMarks: [] };
 
-  const prevSnapshot = getAcademicSnapshot() || {};
+  await migrateLegacyAcademicState();
+  const prevSnapshot = (await getAcademicSnapshot()) || {};
   const prevMarks = prevSnapshot.marks || null;
 
   // Build current marks map: normalizedKey -> { id, title, items }
@@ -249,31 +278,35 @@ export const checkAndRecordMarksSnapshot = (currentCourses) => {
     });
   }
 
-  // Update snapshot with latest marks
-  const nextSnapshot = {
-    ...prevSnapshot,
-    timestamp: Date.now(),
-    marks: currentMarksMap,
-  };
-  try {
-    localStorage.setItem(SNAPSHOT_STORAGE_KEY, JSON.stringify(nextSnapshot));
-  } catch {}
+  // Keep every record already seen. Home uses a compact marks parser, while the
+  // Marks page has the complete list; replacing one with the other made old
+  // assessments look new again on every navigation.
+  await updateAcademicState(SNAPSHOT_KEY, (latestSnapshot) => {
+    const latestMarks = latestSnapshot?.marks || prevMarks || {};
+    const mergedMarks = { ...latestMarks };
+    Object.entries(currentMarksMap).forEach(([key, current]) => {
+      const previousItems = mergedMarks[key]?.items || [];
+      const seenItems = new Map(
+        previousItems.map((item) => [typeof item === "string" ? item : item.key, item]),
+      );
+      current.items.forEach((item) => seenItems.set(item.key, item));
+      mergedMarks[key] = { ...mergedMarks[key], ...current, items: [...seenItems.values()] };
+    });
+    return { ...latestSnapshot, timestamp: Date.now(), marks: mergedMarks };
+  });
 
   if (newMarks.length > 0) {
-    const existing = getPendingUpdates() || { newMarks: [], newAttendance: [] };
-    const merged = {
-      ...existing,
+    const merged = await updateAcademicState(UPDATES_KEY, (latestUpdates) => ({
+      ...latestUpdates,
       detectedAt: Date.now(),
-      newMarks: [...(existing.newMarks || []), ...newMarks].filter(
-        (v, i, a) => a.findIndex((t) => t.courseKey === v.courseKey || t.courseId === v.courseId) === i,
+      newMarks: [...(latestUpdates?.newMarks || []), ...newMarks].filter(
+        (value, index, all) =>
+          all.findIndex(
+            (item) => item.courseKey === value.courseKey || item.courseId === value.courseId,
+          ) === index,
       ),
-    };
-    try {
-      localStorage.setItem(UPDATES_STORAGE_KEY, JSON.stringify(merged));
-      window.dispatchEvent(
-        new CustomEvent("superflex-academic-updates-detected", { detail: merged }),
-      );
-    } catch {}
+    }));
+    dispatchAcademicEvent("superflex-academic-updates-detected", merged);
   }
 
   return { newMarks };
@@ -282,10 +315,11 @@ export const checkAndRecordMarksSnapshot = (currentCourses) => {
 /**
  * Compares incoming attendance against previous snapshot and records any new sessions
  */
-export const checkAndRecordAttendanceSnapshot = (currentSubjects) => {
+export const checkAndRecordAttendanceSnapshot = async (currentSubjects) => {
   if (!Array.isArray(currentSubjects) || currentSubjects.length === 0) return { newAttendance: [] };
 
-  const prevSnapshot = getAcademicSnapshot() || {};
+  await migrateLegacyAcademicState();
+  const prevSnapshot = (await getAcademicSnapshot()) || {};
   const prevAttendance = prevSnapshot.attendance || null;
 
   // Build current attendance map: normalizedKey -> { id, title, records, ... }
@@ -336,31 +370,34 @@ export const checkAndRecordAttendanceSnapshot = (currentSubjects) => {
     });
   }
 
-  // Update snapshot with latest attendance
-  const nextSnapshot = {
-    ...prevSnapshot,
-    timestamp: Date.now(),
-    attendance: currentAttendanceMap,
-  };
-  try {
-    localStorage.setItem(SNAPSHOT_STORAGE_KEY, JSON.stringify(nextSnapshot));
-  } catch {}
+  await updateAcademicState(SNAPSHOT_KEY, (latestSnapshot) => {
+    const latestAttendance = latestSnapshot?.attendance || prevAttendance || {};
+    const mergedAttendance = { ...latestAttendance };
+    Object.entries(currentAttendanceMap).forEach(([key, current]) => {
+      const previousRecords = mergedAttendance[key]?.records || [];
+      const seenRecords = new Map(
+        previousRecords.map((record) => [typeof record === "string" ? record : record.key, record]),
+      );
+      current.records.forEach((record) => seenRecords.set(record.key, record));
+      mergedAttendance[key] = {
+        ...mergedAttendance[key],
+        ...current,
+        records: [...seenRecords.values()],
+      };
+    });
+    return { ...latestSnapshot, timestamp: Date.now(), attendance: mergedAttendance };
+  });
 
   if (newAttendance.length > 0) {
-    const existing = getPendingUpdates() || { newMarks: [], newAttendance: [] };
-    const merged = {
-      ...existing,
+    const merged = await updateAcademicState(UPDATES_KEY, (latestUpdates) => ({
+      ...latestUpdates,
       detectedAt: Date.now(),
-      newAttendance: [...(existing.newAttendance || []), ...newAttendance].filter(
-        (v, i, a) => a.findIndex((t) => t.subjectKey === v.subjectKey) === i,
+      newAttendance: [...(latestUpdates?.newAttendance || []), ...newAttendance].filter(
+        (value, index, all) =>
+          all.findIndex((item) => item.subjectKey === value.subjectKey) === index,
       ),
-    };
-    try {
-      localStorage.setItem(UPDATES_STORAGE_KEY, JSON.stringify(merged));
-      window.dispatchEvent(
-        new CustomEvent("superflex-academic-updates-detected", { detail: merged }),
-      );
-    } catch {}
+    }));
+    dispatchAcademicEvent("superflex-academic-updates-detected", merged);
   }
 
   return { newAttendance };

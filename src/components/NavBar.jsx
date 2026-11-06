@@ -26,13 +26,13 @@ import {
 } from "lucide-react";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
-import { arrayMove } from "@dnd-kit/helpers";
 import { Logo } from "./ui/Logo";
 import ProfileImageModal from "./ui/ProfileImageModal";
 import { getExtensionUrl } from "../utils/extensionApi";
 import { usePreferencesStore } from "../stores/preferencesStore";
 import { sidebarLinksSchema } from "../stores/preferencesSchemas";
 import { getPendingUpdates } from "../utils/academicSnapshot";
+import { getProfileImage } from "../utils/userDataStorage";
 
 const LINK_GROUPS = {
   Home: "Overview",
@@ -71,10 +71,6 @@ const ICONS = {
 };
 
 const DEFAULT_ICON = FileText;
-
-function readProfileImage() {
-  return localStorage.getItem("superflex_user_custom_image") || "/Login/GetImage";
-}
 
 function readSidebarLinks() {
   try {
@@ -173,7 +169,7 @@ function SortableSidebarLink({ link, active, onNavigate, index, group, disabled,
 
 function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   const [menuLinks, setMenuLinks] = useState(readSidebarLinks);
-  const [profileImage, setProfileImage] = useState(readProfileImage);
+  const [profileImage, setProfileImage] = useState("/Login/GetImage");
   const [userName, setUserName] = useState("Student Account");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
@@ -183,13 +179,19 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     usePreferencesStore((state) => state.navOrder),
     usePreferencesStore((state) => state.setNavOrder),
   ];
-  const [pendingUpdates, setPendingUpdates] = useState(getPendingUpdates);
+  const [pendingUpdates, setPendingUpdates] = useState(null);
 
   useEffect(() => {
-    const handleUpdates = () => setPendingUpdates(getPendingUpdates());
+    let active = true;
+    const handleUpdates = async () => {
+      const updates = await getPendingUpdates();
+      if (active) setPendingUpdates(updates);
+    };
+    handleUpdates();
     window.addEventListener("superflex-academic-updates-detected", handleUpdates);
     window.addEventListener("superflex-academic-updates-cleared", handleUpdates);
     return () => {
+      active = false;
       window.removeEventListener("superflex-academic-updates-detected", handleUpdates);
       window.removeEventListener("superflex-academic-updates-cleared", handleUpdates);
     };
@@ -205,40 +207,76 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   callbacksRef.current = { onAttendanceLinkFound, onLinksFound };
 
   const groupedLinks = useMemo(() => {
-    const groups = Object.fromEntries(GROUP_ORDER.map((group) => [group, []]));
+    const linkMap = new Map();
     menuLinks.forEach((link) => {
       const name = link.text.trim();
-      const group = LINK_GROUPS[name] || "More";
       if (!["Grade Report", "My Teachers", "Change Password"].includes(name)) {
-        if (groups[group]) groups[group].push(link);
+        linkMap.set(name, link);
       }
     });
 
-    const orderIndex = new Map();
-    (navOrder || []).forEach((id, index) => {
-      orderIndex.set(id, index);
-      if (id.includes(":")) {
-        const textPart = id.split(":").slice(1).join(":");
-        if (textPart && !orderIndex.has(textPart)) {
-          orderIndex.set(textPart, index);
+    const groups = Object.fromEntries(GROUP_ORDER.map((group) => [group, []]));
+    const placedLinkIds = new Set();
+
+    (navOrder || []).forEach((item, idx) => {
+      let group;
+      let linkId;
+      if (item.includes(":")) {
+        const colonIndex = item.indexOf(":");
+        group = item.slice(0, colonIndex);
+        linkId = item.slice(colonIndex + 1).trim();
+      } else {
+        linkId = item.trim();
+        // If legacy flat order placed Course Registration or Attendance before Marks, infer Overview
+        const marksIndex = (navOrder || []).indexOf("Marks");
+        if (
+          (linkId === "Course Registration" || linkId === "Attendance") &&
+          marksIndex !== -1 &&
+          idx < marksIndex
+        ) {
+          group = "Overview";
+        } else {
+          group = LINK_GROUPS[linkId] || "More";
+        }
+      }
+
+      if (linkMap.has(linkId) && !placedLinkIds.has(linkId)) {
+        const link = linkMap.get(linkId);
+        const targetGroup = groups[group] ? group : (LINK_GROUPS[linkId] || "More");
+        if (groups[targetGroup]) {
+          groups[targetGroup].push(link);
+          placedLinkIds.add(linkId);
         }
       }
     });
 
-    Object.values(groups).forEach((links) => {
-      links.sort((a, b) => {
-        const aId = getLinkId(a);
-        const bId = getLinkId(b);
-        const aIndex = orderIndex.has(aId) ? orderIndex.get(aId) : null;
-        const bIndex = orderIndex.has(bId) ? orderIndex.get(bId) : null;
-        if (aIndex == null && bIndex == null) return 0;
-        if (aIndex == null) return 1;
-        if (bIndex == null) return -1;
-        return aIndex - bIndex;
-      });
+    // Place any menuLinks not in navOrder yet into their default groups
+    menuLinks.forEach((link) => {
+      const name = link.text.trim();
+      if (!placedLinkIds.has(name) && !["Grade Report", "My Teachers", "Change Password"].includes(name)) {
+        const defaultGroup = LINK_GROUPS[name] || "More";
+        if (groups[defaultGroup]) {
+          groups[defaultGroup].push(link);
+          placedLinkIds.add(name);
+        }
+      }
     });
+
     return groups;
   }, [menuLinks, navOrder]);
+
+  useEffect(() => {
+    if (!navOrder || !navOrder.length || !menuLinks.length) return;
+    const hasColons = navOrder.some((item) => item.includes(":"));
+    if (!hasColons) {
+      const migrated = GROUP_ORDER.flatMap((group) =>
+        (groupedLinks[group] || []).map((link) => `${group}:${getLinkId(link)}`),
+      );
+      if (migrated.length) {
+        setNavOrder(migrated);
+      }
+    }
+  }, [navOrder, groupedLinks, menuLinks.length, setNavOrder]);
 
   const changeThemeMode = (mode) => {
     setThemeMode(mode);
@@ -325,9 +363,17 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   }, []);
 
   useEffect(() => {
-    const onStorage = () => setProfileImage(readProfileImage());
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    let active = true;
+    const loadProfileImage = async (event) => {
+      const image = event?.detail || (await getProfileImage());
+      if (active) setProfileImage(image);
+    };
+    loadProfileImage();
+    window.addEventListener("superflex-profile-image-changed", loadProfileImage);
+    return () => {
+      active = false;
+      window.removeEventListener("superflex-profile-image-changed", loadProfileImage);
+    };
   }, []);
 
   useEffect(() => {
@@ -345,50 +391,42 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   };
 
   const handleDragEnd = (event) => {
-    if (event.canceled || !event.operation?.source || !event.operation?.target) return;
-    const sourceId = event.operation.source.id;
-    const targetId = event.operation.target.id;
-    if (!sourceId || !targetId || sourceId === targetId) return;
+    const source = event.operation?.source;
+    const sortable = source?.sortable;
+    if (event.canceled || !source || !sortable) return;
 
-    let sourceGroup = null;
-    let targetGroup = null;
+    // dnd-kit updates the dragged sortable's group and index while it moves.
+    // The final drop target can be the source item itself, so deriving the new
+    // position from operation.target loses otherwise valid reorder operations.
+    const sourceId = source.id;
+    const sourceGroup = sortable.initialGroup;
+    const targetGroup = sortable.group;
+    const targetIndex = sortable.index;
 
-    for (const group of GROUP_ORDER) {
-      const groupLinkIds = (groupedLinks[group] || []).map(getLinkId);
-      if (groupLinkIds.includes(sourceId)) sourceGroup = group;
-      if (groupLinkIds.includes(targetId)) targetGroup = group;
+    if (
+      !sourceId ||
+      !GROUP_ORDER.includes(sourceGroup) ||
+      !GROUP_ORDER.includes(targetGroup) ||
+      !Number.isInteger(targetIndex)
+    ) {
+      return;
     }
-
-    if (!sourceGroup || !targetGroup) return;
 
     const nextGroupedLinks = Object.fromEntries(
       GROUP_ORDER.map((group) => [group, [...(groupedLinks[group] || [])]]),
     );
 
-    if (sourceGroup === targetGroup) {
-      const links = nextGroupedLinks[sourceGroup];
-      const fromIndex = links.findIndex((l) => getLinkId(l) === sourceId);
-      const toIndex = links.findIndex((l) => getLinkId(l) === targetId);
-      if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
-        nextGroupedLinks[sourceGroup] = arrayMove(links, fromIndex, toIndex);
-      }
-    } else {
-      const srcLinks = nextGroupedLinks[sourceGroup];
-      const tgtLinks = nextGroupedLinks[targetGroup];
-      const fromIndex = srcLinks.findIndex((l) => getLinkId(l) === sourceId);
-      const toIndex = tgtLinks.findIndex((l) => getLinkId(l) === targetId);
-      if (fromIndex !== -1) {
-        const [movedItem] = srcLinks.splice(fromIndex, 1);
-        if (toIndex !== -1) {
-          tgtLinks.splice(toIndex, 0, movedItem);
-        } else {
-          tgtLinks.push(movedItem);
-        }
-      }
-    }
+    const sourceLinks = nextGroupedLinks[sourceGroup];
+    const sourceIndex = sourceLinks.findIndex((link) => getLinkId(link) === sourceId);
+    if (sourceIndex === -1) return;
+
+    const [movedLink] = sourceLinks.splice(sourceIndex, 1);
+    const targetLinks = nextGroupedLinks[targetGroup];
+    const insertAt = Math.max(0, Math.min(targetIndex, targetLinks.length));
+    targetLinks.splice(insertAt, 0, movedLink);
 
     const newNavOrder = GROUP_ORDER.flatMap((group) =>
-      (nextGroupedLinks[group] || []).map(getLinkId),
+      (nextGroupedLinks[group] || []).map((link) => `${group}:${getLinkId(link)}`),
     );
     setNavOrder(newNavOrder);
   };
@@ -573,10 +611,6 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         isOpen={profileModalOpen}
         onClose={() => setProfileModalOpen(false)}
         currentImage={profileImage}
-        onImageUpdate={(image) => {
-          setProfileImage(image);
-          localStorage.setItem("superflex_user_custom_image", image);
-        }}
       />
     </>
   );
