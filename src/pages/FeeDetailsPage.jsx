@@ -353,8 +353,20 @@ function FeeDetailsPage() {
             <p className="text-xs text-white/75">Where did all the money go? Payments, remaining dues, and everything in between.</p>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
-            <StatsCard variant="dashboard" icon={DollarSign} label="Lifetime paid" value={`Rs. ${totalPaid}`} />
-            <StatsCard variant="dashboard" icon={TrendingUp} label="Current CGPA" value={semesters[0]?.academic.cgpa || "N/A"} />
+            <StatsCard
+              variant="dashboard"
+              icon={DollarSign}
+              label="Lifetime paid"
+              value={`Rs. ${totalPaid}`}
+              subValue="Total tuition & dues paid"
+            />
+            <StatsCard
+              variant="dashboard"
+              icon={TrendingUp}
+              label="Current CGPA"
+              value={semesters[0]?.academic.cgpa || "N/A"}
+              subValue={semesters[0]?.name ? `${semesters[0].name} standing` : "Cumulative standing"}
+            />
             <StatsCard variant="dashboard" icon={Layers} label="Semesters" value={semesters.length} subValue="Fee records available" />
             <StatsCard variant="dashboard" icon={History} label="Last payment" value={transactions[0]?.amount ? `Rs. ${transactions[0].amount}` : "N/A"} subValue={transactions[0]?.paymentDate || "No payment recorded"} />
           </div>

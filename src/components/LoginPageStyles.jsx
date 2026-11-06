@@ -189,7 +189,11 @@ function LoginPageStyles() {
       let resetTimer;
 
       // Inject "Remember Me" checkbox before the Sign In button
-      if (isLoginSubmit && button.parentElement && !document.getElementById("superflex-remember-me-container")) {
+      if (
+        isLoginSubmit &&
+        button.parentElement &&
+        !document.getElementById("superflex-remember-me-container")
+      ) {
         const rememberContainer = document.createElement("div");
         rememberContainer.id = "superflex-remember-me-container";
         rememberContainer.className =
@@ -237,7 +241,9 @@ function LoginPageStyles() {
             const rememberCheckbox = document.getElementById("superflex-remember-me-checkbox");
             if (rememberCheckbox) rememberCheckbox.checked = true;
 
-            const usernameInput = loginForm?.querySelector('input[name="username"], #m_inputmask_4');
+            const usernameInput = loginForm?.querySelector(
+              'input[name="username"], #m_inputmask_4',
+            );
             const passwordInput = loginForm?.querySelector('input[name="password"], #pass');
 
             // Inject "Auto-fill?" prompt card above the inputs if not already present
@@ -348,7 +354,9 @@ function LoginPageStyles() {
         () => {
           if (!isLoginSubmit || button.disabled || isSubmitting) return;
 
-          const username = loginForm?.querySelector('input[name="username"], #m_inputmask_4')?.value?.trim();
+          const username = loginForm
+            ?.querySelector('input[name="username"], #m_inputmask_4')
+            ?.value?.trim();
           const password = loginForm?.querySelector('input[name="password"], #pass')?.value;
           const rememberCheckbox = document.getElementById("superflex-remember-me-checkbox");
           const isRemember = rememberCheckbox?.checked ?? false;
@@ -884,99 +892,101 @@ function LoginPageStyles() {
       const termsModal = document.createElement("div");
       termsModal.id = "terms-modal";
       termsModal.className =
-        "fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/40";
+        "fixed inset-0 z-[9999] flex items-end justify-center bg-slate-950/60 p-3 backdrop-blur-md transition-opacity duration-200";
+      termsModal.setAttribute("role", "dialog");
+      termsModal.setAttribute("aria-modal", "true");
+      termsModal.setAttribute("aria-labelledby", "terms-modal-title");
+      termsModal.setAttribute("aria-describedby", "terms-modal-description");
 
       termsModal.innerHTML = `
-        <div class="bg-white rounded-[32px] w-full max-w-lg max-h-[82vh] overflow-hidden flex flex-col text-slate-900 animate-in zoom-in-95 duration-200 shadow-none border-none">
-          <!-- Header -->
-          <div class="p-6 border-b border-slate-100 bg-slate-50/50">
-            <div class="flex items-center gap-3.5">
-              <div class="w-11 h-11 rounded-2xl bg-[#e9ddff] flex items-center justify-center text-[#1e0838] select-none">
-                <svg viewBox="0 0 432 432" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M247.227 185.616L282.286 69L133 216L186.861 231.146L133 363L298 208.65L247.227 185.616Z" fill="#1e0838" />
-                </svg>
-              </div>
-              <div>
-                <h2 class="text-lg font-black text-slate-900">Terms & Conditions</h2>
-                <p class="text-[10px] text-purple-700 font-bold uppercase tracking-wider">First Time Setup</p>
-              </div>
-            </div>
+        <div class="terms-sheet flex max-h-[76dvh] w-full max-w-2xl flex-col overflow-hidden rounded-[34px] bg-white text-slate-900 shadow-[0_18px_60px_rgba(35,0,82,.24)] animate-in slide-in-from-bottom-8 duration-300">
+          <div class="flex shrink-0 justify-center pt-3" aria-hidden="true">
+            <span class="terms-sheet-handle h-1.5 w-14 rounded-full bg-[#ded9e5]"></span>
           </div>
 
+          <!-- Header -->
+          <header class="flex shrink-0 flex-col items-center px-6 pb-3 pt-3 text-center sm:px-8">
+            <div class="terms-brand-icon mb-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-[#230052] text-white select-none">
+              <svg viewBox="0 0 432 432" width="28" height="28" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M247.227 185.616L282.286 69L133 216L186.861 231.146L133 363L298 208.65L247.227 185.616Z" />
+              </svg>
+            </div>
+            <p class="terms-eyebrow text-[10px] font-bold uppercase tracking-[0.16em] text-[#230052]/65">Welcome to SuperFlex</p>
+            <h2 id="terms-modal-title" class="mt-1 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">Terms & Privacy</h2>
+            <p id="terms-modal-description" class="mt-1 max-w-md text-sm text-slate-500">A quick overview before you start using SuperFlex.</p>
+          </header>
+
           <!-- Content -->
-          <div class="flex-1 overflow-y-auto p-6 space-y-3.5">
-            <div class="space-y-3">
-              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                <h3 class="text-xs font-bold text-slate-900 mb-1 flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="16" x2="12" y2="12"/>
-                    <line x1="12" y1="8" x2="12.01" y2="8"/>
-                  </svg>
-                  Independent Project
-                </h3>
-                <p class="text-[11px] text-slate-600 leading-relaxed font-medium">
-                  SuperFlex is an independent project that redesigns the Flex portal of NUCES university. This extension is <strong class="text-slate-900 font-bold">not affiliated with, endorsed by, or sponsored by</strong> NUCES university.
-                </p>
-              </div>
+          <div class="min-h-0 flex-1 overflow-y-auto px-5 pb-4 pt-1 sm:px-8">
+            <div class="terms-sections overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-50/70">
+              <!-- Card 1: Independent Project -->
+              <section class="terms-section flex gap-3 px-4 py-3.5">
+                <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#230052]/10 text-[#230052]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="16" x2="12" y2="12"/>
+                      <line x1="12" y1="8" x2="12.01" y2="8"/>
+                    </svg>
+                </span>
+                <div class="min-w-0">
+                  <h3 class="text-sm font-bold text-slate-900">Independent open-source project</h3>
+                  <p class="mt-1 text-xs leading-relaxed text-slate-500">SuperFlex modernizes the Flex student portal, but is <strong class="font-semibold text-slate-700">not affiliated with, endorsed by, or sponsored by</strong> FAST-NUCES.</p>
+                </div>
+              </section>
 
-              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                <h3 class="text-xs font-bold text-slate-900 mb-1 flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                  </svg>
-                  Security & Privacy
-                </h3>
-                <p class="text-[11px] text-slate-600 leading-relaxed font-medium">
-                  This is a personal project intended to enhance the learning experience. SuperFlex <strong class="text-slate-900 font-bold">only applies cosmetic changes</strong> to the user interface without compromising any security measures or accessing unauthorized data. No hacking involved.
-                </p>
-              </div>
+              <!-- Card 2: Security & Privacy (100% Local, Zero Analytics) -->
+              <section class="terms-section flex gap-3 border-t border-slate-200/80 px-4 py-3.5">
+                <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </span>
+                <div class="min-w-0">
+                  <h3 class="text-sm font-bold text-slate-900">Local and privacy-first</h3>
+                  <p class="mt-1 text-xs leading-relaxed text-slate-500">Your grades, attendance, and credentials stay inside your browser. SuperFlex is <strong class="font-semibold text-slate-700">client-side with zero telemetry and zero analytics</strong>.</p>
+                </div>
+              </section>
 
-              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                <h3 class="text-xs font-bold text-slate-900 mb-1 flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                  </svg>
-                  User Responsibility
-                </h3>
-                <p class="text-[11px] text-slate-600 leading-relaxed font-medium">
-                  You are using this extension at <strong class="text-slate-900 font-bold">your own consent and responsibility</strong>. The creator of SuperFlex is not responsible for any issues that may arise, including but not limited to academic discrepancies, data inaccuracies, or system incompatibilities.
-                </p>
-              </div>
-
-              <div class="p-4 rounded-2xl bg-[#f2ecfc]">
-                <h3 class="text-xs font-bold text-[#1e0838] mb-1 flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 3h18v18H3zM21 9H3M9 21V9"/>
-                  </svg>
-                  Analytics
-                </h3>
-                <p class="text-[11px] text-slate-600 leading-relaxed font-medium">
-                  We use <strong class="text-[#1e0838] font-bold">Umami Analytics</strong> to track usage patterns and improve the extension. No personal information, grades, or attendance data is collected. Only anonymous usage statistics.
-                </p>
-              </div>
+              <!-- Card 3: User Responsibility -->
+              <section class="terms-section flex gap-3 border-t border-slate-200/80 px-4 py-3.5">
+                <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                </span>
+                <div class="min-w-0">
+                  <h3 class="text-sm font-bold text-slate-900">Official records still apply</h3>
+                  <p class="mt-1 text-xs leading-relaxed text-slate-500">Use SuperFlex voluntarily as a UI enhancement. Official grades, notices, fee challans, and academic standing remain governed by the university's records.</p>
+                </div>
+              </section>
             </div>
 
-            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-              <p class="text-[11px] text-slate-600 leading-relaxed font-medium">
-                By clicking <strong class="text-slate-900 font-bold">"Accept & Continue"</strong>, you acknowledge that you are using a third-party modification to the university's official system and do so at your own risk.
+            <!-- Bottom notice -->
+            <div class="terms-consent mt-3 rounded-2xl bg-[#230052]/[0.05] px-4 py-3">
+              <p class="text-xs leading-relaxed text-slate-600">
+                By continuing, you acknowledge that you are using this client-side UI overlay at your own discretion.
               </p>
             </div>
           </div>
 
           <!-- Footer -->
-          <div class="p-6 border-t border-slate-100 bg-slate-50/50">
-            <button id="terms-accept-btn" class="w-full bg-[#1e0838] hover:bg-[#2a0c4f] active:scale-[0.98] text-white border-none rounded-full py-3.5 px-6 font-bold text-sm transition-all cursor-pointer shadow-none">
-              Accept & Continue
+          <footer class="terms-footer shrink-0 border-t border-slate-100 bg-white/95 px-5 pb-3 pt-2.5 sm:px-8">
+            <button id="terms-accept-btn" class="flex min-h-12 w-full items-center justify-center gap-2 rounded-full border-none bg-[#230052] px-5 py-2.5 text-sm font-bold text-white transition-all duration-200 hover:bg-[#320075] active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#230052]">
+              <span>Accept & Continue</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m9 18 6-6-6-6"/>
+              </svg>
             </button>
-          </div>
+          </footer>
         </div>
       `;
 
       document.body.appendChild(termsModal);
 
-      document.getElementById("terms-accept-btn").addEventListener("click", () => {
+      const termsAcceptButton = document.getElementById("terms-accept-btn");
+      termsAcceptButton.focus();
+      termsAcceptButton.addEventListener("click", () => {
         localStorage.setItem("superflex_terms_accepted", "true");
         termsModal.classList.add("opacity-0", "scale-95");
         setTimeout(() => termsModal.remove(), 200);

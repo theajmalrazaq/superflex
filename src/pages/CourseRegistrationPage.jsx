@@ -41,9 +41,9 @@ function CourseRegistrationPage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="mx-auto w-full max-w-[1600px] space-y-7">
         <header className="space-y-1">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#230052]/70 dark:text-white">Academics</p>
-          <h1 className="text-3xl font-bold tracking-tight text-[#101010] dark:text-[#f5f6fb] sm:text-4xl">Course Registration</h1>
-          <p className="text-sm text-[#626262] dark:text-[#c4cad6]">Choose your fighters. Naya semester, naye subjects, same old trauma.</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Course Registration</h1>
+          <p className="text-sm text-white/80">Choose your fighters. Naya semester, naye subjects, same old trauma.</p>
         </header>
 
         {loading ? (

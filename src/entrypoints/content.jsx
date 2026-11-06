@@ -12,12 +12,6 @@ export default defineContentScript({
     sendExtensionMessage({ type: "SUPERFLEX_APPLY_DEFAULT_ZOOM" });
 
     (() => {
-      const scriptUmami = document.createElement("script");
-      scriptUmami.src = getExtensionUrl("scripts/umami.js");
-      scriptUmami.defer = true;
-      scriptUmami.dataset.websiteId = "17490ccf-0b15-4d8a-a908-5e774ad648de";
-      if (scriptUmami.src) document.head.appendChild(scriptUmami);
-
       const scriptBridge = document.createElement("script");
       scriptBridge.src = getExtensionUrl("scripts/bridge.js");
       scriptBridge.defer = true;

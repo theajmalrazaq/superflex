@@ -137,6 +137,7 @@ const SectionAccordion = ({ section, isOpen, onToggle, course, pendingUpdates })
 
 const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
   const ROWS_PER_COL = 15;
+  const [hoveredDot, setHoveredDot] = useState(null);
 
   return (
     <div className="flex-1 space-y-4 overflow-hidden" aria-label="Attendance by subject">
@@ -147,7 +148,7 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
           <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[3px] bg-rose-500" /> Absent</span>
         </div>
       </div>
-      <div className="grid max-h-[390px] grid-cols-2 gap-x-4 gap-y-5 overflow-y-auto pr-1 md:grid-cols-3 xl:grid-cols-5">
+      <div className="grid max-h-[390px] grid-cols-2 gap-x-4 gap-y-5 overflow-y-auto px-1 pr-2 md:grid-cols-3 xl:grid-cols-5">
         {subjects.map((subject, index) => {
           const records = [...(subject.records || [])].sort((a, b) => parseAttendanceDate(a.date) - parseAttendanceDate(b.date));
           const isUpdated = updatedSubjectKeys.has(subject.title);
@@ -161,7 +162,7 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
 
           return (
             <div key={`${subject.title}-${index}`} className="flex min-w-0 flex-col items-start py-1">
-              <div className="mb-2 flex min-h-[180px] min-w-0 items-end gap-1 py-1" role="list" aria-label={`${subject.title} class sessions`}>
+              <div className="mb-2 flex min-h-[180px] min-w-0 items-end gap-1.5 px-2 py-1" role="list" aria-label={`${subject.title} class sessions`}>
                 {columns.map((colRecords, colIndex) => (
                   <div key={colIndex} className="flex flex-col-reverse gap-1">
                     {colRecords.map((record, recordIndex) => {
@@ -175,9 +176,15 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
                         <span
                           key={`${record.date}-${recordIndex}`}
                           role="listitem"
-                          title={`${record.date} · ${status || "Unknown"} · ${record.type || "Class"}`}
                           aria-label={`${record.date}: ${status || "Unknown attendance status"}`}
-                          className={`h-3.5 w-3.5 shrink-0 rounded-[3px] transition-transform hover:scale-125 ${color}`}
+                          onMouseEnter={(e) =>
+                            setHoveredDot({
+                              record,
+                              rect: e.currentTarget.getBoundingClientRect(),
+                            })
+                          }
+                          onMouseLeave={() => setHoveredDot(null)}
+                          className={`h-3.5 w-3.5 shrink-0 rounded-[3px] cursor-pointer transition-transform hover:scale-125 ${color}`}
                         />
                       );
                     })}
@@ -198,6 +205,36 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
           );
         })}
       </div>
+
+      {hoveredDot && (
+        <div
+          className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full transform transition-opacity animate-in fade-in duration-75"
+          style={{
+            left: hoveredDot.rect.left + hoveredDot.rect.width / 2,
+            top: hoveredDot.rect.top - 6,
+          }}
+        >
+          <div className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-black/10 bg-white/95 px-3 py-1 text-[11px] font-medium text-slate-900 shadow-lg backdrop-blur-md dark:border-white/20 dark:bg-zinc-900/95 dark:text-white dark:shadow-2xl">
+            <span className="font-semibold text-slate-900 dark:text-white">{hoveredDot.record.date}</span>
+            <span className="text-slate-400 dark:text-white/40">·</span>
+            <span
+              className={`font-bold ${
+                /\bp\b|present/i.test(hoveredDot.record.status)
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-rose-600 dark:text-rose-400"
+              }`}
+            >
+              {/\bp\b|present/i.test(hoveredDot.record.status) ? "Present" : "Absent"}
+            </span>
+            {hoveredDot.record.type && (
+              <>
+                <span className="text-slate-400 dark:text-white/40">·</span>
+                <span className="text-slate-600 dark:text-white/70">{hoveredDot.record.type}</span>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -644,16 +681,37 @@ function HomePage() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
-                  <StatsCard variant="dashboard" icon={GraduationCap} iconTone="plum" label="Degree Program" value={universityInfo?.Degree || "..."} />
-                  <StatsCard variant="dashboard" icon={Users} iconTone="lavender" label="Section" value={universityInfo?.Section || "..."} />
-                  <StatsCard variant="dashboard" icon={Award} iconTone="neutral" label="Registered Courses" value={coursesData.length || 0} />
+                  <StatsCard
+                    variant="dashboard"
+                    icon={GraduationCap}
+                    iconTone="plum"
+                    label="Degree Program"
+                    value={universityInfo?.Degree || "..."}
+                    subValue={universityInfo?.Campus ? `${universityInfo.Campus} Campus` : "Active enrollment"}
+                  />
+                  <StatsCard
+                    variant="dashboard"
+                    icon={Users}
+                    iconTone="lavender"
+                    label="Section"
+                    value={universityInfo?.Section || "..."}
+                    subValue={universityInfo?.Batch ? `Batch of ${universityInfo.Batch}` : "Current cohort"}
+                  />
+                  <StatsCard
+                    variant="dashboard"
+                    icon={Award}
+                    iconTone="neutral"
+                    label="Registered Courses"
+                    value={coursesData.length || 0}
+                    subValue="Current semester"
+                  />
                   <StatsCard
                     variant="dashboard"
                     icon={Activity}
                     iconTone="lavender"
                     label="Critical Attendance"
                     value={loadingAttendance ? <Skeleton className="my-1 h-6 w-24" /> : mostAbsentSubject?.title || "None"}
-                    subValue={loadingAttendance ? <Skeleton className="h-3 w-16" /> : mostAbsentSubject ? `${mostAbsentSubject.absent} Absents` : ""}
+                    subValue={loadingAttendance ? <Skeleton className="h-3 w-16" /> : mostAbsentSubject ? `${mostAbsentSubject.absent} Absents taken` : "All courses 80%+ safe"}
                   />
                 </div>
               </section>

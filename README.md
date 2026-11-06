@@ -84,11 +84,11 @@ This bad boy works by sneaking React components into the boring old LMS pages, b
 - **Real-time Calculations**: Instant grade and attendance calculations
 - **Data Persistence**: LocalStorage integration for settings and preferences
 
-### 📈 Analytics Integration
+### 🔒 Privacy & Local-First Architecture
 
-- **Umami Analytics**: Privacy-focused usage tracking
-- **Performance Monitoring**: Track extension performance and user engagement
-- **No Personal Data Collection**: Analytics only track usage patterns, not personal information
+- **Zero Analytics**: 100% telemetry-free with no tracking scripts or external metric beacons
+- **Local Storage Only**: Credentials, settings, and cached data remain strictly inside your browser sandbox
+- **No Personal Data Collection**: No user metrics, grades, attendance, or personal information leave your device
 
 ## Supported Pages
 
@@ -218,8 +218,7 @@ superflex/
 │   │
 │   ├── reviews.json
 │   └── scripts
-│       ├── bridge.js
-│       └── umami.js
+│       └── bridge.js
 ├── README.md
 ├── scripts
 │   └── clean.js

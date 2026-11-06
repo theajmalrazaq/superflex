@@ -532,7 +532,7 @@ function RetakeExamPage() {
         <section aria-labelledby="retake-overview-heading" className="space-y-4">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Overview</p><h2 id="retake-overview-heading" className="text-xl font-bold tracking-tight text-white">Retake Summary</h2></div><p className="text-xs text-white/75">The redemption arc. Select your papers and calculate the comeback cost.</p></div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
-            <StatsCard variant="dashboard" icon={Layout} label="Total courses" value={courses.length} />
+            <StatsCard variant="dashboard" icon={Layout} label="Total courses" value={courses.length} subValue="Eligible for retake" />
             <StatsCard variant="dashboard" icon={CheckCircle2} label="Selected papers" value={selectedCourses.size} subValue="For this application" />
             <StatsCard variant="dashboard" icon={ShieldCheck} label="Processed" value={courses.filter((course) => course.status?.trim().toLowerCase() === "processed").length} subValue="Already processed" />
             <StatsCard variant="dashboard" icon={AlertCircle} label="Application fee" value={`Rs. ${(selectedCourses.size * 2000).toLocaleString()}`} subValue="Rs. 2,000 per paper" />

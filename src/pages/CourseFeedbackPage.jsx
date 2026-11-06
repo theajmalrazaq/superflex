@@ -302,7 +302,7 @@ function CourseFeedbackPage() {
             <p className="text-xs text-white/75">How many evaluations are done, and how many remain?</p>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
-            <StatsCard variant="dashboard" icon={Layout} label="Total surveys" value={stats.total} />
+            <StatsCard variant="dashboard" icon={Layout} label="Total surveys" value={stats.total} subValue="All course evaluations" />
             <StatsCard variant="dashboard" icon={Clock} label="Pending" value={stats.pending} subValue="Waiting for your review" />
             <StatsCard variant="dashboard" icon={CheckCircle2} label="Completed" value={stats.submitted} subValue="Feedback submitted" />
             <StatsCard variant="dashboard" icon={MessageSquare} label="Progress" value={stats.total ? `${Math.round((stats.submitted / stats.total) * 100)}%` : "0%"} subValue="Surveys completed" />

@@ -202,8 +202,8 @@ export default function SuperFlexSettingsModal({
         <BottomSheetTitle className="text-xl font-bold tracking-tight sm:text-2xl text-foreground">
           {mode === "setup"
             ? step === 1
-              ? "Select Your Course Instructors 👨‍🏫"
-              : "Set Up Octopus AI Assistant 🐙"
+              ? "Select Your Course Instructors"
+              : "Set Up Octopus AI Assistant"
             : currentTab === "autofill"
               ? "FLEX Login Auto-Fill"
               : currentTab === "ai"
@@ -334,10 +334,17 @@ export default function SuperFlexSettingsModal({
 
             {activeCourse && (
               <div className="rounded-xl border border-black/[0.06] bg-slate-50/70 p-2.5 dark:border-white/[0.08] dark:bg-white/[0.03]">
-                <p className="text-[11px] font-bold text-foreground truncate">
-                  {activeCourse.id}: {activeCourse.title}
-                </p>
-                <p className="mt-0.5 text-[10px] text-foreground/60">
+                <div className="flex items-center gap-2">
+                  {courses.length > 1 && (
+                    <span className="rounded-md bg-[#230052]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#230052] dark:bg-white/10 dark:text-white shrink-0">
+                      {courseIndex + 1} of {courses.length}
+                    </span>
+                  )}
+                  <p className="text-[11px] font-bold text-foreground truncate">
+                    {activeCourse.id}: {activeCourse.title}
+                  </p>
+                </div>
+                <p className="mt-0.5 text-[10px] text-foreground/60 pl-0.5">
                   Current Instructor:{" "}
                   <span className="font-semibold text-foreground">
                     {selections[activeCourse.id]?.name || "Not assigned yet"}
@@ -555,13 +562,13 @@ export default function SuperFlexSettingsModal({
                           ? "Enter new key to replace existing"
                           : "Paste Gemini API key (AIzaSy...)"
                       }
-                      className="flex-1 min-w-0 rounded-xl border border-black/[0.08] bg-slate-50 px-3.5 py-2 text-xs text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-[#230052]/30 dark:border-white/[0.1] dark:bg-white/[0.06]"
+                      className="min-h-11 flex-1 min-w-0 rounded-xl border border-black/[0.08] bg-slate-50 px-3.5 py-2.5 text-xs text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-[#230052]/30 dark:border-white/[0.1] dark:bg-white/[0.06]"
                     />
                     <button
                       type="button"
                       onClick={handleConnectGemini}
                       disabled={!apiKeyInput.trim() || isConnecting}
-                      className="flex items-center gap-1.5 rounded-xl bg-[#230052] px-4 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] disabled:opacity-50 dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 shrink-0"
+                      className="min-h-11 flex items-center gap-1.5 rounded-xl bg-[#230052] px-4 py-2.5 text-xs font-bold text-white transition-all hover:bg-[#370c72] disabled:opacity-50 dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 shrink-0"
                     >
                       {isConnecting ? (
                         <LoaderCircle size={14} className="animate-spin" />
@@ -581,7 +588,7 @@ export default function SuperFlexSettingsModal({
                 </div>
 
                 <div className="rounded-xl bg-slate-100/60 p-3 text-[11px] text-foreground/60 dark:bg-white/[0.03]">
-                  💡 <strong>Privacy Note:</strong> Your API key is stored locally inside your browser and never leaves your device. Data is processed directly through Google's official Gemini API.
+                  <strong>Privacy Note:</strong> Your API key is stored locally inside your browser and never leaves your device. Data is processed directly through Google's official Gemini API.
                 </div>
               </div>
             ) : (
@@ -728,47 +735,106 @@ export default function SuperFlexSettingsModal({
         {mode === "setup" ? (
           <>
             {step === 1 ? (
-              <button
-                type="button"
-                onClick={() => setStep(2)}
-                className="text-xs font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white"
-              >
-                Skip Teachers
-              </button>
+              <div className="flex items-center gap-3">
+                {courseIndex > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCourseIndex((i) => Math.max(0, i - 1));
+                      setQuery("");
+                    }}
+                    className="flex items-center gap-1 text-xs font-bold text-foreground/70 hover:text-foreground cursor-pointer"
+                  >
+                    <ArrowLeft size={13} /> Prev Course
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setStep(2)}
+                  className="text-xs font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white cursor-pointer"
+                >
+                  {Object.keys(selections).length > 0 ? "Skip to Octopus AI" : "Skip Teachers"}
+                </button>
+              </div>
             ) : (
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="flex items-center gap-1 text-xs font-bold text-foreground/70 hover:text-foreground"
+                className="flex items-center gap-1 text-xs font-bold text-foreground/70 hover:text-foreground cursor-pointer"
               >
                 <ArrowLeft size={13} /> Back to Teachers
               </button>
             )}
 
             {step === 1 ? (
-              <button
-                type="button"
-                onClick={() => setStep(2)}
-                className="flex items-center gap-1.5 rounded-full bg-[#230052] px-5 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 shadow-xs"
-              >
-                Next: Octopus AI <ArrowRight size={13} />
-              </button>
+              <div className="flex items-center gap-2">
+                {courseIndex < courses.length - 1 ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCourseIndex((i) => Math.min(courses.length - 1, i + 1));
+                      setQuery("");
+                    }}
+                    className="flex items-center gap-1.5 rounded-full bg-[#230052] px-5 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 shadow-xs cursor-pointer"
+                  >
+                    Next Course <ArrowRight size={13} />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    className="flex items-center gap-1.5 rounded-full bg-[#230052] px-5 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 shadow-xs cursor-pointer"
+                  >
+                    Next: Octopus AI <ArrowRight size={13} />
+                  </button>
+                )}
+              </div>
             ) : (
               <button
                 type="button"
                 onClick={onSave}
-                className="flex items-center gap-1.5 rounded-full bg-[#230052] px-6 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 shadow-xs"
+                className="flex items-center gap-1.5 rounded-full bg-[#230052] px-6 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 shadow-xs cursor-pointer"
               >
-                Complete Setup & Launch 🚀
+                Complete Setup & Launch
               </button>
             )}
           </>
         ) : (
-          <div className="flex w-full items-center justify-end gap-2">
+          <div className="flex w-full items-center justify-between gap-2">
+            {currentTab === "teachers" && courses.length > 1 ? (
+              <div className="flex items-center gap-2">
+                {courseIndex > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCourseIndex((i) => Math.max(0, i - 1));
+                      setQuery("");
+                    }}
+                    className="flex items-center gap-1 text-xs font-bold text-foreground/70 hover:text-foreground cursor-pointer"
+                  >
+                    <ArrowLeft size={13} /> Prev
+                  </button>
+                )}
+                {courseIndex < courses.length - 1 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCourseIndex((i) => Math.min(courses.length - 1, i + 1));
+                      setQuery("");
+                    }}
+                    className="flex items-center gap-1 rounded-full border border-black/[0.08] bg-slate-100 px-3.5 py-1.5 text-xs font-bold text-foreground hover:bg-slate-200 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/20 cursor-pointer"
+                  >
+                    Next Course <ArrowRight size={13} />
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div />
+            )}
             <button
               type="button"
               onClick={onClose}
-              className="rounded-full bg-[#230052] px-5 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80"
+              className="rounded-full bg-[#230052] px-5 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 cursor-pointer"
             >
               Done
             </button>

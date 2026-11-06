@@ -77,12 +77,12 @@ CSS-in-JS solutions like styled-components introduce runtime overhead. Tailwind 
 **GroqCloud API**
 The AI assistant connects directly to GroqCloud using an API key supplied by the user. The extension stores the key in `chrome.storage.local`, retrieves the models available to that key, and sends chat requests through the extension background service worker. The key is never placed in the page DOM or sent to SuperFlex servers.
 
-**Umami Analytics**
-Traditional analytics (Google Analytics) violate Chrome's CSP. Umami is:
+**Local-First & Zero Telemetry**
+SuperFlex contains zero analytics tracking. Traditional analytics (Google Analytics) violate Chrome's CSP and compromise student privacy. SuperFlex is completely telemetry-free:
 
-- **Self-Hosted**: I bundle the tracking script with the extension.
-- **Privacy-Focused**: No cookies, no fingerprinting, no PII collection.
-- **Lightweight**: 2KB gzipped tracking script.
+- **Zero Tracking**: No usage beacons, no session counters, no analytics scripts.
+- **Privacy-Guaranteed**: No cookies, no fingerprinting, and zero telemetry collection.
+- **Client-Side Exclusively**: Everything runs purely on your machine.
 
 ---
 
@@ -258,20 +258,15 @@ This means:
 - ❌ Cannot use inline `<script>` tags with code
 - ✅ Can load scripts bundled with the extension
 
-**The Self-Hosting Solution:** I download Umami's script during build time, bundle it with the extension, and inject it as a local resource to comply with CSP restrictions.
+**The Zero-Telemetry Standard:**
 
-**What I Track:**
+To ensure absolute student privacy and strict adherence to Content Security Policy, SuperFlex does not inject any analytics or telemetry scripts. The extension runs entirely within the browser session without pinging external metrics servers.
 
-- Page views (which Flex pages users visit most)
-- Session duration
-- Extension version adoption (to measure update rollout)
-- Browser/OS distribution (to prioritize compatibility fixes)
+**What We Guarantee:**
 
-**What I Don't Track:**
-
-- Student names, IDs, or grades (PII)
-- Individual marks or attendance percentages
-- Any data that could identify a specific user
+- No tracking of page views or user session duration
+- Zero collection of student names, IDs, grades, marks, or attendance
+- Complete isolation from external metrics backends
 
 ---
 

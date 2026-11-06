@@ -34,33 +34,32 @@ When you use the AI Academic Assistant, your message and the selected academic c
 
 ## 3. Information We Collect
 
-We prioritize your anonymity. We use **Umami Analytics**, a privacy-focused, cookieless analytics tool, to track light usage data.
+We prioritize your total privacy. SuperFlex operates with **zero analytics, zero tracking, and zero telemetry**.
 
 ### What we track:
 
-- Which pages are visited most (e.g., Marks vs. Attendance).
-- Extension version adoption.
-- General browser and OS information.
+- **Nothing.** We do not track page views, feature usage, clicks, or session duration.
 
 ### What we NEVER collect:
 
 - Your name, student ID, or roll number.
-- Your specific marks or grades.
-- Any information that could be used to identify you personally.
+- Your specific marks, grades, or transcripts.
+- Any passwords, credentials, or session cookies.
+- Any usage metrics or telemetry that could identify you or your device.
 
 ## 4. Third-Party Services
 
-We use a few trusted partners to provide core functionality:
+We use minimal trusted partners strictly for user-requested functionality:
 
-- **GroqCloud:** Used for AI chat when you provide and configure an API key.
+- **GroqCloud / Google Gemini:** Used for AI academic chat only when you provide and configure your own API key.
 - **Google Fonts:** Used to provide the Google Sans Flex typography.
 - **Github/Vercel:** Used for project hosting and documentation.
 
 ## 5. Security Measures
 
-- **No Backend:** SuperFlex has no central database. If our website were compromised, your academic data would still be safe because it lives only on your computer.
-- **Local Encryption:** We rely on browser sandbox security to protect the data stored in `localStorage`.
-- **HTTPS Only:** All communications with third-party APIs (GroqCloud, Umami) are encrypted via TLS.
+- **No Backend:** SuperFlex has no central database or telemetry servers. Your academic data lives exclusively on your local computer.
+- **Local Encryption:** Login credentials in Auto-Fill are encrypted using AES-GCM (256-bit) before storage in `chrome.storage.local`.
+- **HTTPS Only:** All communications with third-party AI APIs (GroqCloud, Google Gemini) are strictly encrypted via TLS.
 
 ## 6. Your Rights
 

@@ -24,7 +24,6 @@ export default defineConfig({
       "https://mtn.nu.edu.pk/*",
       "https://pwr.nu.edu.pk/*",
       "https://generativelanguage.googleapis.com/*",
-      "https://api-gateway.umami.dev/*",
     ],
     web_accessible_resources: [
       {
@@ -35,7 +34,6 @@ export default defineConfig({
           "assets/logo_sec.svg",
           "assets/clouds/cloud-2.webp",
           "reviews.json",
-          "scripts/umami.js",
           "scripts/bridge.js",
         ],
         matches: ["<all_urls>"],

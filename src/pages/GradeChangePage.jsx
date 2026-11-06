@@ -422,7 +422,21 @@ function GradeChangePage() {
 
         {semesters.length > 0 && <section aria-label="Select semester" className="flex flex-col gap-2 sm:flex-row sm:items-center"><span className="w-20 shrink-0 text-xs font-semibold text-white/85">Semester</span><SuperTabs tabs={semesters} activeTab={semesters.find((semester) => semester.selected)?.value} onTabChange={handleSemesterChange} size="sm" className="!border-0 !bg-white/55 !backdrop-blur-xl dark:!bg-black/25 dark:!backdrop-blur-xl" /></section>}
 
-        <section aria-labelledby="grade-change-overview" className="space-y-4"><div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Overview</p><h2 id="grade-change-overview" className="text-xl font-bold tracking-tight text-white">Application summary</h2></div><p className="text-xs text-white/75">Select eligible courses to start one request.</p></div><div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5"><StatsCard variant="dashboard" icon={History} label="Applications" value={stats.total} /><StatsCard variant="dashboard" icon={Clock} label="In review" value={stats.pending} subValue="Awaiting decision" /><StatsCard variant="dashboard" icon={CheckCircle2} label="Processed" value={stats.processed} subValue="Reviewed requests" /><StatsCard variant="dashboard" icon={AlertTriangle} label="Eligible courses" value={requests.filter((request) => request.checkboxId).length} subValue="Available to request" /></div></section>
+        <section aria-labelledby="grade-change-overview" className="space-y-4">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Overview</p>
+              <h2 id="grade-change-overview" className="text-xl font-bold tracking-tight text-white">Application summary</h2>
+            </div>
+            <p className="text-xs text-white/75">Select eligible courses to start one request.</p>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
+            <StatsCard variant="dashboard" icon={History} label="Applications" value={stats.total} subValue="All recorded requests" />
+            <StatsCard variant="dashboard" icon={Clock} label="In review" value={stats.pending} subValue="Awaiting decision" />
+            <StatsCard variant="dashboard" icon={CheckCircle2} label="Processed" value={stats.processed} subValue="Reviewed requests" />
+            <StatsCard variant="dashboard" icon={AlertTriangle} label="Eligible courses" value={requests.filter((request) => request.checkboxId).length} subValue="Available to request" />
+          </div>
+        </section>
 
         {alerts.length > 0 && <NotificationBanner alerts={alerts} />}
 

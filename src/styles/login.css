@@ -771,16 +771,40 @@ body.superflex-login-page.superflex-login-dark .login-version-chip {
   color: #f5f6fb;
 }
 
-body.superflex-login-page.superflex-login-dark #terms-modal > div {
-  background: #000 !important;
+body.superflex-login-page.superflex-login-dark #terms-modal .terms-sheet {
+  background: #090909 !important;
   color: #f5f6fb !important;
 }
 
-body.superflex-login-page.superflex-login-dark #terms-modal > div > div:first-child,
-body.superflex-login-page.superflex-login-dark #terms-modal > div > div:last-child,
-body.superflex-login-page.superflex-login-dark #terms-modal .p-4.rounded-2xl {
-  background: #2c3344 !important;
-  border-color: #465064 !important;
+body.superflex-login-page.superflex-login-dark #terms-modal .terms-sheet-handle {
+  background: rgb(255 255 255 / 20%) !important;
+}
+
+body.superflex-login-page.superflex-login-dark #terms-modal .terms-brand-icon {
+  background: #fff !important;
+  color: #101027 !important;
+}
+
+body.superflex-login-page.superflex-login-dark #terms-modal .terms-eyebrow {
+  color: #fff !important;
+}
+
+body.superflex-login-page.superflex-login-dark #terms-modal .terms-sections {
+  background: rgb(255 255 255 / 6%) !important;
+  border-color: rgb(255 255 255 / 10%) !important;
+}
+
+body.superflex-login-page.superflex-login-dark #terms-modal .terms-section {
+  border-color: rgb(255 255 255 / 10%) !important;
+}
+
+body.superflex-login-page.superflex-login-dark #terms-modal .terms-consent {
+  background: rgb(255 255 255 / 6%) !important;
+}
+
+body.superflex-login-page.superflex-login-dark #terms-modal .terms-footer {
+  background: rgb(9 9 9 / 95%) !important;
+  border-color: rgb(255 255 255 / 10%) !important;
 }
 
 body.superflex-login-page.superflex-login-dark #terms-modal h2,
@@ -795,7 +819,7 @@ body.superflex-login-page.superflex-login-dark #terms-modal p {
 
 body.superflex-login-page.superflex-login-dark #terms-accept-btn {
   background: #fff !important;
-  color: #180a31 !important;
+  color: #101027 !important;
 }
 
 @media (max-height: 740px) {
