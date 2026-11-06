@@ -229,7 +229,6 @@ body.superflex-login-page #login-popup .login-header p {
   right: -9vw;
   width: clamp(300px, 42vw, 680px);
   opacity: 0.95;
-  animation: login-cloud-drift 60s ease-in-out infinite alternate;
 }
 
 .login-clouds .login-cloud-left {
@@ -238,25 +237,6 @@ body.superflex-login-page #login-popup .login-header p {
   width: clamp(200px, 26vw, 420px);
   opacity: 0.85;
   transform: scaleX(-1);
-  animation: login-cloud-drift-left 80s ease-in-out infinite alternate-reverse;
-}
-
-@keyframes login-cloud-drift {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(4vw);
-  }
-}
-
-@keyframes login-cloud-drift-left {
-  from {
-    transform: scaleX(-1) translateX(0);
-  }
-  to {
-    transform: scaleX(-1) translateX(4vw);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

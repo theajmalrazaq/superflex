@@ -12,7 +12,6 @@
       strategy="afterInteractive"
       data-website-id="bc91863f-8b1b-4d92-8022-ab28362e4412"
       data-domain="theajmalrazaq.github.io"
-      src="https://analytics.brandjet.ai/api/script.js"
     ></script>
 
     <style>
@@ -231,6 +230,177 @@
         transition: all 0.3s ease;
       }
 
+      /* Match the original docs layout to the light cloud homepage theme. */
+      body {
+        color: #101027;
+        background: #fff;
+      }
+
+      .animated-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: auto;
+        height: min(100vh, 760px);
+        z-index: 0;
+        overflow: hidden;
+        pointer-events: none;
+        background: linear-gradient(180deg, #62abe0 0%, #73b3e1 24%, #9ac7e8 38%, #dcebf5 49%, #fff 57%);
+      }
+
+      .animated-bg::before,
+      .animated-bg::after {
+        content: "";
+        position: absolute;
+        z-index: 2;
+        pointer-events: none;
+        background-image: url("res/cloud-2.webp");
+        background-repeat: no-repeat;
+        background-size: contain;
+        filter: none;
+      }
+
+      .animated-bg::before {
+        width: clamp(200px, 26vw, 420px);
+        height: 240px;
+        left: -5vw;
+        top: 9vh;
+        opacity: 0.85;
+        transform: scaleX(-1);
+      }
+
+      .animated-bg::after {
+        width: clamp(300px, 42vw, 680px);
+        height: 320px;
+        right: -9vw;
+        top: -4vh;
+        opacity: 0.95;
+      }
+
+      .animated-bg img,
+      .animated-bg .bg-gradient-to-b {
+        display: none;
+      }
+
+      .glow-1, .glow-2 { display: none; }
+
+      #main-nav {
+        background: rgba(255, 255, 255, 0.82);
+        border-color: rgba(255, 255, 255, 0.75);
+        box-shadow: 0 12px 36px rgba(24, 57, 83, 0.14);
+      }
+
+      #main-nav a,
+      #main-nav button {
+        color: #596579;
+      }
+
+      #mobile-overlay {
+        background: rgba(244, 248, 252, 0.96);
+      }
+
+      #mobile-overlay .mobile-link > span:first-child {
+        color: #101027;
+      }
+
+      #mobile-overlay .mobile-link > span:last-child {
+        color: #5e43a6;
+      }
+
+      #page-tag {
+        color: #230052;
+        border-color: rgba(35, 0, 82, 0.12);
+        background: rgba(255, 255, 255, 0.68);
+      }
+
+      #hero-title {
+        background-image: linear-gradient(90deg, #230052, #49358d 55%, #6551bd);
+      }
+
+      #hero-subtitle {
+        color: #34445a;
+      }
+
+      #markdown-content {
+        padding: 32px;
+        border: 1px solid rgba(255, 255, 255, 0.78);
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 18px 54px rgba(35, 0, 82, 0.09);
+        backdrop-filter: blur(18px);
+      }
+
+      .prose {
+        color: #475467;
+      }
+
+      .prose h1,
+      .prose h2 {
+        color: #230052;
+      }
+
+      .prose h3,
+      .prose th {
+        color: #101027;
+      }
+
+      .prose p,
+      .prose ul,
+      .prose ol,
+      .prose li,
+      .prose td {
+        color: #596579;
+      }
+
+      .prose pre {
+        background: #101027;
+        border-color: rgba(16, 16, 39, 0.12);
+        border-radius: 18px;
+      }
+
+      .prose code {
+        color: #4b2a88;
+        background: rgba(35, 0, 82, 0.07);
+      }
+
+      .prose pre code {
+        color: #f5f6fb;
+        background: transparent;
+      }
+
+      .prose blockquote {
+        color: #596579;
+        border-left-color: #230052;
+      }
+
+      .prose th,
+      .prose td {
+        border-bottom-color: rgba(16, 16, 39, 0.1);
+      }
+
+      footer {
+        color: #101027;
+        border-color: rgba(16, 16, 39, 0.1);
+      }
+
+      footer .text-zinc-400,
+      footer .text-zinc-500 {
+        color: #667085;
+      }
+
+      footer .text-zinc-600,
+      footer .text-zinc-700 {
+        color: #7b8494;
+      }
+
+      @media (max-width: 640px) {
+        #markdown-content {
+          padding: 22px 18px;
+          border-radius: 24px;
+        }
+      }
+
       /* Animated Background */
       .animated-bg {
         position: fixed;
@@ -296,6 +466,77 @@
           opacity: 0;
         }
       }
+
+      #main-nav a:hover, #main-nav button:hover { color: #230052; }
+      #main-nav a.nav-active { background: #230052; color: #fff; border-color: #230052; }
+      #main-nav a:not(.nav-active):hover { background: rgba(35, 0, 82, .08); color: #230052; }
+      #mobile-overlay .mobile-link:hover > span:first-child { color: #230052; }
+      .toc-link:hover, .toc-link.active { color: #230052; }
+      .prose a { color: #4b2a88; text-decoration-color: rgba(35, 0, 82, .3); }
+      .prose a:hover { color: #230052; }
+      .prose h1, .prose h2 { color: #230052; }
+      .brand-mark { background: #000 !important; border-width: 0 !important; border-color: transparent !important; box-shadow: none !important; }
+      .brand-mark path { animation: none !important; transform: none !important; fill: #a098ff !important; }
+      .site-footer {
+        position: relative; isolation: isolate; overflow: hidden;
+        margin: 0 clamp(12px, 3vw, 40px);
+        padding: clamp(32px, 4vw, 52px) clamp(20px, 4vw, 40px) 96px !important;
+        color: #101027 !important; background: #fff !important;
+        border: 1px solid rgba(35, 0, 82, .1) !important; border-radius: 32px 32px 0 0;
+        box-shadow: 0 18px 54px rgba(35, 0, 82, .1);
+      }
+      .site-footer > div:first-child { z-index: 0; }
+      .site-footer .footer-watermark {
+        position: absolute; bottom: -72px; left: 50%; width: min(82%, 820px); height: auto;
+        opacity: .11; transform: translateX(-50%);
+      }
+      .site-footer .flex.gap-4 a { color: #4b3b71; background: rgba(35, 0, 82, .05); border-color: rgba(35, 0, 82, .1); }
+      .site-footer .flex.gap-4 a:hover { color: #230052; background: rgba(35, 0, 82, .1); }
+      .site-footer .border-t { border-color: rgba(35, 0, 82, .1); }
+      .site-footer .max-w-7xl > .flex { gap: 24px !important; }
+      .site-footer .flex.flex-col.items-center.gap-6 { gap: 14px !important; }
+      .site-footer .brand-mark { width: 56px; height: 56px; border-width: 4px; border-radius: 20px; overflow: hidden; }
+      .site-footer .brand-mark svg { width: 56px; height: 56px; }
+      .site-footer img[alt="SuperFlex"] { width: 200px; }
+      .site-footer .border-t { padding-top: 16px; }
+      .site-footer .footer-tagline { max-width: none; white-space: nowrap; }
+      @media (max-width: 640px) { .site-footer .footer-tagline { white-space: normal; } }
+      h1, h2, h3, h4, h5, h6 { font-weight: 500 !important; }
+      #hero-title {
+        color: #fff !important;
+        -webkit-text-fill-color: #fff;
+        background: none !important;
+        background-image: none !important;
+      }
+      #hero-subtitle { color: #230052 !important; }
+      #markdown-content {
+        padding: 12px 0 32px !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+      }
+      #markdown-content,
+      #markdown-content * {
+        color: #475467 !important;
+        background-color: transparent !important;
+        border-color: rgba(35, 0, 82, .12) !important;
+        box-shadow: none !important;
+      }
+      #markdown-content h1, #markdown-content h2, #markdown-content h3,
+      #markdown-content h4, #markdown-content strong, #markdown-content th,
+      #markdown-content a { color: #230052 !important; }
+      .animated-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: min(100vh, 760px);
+        z-index: 0;
+        overflow: hidden;
+        pointer-events: none;
+      }
     </style>
   </head>
   <body>
@@ -322,7 +563,7 @@
           class="flex items-center gap-4 lg:gap-8 w-full lg:w-auto justify-between lg:justify-start"
         >
           <a href="index.html" class="flex items-center shrink-0">
-            <img src="res/logo.svg" alt="Logo" class="h-6 lg:h-8 w-auto" />
+            <img src="res/logo-light.svg" alt="Logo" class="h-6 lg:h-8 w-auto" />
           </a>
 
           <div class="hidden lg:flex items-center gap-1">
@@ -449,16 +690,12 @@
     </main>
 
     <!-- Footer from Index -->
-    <footer class="py-24 px-4 sm:px-6 relative z-20 border-t border-white/10 overflow-hidden">
+    <footer class="site-footer py-24 px-4 sm:px-6 relative z-20 border-t border-white/10 overflow-hidden">
       <!-- Large Gradient Text Background -->
       <div
         class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden"
       >
-        <h1
-          class="text-[8rem] sm:text-[12rem] md:text-[18rem] lg:text-[24rem] font-black bg-gradient-to-b from-white/5 to-transparent bg-clip-text text-transparent select-none whitespace-nowrap"
-        >
-          SUPERFLEX
-        </h1>
+        <img class="footer-watermark" src="res/logo-light.svg" alt="" aria-hidden="true" />
       </div>
 
       <div class="max-w-7xl mx-auto relative z-10">
@@ -470,7 +707,7 @@
                 class="absolute -inset-4 bg-[#a098ff]/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition duration-700"
               ></div>
               <div
-                class="h-20 w-20 bg-black border-8 border-white/5 rounded-[28px] flex items-center justify-center relative z-10"
+                class="brand-mark h-20 w-20 bg-black border-8 border-white/5 rounded-[28px] flex items-center justify-center relative z-10"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -490,12 +727,12 @@
                 </svg>
               </div>
             </div>
-            <img src="res/logo.svg" alt="SuperFlex" class="w-64 filter opacity-90" />
+            <img src="res/logo-light.svg" alt="SuperFlex" class="w-64 filter opacity-90" />
           </div>
 
           <!-- Tagline -->
-          <p class="text-zinc-400 text-sm font-medium text-center max-w-md">
-            pov: you're tired of flex portal being mid 🗿 (we gotchu fam) 💯
+          <p class="footer-tagline text-zinc-400 text-sm font-medium text-center max-w-md">
+            Independent, open-source, and built for a clearer academic workflow.
           </p>
 
           <!-- Social Links -->
@@ -517,36 +754,15 @@
                 />
               </svg>
             </a>
-            <a
-              href="https://www.instagram.com/superflex.fr"
-              target="_blank"
-              class="p-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#a098ff]/30 text-zinc-400 hover:text-[#a098ff] transition-all"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-              </svg>
-            </a>
           </div>
 
           <!-- Copyright -->
           <div class="text-center pt-8 border-t border-white/5 w-full">
             <p class="text-zinc-600 text-xs font-medium">
-              © 2024 superflex • free forever fr fr ✨
+              © 2026 SuperFlex · Open source under the MIT License
             </p>
             <p class="text-zinc-700 text-xs mt-2">
-              coded with ☕ + 🎧 by
+              designed and built by
               <a
                 href="https://github.com/theajmalrazaq"
                 target="_blank"
@@ -598,7 +814,8 @@
         const el = document.getElementById(id);
         if (el) {
           el.classList.remove("text-zinc-400", "hover:text-white", "hover:bg-white/5");
-          el.classList.add("bg-[#a098ff]/10", "text-[#a098ff]", "border", "border-white/10");
+          el.classList.add("nav-active", "border");
+          el.setAttribute("aria-current", "page");
         }
       };
 

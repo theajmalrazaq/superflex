@@ -50,41 +50,6 @@ body {
   pointer-events: none;
 }
 
-/* Floating animated clouds in overlay */
-@keyframes float-cloud-left {
-  0% {
-    transform: translateX(0) translateY(0);
-  }
-  50% {
-    transform: translateX(25px) translateY(-10px);
-  }
-  100% {
-    transform: translateX(0) translateY(0);
-  }
-}
-
-@keyframes float-cloud-right {
-  0% {
-    transform: translateX(0) translateY(0) scaleX(-1);
-  }
-  50% {
-    transform: translateX(-30px) translateY(12px) scaleX(-1);
-  }
-  100% {
-    transform: translateX(0) translateY(0) scaleX(-1);
-  }
-}
-
-.overlay-cloud-left {
-  animation: float-cloud-left 8s ease-in-out infinite;
-  will-change: transform;
-}
-
-.overlay-cloud-right {
-  animation: float-cloud-right 10s ease-in-out infinite;
-  will-change: transform;
-}
-
 @keyframes splash {
   0% {
     transform: scale(0.65);

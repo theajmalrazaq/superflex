@@ -3,14 +3,12 @@ import { createRoot } from "react-dom/client";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
 import LoginPageStyles from "../components/LoginPageStyles";
 import PathRouter from "../components/PathRouter";
-import { getExtensionUrl, sendExtensionMessage } from "../utils/extensionApi";
+import { getExtensionUrl } from "../utils/extensionApi";
 import "../styles/tailwind.css";
 
 export default defineContentScript({
   matches: ["https://flexstudent.nu.edu.pk/*"],
   main() {
-    sendExtensionMessage({ type: "SUPERFLEX_APPLY_DEFAULT_ZOOM" });
-
     (() => {
       const scriptBridge = document.createElement("script");
       scriptBridge.src = getExtensionUrl("scripts/bridge.js");

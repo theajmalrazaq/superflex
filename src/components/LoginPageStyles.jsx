@@ -7,7 +7,8 @@ import {
   getDecryptedCredentials,
   saveCredentials,
   clearSavedCredentials,
-  savePendingLogin,
+  clearPendingLogin,
+  getCredentialMetadata,
 } from "../utils/credentialStorage";
 
 function LoginPageStyles() {
@@ -187,6 +188,7 @@ function LoginPageStyles() {
       let isSubmitting = false;
       let loadingStartedAt = 0;
       let resetTimer;
+      let hasSavedVault = false;
 
       // Inject "Remember Me" checkbox before the Sign In button
       if (
@@ -196,26 +198,39 @@ function LoginPageStyles() {
       ) {
         const rememberContainer = document.createElement("div");
         rememberContainer.id = "superflex-remember-me-container";
-        rememberContainer.className =
-          "w-full flex items-center justify-between px-2 mb-3.5 mt-1 select-none";
+        rememberContainer.className = "w-full px-2 mb-3.5 mt-1 select-none";
         rememberContainer.innerHTML = `
-          <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
-            <input
-              type="checkbox"
-              id="superflex-remember-me-checkbox"
-              class="h-4 w-4 rounded border-slate-300 text-[#230052] focus:ring-0 dark:border-white/20 dark:bg-white/10 cursor-pointer accent-[#230052] dark:accent-white"
-            />
-            <span>Remember Me</span>
-          </label>
-          <span class="text-[11px] text-slate-400 dark:text-slate-500 font-medium flex items-center gap-1 select-none" title="Credentials encrypted via AES-GCM 256-bit in Chrome storage">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-            Encrypted
-          </span>
+          <div class="flex items-center justify-between">
+            <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
+              <input
+                type="checkbox"
+                id="superflex-remember-me-checkbox"
+                class="h-4 w-4 rounded border-slate-300 text-[#230052] focus:ring-0 dark:border-white/20 dark:bg-white/10 cursor-pointer accent-[#230052] dark:accent-white"
+              />
+              <span>Remember Me</span>
+            </label>
+            <span class="text-[11px] text-slate-400 dark:text-slate-500 font-medium flex items-center gap-1 select-none" title="Credentials encrypted via AES-GCM 256-bit in Chrome storage">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              Encrypted
+            </span>
+          </div>
         `;
         button.parentElement.insertBefore(rememberContainer, button);
+
+        const rememberCheckbox = rememberContainer.querySelector("#superflex-remember-me-checkbox");
+
+        rememberCheckbox?.addEventListener("change", () => {
+          if (!rememberCheckbox.checked) {
+            if (hasSavedVault) {
+              clearSavedCredentials();
+              hasSavedVault = false;
+              document.getElementById("superflex-autofill-prompt-card")?.remove();
+            }
+          }
+        });
       }
 
       const updateLoginButtonState = () => {
@@ -235,10 +250,12 @@ function LoginPageStyles() {
         setTimeout(updateLoginButtonState, 0);
         setTimeout(updateLoginButtonState, 500);
 
-        // Check for saved credentials and show Auto-Fill prompt (does not auto-inject until user clicks)
-        getDecryptedCredentials().then((creds) => {
-          if (creds?.username && creds?.password) {
-            const rememberCheckbox = document.getElementById("superflex-remember-me-checkbox");
+        // Returning users only need to choose Auto-Fill; credentials auto-decrypt securely
+        getCredentialMetadata().then((metadata) => {
+          const rememberCheckbox = document.getElementById("superflex-remember-me-checkbox");
+
+          if (metadata.hasCredentials) {
+            hasSavedVault = true;
             if (rememberCheckbox) rememberCheckbox.checked = true;
 
             const usernameInput = loginForm?.querySelector(
@@ -246,37 +263,30 @@ function LoginPageStyles() {
             );
             const passwordInput = loginForm?.querySelector('input[name="password"], #pass');
 
-            // Inject "Auto-fill?" prompt card above the inputs if not already present
-            if (loginForm && !document.getElementById("superflex-autofill-prompt-card")) {
+            const showAutoFillCard = (creds) => {
+              if (
+                !creds ||
+                !loginForm ||
+                document.getElementById("superflex-autofill-prompt-card")
+              ) {
+                return;
+              }
               const promptCard = document.createElement("div");
               promptCard.id = "superflex-autofill-prompt-card";
               promptCard.className =
                 "w-full rounded-2xl bg-[#230052]/5 dark:bg-white/[0.08] border border-[#230052]/15 dark:border-white/15 p-3 flex items-center justify-between mb-4 transition-all";
+
               promptCard.innerHTML = `
-                <div class="flex items-center gap-2.5">
+                <div class="flex min-w-0 items-center gap-2.5">
                   <div class="h-8 w-8 rounded-xl bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] flex items-center justify-center shrink-0 shadow-xs">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M2 18v3c0 .6.4 1 1 1h4v-3h3v-3h2l1.4-1.4a6.5 6.5 0 1 0-4-4Z"/>
-                      <circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/>
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 18v3c0 .6.4 1 1 1h4v-3h3v-3h2l1.4-1.4a6.5 6.5 0 1 0-4-4Z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></svg>
                   </div>
-                  <div class="text-left">
-                    <p class="text-xs font-bold text-slate-800 dark:text-white leading-tight">
-                      Auto-fill ${creds.maskedUsername || creds.username}?
-                    </p>
-                    <p class="text-[11px] text-slate-500 dark:text-slate-400">
-                      Encrypted credentials saved
-                    </p>
+                  <div class="min-w-0 text-left">
+                    <p class="truncate text-xs font-bold text-slate-800 dark:text-white">Saved login ready</p>
+                    <p class="truncate text-[11px] text-slate-500 dark:text-slate-400">${creds.maskedUsername || creds.username}</p>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  id="superflex-autofill-trigger-btn"
-                  class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#230052] hover:bg-[#370c72] dark:bg-white dark:hover:bg-white/80 text-white dark:text-[#0a192f] text-xs font-bold transition-all shadow-xs active:scale-[0.98] cursor-pointer"
-                >
-                  <span>Auto-Fill</span>
-                </button>
-              `;
+                <button type="button" id="superflex-autofill-trigger-btn" class="ml-3 min-h-9 shrink-0 rounded-full bg-[#230052] px-4 text-xs font-bold text-white transition-all hover:bg-[#370c72] active:scale-[0.98] dark:bg-white dark:text-[#0a192f] cursor-pointer">Auto-Fill</button>`;
 
               loginForm.insertBefore(promptCard, loginForm.firstChild);
 
@@ -284,8 +294,7 @@ function LoginPageStyles() {
               fillBtn?.addEventListener("click", (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-
-                if (usernameInput && passwordInput) {
+                if (creds && usernameInput && passwordInput) {
                   usernameInput.value = creds.username;
                   passwordInput.value = creds.password;
 
@@ -306,14 +315,23 @@ function LoginPageStyles() {
                       <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="20 6 9 17 4 12"/>
                       </svg>
-                      <span>Credentials auto-filled for ${creds.maskedUsername || creds.username}</span>
+                      <span>Saved credentials auto-filled</span>
                     </div>
                   `;
                   promptCard.className =
                     "w-full rounded-2xl bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 flex items-center justify-center mb-4 transition-all";
                 }
               });
-            }
+            };
+
+            getDecryptedCredentials().then((creds) => {
+              if (creds) {
+                showAutoFillCard(creds);
+              }
+            });
+          } else {
+            hasSavedVault = false;
+            if (rememberCheckbox) rememberCheckbox.checked = false;
           }
         });
       }
@@ -351,7 +369,7 @@ function LoginPageStyles() {
 
       button.addEventListener(
         "click",
-        () => {
+        async (event) => {
           if (!isLoginSubmit || button.disabled || isSubmitting) return;
 
           const username = loginForm
@@ -361,15 +379,45 @@ function LoginPageStyles() {
           const rememberCheckbox = document.getElementById("superflex-remember-me-checkbox");
           const isRemember = rememberCheckbox?.checked ?? false;
 
-          if (username && password) {
-            if (isRemember) {
-              saveCredentials(username, password);
-            } else {
-              clearSavedCredentials();
-              savePendingLogin(username, password);
+          // First-time saving: if Remember Me is checked and vault isn't saved yet
+          if (username && password && isRemember && !hasSavedVault) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            isSubmitting = true;
+            button.disabled = true;
+            button.innerHTML = `
+              <div class="flex items-center justify-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                </svg>
+                <span>Securing login...</span>
+              </div>`;
+
+            const saved = await saveCredentials(username, password);
+            if (!saved) {
+              isSubmitting = false;
+              button.disabled = false;
+              button.innerHTML = originalContent;
+              updateLoginButtonState();
+              return;
             }
+
+            hasSavedVault = true;
+            clearPendingLogin();
+            isSubmitting = false;
+            button.disabled = false;
+            button.innerHTML = originalContent;
+            button.click();
+            return;
           }
 
+          if (!isRemember) {
+            clearSavedCredentials();
+            clearPendingLogin();
+            hasSavedVault = false;
+          }
+
+          // Normal login or returning user with saved vault: submit directly with no passphrase prompt
           isSubmitting = true;
           loadingStartedAt = performance.now();
           button.innerHTML = `

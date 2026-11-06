@@ -34,6 +34,9 @@ I realized I needed persistent state management and proper component architectur
 **Phase 4: Version 2 - Architectural Rewrite (Late 2024)**
 Community feedback revealed calculation errors in SGPA logic (#7), incorrect grand totals (#2), and the legacy UI bleeding through my overlay (#6). The root cause was my naive approach to data synchronization. V2 represents a complete architectural rewrite with proper separation of concerns, a data service layer, and optimized rendering pipelines.
 
+**Phase 5: Version 6 - Product System (Current)**
+The current release turns the overlay into a coherent academic toolkit. Shared bottom sheets and UI primitives now power settings and setup flows; typed parsers normalize portal HTML; persisted preference stores keep interface choices predictable; Octopus AI streams from Google Gemini with model fallback; campus faculty data powers instructor selection and attendance-review drafts; and optional login Auto-Fill uses a user-chosen passphrase instead of a key embedded in the open-source bundle.
+
 ---
 
 ## 2. Introduction & Technology Stack
@@ -48,7 +51,7 @@ My technology choices were driven by three constraints:
 
 ### Core Technologies
 
-**React 19.0.0**
+**React 19**
 I chose React for several reasons:
 
 - **Virtual DOM**: Efficient diffing prevents unnecessary DOM manipulations, crucial when overlaying on a page I don't control.
@@ -74,8 +77,8 @@ CSS-in-JS solutions like styled-components introduce runtime overhead. Tailwind 
 - **Dark Mode**: Built-in dark:{class} utilities make theming trivial.
 - **No Style Bleeding**: Since I purge legacy CSS, there are no specificity conflicts.
 
-**GroqCloud API**
-The AI assistant connects directly to GroqCloud using an API key supplied by the user. The extension stores the key in `chrome.storage.local`, retrieves the models available to that key, and sends chat requests through the extension background service worker. The key is never placed in the page DOM or sent to SuperFlex servers.
+**Google Gemini API**
+Octopus AI connects directly to Google's Gemini API using a key supplied by the user. The extension stores the key in `chrome.storage.local`, retrieves compatible models, and streams chat requests through the extension background service worker. The key is never placed in the page DOM or sent to SuperFlex servers.
 
 **Local-First & Zero Telemetry**
 SuperFlex contains zero analytics tracking. Traditional analytics (Google Analytics) violate Chrome's CSP and compromise student privacy. SuperFlex is completely telemetry-free:
@@ -105,7 +108,7 @@ _Capabilities:_ Full React, DOM manipulation, chrome.runtime APIs.
 _Restrictions:_ Cannot access `window` variables from Main World.
 
 **3. Background Service Worker**
-A persistent background script that handles cross-tab messaging and can intercept network requests.
+An event-driven Manifest V3 service worker that handles extension messaging and provider requests.
 
 _Capabilities:_ chrome.* APIs, persistent state, network interception.  
 *Restrictions:\* No DOM access, no UI rendering.
@@ -141,8 +144,8 @@ _Capabilities:_ chrome.* APIs, persistent state, network interception.
 │                    BRIDGE LAYER                               │
 │  Main World ↔ Isolated World Communication                    │
 │  • CustomEvent-based messaging                                │
-│  • Stores the user API key and calls GroqCloud                │
-│  • Usage data and Authentication management                   │
+│  • Stores the user API key and calls Google Gemini            │
+│  • Model fallback and extension message handling              │
 └───────────────────────────────────────────────────────────────┘
 ```
 
@@ -195,7 +198,7 @@ createRoot(root).render(<App />);
 
 ### Script Injection Pipeline
 
-The content script injects the analytics script and a small compatibility patch for the portal's jQuery scrollbar plugin. AI requests do not cross into the page's Main World; the extension sends them from the background service worker to GroqCloud.
+The content script injects only the bundled compatibility bridge required for the portal. It does not inject analytics. AI requests do not cross into the page's Main World; the extension sends them from the background service worker to Google Gemini.
 
 ---
 
@@ -270,11 +273,11 @@ To ensure absolute student privacy and strict adherence to Content Security Poli
 
 ---
 
-## 8. AI Integration with GroqCloud
+## 8. Octopus AI Integration with Google Gemini
 
-The React assistant collects the user's question and, when permitted, relevant academic context. It sends a runtime message to the extension background service worker. The worker reads the API key from `chrome.storage.local` and calls GroqCloud's OpenAI-compatible chat completions endpoint. Model options are loaded from GroqCloud's models endpoint using the saved key.
+The React assistant collects the user's question and, when permitted, relevant academic context. It opens an extension port to the background service worker for streaming responses. The worker reads the API key from `chrome.storage.local`, loads compatible models from Google's API, and calls Gemini's `streamGenerateContent` endpoint.
 
-The API key stays in extension storage and is not exposed to the portal page's JavaScript or inserted into the DOM. Chat prompts and selected academic context are sent to GroqCloud for inference.
+The API key stays in extension storage and is not exposed to the portal page's JavaScript or inserted into the DOM. Chat prompts and selected academic context are sent to Google Gemini for inference. If the active model is unavailable, the worker can retry with another compatible model and persist the working selection.
 
 ---
 
@@ -286,7 +289,7 @@ I use WXT for automated manifest processing, Vite-based builds, and code splitti
 
 ### Provider Requests
 
-The background service worker calls the GroqCloud REST API using the extension's `api.groq.com` host permission. This avoids loading a provider SDK or injecting provider code into the Flex portal page.
+The background service worker calls the Gemini REST API using the extension's `generativelanguage.googleapis.com` host permission. This avoids loading a provider SDK or injecting provider code into the Flex portal page.
 
 ---
 
@@ -294,28 +297,33 @@ The background service worker calls the GroqCloud REST API using the extension's
 
 ### Authentication Model
 
-I never store or transmit credentials. The flow is:
+I never transmit credentials. Credential storage is optional and disabled until the user explicitly enables Auto-Fill. The flow is:
 
-1. User logs into the Flex portal normally (I don't touch the login page)
+1. User logs into the Flex portal normally
 2. Browser stores session cookies (httpOnly, Secure, SameSite)
 3. My extension reads data using those cookies
 4. If the session expires, I detect it and gracefully degrade to showing the login page
 
 Session expiry is detected by scanning the page text for error keywords like "server error" or "session expired."
 
+### Optional Auto-Fill Vault
+
+Auto-Fill is an explicit opt-in. When enabled, the user creates a vault passphrase that SuperFlex never stores. PBKDF2-HMAC-SHA256 applies 600,000 iterations with a fresh 16-byte random salt to derive an AES-GCM 256-bit key. Each credential record uses a fresh 12-byte initialization vector. A separate device key wraps the derived vault key inside the browser profile's isolated extension storage. The encrypted record, wrapped key, salt, KDF parameters, and masked username are stored in `chrome.storage.local`, allowing later login screens to offer a single Auto-Fill action without asking for the passphrase again.
+
 ### Data Storage
 
 **What I Store in browser storage:**
 
 - AI chat history and selected model in `localStorage`
-- GroqCloud API key and available models in `chrome.storage.local`
+- Gemini API key and compatible model metadata in `chrome.storage.local`
 - User preferences (theme, selected AI model)
 - Permission status (whether user allowed data sharing with AI)
 - Last sync timestamps (to avoid redundant fetches)
+- Optionally, AES-GCM encrypted login credentials protected by a user-chosen vault passphrase
 
 **What I Don't Store:**
 
-- Passwords or credentials
+- Unencrypted passwords or credentials
 - Raw HTML responses
 - Session tokens (these live in httpOnly cookies I can't access)
 

@@ -1,110 +1,100 @@
-# SuperFlex AI: The Ultimate Prompting Masterclass
+# Octopus AI: Academic Assistant Guide
 
-SuperFlex AI isn't just a chatbot; it's a high-performance academic engine that lives inside your portal. It "hears" your data and "sees" your goals. To unlock its full potential, you need to know how to talk to it.
+Octopus AI is an optional assistant inside SuperFlex. It connects directly to Google's Gemini API using a key you provide and can include selected academic context in a conversation.
 
-## How SuperFlex AI "Sees" Your Data
+## Setup
 
-SuperFlex AI operates on a **Stealth Sync** architecture. It reads the actual HTML of your portal to build its memory.
+1. Open **SuperFlex Settings**.
+2. Select **Octopus AI**.
+3. Enable the assistant.
+4. Create a free Gemini API key in Google AI Studio.
+5. Paste the key into SuperFlex and select **Save Key**.
 
-- **Automatic Sync (At Login)**: When you log in, SuperFlex automatically syncs data from **Home**, **Marks**, **Attendance**, and **Study Plan** pages in the background.
-- **On-Demand Sync (Transcript)**: The **Transcript** page syncs only when you visit it. This prevents logout issues that occurred with heavy background syncing. Visit the Transcript page at least once per session for comprehensive AI context.
+SuperFlex validates the key, loads compatible Gemini models, and keeps the selected model in local extension storage. The key is sent only to Google's Gemini API; it is not sent to a SuperFlex server.
 
-## Choosing Your AI Engine
+## How academic context works
 
-SuperFlex lets you switch between different "brains." Select the right tool for the job.
+SuperFlex builds context from portal pages it can read in your authenticated browser session:
 
-| Model                | Best For...                                                                                         |
-| :------------------- | :-------------------------------------------------------------------------------------------------- |
-| **GPT-4o Mini**      | **Default Driver.** Fast, efficient and reliable for everyday academic tasks.                       |
-| **Gemini 2.0 Flash** | **Speed.** Balanced intelligence with high-speed response times.                                    |
-| **Claude Haiku**     | **Nuance.** Excellent for structured analysis and empathetic responses.                             |
-| **Gemini 3 Pro**     | **Complex Logic.** Use this for deep "What-If" simulations and grade predictions.                   |
-| **Grok 2**           | **Direct Coaching.** Best for blunt interactions like "Roast my GPA" or strict performance reviews. |
-| **Gemini 3 Flash**   | **Lightning Fast.** Good for quick summaries of long academic histories.                            |
+- Home and profile information
+- Marks and course assessments
+- Attendance summaries and individual records
+- Transcript and GPA history
+- Study plan and remaining coursework
 
-## The "C.S.G." Framework for Perfect Prompts
+Context synchronization is local. Only the context needed for an enabled AI request is sent with your prompt to Gemini. You can disable Octopus AI from settings at any time.
 
-To get precision, include three elements in your prompt:
+## Model selection and fallback
 
-1.  **Context**: The subject or semester (e.g., "In Numerical Computing...")
-2.  **Specificity**: The exact metric (e.g., "...calculate the weighted average...")
-3.  **Goal**: The desired outcome (e.g., "...to forecast my final grade.")
+The available model list comes from your Gemini API key. SuperFlex prioritizes compatible Flash models for responsive chat, but the exact list depends on Google and your account.
 
-> **Bad Prompt**: "How are my grades?"
->
-> **God Prompt**: "Based on my current semester marks, calculate my forecasted grade in 'Numerical Computing' if I average 80% in the remaining assignments."
+When the selected model is overloaded, rate-limited, retired, or temporarily unavailable, SuperFlex can retry with another compatible model and save the working choice. This prevents a single unavailable model from breaking the assistant.
 
-## Advanced Prompt Library
+## Writing useful prompts
 
-### 1. Marks & Relative Grading (MCA)
+A strong academic prompt includes:
 
-_SuperFlex understands the NUCES relative grading curves._
+1. **Context** — the course, semester, or record you mean.
+2. **Metric** — the exact calculation or comparison you need.
+3. **Goal** — the decision you are trying to make.
 
-- **Safe Range Analysis**:
-  > "Looking at my current marks and the MCA data from the transcript page, what is the safest range for an A grade in Data Structures?"
-- **Impact Analysis**:
-  > "I just got 15/20 in my Quiz 2. How does this affect my weighted average in this course compared to the class average?"
-- **Summary Table**:
-  > "Create a table showing my total obtained weighted marks vs. total weight for all current subjects."
+Instead of:
 
-### 2. The Bunker Mode (Attendance)
+> How are my grades?
 
-_Optimize your skips without getting debarred._
+Try:
 
-- **Threshold Check**:
-  > "Which subjects am I closest to the 80% threshold in? Tell me exactly how many classes I can still miss per subject."
-- **Future Simulation**:
-  > "I have a family event next Tuesday. If I miss my 'Compiler Construction' lecture, what will my new attendance percentage be?"
-- **Log View**:
-  > "List all my absent dates for the month of October in a chronological list."
+> Based on my current Numerical Computing marks, estimate my weighted total if I average 80% in the remaining assignments. Show the assumptions.
 
-### 3. "What-If" Simulations
+## Prompt examples
 
-_Predict the future based on current trajectory._
+### Attendance
 
-- **CGPA Prediction**:
-  > "Assume I get a 'B+' in my final project but 'A's in everything else this semester. What will be my new CGPA?"
-- **Target Setting**:
-  > "I want to reach a 3.5 CGPA by the end of my 6th semester. Given my current 2.9, what SGPA do I need to maintain for the next two semesters?"
-- **Retake Impact**:
-  > "Calculate my SGPA if I retake 'Object Oriented Programming' and replace my current 'D' grade with a 'B+'."
+- "Which courses are closest to the 80% attendance threshold?"
+- "If I miss the next Compiler Construction class, what will the estimated percentage be?"
+- "Summarize my absences by course and date."
 
-### 4. Degree Roadmap & Personas
+### Marks and grades
 
-- **Roadmap**: "According to my Tentative Study Plan, how many 'Core' subjects do I have left to complete?"
-- **Graduation Check**: "Am I on track to graduate on time? Show me any prerequisites I haven't cleared yet."
+- "Compare my obtained weighted marks with the available weight in each course."
+- "Show a best-case and conservative final-grade forecast for Data Structures."
+- "Explain which assessment would have the biggest effect on my total."
 
-**Try Different Personas:**
+### Transcript and planning
 
-- **Strict Counselor**: "Act as a strict academic counselor. Roast my current GPA and tell me where I'm being lazy."
-- **Chill Senior**: "Act as a chill senior. Give me survival tips for 'Theory of Automata' based on my current marks."
-- **Strategist**: "Think like a consultant. How can I optimize my study hours to maximize CGPA with minimal effort."
+- "What semester GPA would I need to reach a 3.5 CGPA? State any assumptions."
+- "Summarize repeated courses and their possible impact on my CGPA."
+- "Which core courses remain in my study plan?"
 
-## University Specific Hacks (NUCES/Flex)
+### Output format
 
-- **Relative Grading**: Always ask the AI to factor in "MCA" (Relative Grading) when predicting grades.
-- **Attendance Debar**: The AI helps you skirt the line of the 80% rule safely.
-- **Retake Logic**: Ask for a Cost-Benefit Analysis: "Is it worth retaking X or strictly focusing on current GPA?"
+Octopus AI supports Markdown. Ask for a specific format when it helps:
 
-## Pro Techniques
-
-- **Chain of Thought**: Ask the AI to show steps.
-  - _Example_: "Evaluate my OS performance. First look at quiz averages, then mid-term, then estimate final grade."
-- **Formatting**: Request specific layouts.
-  - _Example_: "Summarize attendance in a Markdown table with columns: Subject, Percentage, Classes Missed, Status."
+- "Return this as a compact table."
+- "List the assumptions before the calculation."
+- "Give me a three-step action plan."
 
 ## Troubleshooting
 
-**"Memory Loss"** or Missing Data?
-If the AI says "I don't have transcript data":
+### The assistant says data is missing
 
-1.  Go to the **Transcript** page.
-2.  Wait for the **"Transcript Sync Complete"** notification.
-3.  Return to the chat.
+Visit the relevant portal page so SuperFlex can parse and cache the latest record, then retry. Transcript context may require opening the Transcript page during the current session.
 
-## Privacy & Reliability
+### The API key does not connect
 
-- **Data Transmission**: Your message and the academic context used to answer it are sent to GroqCloud with the API key you provide. The key is stored in the extension's local storage and is not sent to SuperFlex servers.
-- **Estimation**: AI provides **estimates**. Always verify critical calculations with your coordinator.
+- Confirm the key was created in Google AI Studio.
+- Check that the key has access to the Gemini API.
+- Generate a replacement key if it was exposed publicly.
+- Retry after a short delay if Google reports high demand.
 
-_Developed for the dreamers, the grinders, and the ones who just want to Flex._
+### A model is unavailable
+
+Refresh the available models in settings or select another compatible model. SuperFlex may also switch automatically when a request fails for an availability-related reason.
+
+## Privacy and reliability
+
+- Octopus AI is opt-in.
+- Your Gemini key is stored in `chrome.storage.local` and is not placed in the portal page DOM.
+- Prompts and permitted academic context are processed by Google's Gemini API under your Google account and provider settings.
+- Chat history remains local to the browser unless you copy or send it elsewhere.
+- AI output is an estimate, not an official academic record. Verify important calculations against the portal and university policy.

@@ -17,13 +17,16 @@ import {
   ArrowRight,
   ArrowLeft,
 } from "lucide-react";
-import BottomSheet, { BottomSheetClose, BottomSheetDescription, BottomSheetTitle } from "./ui/BottomSheet";
+import BottomSheet, {
+  BottomSheetClose,
+  BottomSheetDescription,
+  BottomSheetTitle,
+} from "./ui/BottomSheet";
 import { sendExtensionMessage } from "../utils/extensionApi";
 import {
-  getDecryptedCredentials,
   saveCredentials,
   clearSavedCredentials,
-  hasSavedCredentials,
+  getCredentialMetadata,
 } from "../utils/credentialStorage";
 
 const Avatar = ({ teacher }) =>
@@ -103,12 +106,8 @@ export default function SuperFlexSettingsModal({
       });
 
       // Check saved credentials for Auto-Fill
-      hasSavedCredentials().then((has) => {
-        if (has) {
-          getDecryptedCredentials().then((creds) => setSavedCreds(creds));
-        } else {
-          setSavedCreds(null);
-        }
+      getCredentialMetadata().then((metadata) => {
+        setSavedCreds(metadata.hasCredentials ? metadata : null);
       });
     }
   }, [open, initialTab]);
@@ -378,7 +377,10 @@ export default function SuperFlexSettingsModal({
             <div className="max-h-56 space-y-1.5 overflow-y-auto pr-1 scrollbar-hide">
               {loadingTeachers ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center text-xs text-slate-400">
-                  <LoaderCircle size={20} className="animate-spin text-[#230052] dark:text-white mb-2" />
+                  <LoaderCircle
+                    size={20}
+                    className="animate-spin text-[#230052] dark:text-white mb-2"
+                  />
                   Loading {campus?.name || "campus"} faculty records...
                 </div>
               ) : errorTeachers ? (
@@ -489,7 +491,8 @@ export default function SuperFlexSettingsModal({
                     Enable Octopus AI Assistant
                   </span>
                   <span className="text-xs text-foreground/60 leading-relaxed">
-                    AI calculations for 80% attendance leaves, grade forecasting, and teacher emails.
+                    AI calculations for 80% attendance leaves, grade forecasting, and teacher
+                    emails.
                   </span>
                 </div>
               </div>
@@ -523,7 +526,8 @@ export default function SuperFlexSettingsModal({
                         1. Get Free Google Gemini API Key
                       </span>
                       <p className="mt-0.5 text-[11px] text-sky-900/70 dark:text-sky-300/70 leading-relaxed">
-                        Official Gemini free-tier key from Google AI Studio. No credit card required.
+                        Official Gemini free-tier key from Google AI Studio. No credit card
+                        required.
                       </p>
                     </div>
                     <a
@@ -588,12 +592,15 @@ export default function SuperFlexSettingsModal({
                 </div>
 
                 <div className="rounded-xl bg-slate-100/60 p-3 text-[11px] text-foreground/60 dark:bg-white/[0.03]">
-                  <strong>Privacy Note:</strong> Your API key is stored locally inside your browser and never leaves your device. Data is processed directly through Google's official Gemini API.
+                  <strong>Privacy Note:</strong> Your API key is stored locally inside your browser
+                  and never leaves your device. Data is processed directly through Google's official
+                  Gemini API.
                 </div>
               </div>
             ) : (
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-center text-xs text-foreground/60 dark:border-white/10 dark:bg-white/[0.03]">
-                Octopus AI is currently disabled. The floating chat dock will remain hidden on all portal pages.
+                Octopus AI is currently disabled. The floating chat dock will remain hidden on all
+                portal pages.
               </div>
             )}
           </div>
@@ -613,7 +620,7 @@ export default function SuperFlexSettingsModal({
                     </span>
                   </div>
                   <p className="text-xs text-foreground/60">
-                    Saves your Roll No & password securely in local extension storage so you never have to re-enter them on session timeout.
+                    Saves your Roll No & password securely in local extension storage so you can easily Auto-Fill on future logins.
                   </p>
                 </div>
               </div>
@@ -702,11 +709,14 @@ export default function SuperFlexSettingsModal({
                     onClick={async () => {
                       if (!autofillUser.trim() || !autofillPass) return;
                       setAutofillSaving(true);
-                      await saveCredentials(autofillUser.trim(), autofillPass);
-                      const creds = await getDecryptedCredentials();
-                      setSavedCreds(creds);
+                      const saved = await saveCredentials(
+                        autofillUser.trim(),
+                        autofillPass,
+                      );
+                      const metadata = await getCredentialMetadata();
+                      setSavedCreds(saved ? metadata : null);
                       setAutofillSaving(false);
-                      setAutofillSuccess(true);
+                      setAutofillSuccess(saved);
                       setAutofillUser("");
                       setAutofillPass("");
                       setTimeout(() => setAutofillSuccess(false), 3000);

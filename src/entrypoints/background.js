@@ -465,26 +465,6 @@ export default defineBackground(() => {
       return true;
     }
 
-    if (message?.type === "SUPERFLEX_APPLY_DEFAULT_ZOOM") {
-      const tabId = _sender.tab?.id;
-      if (tabId == null) {
-        sendResponse({ applied: false });
-        return undefined;
-      }
-      chrome.tabs.getZoom(tabId, (zoom) => {
-        if (chrome.runtime.lastError) {
-          sendResponse({ applied: false });
-          return;
-        }
-        if (Math.abs(zoom - 1) < 0.001) {
-          chrome.tabs.setZoom(tabId, 1.1, () => sendResponse({ applied: !chrome.runtime.lastError, zoom: 1.1 }));
-          return;
-        }
-        sendResponse({ applied: false, zoom });
-      });
-      return true;
-    }
-
     if (message?.type !== "SUPERFLEX_GET_CAMPUS_FACULTY") return undefined;
     const urls = CAMPUS_DIRECTORY_URLS[message.campusId];
     if (!urls) {

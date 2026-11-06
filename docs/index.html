@@ -18,7 +18,6 @@
       strategy="afterInteractive"
       data-website-id="bc91863f-8b1b-4d92-8022-ab28362e4412"
       data-domain="theajmalrazaq.github.io"
-      src="https://analytics.brandjet.ai/api/script.js"
     ></script>
 
     <style>
@@ -331,6 +330,376 @@
       .mobile-link span {
         transition: all 0.3s ease;
       }
+
+      /* Light cloud theme: preserve the original page structure and motion. */
+      body {
+        color: #101027;
+        background: #fff;
+      }
+
+      .animated-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: min(100vh, 760px);
+        z-index: 0;
+        overflow: hidden;
+        pointer-events: none;
+        background: linear-gradient(180deg, #62abe0 0%, #73b3e1 24%, #9ac7e8 38%, #dcebf5 49%, #fff 57%);
+      }
+
+      .animated-bg::before,
+      .animated-bg::after {
+        content: "";
+        position: absolute;
+        z-index: 2;
+        pointer-events: none;
+        background-image: url("res/cloud-2.webp");
+        background-repeat: no-repeat;
+        background-size: contain;
+        filter: none;
+      }
+
+      .animated-bg::before {
+        width: clamp(200px, 26vw, 420px);
+        height: 240px;
+        left: -5vw;
+        top: 9vh;
+        opacity: 0.85;
+        transform: scaleX(-1);
+      }
+
+      .animated-bg::after {
+        width: clamp(300px, 42vw, 680px);
+        height: 320px;
+        right: -9vw;
+        top: -4vh;
+        opacity: 0.95;
+      }
+
+      .animated-bg img,
+      .animated-bg .bg-gradient-to-b {
+        display: none;
+      }
+
+      .glow-1 {
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+      }
+
+      .glow-2 {
+        background: radial-gradient(circle, rgba(35, 0, 82, 0.08) 0%, transparent 70%);
+      }
+
+      #main-nav {
+        background: rgba(255, 255, 255, 0.82);
+        border-color: rgba(255, 255, 255, 0.75);
+        box-shadow: 0 12px 36px rgba(24, 57, 83, 0.14);
+      }
+
+      #main-nav a,
+      #main-nav button {
+        color: #596579;
+      }
+
+      #main-nav #home-nav-link {
+        background: rgba(35, 0, 82, 0.08);
+        color: #230052;
+        border-color: rgba(35, 0, 82, 0.12);
+      }
+
+      #mobile-overlay {
+        background: rgba(244, 248, 252, 0.96);
+      }
+
+      #mobile-overlay .mobile-link > span:first-child {
+        color: #101027;
+      }
+
+      #mobile-overlay .mobile-link > span:last-child {
+        color: #5e43a6;
+      }
+
+      #version-text {
+        background-image: linear-gradient(to bottom, #230052, rgba(35, 0, 82, 0.68));
+      }
+
+      .hero-logo {
+        filter: drop-shadow(0 4px 16px rgba(16, 16, 39, 0.14));
+      }
+
+      .hero-section-injected,
+      .feature-card,
+      .review-card {
+        color: #101027;
+        background: rgba(255, 255, 255, 0.8);
+        border-color: rgba(16, 16, 39, 0.1);
+        box-shadow: 0 14px 42px rgba(35, 0, 82, 0.07);
+        backdrop-filter: blur(18px);
+      }
+
+      .feature-card:hover,
+      .review-card:hover {
+        background: rgba(255, 255, 255, 0.95);
+        border-color: rgba(35, 0, 82, 0.24);
+        box-shadow: 0 20px 52px rgba(35, 0, 82, 0.12);
+      }
+
+      .review-name,
+      .feature-card h3 {
+        color: #101027;
+      }
+
+      .review-comment {
+        color: #667085;
+      }
+
+      #features h2,
+      #features h3,
+      #features p {
+        color: #101027;
+      }
+
+      #features p {
+        color: #667085;
+      }
+
+      #features .text-zinc-300,
+      #features .text-zinc-400 {
+        color: #667085;
+      }
+
+      #features .bg-white\/5 {
+        background: rgba(35, 0, 82, 0.05);
+      }
+
+      #features .border-white\/10 {
+        border-color: rgba(35, 0, 82, 0.1);
+      }
+
+      #features .text-white {
+        color: #101027;
+      }
+
+      #features .bg-\[\#a098ff\]\/10,
+      #features .group-hover\:bg-\[\#a098ff\]\/20 {
+        background: rgba(35, 0, 82, 0.08);
+      }
+
+      #how-to-use-btn {
+        color: #230052;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(35, 0, 82, 0.12);
+      }
+
+      #video-modal .relative.w-full {
+        background: #fff;
+        border-color: rgba(16, 16, 39, 0.1);
+        box-shadow: 0 24px 80px rgba(16, 16, 39, 0.2);
+      }
+
+      #video-modal .relative.w-full > div:first-child {
+        background: #fff;
+        border-color: rgba(16, 16, 39, 0.08);
+      }
+
+      #video-modal h3,
+      #video-modal button {
+        color: #101027;
+      }
+
+      #video-modal p {
+        color: #667085;
+      }
+
+      #video-modal .bg-black {
+        background: #101027;
+      }
+
+      footer {
+        color: #101027;
+        border-color: rgba(16, 16, 39, 0.1);
+      }
+
+      footer .text-zinc-400,
+      footer .text-zinc-500 {
+        color: #667085;
+      }
+
+      footer .text-zinc-600,
+      footer .text-zinc-700 {
+        color: #7b8494;
+      }
+
+      footer .from-white\/5 {
+        --tw-gradient-from: rgba(35, 0, 82, 0.06) var(--tw-gradient-from-position);
+        --tw-gradient-to: rgba(35, 0, 82, 0) var(--tw-gradient-to-position);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      #main-nav a:hover, #main-nav button:hover { color: #230052; }
+      #main-nav #home-nav-link { background: #230052; color: #fff; border-color: #230052; }
+      #mobile-overlay .mobile-link:hover > span:first-child { color: #230052; }
+      #version-text { background-image: none; color: #230052; font-weight: 700; }
+      #hero-card {
+        width: min(100%, 780px);
+        padding: clamp(24px, 5vw, 56px);
+        border: 0;
+        border-radius: 32px;
+        background: #fff;
+        box-shadow: none;
+      }
+      #hero-card > div:first-child > a > button { background: #fff; border: 1px solid rgba(35, 0, 82, .12); box-shadow: none; }
+      #hero-card > div:first-child > a > button > span { background: rgba(255, 255, 255, .88); }
+      #hero-card > div:first-child > a > button svg { stroke: #230052; }
+      #hero-tagline { color: #230052; }
+      #hero-card #hero-tagline + span { background-image: linear-gradient(to left, transparent, rgba(35, 0, 82, .18)); }
+      #hero-card .flex.items-center.justify-center.gap-3.w-full > span:first-child { background-image: linear-gradient(to right, transparent, rgba(35, 0, 82, .18)); }
+      .brand-mark { background: #000 !important; border-width: 0 !important; border-color: transparent !important; box-shadow: none !important; }
+      .brand-mark path { animation: none !important; transform: none !important; fill: #a098ff !important; }
+      #hero-credit { color: #475467; }
+      #hero-credit a { color: #230052; text-decoration-color: rgba(35, 0, 82, .35); }
+      #add-to-chrome-btn { background: #230052; box-shadow: none; }
+      #add-to-chrome-btn:hover { background: #370c72; }
+      #how-to-use-btn { color: #230052; background: transparent; background-image: none; border-color: transparent; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+      #how-to-use-btn:hover { background: transparent; }
+      #how-to-use-btn svg { color: #6551bd; }
+      #features .text-\[\#a098ff\] { color: #6551bd; }
+      #features .text-\[\#230052\] { color: #230052; }
+      #features .bg-\[\#a098ff\] { background-color: rgba(35, 0, 82, .08); }
+      #features .bg-\[\#a098ff\]\/10 { background-color: rgba(35, 0, 82, .08); }
+      #features .text-slate-600 { color: #596579; }
+      #features {
+        padding-top: clamp(48px, 7vw, 84px);
+        padding-bottom: clamp(48px, 7vw, 84px);
+      }
+      #features .features-heading { margin-bottom: 40px; }
+      #features .features-heading > p:first-child { color: #6551bd; }
+      #features .feature-grid { grid-template-columns: minmax(0, 1fr); grid-auto-rows: minmax(210px, auto); gap: 16px; }
+      #features .feature-card {
+        padding: 24px;
+        border: 1px solid rgba(0, 0, 0, .06);
+        border-radius: 32px;
+        background: #fff;
+        min-height: 220px;
+        box-shadow: none;
+        backdrop-filter: none;
+        transition: border-color 180ms ease;
+      }
+      #features .feature-card:hover {
+        border-color: rgba(0, 0, 0, .1);
+        background: #fff;
+        box-shadow: none;
+      }
+      #features .feature-card-header > div:first-child {
+        width: 52px;
+        height: 52px;
+        margin: 0;
+        flex: 0 0 52px;
+        border: 0;
+        border-radius: 36%;
+        background: #230052;
+        color: #fff;
+      }
+      #features .feature-card-header > div:first-child svg { width: 24px; height: 24px; stroke: currentColor !important; }
+      #features .feature-card:not(.feature-ai) .feature-card-header > div:first-child svg { fill: none; }
+      #features .feature-ai .feature-card-header > div:first-child svg path { fill: #a098ff !important; }
+      #features .feature-card-header { display: flex; align-items: center; gap: 12px; }
+      #features .feature-card-header .feature-label { margin: 0; color: #626262; font-size: 14px; font-weight: 600; line-height: 1.3; }
+      #features .feature-card h3 { margin: auto 0 0; padding-top: 28px; color: #101010; font-size: 16px; font-weight: 500 !important; line-height: 1.3; letter-spacing: -.02em; }
+      #features .feature-card p { margin-top: 8px; color: #777780; font-size: 12px; line-height: 1.45; }
+      #features .feature-ai { background: #fff; }
+      #features .ai-feature-preview {
+        margin-top: 16px;
+        padding: 14px;
+        border-radius: 20px;
+        background: #f6f6f8;
+      }
+      #features .ai-feature-preview > p { margin: 0 0 8px; color: #6551bd; font-size: 10px; font-weight: 700; }
+      #features .ai-preview-question {
+        width: fit-content;
+        max-width: 90%;
+        padding: 8px 11px;
+        border-radius: 12px 12px 12px 4px;
+        color: #51436c;
+        background: #fff;
+        font-size: 12px;
+      }
+      #features .ai-preview-answer {
+        width: fit-content;
+        max-width: 94%;
+        margin: 8px 0 0 auto;
+        padding: 8px 11px;
+        border-radius: 12px 12px 4px 12px;
+        color: #fff;
+        background: #230052;
+        font-size: 12px;
+      }
+      @media (min-width: 640px) {
+        #features .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (min-width: 1024px) {
+        #features .feature-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        #features .feature-ai { grid-column: span 2; grid-row: span 2; }
+      }
+      .toolkit-callout {
+        padding: 24px;
+        border: 1px solid rgba(0, 0, 0, .06);
+        border-radius: 32px;
+        background: #fff;
+      }
+      .toolkit-points { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 20px; }
+      .toolkit-points span { border: 0; border-radius: 999px; padding: 7px 12px; color: #4b3b71; background: #f6f6f8; font-size: 12px; font-weight: 600; }
+      .glow-1, .glow-2, #hero-card .group > div:first-child { display: none !important; }
+      #hero-card, #hero-card * { box-shadow: none !important; }
+      #hero-card .hero-logo { filter: none !important; }
+      .site-footer {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        margin: 0 clamp(12px, 3vw, 40px);
+        padding: clamp(32px, 4vw, 52px) clamp(20px, 4vw, 40px) 96px !important;
+        color: #101027 !important;
+        background: #fff !important;
+        border: 1px solid rgba(35, 0, 82, .1) !important;
+        border-radius: 32px 32px 0 0;
+        box-shadow: 0 18px 54px rgba(35, 0, 82, .1);
+      }
+      .site-footer > div:first-child { z-index: 0; }
+      .site-footer .footer-watermark {
+        position: absolute;
+        bottom: -72px;
+        left: 50%;
+        width: min(82%, 820px);
+        height: auto;
+        opacity: .11;
+        transform: translateX(-50%);
+      }
+      .site-footer .flex.gap-4 a {
+        color: #4b3b71;
+        background: rgba(35, 0, 82, .05);
+        border-color: rgba(35, 0, 82, .1);
+      }
+      .site-footer .flex.gap-4 a:hover { color: #230052; background: rgba(35, 0, 82, .1); }
+      .site-footer .border-t { border-color: rgba(35, 0, 82, .1); }
+      .site-footer .max-w-7xl > .flex { gap: 24px !important; }
+      .site-footer .flex.flex-col.items-center.gap-6 { gap: 14px !important; }
+      .site-footer .brand-mark { width: 56px; height: 56px; border-width: 4px; border-radius: 20px; overflow: hidden; }
+      .site-footer .brand-mark svg { width: 56px; height: 56px; }
+      .site-footer img[alt="SuperFlex"] { width: 200px; }
+      .site-footer .border-t { padding-top: 16px; }
+      .site-footer .footer-tagline { max-width: none; white-space: nowrap; }
+      @media (max-width: 640px) { .site-footer .footer-tagline { white-space: normal; } }
+      h1, h2, h3, h4, h5, h6 { font-weight: 500 !important; }
     </style>
   </head>
   <body>
@@ -356,11 +725,12 @@
           class="flex items-center gap-4 lg:gap-8 w-full lg:w-auto justify-between lg:justify-start"
         >
           <a href="index.html" class="flex items-center shrink-0">
-            <img src="res/logo.svg" alt="Logo" class="h-6 lg:h-8 w-auto" />
+            <img src="res/logo-light.svg" alt="Logo" class="h-6 lg:h-8 w-auto" />
           </a>
 
           <div class="hidden lg:flex items-center gap-1">
             <a
+              id="home-nav-link"
               href="index.html"
               class="px-4 py-2 rounded-full bg-[#a098ff]/10 text-[#a098ff] border border-white/10 text-[13px] font-medium transition-all duration-300"
               >Home</a
@@ -447,6 +817,7 @@
     <section
       class="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 relative z-20"
     >
+      <div id="hero-card">
       <div class="flex flex-col pt-7 justify-center text-center w-full mb-6">
         <!-- Version Badge -->
         <a
@@ -500,7 +871,7 @@
               class="absolute -inset-4 bg-[#a098ff]/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition duration-700"
             ></div>
             <div
-              class="h-24 w-24 bg-black border-8 border-white/5 bg-cover rounded-[32px] flex items-center justify-center relative z-10"
+              class="brand-mark h-24 w-24 bg-black border-8 border-white/5 bg-cover rounded-[32px] flex items-center justify-center relative z-10"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -540,22 +911,14 @@
           <!-- Logo Text -->
           <div class="space-y-4 flex items-center flex-col gap-2 w-full px-6">
             <img
-              src="res/logo.svg"
+              src="res/logo-light.svg"
               alt="SuperFlex"
               class="w-full max-w-[280px] sm:max-w-md hero-logo filter"
             />
-            <div class="flex items-center justify-center gap-3 w-full">
-              <span class="w-8 sm:w-12 h-px bg-gradient-to-r from-transparent to-white/20"></span>
-              <span
-                class="font-black text-[8px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.4em] text-[#a098ff]/80 text-center"
-                >Flex Portal Sucks? Not Anymore. Time to Flex on 'Em</span
-              >
-              <span class="w-8 sm:w-12 h-px bg-gradient-to-l from-transparent to-white/20"></span>
-            </div>
           </div>
 
           <!-- Subtitle -->
-          <p class="text-zinc-400 text-sm font-medium">
+          <p id="hero-credit" class="text-zinc-400 text-sm font-medium">
             Crafted with obsession by
             <a
               href="https://github.com/theajmalrazaq"
@@ -597,7 +960,7 @@
           </a>
           <button
             id="how-to-use-btn"
-            class="group relative bg-white/10 backdrop-blur-sm px-8 py-3.5 rounded-2xl text-white hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto whitespace-nowrap h-[52px]"
+            class="group relative bg-transparent px-8 py-3.5 rounded-2xl text-white hover:bg-transparent transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto whitespace-nowrap h-[52px]"
             style="font-family: &quot;Google Sans Flex&quot;, sans-serif"
           >
             <span class="text-sm font-medium">How to Use</span>
@@ -618,6 +981,7 @@
             </svg>
           </button>
         </div>
+      </div>
 
         <!-- Video Modal -->
         <div id="video-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
@@ -695,25 +1059,23 @@
     </section>
 
     <!-- Features Section -->
-    <section class="py-24 px-4 sm:px-6 relative z-20">
+    <section id="features" class="py-24 px-4 sm:px-6 relative z-20">
       <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-16">
-          <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
-            Features That Actually Matter
+        <div class="features-heading text-center">
+          <p class="mb-3 text-xs font-bold uppercase tracking-[.14em] text-[#6551bd]">A better way to Flex</p>
+          <h2 class="mb-3 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
+            Your academic day, made easier.
           </h2>
-          <p class="text-zinc-400 font-medium text-lg max-w-2xl mx-auto">
-            Say goodbye to the clunky interface. SuperFlex brings premium features that make
-            managing your academic life a breeze.
+          <p class="mx-auto max-w-2xl text-base leading-relaxed text-slate-600">
+            Useful tools for grades, attendance, planning, and a smoother portal experience.
           </p>
         </div>
 
         <!-- Bento Grid Layout -->
-        <div class="grid md:grid-cols-4 gap-4">
-          <!-- AI Assistant - Large Feature (2x2) -->
-          <div class="feature-card group md:col-span-2 md:row-span-2 flex flex-col">
-            <div
-              class="w-14 h-14 rounded-2xl bg-[#a098ff]/10 flex items-center justify-center mb-6 border border-[#a098ff]/20 relative z-10"
-            >
+        <div class="feature-grid grid md:grid-cols-4">
+          <div class="feature-card feature-ai group flex flex-col md:col-span-2 md:row-span-2">
+            <div class="feature-card-header">
+              <div class="flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white">
               <svg
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
@@ -726,38 +1088,30 @@
                   d="M13.295 10.769l2.552-5.787-7.979 7.28 3.254.225-3.353 6.362 8.485-7.388-2.959-.692z"
                 />
               </svg>
+              </div>
+              <p class="feature-label">ACADEMIC ASSISTANT</p>
             </div>
-            <h3 class="text-2xl font-bold mb-3 text-white">AI-Powered Academic Assistant</h3>
-            <p class="text-zinc-400 font-medium text-sm leading-relaxed mb-4">
-              Chat with multiple AI models (Gemini, GPT-4o, DeepSeek, Grok) that understand your
-              academic data. Get instant answers about your CGPA, attendance predictions, grade
-              forecasts, and personalized study advice.
+            <h3 class="font-bold">Octopus AI for your studies</h3>
+            <p>
+              Bring your own Gemini API key for streamed answers, grade forecasts, attendance insights, and study suggestions using the context you choose to share.
             </p>
-            <div class="flex flex-wrap gap-2 mt-auto">
-              <span
-                class="text-xs px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-zinc-300 font-medium"
-                >Gemini 2.0 Flash</span
-              >
-              <span
-                class="text-xs px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-zinc-300 font-medium"
-                >GPT-4o Mini</span
-              >
-              <span
-                class="text-xs px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-zinc-300 font-medium"
-                >DeepSeek</span
-              >
-              <span
-                class="text-xs px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-zinc-300 font-medium"
-                >Grok 2</span
-              >
+            <div class="ai-feature-preview" aria-label="Example Octopus AI conversation">
+              <p>OCTOPUS AI · GEMINI</p>
+              <div class="ai-preview-question">How many classes can I miss and stay above 80%?</div>
+              <div class="ai-preview-answer">I’ll check your attendance and show the calculation.</div>
+            </div>
+            <div class="mt-auto flex flex-wrap gap-2 pt-5">
+              <span class="rounded-full bg-[#f6f6f8] px-3 py-1.5 text-xs font-semibold text-slate-600">Your API key</span>
+              <span class="rounded-full bg-[#f6f6f8] px-3 py-1.5 text-xs font-semibold text-slate-600">Streaming</span>
+              <span class="rounded-full bg-[#f6f6f8] px-3 py-1.5 text-xs font-semibold text-slate-600">Your chosen context</span>
+              <span class="rounded-full bg-[#f6f6f8] px-3 py-1.5 text-xs font-semibold text-slate-600">Model fallback</span>
             </div>
           </div>
 
           <!-- Feature 1 - Modern Dashboard -->
-          <div class="feature-card group">
-            <div
-              class="w-14 h-14 rounded-2xl bg-[#a098ff]/10 flex items-center justify-center mb-6 group-hover:bg-[#a098ff]/20 transition-all"
-            >
+          <div class="feature-card group flex flex-col">
+            <div class="feature-card-header">
+              <div class="flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="28"
@@ -772,19 +1126,19 @@
                 <rect x="3" y="3" width="18" height="18" rx="2" />
                 <path d="M3 9h18M9 21V9" />
               </svg>
+              </div>
+              <p class="feature-label">DASHBOARD</p>
             </div>
-            <h3 class="text-xl font-bold mb-3 text-white">Modern Dashboard</h3>
-            <p class="text-zinc-400 font-medium text-sm leading-relaxed">
-              Stunning glassmorphic UI with smooth animations, dark mode, and a layout that doesn't
-              make your eyes bleed.
+            <h3 class="font-bold">A clearer portal</h3>
+            <p>
+              Find grades, courses, and useful updates in a clean layout that works across screens.
             </p>
           </div>
 
           <!-- Feature 2 -->
-          <div class="feature-card group">
-            <div
-              class="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-6 group-hover:bg-emerald-500/20 transition-all"
-            >
+          <div class="feature-card group flex flex-col">
+            <div class="feature-card-header">
+              <div class="flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="28"
@@ -799,18 +1153,18 @@
                 <line x1="12" y1="1" x2="12" y2="23" />
                 <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
               </svg>
+              </div>
+              <p class="feature-label">SECURE SIGN-IN</p>
             </div>
-            <h3 class="text-xl font-bold mb-3 text-white">Smart Analytics</h3>
-            <p class="text-zinc-400 font-medium text-sm leading-relaxed">
-              Visualize your CGPA trends, grade distributions, and attendance patterns with
-              interactive charts and insights.
+            <h3 class="font-bold">Private Auto-Fill</h3>
+            <p>
+              Encrypt your login in a local vault with a passphrase only you know. Your passphrase is never stored.
             </p>
           </div>
 
-          <div class="feature-card group">
-            <div
-              class="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-6 group-hover:bg-purple-500/20 transition-all"
-            >
+          <div class="feature-card group flex flex-col">
+            <div class="feature-card-header">
+              <div class="flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="28"
@@ -825,18 +1179,18 @@
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg>
+              </div>
+              <p class="feature-label">ATTENDANCE</p>
             </div>
-            <h3 class="text-xl font-bold mb-3 text-white">Real-Time Tracking</h3>
-            <p class="text-zinc-400 font-medium text-sm leading-relaxed">
-              Monitor attendance percentages with color-coded warnings and never miss an important
-              deadline again.
+            <h3 class="font-bold">Instructor tools</h3>
+            <p>
+              Check attendance, look up campus faculty, and prepare a review email for your instructor.
             </p>
           </div>
           <!-- Feature 3 -->
-          <div class="feature-card group">
-            <div
-              class="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-6 group-hover:bg-blue-500/20 transition-all"
-            >
+          <div class="feature-card group flex flex-col">
+            <div class="feature-card-header">
+              <div class="flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="28"
@@ -851,28 +1205,38 @@
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
               </svg>
+              </div>
+              <p class="feature-label">GRADE PLANNING</p>
             </div>
-            <h3 class="text-xl font-bold mb-3 text-white">Grade Calculator</h3>
-            <p class="text-zinc-400 font-medium text-sm leading-relaxed">
-              What-if scenarios, CGPA target planning, and best-of calculations to predict and plan
-              your academic future.
+            <h3 class="font-bold">Plan your grades</h3>
+            <p>
+              Try what-if scenarios, plan a CGPA target, and compare best-of calculations.
             </p>
           </div>
         </div>
       </div>
     </section>
 
+    <section class="relative z-20 px-4 pb-20 sm:px-6">
+      <div class="toolkit-callout mx-auto max-w-5xl text-center">
+        <p class="text-xs font-bold uppercase tracking-[.14em] text-[#6551bd]">The SuperFlex toolkit</p>
+        <h2 class="mt-2 text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">One extension. Your whole academic workflow.</h2>
+        <p class="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-slate-600">
+          Keep your portal tools together, with local-first settings and AI features you control.
+        </p>
+        <div class="toolkit-points" aria-label="SuperFlex toolkit highlights">
+          <span>Open source</span><span>Local-first privacy</span><span>Bring your own AI key</span><span>Built for FLEX</span>
+        </div>
+      </div>
+    </section>
+
     <!-- Footer -->
-    <footer class="py-24 px-4 sm:px-6 relative z-20 border-t border-white/10 overflow-hidden">
+    <footer class="site-footer py-24 px-4 sm:px-6 relative z-20 border-t border-white/10 overflow-hidden">
       <!-- Large Gradient Text Background -->
       <div
         class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden"
       >
-        <h1
-          class="text-[8rem] sm:text-[12rem] md:text-[18rem] lg:text-[24rem] font-black bg-gradient-to-b from-white/5 to-transparent bg-clip-text text-transparent select-none whitespace-nowrap"
-        >
-          SUPERFLEX
-        </h1>
+        <img class="footer-watermark" src="res/logo-light.svg" alt="" aria-hidden="true" />
       </div>
 
       <div class="max-w-7xl mx-auto relative z-10">
@@ -884,7 +1248,7 @@
                 class="absolute -inset-4 bg-[#a098ff]/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition duration-700"
               ></div>
               <div
-                class="h-20 w-20 bg-black border-8 border-white/5 rounded-[28px] flex items-center justify-center relative z-10"
+                class="brand-mark h-20 w-20 bg-black border-8 border-white/5 rounded-[28px] flex items-center justify-center relative z-10"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -904,12 +1268,12 @@
                 </svg>
               </div>
             </div>
-            <img src="res/logo.svg" alt="SuperFlex" class="w-64 filter opacity-90" />
+            <img src="res/logo-light.svg" alt="SuperFlex" class="w-64 filter opacity-90" />
           </div>
 
           <!-- Tagline -->
-          <p class="text-zinc-400 text-sm font-medium text-center max-w-md">
-            pov: you're tired of flex portal being mid 🗿 (we gotchu fam) 💯
+          <p class="footer-tagline text-zinc-400 text-sm font-medium text-center max-w-md">
+              Independent, open-source, and built for a clearer academic workflow.
           </p>
 
           <!-- Social Links -->
@@ -931,36 +1295,15 @@
                 />
               </svg>
             </a>
-            <a
-              href="https://www.instagram.com/superflex.fr"
-              target="_blank"
-              class="p-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#a098ff]/30 text-zinc-400 hover:text-[#a098ff] transition-all"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-              </svg>
-            </a>
           </div>
 
           <!-- Copyright -->
           <div class="text-center pt-8 border-t border-white/5 w-full">
             <p class="text-zinc-600 text-xs font-medium">
-              © 2024 superflex • free forever fr fr ✨
+              © 2026 SuperFlex · Open source under the MIT License
             </p>
             <p class="text-zinc-700 text-xs mt-2">
-              coded with ☕ + 🎧 by
+              designed and built by
               <a
                 href="https://github.com/theajmalrazaq"
                 target="_blank"

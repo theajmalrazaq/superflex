@@ -1,319 +1,183 @@
 <div align="center">
-  <img src="public/assets/logo.svg" alt="SuperFlex Logo" width="300" />
-  <p>A modern interface enhancement extension for university learning management systems</p>
-
-<p>
-  <a href="https://github.com/theajmalrazaq/superflex/releases">
-    <img src="https://img.shields.io/github/downloads/theajmalrazaq/superflex/total?style=for-the-badge&color=a098ff" alt="GitHub all downloads">
-  </a>
-
-  <a href="https://github.com/theajmalrazaq/superflex">
-    <img src="https://img.shields.io/github/stars/theajmalrazaq/superflex?style=for-the-badge&color=a098ff" alt="GitHub stars">
-  </a>
-
-  <a href="https://github.com/theajmalrazaq/superflex/issues">
-    <img src="https://img.shields.io/github/issues-raw/theajmalrazaq/superflex?style=for-the-badge&color=a098ff" alt="GitHub issues">
-  </a>
-
-  <a href="https://github.com/theajmalrazaq/superflex/blob/master/LICENSE">
-    <img src="https://img.shields.io/badge/license-MIT-a098ff?style=for-the-badge" alt="License">
-  </a>
-</p>
+  <img src="public/assets/logo.svg" alt="SuperFlex" width="300" />
+  <p>A privacy-first interface and academic toolkit for the FAST-NUCES Flex Student Portal.</p>
 
   <p>
-    <a href="https://theajmalrazaq.github.io/superflex">Website</a> •
-    <a href="#features">Features</a> •
-    <a href="#installation">Installation</a> •
-    <a href="#development">Development</a> •
-    <a href="#contributing">Contributing</a>
+    <a href="https://github.com/theajmalrazaq/superflex/releases"><img src="https://img.shields.io/github/downloads/theajmalrazaq/superflex/total?style=for-the-badge&color=a098ff" alt="GitHub downloads"></a>
+    <a href="https://github.com/theajmalrazaq/superflex"><img src="https://img.shields.io/github/stars/theajmalrazaq/superflex?style=for-the-badge&color=a098ff" alt="GitHub stars"></a>
+    <a href="https://github.com/theajmalrazaq/superflex/issues"><img src="https://img.shields.io/github/issues-raw/theajmalrazaq/superflex?style=for-the-badge&color=a098ff" alt="GitHub issues"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-a098ff?style=for-the-badge" alt="MIT License"></a>
+  </p>
+
+  <p>
+    <a href="https://theajmalrazaq.github.io/superflex">Website</a> ·
+    <a href="#features">Features</a> ·
+    <a href="#installation">Installation</a> ·
+    <a href="#privacy-and-security">Privacy</a> ·
+    <a href="#development">Development</a>
   </p>
 </div>
 
 ## Overview
 
-SuperFlex is the ultimate glow-up for that crusty university Flex portal at NUCES that was giving major 2005 vibes. It's literally a browser extension that said "challenge accepted" and transformed the ancient interface into this sleek, dark-mode masterpiece. It's not just a pretty face though - we've added so many features that your productivity is about to be _chef's kiss_ 🔥
+SuperFlex is an open-source Chrome extension that replaces the dated Flex Student Portal interface with a responsive React experience. It keeps the university portal as the source of truth while adding clearer dashboards, academic tools, optional AI assistance, instructor workflows, and a safer login Auto-Fill vault.
 
-This bad boy works by sneaking React components into the boring old LMS pages, basically performing plastic surgery on the UI. No cap, it's the ultimate uni life hack that the administration wasn't ready for. Flex portal? More like FLEX on your classmates with this aesthetic upgrade! 😎
+SuperFlex runs on the client side. It has no SuperFlex backend, analytics pipeline, advertising SDK, or telemetry service.
 
 ## Features
 
-### 🤖 AI-Powered Academic Assistant
+### Modern portal UI
 
-- **GroqCloud Model Support**: Add your own GroqCloud API key and choose from the chat models available to your account.
-- **Context-Aware Responses**: AI understands your academic data (CGPA, attendance, marks, study plan)
-- **Intelligent Predictions**: Get grade forecasts, attendance warnings, and study recommendations
-- **Auto Data Sync**: Automatically fetches and syncs your academic records for AI context
-- **Persistent Chat History**: Your conversations are saved across sessions
+- Responsive dashboards using Google Sans Flex and a consistent light/dark design system.
+- Bottom-sheet settings, focused loading states, accessible controls, and mobile-friendly navigation.
+- Clear layouts for attendance, marks, transcript, study plan, fees, feedback, registration, withdrawal, retakes, and grade-change workflows.
+- Local preferences for theme, bookmarks, selected instructors, and interface settings.
 
-### 🎨 Modern UI/UX
+### Octopus AI assistant
 
-- **Glassmorphic Dark Mode**: Stunning dark theme with frosted glass effects
-- **Google Sans Flex Typography**: Professional and highly readable custom font
-- **Flat Design**: Modern minimalist aesthetic with no shadow bloat
-- **Smooth Animations**: Buttery transitions and micro-interactions
-- **Responsive Layout**: Optimized for all screen sizes
-- **Custom Loading States**: Beautiful animated loading overlays with splash branding
-- **AI Data Visualization**: Interactive status cards within the AI assistant
+- Connects directly to Google's Gemini API with a key supplied by the user.
+- Streams responses and automatically falls back to another compatible Gemini model when the selected model is unavailable.
+- Uses only the academic context the user permits, including attendance, marks, transcript, and study-plan data.
+- Supports Markdown answers, persistent local chat history, academic forecasts, summaries, and what-if questions.
+- Can be disabled completely from settings.
 
-### 📊 Enhanced Dashboards
+### Attendance and instructor tools
 
-- **Attendance Visualization**:
-  - Color-coded progress bars (green/yellow/red based on percentage)
-  - Real-time attendance tracking with warnings
-  - Detailed course-wise breakdown
-  - Bookmark important courses
-- **Advanced Grade Calculator**:
-  - What-if scenario planning
-  - Target CGPA calculator
-  - Best-of score calculations
-  - Grade scheme visualization
-  - Real-time GPA updates
-- **CGPA Tracking**: Monitor semester and cumulative GPA trends
-- **Financial Dashboard**: Clear fee breakdown and transaction history
+- Course-level attendance breakdowns, threshold warnings, and leave calculations.
+- Campus-aware faculty directory with instructor search and manual instructor entry.
+- Attendance-review workflow that prepares a respectful email draft, opens Gmail, or copies the message.
+- Instructor selections are stored locally and can be changed at any time.
 
-### 🛠️ Improved Functionality
+### Passphrase-protected Auto-Fill
 
-- **Smart Tables**:
-  - Sortable columns
-  - Filterable data
-  - Responsive design
-  - Export capabilities
-- **Interactive Accordions**: Collapsible sections for better content organization
-- **Custom Navigation**: Streamlined sidebar with quick access to all features
-- **Bookmark System**: Mark and quick-access important courses
-- **Real-time Calculations**: Instant grade and attendance calculations
-- **Data Persistence**: LocalStorage integration for settings and preferences
+- Auto-Fill is optional and must be explicitly enabled.
+- The user creates a vault passphrase; the passphrase is never stored.
+- PBKDF2-HMAC-SHA256 with a unique random salt derives the encryption key.
+- Credentials are encrypted locally with AES-GCM 256-bit in `chrome.storage.local`.
+- The derived vault key is wrapped with a device key in isolated extension storage, so later logins
+  only require choosing Auto-Fill on that browser profile.
 
-### 🔒 Privacy & Local-First Architecture
+### Academic planning
 
-- **Zero Analytics**: 100% telemetry-free with no tracking scripts or external metric beacons
-- **Local Storage Only**: Credentials, settings, and cached data remain strictly inside your browser sandbox
-- **No Personal Data Collection**: No user metrics, grades, attendance, or personal information leave your device
+- Attendance simulations and course-level status indicators.
+- Marks breakdowns, best-of calculations, and grade forecasting.
+- Semester and cumulative GPA views.
+- Study-plan and transcript parsing for a clearer degree overview.
+- Fee details and challan pages with simplified financial information.
 
-## Supported Pages
+## Supported pages
 
-SuperFlex enhances the following university LMS pages:
+- Home
+- Attendance
+- Marks and PLO report
+- Transcript
+- Study plan
+- Course registration and withdrawal
+- Course feedback
+- Grade change
+- Fee details and fee challan
+- Retake exam
+- Change password and session-expiry screens
 
-- **Home Page**: Dashboard with key student information
-- **Transcript Page**: Academic records with GPA calculator
-- **Marks Page**: Course marks with performance visualization
-- **Attendance Page**: Attendance tracking with statistics
-- **Study Plan Page**: Curriculum planning with modern interface
-- **Course Feedback Page**: Improved feedback submission forms
-- **Grade Change Page**: Streamlined grade appeal process
-- **Fee Details Page**: Clearer financial information display
-- **Retake Exam Page**: Simplified exam registration process
+## Privacy and security
+
+- **Zero telemetry:** the extension does not send usage analytics or tracking events.
+- **No SuperFlex backend:** academic records and preferences remain in the browser.
+- **Direct AI connection:** permitted prompts and academic context go directly to Google's Gemini API using the user's key.
+- **Optional credential vault:** login credentials are stored only when Auto-Fill is enabled and are protected by the user's passphrase.
+- **Official records win:** SuperFlex is a client-side interface. University records remain authoritative.
+
+Read the full [Privacy Policy](docs/articles/privacy.md).
 
 ## Installation
 
-### Desktop (Chrome/Chromium Browsers)
+### Chrome and Chromium browsers
 
-1. Install directly from the [Chrome Web Store](https://chromewebstore.google.com/detail/superflex/gipkdnbjfhjenfgehofkimpffdbkgppd?authuser=0&hl=en)
-2. SuperFlex will now be active when you visit your university LMS
+1. Install SuperFlex from the [Chrome Web Store](https://chromewebstore.google.com/detail/superflex/gipkdnbjfhjenfgehofkimpffdbkgppd).
+2. Open the FAST-NUCES Flex Student Portal.
+3. Complete the first-run privacy setup and configure only the optional tools you want.
 
-#### Manual Installation (Alternative)
+### Manual installation
 
-1. Download the latest release from the [GitHub Releases page](https://github.com/theajmalrazaq/superflex/releases)
-2. Unzip the downloaded file
-3. Open Chrome and go to `chrome://extensions/`
-4. Enable "Developer Mode" in the top right
-5. Click "Load Unpacked" and select the unzipped folder
-6. SuperFlex will now be active when you visit your university LMS
+1. Download the latest package from [GitHub Releases](https://github.com/theajmalrazaq/superflex/releases).
+2. Extract the archive.
+3. Open `chrome://extensions` and enable Developer mode.
+4. Select **Load unpacked** and choose the extracted extension directory.
 
-### Mobile (Android)
+### Android
 
-SuperFlex works on mobile devices using **Quetta Browser** - a Chromium-based browser with extension support:
-
-1. Download **Quetta Browser** from the Play Store or visit [quetta.net](https://www.quetta.net/features/extensions)
-2. Install SuperFlex from the [Chrome Web Store](https://chromewebstore.google.com/detail/superflex/gipkdnbjfhjenfgehofkimpffdbkgppd?authuser=0&hl=en) or download the latest release from [GitHub Releases](https://github.com/theajmalrazaq/superflex/releases)
-3. If downloading from GitHub, extract the downloaded file to your device
-4. Open Quetta Browser and navigate to the extensions page
-5. Enable "Developer Mode"
-6. Load the unpacked SuperFlex extension folder (if not using Chrome Web Store)
-7. Enjoy SuperFlex on your mobile device! 📱
+SuperFlex can run in Chromium-based Android browsers that support Chrome extensions, such as [Quetta Browser](https://www.quetta.net/features/extensions). Mobile extension support is controlled by the browser and may vary by version.
 
 ## Development
 
-SuperFlex is built with modern web technologies:
+### Stack
 
-- **React**: Component-based UI library
-- **Vite**: Fast build tooling
-- **Tailwind CSS**: Utility-first CSS framework
-- **CRXJS**: Chrome extension development tools
+- React 19
+- WXT and Vite
+- Tailwind CSS 4
+- Radix UI primitives
+- Zustand and Zod
+- Chart.js
+- Vitest, Oxlint, and Oxfmt
 
-### Prerequisites
-
-- Node.js (v16+)
-- npm or yarn
-- Chrome browser
-
-### Setup Development Environment
-
-1. Clone the repository:
+### Setup
 
 ```bash
 git clone https://github.com/theajmalrazaq/superflex.git
 cd superflex
-```
-
-2. Install dependencies:
-
-```bash
 npm install
-# or
-yarn
-```
-
-3. Start the development server:
-
-```bash
 npm run dev
-# or
-yarn dev
 ```
 
-4. Load the extension in Chrome:
-   - Go to `chrome://extensions/`
-   - Enable "Developer Mode"
-   - Click "Load Unpacked"
-   - Select the `dist` folder from your project directory
+WXT creates the development extension output. Load the generated Chrome MV3 directory shown by WXT in `chrome://extensions`.
 
-5. The extension will automatically reload when you make changes
-
-### Project Structure
-
-```
-superflex/
-├── docs
-│   ├── articles
-│   │   ├── bts.md
-│   │   └── superflexai.md
-│   ├── docs.html
-│   ├── index.html
-│   ├── res
-│   │   ├── bg.png
-│   │   ├── bts.png
-│   │   ├── favicon.svg
-│   │   ├── intro.svg
-│   │   ├── logo_sec.svg
-│   │   ├── logo.svg
-│   │   └── prompt.png
-│   ├── reviews.json
-│   └── video.mp4
-├── .oxfmtrc.json
-├── .oxlintrc.json
-├── eslint.config.js
-├── LICENSE
-├── package.json
-├── bun.lock
-├── wxt.config.js
-├── postcss.config.mjs
-├── public
-│   ├── assets
-│   │   ├── bg.png
-│   │   ├── favicon.png
-│   │   ├── favicon.svg
-│   │   ├── logo_sec.svg
-│   │   ├── logo.svg
-│   │
-│   ├── reviews.json
-│   └── scripts
-│       └── bridge.js
-├── README.md
-├── scripts
-│   └── clean.js
-├── src
-│   ├── components
-│   │   ├── layouts
-│   │   │   └── PageLayout.jsx
-│   │   ├── LoginPageStyles.jsx
-│   │   ├── NavBar.jsx
-│   │   ├── PathRouter.jsx
-│   │   ├── SuperFlexAI.jsx
-│   │   └── ui
-│   │       ├── LoadingOverlay.jsx
-│   │       ├── NotificationBanner.jsx
-│   │       ├── PageHeader.jsx
-│   │       ├── ReviewCarousel.jsx
-│   │       ├── Skeleton.jsx
-│   │       ├── StatsCard.jsx
-│   │       └── SuperTabs.jsx
-│   ├── constants
-│   │   └── mcaData.js
-│   ├── content.jsx
-│   ├── hooks
-│   │   └── useAiSync.js
-│   ├── pages
-│   │   ├── AttendancePage.jsx
-│   │   ├── ChangePasswordPage.jsx
-│   │   ├── CourseFeedbackPage.jsx
-│   │   ├── CourseRegistrationPage.jsx
-│   │   ├── CourseWithdrawPage.jsx
-│   │   ├── FeeChallanPage.jsx
-│   │   ├── FeeDetailsPage.jsx
-│   │   ├── GradeChangePage.jsx
-│   │   ├── HomePage.jsx
-│   │   ├── MarksPage.jsx
-│   │   ├── MarksPloReportPage.jsx
-│   │   ├── NotFoundPage.jsx
-│   │   ├── RetakeExamPage.jsx
-│   │   ├── SessionExpirePage.jsx
-│   │   ├── StudyPlanPage.jsx
-│   │   └── TranscriptPage.jsx
-│   ├── styles
-│   │   ├── loading.css
-│   │   └── tailwind.css
-│   └── utils
-│       └── marksProcessor.js
-└── vite.config.js
-
-17 directories, 68 files
-```
-
-## Building for Production
-
-To create a production build:
+### Quality checks
 
 ```bash
+npm run lint
+npm test
+npm run typecheck:parsers
+npm run format:check
 npm run build
-# or
-yarn build
 ```
 
-The production build will be available in the `dist` folder, ready to be published or loaded as an unpacked extension.
+### Project map
+
+```text
+src/
+├── components/       Shared UI, settings, AI, instructor and login experiences
+├── components/ui/    Buttons, inputs, bottom sheets, modals and reusable states
+├── entrypoints/      WXT content-script and background-service-worker entrypoints
+├── hooks/            Academic context synchronization
+├── pages/            Portal page replacements
+├── parsers/          Typed HTML-to-data parsers
+├── stores/           Persisted user preferences
+└── utils/            Storage, credentials, processing and extension helpers
+
+docs/
+├── index.html        Project website
+├── docs.html         Documentation reader
+└── articles/         AI guide, privacy policy and engineering notes
+```
+
+## Version notes
+
+The current V6 interface consolidates settings into a shared bottom-sheet system, introduces the Octopus AI setup flow, adds campus faculty and attendance-review tools, and replaces the previous fixed credential seed with a user-chosen passphrase vault. Historical implementation notes remain in [Behind the Scenes](docs/articles/bts.md), clearly separated from current behavior.
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on how to contribute to SuperFlex.
+Issues and pull requests are welcome.
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgements
-
-- The university community for providing feedback and feature suggestions
-- All contributors who have helped improve SuperFlex
-- [Lucide Icons](https://lucide.dev/) for beautiful UI icons
-
-## Contact
-
-Ajmal Razaq Bhatti - [@theajmalrazaq](https://github.com/theajmalrazaq)
-
-Project Link: [https://github.com/theajmalrazaq/superflex](https://github.com/theajmalrazaq/superflex)
+1. Fork the repository.
+2. Create a focused branch.
+3. Add or update tests where behavior changes.
+4. Run the quality checks above.
+5. Open a pull request explaining the problem and the chosen solution.
 
 ## Disclaimer
 
-SuperFlex is an independent project that redesigns the Flex portal of NUCES university. This extension is not affiliated with, endorsed by, or sponsored by NUCES university.
+SuperFlex is an independent open-source community project. It is not affiliated with, endorsed by, or sponsored by FAST-NUCES. It does not modify university records or bypass university security controls. Use it voluntarily, verify important academic information against the official portal, and report discrepancies through the university's official channels.
 
-This is my personal project intended to enhance my learning experience. I did not hack anything or intend to do so. SuperFlex merely applies cosmetic changes to the user interface without compromising any security measures or accessing unauthorized data. This project should not warrant any academic warnings or disciplinary actions as it respects the system's integrity and security.
+## License
 
-Users are using this extension at their own consent and responsibility. The creator of SuperFlex is not responsible for any issues that may arise from using this extension, including but not limited to academic discrepancies, data inaccuracies, or system incompatibilities.
-
-By installing SuperFlex, you acknowledge that you are using a third-party modification to the university's official system and do so at your own risk.
+Released under the [MIT License](LICENSE).

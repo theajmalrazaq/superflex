@@ -5,9 +5,12 @@
  */
 
 const STORAGE_KEY = "superflex_encrypted_credentials";
-const SALT_KEY = "superflex_vault_salt";
+const DEVICE_KEY = "superflex_credential_device_key";
 const SESSION_PENDING_KEY = "superflex_pending_login";
 const DISMISSED_KEY = "superflex_autofill_prompt_dismissed";
+const VAULT_VERSION = 3;
+const PBKDF2_ITERATIONS = 600000;
+const MIN_PASSPHRASE_LENGTH = 8;
 
 function bufferToBase64(buffer) {
   const bytes = new Uint8Array(buffer);
@@ -74,18 +77,16 @@ function removeStorageItem(key) {
   });
 }
 
-async function getVaultKey() {
-  let saltBase64 = await getStorageItem(SALT_KEY);
-  if (!saltBase64) {
-    const randomSalt = crypto.getRandomValues(new Uint8Array(16));
-    saltBase64 = bufferToBase64(randomSalt);
-    await setStorageItem(SALT_KEY, saltBase64);
-  }
-
+async function deriveVaultKey(
+  passphrase,
+  saltBase64,
+  iterations = PBKDF2_ITERATIONS,
+  extractable = false,
+) {
   const encoder = new TextEncoder();
   const keyMaterial = await crypto.subtle.importKey(
     "raw",
-    encoder.encode("superflex-hardware-vault-key-seed-v1"),
+    encoder.encode(passphrase),
     "PBKDF2",
     false,
     ["deriveKey"],
@@ -95,23 +96,83 @@ async function getVaultKey() {
     {
       name: "PBKDF2",
       salt: base64ToBuffer(saltBase64),
-      iterations: 100000,
+      iterations,
       hash: "SHA-256",
     },
     keyMaterial,
     { name: "AES-GCM", length: 256 },
-    false,
+    extractable,
     ["encrypt", "decrypt"],
   );
 }
 
+async function getOrCreateDeviceKey() {
+  let encodedKey = await getStorageItem(DEVICE_KEY);
+  if (!encodedKey) {
+    encodedKey = bufferToBase64(crypto.getRandomValues(new Uint8Array(32)));
+    if (!(await setStorageItem(DEVICE_KEY, encodedKey))) return null;
+  }
+
+  return crypto.subtle.importKey("raw", base64ToBuffer(encodedKey), { name: "AES-GCM" }, false, [
+    "encrypt",
+    "decrypt",
+  ]);
+}
+
+async function getVaultKey(record, passphrase) {
+  if (record.wrappedKey && record.wrapIv) {
+    const deviceKey = await getOrCreateDeviceKey();
+    if (deviceKey) {
+      try {
+        const rawKey = await crypto.subtle.decrypt(
+          { name: "AES-GCM", iv: base64ToBuffer(record.wrapIv) },
+          deviceKey,
+          base64ToBuffer(record.wrappedKey),
+        );
+        return crypto.subtle.importKey("raw", rawKey, { name: "AES-GCM" }, false, [
+          "encrypt",
+          "decrypt",
+        ]);
+      } catch {}
+    }
+  }
+
+  if (typeof passphrase !== "string" || passphrase.length < MIN_PASSPHRASE_LENGTH) {
+    return null;
+  }
+  return deriveVaultKey(passphrase, record.kdf.salt, record.kdf.iterations || PBKDF2_ITERATIONS);
+}
+
 /**
  * Encrypts and securely saves credentials into chrome.storage.local.
+ * Automatically generates a cryptographically random passphrase if none is provided.
  */
-export async function saveCredentials(username, password) {
+export async function saveCredentials(username, password, passphrase) {
   if (!username || !password) return false;
+
+  let activePassphrase = passphrase;
+  if (!activePassphrase) {
+    activePassphrase = bufferToBase64(crypto.getRandomValues(new Uint8Array(32)));
+  } else if (
+    typeof activePassphrase !== "string" ||
+    activePassphrase.length < MIN_PASSPHRASE_LENGTH
+  ) {
+    return false;
+  }
+
   try {
-    const key = await getVaultKey();
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const saltBase64 = bufferToBase64(salt);
+    const key = await deriveVaultKey(activePassphrase, saltBase64, PBKDF2_ITERATIONS, true);
+    const rawKey = await crypto.subtle.exportKey("raw", key);
+    const deviceKey = await getOrCreateDeviceKey();
+    if (!deviceKey) return false;
+    const wrapIv = crypto.getRandomValues(new Uint8Array(12));
+    const wrappedKey = await crypto.subtle.encrypt(
+      { name: "AES-GCM", iv: wrapIv },
+      deviceKey,
+      rawKey,
+    );
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const payload = JSON.stringify({
       username: username.trim(),
@@ -126,17 +187,28 @@ export async function saveCredentials(username, password) {
     );
 
     const record = {
+      version: VAULT_VERSION,
+      kdf: {
+        name: "PBKDF2",
+        hash: "SHA-256",
+        iterations: PBKDF2_ITERATIONS,
+        salt: saltBase64,
+      },
       iv: bufferToBase64(iv),
       ciphertext: bufferToBase64(encrypted),
+      wrapIv: bufferToBase64(wrapIv),
+      wrappedKey: bufferToBase64(wrappedKey),
       savedAt: Date.now(),
       autoFill: true,
       maskedUsername: maskUsername(username),
     };
 
-    await setStorageItem(STORAGE_KEY, record);
+    if (!(await setStorageItem(STORAGE_KEY, record))) return false;
     clearPendingLogin();
     if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("superflex-credentials-updated", { detail: { hasCredentials: true } }));
+      window.dispatchEvent(
+        new CustomEvent("superflex-credentials-updated", { detail: { hasCredentials: true } }),
+      );
     }
     return true;
   } catch (err) {
@@ -148,12 +220,16 @@ export async function saveCredentials(username, password) {
 /**
  * Retrieves and decrypts saved credentials.
  */
-export async function getDecryptedCredentials() {
+export async function getDecryptedCredentials(passphrase) {
   try {
     const record = await getStorageItem(STORAGE_KEY);
     if (!record || !record.ciphertext || !record.iv) return null;
+    if (![2, VAULT_VERSION].includes(record.version) || !record.kdf?.salt || !record.ciphertext) {
+      return null;
+    }
 
-    const key = await getVaultKey();
+    const key = await getVaultKey(record, passphrase);
+    if (!key) return null;
     const decrypted = await crypto.subtle.decrypt(
       { name: "AES-GCM", iv: base64ToBuffer(record.iv) },
       key,
@@ -183,12 +259,33 @@ export async function hasSavedCredentials() {
 }
 
 /**
+ * Returns non-sensitive vault information without decrypting credentials.
+ */
+export async function getCredentialMetadata() {
+  const record = await getStorageItem(STORAGE_KEY);
+  if (!record || !record.ciphertext || !record.iv) {
+    return { hasCredentials: false };
+  }
+
+  return {
+    hasCredentials: true,
+    version: record.version || 1,
+    rememberedOnDevice: Boolean(record.wrappedKey && record.wrapIv),
+    maskedUsername: record.maskedUsername || "Saved account",
+    savedAt: record.savedAt || null,
+  };
+}
+
+/**
  * Deletes saved credentials from extension storage.
  */
 export async function clearSavedCredentials() {
   await removeStorageItem(STORAGE_KEY);
+  await removeStorageItem(DEVICE_KEY);
   if (typeof window !== "undefined") {
-    window.dispatchEvent(new CustomEvent("superflex-credentials-updated", { detail: { hasCredentials: false } }));
+    window.dispatchEvent(
+      new CustomEvent("superflex-credentials-updated", { detail: { hasCredentials: false } }),
+    );
   }
 }
 

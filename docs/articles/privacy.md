@@ -7,7 +7,7 @@ Your data privacy and security are at the core of everything we do at SuperFlex.
 SuperFlex was built by students, for students. We understand the sensitivity of academic records, and we have designed the extension with a **Privacy-First** architecture.
 
 - **We don't want your data.** We only access it to show it to you in a better way.
-- **We never store your credentials.** Your login information remains between you and the university.
+- **Credential storage is optional.** Auto-Fill stores credentials only when you explicitly enable it and protect them with a vault passphrase.
 - **You are in control.** You decide which data to sync and when to use AI features.
 
 ## 2. Information We Access
@@ -27,10 +27,10 @@ To provide the dashboard, calculators, and AI features, SuperFlex reads:
 
 ### AI Context Sync
 
-When you use the AI Academic Assistant, your message and the selected academic context are sent directly to GroqCloud using the API key you provide. The key is stored in the browser extension's local storage. SuperFlex does not proxy these requests or store the key on its servers.
+When you use Octopus AI, your message and the selected academic context are sent directly to Google's Gemini API using the API key you provide. The key is stored in the browser extension's local storage. SuperFlex does not proxy these requests or store the key on its servers.
 
 - **Opt-in Only:** AI data access is only enabled if you explicitly grant permission.
-- **Provider policies:** Data handling follows GroqCloud's policies and your account settings.
+- **Provider policies:** AI data handling follows Google's Gemini API terms and your account settings.
 
 ## 3. Information We Collect
 
@@ -51,15 +51,15 @@ We prioritize your total privacy. SuperFlex operates with **zero analytics, zero
 
 We use minimal trusted partners strictly for user-requested functionality:
 
-- **GroqCloud / Google Gemini:** Used for AI academic chat only when you provide and configure your own API key.
+- **Google Gemini:** Used for AI academic chat only when you provide and configure your own API key.
 - **Google Fonts:** Used to provide the Google Sans Flex typography.
 - **Github/Vercel:** Used for project hosting and documentation.
 
 ## 5. Security Measures
 
 - **No Backend:** SuperFlex has no central database or telemetry servers. Your academic data lives exclusively on your local computer.
-- **Local Encryption:** Login credentials in Auto-Fill are encrypted using AES-GCM (256-bit) before storage in `chrome.storage.local`.
-- **HTTPS Only:** All communications with third-party AI APIs (GroqCloud, Google Gemini) are strictly encrypted via TLS.
+- **Passphrase-Protected Local Encryption:** Auto-Fill derives a key from your vault passphrase using PBKDF2-HMAC-SHA256 with a unique random salt, then encrypts credentials using AES-GCM (256-bit) before storage in `chrome.storage.local`. The passphrase is not stored. A separate device key wraps the derived vault key in the browser profile's isolated extension storage so future logins can use Auto-Fill without asking for the passphrase again.
+- **HTTPS Only:** Communications with Google's Gemini API are encrypted in transit using HTTPS/TLS.
 
 ## 6. Your Rights
 
@@ -78,4 +78,4 @@ If you have any questions about this Privacy Policy or how we handle your data, 
 
 ---
 
-_Last Updated: December 27, 2024_
+_Last Updated: November 6, 2026_
