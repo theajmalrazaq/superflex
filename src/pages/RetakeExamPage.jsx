@@ -57,8 +57,8 @@ const RetakeModal = ({ isOpen, onClose, onSubmit, fee }) => {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Request Details"
-      subtitle="Retake Exam Submission"
+      title="The Comeback Application"
+      subtitle="Provide your reason and required documents for the retake."
       icon={<FileText size={24} />}
     >
       <div className="space-y-6 pt-4">
@@ -503,8 +503,8 @@ function RetakeExamPage() {
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-1">
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p>
-            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Retake exam</h1>
-            <p className="text-sm text-white/80">Choose eligible papers and prepare your retake application.</p>
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Retake Exam Request</h1>
+            <p className="text-sm text-white/80">Round two, fight! Paper ne pehli baar hara diya? Time for a comeback.</p>
           </div>
           <button type="button" onClick={() => setIsInstructionsOpen(true)} className="flex cursor-pointer items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"><Shield size={15} /> Rules &amp; procedures</button>
         </header>
@@ -532,7 +532,7 @@ function RetakeExamPage() {
         </section>
 
         <section aria-labelledby="retake-overview-heading" className="space-y-4">
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Overview</p><h2 id="retake-overview-heading" className="text-xl font-bold tracking-tight text-white">Application summary</h2></div><p className="text-xs text-white/75">Select papers to calculate the application fee.</p></div>
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Overview</p><h2 id="retake-overview-heading" className="text-xl font-bold tracking-tight text-white">Retake Summary</h2></div><p className="text-xs text-white/75">The redemption arc. Select your papers and calculate the comeback cost.</p></div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
             <StatsCard variant="dashboard" icon={Layout} label="Total courses" value={courses.length} />
             <StatsCard variant="dashboard" icon={CheckCircle2} label="Selected papers" value={selectedCourses.size} subValue="For this application" />
@@ -549,14 +549,14 @@ function RetakeExamPage() {
                 {[{ value: "all", label: "All" }, { value: "available", label: "Selectable" }, { value: "selected", label: "Selected" }].map((filter) => <button key={filter.value} type="button" onClick={() => setCourseFilter(filter.value)} aria-pressed={courseFilter === filter.value} className={`cursor-pointer rounded-full px-3 py-2 text-xs font-bold transition-colors ${courseFilter === filter.value ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"}`}>{filter.label}</button>)}
               </div>
             </header>
-            {filteredCourses.length ? <div className="divide-y divide-black/[0.05] px-4 dark:divide-white/[0.08] sm:px-6">{filteredCourses.map((course, index) => <RetakeCourseCard key={course.id} course={course} index={index + 1} isSelected={selectedCourses.has(course.id)} onToggle={() => toggleCourse(course.id)} />)}</div> : <div className="flex min-h-[220px] flex-col items-center justify-center px-6 py-10 text-center"><span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[36%] bg-slate-100 text-slate-500 dark:bg-white/[0.08] dark:text-slate-300"><FileText size={22} /></span><h3 className="text-base font-bold">{courseFilter === "selected" ? "No papers selected" : "No courses eligible for retake"}</h3><p className="mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">{courseFilter === "selected" ? "Select one or more available papers to start an application." : "No retake papers are available for this exam type and semester."}</p></div>}
+            {filteredCourses.length ? <div className="divide-y divide-black/[0.05] px-4 dark:divide-white/[0.08] sm:px-6">{filteredCourses.map((course, index) => <RetakeCourseCard key={course.id} course={course} index={index + 1} isSelected={selectedCourses.has(course.id)} onToggle={() => toggleCourse(course.id)} />)}</div> : <div className="flex min-h-[220px] flex-col items-center justify-center px-6 py-10 text-center"><span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[36%] bg-slate-100 text-slate-500 dark:bg-white/[0.08] dark:text-slate-300"><FileText size={22} /></span><h3 className="text-base font-bold">No Papers Available</h3><p className="mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">No rematches available. No eligible papers found for this selection.</p></div>}
           </section>
 
           <aside className="relative rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] xl:sticky xl:top-6">
             <div className="border-b border-black/[0.06] px-5 py-4 dark:border-white/[0.1] sm:px-6"><h2 className="text-base font-bold">Request details</h2><p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Review the reason and fee before continuing.</p></div>
             <div className="space-y-5 p-5 sm:p-6">
               <div className="space-y-2"><p className="text-xs font-semibold text-slate-600 dark:text-slate-300">Retake situation</p><ReasonSelector reasons={reasons} selectedReason={selectedReason} onChange={handleReasonChange} /></div>
-              <div className="rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.05]"><div className="mb-4 flex items-center gap-2"><span className="flex h-9 w-9 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><ShieldCheck size={17} /></span><h3 className="text-sm font-bold">Fee summary</h3></div><div className="space-y-3 text-xs"><div className="flex justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Selected papers</span><span className="font-semibold">{selectedCourses.size}</span></div><div className="flex justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Fee per paper</span><span className="font-semibold">Rs. 2,000</span></div><div className="flex justify-between gap-3 border-t border-black/[0.06] pt-3 text-sm dark:border-white/[0.1]"><span className="font-bold">Total fee</span><span className="font-bold">Rs. {(selectedCourses.size * 2000).toLocaleString()}</span></div></div></div>
+              <div className="rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.05]"><div className="mb-4 flex items-center gap-2"><span className="flex h-9 w-9 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><ShieldCheck size={17} /></span><h3 className="text-sm font-bold">Fee Breakdown</h3></div><div className="space-y-3 text-xs"><div className="flex justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Selected papers</span><span className="font-semibold">{selectedCourses.size}</span></div><div className="flex justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Fee per paper</span><span className="font-semibold">Rs. 2,000</span></div><div className="flex justify-between gap-3 border-t border-black/[0.06] pt-3 text-sm dark:border-white/[0.1]"><span className="font-bold">Total fee</span><span className="font-bold">Rs. {(selectedCourses.size * 2000).toLocaleString()}</span></div></div></div>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-1"><Button variant="secondary" disabled={selectedCourses.size === 0} onClick={handleDownloadForm} className="w-full rounded-full" icon={<Download size={16} />}>Download form</Button><Button disabled={selectedCourses.size === 0} onClick={handleInitiateRequest} className="w-full rounded-full" variant="primary" icon={<ChevronRight size={16} />}>Continue request</Button></div>
               <p className="flex items-start gap-2 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400"><AlertTriangle size={15} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-300" />A processing fee of Rs. 2,000 applies to each selected paper.</p>
             </div>

@@ -42,8 +42,8 @@ export default function AttendanceReviewModal({ open, course, record, teacher, o
         <header className="flex shrink-0 flex-col items-center px-6 pb-3 pt-3 text-center sm:px-8">
           <span className="mb-2 flex h-11 w-11 items-center justify-center rounded-[16px] bg-[#230052] text-white dark:bg-white dark:text-[#101027]"><Mail size={21} /></span>
           <p className="text-[10px] font-bold uppercase tracking-[.15em] text-[#230052]/65 dark:text-white">Attendance</p>
-          <BottomSheetTitle className="mt-1 text-xl font-bold">Request an attendance review</BottomSheetTitle>
-          <BottomSheetDescription className="mt-1 text-sm text-slate-500 dark:text-slate-400">{course?.title} · {record?.date}</BottomSheetDescription>
+          <BottomSheetTitle className="mt-1 text-xl font-bold">Sir, Main Class Mein Tha. Kasam Se. 😭</BottomSheetTitle>
+          <BottomSheetDescription className="mt-1 text-sm text-slate-500 dark:text-slate-400">Attendance issue? Let's write a respectful email before things get worse. ({course?.title} · {record?.date})</BottomSheetDescription>
         </header>
 
         <div className="min-h-0 space-y-3 overflow-y-auto px-5 pb-3 pt-1 sm:px-8">
@@ -54,8 +54,9 @@ export default function AttendanceReviewModal({ open, course, record, teacher, o
             </div>
           ) : (
             <div className="rounded-2xl bg-amber-50 p-4 text-sm text-amber-900 dark:bg-amber-400/10 dark:text-amber-200">
-              No instructor email is saved for this course yet. Set the course teacher first, then return here to open a pre-addressed email.
-              <button type="button" onClick={() => { onClose(); window.dispatchEvent(new CustomEvent("superflex-open-teacher-settings")); }} className="ml-1 font-bold underline">Choose teacher</button>
+              <p className="font-bold">We Don't Even Have Sir's Email. 💀</p>
+              <p className="mt-1 text-xs">Select your course instructor first to prepare the email.</p>
+              <button type="button" onClick={() => { onClose(); window.dispatchEvent(new CustomEvent("superflex-open-teacher-settings")); }} className="mt-2 inline-block font-bold underline">Choose teacher</button>
             </div>
           )}
 
@@ -70,7 +71,7 @@ export default function AttendanceReviewModal({ open, course, record, teacher, o
           </label>
 
           <div className="rounded-2xl bg-slate-50 p-3 dark:bg-white/[.05]">
-            <p className="text-sm font-bold text-slate-600 dark:text-slate-300">Email preview</p>
+            <p className="text-sm font-bold text-slate-600 dark:text-slate-300">The Formal Begging Draft.</p>
             <p className="mt-1 truncate text-[13px] text-slate-500 dark:text-slate-400">Subject: {subject}</p>
             <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-slate-600 dark:text-slate-300">{body}</p>
           </div>

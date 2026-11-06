@@ -64,8 +64,8 @@ export default function TeacherSelectionModal({
         <header className="flex shrink-0 flex-col items-center px-6 pb-3 pt-3 text-center sm:px-8">
           <span className="mb-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-[#230052] text-white dark:bg-white dark:text-[#101027]"><GraduationCap size={23} /></span>
           <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#230052]/65 dark:text-white">Personalize your dashboard</p>
-          <BottomSheetTitle className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">Who teaches your courses?</BottomSheetTitle>
-          <BottomSheetDescription className="mt-1 max-w-md text-sm text-slate-500 dark:text-slate-400">Choose an instructor for each course. You can change these choices later.</BottomSheetDescription>
+          <BottomSheetTitle className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">Meet Your Final Bosses. 🎮</BottomSheetTitle>
+          <BottomSheetDescription className="mt-1 max-w-md text-sm text-slate-500 dark:text-slate-400">Select the instructors responsible for your academic character development.</BottomSheetDescription>
         </header>
 
         <div className="shrink-0 px-5 pb-2 sm:px-8">
@@ -91,7 +91,7 @@ export default function TeacherSelectionModal({
             <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search teachers by name or email" className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400" />
           </label>
 
-          {loading ? <div className="flex items-center justify-center gap-3 py-12 text-sm text-slate-500"><span className="h-5 w-5 animate-spin rounded-full border-2 border-[#230052]/20 border-t-[#230052] dark:border-white dark:border-t-white" />Loading official faculty directory…</div> : (
+          {loading ? <div className="flex items-center justify-center gap-3 py-12 text-sm text-slate-500"><span className="h-5 w-5 animate-spin rounded-full border-2 border-[#230052]/20 border-t-[#230052] dark:border-white dark:border-t-white" />Summoning the Faculty...</div> : (
             <div className="mt-3 space-y-2">
               {filteredTeachers.map((teacher) => {
                 const selected = selections[activeCourse?.id]?.id === teacher.id;
@@ -101,14 +101,31 @@ export default function TeacherSelectionModal({
                   {selected && <Check size={18} className="shrink-0 text-[#230052] dark:text-white" />}
                 </button>;
               })}
-              {!filteredTeachers.length && !error && !loading && <div className="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500 dark:bg-white/[.04]">No teachers match that search.</div>}
-              {error && <div className="rounded-2xl bg-amber-50 p-4 text-sm text-amber-900 dark:bg-amber-400/10 dark:text-amber-200">The official directory could not be loaded. You can retry or add your instructor manually.<button type="button" onClick={onRetry} className="ml-2 font-bold underline">Retry</button></div>}
-              {!loading && !teachers.length && !error && <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600 dark:bg-white/[.04] dark:text-slate-300">No public faculty profiles were found for this campus. Add your instructor below.</div>}
+              {!filteredTeachers.length && !error && !loading && (
+                <div className="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500 dark:bg-white/[.04]">
+                  <p className="font-bold text-slate-900 dark:text-white">This Teacher Is a Mystery.</p>
+                  <p className="mt-1 text-xs">No faculty matched your search. Try another spelling or add them manually.</p>
+                </div>
+              )}
+              {error && (
+                <div className="rounded-2xl bg-amber-50 p-4 text-sm text-amber-900 dark:bg-amber-400/10 dark:text-amber-200">
+                  <p className="font-bold">Even the Faculty Directory Gave Up. 💀</p>
+                  <p className="mt-1 text-xs">Could not load official faculty listings. Try again or add your instructor manually.</p>
+                  <button type="button" onClick={onRetry} className="mt-2 font-bold underline">Retry</button>
+                </div>
+              )}
+              {!loading && !teachers.length && !error && (
+                <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600 dark:bg-white/[.04] dark:text-slate-300">
+                  <p className="font-bold text-slate-900 dark:text-white">No Teachers Found in This Universe.</p>
+                  <p className="mt-1 text-xs">The directory for this campus returned 0 teachers.</p>
+                </div>
+              )}
             </div>
           )}
 
           <div className="mt-3 rounded-2xl border border-dashed border-slate-300 p-3 dark:border-white">
-            <p className="mb-2 flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"><UserRound size={14} /> Add a teacher not listed</p>
+            <p className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300"><UserRound size={14} /> Add Your Final Boss.</p>
+            <p className="mb-2 text-[11px] text-slate-500 dark:text-slate-400">Can't find them in the directory? Enter their details manually.</p>
             <div className="flex flex-col gap-2 sm:flex-row">
               <input value={manualName} onChange={(event) => setManualName(event.target.value)} placeholder="Teacher name" className="min-w-0 flex-1 rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none dark:bg-white/[.08]" />
               <input value={manualEmail} onChange={(event) => setManualEmail(event.target.value)} placeholder="Email (optional)" className="min-w-0 flex-1 rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none dark:bg-white/[.08]" />

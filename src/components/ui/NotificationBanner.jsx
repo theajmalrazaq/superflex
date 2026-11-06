@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertTriangle, ChevronRight, Sparkles, X } from "lucide-react";
+import { AlertTriangle, ChevronRight, Bell, X } from "lucide-react";
 
 const NotificationBanner = ({
   alerts,
@@ -48,7 +48,7 @@ const NotificationBanner = ({
             className={`relative flex items-center gap-4 overflow-hidden rounded-[24px] border bg-white p-4 text-slate-900 dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] ${borderClass} shadow-xs`}
           >
             <div className={`shrink-0 rounded-xl p-3 ${iconBgClass}`}>
-              {isSuccess ? <Sparkles size={20} /> : <AlertTriangle size={20} />}
+              {isSuccess ? <Bell size={20} /> : <AlertTriangle size={20} />}
             </div>
 
             <div className="space-y-0.5 flex-1 min-w-0">
@@ -57,7 +57,7 @@ const NotificationBanner = ({
                   {alert.title}
                 </p>
               )}
-              <p className="text-xs md:text-sm font-medium leading-relaxed">{alert.message || alert.text}</p>
+              <div className="text-xs md:text-sm font-medium leading-relaxed">{alert.message || alert.text}</div>
             </div>
 
             {alert.dismissible && onDismissAlert && (

@@ -115,8 +115,8 @@ const CGPAPlannerModal = ({ isOpen, onClose, currentCGPA, currentCreditHours }) 
     <TranscriptBottomSheet
       isOpen={isOpen}
       onClose={onClose}
-      title="CGPA Planner"
-      subtitle="Strategize your target CGPA"
+      title="The Comeback Calculator 🫡"
+      subtitle="Dream big. Let's see if the math agrees."
       icon={<Target size={24} />}
     >
       <div className="space-y-8 pt-4">
@@ -185,7 +185,7 @@ const CGPAPlannerModal = ({ isOpen, onClose, currentCGPA, currentCreditHours }) 
             {result > 4.0 && (
               <div className="mt-4 flex items-start gap-3 text-[11px] font-medium text-rose-400 bg-rose-500/5 p-4 rounded-2xl border border-rose-500/10 italic">
                 <AlertTriangle size={14} className="shrink-0 mt-0.5" />
-                <span>Note: This target requires exceeding a 4.00 GPA in a single term.</span>
+                <span>Bhai, even a 4.0 can't save this target. 💀</span>
               </div>
             )}
           </div>
@@ -236,8 +236,8 @@ const MCALookupModal = ({ isOpen, onClose, initialMCA = "" }) => {
     <TranscriptBottomSheet
       isOpen={isOpen}
       onClose={onClose}
-      title="Relative Grade Lookup"
-      subtitle="Determine grade based on MCA"
+      title="Let the Curve Decide."
+      subtitle="Enter your marks and MCA. Time to trust the grading gods."
       icon={<Scale size={24} />}
     >
       <div className="space-y-8 pt-4">
@@ -657,8 +657,8 @@ function TranscriptPage() {
         <header className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
           <div className="space-y-1">
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p>
-            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Transcript &amp; degree progress</h1>
-            <p className="text-sm text-white/80">Review your semester results and track your GPA over time.</p>
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Official Transcript</h1>
+            <p className="text-sm text-white/80">Four years of questionable decisions, beautifully documented.</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <button type="button" onClick={() => setIsPlannerOpen(true)} className="flex items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"><Target size={15} />Strategic planner</button>
@@ -698,8 +698,8 @@ function TranscriptPage() {
 
         <section aria-labelledby="semester-report-heading" className="space-y-4">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-            <div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academic record</p><h2 id="semester-report-heading" className="text-xl font-bold tracking-tight text-white">Semester results</h2></div>
-            <p className="text-xs text-white/75">Choose a semester to review courses, grades, and credit hours.</p>
+            <div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academic record</p><h2 id="semester-report-heading" className="text-xl font-bold tracking-tight text-white">Semester History</h2></div>
+            <p className="text-xs text-white/75">Every semester has a story. Some are horror stories.</p>
           </div>
           <div>
             <div className="flex flex-col gap-5 overflow-hidden rounded-[24px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6">

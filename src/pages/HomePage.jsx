@@ -29,6 +29,10 @@ import {
   checkAndRecordAttendanceSnapshot,
   getPendingUpdates,
   clearPendingUpdates,
+  clearPendingUpdateType,
+  isCourseMarksUpdated,
+  isSectionMarksUpdated,
+  isAssessmentMarksUpdated,
 } from "../utils/academicSnapshot";
 
 const TEACHER_SELECTIONS_KEY = "superflex_course_teachers_v1";
@@ -49,8 +53,10 @@ const parseAttendanceDate = (value) => {
   return Number.isNaN(parsed) ? 0 : parsed;
 };
 
-const SectionAccordion = ({ section, isOpen, onToggle }) => {
+const SectionAccordion = ({ section, isOpen, onToggle, course, pendingUpdates }) => {
   const rows = section.rows || [];
+  const hasSectionUpdate = isSectionMarksUpdated(pendingUpdates, course, section.title);
+
   return (
     <div className="mb-3 overflow-hidden rounded-[18px] border border-black/[0.06] bg-[#fafafa] dark:border-white/[0.1] dark:bg-white/[0.04]">
       <button
@@ -65,6 +71,14 @@ const SectionAccordion = ({ section, isOpen, onToggle }) => {
             {isOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
           </span>
           <span className="truncate text-sm font-semibold text-foreground">{section.title}</span>
+          {hasSectionUpdate && (
+            <span className="flex shrink-0 items-center justify-center p-0.5">
+              <span
+                className="h-2 w-2 rounded-full bg-[#230052] animate-pulse ring-2 ring-[#230052]/30 dark:bg-white dark:ring-white/40"
+                title="New marks uploaded in this section"
+              />
+            </span>
+          )}
           <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold text-foreground/50">
             {rows.length}
           </span>
@@ -87,9 +101,20 @@ const SectionAccordion = ({ section, isOpen, onToggle }) => {
             <tbody className="divide-y divide-foreground/5">
               {rows.map((row, index) => {
                 const percentage = row.total > 0 ? (row.obtained / row.total) * 100 : 0;
+                const isRowUpdated = isAssessmentMarksUpdated(pendingUpdates, course, row.title);
                 return (
-                  <tr key={index} className={`transition-colors hover:bg-foreground/[0.02] ${row.included ? "" : "opacity-40"}`}>
-                    <td className="p-3 text-sm font-medium text-foreground/70">{row.title}</td>
+                  <tr key={index} className={`transition-colors hover:bg-foreground/[0.02] ${row.included ? "" : "opacity-40"} ${isRowUpdated ? "bg-[#230052]/[0.04] dark:bg-white/[0.05]" : ""}`}>
+                    <td className="p-3 text-sm font-medium text-foreground/70">
+                      <div className="flex items-center gap-2">
+                        <span>{row.title}</span>
+                        {isRowUpdated && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[#230052]/10 px-2 py-0.5 text-[10px] font-bold text-[#230052] dark:bg-white/15 dark:text-white">
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#230052] animate-pulse dark:bg-white" />
+                            New
+                          </span>
+                        )}
+                      </div>
+                    </td>
                     <td className="p-3 text-right text-sm font-bold text-foreground">
                       {row.obtained} <span className="text-xs font-normal text-foreground/40">/ {row.total}</span>
                     </td>
@@ -178,7 +203,18 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
 
 function HomePage() {
   const [universityInfo, setUniversityInfo] = useState(null);
-  const [personalInfo, setPersonalInfo] = useState(null);
+  const [personalInfo, setPersonalInfo] = useState(() => {
+    try {
+      const saved = localStorage.getItem("superflex_cached_personal_info");
+      if (saved) return JSON.parse(saved);
+      const aiCtx =
+        window.superflex_ai_context ||
+        JSON.parse(localStorage.getItem("superflex_ai_context") || "{}");
+      if (aiCtx?.personalInfo) return aiCtx.personalInfo;
+      if (aiCtx?.studentName) return { Name: aiCtx.studentName };
+    } catch {}
+    return null;
+  });
   const [profileSections, setProfileSections] = useState([]);
   const [activeMainTab, setActiveMainTab] = useState("stats");
   const [alerts, setAlerts] = useState([]);
@@ -243,9 +279,26 @@ function HomePage() {
       dynamic.push({
         type: "update",
         title: "New Marks Uploaded",
-        message: pendingUpdates.newMarks
-          .map((m) => `${m.courseTitle || m.courseId}: ${m.newCount} assessment${m.newCount > 1 ? "s" : ""} added`)
-          .join(" • "),
+        message: (
+          <div className="space-y-1.5 pt-0.5">
+            {pendingUpdates.newMarks.map((m, idx) => {
+              const itemsList = m.items || [];
+              const displayItems = itemsList.slice(0, 3).join(", ");
+              const extraCount = itemsList.length - 3;
+              return (
+                <div key={idx} className="flex flex-wrap items-baseline gap-1.5">
+                  <span className="font-bold text-foreground">{m.courseTitle || m.courseId}:</span>
+                  <span className="text-foreground/80">{displayItems}</span>
+                  {extraCount > 0 && (
+                    <span className="text-[11px] font-semibold text-[#230052]/70 dark:text-white/70">
+                      +{extraCount} more
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ),
         dismissible: true,
         key: "update-marks",
       });
@@ -254,9 +307,28 @@ function HomePage() {
       dynamic.push({
         type: "update",
         title: "New Attendance Marked",
-        message: pendingUpdates.newAttendance
-          .map((a) => `${a.subjectTitle}: ${a.newCount} session${a.newCount > 1 ? "s" : ""}`)
-          .join(" • "),
+        message: (
+          <div className="space-y-1.5 pt-0.5">
+            {pendingUpdates.newAttendance.map((a, idx) => {
+              const recordsList = a.records || [];
+              const displayRecords = recordsList.slice(0, 3).join(", ");
+              const extraCount = recordsList.length - 3;
+              return (
+                <div key={idx} className="flex flex-wrap items-baseline gap-1.5">
+                  <span className="font-bold text-foreground">{a.subjectTitle || a.courseTitle}:</span>
+                  <span className="text-foreground/80">
+                    {displayRecords || `${a.newCount} session${a.newCount > 1 ? "s" : ""} marked`}
+                  </span>
+                  {extraCount > 0 && (
+                    <span className="text-[11px] font-semibold text-[#230052]/70 dark:text-white/70">
+                      +{extraCount} more
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ),
         dismissible: true,
         key: "update-attendance",
       });
@@ -265,8 +337,10 @@ function HomePage() {
   }, [pendingUpdates, alerts]);
 
   const handleDismissAlert = (alertToDismiss) => {
-    if (alertToDismiss.key === "update-marks" || alertToDismiss.key === "update-attendance") {
-      clearPendingUpdates();
+    if (alertToDismiss.key === "update-marks") {
+      clearPendingUpdateType("marks");
+    } else if (alertToDismiss.key === "update-attendance") {
+      clearPendingUpdateType("attendance");
     } else {
       setAlerts((prev) => prev.filter((a) => a !== alertToDismiss));
     }
@@ -303,11 +377,26 @@ function HomePage() {
     );
   }, [attendanceData]);
 
-  const greetingMessage = useMemo(() => {
+  const greetingHeading = useMemo(() => {
     const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
+    const rawName = personalInfo?.Name?.trim();
+    const name = rawName ? rawName.split(" ")[0] : "";
+    const timeGreeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
+    return name ? `${timeGreeting}, ${name}` : timeGreeting;
+  }, [personalInfo?.Name]);
+
+  const greetingSubheading = useMemo(() => {
+    const hour = new Date().getHours();
+    const roasts = [
+      "Dil thaam ke marks dekhein.",
+      "Duaon pe chalti hui degree.",
+      "Damage control mode shuru karein.",
+      "Chai peo aur hosla rakho.",
+      "FLEX khol hi liya hai toh sabr karein.",
+      "Survival mode: Always ON.",
+    ];
+    const index = Math.abs((new Date().getDate() * 7 + hour) % roasts.length);
+    return roasts[index];
   }, []);
 
   useEffect(() => {
@@ -337,6 +426,11 @@ function HomePage() {
       setProfileSections(profile.sections);
       setUniversityInfo(profile.universityInfo);
       setPersonalInfo(profile.personalInfo);
+      if (profile.personalInfo && Object.keys(profile.personalInfo).length > 0) {
+        try {
+          localStorage.setItem("superflex_cached_personal_info", JSON.stringify(profile.personalInfo));
+        } catch {}
+      }
 
       targetElement.remove();
     }
@@ -475,10 +569,10 @@ function HomePage() {
                   Student dashboard
                 </p>
                 <h1 className="truncate text-[28px] font-bold leading-tight tracking-[-0.045em] text-white sm:text-4xl">
-                  {greetingMessage}, {personalInfo?.Name?.split(" ")[0] || "Student"}
+                  {greetingHeading}
                 </h1>
                 <p className="mt-1 text-sm text-white/80">
-                  Your academic snapshot at a glance.
+                  {greetingSubheading}
                 </p>
               </div>
             </div>
@@ -555,8 +649,8 @@ function HomePage() {
                     <div className="flex items-center gap-3">
                       <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><Award size={22} /></span>
                       <div className="space-y-1">
-                        <h3 className="text-lg font-bold tracking-tight text-foreground">Course Performance</h3>
-                        <p className="text-xs text-foreground/50">Detailed marks and assessments</p>
+                        <h3 className="text-lg font-bold tracking-tight text-foreground">Assessments</h3>
+                        <p className="text-xs text-foreground/50">Let's see how badly those quizzes went.</p>
                       </div>
                     </div>
                     {links.marks && <a href={links.marks} className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#230052] px-4 text-xs font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80">View Details <ArrowRight size={12} /></a>}
@@ -566,23 +660,30 @@ function HomePage() {
                       <div className="w-full overflow-x-auto scrollbar-hide">
                         <div className="flex w-fit gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/[0.08]">
                           {coursesData.map((course) => {
-                            const hasUpdate = updatedCourseIds.has(course.id);
+                            const hasUpdate = isCourseMarksUpdated(pendingUpdates, course);
+                            const isActive = activeCourse === course.id;
                             return (
                               <button
                                 key={course.id}
                                 type="button"
                                 onClick={() => setActiveCourse(course.id)}
                                 className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-5 py-2 text-xs font-bold transition-all ${
-                                  activeCourse === course.id
+                                  isActive
                                     ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"
                                     : "text-slate-600 hover:text-[#230052] dark:text-slate-300 dark:hover:text-white"
                                 }`}
                               >
                                 {hasUpdate && (
-                                  <span
-                                    className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse ring-2 ring-emerald-500/30"
-                                    title="New marks uploaded for this course"
-                                  />
+                                  <span className="flex shrink-0 items-center justify-center p-0.5">
+                                    <span
+                                      className={`h-2 w-2 rounded-full animate-pulse ring-2 ${
+                                        isActive
+                                          ? "bg-white ring-white/40 dark:bg-[#0a192f] dark:ring-[#0a192f]/40"
+                                          : "bg-[#230052] ring-[#230052]/30 dark:bg-white dark:ring-white/40"
+                                      }`}
+                                      title="New marks uploaded for this course"
+                                    />
+                                  </span>
                                 )}
                                 {course.id}
                               </button>
@@ -604,15 +705,26 @@ function HomePage() {
                             </div>
                           </div>
                           <div className="space-y-3">
-                            {activeCourseData.sections.filter((section) => !section.id.endsWith("Grand_Total_Marks")).map((section, index) => <SectionAccordion key={index} section={section} isOpen={openCategoryIdx === index} onToggle={() => setOpenCategoryIdx(openCategoryIdx === index ? null : index)} />)}
+                            {activeCourseData.sections
+                              .filter((section) => !section.id.endsWith("Grand_Total_Marks"))
+                              .map((section, index) => (
+                                <SectionAccordion
+                                  key={index}
+                                  section={section}
+                                  course={activeCourseData}
+                                  pendingUpdates={pendingUpdates}
+                                  isOpen={openCategoryIdx === index}
+                                  onToggle={() => setOpenCategoryIdx(openCategoryIdx === index ? null : index)}
+                                />
+                              ))}
                           </div>
                         </div>
                       )}
                     </>
                   ) : <div className="flex flex-1 flex-col items-center justify-center text-center">
                     <div className="mb-4 rounded-3xl bg-foreground/5 p-6"><Award size={40} className="text-foreground/40" /></div>
-                    <h4 className="text-lg font-bold text-foreground/60">No Performance Data</h4>
-                    <p className="mt-1 text-xs text-foreground/40">Course marks haven't been uploaded yet.</p>
+                    <h4 className="text-lg font-bold text-foreground/60">No Assessments Uploaded</h4>
+                    <p className="mt-1 text-xs text-foreground/40">Enjoy the peace while it lasts.</p>
                   </div>}
                 </div>
 
@@ -622,15 +734,15 @@ function HomePage() {
                       <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><Activity size={22} /></span>
                       <div className="space-y-1">
                         <h3 className="text-lg font-bold tracking-tight text-foreground">Attendance Overview</h3>
-                        <p className="text-xs text-foreground/50">Presence and absence analytics</p>
+                        <p className="text-xs text-foreground/50">Ek aur chutti aur game over?</p>
                       </div>
                     </div>
                     {links.attendance && <a href={links.attendance} className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#230052] px-4 text-xs font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80">View Details <ArrowRight size={12} /></a>}
                   </div>
                   {loadingAttendance ? <AttendanceSkeleton /> : attendanceData?.length ? <AttendanceHeatmap subjects={attendanceData} updatedSubjectKeys={updatedAttendanceSubjectTitles} /> : <div className="flex flex-1 flex-col items-center justify-center text-center">
                     <div className="mb-4 rounded-3xl bg-foreground/5 p-6"><Activity size={40} className="text-foreground/40" /></div>
-                    <h4 className="text-lg font-bold text-foreground/60">No Attendance Data</h4>
-                    <p className="mt-1 text-xs text-foreground/40">Attendance records are currently unavailable.</p>
+                    <h4 className="text-lg font-bold text-foreground/60">No Attendance Records</h4>
+                    <p className="mt-1 text-xs text-foreground/40">Attendance hasn't been uploaded. Innocent until proven absent.</p>
                   </div>}
                 </div>
               </div>

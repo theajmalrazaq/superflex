@@ -206,7 +206,7 @@ function MarksPloReportPage() {
           <div className="space-y-1">
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p>
             <h1 className="text-3xl font-bold tracking-tight text-white">Marks PLO Report</h1>
-            <p className="text-sm text-white/80">Program learning outcomes and course attainment.</p>
+            <p className="text-sm text-white/80">Wait, we're grading outcomes too? Because apparently, marks alone weren't enough.</p>
           </div>
           {semesters.length > 0 && (
             <SuperTabs
@@ -238,7 +238,7 @@ function MarksPloReportPage() {
                   </div>
                 ))}
                 <div className="rounded-[24px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6 print:border-gray-200">
-                  <div className="mb-4 flex items-center gap-3"><span className="flex h-12 w-12 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><FileBarChart size={22} /></span><h2 className="text-sm font-semibold">PLO breakdown</h2></div>
+                  <div className="mb-4 flex items-center gap-3"><span className="flex h-12 w-12 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><FileBarChart size={22} /></span><h2 className="text-sm font-semibold">Outcome Breakdown</h2></div>
                   <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                     {summaryData.ploBreakdown.map((plo) => <div key={plo.id} className="flex flex-col items-center rounded-xl bg-slate-50 px-2 py-2.5 dark:bg-white/[.06]"><span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">PLO{plo.id}</span><span className="mt-1 text-xs font-bold text-[#230052] dark:text-white">{plo.value}%</span></div>)}
                   </div>
@@ -250,7 +250,7 @@ function MarksPloReportPage() {
               <section className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] print:border-gray-200">
                 <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4 dark:border-white/10 sm:px-6">
                   <span className="flex h-11 w-11 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><FileBarChart size={20} /></span>
-                  <div><h2 className="text-base font-bold">Detailed results</h2><p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Course learning outcome attainment by assessment.</p></div>
+                  <div><h2 className="text-base font-bold">Full PLO Report</h2><p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">The full investigation. Every learning outcome, every assessment, every percentage.</p></div>
                 </div>
                 <div className="sf-data-table-wrapper overflow-x-auto scrollbar-hide">
                   <div className="portal-table-wrapper [&_table]:w-full [&_table]:border-collapse [&_td]:whitespace-nowrap [&_th]:whitespace-nowrap" dangerouslySetInnerHTML={{ __html: reportHtml }} />
@@ -259,8 +259,8 @@ function MarksPloReportPage() {
             ) : (
               <div className="flex min-h-[300px] flex-col items-center justify-center rounded-[24px] border border-black/[0.06] bg-white px-6 py-12 text-center dark:border-white/[0.14] dark:bg-black">
                 <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><Info size={25} /></span>
-                <p className="text-xl font-bold text-[#101010] dark:text-[#f5f6fb]">No PLO report available</p>
-                <p className="mt-2 max-w-lg text-sm text-slate-500 dark:text-slate-400">There is no PLO attainment data for the selected semester. Try another semester if one is available.</p>
+                <p className="text-xl font-bold text-[#101010] dark:text-[#f5f6fb]">No PLO Report Available</p>
+                <p className="mt-2 max-w-lg text-sm text-slate-500 dark:text-slate-400">Even the PLOs gave up. No report available for this semester.</p>
               </div>
             )}
           </div>

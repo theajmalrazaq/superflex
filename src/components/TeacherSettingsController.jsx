@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import TeacherSelectionModal from "./TeacherSelectionModal";
+import SuperFlexSettingsModal from "./SuperFlexSettingsModal";
 import { getCampusFromRollNumber } from "../data/facultyDirectories";
 import { parseFacultyPages } from "../utils/facultyDirectory";
 import { sendExtensionMessage } from "../utils/extensionApi";
@@ -8,6 +8,7 @@ const SELECTIONS_KEY = "superflex_course_teachers_v1";
 const COURSES_KEY = "superflex_cached_courses_v1";
 const ROLL_NUMBER_KEY = "superflex_student_roll_number_v1";
 const ONBOARDING_KEY = "superflex_teacher_onboarding_complete_v1";
+const FIRST_TIME_SETUP_KEY = "superflex_first_time_setup_v1";
 
 const readJson = (key, fallback) => {
   try {
@@ -22,6 +23,8 @@ export default function TeacherSettingsController() {
   const [rollNumber, setRollNumber] = useState(() => localStorage.getItem(ROLL_NUMBER_KEY) || "");
   const [selections, setSelections] = useState(() => readJson(SELECTIONS_KEY, {}));
   const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState("settings"); // "setup" | "settings"
+  const [initialTab, setInitialTab] = useState("teachers"); // "teachers" | "ai"
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -34,21 +37,41 @@ export default function TeacherSettingsController() {
       setCourses(readJson(COURSES_KEY, []));
       setRollNumber(localStorage.getItem(ROLL_NUMBER_KEY) || "");
       setSelections(readJson(SELECTIONS_KEY, {}));
+      setMode("settings");
+      setInitialTab("teachers");
       setOpen(true);
     };
+
+    const openGlobalSettings = (event) => {
+      setCourses(readJson(COURSES_KEY, []));
+      setRollNumber(localStorage.getItem(ROLL_NUMBER_KEY) || "");
+      setSelections(readJson(SELECTIONS_KEY, {}));
+      setMode("settings");
+      setInitialTab(event?.detail?.tab || "teachers");
+      setOpen(true);
+    };
+
     const updateCourseData = (event) => {
       const { nextCourses = [], nextRollNumber = "" } = event.detail || {};
       setCourses(nextCourses);
       setRollNumber(nextRollNumber);
-      if (localStorage.getItem(ONBOARDING_KEY) !== "complete" && nextCourses.length && nextRollNumber) {
+      if (
+        localStorage.getItem(FIRST_TIME_SETUP_KEY) !== "complete" &&
+        nextCourses.length &&
+        nextRollNumber
+      ) {
+        setMode("setup");
+        setInitialTab("teachers");
         setOpen(true);
       }
     };
 
     window.addEventListener("superflex-open-teacher-settings", openSettings);
+    window.addEventListener("superflex-open-global-settings", openGlobalSettings);
     window.addEventListener("superflex-teacher-course-data", updateCourseData);
     return () => {
       window.removeEventListener("superflex-open-teacher-settings", openSettings);
+      window.removeEventListener("superflex-open-global-settings", openGlobalSettings);
       window.removeEventListener("superflex-teacher-course-data", updateCourseData);
     };
   }, []);
@@ -85,23 +108,26 @@ export default function TeacherSettingsController() {
 
   const finish = () => {
     localStorage.setItem(SELECTIONS_KEY, JSON.stringify(selections));
+    localStorage.setItem(FIRST_TIME_SETUP_KEY, "complete");
     localStorage.setItem(ONBOARDING_KEY, "complete");
     setOpen(false);
   };
 
   return (
-    <TeacherSelectionModal
-      open={open && courses.length > 0}
+    <SuperFlexSettingsModal
+      open={open && (courses.length > 0 || mode === "settings")}
+      mode={mode}
+      initialTab={initialTab}
       courses={courses}
       campus={campus}
       teachers={teachers}
-      loading={loading}
-      error={error}
+      loadingTeachers={loading}
+      errorTeachers={error}
       selections={selections}
-      onSelect={updateSelection}
+      onSelectTeacher={updateSelection}
       onSave={finish}
-      onSkip={finish}
-      onRetry={() => {
+      onClose={finish}
+      onRetryTeachers={() => {
         setTeachers([]);
         setRetryKey((key) => key + 1);
       }}

@@ -25,15 +25,34 @@ import { processCourseMarks } from "../utils/marksProcessor";
 import { findMarksForm, parseMarksPage } from "../parsers/marks";
 import { findFlexPageRoot } from "../parsers/dom";
 import { useAiSync } from "../hooks/useAiSync";
-import { checkAndRecordMarksSnapshot } from "../utils/academicSnapshot";
+import {
+  checkAndRecordMarksSnapshot,
+  getPendingUpdates,
+  isCourseMarksUpdated,
+  isSectionMarksUpdated,
+  isAssessmentMarksUpdated,
+} from "../utils/academicSnapshot";
 
-const MarksCourseTabs = ({ courses, selectedId, onSelect }) => (
+const MarksCourseTabs = ({ courses, selectedId, onSelect, pendingUpdates }) => (
   <div className="inline-flex w-fit max-w-full gap-1.5 overflow-x-auto rounded-full bg-white/55 p-1.5 shadow-sm shadow-black/[0.03] scrollbar-hide dark:bg-black/25 dark:shadow-none" aria-label="Select course">
     {courses.map((course) => {
       const active = course.id === selectedId;
       const code = course.title.match(/[A-Z]{2,5}\s?-?\d{3,4}/i)?.[0] || course.id;
+      const hasUpdate = isCourseMarksUpdated(pendingUpdates, course);
       return (
         <button key={course.id} type="button" onClick={() => onSelect(course.id)} aria-pressed={active} title={course.title} className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold transition-colors ${active ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-600 hover:bg-white/80 hover:text-[#230052] dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white"}`}>
+          {hasUpdate && (
+            <span className="flex shrink-0 items-center justify-center p-0.5">
+              <span
+                className={`h-2 w-2 rounded-full animate-pulse ring-2 ${
+                  active
+                    ? "bg-white ring-white/40 dark:bg-[#0a192f] dark:ring-[#0a192f]/40"
+                    : "bg-[#230052] ring-[#230052]/30 dark:bg-white dark:ring-white/40"
+                }`}
+                title="New marks in this course"
+              />
+            </span>
+          )}
           <span>{code}</span>
           {course.grandTotalStats && <span className="text-[10px] opacity-75">{course.grandTotalStats.percentage.toFixed(0)}%</span>}
         </button>
@@ -336,8 +355,8 @@ const BestOfModal = ({ isOpen, onClose, onApply, itemCount, sectionTitle }) => {
         <header className="flex shrink-0 flex-col items-center px-6 pb-4 pt-3 text-center sm:px-8">
           <span className="mb-2 flex h-11 w-11 items-center justify-center rounded-[16px] bg-[#230052] text-white dark:bg-white dark:text-[#101027]"><Settings size={21} /></span>
           <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#230052]/65 dark:text-white">Marks simulator</p>
-          <BottomSheetTitle className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">Best {itemType} calculator</BottomSheetTitle>
-          <BottomSheetDescription className="mt-1 text-sm text-slate-500 dark:text-slate-400">{sectionTitle} · Choose how the assessment weight is distributed.</BottomSheetDescription>
+          <BottomSheetTitle className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">Let's do some damage control.</BottomSheetTitle>
+          <BottomSheetDescription className="mt-1 text-sm text-slate-500 dark:text-slate-400">Pick your best scores and see if there's still hope.</BottomSheetDescription>
         </header>
 
         <div className="min-h-0 space-y-4 overflow-y-auto px-5 pb-4 sm:px-8">
@@ -370,9 +389,11 @@ const AssessmentView = ({
   markedItems,
   onToggleMark,
   courseId,
+  course,
   onBestOf,
   onReset,
   isSimulationMode,
+  pendingUpdates,
 }) => {
   const [isBestOfOpen, setIsBestOfOpen] = useState(false);
   const isGrandTotal = section.title.includes("Grand Total");
@@ -384,6 +405,7 @@ const AssessmentView = ({
     : performance >= 60
       ? "text-amber-700 dark:text-amber-300"
       : "text-rose-700 dark:text-rose-300";
+  const hasSectionUpdate = isSectionMarksUpdated(pendingUpdates, course, section.title);
 
   return (
     <section id={`marks-section-${section.id}`} className={`overflow-hidden rounded-[24px] border bg-white text-slate-900 dark:bg-black dark:text-[#f5f6fb] ${isGrandTotal ? "border-[#230052]/15 dark:border-white" : "border-black/[0.06] dark:border-white/[0.14]"}`}>
@@ -391,6 +413,14 @@ const AssessmentView = ({
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="truncate text-base font-bold">{section.title}</h3>
+            {hasSectionUpdate && (
+              <span className="flex shrink-0 items-center justify-center p-0.5">
+                <span
+                  className="h-2 w-2 rounded-full bg-[#230052] animate-pulse ring-2 ring-[#230052]/30 dark:bg-white dark:ring-white/40"
+                  title="New marks uploaded in this section"
+                />
+              </span>
+            )}
             {isGrandTotal && <span className="rounded-full bg-[#230052]/10 px-2 py-0.5 text-[10px] font-bold text-[#230052] dark:bg-white/15 dark:text-white">Final</span>}
           </div>
           <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">{rows.length} {rows.length === 1 ? "assessment" : "assessments"} · {section.weight.toFixed(2)}% weight</p>
@@ -422,14 +452,24 @@ const AssessmentView = ({
               const rowIndex = section.rows.indexOf(row);
               const uniqueId = `${courseId}-${section.id}-${row.title}`;
               const isMarked = markedItems?.has(uniqueId);
+              const isRowUpdated = isAssessmentMarksUpdated(pendingUpdates, course, row.title);
               const scoreRatio = row.total > 0 ? row.obtained / row.total : 0;
               const scoreColor = scoreRatio >= 0.8 ? "text-emerald-700 dark:text-emerald-300" : scoreRatio >= 0.6 ? "text-amber-700 dark:text-amber-300" : "text-rose-700 dark:text-rose-300";
               return (
-                <div key={`${row.title}-${rowIndex}`} className={`grid grid-cols-[minmax(0,1fr)_64px_148px_76px] items-center gap-3 border-b border-black/[0.05] px-4 py-3.5 last:border-b-0 dark:border-white/[.08] sm:px-5 ${!row.included ? "opacity-45" : ""} ${isMarked ? "bg-[#230052]/[.05] dark:bg-white/[.08]" : "hover:bg-slate-50 dark:hover:bg-white/[.025]"}`}>
+                <div key={`${row.title}-${rowIndex}`} className={`grid grid-cols-[minmax(0,1fr)_64px_148px_76px] items-center gap-3 border-b border-black/[0.05] px-4 py-3.5 last:border-b-0 dark:border-white/[.08] sm:px-5 ${!row.included ? "opacity-45" : ""} ${isMarked ? "bg-[#230052]/[.05] dark:bg-white/[.08]" : isRowUpdated ? "bg-[#230052]/[0.03] dark:bg-white/[0.04]" : "hover:bg-slate-50 dark:hover:bg-white/[.025]"}`}>
                   <div className="flex min-w-0 items-center gap-2.5">
                     <button type="button" onClick={() => onToggleMark?.(uniqueId)} aria-label={isMarked ? `Remove bookmark for ${row.title}` : `Bookmark ${row.title}`} className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors ${isMarked ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-400 hover:bg-slate-200 hover:text-[#230052] dark:hover:bg-white/10 dark:hover:text-white"}`}><Bookmark size={14} fill={isMarked ? "currentColor" : "none"} /></button>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold">{row.title}{!row.included && <span className="ml-2 rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold text-slate-500 dark:bg-white/10 dark:text-slate-400">Dropped</span>}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="truncate text-sm font-semibold">{row.title}</p>
+                        {isRowUpdated && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[#230052]/10 px-2 py-0.5 text-[10px] font-bold text-[#230052] dark:bg-white/15 dark:text-white">
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#230052] animate-pulse dark:bg-white" />
+                            New
+                          </span>
+                        )}
+                        {!row.included && <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold text-slate-500 dark:bg-white/10 dark:text-slate-400">Dropped</span>}
+                      </div>
                       <p className="mt-0.5 truncate text-[10px] text-slate-500 dark:text-slate-400">Avg {row.avg.toFixed(1)} · Range {row.min.toFixed(1)}–{row.max.toFixed(1)}</p>
                     </div>
                   </div>
@@ -464,8 +504,19 @@ function MarksPage() {
   const [selectedCourseId, setSelectedCourseId] = useState(null);
   const [semesters, setSemesters] = useState([]);
   const [alerts, setAlerts] = useState([]);
+  const [pendingUpdates, setPendingUpdates] = useState(getPendingUpdates);
   const hiddenFormRef = useRef(null);
   const initialCoursesRef = useRef([]);
+
+  useEffect(() => {
+    const handleUpdates = () => setPendingUpdates(getPendingUpdates());
+    window.addEventListener("superflex-academic-updates-detected", handleUpdates);
+    window.addEventListener("superflex-academic-updates-cleared", handleUpdates);
+    return () => {
+      window.removeEventListener("superflex-academic-updates-detected", handleUpdates);
+      window.removeEventListener("superflex-academic-updates-cleared", handleUpdates);
+    };
+  }, []);
 
   const [markedItems, setMarkedItems] = useState(() => {
     if (typeof window !== "undefined") {
@@ -688,8 +739,8 @@ function MarksPage() {
         <header className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
           <div className="space-y-1">
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p>
-            <h1 className="text-3xl font-bold tracking-tight text-white">Marks &amp; Grades</h1>
-            <p className="text-sm text-white/80">Review every assessment and score for your courses.</p>
+            <h1 className="text-3xl font-bold tracking-tight text-white">Marks & Assessments</h1>
+            <p className="text-sm text-white/80">Quizzes, assignments, mids, finals. Dil thaam ke marks dekhein.</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <SuperTabs
@@ -725,7 +776,12 @@ function MarksPage() {
           <PageSkeleton label="Loading marks" cards={4} rows={6} showHeader={false} />
         ) : selectedCourse ? (
           <div className="space-y-5">
-            <MarksCourseTabs courses={courses} selectedId={selectedCourseId} onSelect={setSelectedCourseId} />
+            <MarksCourseTabs
+              courses={courses}
+              selectedId={selectedCourseId}
+              onSelect={setSelectedCourseId}
+              pendingUpdates={pendingUpdates}
+            />
             <div className="flex flex-wrap items-end justify-between gap-3 px-1">
               <div>
                 <h2 className="text-xl font-bold tracking-tight text-white">{selectedCourse.title}</h2>
@@ -744,6 +800,8 @@ function MarksPage() {
                   <AssessmentView
                     key={section.id}
                     section={section}
+                    course={selectedCourse}
+                    pendingUpdates={pendingUpdates}
                     onUpdate={(rowIndex, field, value) => handleRowUpdate(section.id, rowIndex, field, value)}
                     markedItems={markedItems}
                     onToggleMark={handleToggleMark}
@@ -757,8 +815,8 @@ function MarksPage() {
             ) : (
               <div className="flex min-h-[300px] flex-col items-center justify-center rounded-[24px] border border-black/[0.06] bg-white px-6 py-12 text-center dark:border-white/[0.14] dark:bg-black">
                 <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><Layers size={24} /></div>
-                <h4 className="text-xl font-bold text-[#101010] dark:text-[#f5f6fb]">No evaluations available</h4>
-                <p className="mt-2 max-w-sm text-sm text-[#626262] dark:text-[#c4cad6]">Evaluation data for this course has not been uploaded yet.</p>
+                <h4 className="text-xl font-bold text-[#101010] dark:text-[#f5f6fb]">No Marks Uploaded Yet</h4>
+                <p className="mt-2 max-w-sm text-sm text-[#626262] dark:text-[#c4cad6]">Marks haven't been uploaded. Stay delusional for now.</p>
               </div>
             )}
           </div>

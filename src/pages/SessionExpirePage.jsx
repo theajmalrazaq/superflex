@@ -19,10 +19,10 @@ const SessionExpirePage = () => {
 
         <div className="space-y-4">
           <h1 className="text-4xl !font-bold !text-foreground">
-            Session <span className="!text-rose-500">Expired</span>
+            Session Expired
           </h1>
           <p className="!text-foreground/50 text-sm leading-relaxed">
-            Your session timed out. Please sign in again to continue.
+            Even FLEX needs a break. Sign back in, the ragra isn't over.
           </p>
         </div>
 

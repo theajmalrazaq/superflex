@@ -225,8 +225,8 @@ function FeeChallanPage() {
         <header className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
           <div className="space-y-1">
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Finance</p>
-            <h1 className="text-3xl font-bold tracking-tight text-white">Fee Challans</h1>
-            <p className="text-sm text-white/80">Review your invoices, payment status, and due dates.</p>
+            <h1 className="text-3xl font-bold tracking-tight text-white">Fee Challan</h1>
+            <p className="text-sm text-white/80">FAST wants its money again. Your wallet's least favorite page.</p>
           </div>
           <div className="flex w-fit items-center gap-3 rounded-full bg-white/15 px-4 py-2.5 text-[#101010] dark:bg-white/10 dark:text-white">
             <Receipt size={19} />
@@ -284,8 +284,8 @@ function FeeChallanPage() {
                 <FileText size={20} />
               </div>
               <div>
-                <h2 className="text-lg font-bold tracking-tight">Invoice history</h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">View status, payment, and print options.</p>
+                <h2 className="text-lg font-bold tracking-tight">Challan History</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">A timeline of financial pain. Every challan, every payment, every heartbreak.</p>
               </div>
             </div>
 
@@ -449,8 +449,8 @@ function FeeChallanPage() {
                     <Receipt size={22} />
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-900 dark:text-white">No challans found</p>
-                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Generated fee invoices will appear here.</p>
+                    <p className="font-semibold text-slate-900 dark:text-white">Your Wallet Is Safe. For Now.</p>
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">No challans generated yet. Enjoy this rare moment.</p>
                   </div>
                 </div>
               )}
@@ -463,8 +463,8 @@ function FeeChallanPage() {
                 <Printer size={19} />
               </div>
               <div>
-                <h2 className="text-lg font-bold tracking-tight">Payment instructions</h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Online and branch payment options.</p>
+                <h2 className="text-lg font-bold tracking-tight">Payment Instructions</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">How to fund the ragra. Choose your payment method and settle the bill.</p>
               </div>
             </div>
             <PaymentInstructions />

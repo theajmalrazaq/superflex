@@ -292,16 +292,16 @@ function CourseFeedbackPage() {
       <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8">
         <header className="space-y-1">
           <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Services</p>
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Course feedback</h1>
-          <p className="text-sm text-white/80">Review course evaluations and see which surveys still need your response.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Course Feedback</h1>
+          <p className="text-sm text-white/80">Now it's your turn. Poora semester tum evaluate huay, ab teachers ki baari.</p>
         </header>
 
         <NotificationBanner alerts={alerts} />
 
         <section aria-labelledby="feedback-overview-heading" className="space-y-4">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-            <div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Overview</p><h2 id="feedback-overview-heading" className="text-xl font-bold tracking-tight text-white">Survey summary</h2></div>
-            <p className="text-xs text-white/75">Your evaluation progress for this semester.</p>
+            <div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Overview</p><h2 id="feedback-overview-heading" className="text-xl font-bold tracking-tight text-white">Your Feedback Progress</h2></div>
+            <p className="text-xs text-white/75">How many evaluations are done, and how many remain?</p>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
             <StatsCard variant="dashboard" icon={Layout} label="Total surveys" value={stats.total} />
@@ -313,8 +313,8 @@ function CourseFeedbackPage() {
 
         <section aria-labelledby="feedback-courses-heading" className="space-y-4">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-            <div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Course list</p><h2 id="feedback-courses-heading" className="text-xl font-bold tracking-tight text-white">Faculty surveys</h2></div>
-            <p className="text-xs text-white/75">Select a course to review its instructor feedback form.</p>
+            <div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Course list</p><h2 id="feedback-courses-heading" className="text-xl font-bold tracking-tight text-white">Course Feedback Forms</h2></div>
+            <p className="text-xs text-white/75">The semester review session. Select a course and share your honest feedback.</p>
           </div>
 
           <div className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]">
@@ -334,7 +334,7 @@ function CourseFeedbackPage() {
             ) : (
               <div className="flex min-h-[220px] flex-col items-center justify-center px-6 py-10 text-center">
                 <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[36%] bg-emerald-50 text-emerald-700 dark:bg-emerald-300/10 dark:text-emerald-200"><CheckCircle2 size={22} /></span>
-                <h3 className="text-base font-bold">{statusFilter === "all" ? "No course surveys available" : statusFilter === "pending" ? "No pending reviews" : "No completed surveys yet"}</h3>
+                <h3 className="text-base font-bold">{statusFilter === "all" ? "No Evaluations Available" : statusFilter === "pending" ? "All Caught Up" : "No Submitted Feedback"}</h3>
                 <p className="mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">{statusFilter === "all" ? "Course evaluations will appear here when the university makes them available." : statusFilter === "pending" ? "All available course evaluations are complete." : "Your submitted course evaluations will appear here."}</p>
               </div>
             )}

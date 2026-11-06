@@ -51,7 +51,11 @@ function ChangePasswordPage() {
             alert.classList.contains("m-alert--outline-danger")
               ? "error"
               : "info";
-          alertList.push({ type, message });
+          const displayMessage =
+            type !== "error" && /password.*(success|updated|changed)/i.test(message)
+              ? "Password updated. Now if only GPA worked like that."
+              : message;
+          alertList.push({ type, message: displayMessage });
         }
       });
       setAlerts(alertList);
@@ -123,9 +127,9 @@ function ChangePasswordPage() {
               <div class="h-12 w-12 rounded-2xl bg-black flex items-center justify-center dark:bg-white">
                   <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 432 432" fill="#a098ff"><path d="M247.227 185.616L282.286 69L133 216L186.861 231.146L133 363L298 208.65L247.227 185.616Z"/></svg>
               </div>
-              Update Password
+              Change Password
           </h3>
-          <p class="text-sm text-slate-500 dark:text-slate-400">Choose a strong password you don’t use elsewhere.</p>
+          <p class="text-sm text-slate-500 dark:text-slate-400">At least you can change this. GPA nahi toh password hi change kar le bhai.</p>
       `;
       formColumn.appendChild(headerDiv);
 

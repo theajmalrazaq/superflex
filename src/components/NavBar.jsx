@@ -22,6 +22,7 @@ import {
   XCircle,
   Clock3,
   GripVertical,
+  Settings,
 } from "lucide-react";
 import { DragDropProvider } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
@@ -48,10 +49,9 @@ const LINK_GROUPS = {
   "Retake Exam Request": "Services",
   "Course Withdraw": "Services",
   "Grade Change Request": "Services",
-  "My Teachers": "Settings",
 };
 
-const GROUP_ORDER = ["Overview", "Academics", "Finance", "Services", "Settings", "More"];
+const GROUP_ORDER = ["Overview", "Academics", "Finance", "Services", "More"];
 const ICONS = {
   Home: House,
   "Course Registration": BookOpen,
@@ -67,7 +67,6 @@ const ICONS = {
   "Grade Change Request": RefreshCw,
   "Tentative Study Plan": ListChecks,
   "Grade Report": GraduationCap,
-  "My Teachers": GraduationCap,
   "Change Password": KeyRound,
 };
 
@@ -115,17 +114,27 @@ function SidebarLink({ link, active, onNavigate, compact = false, hasUpdate = fa
       <div className="relative shrink-0">
         <Icon size={17} strokeWidth={2} />
         {hasUpdate && compact && (
-          <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-emerald-500 animate-pulse ring-2 ring-emerald-500/30" />
+          <span className="absolute -top-1.5 -right-1.5 flex p-0.5">
+            <span
+              className={`h-2 w-2 rounded-full bg-white animate-pulse ring-2 ring-white/40 ${
+                active ? "dark:bg-[#0a192f] dark:ring-[#0a192f]/40" : ""
+              }`}
+            />
+          </span>
         )}
       </div>
       {!compact && (
-        <span className="flex items-center gap-2 truncate">
+        <span className="flex items-center gap-2 min-w-0">
           <span className="truncate">{link.text}</span>
           {hasUpdate && (
-            <span
-              className="h-2 w-2 shrink-0 rounded-full bg-emerald-500 animate-pulse ring-2 ring-emerald-500/30"
-              title="New updates available"
-            />
+            <span className="flex shrink-0 items-center justify-center p-0.5">
+              <span
+                className={`h-2 w-2 rounded-full bg-white animate-pulse ring-2 ring-white/40 ${
+                  active ? "dark:bg-[#0a192f] dark:ring-[#0a192f]/40" : ""
+                }`}
+                title="New updates available"
+              />
+            </span>
           )}
         </span>
       )}
@@ -200,9 +209,10 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     menuLinks.forEach((link) => {
       const name = link.text.trim();
       const group = LINK_GROUPS[name] || "More";
-      if (!["Grade Report", "My Teachers", "Change Password"].includes(name)) groups[group].push(link);
+      if (!["Grade Report", "My Teachers", "Change Password"].includes(name)) {
+        if (groups[group]) groups[group].push(link);
+      }
     });
-    groups.Settings.push({ text: "My Teachers", path: "/settings/teachers", action: "teachers" });
 
     const orderIndex = new Map();
     (navOrder || []).forEach((id, index) => {
@@ -438,23 +448,45 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
       <div className="space-y-3 p-4">
         <div>
-          <div className="rounded-2xl bg-white/30 p-3 dark:bg-white/[0.04]">
-            <div className="grid grid-cols-2 gap-1.5">
+          <div className="rounded-2xl bg-white/30 p-2 dark:bg-white/[0.04]">
+            <div className="flex items-center gap-1.5">
+              <div className="grid flex-1 grid-cols-2 gap-1">
+                <button
+                  type="button"
+                  onClick={() => changeThemeMode("light")}
+                  aria-pressed={themeMode === "light"}
+                  title="Light Mode"
+                  className={`flex items-center justify-center gap-1 rounded-full py-2 text-xs font-bold transition-all ${
+                    themeMode === "light"
+                      ? "bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#0a192f]"
+                      : "bg-white/70 text-slate-700 hover:bg-white dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/15"
+                  }`}
+                >
+                  <Sun size={13} /> Light
+                </button>
+                <button
+                  type="button"
+                  onClick={() => changeThemeMode("dark")}
+                  aria-pressed={themeMode === "dark"}
+                  title="Dark Mode"
+                  className={`flex items-center justify-center gap-1 rounded-full py-2 text-xs font-bold transition-all ${
+                    themeMode === "dark"
+                      ? "bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#0a192f]"
+                      : "bg-white/70 text-slate-700 hover:bg-white dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/15"
+                  }`}
+                >
+                  <Moon size={13} /> Dark
+                </button>
+              </div>
+
               <button
                 type="button"
-                onClick={() => changeThemeMode("light")}
-                aria-pressed={themeMode === "light"}
-                className={`flex items-center justify-center gap-1 rounded-full px-2 py-2 text-xs font-bold ${themeMode === "light" ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "bg-white/70 text-slate-700 dark:bg-white/10 dark:text-slate-200"}`}
+                onClick={() => window.dispatchEvent(new CustomEvent("superflex-open-global-settings"))}
+                aria-label="SuperFlex Settings"
+                title="SuperFlex Settings"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/70 text-slate-700 hover:bg-white hover:text-[#230052] dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/20 dark:hover:text-white transition-all shadow-xs"
               >
-                <Sun size={14} /> Light
-              </button>
-              <button
-                type="button"
-                onClick={() => changeThemeMode("dark")}
-                aria-pressed={themeMode === "dark"}
-                className={`flex items-center justify-center gap-1 rounded-full px-2 py-2 text-xs font-bold ${themeMode === "dark" ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "bg-white/70 text-slate-700 dark:bg-white/10 dark:text-slate-200"}`}
-              >
-                <Moon size={14} /> Dark
+                <Settings size={15} />
               </button>
             </div>
           </div>

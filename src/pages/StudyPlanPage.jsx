@@ -81,7 +81,7 @@ function StudyPlanPage() {
           <div className="space-y-1">
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p>
             <h1 className="text-3xl font-bold tracking-tight text-white">Tentative Study Plan</h1>
-            <p className="text-sm text-white/80">Explore your planned courses and credit load by semester.</p>
+            <p className="text-sm text-white/80">Future suffering, planned. Agle semesters mein kya kya zaleel karega? Find out here.</p>
           </div>
           <div className="flex w-fit items-center gap-3 rounded-full bg-white/15 px-4 py-2.5 text-[#101010] dark:bg-white/10 dark:text-white">
             <GraduationCap size={19} />
@@ -152,7 +152,7 @@ function StudyPlanPage() {
                   </div>
                   <div className="min-w-0">
                     <h2 className="truncate text-lg font-bold tracking-tight">{activeSemData.title}</h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Semester course plan</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">The Roadmap to Graduation (Hopefully)</p>
                   </div>
                 </div>
                 {activeSemData.courses.length ? (
@@ -183,14 +183,18 @@ function StudyPlanPage() {
                     </table>
                   </div>
                 ) : (
-                  <p className="px-6 pb-6 text-sm text-slate-500 dark:text-slate-400">No courses are listed for this semester.</p>
+                  <div className="px-6 pb-6 text-center">
+                    <p className="text-sm font-bold text-foreground">Future trauma not found.</p>
+                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">No courses listed for this semester yet.</p>
+                  </div>
                 )}
               </>
             )}
           </section>
         ) : (
-          <section className="rounded-[24px] border border-black/[0.06] bg-white p-8 text-center text-sm text-slate-500 dark:border-white/[0.14] dark:bg-black dark:text-slate-400">
-            No tentative study plan is available.
+          <section className="rounded-[24px] border border-black/[0.06] bg-white p-8 text-center dark:border-white/[0.14] dark:bg-black">
+            <p className="text-sm font-bold text-foreground">Future trauma not found.</p>
+            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">No tentative study plan is available yet.</p>
           </section>
         )}
       </div>

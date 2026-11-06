@@ -278,7 +278,10 @@ function SubmitFeedbackPage() {
         <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
         <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
-        <PageHeader title="Course Feedback" subtitle={courseTitle || "Faculty Evaluation Survey"} />
+        <PageHeader
+          title="Submit Course Feedback"
+          subtitle={courseTitle ? `${courseTitle} is now under review. The tables have turned.` : "Your course is now under review. The tables have turned."}
+        />
 
         <NotificationBanner alerts={alerts} />
 
@@ -287,7 +290,7 @@ function SubmitFeedbackPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex-1 space-y-2">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-foreground/60">COMPLETION PROGRESS</span>
+                <span className="text-xs font-medium text-foreground/60">Feedback Progress</span>
                 <span className="text-xs font-medium text-accent">{Math.round(progress)}%</span>
               </div>
               <div className="w-full h-2 bg-foreground/5 rounded-full overflow-hidden">

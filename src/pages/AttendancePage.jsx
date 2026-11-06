@@ -263,7 +263,7 @@ function AttendancePage() {
           <div className="space-y-1">
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p>
             <h1 className="text-3xl font-bold tracking-tight text-white">Attendance</h1>
-            <p className="text-sm text-white/80">A quick view of your class presence and session history.</p>
+            <p className="text-sm text-white/80">80% or RIP? Dekh le bhai, aur kitni classes bunk kar sakta hai.</p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             {semesters.length > 1 && (
@@ -473,8 +473,8 @@ function AttendancePage() {
         ) : (
           <section className="flex min-h-[300px] flex-1 flex-col items-center justify-center rounded-[24px] border border-black/[0.06] bg-white px-6 py-10 text-center dark:border-white/[0.14] dark:bg-black">
             <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><BookOpen size={24} /></span>
-            <h2 className="text-xl font-bold text-[#101010] dark:text-[#f5f6fb]">No attendance data available</h2>
-            <p className="mt-2 max-w-lg text-sm text-[#626262] dark:text-[#c4cad6]">{alerts[0]?.message || "Attendance records will appear here when they are available."}</p>
+            <h2 className="text-xl font-bold text-[#101010] dark:text-[#f5f6fb]">No Attendance Records Found</h2>
+            <p className="mt-2 max-w-lg text-sm text-[#626262] dark:text-[#c4cad6]">{alerts[0]?.message || "Sir hasn't uploaded anything yet. Suspense continues."}</p>
             {semesters.length > 1 && <div className="mt-5"><SuperTabs tabs={semesters} activeTab={semesters.find((semester) => semester.selected)?.value} size="sm" className="!border-0 !bg-white/55 !backdrop-blur-xl dark:!bg-black/25 dark:!backdrop-blur-xl" onTabChange={(value) => {
               const select = hiddenFormRef.current?.querySelector("select");
               if (!select) return;

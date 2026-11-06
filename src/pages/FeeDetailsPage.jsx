@@ -86,7 +86,7 @@ const SemesterAccordion = ({ semester }) => {
         <div className="grid gap-5 border-t border-black/[0.06] p-4 dark:border-white/[0.1] sm:p-5 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
           <div className="space-y-5">
             <section>
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-bold"><DollarSign size={16} /> Fee breakdown</h3>
+              <h3 className="mb-3 flex items-center gap-2 text-sm font-bold"><DollarSign size={16} /> Fee Breakdown</h3>
               {semester.feeItems.length ? (
                 <div className="divide-y divide-black/[0.05] rounded-[18px] border border-black/[0.06] px-4 dark:divide-white/[0.08] dark:border-white/[0.1]">
                   {semester.feeItems.map((item, index) => (
@@ -124,7 +124,7 @@ const SemesterAccordion = ({ semester }) => {
           </div>
 
           <section className="min-w-0">
-            <h3 className="mb-3 flex items-center gap-2 text-sm font-bold"><BookOpen size={16} /> Registered courses</h3>
+            <h3 className="mb-3 flex items-center gap-2 text-sm font-bold"><BookOpen size={16} /> Registered Courses</h3>
             {semester.courses.length ? (
               <div className="overflow-x-auto rounded-[18px] border border-black/[0.06] dark:border-white/[0.1]">
                 <table className="sf-data-table w-full min-w-[460px] text-left">
@@ -330,8 +330,8 @@ function FeeDetailsPage() {
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/80">Finance</p>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight text-white sm:text-4xl">Fee details</h1>
-            <p className="mt-1 text-sm text-white/80">Review semester charges, balances, and payment history.</p>
+            <h1 className="mt-1 text-3xl font-bold tracking-tight text-white sm:text-4xl">Fee Details</h1>
+            <p className="mt-1 text-sm text-white/80">The financial damage report. Dekh le bhai, degree pe kitna investment ho chuka hai.</p>
           </div>
           <div className="flex items-center gap-3 rounded-2xl bg-white/15 px-4 py-3 text-[#101010] backdrop-blur-sm dark:text-white">
             <CreditCard size={19} />
@@ -348,9 +348,9 @@ function FeeDetailsPage() {
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Overview</p>
-              <h2 id="fee-overview-heading" className="text-xl font-bold tracking-tight text-white">Fee summary</h2>
+              <h2 id="fee-overview-heading" className="text-xl font-bold tracking-tight text-white">Financial Summary</h2>
             </div>
-            <p className="text-xs text-white/75">Your payments and semester fee records at a glance.</p>
+            <p className="text-xs text-white/75">Where did all the money go? Payments, remaining dues, and everything in between.</p>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
             <StatsCard variant="dashboard" icon={DollarSign} label="Lifetime paid" value={`Rs. ${totalPaid}`} />
@@ -364,9 +364,9 @@ function FeeDetailsPage() {
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Financial record</p>
-              <h2 id="fee-semesters-heading" className="text-xl font-bold tracking-tight text-white">Semester fee details</h2>
+              <h2 id="fee-semesters-heading" className="text-xl font-bold tracking-tight text-white">Semester Fees</h2>
             </div>
-            <p className="text-xs text-white/75">Charges, balances, and registered courses by semester.</p>
+            <p className="text-xs text-white/75">The cost of each semester. Turns out, even suffering has a price tag.</p>
           </div>
           {semesters.length ? (
             <div className="grid grid-cols-1 gap-4 2xl:grid-cols-2">
@@ -381,9 +381,9 @@ function FeeDetailsPage() {
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Transactions</p>
-              <h2 id="fee-history-heading" className="text-xl font-bold tracking-tight text-white">Payment history</h2>
+              <h2 id="fee-history-heading" className="text-xl font-bold tracking-tight text-white">Transaction History</h2>
             </div>
-            <p className="text-xs text-white/75">Recorded challans and payment transactions.</p>
+            <p className="text-xs text-white/75">Wallet's villain origin story. A complete history of your financial sacrifices.</p>
           </div>
           <div className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-white">
             {transactions.length ? (

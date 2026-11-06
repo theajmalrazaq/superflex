@@ -28,11 +28,10 @@ const NotFoundPage = () => {
 
           <div className="space-y-4">
             <h1 className="text-4xl !font-bold !text-foreground">
-              Page <span className="!text-rose-500">Not Found</span>
+              Page Not Found
             </h1>
             <p className="!text-foreground/50 text-sm leading-relaxed">
-              The page you are looking for doesn't exist, has been moved, or is currently
-              unavailable in the SuperFlex universe.
+              Bhai, tu kahan aa gaya? This page doesn't exist. Just like your semester break.
             </p>
           </div>
 

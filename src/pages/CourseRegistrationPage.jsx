@@ -43,7 +43,7 @@ function CourseRegistrationPage() {
         <header className="space-y-1">
           <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#230052]/70 dark:text-white">Academics</p>
           <h1 className="text-3xl font-bold tracking-tight text-[#101010] dark:text-[#f5f6fb] sm:text-4xl">Course Registration</h1>
-          <p className="text-sm text-[#626262] dark:text-[#c4cad6]">Manage your semester course enrollments.</p>
+          <p className="text-sm text-[#626262] dark:text-[#c4cad6]">Choose your fighters. Naya semester, naye subjects, same old trauma.</p>
         </header>
 
         {loading ? (
@@ -111,9 +111,9 @@ function CourseRegistrationPage() {
                   <BookOpen size={25} />
                 </div>
                 <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#230052]/70 dark:text-white">Registration status</p>
-                <h2 className="text-xl font-bold tracking-tight text-[#101010] dark:text-[#f5f6fb] sm:text-2xl">Course registration is not active</h2>
+                <h2 className="text-xl font-bold tracking-tight text-[#101010] dark:text-[#f5f6fb] sm:text-2xl">Registration Closed</h2>
                 <p className="mt-2 max-w-lg text-sm leading-relaxed text-[#626262] dark:text-[#c4cad6]">
-                  {alerts[0]?.message || "Registration may be closed right now. Course options will appear here when enrollment opens."}
+                  {alerts[0]?.message || "The registration window is closed. Registrar ka mood badalne ka wait karo."}
                 </p>
               </section>
             )}
