@@ -45,6 +45,7 @@ describe("parseEmailDraftUrl", () => {
       to: "teacher@nu.edu.pk",
       subject: "Apology for lateness",
       body: "Dear Professor,\n\nPlease accept my apology.",
+      introText: "",
     });
   });
 
@@ -74,6 +75,19 @@ You can open this draft directly in Gmail:
       to: "teacher@nu.edu.pk",
       subject: "Apology for lateness",
       body: "Dear Professor,\n\nPlease accept my apology for arriving late to class.\n\nSincerely,\nAjmal Razaq",
+      introText: "Here is a draft for you:",
     });
+  });
+
+  it("rejects plain email addresses without draft parameters", () => {
+    expect(parseEmailDraftUrl("mailto:student@nu.edu.pk")).toBeNull();
+    expect(parseEmailDraftUrl("mailto:teacher@cfd.nu.edu.pk")).toBeNull();
+
+    const profileText = `Here's a summary of your information:
+• Name: Ajmal Razaq
+• Roll Number: 23F-0524
+• Email: f230524@cfd.nu.edu.pk
+• Mobile No: 0306-7107353`;
+    expect(parseEmailDraftContent(profileText)).toBeNull();
   });
 });

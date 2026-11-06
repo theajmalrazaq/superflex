@@ -19,6 +19,12 @@ import {
 } from "lucide-react";
 import BottomSheet, { BottomSheetClose, BottomSheetDescription, BottomSheetTitle } from "./ui/BottomSheet";
 import { sendExtensionMessage } from "../utils/extensionApi";
+import {
+  getDecryptedCredentials,
+  saveCredentials,
+  clearSavedCredentials,
+  hasSavedCredentials,
+} from "../utils/credentialStorage";
 
 const Avatar = ({ teacher }) =>
   teacher.image ? (
@@ -41,8 +47,8 @@ const Avatar = ({ teacher }) =>
 
 export default function SuperFlexSettingsModal({
   open,
-  mode = "settings", // "setup" | "settings"
-  initialTab = "teachers", // "teachers" | "ai"
+  mode = "settings",
+  initialTab = "teachers",
   courses = [],
   campus,
   teachers = [],
@@ -72,6 +78,13 @@ export default function SuperFlexSettingsModal({
   const [saveError, setSaveError] = useState("");
   const [saveSuccess, setSaveSuccess] = useState(false);
 
+  // Auto-Fill Settings State
+  const [savedCreds, setSavedCreds] = useState(null);
+  const [autofillUser, setAutofillUser] = useState("");
+  const [autofillPass, setAutofillPass] = useState("");
+  const [autofillSaving, setAutofillSaving] = useState(false);
+  const [autofillSuccess, setAutofillSuccess] = useState(false);
+
   useEffect(() => {
     if (open) {
       setActiveTab(initialTab);
@@ -88,10 +101,19 @@ export default function SuperFlexSettingsModal({
           setActiveModel(response.model || null);
         }
       });
+
+      // Check saved credentials for Auto-Fill
+      hasSavedCredentials().then((has) => {
+        if (has) {
+          getDecryptedCredentials().then((creds) => setSavedCreds(creds));
+        } else {
+          setSavedCreds(null);
+        }
+      });
     }
   }, [open, initialTab]);
 
-  const activeCourse = courses[courseIndex];
+  const activeCourse = (courses || [])[courseIndex] || null;
   const filteredTeachers = useMemo(() => {
     const search = query.trim().toLowerCase();
     if (!search) return teachers;
@@ -168,7 +190,13 @@ export default function SuperFlexSettingsModal({
       {/* Header */}
       <header className="flex shrink-0 flex-col items-center px-6 pb-2 pt-2 text-center sm:px-8">
         <div className="mb-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#230052] text-white dark:bg-white dark:text-[#101027] shadow-sm">
-          {currentTab === "teachers" ? <GraduationCap size={22} /> : <Bot size={22} />}
+          {currentTab === "teachers" ? (
+            <GraduationCap size={22} />
+          ) : currentTab === "autofill" ? (
+            <KeyRound size={22} />
+          ) : (
+            <Bot size={22} />
+          )}
         </div>
 
         <BottomSheetTitle className="text-xl font-bold tracking-tight sm:text-2xl text-foreground">
@@ -176,7 +204,11 @@ export default function SuperFlexSettingsModal({
             ? step === 1
               ? "Select Your Course Instructors 👨‍🏫"
               : "Set Up Octopus AI Assistant 🐙"
-            : "SuperFlex Preferences & Setup"}
+            : currentTab === "autofill"
+              ? "FLEX Login Auto-Fill"
+              : currentTab === "ai"
+                ? "Octopus AI Settings"
+                : "Course Faculty Settings"}
         </BottomSheetTitle>
 
         <BottomSheetDescription className="mt-0.5 max-w-md text-xs sm:text-sm text-slate-500 dark:text-slate-400">
@@ -184,7 +216,9 @@ export default function SuperFlexSettingsModal({
             ? step === 1
               ? "Select instructors to personalize attendance reviews, grades, and email drafts."
               : "Configure your academic AI companion for leave tracking and smart suggestions."
-            : "Manage your course instructors, AI permissions, and API key preferences."}
+            : activeTab === "autofill"
+              ? "Securely manage your encrypted Roll No and password for 1-click auto-fill."
+              : "Manage your course instructors, AI permissions, and API key preferences."}
         </BottomSheetDescription>
 
         {/* Mode & Navigation Tabs */}
@@ -213,6 +247,18 @@ export default function SuperFlexSettingsModal({
             >
               <Bot size={13} />
               Octopus AI
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("autofill")}
+              className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold transition-all ${
+                activeTab === "autofill"
+                  ? "bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#0a192f]"
+                  : "text-foreground/70 hover:text-foreground"
+              }`}
+            >
+              <KeyRound size={13} />
+              Auto-Fill
             </button>
           </div>
         ) : (
@@ -243,7 +289,7 @@ export default function SuperFlexSettingsModal({
 
       {/* Body Content */}
       <div className="min-h-0 flex-1 overflow-y-auto px-5 py-3 sm:px-8">
-        {currentTab === "teachers" ? (
+        {currentTab === "teachers" && (
           /* ================= TEACHERS SELECTION TAB ================= */
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-2 text-xs dark:bg-white/[.06]">
@@ -420,8 +466,10 @@ export default function SuperFlexSettingsModal({
               </button>
             </div>
           </div>
-        ) : (
-          /* ================= OCTOPUS AI TAB ================= */
+        )}
+
+        {/* ================= OCTOPUS AI TAB ================= */}
+        {currentTab === "ai" && (
           <div className="space-y-4">
             {/* AI Toggle Card */}
             <div className="flex items-center justify-between gap-4 rounded-2xl border border-black/[0.08] bg-slate-50/80 p-4 dark:border-white/10 dark:bg-white/[0.04]">
@@ -539,6 +587,136 @@ export default function SuperFlexSettingsModal({
             ) : (
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-center text-xs text-foreground/60 dark:border-white/10 dark:bg-white/[0.03]">
                 Octopus AI is currently disabled. The floating chat dock will remain hidden on all portal pages.
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tab 3: Auto-Fill & Security */}
+        {currentTab === "autofill" && (
+          <div className="space-y-5 animate-in fade-in duration-200">
+            <div className="rounded-2xl border border-black/[0.08] bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.04]">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm font-bold text-foreground">FLEX Login Auto-Fill</h4>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                      <ShieldCheck size={11} />
+                      AES-GCM 256-bit
+                    </span>
+                  </div>
+                  <p className="text-xs text-foreground/60">
+                    Saves your Roll No & password securely in local extension storage so you never have to re-enter them on session timeout.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {savedCreds ? (
+              <div className="space-y-4 rounded-2xl border border-black/[0.08] bg-white p-5 dark:border-white/10 dark:bg-black">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-foreground/50">
+                      Active Credentials
+                    </p>
+                    <p className="mt-1 text-base font-bold text-foreground">
+                      {savedCreds.maskedUsername || savedCreds.username}
+                    </p>
+                    <p className="text-xs text-foreground/50">
+                      Password: <span className="font-mono tracking-widest">••••••••••••</span>
+                    </p>
+                  </div>
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                    <Check size={12} strokeWidth={3} />
+                    Auto-Fill Active
+                  </span>
+                </div>
+
+                <div className="border-t border-black/[0.06] pt-4 dark:border-white/[0.08] flex items-center justify-between">
+                  <p className="text-xs text-foreground/50">
+                    Credentials are encrypted and never leave this browser.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await clearSavedCredentials();
+                      setSavedCreds(null);
+                    }}
+                    className="rounded-full bg-rose-500/10 px-3.5 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-500/20 dark:text-rose-400 transition-colors cursor-pointer"
+                  >
+                    Clear Credentials
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4 rounded-2xl border border-black/[0.08] bg-white p-5 dark:border-white/10 dark:bg-black">
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-foreground/60">
+                    Save Credentials Manually
+                  </h4>
+                  <p className="mt-0.5 text-xs text-foreground/50">
+                    Or check "Remember Me" next time you sign into FLEX.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-foreground/70 uppercase">
+                      Roll Number / Username
+                    </label>
+                    <input
+                      type="text"
+                      value={autofillUser}
+                      onChange={(e) => setAutofillUser(e.target.value)}
+                      placeholder="e.g. 21K-1234"
+                      className="w-full rounded-xl border border-black/[0.1] bg-slate-50 px-3.5 py-2 text-xs font-medium text-foreground outline-hidden focus:border-[#230052] dark:border-white/10 dark:bg-white/[0.05]"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-foreground/70 uppercase">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      value={autofillPass}
+                      onChange={(e) => setAutofillPass(e.target.value)}
+                      placeholder="FLEX Password"
+                      className="w-full rounded-xl border border-black/[0.1] bg-slate-50 px-3.5 py-2 text-xs font-medium text-foreground outline-hidden focus:border-[#230052] dark:border-white/10 dark:bg-white/[0.05]"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <p className="text-[11px] text-foreground/50">
+                    Stored in Chrome's sandboxed local extension storage.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (!autofillUser.trim() || !autofillPass) return;
+                      setAutofillSaving(true);
+                      await saveCredentials(autofillUser.trim(), autofillPass);
+                      const creds = await getDecryptedCredentials();
+                      setSavedCreds(creds);
+                      setAutofillSaving(false);
+                      setAutofillSuccess(true);
+                      setAutofillUser("");
+                      setAutofillPass("");
+                      setTimeout(() => setAutofillSuccess(false), 3000);
+                    }}
+                    disabled={!autofillUser.trim() || !autofillPass || autofillSaving}
+                    className="flex items-center gap-1.5 rounded-full bg-[#230052] px-4 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] disabled:opacity-50 dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 cursor-pointer"
+                  >
+                    <ShieldCheck size={13} />
+                    {autofillSaving ? "Encrypting..." : "Save Credentials"}
+                  </button>
+                </div>
+
+                {autofillSuccess && (
+                  <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                    ✓ Credentials encrypted and saved successfully!
+                  </p>
+                )}
               </div>
             )}
           </div>

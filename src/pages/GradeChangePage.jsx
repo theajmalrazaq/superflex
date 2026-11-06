@@ -21,6 +21,7 @@ import Modal from "../components/ui/Modal";
 import Button from "../components/ui/Button";
 import { TextArea } from "../components/ui/Input";
 import SelectMenu from "../components/ui/SelectMenu";
+import { hideFlexPageRoot } from "../parsers/dom";
 
 const GradeChangeSkeleton = () => (
   <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8" role="status" aria-label="Loading grade change details">
@@ -134,10 +135,15 @@ function GradeChangePage() {
     hiderStyle.id = "superflex-grade-change-hide";
     hiderStyle.innerHTML = `
       .m-grid.m-grid--hor.m-grid--root.m-page:not(#portal-root-hidden) {
-        visibility: hidden !important;
-        position: absolute !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
         pointer-events: none !important;
-        z-index: -1 !important;
+        z-index: -9999 !important;
       }
       #portal-root-hidden {
         display: none !important;
@@ -291,10 +297,7 @@ function GradeChangePage() {
           hiddenContentRef.current.appendChild(clone);
         }
 
-        root.style.opacity = "0";
-        root.style.pointerEvents = "none";
-        root.style.position = "absolute";
-        root.style.zIndex = "-1";
+        hideFlexPageRoot(root);
 
         setLoading(false);
       } catch (err) {

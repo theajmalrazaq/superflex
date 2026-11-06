@@ -14,6 +14,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
+import AutoFillPromptBanner from "../components/ui/AutoFillPromptBanner";
 import StatsCard from "../components/ui/StatsCard";
 import Skeleton, { MarksSkeleton, AttendanceSkeleton } from "../components/ui/Skeleton";
 import {
@@ -619,6 +620,7 @@ function HomePage() {
           </header>
 
           <NotificationBanner alerts={combinedAlerts} onDismissAlert={handleDismissAlert} />
+          <AutoFillPromptBanner />
 
           {}
           {activeMainTab === "stats" && (

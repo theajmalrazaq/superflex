@@ -51,3 +51,16 @@ export function parseSemesterOptions(form: ParentNode | null): SemesterOption[] 
     selected: option.selected,
   }));
 }
+
+export function hideFlexPageRoot(root: HTMLElement | null): void {
+  if (!root) return;
+  root.style.position = "fixed";
+  root.style.top = "0";
+  root.style.left = "0";
+  root.style.width = "0";
+  root.style.height = "0";
+  root.style.overflow = "hidden";
+  root.style.opacity = "0";
+  root.style.pointerEvents = "none";
+  root.style.zIndex = "-9999";
+}

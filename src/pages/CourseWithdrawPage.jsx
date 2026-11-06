@@ -24,6 +24,7 @@ import Modal from "../components/ui/Modal";
 import Button from "../components/ui/Button";
 import { TextArea } from "../components/ui/Input";
 import Skeleton from "../components/ui/Skeleton";
+import { hideFlexPageRoot } from "../parsers/dom";
 
 const CourseWithdrawSkeleton = () => (
   <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8" role="status" aria-label="Loading course withdrawal details">
@@ -335,10 +336,7 @@ function CourseWithdrawPage() {
           hiddenContentRef.current.appendChild(root.cloneNode(true));
         }
 
-        root.style.opacity = "0";
-        root.style.pointerEvents = "none";
-        root.style.position = "absolute";
-        root.style.zIndex = "-1";
+        hideFlexPageRoot(root);
 
         setLoading(false);
       } catch (err) {

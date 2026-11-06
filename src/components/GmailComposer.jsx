@@ -8,10 +8,18 @@ export const parseEmailDraftUrl = (href) => {
       typeof window === "undefined" ? "https://flexstudent.nu.edu.pk" : window.location.origin;
     const url = new URL(href, baseUrl);
     const isMailto = url.protocol === "mailto:";
+    const to = isMailto ? decodeURIComponent(url.pathname) : url.searchParams.get("to") || "";
+    const subject = url.searchParams.get(isMailto ? "subject" : "su") || "";
+    const body = url.searchParams.get("body") || "";
+
+    // A mailto without subject or body is just an email contact link, not a draft!
+    if (isMailto && !subject && !body) return null;
+    if (!to && !subject && !body) return null;
+
     return {
-      to: isMailto ? decodeURIComponent(url.pathname) : url.searchParams.get("to") || "",
-      subject: url.searchParams.get(isMailto ? "subject" : "su") || "",
-      body: url.searchParams.get("body") || "",
+      to,
+      subject,
+      body,
     };
   } catch {
     return null;
@@ -36,9 +44,11 @@ export const parseEmailDraftContent = (content) => {
       .replace(/^\s*>\s?/, "")
       .replace(/\*\*/g, "")
       .trim();
-  const subjectIndex = lines.findIndex((line) => /^Subject\s*:/i.test(cleanLine(line)));
-  const toLine = lines.find((line) => /^To\s*:/i.test(cleanLine(line)));
+  const toIndex = lines.findIndex((line) => /^To\s*:/i.test(cleanLine(line)));
+  const toLine = toIndex >= 0 ? lines[toIndex] : undefined;
   const plainTo = cleanLine(toLine || "").match(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/)?.[0] || "";
+
+  const subjectIndex = lines.findIndex((line) => /^Subject\s*:/i.test(cleanLine(line)));
   const plainSubject =
     subjectIndex >= 0 ? cleanLine(lines[subjectIndex]).replace(/^Subject\s*:\s*/i, "") : "";
 
@@ -58,12 +68,20 @@ export const parseEmailDraftContent = (content) => {
     plainBody = bodyLines.join("\n").trim();
   }
 
-  if (!linkedDraft && !plainTo && !plainSubject) return null;
+  // Must have linkedDraft OR (subjectIndex >= 0 && (plainTo || plainSubject || plainBody))
+  if (!linkedDraft && (subjectIndex < 0 || (!plainTo && !plainSubject && !plainBody))) {
+    return null;
+  }
+
+  const firstDraftIndex = [toIndex, subjectIndex].filter((i) => i >= 0).sort((a, b) => a - b)[0];
+  const introText =
+    firstDraftIndex > 0 ? lines.slice(0, firstDraftIndex).join("\n").trim() : "";
 
   return {
     to: linkedDraft?.to || plainTo,
     subject: linkedDraft?.subject || plainSubject,
     body: linkedDraft?.body || plainBody,
+    introText,
   };
 };
 
@@ -82,7 +100,12 @@ const openDraftInGmail = (draft) => {
   );
 };
 
-export default function GmailComposer({ draft, senderName, onClose, onRequestRevision }) {
+export default function GmailComposer({
+  draft,
+  status = "reviewing",
+  senderName,
+  onClose,
+}) {
   const composerData = {
     to: draft?.to || "",
     subject: draft?.subject || "",
@@ -92,24 +115,22 @@ export default function GmailComposer({ draft, senderName, onClose, onRequestRev
   };
 
   return (
-    <EmailOutreachComposer
+    <EmailOutreachComposer.Root
       data={composerData}
-      status="reviewing"
+      status={status}
       senderName={senderName || "Student"}
       senderEmail="Your Gmail account"
-      showTokens={false}
-      showSubjectAnalyzer={false}
-      approveLabel="Open in Gmail"
-      rejectLabel="Ask AI to revise"
       onApprove={(finalDraft) => {
         openDraftInGmail(finalDraft);
-        onClose();
-      }}
-      onReject={(feedback) => {
-        onClose();
-        onRequestRevision?.(feedback);
+        onClose?.();
       }}
       className="superflex-email-composer mt-3 shadow-none"
-    />
+    >
+      <EmailOutreachComposer.Header senderName={senderName || "Student"} />
+      <EmailOutreachComposer.Editor showTokens={false} showSubjectAnalyzer={false} />
+      <EmailOutreachComposer.Actions>
+        <EmailOutreachComposer.ApproveButton label="Open in Gmail" />
+      </EmailOutreachComposer.Actions>
+    </EmailOutreachComposer.Root>
   );
 }

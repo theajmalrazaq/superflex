@@ -15,14 +15,12 @@ import {
   RefreshCw,
   Cpu,
   Copy,
-  Sparkles,
   Zap,
   Mail,
   Info,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Logo } from "./ui/Logo";
 import GmailComposer, {
   parseEmailDraftContent,
   parseEmailDraftUrl,
@@ -271,9 +269,6 @@ const MarkdownRenderer = ({ content, isStreaming = false, onOpenEmailComposer })
             </p>
           ),
           a: ({ href, children }) => {
-            const isMail =
-              href &&
-              (href.includes("mail.google.com") || href.startsWith("mailto:") || href === "#");
             const stripEmoji = (str) =>
               typeof str === "string"
                 ? str
@@ -284,8 +279,28 @@ const MarkdownRenderer = ({ content, isStreaming = false, onOpenEmailComposer })
               ? children.map(stripEmoji)
               : stripEmoji(children);
 
-            if (isMail) {
+            // Check if this link is an email draft action (Gmail compose URL or mailto with subject/body)
+            const hasDraftQuery = (urlStr) => {
+              if (!urlStr) return false;
+              return (
+                urlStr.includes("mail.google.com/mail/") ||
+                (urlStr.startsWith("mailto:") &&
+                  (urlStr.includes("subject=") || urlStr.includes("body=")))
+              );
+            };
+
+            const isDraftAction = href && (href === "#" || hasDraftQuery(href));
+
+            if (isDraftAction) {
               const isPreparing = href === "#";
+              const labelText =
+                (typeof cleanChildren === "string" && cleanChildren.trim()) ||
+                (Array.isArray(cleanChildren) && cleanChildren.filter(Boolean).length > 0
+                  ? cleanChildren
+                  : isPreparing
+                    ? "Preparing email draft..."
+                    : "Review email draft");
+
               return (
                 <a
                   href={isPreparing ? undefined : href}
@@ -300,20 +315,19 @@ const MarkdownRenderer = ({ content, isStreaming = false, onOpenEmailComposer })
                   }`}
                 >
                   <Mail size={14} className={`shrink-0 ${isPreparing ? "animate-pulse" : ""}`} />
-                  <span>
-                    {isPreparing
-                      ? cleanChildren || "Preparing email draft..."
-                      : "Review email draft"}
-                  </span>
+                  <span>{labelText}</span>
                 </a>
               );
             }
+
+            // Normal email address (e.g. mailto:user@domain.com) or external web link
+            const isEmail = Boolean(href && href.startsWith("mailto:"));
             return (
               <a
                 href={href}
-                target="_blank"
-                rel="noreferrer"
-                className="font-bold text-[#230052] dark:text-[#93c5fd] underline decoration-[#230052]/40 dark:decoration-white/40 underline-offset-2 hover:decoration-[#230052] dark:hover:decoration-white"
+                target={isEmail ? undefined : "_blank"}
+                rel={isEmail ? undefined : "noreferrer"}
+                className="font-medium text-[#230052] dark:text-[#93c5fd] underline decoration-[#230052]/40 dark:decoration-white/40 underline-offset-2 hover:decoration-[#230052] dark:hover:decoration-white"
               >
                 {children}
               </a>
@@ -368,6 +382,7 @@ const SuperFlexAI = () => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionError, setConnectionError] = useState("");
   const [emailDraft, setEmailDraft] = useState(null);
+  const [dismissedDrafts, setDismissedDrafts] = useState({});
   const [userImage, setUserImage] = useState("/Login/GetImage");
   const scrollRef = useRef(null);
   const activeRequestIdRef = useRef(null);
@@ -1102,41 +1117,64 @@ const SuperFlexAI = () => {
                             </div>
                           ) : (
                             <>
-                              {emailDraft?.messageIndex === i ? (
-                                <>
-                                  <p className="my-1.5 text-xs leading-relaxed text-foreground/75 sm:text-sm">
-                                    I prepared the email for you. Review or edit it before opening
-                                    Gmail.
-                                  </p>
-                                  <GmailComposer
-                                    draft={emailDraft}
-                                    senderName={dataContext.studentName}
-                                    onClose={() => setEmailDraft(null)}
-                                    onRequestRevision={(feedback) =>
-                                      handleSend(
-                                        `Please revise the email draft using this feedback: ${feedback}`,
-                                      )
+                              {(() => {
+                                const isThisStreaming = isStreaming && i === messages.length - 1;
+                                const detectedDraft = parseEmailDraftContent(m.content);
+                                const activeDraft =
+                                  emailDraft?.messageIndex === i ? emailDraft : detectedDraft;
+                                const isDismissed = dismissedDrafts[i];
+
+                                if (activeDraft && !isDismissed) {
+                                  return (
+                                    <>
+                                      {activeDraft.introText ? (
+                                        <MarkdownRenderer
+                                          content={activeDraft.introText}
+                                          isStreaming={false}
+                                        />
+                                      ) : (
+                                        <p className="my-1.5 text-xs leading-relaxed text-foreground/75 sm:text-sm">
+                                          {isThisStreaming
+                                            ? "Drafting your email to the instructor..."
+                                            : "I prepared the email for you. Review or edit it before opening Gmail."}
+                                        </p>
+                                      )}
+                                      <GmailComposer
+                                        draft={activeDraft}
+                                        status={isThisStreaming ? "streaming" : "reviewing"}
+                                        senderName={dataContext.studentName}
+                                        onClose={() =>
+                                          setDismissedDrafts((prev) => ({ ...prev, [i]: true }))
+                                        }
+                                      />
+                                    </>
+                                  );
+                                }
+
+                                return (
+                                  <MarkdownRenderer
+                                    content={
+                                      typeof m.content === "string"
+                                        ? m.content
+                                            .replace(
+                                              />?\s*ℹ️?\s*_?Switched to \*\*?(.*?)\*\*? as primary model was under high load\._?/gi,
+                                              "",
+                                            )
+                                            .trimEnd()
+                                        : m.content
                                     }
+                                    isStreaming={isThisStreaming}
+                                    onOpenEmailComposer={(draft) => {
+                                      setDismissedDrafts((prev) => {
+                                        const next = { ...prev };
+                                        delete next[i];
+                                        return next;
+                                      });
+                                      setEmailDraft({ ...draft, messageIndex: i });
+                                    }}
                                   />
-                                </>
-                              ) : (
-                                <MarkdownRenderer
-                                  content={
-                                    typeof m.content === "string"
-                                      ? m.content
-                                          .replace(
-                                            />?\s*ℹ️?\s*_?Switched to \*\*?(.*?)\*\*? as primary model was under high load\._?/gi,
-                                            "",
-                                          )
-                                          .trimEnd()
-                                      : m.content
-                                  }
-                                  isStreaming={isStreaming && i === messages.length - 1}
-                                  onOpenEmailComposer={(draft) =>
-                                    setEmailDraft({ ...draft, messageIndex: i })
-                                  }
-                                />
-                              )}
+                                );
+                              })()}
                               {(m.switchedModel ||
                                 (typeof m.content === "string" &&
                                   /Switched to .* as primary model/i.test(m.content))) && (
@@ -1296,11 +1334,11 @@ const SuperFlexAI = () => {
         </svg>
 
         {/* Floating Center Input Bar with Skyblue Electric Border */}
-        <div className="group relative flex items-center gap-2 rounded-full border border-sky-400/40 bg-white/95 p-1.5 shadow-md shadow-black/5 backdrop-blur-2xl transition-all focus-within:border-sky-400/70 dark:border-sky-400/40 dark:bg-black/95 dark:focus-within:border-sky-400/70">
+        <div className="group relative flex items-center gap-2 rounded-full border border-black/20 bg-white/95 p-1.5 shadow-md shadow-black/5 backdrop-blur-2xl transition-all focus-within:border-black/20 dark:border-white/20 dark:bg-black/95 dark:focus-within:border-white/20">
           {/* Pure electric line effect bound seamlessly to the perimeter */}
           <div
-            className="absolute inset-0 rounded-full border-[1.5px] border-sky-400 pointer-events-none z-10"
-            style={{ filter: "url(#turbulent-displace)" }}
+            className="absolute inset-0 rounded-full border-[1.5px] border-black/20 pointer-events-none z-10 dark:border-white/20"
+            style={{ filter: isOpen ? "none" : "url(#turbulent-displace)" }}
           />
           {/* Model switcher button */}
           <div className="relative pl-1">
