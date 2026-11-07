@@ -17,7 +17,10 @@ import {
   ArrowLeft,
   ArrowRight,
   ChevronRight,
+  Sun,
+  Moon,
 } from "lucide-react";
+import { usePreferencesStore } from "../stores/preferencesStore";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import StatsCard from "../components/ui/StatsCard";
 import Skeleton, { MarksSkeleton, AttendanceSkeleton } from "../components/ui/Skeleton";
@@ -312,6 +315,9 @@ function HomePage() {
   const [activeMainTab, setActiveMainTab] = useState("stats");
   const [alerts, setAlerts] = useState(() => profile?.alerts || []);
   const profileImage = useProfileImage();
+  const themeMode = usePreferencesStore((state) => state.themeMode);
+  const setThemeMode = usePreferencesStore((state) => state.setThemeMode);
+  const toggleTheme = () => setThemeMode(themeMode === "dark" ? "light" : "dark");
 
   const [attendanceData, setAttendanceData] = useState(null);
   const [coursesData, setCoursesData] = useState([]);
@@ -645,23 +651,38 @@ function HomePage() {
                 <h1 className="min-w-0 text-[26px] font-extrabold leading-[1.12] tracking-[-0.035em] text-white">
                   {greetingHeading}
                 </h1>
-                <button
-                  type="button"
-                  onClick={() => setActiveMainTab("info")}
-                  aria-label="Open student profile"
-                  className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/70 bg-white/25 transition-transform active:scale-95"
-                >
-                  <img
-                    src={profileImage}
-                    alt="Profile"
-                    className="h-full w-full object-cover"
-                    onError={(event) => {
-                      const fallbackUrl = getExtensionUrl("assets/favicon.png");
-                      if (fallbackUrl) event.currentTarget.src = fallbackUrl;
-                      else event.currentTarget.hidden = true;
-                    }}
-                  />
-                </button>
+                <div className="flex shrink-0 items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={toggleTheme}
+                    aria-label={`Switch to ${themeMode === "dark" ? "light" : "dark"} mode`}
+                    title={`Switch to ${themeMode === "dark" ? "light" : "dark"} mode`}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/25 text-white backdrop-blur-md transition-transform active:scale-95"
+                  >
+                    {themeMode === "dark" ? (
+                      <Sun size={18} strokeWidth={2.2} />
+                    ) : (
+                      <Moon size={18} strokeWidth={2.2} />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveMainTab("info")}
+                    aria-label="Open student profile"
+                    className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/70 bg-white/25 transition-transform active:scale-95"
+                  >
+                    <img
+                      src={profileImage}
+                      alt="Profile"
+                      className="h-full w-full object-cover"
+                      onError={(event) => {
+                        const fallbackUrl = getExtensionUrl("assets/favicon.png");
+                        if (fallbackUrl) event.currentTarget.src = fallbackUrl;
+                        else event.currentTarget.hidden = true;
+                      }}
+                    />
+                  </button>
+                </div>
               </div>
 
               <div className="flex items-center justify-between gap-2 pt-0.5">
@@ -694,7 +715,19 @@ function HomePage() {
                 >
                   <ArrowLeft size={19} strokeWidth={2.2} />
                 </button>
-                <span className="h-10 w-10" />
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  aria-label={`Switch to ${themeMode === "dark" ? "light" : "dark"} mode`}
+                  title={`Switch to ${themeMode === "dark" ? "light" : "dark"} mode`}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/25 text-white backdrop-blur-md transition-transform active:scale-95 dark:bg-white/10"
+                >
+                  {themeMode === "dark" ? (
+                    <Sun size={18} strokeWidth={2.2} />
+                  ) : (
+                    <Moon size={18} strokeWidth={2.2} />
+                  )}
+                </button>
               </div>
 
               <div className="relative mt-1">
