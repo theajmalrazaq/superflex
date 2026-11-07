@@ -275,8 +275,6 @@ function SubmitFeedbackPage() {
   return (
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-4 md:p-8 space-y-8 relative z-10 animate-in fade-in duration-500">
-        <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/5 blur-[120px] rounded-full -mr-64 -mt-64 pointer-events-none z-0"></div>
-        <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -ml-64 -mb-64 pointer-events-none z-0"></div>
 
         <PageHeader
           title="Submit Course Feedback"

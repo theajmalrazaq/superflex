@@ -793,6 +793,10 @@ function LoginPageStyles() {
         <span class="login-theme-icon" aria-hidden="true"></span>
         <span class="login-theme-label">Dark mode</span>
       </button>
+      <span class="basis-full mt-2 text-[11px] text-slate-500">
+        designed and built by
+        <a href="https://github.com/theajmalrazaq" target="_blank" rel="noopener noreferrer">ajmal</a>
+      </span>
     `;
 
     const themeToggle = footerWrapper.querySelector(".login-theme-toggle");

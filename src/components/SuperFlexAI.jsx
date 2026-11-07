@@ -88,75 +88,8 @@ const AnimatedLogo = ({ size = 24, animated = true, className = "" }) => (
   </div>
 );
 
-// Balances incomplete markdown structures while text is actively streaming
-const completeStreamingMarkdown = (text) => {
-  if (!text) return "";
-  let completed = text;
-
-  // 1. Balance unclosed code blocks (```)
-  const codeBlockCount = (completed.match(/```/g) || []).length;
-  if (codeBlockCount % 2 !== 0) {
-    completed += "\n```";
-  } else {
-    // 2. Balance unclosed inline code (`) - only when not inside a code block
-    const inlineBackticks = (completed.replace(/```[\s\S]*?```/g, "").match(/`/g) || []).length;
-    if (inlineBackticks % 2 !== 0) {
-      completed += "`";
-    }
-  }
-
-  // 3. Balance unclosed bold (**)
-  const boldCount = (
-    completed
-      .replace(/```[\s\S]*?```/g, "")
-      .replace(/`[^`]*`/g, "")
-      .match(/\*\*/g) || []
-  ).length;
-  if (boldCount % 2 !== 0) {
-    completed += "**";
-  }
-
-  return completed;
-};
-
-const sanitizeMarkdownContent = (text, isStreaming = false) => {
-  if (!text) return "";
-  let processed = text;
-
-  // 1. Unwrap any links accidentally wrapped in backticks (e.g. `[Open Draft in Gmail](...)`)
-  processed = processed.replace(/`+(\[(?:Open Draft|[^\]]+)\]\(https?:\/\/[^`\n]+\))`+/g, "$1");
-  processed = processed.replace(
-    /```(?:markdown|text)?\s*(\[(?:Open Draft|[^\]]+)\]\(https?:\/\/[^)\n]+\))\s*```/g,
-    "$1",
-  );
-
-  // 2. Convert bare Gmail compose links into standard markdown links
-  processed = processed.replace(
-    /(?<!\(|\]\()(https:\/\/mail\.google\.com\/mail\/\S+)/g,
-    "[Open Draft in Gmail]($1)",
-  );
-
-  // 3. While actively streaming, hide raw unfinished URL query code and show a smooth placeholder
-  if (isStreaming) {
-    if (/\[([^\]]+)\]\((?:https?:\/\/[^)\n]*)?$/.test(processed)) {
-      processed = processed.replace(
-        /\[([^\]]+)\]\((?:https?:\/\/[^)\n]*)?$/,
-        "[$1 · Preparing link...](#)",
-      );
-    } else if (/(?<!\]\()https:\/\/mail\.google\.com\/mail\/[^\s\n]*$/.test(processed)) {
-      processed = processed.replace(
-        /(?<!\]\()https:\/\/mail\.google\.com\/mail\/[^\s\n]*$/,
-        "[Open Draft in Gmail · Preparing link...](#)",
-      );
-    }
-    processed = completeStreamingMarkdown(processed);
-  }
-
-  return processed;
-};
-
 const MarkdownRenderer = ({ content, isStreaming = false, onOpenEmailComposer }) => {
-  const safeContent = sanitizeMarkdownContent(content, isStreaming);
+  const markdown = typeof content === "string" ? content : "";
 
   return (
     <div className="markdown-body">
@@ -242,7 +175,7 @@ const MarkdownRenderer = ({ content, isStreaming = false, onOpenEmailComposer })
           ),
           code: ({ className, children, ...props }) => {
             const isBlock =
-              /language-/.test(className || "") ||
+              (className || "").includes("language-") ||
               (typeof children === "string" && children.includes("\n"));
             if (isBlock) {
               return (
@@ -269,16 +202,6 @@ const MarkdownRenderer = ({ content, isStreaming = false, onOpenEmailComposer })
             </p>
           ),
           a: ({ href, children }) => {
-            const stripEmoji = (str) =>
-              typeof str === "string"
-                ? str
-                    .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, "")
-                    .trim()
-                : str;
-            const cleanChildren = Array.isArray(children)
-              ? children.map(stripEmoji)
-              : stripEmoji(children);
-
             // Check if this link is an email draft action (Gmail compose URL or mailto with subject/body)
             const hasDraftQuery = (urlStr) => {
               if (!urlStr) return false;
@@ -294,9 +217,9 @@ const MarkdownRenderer = ({ content, isStreaming = false, onOpenEmailComposer })
             if (isDraftAction) {
               const isPreparing = href === "#";
               const labelText =
-                (typeof cleanChildren === "string" && cleanChildren.trim()) ||
-                (Array.isArray(cleanChildren) && cleanChildren.filter(Boolean).length > 0
-                  ? cleanChildren
+                (typeof children === "string" && children.trim()) ||
+                (Array.isArray(children) && children.filter(Boolean).length > 0
+                  ? children
                   : isPreparing
                     ? "Preparing email draft..."
                     : "Review email draft");
@@ -335,7 +258,7 @@ const MarkdownRenderer = ({ content, isStreaming = false, onOpenEmailComposer })
           },
         }}
       >
-        {safeContent}
+        {markdown}
       </ReactMarkdown>
       {isStreaming && (
         <span className="inline-block h-3.5 w-1.5 ml-1 bg-[#230052] dark:bg-white animate-pulse align-middle rounded-xs" />
@@ -351,6 +274,7 @@ const SuperFlexAI = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const streamPortRef = useRef(null);
+  const requestInProgressRef = useRef(false);
   const [copiedIdx, setCopiedIdx] = useState(null);
   const [dataContext, setDataContext] = useState({
     attendance: null,
@@ -550,13 +474,14 @@ const SuperFlexAI = () => {
 
   const handleSend = async (txt) => {
     const textToSend = txt || input;
-    if (!textToSend.trim() || isLoading) return;
+    if (!textToSend.trim() || isLoading || requestInProgressRef.current) return;
 
     if (permissionStatus !== "granted") {
       setIsOpen(false);
       return;
     }
 
+    requestInProgressRef.current = true;
     const userMessage = textToSend.trim();
     const assistantMessageIndex = messages.length + 1;
     setInput("");
@@ -698,6 +623,7 @@ const SuperFlexAI = () => {
     } finally {
       if (activeRequestIdRef.current === requestId) {
         activeRequestIdRef.current = null;
+        requestInProgressRef.current = false;
         setIsLoading(false);
         setIsStreaming(false);
       }
@@ -713,6 +639,7 @@ const SuperFlexAI = () => {
     }
     if (activeRequestIdRef.current) {
       activeRequestIdRef.current = null;
+      requestInProgressRef.current = false;
       setIsLoading(false);
       setIsStreaming(false);
 

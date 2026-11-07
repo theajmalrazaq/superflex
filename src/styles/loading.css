@@ -35,12 +35,22 @@ body {
 .dark .loading-overlay {
   background: linear-gradient(
     180deg,
-    #173d5d 0%,
-    #13314b 24%,
-    #0e2235 45%,
-    #07131e 70%,
-    #050b11 100%
+    #0f1422 0%,
+    #0f1422 24%,
+    #0b0e17 38%,
+    #06070c 49%,
+    #000 57%
   );
+}
+
+.dark .loading-overlay .overlay-cloud-left {
+  opacity: 0.26;
+  filter: brightness(0.78) saturate(0.72);
+}
+
+.dark .loading-overlay .overlay-cloud-right {
+  opacity: 0.34;
+  filter: brightness(0.78) saturate(0.72);
 }
 
 .loading-overlay.fade-out {

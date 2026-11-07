@@ -13,6 +13,9 @@
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      document.documentElement.classList.toggle("dark", localStorage.getItem("superflex-theme-mode") === "dark");
+    </script>
     <script
       defer
       strategy="afterInteractive"
@@ -27,8 +30,10 @@
         padding: 0;
         box-sizing: border-box;
         font-family: "Google Sans Flex", sans-serif;
-        font-size: 90%;
       }
+
+      html { font-size: 80%; }
+      @media (max-width: 640px) { html { font-size: 70%; } }
 
       body {
         font-family: "Google Sans Flex", sans-serif;
@@ -549,7 +554,17 @@
       #main-nav a:hover, #main-nav button:hover { color: #230052; }
       #main-nav #home-nav-link { background: #230052; color: #fff; border-color: #230052; }
       #mobile-overlay .mobile-link:hover > span:first-child { color: #230052; }
-      #version-text { background-image: none; color: #230052; font-weight: 700; }
+      #version-text { background-image: none; color: #230052; font-weight: 600; }
+      #version-pill { box-sizing: border-box; display: inline-flex; align-items: center; gap: 12px; width: fit-content; max-width: min(calc(100vw - 32px), 100%); padding: 7px 18px 7px 7px; border: 0; border-radius: 999px; background: rgb(255 255 255 / 35%); color: #fff; font-size: 14px; font-weight: 600; line-height: 1.3; backdrop-filter: blur(12px); box-shadow: none; }
+      #version-chip { box-sizing: border-box; display: inline-flex; flex: 0 1 auto; min-width: 0; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 999px; background: #fff; color: #230052; font-weight: 600; white-space: nowrap; }
+      #version-chip svg { flex: none; stroke: #a098ff; }
+      #version-brand { flex: 0 1 auto; min-width: 0; color: inherit; text-align: left; white-space: nowrap; }
+      @media (max-width: 260px) {
+        #version-pill { gap: 6px; max-width: calc(100vw - 24px); padding: 4px 8px 4px 4px; }
+        #version-chip { gap: 4px; padding: 4px 8px; font-size: 11px; }
+        #version-chip svg { width: 14px; height: 14px; }
+        #version-brand { font-size: 11px; }
+      }
       #hero-card {
         width: min(100%, 780px);
         padding: clamp(24px, 5vw, 56px);
@@ -558,20 +573,18 @@
         background: #fff;
         box-shadow: none;
       }
-      #hero-card > div:first-child > a > button { background: #fff; border: 1px solid rgba(35, 0, 82, .12); box-shadow: none; }
-      #hero-card > div:first-child > a > button > span { background: rgba(255, 255, 255, .88); }
-      #hero-card > div:first-child > a > button svg { stroke: #230052; }
       #hero-tagline { color: #230052; }
       #hero-card #hero-tagline + span { background-image: linear-gradient(to left, transparent, rgba(35, 0, 82, .18)); }
       #hero-card .flex.items-center.justify-center.gap-3.w-full > span:first-child { background-image: linear-gradient(to right, transparent, rgba(35, 0, 82, .18)); }
-      .brand-mark { background: #000 !important; border-width: 0 !important; border-color: transparent !important; box-shadow: none !important; }
+      .brand-mark { background: #000 !important; border-width: 0 !important; border-color: transparent !important; border-radius: 28% !important; box-shadow: none !important; }
       .brand-mark path { animation: none !important; transform: none !important; fill: #a098ff !important; }
-      #hero-credit { color: #475467; }
+      #hero-credit { color: #667085; }
       #hero-credit a { color: #230052; text-decoration-color: rgba(35, 0, 82, .35); }
       #add-to-chrome-btn { background: #230052; box-shadow: none; }
       #add-to-chrome-btn:hover { background: #370c72; }
-      #how-to-use-btn { color: #230052; background: transparent; background-image: none; border-color: transparent; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
-      #how-to-use-btn:hover { background: transparent; }
+      #add-to-chrome-btn span { background: none !important; background-image: none !important; background-clip: border-box !important; -webkit-text-fill-color: currentColor !important; color: inherit; }
+      #how-to-use-btn { color: #230052; background: transparent; background-image: none; border-color: transparent; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; user-select: none; }
+      #how-to-use-btn:hover, #how-to-use-btn span { background: transparent !important; background-image: none !important; }
       #how-to-use-btn svg { color: #6551bd; }
       #features .text-\[\#a098ff\] { color: #6551bd; }
       #features .text-\[\#230052\] { color: #230052; }
@@ -615,7 +628,7 @@
       #features .feature-ai .feature-card-header > div:first-child svg path { fill: #a098ff !important; }
       #features .feature-card-header { display: flex; align-items: center; gap: 12px; }
       #features .feature-card-header .feature-label { margin: 0; color: #626262; font-size: 14px; font-weight: 600; line-height: 1.3; }
-      #features .feature-card h3 { margin: auto 0 0; padding-top: 28px; color: #101010; font-size: 16px; font-weight: 500 !important; line-height: 1.3; letter-spacing: -.02em; }
+      #features .feature-card h3 { margin: auto 0 0; padding-top: 28px; color: #101010; font-size: 16px; font-weight: 700 !important; line-height: 1.3; letter-spacing: -.02em; text-transform: capitalize; }
       #features .feature-card p { margin-top: 8px; color: #777780; font-size: 12px; line-height: 1.45; }
       #features .feature-ai { background: #fff; }
       #features .ai-feature-preview {
@@ -693,13 +706,110 @@
       .site-footer .border-t { border-color: rgba(35, 0, 82, .1); }
       .site-footer .max-w-7xl > .flex { gap: 24px !important; }
       .site-footer .flex.flex-col.items-center.gap-6 { gap: 14px !important; }
-      .site-footer .brand-mark { width: 56px; height: 56px; border-width: 4px; border-radius: 20px; overflow: hidden; }
+      .site-footer .brand-mark { width: 56px; height: 56px; border-width: 4px; border-radius: 28% !important; overflow: hidden; }
       .site-footer .brand-mark svg { width: 56px; height: 56px; }
       .site-footer img[alt="SuperFlex"] { width: 200px; }
       .site-footer .border-t { padding-top: 16px; }
       .site-footer .footer-tagline { max-width: none; white-space: nowrap; }
       @media (max-width: 640px) { .site-footer .footer-tagline { white-space: normal; } }
-      h1, h2, h3, h4, h5, h6 { font-weight: 500 !important; }
+      h1, h2, h3, h4, h5, h6 { font-weight: 700 !important; text-transform: capitalize; }
+
+      html.dark body { color: #f5f6fb; background: #000; }
+      html.dark .animated-bg {
+        background: linear-gradient(180deg, #0f1422 0%, #0f1422 24%, #0b0e17 38%, #06070c 49%, #000 57%);
+      }
+      html.dark .animated-bg::before,
+      html.dark .animated-bg::after { filter: brightness(.78) saturate(.72); }
+      html.dark .animated-bg::before { opacity: .26; }
+      html.dark .animated-bg::after { opacity: .34; }
+      html.dark #main-nav { background: rgba(0,0,0,.72); border-color: rgba(255,255,255,.12); box-shadow: none; }
+      html.dark #main-nav a, html.dark #main-nav button { color: #c4cad6; }
+      html.dark #main-nav #home-nav-link { color: #0a192f; background: #fff; border-color: #fff; }
+      html.dark #mobile-overlay { background: rgba(0,0,0,.96); }
+      html.dark #mobile-overlay .mobile-link > span:first-child { color: #f5f6fb; }
+      html.dark #mobile-overlay .mobile-link > span:last-child { color: #a098ff; }
+      html.dark #hero-card, html.dark .hero-section-injected, html.dark #features .feature-card, html.dark .review-card { color: #f5f6fb; background: #000; border-color: rgba(255,255,255,.12); box-shadow: none; }
+      html.dark #features .feature-card:hover, html.dark .review-card:hover { background: #000; border-color: rgba(255,255,255,.3); }
+      html.dark .review-name, html.dark #features h2, html.dark #features h3, html.dark #features .feature-card h3 { color: #f5f6fb !important; }
+      html.dark .review-comment, html.dark #features p, html.dark #features .feature-card p, html.dark #features .feature-card-header .feature-label { color: #b9c0ce !important; }
+      html.dark #features .feature-ai { background: #000; }
+      html.dark .toolkit-callout { color: #f5f6fb; background: #000; border-color: rgba(255,255,255,.12); }
+      html.dark .toolkit-callout h2 { color: #f5f6fb !important; }
+      html.dark .toolkit-callout p { color: #c4cad6 !important; }
+      html.dark .toolkit-callout > p:first-child { color: #fff !important; }
+      html.dark .toolkit-points span { color: #d6d1ff; background: rgba(255,255,255,.08); }
+      html.dark #features .ai-feature-preview { background: #08080c; }
+      html.dark #features .ai-preview-question { background: rgba(255,255,255,.08); color: #e2e5ed; }
+      html.dark #features .ai-preview-answer { background: #fff; color: #000; }
+      html.dark #features .feature-card-header > div:first-child { background: #fff; color: #0a192f; }
+      html.dark #how-to-use-btn, html.dark #how-to-use-btn span { color: #fff !important; }
+      html.dark #how-to-use-btn svg { color: #fff !important; }
+      html.dark #version-text { color: #f5f6fb !important; background-image: none; }
+      html.dark #version-pill { background: rgb(255 255 255 / 8%); color: #e8eef8; }
+      html.dark #version-chip { color: #f5f6fb; background: #121212 !important; }
+      html.dark #video-modal .relative.w-full, html.dark #video-modal .relative.w-full > div:first-child { color: #f5f6fb; background: #101014; border-color: rgba(255,255,255,.12); }
+      html.dark #video-modal h3, html.dark #video-modal button { color: #f5f6fb; }
+      html.dark #video-modal p { color: #aeb5c3; }
+      html.dark #hero-tagline { color: #d7d3ff; }
+      html.dark #hero-credit { color: #fff !important; }
+      html.dark #hero-credit a { color: #a098ff; }
+      html.dark #add-to-chrome-btn { color: #0a192f; background: #fff; border: 1px solid rgba(255,255,255,.9); }
+      html.dark #add-to-chrome-btn:hover { color: #0a192f; background: #e7e9ef; }
+      html.dark #add-to-chrome-btn svg { color: #0a192f; }
+      html.dark #how-to-use-btn, html.dark #how-to-use-btn span { color: #fff !important; }
+      html.dark #how-to-use-btn:hover { color: #e5e7eb !important; }
+      html.dark #features .feature-card-header > div:first-child { background: #fff; color: #0a192f; }
+      html.dark #features .feature-card-header > div:first-child svg { stroke: #230052 !important; }
+      html.dark #features .feature-ai .feature-card-header > div:first-child svg path { fill: #230052 !important; }
+      html.dark #features .feature-card-header .feature-label { color: #b9c0ce !important; }
+      html.dark #features .feature-ai > div.mt-auto > span { color: #d6d1ff !important; background: rgba(160,152,255,.12) !important; border: 1px solid rgba(160,152,255,.18); }
+      html.dark #features .feature-ai { border-color: rgba(255,255,255,.12); }
+      html.dark #features .features-heading > p:first-child,
+      html.dark #features [class~="text-[#a098ff]"] { color: #fff !important; }
+      html.dark .site-footer .brand-mark svg path { fill: #a098ff !important; }
+      html.dark .brand-mark { background: #fff !important; }
+      html.dark .site-footer { color: #f5f6fb !important; background: #000 !important; border-color: rgba(255,255,255,.12) !important; box-shadow: none; }
+      html.dark .site-footer p, html.dark .site-footer .footer-tagline { color: #c4cad6 !important; }
+      html.dark .site-footer .text-zinc-600, html.dark .site-footer .text-zinc-700 { color: #9aa3b2 !important; }
+      html.dark .site-footer a.text-zinc-500 { color: #b4adff !important; }
+      html.dark .site-footer .footer-watermark { opacity: .04; }
+      html.dark .site-footer .flex.gap-4 a:hover { color: #a098ff; background: rgba(160,152,255,.12); }
+      html.dark .site-footer .border-t { border-color: rgba(255,255,255,.12); }
+      #theme-toggle { display: inline-flex; align-items: center; gap: 7px; }
+      #theme-toggle .theme-icon { width: 16px; height: 16px; flex: none; }
+      html.dark #theme-toggle { color: #e5e7eb !important; background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); }
+      html:not(.dark) #theme-toggle { color: #596579 !important; background: rgba(35,0,82,.05); border-color: rgba(35,0,82,.12); }
+      body *, body *::before, body *::after { box-shadow: none !important; text-shadow: none !important; }
+      .glow-1, .glow-2, .site-footer .group > div:first-child { display: none !important; }
+      .hero-logo { filter: none !important; }
+      #features .feature-card-header .feature-label { text-transform: none; letter-spacing: 0; }
+      html.dark #hero-card {
+        background: #000;
+        border: 0;
+        border-radius: 32px;
+        box-shadow: none;
+      }
+      html.dark #main-nav a:hover, html.dark #main-nav button:hover,
+      html.dark #main-nav a:not(.nav-active):hover,
+      html.dark #mobile-overlay .mobile-link:hover > span:first-child { color: #fff; }
+      html.dark #mobile-overlay .mobile-link > span:last-child,
+      html.dark #hero-credit a, html.dark .site-footer a.text-zinc-500 { color: #d0d4df !important; }
+      html.dark #features .feature-card,
+      html.dark #features .feature-card:hover { border: 0; }
+      html.dark #features .feature-card-header > div:first-child { background: #fff; color: #0a192f; }
+      html.dark #features .feature-card-header > div:first-child svg {
+        color: #0a192f !important;
+        stroke: #0a192f !important;
+        fill: none !important;
+      }
+      html.dark #features .feature-card-header > div:first-child svg path {
+        fill: none !important;
+        stroke: #0a192f !important;
+      }
+      html.dark #features .feature-ai .feature-card-header > div:first-child svg path {
+        fill: #0a192f !important;
+        stroke: none !important;
+      }
     </style>
   </head>
   <body>
@@ -751,6 +861,8 @@
               >Privacy</a
             >
           </div>
+
+          <button id="theme-toggle" type="button" class="shrink-0 rounded-full border px-3 py-2 text-xs font-semibold transition-colors" aria-label="Switch to dark mode" aria-pressed="false"></button>
 
           <!-- Mobile Toggle -->
           <button
@@ -817,53 +929,29 @@
     <section
       class="min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 relative z-20"
     >
+      <!-- Version Badge -->
+      <a
+        href="https://github.com/theajmalrazaq/superflex"
+        target="_blank"
+        class="mb-5"
+      >
+        <button
+          class="group relative rounded-full p-0 overflow-visible bg-transparent cursor-pointer transition-all duration-200 ease-in-out"
+        >
+          <span id="version-pill" class="relative z-[1] inline-flex items-center gap-3 rounded-full px-3 py-2">
+            <span id="version-chip" class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-[#49358d]">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+              <span id="version-text">v6.0.0</span>
+            </span>
+            <span id="version-brand" class="text-sm font-semibold text-white">SuperFlex</span>
+          </span>
+        </button>
+      </a>
       <div id="hero-card">
       <div class="flex flex-col pt-7 justify-center text-center w-full mb-6">
-        <!-- Version Badge -->
-        <a
-          href="https://github.com/theajmalrazaq/superflex"
-          target="_blank"
-          class="mt-4 md:mt-0 mb-6"
-        >
-          <button
-            class="group relative bg-neutral-800 rounded-full p-px overflow-hidden cursor-pointer transition-all duration-200 ease-in-out"
-          >
-            <span
-              class="flex items-center justify-center gap-1 relative z-[1] bg-neutral-950/90 rounded-full py-2 px-4 pl-2 w-full"
-            >
-              <span class="relative transition-transform duration-500">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#a098ff"
-                  stroke-width="2.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="m9 12 2 2 4-4" />
-                </svg>
-                <span
-                  class="rounded-full size-11 absolute opacity-30 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-lg"
-                  style="
-                    animation: 14s ease-in-out 0s infinite alternate none running star-shine;
-                    background: #a098ff;
-                  "
-                ></span>
-              </span>
-              <span
-                id="version-text"
-                class="bg-gradient-to-b ml-1.5 from-white to-white/50 bg-clip-text text-xs text-transparent uppercase font-bold"
-              >
-                SuperFlex V6.0.0
-              </span>
-            </span>
-          </button>
-        </a>
-
         <!-- Logo & Icon -->
         <div class="flex flex-col gap-6 justify-center items-center text-center relative z-10">
           <div class="group relative">
@@ -1064,7 +1152,7 @@
         <div class="features-heading text-center">
           <p class="mb-3 text-xs font-bold uppercase tracking-[.14em] text-[#6551bd]">A better way to Flex</p>
           <h2 class="mb-3 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
-            Your academic day, made easier.
+            Your Academic Day, Made Easier.
           </h2>
           <p class="mx-auto max-w-2xl text-base leading-relaxed text-slate-600">
             Useful tools for grades, attendance, planning, and a smoother portal experience.
@@ -1089,14 +1177,14 @@
                 />
               </svg>
               </div>
-              <p class="feature-label">ACADEMIC ASSISTANT</p>
+              <p class="feature-label">Academic Assistant</p>
             </div>
-            <h3 class="font-bold">Octopus AI for your studies</h3>
+            <h3 class="font-bold">Octopus AI For Your Studies</h3>
             <p>
               Bring your own Gemini API key for streamed answers, grade forecasts, attendance insights, and study suggestions using the context you choose to share.
             </p>
             <div class="ai-feature-preview" aria-label="Example Octopus AI conversation">
-              <p>OCTOPUS AI · GEMINI</p>
+              <p>Octopus AI · Gemini</p>
               <div class="ai-preview-question">How many classes can I miss and stay above 80%?</div>
               <div class="ai-preview-answer">I’ll check your attendance and show the calculation.</div>
             </div>
@@ -1127,9 +1215,9 @@
                 <path d="M3 9h18M9 21V9" />
               </svg>
               </div>
-              <p class="feature-label">DASHBOARD</p>
+              <p class="feature-label">Dashboard</p>
             </div>
-            <h3 class="font-bold">A clearer portal</h3>
+            <h3 class="font-bold">A Clearer Portal</h3>
             <p>
               Find grades, courses, and useful updates in a clean layout that works across screens.
             </p>
@@ -1154,7 +1242,7 @@
                 <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
               </svg>
               </div>
-              <p class="feature-label">SECURE SIGN-IN</p>
+              <p class="feature-label">Secure Sign-In</p>
             </div>
             <h3 class="font-bold">Private Auto-Fill</h3>
             <p>
@@ -1180,9 +1268,9 @@
                 <polyline points="12 6 12 12 16 14" />
               </svg>
               </div>
-              <p class="feature-label">ATTENDANCE</p>
+              <p class="feature-label">Attendance</p>
             </div>
-            <h3 class="font-bold">Instructor tools</h3>
+            <h3 class="font-bold">Instructor Tools</h3>
             <p>
               Check attendance, look up campus faculty, and prepare a review email for your instructor.
             </p>
@@ -1206,9 +1294,9 @@
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
               </svg>
               </div>
-              <p class="feature-label">GRADE PLANNING</p>
+              <p class="feature-label">Grade Planning</p>
             </div>
-            <h3 class="font-bold">Plan your grades</h3>
+            <h3 class="font-bold">Plan Your Grades</h3>
             <p>
               Try what-if scenarios, plan a CGPA target, and compare best-of calculations.
             </p>
@@ -1220,7 +1308,7 @@
     <section class="relative z-20 px-4 pb-20 sm:px-6">
       <div class="toolkit-callout mx-auto max-w-5xl text-center">
         <p class="text-xs font-bold uppercase tracking-[.14em] text-[#6551bd]">The SuperFlex toolkit</p>
-        <h2 class="mt-2 text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">One extension. Your whole academic workflow.</h2>
+        <h2 class="mt-2 text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">One Extension. Your Whole Academic Workflow.</h2>
         <p class="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-slate-600">
           Keep your portal tools together, with local-first settings and AI features you control.
         </p>
@@ -1402,6 +1490,23 @@
       const line1 = document.getElementById("line1");
       const line2 = document.getElementById("line2");
       const navPill = document.getElementById("main-nav");
+
+      const themeToggle = document.getElementById("theme-toggle");
+      const applyTheme = (mode) => {
+        const isDark = mode === "dark";
+        document.documentElement.classList.toggle("dark", isDark);
+        localStorage.setItem("superflex-theme-mode", isDark ? "dark" : "light");
+        document.querySelectorAll('img[src$="logo-light.svg"], img[src$="logo-dark.svg"]').forEach((logo) => {
+          const lightSource = logo.dataset.lightSource || logo.getAttribute("src").replace("logo-dark.svg", "logo-light.svg");
+          logo.dataset.lightSource = lightSource;
+          logo.src = isDark ? lightSource.replace("logo-light.svg", "logo-dark.svg") : lightSource;
+        });
+        themeToggle?.setAttribute("aria-pressed", String(isDark));
+        themeToggle?.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
+        if (themeToggle) themeToggle.innerHTML = `${isDark ? '<svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>' : '<svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6.5 6.5 0 0 0 8.268 8.268c.344-.215.825-.003.803.401"/></svg>'}<span>${isDark ? "Light" : "Dark"}</span>`;
+      };
+      applyTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
+      themeToggle?.addEventListener("click", () => applyTheme(document.documentElement.classList.contains("dark") ? "light" : "dark"));
 
       if (mobileToggle) {
         mobileToggle.addEventListener("click", () => {

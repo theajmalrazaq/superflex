@@ -14,7 +14,6 @@
     "typecheck:parsers": "tsc -p tsconfig.parsers.json",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "clean": "node scripts/clean.js && oxfmt"
   },
   "dependencies": {
     "@dnd-kit/helpers": "^0.5.3",

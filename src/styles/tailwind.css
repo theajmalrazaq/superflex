@@ -3,6 +3,20 @@
 @source "../../node_modules/agentcomposerui/dist";
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Keep extension surfaces flat without changing styles on the host portal. */
+#react-chrome-app *,
+#react-chrome-app *::before,
+#react-chrome-app *::after,
+body.superflex-login-page *,
+body.superflex-login-page *::before,
+body.superflex-login-page *::after,
+body > [data-radix-portal] *,
+body > [data-radix-portal] *::before,
+body > [data-radix-portal] *::after {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
 /* stylelint-disable-next-line at-rule-no-unknown */
 @theme {
   --color-accent: var(--accent);
@@ -451,14 +465,7 @@ h6 {
 }
 
 .border-beam-element::after {
-  content: "";
-  position: absolute;
-  width: 60px;
-  height: 60px;
-  background: radial-gradient(circle at center, var(--accent), transparent 80%);
-  offset-path: inset(1px round 9999px);
-  offset-anchor: 50% 50%;
-  animation: border-beam 4s linear infinite;
+  display: none !important;
 }
 
 /* Shared table treatment: compact list rows, quiet dividers, and stable header styling. */
