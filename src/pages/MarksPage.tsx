@@ -27,7 +27,7 @@ import { getMarkedMarks, setMarkedMarks } from "../utils/userDataStorage";
 
 const MarksCourseTabs = ({ courses, selectedId, onSelect, pendingUpdates }) => (
   <div
-    className="inline-flex w-fit max-w-full gap-1.5 overflow-x-auto rounded-full bg-white/55 p-1.5 shadow-sm shadow-black/[0.03] scrollbar-hide dark:bg-black/25 dark:shadow-none"
+    className="flex w-full max-w-full gap-2 overflow-x-auto pb-0.5 scrollbar-hide sm:inline-flex sm:w-fit sm:gap-1.5 sm:rounded-full sm:bg-white/55 sm:p-1.5 sm:shadow-sm sm:shadow-black/[0.03] sm:dark:bg-black/25 sm:dark:shadow-none"
     aria-label="Select course"
   >
     {courses.map((course) => {
@@ -41,7 +41,11 @@ const MarksCourseTabs = ({ courses, selectedId, onSelect, pendingUpdates }) => (
           onClick={() => onSelect(course.id)}
           aria-pressed={active}
           title={course.title}
-          className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold transition-colors ${active ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-600 hover:bg-white/80 hover:text-[#230052] dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white"}`}
+          className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-colors sm:py-2.5 ${
+            active
+              ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"
+              : "bg-white text-[#101027] hover:bg-white/90 dark:bg-white/10 dark:text-slate-200 sm:bg-transparent sm:text-slate-600 sm:hover:bg-white/80 sm:hover:text-[#230052]"
+          }`}
         >
           {hasUpdate && (
             <span className="flex shrink-0 items-center justify-center p-0.5">
@@ -257,12 +261,14 @@ export const AssessmentView = ({
   return (
     <section
       id={`marks-section-${section.id}`}
-      className={`overflow-hidden rounded-[24px] border bg-white text-slate-900 dark:bg-black dark:text-[#f5f6fb] ${isGrandTotal ? "border-[#230052]/15 dark:border-white" : "border-black/[0.06] dark:border-white/[0.14]"}`}
+      className={`overflow-hidden rounded-[22px] border bg-white text-[#101027] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px] ${isGrandTotal ? "border-[#230052]/15 dark:border-white" : "border-black/[0.05] dark:border-white/[0.14]"}`}
     >
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-black/[0.06] px-4 py-4 dark:border-white/[0.1] sm:px-5">
+      <header className="flex flex-wrap items-center justify-between gap-2.5 border-b border-black/[0.06] px-4 py-3.5 dark:border-white/[0.1] sm:gap-3 sm:px-5 sm:py-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="truncate text-base font-bold">{section.title}</h3>
+            <h3 className="truncate text-[17px] font-bold tracking-[-0.02em] sm:text-base">
+              {section.title}
+            </h3>
             {hasSectionUpdate && (
               <span className="flex shrink-0 items-center justify-center p-0.5">
                 <span
@@ -277,28 +283,28 @@ export const AssessmentView = ({
               </span>
             )}
           </div>
-          <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
+          <p className="mt-0.5 text-[11px] text-[#667085] dark:text-slate-400">
             {rows.length} {rows.length === 1 ? "assessment" : "assessments"} ·{" "}
             {section.weight.toFixed(2)}% weight
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:bg-white/[.08] dark:text-slate-300">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 dark:bg-white/[.08] dark:text-slate-300 sm:py-1.5">
             Obtained{" "}
             <b className="ml-1 text-slate-900 dark:text-white">{section.obtained.toFixed(2)}</b>
           </span>
           <span
-            className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600 dark:bg-white/[.08] dark:text-slate-300"
+            className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 dark:bg-white/[.08] dark:text-slate-300 sm:py-1.5"
             title="Class average converted to this section's course weight"
           >
-            Weighted avg{" "}
+            Avg{" "}
             <b className="ml-1 text-slate-900 dark:text-white">
               ~{(section.stats?.weightedAvg ?? 0).toFixed(2)}
             </b>
           </span>
           <span
-            className={`rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold dark:bg-white/[.08] ${performanceColor}`}
+            className={`rounded-full bg-slate-100 px-3 py-1 text-xs font-bold dark:bg-white/[.08] sm:py-1.5 ${performanceColor}`}
           >
             {performance.toFixed(1)}%
           </span>
@@ -306,7 +312,7 @@ export const AssessmentView = ({
             <button
               type="button"
               onClick={() => setIsBestOfOpen(true)}
-              className="rounded-full bg-[#230052]/[.06] px-3 py-1.5 text-xs font-bold text-[#230052] dark:bg-white/10 dark:text-white"
+              className="rounded-full bg-[#230052]/[.06] px-3 py-1 text-xs font-bold text-[#230052] dark:bg-white/10 dark:text-white sm:py-1.5"
             >
               Best Of
             </button>
@@ -336,8 +342,105 @@ export const AssessmentView = ({
       </header>
 
       {rows.length > 0 ? (
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="min-w-[540px]">
+        <>
+          {/* Mobile Native List View (no horizontal table scroll) */}
+          <div className="divide-y divide-black/[0.06] px-4 dark:divide-white/[0.08] sm:hidden">
+            {rows.map((row) => {
+              const rowIndex = section.rows.indexOf(row);
+              const uniqueId = `${courseId}-${section.id}-${row.title}`;
+              const isMarked = markedItems?.has(uniqueId);
+              const isRowUpdated = isAssessmentMarksUpdated(pendingUpdates, course, row.title);
+              const scoreRatio = row.total > 0 ? row.obtained / row.total : 0;
+              const scoreColor =
+                scoreRatio >= 0.8
+                  ? "text-emerald-700 dark:text-emerald-300"
+                  : scoreRatio >= 0.6
+                    ? "text-amber-700 dark:text-amber-300"
+                    : "text-rose-700 dark:text-rose-300";
+              const weightedVal = row.total > 0 ? (row.obtained / row.total) * row.weight : 0;
+
+              return (
+                <div
+                  key={`${row.title}-${rowIndex}-mobile`}
+                  className={`flex items-center justify-between gap-3 py-3 ${!row.included ? "opacity-45" : ""}`}
+                >
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => onToggleMark?.(uniqueId)}
+                      aria-label={
+                        isMarked ? `Remove bookmark for ${row.title}` : `Bookmark ${row.title}`
+                      }
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors ${isMarked ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-400 hover:bg-slate-200 hover:text-[#230052] dark:hover:bg-white/10 dark:hover:text-white"}`}
+                    >
+                      <Bookmark size={14} fill={isMarked ? "currentColor" : "none"} />
+                    </button>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <p className="truncate text-xs font-semibold text-[#101027] dark:text-white sm:text-sm">
+                          {row.title}
+                        </p>
+                        {isRowUpdated && (
+                          <span className="h-2 w-2 shrink-0 rounded-full bg-[#230052] animate-pulse dark:bg-white" />
+                        )}
+                        {!row.included && (
+                          <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold text-slate-500 dark:bg-white/10 dark:text-slate-400">
+                            Dropped
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-0.5 truncate text-[11px] text-[#667085] dark:text-slate-400">
+                        Wt {row.weight}% · Avg {row.avg.toFixed(1)} · {row.min.toFixed(0)}–
+                        {row.max.toFixed(0)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {isSimulationMode ? (
+                    <div className="flex shrink-0 items-center gap-1 text-xs">
+                      <input
+                        type="number"
+                        aria-label={`${row.title} score`}
+                        value={row.obtained ?? ""}
+                        onChange={(event) => onUpdate(rowIndex, "obtained", event.target.value)}
+                        className={`w-12 rounded-lg bg-slate-100 px-1 py-1 text-center text-xs font-bold outline-none dark:bg-white/10 ${scoreColor}`}
+                      />
+                      <span className="text-slate-400">/</span>
+                      <input
+                        type="number"
+                        aria-label={`${row.title} total marks`}
+                        value={row.total}
+                        onChange={(event) => onUpdate(rowIndex, "total", event.target.value)}
+                        className="w-12 rounded-lg bg-slate-100 px-1 py-1 text-center text-xs text-slate-600 outline-none dark:bg-white/10 dark:text-slate-300"
+                      />
+                    </div>
+                  ) : (
+                    <div className="shrink-0 text-right">
+                      <p className={`text-xs font-bold ${scoreColor} sm:text-[13px]`}>
+                        {row.obtained}{" "}
+                        <span className="text-[11px] font-normal text-[#667085]">/ {row.total}</span>
+                      </p>
+                      <p className="text-[10px] font-medium text-[#230052] dark:text-white/80 sm:text-[11px]">
+                        {weightedVal.toFixed(2)} pts
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            <div className="flex items-center justify-between py-2.5 text-xs font-semibold sm:py-3">
+              <span className="text-[#667085] dark:text-slate-400">
+                Section Total ({section.weight.toFixed(2)}% weight)
+              </span>
+              <span className="text-xs font-bold text-[#230052] dark:text-white sm:text-sm">
+                {section.obtained.toFixed(2)} / {section.weight.toFixed(2)}
+              </span>
+            </div>
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden overflow-x-auto scrollbar-hide sm:block">
+            <div className="min-w-[540px]">
             <div className="grid grid-cols-[minmax(0,1fr)_64px_148px_76px] items-center gap-3 border-b border-black/[0.05] bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:border-white/[.08] dark:bg-white/[.04] dark:text-slate-400 sm:px-5">
               <span>Assessment</span>
               <span className="text-center">Weight</span>
@@ -430,8 +533,9 @@ export const AssessmentView = ({
                 {section.obtained.toFixed(2)}
               </span>
             </div>
+            </div>
           </div>
-        </div>
+        </>
       ) : (
         <div className="flex items-center justify-between gap-4 px-5 py-4 text-sm">
           <span className="text-slate-500 dark:text-slate-400">
@@ -700,14 +804,16 @@ function MarksPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-5 pb-24">
-        <header className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
+      <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-3.5 pb-6 sm:gap-5 sm:pb-24">
+        <header className="flex flex-col justify-between gap-3 xl:flex-row xl:items-end sm:gap-4">
           <div className="space-y-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+            <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-[10px] sm:font-bold sm:tracking-[0.16em] sm:text-white/80">
               Academics
             </p>
-            <h1 className="text-3xl font-bold tracking-tight text-white">Marks & Assessments</h1>
-            <p className="text-sm text-white/80">
+            <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:text-3xl sm:font-bold sm:tracking-tight">
+              Marks & Assessments
+            </h1>
+            <p className="text-xs text-white/85 sm:text-sm">
               Quizzes, assignments, mids, finals. Dil thaam ke marks dekhein.
             </p>
           </div>
@@ -757,12 +863,12 @@ function MarksPage() {
               onSelect={setSelectedCourseId}
               pendingUpdates={pendingUpdates}
             />
-            <div className="flex flex-wrap items-end justify-between gap-3 px-1">
+            <div className="flex flex-wrap items-end justify-between gap-2.5 px-1 sm:gap-3">
               <div>
-                <h2 className="text-xl font-bold tracking-tight text-white">
+                <h2 className="text-base font-bold tracking-tight text-white sm:text-xl">
                   {selectedCourse.title}
                 </h2>
-                <p className="mt-1 text-xs text-white/75">
+                <p className="mt-0.5 text-[11px] text-white/75 sm:mt-1 sm:text-xs">
                   {
                     selectedCourse.sections.filter(
                       (section) => !section.title.includes("Grand Total"),
@@ -771,21 +877,21 @@ function MarksPage() {
                   evaluation categories
                 </p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <button
                   type="button"
                   onClick={handleToggleSimulation}
-                  className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold transition-colors ${selectedCourse.simulationMode ? "bg-amber-500 text-white" : "bg-white/55 text-[#230052] hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"}`}
+                  className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition-colors sm:px-4 sm:py-2 sm:text-sm ${selectedCourse.simulationMode ? "bg-amber-500 text-white" : "bg-white/55 text-[#230052] hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"}`}
                   title={
                     selectedCourse.simulationMode
                       ? "Exit simulation and restore original marks"
                       : "Enable simulation and edit marks"
                   }
                 >
-                  <Zap size={14} />
+                  <Zap size={13} />
                   {selectedCourse.simulationMode ? "Simulating" : "Simulate"}
                 </button>
-                <div className="rounded-full bg-white/55 px-4 py-2 text-sm font-bold text-[#230052] dark:bg-black/25 dark:text-white">
+                <div className="rounded-full bg-white/55 px-3 py-1.5 text-xs font-bold text-[#230052] dark:bg-black/25 dark:text-white sm:px-4 sm:py-2 sm:text-sm">
                   Overall {selectedCourse.grandTotalStats.percentage.toFixed(1)}%
                 </div>
               </div>
@@ -812,7 +918,7 @@ function MarksPage() {
               </div>
             ) : (
               <div className="flex min-h-[300px] flex-col items-center justify-center rounded-[24px] border border-black/[0.06] bg-white px-6 py-12 text-center dark:border-white/[0.14] dark:bg-black">
-                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
                   <Layers size={24} />
                 </div>
                 <h4 className="text-xl font-bold text-[#101010] dark:text-[#f5f6fb]">

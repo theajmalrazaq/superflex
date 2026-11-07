@@ -675,16 +675,16 @@ function TranscriptPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname} fullWidth>
-      <div className="relative z-10 mx-auto w-full max-w-[1680px] space-y-7 px-4 py-6 pb-24 sm:px-6 lg:px-8 lg:py-8">
-        <header className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
+      <div className="relative z-10 mx-auto w-full max-w-[1680px] space-y-3.5 px-4 pb-6 pt-2 sm:space-y-7 sm:px-6 sm:py-6 sm:pb-24 lg:px-8 lg:py-8">
+        <header className="flex flex-col justify-between gap-3 xl:flex-row xl:items-end sm:gap-4">
           <div className="space-y-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+            <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-[10px] sm:font-bold sm:tracking-[0.16em] sm:text-white/80">
               Academics
             </p>
-            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:text-4xl sm:font-bold sm:tracking-tight">
               Official Transcript
             </h1>
-            <p className="text-sm text-white/80">
+            <p className="text-xs text-white/85 sm:text-sm">
               Four years of questionable decisions, beautifully documented.
             </p>
           </div>
@@ -692,17 +692,17 @@ function TranscriptPage() {
             <button
               type="button"
               onClick={() => setIsPlannerOpen(true)}
-              className="flex items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"
+              className="flex items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-xs font-bold text-[#101027] transition-colors hover:bg-white/90 dark:bg-white/10 dark:text-white sm:gap-2 sm:bg-white/55 sm:px-4 sm:py-2.5 sm:text-[#230052]"
             >
-              <Target size={15} />
+              <Target size={14} />
               Strategic planner
             </button>
             <button
               type="button"
               onClick={() => setIsMCALookupOpen(true)}
-              className="flex items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"
+              className="flex items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-xs font-bold text-[#101027] transition-colors hover:bg-white/90 dark:bg-white/10 dark:text-white sm:gap-2 sm:bg-white/55 sm:px-4 sm:py-2.5 sm:text-[#230052]"
             >
-              <Scale size={15} />
+              <Scale size={14} />
               MCA lookup
             </button>
             <button
@@ -712,12 +712,12 @@ function TranscriptPage() {
                   ? (setOverriddenGrades({}), setSimulationMode(false))
                   : setSimulationMode(true)
               }
-              className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold transition-colors ${simulationMode ? "bg-amber-500 text-white" : "bg-white/55 text-[#230052] hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"}`}
+              className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-bold transition-colors sm:gap-2 sm:px-4 sm:py-2.5 ${simulationMode ? "bg-amber-500 text-white" : "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:bg-white/55 sm:text-[#230052]"}`}
               title={
                 simulationMode ? "Exit simulation and restore grades" : "Enable grade simulation"
               }
             >
-              <Zap size={15} fill={simulationMode ? "currentColor" : "none"} />
+              <Zap size={14} fill={simulationMode ? "currentColor" : "none"} />
               {simulationMode ? "Simulating" : "Simulate"}
             </button>
           </div>
@@ -725,24 +725,24 @@ function TranscriptPage() {
 
         <NotificationBanner alerts={alerts} />
 
-        <section aria-labelledby="transcript-overview-heading" className="space-y-4">
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <section aria-labelledby="transcript-overview-heading" className="space-y-2.5 sm:space-y-4">
+          <div className="hidden flex-col gap-0.5 sm:flex sm:flex-row sm:items-end sm:justify-between sm:gap-1">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/80 sm:text-[10px]">
                 Overview
               </p>
               <h2
                 id="transcript-overview-heading"
-                className="text-xl font-bold tracking-tight text-white"
+                className="text-base font-bold tracking-tight text-white sm:text-xl"
               >
                 Academic snapshot
               </h2>
             </div>
-            <p className="text-xs text-white/75">
+            <p className="text-[11px] text-white/75 sm:text-xs">
               Current GPA, cleared credits, and semester trends.
             </p>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
+          <div className="sf-mobile-cards-scroll pb-1 scrollbar-hide sm:grid sm:grid-cols-2 sm:gap-4 sm:pb-0 xl:grid-cols-4 xl:gap-5">
             <StatsCard
               icon={TrendingUp}
               label="Cumulative GPA"
@@ -758,17 +758,17 @@ function TranscriptPage() {
               variant="dashboard"
             />
             <div
-              className="flex min-h-[156px] min-w-0 flex-col rounded-[32px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6"
+              className="sf-mobile-card-wide flex min-h-[132px] min-w-0 flex-col rounded-[22px] border border-black/[0.05] bg-white p-4 text-[#101027] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:min-h-[156px] sm:rounded-[32px] sm:p-6"
               onMouseLeave={() => setHoveredHistoryIndex(null)}
             >
-              <p className="text-sm font-semibold text-[#40404a] dark:text-[#c4cad6]">
+              <p className="text-[13px] font-medium text-[#667085] dark:text-[#c4cad6] sm:text-sm sm:font-semibold sm:text-[#40404a]">
                 Semester GPA
               </p>
-              <div className="mt-auto flex items-end justify-between gap-2">
-                <span className="text-[28px] font-bold leading-none tracking-tight text-foreground">
+              <div className="mt-auto flex items-end justify-between gap-2 pt-2 sm:pt-0">
+                <span className="text-[22px] font-bold leading-none tracking-tight text-foreground sm:text-[28px]">
                   {shownHistory?.sgpa.toFixed(2) || "0.00"}
                 </span>
-                <span className="truncate text-right text-[10px] font-medium text-foreground/55">
+                <span className="truncate text-right text-[11px] font-medium text-[#667085]">
                   {shownHistory?.title || ""}
                   {sgpaDelta != null && (
                     <>
@@ -779,22 +779,22 @@ function TranscriptPage() {
                   )}
                 </span>
               </div>
-              <div className="mt-2 h-11 w-full">
+              <div className="mt-2 h-9 w-full sm:h-11">
                 {chartData && <Line data={chartData.sgpa} options={sgpaChartOptions} />}
               </div>
             </div>
             <div
-              className="flex min-h-[156px] min-w-0 flex-col rounded-[32px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6"
+              className="sf-mobile-card-wide flex min-h-[132px] min-w-0 flex-col rounded-[22px] border border-black/[0.05] bg-white p-4 text-[#101027] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:min-h-[156px] sm:rounded-[32px] sm:p-6"
               onMouseLeave={() => setHoveredHistoryIndex(null)}
             >
-              <p className="text-sm font-semibold text-[#40404a] dark:text-[#c4cad6]">
+              <p className="text-[13px] font-medium text-[#667085] dark:text-[#c4cad6] sm:text-sm sm:font-semibold sm:text-[#40404a]">
                 Cumulative GPA
               </p>
-              <div className="mt-auto flex items-end justify-between gap-2">
-                <span className="text-[28px] font-bold leading-none tracking-tight text-foreground">
+              <div className="mt-auto flex items-end justify-between gap-2 pt-2 sm:pt-0">
+                <span className="text-[22px] font-bold leading-none tracking-tight text-foreground sm:text-[28px]">
                   {shownHistory?.cgpa.toFixed(2) || "0.00"}
                 </span>
-                <span className="truncate text-right text-[10px] font-medium text-foreground/55">
+                <span className="truncate text-right text-[11px] font-medium text-[#667085]">
                   {shownHistory?.title || ""}
                   {cgpaDelta != null && (
                     <>
@@ -805,33 +805,33 @@ function TranscriptPage() {
                   )}
                 </span>
               </div>
-              <div className="mt-2 h-11 w-full">
+              <div className="mt-2 h-9 w-full sm:h-11">
                 {chartData && <Line data={chartData.cgpa} options={cgpaChartOptions} />}
               </div>
             </div>
           </div>
         </section>
 
-        <section aria-labelledby="semester-report-heading" className="space-y-4">
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <section aria-labelledby="semester-report-heading" className="space-y-2.5 sm:space-y-4">
+          <div className="hidden flex-col gap-0.5 sm:flex sm:flex-row sm:items-end sm:justify-between sm:gap-1">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/80 sm:text-[10px]">
                 Academic record
               </p>
               <h2
                 id="semester-report-heading"
-                className="text-xl font-bold tracking-tight text-white"
+                className="text-base font-bold tracking-tight text-white sm:text-xl"
               >
                 Semester History
               </h2>
             </div>
-            <p className="text-xs text-white/75">
+            <p className="text-[11px] text-white/75 sm:text-xs">
               Every semester has a story. Some are horror stories.
             </p>
           </div>
           <div>
-            <div className="flex flex-col gap-5 overflow-hidden rounded-[24px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6">
-              <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+            <div className="flex flex-col gap-3.5 overflow-hidden rounded-[22px] border border-black/[0.05] bg-white p-4 text-[#101027] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:gap-5 sm:rounded-[24px] sm:p-6">
+              <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center sm:gap-4">
                 <SuperTabs<number>
                   tabs={semesters.map((s, idx) => ({
                     value: idx,
@@ -845,20 +845,22 @@ function TranscriptPage() {
               </div>
 
               {activeSemData && (
-                <div className="space-y-5">
-                  <div className="flex flex-col justify-between gap-5 border-b border-slate-100 pb-5 dark:border-white/10 md:flex-row md:items-end">
-                    <div className="space-y-1">
-                      <h2 className="text-3xl font-bold text-foreground ">{activeSemData.title}</h2>
-                      <p className="text-xs text-foreground/50 font-bold  tracking-[0px]">
+                <div className="space-y-3.5 sm:space-y-5">
+                  <div className="flex flex-col justify-between gap-3.5 border-b border-slate-100 pb-3.5 dark:border-white/10 sm:gap-5 sm:pb-5 md:flex-row md:items-end">
+                    <div className="space-y-0.5 sm:space-y-1">
+                      <h2 className="text-lg font-bold text-foreground sm:text-3xl">
+                        {activeSemData.title}
+                      </h2>
+                      <p className="text-[11px] font-bold tracking-[0px] text-foreground/50 sm:text-xs">
                         Semester Detail Report
                       </p>
                     </div>
-                    <div className="flex flex-wrap items-center gap-x-12 lg:gap-x-16 gap-y-6">
-                      <div className="text-right flex flex-col items-end min-w-[70px]">
-                        <span className="text-[10px] font-bold text-foreground/40  tracking-[0px] mb-2 bg-tertiary px-2 py-0.5 rounded">
+                    <div className="grid grid-cols-4 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-x-12 sm:gap-y-6 lg:gap-x-16">
+                      <div className="flex flex-col items-start sm:min-w-[70px] sm:items-end sm:text-right">
+                        <span className="mb-1 rounded bg-tertiary px-1.5 py-0.5 text-[9px] font-bold tracking-[0px] text-foreground/40 sm:mb-2 sm:px-2 sm:text-[10px]">
                           Attemp.
                         </span>
-                        <span className="text-3xl font-bold font-sans text-foreground ">
+                        <span className="font-sans text-lg font-bold text-foreground sm:text-3xl">
                           {activeSemData.courses.reduce((acc, c) => {
                             const grade =
                               overriddenGrades[`${activeSemData.title}-${c.code}`] || c.grade;
@@ -870,11 +872,11 @@ function TranscriptPage() {
                           }, 0)}
                         </span>
                       </div>
-                      <div className="text-right flex flex-col items-end min-w-[70px]">
-                        <span className="text-[10px] font-bold text-foreground/40  tracking-[0px] mb-2 bg-tertiary px-2 py-0.5 rounded">
+                      <div className="flex flex-col items-start sm:min-w-[70px] sm:items-end sm:text-right">
+                        <span className="mb-1 rounded bg-tertiary px-1.5 py-0.5 text-[9px] font-bold tracking-[0px] text-foreground/40 sm:mb-2 sm:px-2 sm:text-[10px]">
                           Earned
                         </span>
-                        <span className="text-3xl font-bold font-sans text-accent ">
+                        <span className="font-sans text-lg font-bold text-accent sm:text-3xl">
                           {activeSemIdx === semesters.length - 1 &&
                           !overriddenGrades[
                             Object.keys(overriddenGrades).find((k) =>
@@ -886,11 +888,11 @@ function TranscriptPage() {
                                 ?.earned || 0}
                         </span>
                       </div>
-                      <div className="text-right flex flex-col items-end min-w-[70px]">
-                        <span className="text-[10px] font-bold text-foreground/40  tracking-[0px] mb-2 bg-tertiary px-2 py-0.5 rounded">
+                      <div className="flex flex-col items-start sm:min-w-[70px] sm:items-end sm:text-right">
+                        <span className="mb-1 rounded bg-tertiary px-1.5 py-0.5 text-[9px] font-bold tracking-[0px] text-foreground/40 sm:mb-2 sm:px-2 sm:text-[10px]">
                           SGPA
                         </span>
-                        <span className="text-3xl font-bold font-sans text-accent ">
+                        <span className="font-sans text-lg font-bold text-accent sm:text-3xl">
                           {activeSemIdx === semesters.length - 1 &&
                           !overriddenGrades[
                             Object.keys(overriddenGrades).find((k) =>
@@ -903,11 +905,11 @@ function TranscriptPage() {
                                 ?.sgpa.toFixed(2) || "0.00"}
                         </span>
                       </div>
-                      <div className="text-right flex flex-col items-end min-w-[70px]">
-                        <span className="text-[10px] font-bold text-foreground/40  tracking-[0px] mb-2 bg-tertiary px-2 py-0.5 rounded">
+                      <div className="flex flex-col items-start sm:min-w-[70px] sm:items-end sm:text-right">
+                        <span className="mb-1 rounded bg-tertiary px-1.5 py-0.5 text-[9px] font-bold tracking-[0px] text-foreground/40 sm:mb-2 sm:px-2 sm:text-[10px]">
                           CGPA
                         </span>
-                        <span className="text-3xl font-bold font-sans text-foreground ">
+                        <span className="font-sans text-lg font-bold text-foreground sm:text-3xl">
                           {activeSemIdx === semesters.length - 1 &&
                           !overriddenGrades[
                             Object.keys(overriddenGrades).find((k) =>
@@ -923,7 +925,91 @@ function TranscriptPage() {
                     </div>
                   </div>
 
-                  <div className="overflow-x-auto scrollbar-hide -mx-2">
+                  {/* Mobile Native App Course List */}
+                  <div className="divide-y divide-black/[0.06] dark:divide-white/[0.08] sm:hidden">
+                    {activeSemData.courses.map((course, idx) => {
+                      const currentGrade =
+                        overriddenGrades[`${activeSemData.title}-${course.code}`] || course.grade;
+                      const isSimulated =
+                        !!overriddenGrades[`${activeSemData.title}-${course.code}`];
+                      const pts = isSimulated
+                        ? ((GRADE_POINTS[currentGrade] || 0) * course.crHrs).toFixed(1)
+                        : course.points.toFixed(2);
+
+                      return (
+                        <div key={idx} className="flex items-center justify-between gap-3 py-3">
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-xs font-semibold text-slate-900 dark:text-white sm:text-sm">
+                              {course.description}
+                            </p>
+                            <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-[#667085] dark:text-slate-400">
+                              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-700 dark:bg-white/10 dark:text-white">
+                                {course.code}
+                              </span>
+                              <span>·</span>
+                              <span>{course.crHrs} Cr.H</span>
+                              {course.section && (
+                                <>
+                                  <span>·</span>
+                                  <span>Sec {course.section}</span>
+                                </>
+                              )}
+                              {course.mca && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedMCA(course.mca);
+                                    setIsMCALookupOpen(true);
+                                  }}
+                                  className="inline-flex items-center gap-1 rounded bg-[#230052]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#230052] dark:bg-white/15 dark:text-white"
+                                >
+                                  MCA {course.mca}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex shrink-0 items-center gap-2.5 text-right">
+                            {simulationMode ? (
+                              <GradeSelector
+                                value={currentGrade}
+                                grades={Object.keys(GRADE_POINTS).concat(["I", "S", "U", "W"])}
+                                onChange={(grade) =>
+                                  handleGradeChange(activeSemData.title, course.code, grade)
+                                }
+                              />
+                            ) : (
+                              <span
+                                className={`rounded-full border px-2.5 py-1 text-xs font-bold ${
+                                  currentGrade.startsWith("A")
+                                    ? "border-accent/20 bg-accent/10 text-accent"
+                                    : currentGrade.startsWith("B")
+                                      ? "border-blue-500/20 bg-blue-500/10 text-blue-500"
+                                      : currentGrade.startsWith("C")
+                                        ? "border-amber-500/20 bg-amber-500/10 text-amber-500"
+                                        : currentGrade === "F"
+                                          ? "border-rose-500/20 bg-rose-500/10 text-rose-500"
+                                          : "border-transparent bg-tertiary text-foreground/60"
+                                }`}
+                              >
+                                {currentGrade}
+                              </span>
+                            )}
+                            <span
+                              className={`min-w-[38px] text-xs font-bold ${
+                                isSimulated ? "text-accent" : "text-[#667085] dark:text-slate-400"
+                              }`}
+                            >
+                              {pts}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Desktop Table */}
+                  <div className="-mx-2 hidden overflow-x-auto scrollbar-hide sm:block">
                     <table className="sf-data-table w-full text-left border-collapse">
                       <thead>
                         <tr className="bg-foreground/[0.02]">

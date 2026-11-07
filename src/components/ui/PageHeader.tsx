@@ -10,17 +10,17 @@ interface PageHeaderProps {
 const PageHeader = ({ title, subtitle, children, className = "" }: PageHeaderProps) => {
   return (
     <div
-      className={`flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-6 md:mb-10 ${className}`}
+      className={`mb-4 flex flex-col items-start justify-between gap-3 sm:mb-6 sm:gap-6 md:mb-10 lg:flex-row lg:items-center ${className}`}
     >
       <div className="space-y-1">
-        <h1 className="text-3xl md:text-5xl font-black text-foreground tracking-tighter leading-tight">
+        <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-foreground sm:text-3xl sm:font-black sm:tracking-tighter md:text-5xl">
           {title}
         </h1>
         {subtitle && (
-          <p className="text-foreground/50 font-medium text-sm md:text-lg">{subtitle}</p>
+          <p className="text-xs font-medium text-foreground/60 sm:text-sm md:text-lg">{subtitle}</p>
         )}
       </div>
-      <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto justify-start lg:justify-end">
+      <div className="flex w-full flex-wrap items-center justify-start gap-2.5 sm:gap-4 lg:w-auto lg:justify-end">
         {children}
       </div>
     </div>

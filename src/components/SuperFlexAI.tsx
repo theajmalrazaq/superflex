@@ -412,10 +412,16 @@ const SuperFlexAI = () => {
     fetchConfig();
 
     const handleKeyUpdate = () => fetchConfig();
+    const handleToggleAi = () => {
+      setIsOpen((prev) => !prev);
+      setShowAiSettings(false);
+    };
 
     window.addEventListener("superflex-ai-key-updated", handleKeyUpdate);
+    window.addEventListener("superflex-toggle-ai", handleToggleAi);
     return () => {
       window.removeEventListener("superflex-ai-key-updated", handleKeyUpdate);
+      window.removeEventListener("superflex-toggle-ai", handleToggleAi);
     };
   }, []);
 
@@ -456,15 +462,7 @@ const SuperFlexAI = () => {
     };
   }, [permissionStatus, studentId]);
 
-  useEffect(() => {
-    const handleToggle = (event) => {
-      if (event instanceof CustomEvent || event.isTrusted) {
-        setIsOpen((prev) => !prev);
-      }
-    };
-    window.addEventListener("superflex-toggle-ai", handleToggle);
-    return () => window.removeEventListener("superflex-toggle-ai", handleToggle);
-  }, []);
+
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -853,10 +851,14 @@ const SuperFlexAI = () => {
       )}
 
       {}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999] w-[min(520px,calc(100vw-2rem))] pointer-events-auto">
+      <div
+        className={`fixed bottom-[78px] left-1/2 -translate-x-1/2 z-[999] w-[min(520px,calc(100dvw-2rem))] pointer-events-auto lg:bottom-6 lg:w-[min(520px,calc(100vw-2rem))] ${
+          isOpen ? "block" : "hidden lg:block"
+        }`}
+      >
         {}
         {isOpen && (
-          <div className="absolute bottom-full mb-3.5 left-1/2 -translate-x-1/2 w-[min(720px,calc(100vw-2rem))] max-h-[min(580px,calc(100vh-140px))] flex flex-col rounded-[24px] border border-black/[0.08] bg-white/95 p-4 sm:p-5 shadow-2xl backdrop-blur-2xl dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] animate-in fade-in slide-in-from-bottom-3 duration-200 overflow-hidden">
+          <div className="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 w-[min(720px,calc(100dvw-2rem))] max-h-[min(540px,calc(100dvh-160px))] flex flex-col rounded-[22px] border border-black/[0.08] bg-white/95 p-4 shadow-2xl backdrop-blur-2xl dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] animate-in fade-in slide-in-from-bottom-3 duration-200 overflow-hidden sm:mb-3.5 sm:w-[min(720px,calc(100vw-2rem))] sm:rounded-[24px] sm:p-5">
             {}
             <div className="flex items-center justify-between pb-3 mb-2 border-b border-black/[0.06] dark:border-white/[0.08] shrink-0">
               <div className="flex items-center gap-2">
@@ -901,7 +903,7 @@ const SuperFlexAI = () => {
               {permissionStatus !== "granted" ? (
                 <div className="flex flex-col gap-3 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:rounded-2xl">
                       <Shield size={20} />
                     </div>
                     <div>
@@ -937,7 +939,7 @@ const SuperFlexAI = () => {
               ) : !hasApiKey ? (
                 <div className="flex flex-col gap-3 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:rounded-2xl">
                       <KeyRound size={20} />
                     </div>
                     <div className="min-w-0">
@@ -980,7 +982,7 @@ const SuperFlexAI = () => {
                   </p>
 
                   {}
-                  <div className="mt-3.5 grid w-full grid-cols-4 gap-2 text-left">
+                  <div className="mt-3 flex w-full snap-x snap-mandatory gap-2 overflow-x-auto pb-1 text-left scrollbar-hide sm:mt-3.5 sm:grid sm:grid-cols-4 sm:pb-0">
                     {syncCards.map((card) => {
                       const Icon = card.icon;
                       return (
@@ -996,7 +998,7 @@ const SuperFlexAI = () => {
                               ? `Ask: "${card.prompt}"`
                               : `Visit ${card.label} page to sync data into Octopus`
                           }
-                          className={`group relative min-w-0 flex flex-col justify-between rounded-2xl border p-2.5 transition-all duration-200 text-left ${
+                          className={`group relative flex min-w-[144px] shrink-0 snap-start flex-col justify-between rounded-xl border p-2.5 text-left transition-all duration-200 sm:min-w-0 sm:rounded-2xl ${
                             card.active
                               ? "cursor-pointer border-black/[0.08] bg-slate-50/80 hover:bg-slate-100/90 hover:border-black/20 hover:-translate-y-0.5 active:scale-[0.99] dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] dark:hover:border-white/20 shadow-xs"
                               : "cursor-not-allowed border-black/[0.04] bg-slate-100/40 opacity-45 grayscale dark:border-white/[0.04] dark:bg-white/[0.02]"

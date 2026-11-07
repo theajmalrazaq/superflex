@@ -74,7 +74,7 @@ function PageLayout({
 
       <main
         className={`relative z-10 min-h-screen overflow-x-hidden lg:ml-[276px] ${
-          fullWidth ? "" : "px-4 py-6 sm:px-6 lg:px-8 lg:py-8"
+          fullWidth ? "pb-24 lg:pb-0" : "px-4 pb-24 pt-2 sm:px-6 sm:py-6 lg:px-8 lg:py-8"
         }`}
       >
         {children}

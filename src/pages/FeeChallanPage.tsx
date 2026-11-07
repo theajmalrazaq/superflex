@@ -70,7 +70,7 @@ const PaymentInstructions = () => (
         },
       ].map((step, index) => (
         <li key={step.title} className="flex gap-3 py-3 first:pt-1 last:pb-1">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-[11px] font-bold text-white dark:bg-white dark:text-[#0a192f]">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#230052] text-[11px] font-bold text-white dark:bg-white dark:text-[#0a192f] sm:rounded-xl">
             {index + 1}
           </span>
           <div className="min-w-0 pt-0.5">
@@ -233,26 +233,28 @@ function FeeChallanPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-5 pb-24">
-        <header className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
+      <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-3.5 pb-6 sm:gap-5 sm:pb-24">
+        <header className="flex flex-col justify-between gap-3 xl:flex-row xl:items-end sm:gap-4">
           <div className="space-y-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+            <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-[10px] sm:font-bold sm:tracking-[0.16em] sm:text-white/80">
               Finance
             </p>
-            <h1 className="text-3xl font-bold tracking-tight text-white">Fee Challan</h1>
-            <p className="text-sm text-white/80">
+            <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:text-3xl sm:font-bold sm:tracking-tight">
+              Fee Challan
+            </h1>
+            <p className="text-xs text-white/85 sm:text-sm">
               FAST wants its money again. Your wallet's least favorite page.
             </p>
           </div>
-          <div className="flex w-fit items-center gap-3 rounded-full bg-white/15 px-4 py-2.5 text-[#101010] dark:bg-white/10 dark:text-white">
-            <Receipt size={19} />
-            <span className="text-sm font-semibold">
+          <div className="flex w-fit items-center gap-2 rounded-full bg-white/25 px-3.5 py-2 text-white backdrop-blur-md dark:bg-white/10 sm:gap-3 sm:bg-white/15 sm:px-4 sm:py-2.5 sm:text-[#101010] sm:dark:text-white">
+            <Receipt size={16} className="sm:h-[19px] sm:w-[19px]" />
+            <span className="text-xs font-semibold sm:text-sm">
               {stats.unpaid > 0 ? `${stats.unpaid} outstanding` : "All paid"}
             </span>
           </div>
         </header>
 
-        <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+        <div className="sf-mobile-cards-scroll pb-1 scrollbar-hide sm:grid sm:grid-cols-2 sm:gap-4 sm:pb-0 xl:grid-cols-4">
           <StatsCard
             icon={AlertCircle}
             label="Outstanding"
@@ -297,10 +299,10 @@ function FeeChallanPage() {
           )}
         />
 
-        <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)]">
-          <section className="min-w-0 overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]">
+        <div className="grid grid-cols-1 items-start gap-4 sm:gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)]">
+          <section className="min-w-0 overflow-hidden rounded-2xl border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px]">
             <div className="flex items-center gap-3 border-b border-black/[0.06] px-5 py-4 dark:border-white/[0.1] sm:px-6">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:rounded-2xl">
                 <FileText size={20} />
               </div>
               <div>
@@ -410,11 +412,11 @@ function FeeChallanPage() {
                 </table>
               </div>
 
-              <div className="space-y-3 p-4 md:hidden">
+              <div className="space-y-2.5 p-3 md:hidden sm:p-4">
                 {challans.map((c, idx) => (
                   <div
                     key={idx}
-                    className="space-y-4 rounded-[20px] border border-black/[0.06] bg-white p-4 dark:border-white/[0.1] dark:bg-black"
+                    className="space-y-3 rounded-xl border border-black/[0.06] bg-white p-3.5 dark:border-white/[0.1] dark:bg-black sm:space-y-4 sm:rounded-[20px] sm:p-4"
                   >
                     <div className="flex justify-between items-start">
                       <div className="space-y-1">
@@ -488,7 +490,7 @@ function FeeChallanPage() {
 
               {challans.length === 0 && (
                 <div className="flex flex-col items-center gap-3 px-6 py-14 text-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-[36%] bg-[#f2ecfc] text-[#230052] dark:bg-white/[0.1] dark:text-white">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-[13px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:rounded-2xl">
                     <Receipt size={22} />
                   </div>
                   <div>
@@ -504,9 +506,9 @@ function FeeChallanPage() {
             </div>
           </section>
 
-          <section className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6">
+          <section className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white p-4 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px] sm:p-6">
             <div className="mb-5 flex items-center gap-3 border-b border-black/[0.06] pb-4 dark:border-white/[0.1]">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:rounded-2xl">
                 <Printer size={19} />
               </div>
               <div>

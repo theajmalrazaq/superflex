@@ -10,7 +10,7 @@ const ChangePasswordSkeleton = () => (
     role="status"
     aria-label="Loading security settings"
   >
-    <div className="mx-auto w-full max-w-[480px] space-y-5 rounded-[32px] bg-white p-6 dark:bg-black sm:p-8">
+    <div className="mx-auto w-full max-w-[480px] space-y-5 rounded-2xl bg-white p-5 dark:bg-black sm:rounded-[32px] sm:p-8">
       <Skeleton className="h-12 w-12 rounded-2xl" />
       <Skeleton className="h-6 w-48" />
       <Skeleton className="h-4 w-72 max-w-full" />
@@ -34,7 +34,8 @@ const applyCustomStyling = (element: HTMLElement) => {
       "!border-0",
       "dark:!border",
       "dark:!border-white/[0.14]",
-      "!rounded-[32px]",
+      "!rounded-2xl",
+      "sm:!rounded-[32px]",
       "!p-0",
       "!text-[#101010]",
       "dark:!text-[#f5f6fb]",

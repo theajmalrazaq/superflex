@@ -14,7 +14,9 @@ import {
   GraduationCap,
   ChevronDown,
   ChevronUp,
+  ArrowLeft,
   ArrowRight,
+  ChevronRight,
 } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import StatsCard from "../components/ui/StatsCard";
@@ -69,19 +71,21 @@ const SectionAccordion = ({ section, isOpen, onToggle, course, pendingUpdates })
   const hasSectionUpdate = isSectionMarksUpdated(pendingUpdates, course, section.title);
 
   return (
-    <div className="mb-3 overflow-hidden rounded-[18px] border border-black/[0.06] bg-[#fafafa] dark:border-white/[0.1] dark:bg-white/[0.04]">
+    <div className="mb-2.5 overflow-hidden rounded-xl border border-black/[0.06] bg-[#fafafa] dark:border-white/[0.1] dark:bg-white/[0.04] sm:mb-3 sm:rounded-[18px]">
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center justify-between gap-3 bg-transparent px-4 py-3.5 text-left transition-colors hover:bg-black/[0.025] dark:hover:bg-white/[0.04]"
+        className="flex w-full items-center justify-between gap-2.5 bg-transparent px-3 py-2.5 text-left transition-colors hover:bg-black/[0.025] dark:hover:bg-white/[0.04] sm:gap-3 sm:px-4 sm:py-3.5"
       >
-        <div className="flex min-w-0 items-center gap-3">
+        <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
           <span
-            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${isOpen ? "bg-[#dfc8fc] text-[#230052] dark:bg-white dark:text-[#0a192f]" : "bg-white text-slate-500 dark:bg-white/10 dark:text-slate-300"}`}
+            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg sm:h-8 sm:w-8 sm:rounded-xl ${isOpen ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "bg-white text-slate-500 dark:bg-white/10 dark:text-slate-300"}`}
           >
-            {isOpen ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </span>
-          <span className="truncate text-sm font-semibold text-foreground">{section.title}</span>
+          <span className="truncate text-xs font-semibold text-foreground sm:text-sm">
+            {section.title}
+          </span>
           {hasSectionUpdate && (
             <span className="flex shrink-0 items-center justify-center p-0.5">
               <span
@@ -135,9 +139,9 @@ const SectionAccordion = ({ section, isOpen, onToggle, course, pendingUpdates })
                         )}
                       </div>
                     </td>
-                    <td className="p-3 text-right text-sm font-bold text-foreground">
+                    <td className="p-3 text-right text-xs font-bold text-foreground sm:text-sm">
                       {row.obtained}{" "}
-                      <span className="text-xs font-normal text-foreground/40">/ {row.total}</span>
+                      <span className="text-[11px] font-normal text-foreground/40 sm:text-xs">/ {row.total}</span>
                     </td>
                     <td className="p-3 text-right">
                       <span
@@ -174,7 +178,7 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
           </span>
         </div>
       </div>
-      <div className="grid max-h-[390px] grid-cols-2 gap-x-4 gap-y-5 overflow-y-auto px-1 pr-2 md:grid-cols-3 xl:grid-cols-5">
+      <div className="flex flex-col gap-4 sm:grid sm:max-h-[390px] sm:grid-cols-2 sm:gap-x-4 sm:gap-y-5 sm:overflow-y-auto sm:px-1 sm:pb-0 sm:pr-2 md:grid-cols-3 xl:grid-cols-5">
         {subjects.map((subject, index) => {
           const records = [...(subject.records || [])].sort(
             (a, b) =>
@@ -193,15 +197,15 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
           return (
             <div
               key={`${subject.title}-${index}`}
-              className="flex min-w-0 flex-col items-start py-1"
+              className="flex w-full flex-col items-start py-1 sm:min-w-0"
             >
               <div
-                className="mb-2 flex min-h-[180px] min-w-0 items-end gap-1.5 px-2 py-1"
+                className="mb-2 flex flex-col gap-1.5 py-1 sm:min-h-[180px] sm:flex-row sm:items-end sm:gap-1.5 sm:px-2"
                 role="list"
                 aria-label={`${subject.title} class sessions`}
               >
                 {columns.map((colRecords, colIndex) => (
-                  <div key={colIndex} className="flex flex-col-reverse gap-1">
+                  <div key={colIndex} className="flex flex-row flex-wrap gap-1 sm:flex-col-reverse">
                     {colRecords.map((record, recordIndex) => {
                       const status = String(record.status || "").trim();
                       const color = /\bp\b|present/i.test(status)
@@ -214,6 +218,12 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
                           key={`${record.date}-${recordIndex}`}
                           role="listitem"
                           aria-label={`${record.date}: ${status || "Unknown attendance status"}`}
+                          onClick={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            setHoveredDot((prev) =>
+                              prev?.record === record ? null : { record, rect },
+                            );
+                          }}
                           onMouseEnter={(e) =>
                             setHoveredDot({
                               record,
@@ -627,13 +637,106 @@ function HomePage() {
       fullWidth={true}
     >
       <div className="relative">
-        <div className="relative z-10 mx-auto w-full max-w-[1680px] space-y-7 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-          <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
-            <div className="flex min-w-0 items-center gap-4">
+        <div className="relative z-10 mx-auto w-full max-w-[1680px] space-y-3.5 px-4 pb-6 pt-3.5 sm:space-y-7 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+          {/* Mobile App Hero Header (Overview vs Profile) */}
+          {activeMainTab === "stats" ? (
+            <header className="space-y-2.5 pb-1 sm:hidden">
+              <div className="flex items-center justify-between gap-3">
+                <h1 className="min-w-0 text-[26px] font-extrabold leading-[1.12] tracking-[-0.035em] text-white">
+                  {greetingHeading}
+                </h1>
+                <button
+                  type="button"
+                  onClick={() => setActiveMainTab("info")}
+                  aria-label="Open student profile"
+                  className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/70 bg-white/25 transition-transform active:scale-95"
+                >
+                  <img
+                    src={profileImage}
+                    alt="Profile"
+                    className="h-full w-full object-cover"
+                    onError={(event) => {
+                      const fallbackUrl = getExtensionUrl("assets/favicon.png");
+                      if (fallbackUrl) event.currentTarget.src = fallbackUrl;
+                      else event.currentTarget.hidden = true;
+                    }}
+                  />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between gap-2 pt-0.5">
+                <div className="inline-flex min-w-0 items-center gap-2.5 rounded-full bg-white/30 p-1.5 pr-4 backdrop-blur-md dark:bg-white/10">
+                  <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-bold text-[#101027]">
+                    {rollNumber || universityInfo?.Section || "FLEX"}
+                  </span>
+                  <span className="truncate text-xs font-medium text-white">
+                    {greetingSubheading}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveMainTab("info")}
+                  className="shrink-0 rounded-full bg-white/95 px-3.5 py-2 text-xs font-bold text-[#101027] transition-transform active:scale-95 dark:bg-white/15 dark:text-white"
+                >
+                  Profile
+                </button>
+              </div>
+            </header>
+          ) : (
+            <header className="flex flex-col items-center pb-2 pt-1 text-center sm:hidden">
+              <div className="flex w-full items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => setActiveMainTab("stats")}
+                  aria-label="Back to Overview"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/25 text-white backdrop-blur-md transition-transform active:scale-95 dark:bg-white/10"
+                >
+                  <ArrowLeft size={19} strokeWidth={2.2} />
+                </button>
+                <span className="h-10 w-10" />
+              </div>
+
+              <div className="relative mt-1">
+                <img
+                  src={profileImage}
+                  alt=""
+                  className="h-24 w-24 rounded-full border-2 border-white/50 bg-white object-cover"
+                  onError={(event) => {
+                    const fallbackUrl = getExtensionUrl("assets/favicon.png");
+                    if (fallbackUrl) event.currentTarget.src = fallbackUrl;
+                    else event.currentTarget.hidden = true;
+                  }}
+                />
+              </div>
+
+              <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/25 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md dark:bg-white/10">
+                <span className="font-bold opacity-90">@</span>
+                <span>
+                  {(rollNumber || personalInfo?.Name || "student")
+                    .toLowerCase()
+                    .replace(/\s+/g, "")}
+                </span>
+              </div>
+
+              <p className="mt-3 text-xs font-medium text-white/95">
+                {universityInfo?.Degree || "Student"}
+                {universityInfo?.Batch ? ` · Batch ${universityInfo.Batch}` : ""}
+              </p>
+              <p className="mt-0.5 text-xs text-white/75">
+                {universityInfo?.Campus ? `${universityInfo.Campus} Campus` : "FAST NUCES"}
+                {universityInfo?.Section ? ` (${universityInfo.Section})` : ""}
+              </p>
+            </header>
+          )}
+
+          {/* Desktop Header */}
+          <header className="hidden flex-col justify-between gap-3.5 sm:flex sm:flex-row sm:items-center sm:gap-5">
+            <div className="flex min-w-0 items-center gap-3 sm:gap-4">
               <img
                 src={profileImage}
                 alt=""
-                className="h-12 w-12 shrink-0 rounded-full border-2 border-white/80 bg-white object-cover sm:h-14 sm:w-14"
+                className="h-10 w-10 shrink-0 rounded-full border-2 border-white/80 bg-white object-cover sm:h-14 sm:w-14"
                 onError={(event) => {
                   const fallbackUrl = getExtensionUrl("assets/favicon.png");
                   if (fallbackUrl) event.currentTarget.src = fallbackUrl;
@@ -641,13 +744,15 @@ function HomePage() {
                 }}
               />
               <div className="min-w-0">
-                <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-white/80 dark:text-white/80">
+                <p className="mb-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-white/80 dark:text-white/80 sm:mb-1 sm:text-[10px]">
                   Student dashboard
                 </p>
-                <h1 className="truncate text-[28px] font-bold leading-tight tracking-[-0.045em] text-white sm:text-4xl">
+                <h1 className="truncate text-xl font-bold leading-tight tracking-[-0.045em] text-white sm:text-4xl">
                   {greetingHeading}
                 </h1>
-                <p className="mt-1 text-sm text-white/80">{greetingSubheading}</p>
+                <p className="mt-0.5 text-xs text-white/80 sm:mt-1 sm:text-sm">
+                  {greetingSubheading}
+                </p>
               </div>
             </div>
 
@@ -655,25 +760,25 @@ function HomePage() {
               <button
                 type="button"
                 onClick={() => setActiveMainTab("stats")}
-                className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold transition-colors sm:px-5 sm:text-sm ${
+                className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm ${
                   activeMainTab === "stats"
                     ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"
                     : "text-slate-600 hover:text-[#230052] dark:text-slate-300 dark:hover:text-white"
                 }`}
               >
-                <Activity size={16} />
+                <Activity size={14} className="sm:h-4 sm:w-4" />
                 Overview
               </button>
               <button
                 type="button"
                 onClick={() => setActiveMainTab("info")}
-                className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold transition-colors sm:px-5 sm:text-sm ${
+                className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm ${
                   activeMainTab === "info"
                     ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"
                     : "text-slate-600 hover:text-[#230052] dark:text-slate-300 dark:hover:text-white"
                 }`}
               >
-                <User size={16} />
+                <User size={14} className="sm:h-4 sm:w-4" />
                 Profile
               </button>
             </div>
@@ -686,26 +791,26 @@ function HomePage() {
 
           {}
           {activeMainTab === "stats" && (
-            <div className="space-y-7">
-              <section aria-labelledby="overview-heading" className="space-y-4">
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div className="space-y-3 sm:space-y-7">
+              <section aria-labelledby="overview-heading" className="space-y-2.5 sm:space-y-4">
+                <div className="hidden flex-col gap-0.5 sm:flex sm:flex-row sm:items-end sm:justify-between sm:gap-1">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/80 sm:text-[10px]">
                       Overview
                     </p>
                     <h2
                       id="overview-heading"
-                      className="text-xl font-bold tracking-tight text-white"
+                      className="text-base font-bold tracking-tight text-white sm:text-xl"
                     >
                       Academic snapshot
                     </h2>
                   </div>
-                  <p className="text-xs text-white/75">
+                  <p className="text-[11px] text-white/75 sm:text-xs">
                     Live metrics from your marks and attendance records.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
+                <div className="sf-mobile-cards-scroll pb-1 scrollbar-hide sm:grid sm:grid-cols-2 sm:gap-4 sm:pb-0 xl:grid-cols-4 xl:gap-5">
                   <StatsCard
                     variant="dashboard"
                     icon={GraduationCap}
@@ -765,18 +870,19 @@ function HomePage() {
                 </div>
               </section>
 
-              <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2 xl:gap-8">
-                <div className="flex h-full flex-col gap-6 overflow-hidden rounded-[24px] border border-black/[0.06] bg-white p-5 text-slate-900 shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-7 xl:p-8">
-                  <div className="flex min-h-[52px] flex-col items-start justify-between gap-4 sm:flex-row">
-                    <div className="flex items-center gap-3">
-                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
-                        <Award size={22} />
+              <div className="grid grid-cols-1 items-stretch gap-3 sm:gap-6 lg:grid-cols-2 xl:gap-8">
+                <div className="flex h-full flex-col gap-3.5 overflow-hidden rounded-[22px] border border-black/[0.05] bg-white p-4 text-slate-900 shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:gap-6 sm:rounded-[24px] sm:p-7 xl:p-8">
+                  <div className="flex items-center justify-between gap-3 sm:min-h-[52px] sm:gap-4">
+                    <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12 sm:rounded-2xl">
+                        <Award size={18} className="sm:h-[22px] sm:w-[22px]" />
                       </span>
-                      <div className="space-y-1">
-                        <h3 className="text-lg font-bold tracking-tight text-foreground">
+                      <div className="min-w-0 space-y-0.5 sm:space-y-1">
+                        <h3 className="flex items-center gap-1 truncate text-[17px] font-bold tracking-[-0.02em] text-foreground sm:text-lg">
                           Assessments
+                          <ChevronRight size={17} className="text-foreground/60 sm:hidden" />
                         </h3>
-                        <p className="text-xs text-foreground/50">
+                        <p className="hidden truncate text-xs text-foreground/50 sm:block">
                           Let's see how badly those quizzes went.
                         </p>
                       </div>
@@ -784,9 +890,12 @@ function HomePage() {
                     {links.marks && (
                       <a
                         href={links.marks}
-                        className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#230052] px-4 text-xs font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80"
+                        className="flex h-7 items-center gap-1 rounded-full bg-[#230052] px-3 text-xs font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] sm:h-9 sm:gap-1.5 sm:px-4"
                       >
-                        View Details <ArrowRight size={12} />
+                        <span className="sm:hidden">See all</span>
+                        <span className="hidden items-center gap-1.5 sm:inline-flex">
+                          Details <ArrowRight size={11} />
+                        </span>
                       </a>
                     )}
                   </div>
@@ -797,7 +906,7 @@ function HomePage() {
                   ) : coursesData.length ? (
                     <>
                       <div className="w-full overflow-x-auto scrollbar-hide">
-                        <div className="flex w-fit gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/[0.08]">
+                        <div className="flex w-fit gap-1.5 rounded-full bg-slate-100 p-1 dark:bg-white/[0.08]">
                           {coursesData.map((course) => {
                             const hasUpdate = isCourseMarksUpdated(pendingUpdates, course);
                             const isActive = activeCourse === course.id;
@@ -806,7 +915,7 @@ function HomePage() {
                                 key={course.id}
                                 type="button"
                                 onClick={() => selectCourse(course.id)}
-                                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-5 py-2 text-xs font-bold transition-all ${
+                                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all sm:px-5 sm:py-2 ${
                                   isActive
                                     ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"
                                     : "text-slate-600 hover:text-[#230052] dark:text-slate-300 dark:hover:text-white"
@@ -832,8 +941,8 @@ function HomePage() {
                       </div>
                       {activeCourseData && (
                         <div key={activeCourse}>
-                          <div className="mb-4 flex flex-col gap-2">
-                            <h2 className="text-xl font-bold leading-tight text-foreground">
+                          <div className="mb-3 flex flex-col gap-1 sm:mb-4 sm:gap-2">
+                            <h2 className="text-[15px] font-bold leading-tight text-foreground sm:text-xl">
                               {activeCourseData.title}
                             </h2>
                             {teacherSelections[activeCourseData.id] && (
@@ -866,7 +975,7 @@ function HomePage() {
                               </span>
                             </div>
                           </div>
-                          <div className="space-y-3">
+                          <div className="space-y-2.5 sm:space-y-3">
                             {activeCourseData.sections
                               .filter((section) => !section.id.endsWith("Grand_Total_Marks"))
                               .map((section, index) => (
@@ -898,25 +1007,31 @@ function HomePage() {
                   )}
                 </div>
 
-                <div className="flex h-full flex-col gap-6 rounded-[24px] border border-black/[0.06] bg-white p-5 text-slate-900 shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-7 xl:p-8">
-                  <div className="flex min-h-[52px] items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
-                        <Activity size={22} />
+                <div className="flex h-full flex-col gap-3.5 rounded-[22px] border border-black/[0.05] bg-white p-4 text-slate-900 shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:gap-6 sm:rounded-[24px] sm:p-7 xl:p-8">
+                  <div className="flex items-center justify-between gap-3 sm:min-h-[52px] sm:gap-4">
+                    <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12 sm:rounded-2xl">
+                        <Activity size={18} className="sm:h-[22px] sm:w-[22px]" />
                       </span>
-                      <div className="space-y-1">
-                        <h3 className="text-lg font-bold tracking-tight text-foreground">
+                      <div className="min-w-0 space-y-0.5 sm:space-y-1">
+                        <h3 className="flex items-center gap-1 truncate text-[17px] font-bold tracking-[-0.02em] text-foreground sm:text-lg">
                           Attendance Overview
+                          <ChevronRight size={17} className="text-foreground/60 sm:hidden" />
                         </h3>
-                        <p className="text-xs text-foreground/50">Ek aur chutti aur game over?</p>
+                        <p className="hidden truncate text-xs text-foreground/50 sm:block">
+                          Ek aur chutti aur game over?
+                        </p>
                       </div>
                     </div>
                     {links.attendance && (
                       <a
                         href={links.attendance}
-                        className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#230052] px-4 text-xs font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80"
+                        className="flex h-7 items-center gap-1 rounded-full bg-[#230052] px-3 text-xs font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] sm:h-9 sm:gap-1.5 sm:px-4"
                       >
-                        View Details <ArrowRight size={12} />
+                        <span className="sm:hidden">See all</span>
+                        <span className="hidden items-center gap-1.5 sm:inline-flex">
+                          Details <ArrowRight size={11} />
+                        </span>
                       </a>
                     )}
                   </div>
@@ -961,36 +1076,50 @@ function HomePage() {
 const ProfileInfoTabs = ({ profileSections }) => {
   if (!profileSections || profileSections.length === 0) {
     return (
-      <div className="rounded-[24px] border border-black/[0.06] bg-white p-8 text-center text-sm text-slate-500 dark:border-white/[0.14] dark:bg-black dark:text-slate-400">
+      <div className="rounded-[22px] border border-black/[0.05] bg-white p-6 text-center text-sm text-slate-500 dark:border-white/[0.14] dark:bg-black dark:text-slate-400 sm:rounded-[24px] sm:p-8">
         Profile information is not available yet.
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-3 sm:space-y-8">
       {profileSections.map((section, idx) => (
         <div
           key={idx}
-          className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white p-6 text-slate-900 shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-8"
+          className="overflow-hidden rounded-[22px] border border-black/[0.05] bg-white px-5 pt-5 pb-3 text-[#101027] shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px] sm:p-8"
         >
-          {}
-          <div className="mb-6 flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+          {/* Section Header */}
+          <div className="mb-3 flex items-center gap-2.5 sm:mb-6 sm:gap-4">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12 sm:rounded-2xl">
               {(() => {
                 const title = section.title.toLowerCase();
-                if (title.includes("personal")) return <User size={24} />;
-                if (title.includes("university")) return <Building size={24} />;
+                if (title.includes("personal")) return <User size={18} className="sm:h-6 sm:w-6" />;
+                if (title.includes("university")) return <Building size={18} className="sm:h-6 sm:w-6" />;
                 if (title.includes("guardian") || title.includes("family"))
-                  return <Users size={24} />;
-                return <Activity size={24} />;
+                  return <Users size={18} className="sm:h-6 sm:w-6" />;
+                return <Activity size={18} className="sm:h-6 sm:w-6" />;
               })()}
             </div>
-            <h3 className="text-xl font-bold tracking-tight text-foreground">{section.title}</h3>
+            <h3 className="text-base font-bold tracking-tight text-foreground sm:text-xl">{section.title}</h3>
           </div>
 
-          {}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {/* Mobile Grouped Key-Value Rows (matches Screenshot 3) */}
+          <div className="divide-y divide-black/[0.06] dark:divide-white/[0.08] sm:hidden">
+            {Object.entries(section.data as Record<string, string>).map(([key, val], i) => (
+              <div key={i} className="flex items-center justify-between gap-3 py-2.5">
+                <span className="shrink-0 text-xs font-semibold text-[#101027] dark:text-white">
+                  {key}
+                </span>
+                <span className="min-w-0 truncate text-right text-xs font-normal text-[#667085] dark:text-[#9ca3b3]">
+                  {val}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop 3-Column Grid */}
+          <div className="hidden grid-cols-1 gap-3 sm:grid sm:grid-cols-2 xl:grid-cols-3">
             {Object.entries(section.data as Record<string, string>).map(([key, val], i) => (
               <div
                 key={i}
