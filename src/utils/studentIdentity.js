@@ -15,9 +15,7 @@ export const getActiveStudentId = () => {
 
 export const getStudentStorageKey = (key, studentId = getActiveStudentId()) => {
   const normalizedStudentId = normalizeStudentId(studentId);
-  return normalizedStudentId
-    ? `${key}:${encodeURIComponent(normalizedStudentId)}`
-    : null;
+  return normalizedStudentId ? `${key}:${encodeURIComponent(normalizedStudentId)}` : null;
 };
 
 const notifyIdentityChanged = () => {

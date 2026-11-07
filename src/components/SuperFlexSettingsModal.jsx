@@ -28,25 +28,8 @@ import {
   clearSavedCredentials,
   getCredentialMetadata,
 } from "../utils/credentialStorage";
-
-const Avatar = ({ teacher }) =>
-  teacher.image ? (
-    <img
-      src={teacher.image}
-      alt=""
-      className="h-10 w-10 shrink-0 rounded-2xl object-cover"
-      loading="lazy"
-    />
-  ) : (
-    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#230052]/10 text-xs font-bold text-[#230052] dark:bg-white/15 dark:text-white">
-      {teacher.name
-        .split(/\s+/)
-        .slice(0, 2)
-        .map((part) => part[0])
-        .join("")
-        .toUpperCase()}
-    </span>
-  );
+import TeacherAvatar from "./TeacherAvatar";
+import { createManualTeacher, filterTeachers } from "../utils/teacherSelection";
 
 export default function SuperFlexSettingsModal({
   open,
@@ -114,13 +97,7 @@ export default function SuperFlexSettingsModal({
 
   const activeCourse = (courses || [])[courseIndex] || null;
   const dockEnabled = open ? localStorage.getItem("superflex_ai_enabled") !== "false" : aiEnabled;
-  const filteredTeachers = useMemo(() => {
-    const search = query.trim().toLowerCase();
-    if (!search) return teachers;
-    return teachers.filter((teacher) =>
-      `${teacher.name} ${teacher.email} ${teacher.designation}`.toLowerCase().includes(search),
-    );
-  }, [teachers, query]);
+  const filteredTeachers = useMemo(() => filterTeachers(teachers, query), [teachers, query]);
 
   const handleToggleAi = (enabled, event) => {
     if (!event?.nativeEvent?.isTrusted) return;
@@ -154,17 +131,9 @@ export default function SuperFlexSettingsModal({
   };
 
   const addManualTeacher = () => {
-    const name = manualName.trim();
-    const email = manualEmail.trim();
-    if (!name || !activeCourse) return;
-    onSelectTeacher(activeCourse.id, {
-      id: `manual:${email.toLowerCase() || name.toLowerCase()}`,
-      name,
-      email,
-      designation: "Added by you",
-      image: "",
-      source: "manual",
-    });
+    const teacher = createManualTeacher(manualName, manualEmail);
+    if (!teacher || !activeCourse) return;
+    onSelectTeacher(activeCourse.id, teacher);
     setManualName("");
     setManualEmail("");
   };
@@ -415,7 +384,7 @@ export default function SuperFlexSettingsModal({
                           : "border-slate-100 hover:border-slate-300 dark:border-white/[0.05] dark:hover:border-white/15"
                       }`}
                     >
-                      <Avatar teacher={teacher} />
+                      <TeacherAvatar teacher={teacher} size="sm" />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-xs font-bold text-slate-900 dark:text-white">
                           {teacher.name}

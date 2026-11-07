@@ -5,25 +5,8 @@ import BottomSheet, {
   BottomSheetDescription,
   BottomSheetTitle,
 } from "./ui/BottomSheet";
-
-const Avatar = ({ teacher }) =>
-  teacher.image ? (
-    <img
-      src={teacher.image}
-      alt=""
-      className="h-11 w-11 shrink-0 rounded-2xl object-cover"
-      loading="lazy"
-    />
-  ) : (
-    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#230052]/10 text-sm font-bold text-[#230052] dark:bg-white/15 dark:text-white">
-      {teacher.name
-        .split(/\s+/)
-        .slice(0, 2)
-        .map((part) => part[0])
-        .join("")
-        .toUpperCase()}
-    </span>
-  );
+import TeacherAvatar from "./TeacherAvatar";
+import { createManualTeacher, filterTeachers } from "../utils/teacherSelection";
 
 export default function TeacherSelectionModal({
   open,
@@ -43,13 +26,7 @@ export default function TeacherSelectionModal({
   const [manualName, setManualName] = useState("");
   const [manualEmail, setManualEmail] = useState("");
   const activeCourse = courses[courseIndex];
-  const filteredTeachers = useMemo(() => {
-    const search = query.trim().toLowerCase();
-    if (!search) return teachers;
-    return teachers.filter((teacher) =>
-      `${teacher.name} ${teacher.email} ${teacher.designation}`.toLowerCase().includes(search),
-    );
-  }, [teachers, query]);
+  const filteredTeachers = useMemo(() => filterTeachers(teachers, query), [teachers, query]);
 
   useEffect(() => {
     if (open) {
@@ -59,17 +36,9 @@ export default function TeacherSelectionModal({
   }, [open]);
 
   const addManualTeacher = () => {
-    const name = manualName.trim();
-    const email = manualEmail.trim();
-    if (!name) return;
-    onSelect(activeCourse.id, {
-      id: `manual:${email.toLowerCase() || name.toLowerCase()}`,
-      name,
-      email,
-      designation: "Added by you",
-      image: "",
-      source: "manual",
-    });
+    const teacher = createManualTeacher(manualName, manualEmail);
+    if (!teacher || !activeCourse) return;
+    onSelect(activeCourse.id, teacher);
     setManualName("");
     setManualEmail("");
   };
@@ -162,7 +131,7 @@ export default function TeacherSelectionModal({
                   className={`flex w-full items-center gap-3 rounded-2xl border p-2.5 text-left transition-colors ${selected ? "border-[#230052]/30 bg-[#230052]/[.06] dark:border-white/40 dark:bg-white/[.1]" : "border-slate-200/80 hover:bg-slate-50 dark:border-white/10 dark:hover:bg-white/[.05]"}`}
                 >
                   <span className="scale-90">
-                    <Avatar teacher={teacher} />
+                    <TeacherAvatar teacher={teacher} />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-bold">{teacher.name}</span>

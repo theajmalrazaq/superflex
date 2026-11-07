@@ -1,4 +1,5 @@
-import { parseInteger, parseNumber, parsePortalAlerts, readText } from "./dom";
+import { parseNumber, parsePortalAlerts, readText } from "./dom";
+import { parseStudyPlanSemesters } from "./studyPlan";
 import type { HomeProfileData, RawMarkCourse, RawMarkRow, StudyPlanSemester } from "./types";
 
 export function parseHomeProfile(root: ParentNode): HomeProfileData {
@@ -122,25 +123,5 @@ export function parseHomeMarksReport(document: ParentNode): RawMarkCourse[] {
 }
 
 export function parseHomeStudyPlan(document: ParentNode): StudyPlanSemester[] {
-  return Array.from(document.querySelectorAll<HTMLElement>(".col-md-6")).flatMap((column) => {
-    const heading = column.querySelector("h4");
-    if (!heading) return [];
-    const creditText = readText(heading.querySelector("small"));
-    const title = (heading.textContent || "")
-      .replace(heading.querySelector("small")?.textContent || "", "")
-      .trim();
-    const courses = Array.from(column.querySelectorAll("table tbody tr")).flatMap((row) => {
-      const cells = row.querySelectorAll("td");
-      if (cells.length < 4) return [];
-      return [
-        {
-          code: readText(cells[0]),
-          title: readText(cells[1]),
-          crHrs: parseInteger(readText(cells[2])),
-          type: readText(cells[3]),
-        },
-      ];
-    });
-    return [{ title, crHrs: parseInteger(creditText.match(/\d+/)?.[0]), courses }];
-  });
+  return parseStudyPlanSemesters(document, "");
 }

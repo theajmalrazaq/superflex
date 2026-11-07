@@ -42,6 +42,28 @@ const TEACHER_SELECTIONS_KEY = "superflex_course_teachers_v1";
 const TEACHER_COURSES_KEY = "superflex_cached_courses_v1";
 const readTeacherSelections = () => readStudentJson(TEACHER_SELECTIONS_KEY, {});
 
+const fetchPortalDocument = async (url) => {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Portal request failed (${response.status})`);
+  const html = await response.text();
+  return new DOMParser().parseFromString(html, "text/html");
+};
+
+const ReportLoadError = ({ report, onRetry }) => (
+  <div role="alert" className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
+    <p className="text-sm font-semibold text-rose-600 dark:text-rose-300">
+      Could not load {report}.
+    </p>
+    <button
+      type="button"
+      onClick={onRetry}
+      className="rounded-full bg-[#230052] px-4 py-2 text-xs font-bold text-white dark:bg-white dark:text-[#0a192f]"
+    >
+      Retry
+    </button>
+  </div>
+);
+
 const SectionAccordion = ({ section, isOpen, onToggle, course, pendingUpdates }) => {
   const rows = section.rows || [];
   const hasSectionUpdate = isSectionMarksUpdated(pendingUpdates, course, section.title);
@@ -281,6 +303,9 @@ function HomePage() {
 
   const [loadingMarks, setLoadingMarks] = useState(false);
   const [loadingAttendance, setLoadingAttendance] = useState(false);
+  const [marksError, setMarksError] = useState(false);
+  const [attendanceError, setAttendanceError] = useState(false);
+  const [studyPlanError, setStudyPlanError] = useState(false);
   const [studyPlanData, setStudyPlanData] = useState(null);
   const [pendingUpdates, setPendingUpdates] = useState(null);
 
@@ -550,59 +575,54 @@ function HomePage() {
     setLinks(linkMap);
   };
 
-  useEffect(() => {
-    if (links.attendance) {
-      setLoadingAttendance(true);
-      fetchAttendance(links.attendance).finally(() => setLoadingAttendance(false));
-    }
-    if (links.marks) {
-      setLoadingMarks(true);
-      fetchMarks(links.marks).finally(() => setLoadingMarks(false));
-    }
-    if (links.studyPlan) {
-      fetchStudyPlan(links.studyPlan);
-    }
-  }, [links]);
-
   const fetchAttendance = async (url) => {
+    setLoadingAttendance(true);
+    setAttendanceError(false);
     try {
-      const res = await fetch(url);
-      const html = await res.text();
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, "text/html");
+      const doc = await fetchPortalDocument(url);
       const parsedAttendance = parseHomeAttendanceReport(doc);
       setAttendanceData(parsedAttendance);
     } catch (e) {
       console.error("Attendance fetch error", e);
+      setAttendanceError(true);
+    } finally {
+      setLoadingAttendance(false);
     }
   };
 
   const fetchMarks = async (url) => {
+    setLoadingMarks(true);
+    setMarksError(false);
     try {
-      const res = await fetch(url);
-      const html = await res.text();
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, "text/html");
+      const doc = await fetchPortalDocument(url);
       const parsedCourses = parseHomeMarksReport(doc).map((course) => processCourseMarks(course));
 
       setCoursesData(parsedCourses);
       if (parsedCourses.length) setActiveCourse(parsedCourses[0].id);
     } catch (e) {
       console.error("Marks fetch error", e);
+      setMarksError(true);
+    } finally {
+      setLoadingMarks(false);
     }
   };
 
   const fetchStudyPlan = async (url) => {
+    setStudyPlanError(false);
     try {
-      const res = await fetch(url);
-      const html = await res.text();
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, "text/html");
+      const doc = await fetchPortalDocument(url);
       setStudyPlanData(parseHomeStudyPlan(doc));
     } catch (e) {
       console.error("Study Plan fetch error", e);
+      setStudyPlanError(true);
     }
   };
+
+  useEffect(() => {
+    if (links.attendance) void fetchAttendance(links.attendance);
+    if (links.marks) void fetchMarks(links.marks);
+    if (links.studyPlan) void fetchStudyPlan(links.studyPlan);
+  }, [links]);
 
   return (
     <PageLayout
@@ -664,6 +684,9 @@ function HomePage() {
           </header>
 
           <NotificationBanner alerts={combinedAlerts} onDismissAlert={handleDismissAlert} />
+          {studyPlanError && (
+            <ReportLoadError report="study plan" onRetry={() => fetchStudyPlan(links.studyPlan)} />
+          )}
 
           {}
           {activeMainTab === "stats" && (
@@ -714,8 +737,8 @@ function HomePage() {
                     icon={Award}
                     iconTone="neutral"
                     label="Registered Courses"
-                    value={coursesData.length || 0}
-                    subValue="Current semester"
+                    value={marksError ? "Unavailable" : coursesData.length || 0}
+                    subValue={marksError ? "Marks could not be loaded" : "Current semester"}
                   />
                   <StatsCard
                     variant="dashboard"
@@ -725,6 +748,8 @@ function HomePage() {
                     value={
                       loadingAttendance ? (
                         <Skeleton className="my-1 h-6 w-24" />
+                      ) : attendanceError ? (
+                        "Unavailable"
                       ) : (
                         mostAbsentSubject?.title || "None"
                       )
@@ -732,10 +757,12 @@ function HomePage() {
                     subValue={
                       loadingAttendance ? (
                         <Skeleton className="h-3 w-16" />
+                      ) : attendanceError ? (
+                        "Attendance could not be loaded"
                       ) : mostAbsentSubject ? (
                         `${mostAbsentSubject.absent} Absents taken`
                       ) : (
-                        "All courses 80%+ safe"
+                        "No attendance data"
                       )
                     }
                   />
@@ -769,6 +796,8 @@ function HomePage() {
                   </div>
                   {loadingMarks ? (
                     <MarksSkeleton />
+                  ) : marksError ? (
+                    <ReportLoadError report="marks" onRetry={() => fetchMarks(links.marks)} />
                   ) : coursesData.length ? (
                     <>
                       <div className="w-full overflow-x-auto scrollbar-hide">
@@ -905,6 +934,11 @@ function HomePage() {
                   </div>
                   {loadingAttendance ? (
                     <AttendanceSkeleton />
+                  ) : attendanceError ? (
+                    <ReportLoadError
+                      report="attendance"
+                      onRetry={() => fetchAttendance(links.attendance)}
+                    />
                   ) : attendanceData?.length ? (
                     <AttendanceHeatmap
                       subjects={attendanceData}
