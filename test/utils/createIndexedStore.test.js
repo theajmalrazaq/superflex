@@ -1,6 +1,6 @@
 import { beforeEach, expect, it, vi } from "vitest";
 import { openDB } from "idb";
-import { createIndexedStore } from "./createIndexedStore";
+import { createIndexedStore } from "../../src/utils/createIndexedStore";
 
 vi.mock("idb", () => ({ openDB: vi.fn() }));
 

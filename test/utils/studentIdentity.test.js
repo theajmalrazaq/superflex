@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getStudentStorageKey } from "./studentIdentity";
+import { getStudentStorageKey } from "../../src/utils/studentIdentity";
 
 describe("getStudentStorageKey", () => {
   it("normalizes explicit student IDs before building storage keys", () => {

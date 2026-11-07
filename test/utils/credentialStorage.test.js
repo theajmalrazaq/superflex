@@ -8,7 +8,7 @@ import {
   getPendingLogin,
   clearPendingLogin,
   getCredentialMetadata,
-} from "./credentialStorage";
+} from "../../src/utils/credentialStorage";
 
 const storageMock = new Map();
 globalThis.chrome = {

@@ -2,15 +2,23 @@ import React, { useEffect, useMemo } from "react";
 import { DragDropProvider } from "@dnd-kit/react";
 import { DragDropManager } from "@dnd-kit/dom";
 
-class DeferredCleanupManager extends DragDropManager {
+export class DeferredCleanupManager extends DragDropManager {
   cleanupVersion = 0;
 
-  destroy() {
-    // The adapter's insertion-effect cleanup must not synchronously notify React subscribers.
-    const cleanupVersion = ++this.cleanupVersion;
-    queueMicrotask(() => {
-      if (cleanupVersion === this.cleanupVersion) super.destroy();
-    });
+  constructor(options) {
+    super(options);
+    const originalDestroy = this.destroy.bind(this);
+    this.destroy = () => {
+      const cleanupVersion = ++this.cleanupVersion;
+      queueMicrotask(() => {
+        if (cleanupVersion === this.cleanupVersion) {
+          try {
+            originalDestroy();
+          } catch {
+          }
+        }
+      });
+    };
   }
 
   cancelDeferredDestroy() {
@@ -19,7 +27,7 @@ class DeferredCleanupManager extends DragDropManager {
 }
 
 export default function DeferredDragDropProvider({ children, ...props }) {
-  const manager = useMemo(() => new DeferredCleanupManager(), []);
+  const manager = useMemo(() => new DeferredCleanupManager(props), []);
 
   useEffect(() => {
     manager.cancelDeferredDestroy();

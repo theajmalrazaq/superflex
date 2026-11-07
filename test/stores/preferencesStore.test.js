@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readNavOrder, resolveNavOrder } from "./preferencesStore";
+import { readNavOrder, resolveNavOrder } from "../../src/stores/preferencesStore";
 
 const localStorageMock = (() => {
   const values = new Map();
@@ -14,7 +14,7 @@ import {
   persistedPreferencesSchema,
   sidebarLinksSchema,
   themeModeSchema,
-} from "./preferencesSchemas";
+} from "../../src/stores/preferencesSchemas";
 
 describe("preference schemas", () => {
   it("accepts supported theme modes only", () => {

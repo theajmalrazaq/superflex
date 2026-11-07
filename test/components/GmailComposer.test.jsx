@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseEmailDraftContent, parseEmailDraftUrl } from "./GmailComposer";
+import { parseEmailDraftContent, parseEmailDraftUrl } from "../../src/components/GmailComposer";
 
 describe("parseEmailDraftUrl", () => {
   it("extracts an AI-generated Gmail draft", () => {

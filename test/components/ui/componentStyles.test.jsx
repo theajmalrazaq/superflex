@@ -1,9 +1,9 @@
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import Button from "./Button";
-import Input from "./Input";
-import SuperTabs from "./SuperTabs";
+import Button from "../../../src/components/ui/Button";
+import Input from "../../../src/components/ui/Input";
+import SuperTabs from "../../../src/components/ui/SuperTabs";
 
 describe("shared UI style contracts", () => {
   it("preserves button styling while allowing caller overrides", () => {
