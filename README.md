@@ -112,7 +112,7 @@ SuperFlex can run in Chromium-based Android browsers that support Chrome extensi
 
 ### Stack
 
-- React 19
+- TypeScript and React 19
 - WXT and Vite
 - Tailwind CSS 4
 - Radix UI primitives
@@ -136,10 +136,29 @@ WXT creates the development extension output. Load the generated Chrome MV3 dire
 ```bash
 npm run lint
 npm test
-npm run typecheck:parsers
+npm run typecheck
 npm run format:check
 npm run build
 ```
+
+The project-wide TypeScript check covers source, tests, build configuration, and documentation scripts. Implicit parameter types and nullable legacy values are allowed during migration; the parser check remains fully strict.
+
+### Shared state and validation
+
+Use the Zustand preference, teacher, and faculty stores for state shared between components. Teacher data stays in the existing student-scoped storage keys; faculty requests are cached separately by campus. Keep transient form fields and modal state local to their components.
+
+Validate storage, extension messages, model responses, credentials, email drafts, and review data with the Zod Mini schemas in `src/schemas/`. Derive TypeScript types from schemas when a runtime schema exists. Use the shared Markdown parser for draft links and question text, including reference links and nested formatting. Regex remains useful for locating tokens and extracting portal formats; complete-value validation belongs in schemas.
+
+The existing Radix primitives, `cva`, `cn` (`clsx` and `tailwind-merge`), Chart.js, and transactional `idb` helpers already serve their intended roles. Use `structuredClone` for copies of plain academic data.
+
+### Documentation website
+
+```bash
+npm run dev:docs
+npm run build:docs
+```
+
+The docs pages load TypeScript modules through Vite. Publish `dist-docs/` after building; serving the raw HTML directly does not compile those modules. HTML, CSS, JSON, Markdown, and media remain in their native formats.
 
 ### Project map
 
@@ -147,16 +166,18 @@ npm run build
 src/
 ├── components/       Shared UI, settings, AI, instructor and login experiences
 ├── components/ui/    Buttons, inputs, bottom sheets, modals and reusable states
-├── entrypoints/      WXT content-script and background-service-worker entrypoints
+├── entrypoints/      WXT content script, background worker, and browser bridge
 ├── hooks/            Academic context synchronization
 ├── pages/            Portal page replacements
 ├── parsers/          Typed HTML-to-data parsers
-├── stores/           Persisted user preferences
+├── schemas/          Runtime validation for stored and external data
+├── stores/           Shared preferences, student teachers, and campus faculty cache
 └── utils/            Storage, credentials, processing and extension helpers
 
 docs/
 ├── index.html        Project website
 ├── docs.html         Documentation reader
+├── scripts/          TypeScript website behavior and theme setup
 └── articles/         AI guide, privacy policy and engineering notes
 ```
 

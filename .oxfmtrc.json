@@ -1,4 +1,4 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": ["dist/**", "**/puter.js"]
+  "ignorePatterns": ["dist/**", "**/puter.js", "dist-docs/**"]
 }

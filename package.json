@@ -13,12 +13,12 @@
     "test:watch": "vitest",
     "typecheck:parsers": "tsc -p tsconfig.parsers.json",
     "format": "oxfmt",
-    "format:check": "oxfmt --check"
+    "format:check": "oxfmt --check",
+    "typecheck": "wxt prepare && tsc --noEmit && tsc -p tsconfig.parsers.json",
+    "dev:docs": "vite --config vite.docs.config.ts",
+    "build:docs": "vite build --config vite.docs.config.ts && cp -R docs/res docs/articles docs/reviews.json dist-docs/"
   },
   "dependencies": {
-    "@dnd-kit/dom": "^0.5.3",
-    "@dnd-kit/helpers": "^0.5.3",
-    "@dnd-kit/react": "^0.5.3",
     "@tailwindcss/postcss": "^4.1.13",
     "agentcomposerui": "0.1.3",
     "chart.js": "^4.5.1",
@@ -26,6 +26,7 @@
     "clsx": "^2.1.1",
     "idb": "8.0.4",
     "lucide-react": "^0.487.0",
+    "mdast-util-to-string": "^4.0.0",
     "postcss": "^8.5.6",
     "radix-ui": "^1.8.1",
     "react": "^19.2.3",
@@ -33,8 +34,10 @@
     "react-dom": "^19.2.3",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
     "tailwind-merge": "^3.7.0",
     "tailwindcss": "^4.1.13",
+    "unified": "^11.0.5",
     "zod": "^4.6.7",
     "zustand": "^5.0.16"
   },

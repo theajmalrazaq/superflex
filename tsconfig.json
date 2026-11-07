@@ -1,0 +1,22 @@
+{
+  "extends": "./.wxt/tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": false,
+    "verbatimModuleSyntax": false,
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "useUnknownInCatchVariables": false
+  },
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "*.config.ts",
+    ".wxt/wxt.d.ts",
+    "docs/scripts/**/*.ts",
+    "vite.docs.config.ts"
+  ],
+  "exclude": ["node_modules", "dist", "dist-docs"]
+}

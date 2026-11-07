@@ -66,9 +66,11 @@ Please be respectful and constructive in discussions, issue reports, and pull re
   git checkout -b fix/your-bug-fix
   ```
 
+Run `bun run typecheck` and `bun test` before submitting changes. Use `.ts` for modules and `.tsx` for React components and tests. Run `bun run dev:docs` to work on the documentation website.
+
 ### Code Style & Formatting
 
-- Maintain consistency with the existing codebase (React 19, Tailwind CSS v4, modern ES module syntax).
+- Maintain consistency with the existing codebase (TypeScript, React 19, Tailwind CSS v4, modern ES module syntax).
 - Format your code with oxfmt:
   ```bash
   bun run format

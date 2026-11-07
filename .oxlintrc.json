@@ -6,7 +6,7 @@
     "webextensions": true,
     "builtin": true
   },
-  "ignorePatterns": ["dist/**", "public/scripts/**"],
+  "ignorePatterns": ["dist/**", "dist-docs/**"],
   "categories": {
     "correctness": "warn"
   },
