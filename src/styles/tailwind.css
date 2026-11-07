@@ -3,7 +3,6 @@
 @source "../../node_modules/agentcomposerui/dist";
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Keep extension surfaces flat without changing styles on the host portal. */
 #react-chrome-app *,
 #react-chrome-app *::before,
 #react-chrome-app *::after,
@@ -17,7 +16,6 @@ body > [data-radix-portal] *::after {
   text-shadow: none !important;
 }
 
-/* stylelint-disable-next-line at-rule-no-unknown */
 @theme {
   --color-accent: var(--accent);
   --color-background: var(--background);
@@ -103,12 +101,12 @@ body > [data-radix-portal] *::after {
 }
 
 html {
-  font-size: 80%; /* Scale down to approx 14.4px base */
+  font-size: 80%;
 }
 
 @media (max-width: 640px) {
   html {
-    font-size: 70%; /* Scale down to approx 12.8px base on mobile */
+    font-size: 70%;
   }
 }
 
@@ -180,8 +178,6 @@ h6 {
   font-weight: 700;
 }
 
-/* Chat Markdown is explicitly styled because Tailwind's reset removes the
-   browser defaults that distinguish headings, lists, quotes, and code. */
 .markdown-body {
   min-width: 0;
   overflow-wrap: anywhere;
@@ -364,7 +360,6 @@ h6 {
   margin-right: 0.45em;
 }
 
-/* Toast Redesign */
 #toast-container {
   display: flex !important;
   flex-direction: column;
@@ -392,7 +387,7 @@ h6 {
 }
 
 #toast-container > div:hover {
-  box-shadow: none !important; /* Glow effect on hover */
+  box-shadow: none !important;
   border-color: color-mix(in srgb, var(--accent), transparent 0.7) !important;
   transform: translateY(-2px);
 }
@@ -402,24 +397,22 @@ h6 {
   margin-left: 0 !important;
 }
 
-/* Toast Types */
 .toast-success {
-  border-left: 4px solid #10b981 !important; /* Emerald-500 */
+  border-left: 4px solid #10b981 !important;
 }
 
 .toast-error {
-  border-left: 4px solid #f43f5e !important; /* Rose-500 */
+  border-left: 4px solid #f43f5e !important;
 }
 
 .toast-info {
-  border-left: 4px solid #3b82f6 !important; /* Blue-500 */
+  border-left: 4px solid #3b82f6 !important;
 }
 
 .toast-warning {
-  border-left: 4px solid #f59e0b !important; /* Amber-500 */
+  border-left: 4px solid #f59e0b !important;
 }
 
-/* Explicitly remove background images (icons) from all toast types with high specificity */
 #toast-container > .toast-success,
 #toast-container > .toast-error,
 #toast-container > .toast-info,
@@ -427,14 +420,12 @@ h6 {
   background-image: none !important;
 }
 
-/* Remove pseudo-elements that might be used for icons or effects */
 #toast-container > div::before,
 #toast-container > div::after {
   content: none !important;
   display: none !important;
 }
 
-/* Keep portal toasts inside the visible viewport. */
 .toast-top-right {
   top: 12px;
   right: 12px;
@@ -460,7 +451,7 @@ h6 {
     linear-gradient(#fff 0 0);
   mask-composite: exclude;
   padding: 1px;
-  background: rgba(255, 255, 255, 0.08); /* Modern, subtle static border */
+  background: rgba(255, 255, 255, 0.08);
   z-index: 10;
 }
 
@@ -468,7 +459,6 @@ h6 {
   display: none !important;
 }
 
-/* Shared table treatment: compact list rows, quiet dividers, and stable header styling. */
 .sf-data-table,
 .sf-data-table-wrapper table {
   width: 100%;
@@ -537,7 +527,6 @@ h6 {
   background: rgb(255 255 255 / 2.5%);
 }
 
-/* The assistant logo keeps its subtle pulse independently of the retired page loader. */
 @keyframes splash {
   0% {
     transform: scale(0.2);
@@ -558,7 +547,6 @@ h6 {
   transform-origin: center;
 }
 
-/* The outreach library always renders inbox snippet text; student emails do not need it. */
 .superflex-email-composer div:has(> label[for="email-preview-text"]) {
   display: none;
 }

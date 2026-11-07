@@ -27,9 +27,7 @@ const NotFoundPage = () => {
           </div>
 
           <div className="space-y-4">
-            <h1 className="text-4xl !font-bold !text-foreground">
-              Page Not Found
-            </h1>
+            <h1 className="text-4xl !font-bold !text-foreground">Page Not Found</h1>
             <p className="!text-foreground/50 text-sm leading-relaxed">
               Bhai, tu kahan aa gaya? This page doesn't exist. Just like your semester break.
             </p>

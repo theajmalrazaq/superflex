@@ -46,7 +46,10 @@ const Button = ({
     >
       <div className="flex min-h-[1.5rem] w-full items-center justify-center">
         {isLoading ? (
-          <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden="true" />
+          <span
+            className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+            aria-hidden="true"
+          />
         ) : (
           <div className="flex items-center justify-center gap-2.5">
             {icon && (

@@ -21,17 +21,16 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import GmailComposer, {
-  parseEmailDraftContent,
-  parseEmailDraftUrl,
-} from "./GmailComposer";
+import GmailComposer, { parseEmailDraftContent, parseEmailDraftUrl } from "./GmailComposer";
 import { sendExtensionMessage } from "../utils/extensionApi";
+import { getActiveStudentId } from "../utils/studentIdentity";
+import { readStudentJson } from "../utils/jsonStorage";
+import { useProfileImage } from "../hooks/useProfileImage";
 import { buildGeminiPayload } from "../utils/aiPrompt";
 import {
   deleteAiMessages,
   getAiContext,
   getAiMessages,
-  getProfileImage,
   setAiMessages,
 } from "../utils/userDataStorage";
 
@@ -202,7 +201,6 @@ const MarkdownRenderer = ({ content, isStreaming = false, onOpenEmailComposer })
             </p>
           ),
           a: ({ href, children }) => {
-            // Check if this link is an email draft action (Gmail compose URL or mailto with subject/body)
             const hasDraftQuery = (urlStr) => {
               if (!urlStr) return false;
               return (
@@ -243,7 +241,6 @@ const MarkdownRenderer = ({ content, isStreaming = false, onOpenEmailComposer })
               );
             }
 
-            // Normal email address (e.g. mailto:user@domain.com) or external web link
             const isEmail = Boolean(href && href.startsWith("mailto:"));
             return (
               <a
@@ -291,9 +288,8 @@ const SuperFlexAI = () => {
     lastSync: null,
   });
 
-  const [permissionStatus, setPermissionStatus] = useState(
-    () => localStorage.getItem("superflex_ai_data_permission") || "pending",
-  );
+  const [permissionStatus, setPermissionStatus] = useState("pending");
+  const [studentId, setStudentId] = useState(getActiveStudentId);
   const [aiEnabled, setAiEnabled] = useState(() => {
     return localStorage.getItem("superflex_ai_enabled") !== "false";
   });
@@ -301,13 +297,14 @@ const SuperFlexAI = () => {
   const [availableModels, setAvailableModels] = useState([]);
   const [isRefreshingModels, setIsRefreshingModels] = useState(false);
   const [showAiSettings, setShowAiSettings] = useState(false);
-  const [hasApiKey, setHasApiKey] = useState(false);
+  const [showKeyModal, setShowKeyModal] = useState(false);
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [isConnecting, setIsConnecting] = useState(false);
-  const [connectionError, setConnectionError] = useState("");
+  const [keyError, setKeyError] = useState("");
+  const [hasApiKey, setHasApiKey] = useState(false);
   const [emailDraft, setEmailDraft] = useState(null);
   const [dismissedDrafts, setDismissedDrafts] = useState({});
-  const [userImage, setUserImage] = useState("/Login/GetImage");
+  const userImage = useProfileImage();
   const scrollRef = useRef(null);
   const activeRequestIdRef = useRef(null);
 
@@ -320,19 +317,33 @@ const SuperFlexAI = () => {
       );
     });
 
-  const connectGemini = async () => {
+  const openSecureKeySettings = () => {
+    setShowAiSettings(false);
+    setApiKeyInput("");
+    setKeyError("");
+    setShowKeyModal(true);
+  };
+
+  const saveApiKey = async (event) => {
+    event.preventDefault();
+    if (!event?.nativeEvent?.isTrusted || !apiKeyInput.trim() || isConnecting) return;
     setIsConnecting(true);
-    setConnectionError("");
-    const result = await runtimeMessage({ type: "SUPERFLEX_AI_SAVE_KEY", apiKey: apiKeyInput });
+    setKeyError("");
+    const result = await runtimeMessage({
+      type: "SUPERFLEX_AI_SAVE_KEY",
+      apiKey: apiKeyInput.trim(),
+    });
     setIsConnecting(false);
     if (result.error) {
-      setConnectionError(result.error);
+      setKeyError(result.error);
       return;
     }
     setHasApiKey(true);
     setActiveModel(result.model || null);
     setAvailableModels(result.availableModels || []);
     setApiKeyInput("");
+    setShowKeyModal(false);
+    window.dispatchEvent(new CustomEvent("superflex-ai-key-updated"));
   };
 
   const handleSelectModel = async (model) => {
@@ -359,16 +370,27 @@ const SuperFlexAI = () => {
   };
 
   useEffect(() => {
-    let active = true;
-    const loadProfileImage = async (event) => {
-      const image = event?.detail || (await getProfileImage());
-      if (active) setUserImage(image);
+    const loadPermission = () => {
+      runtimeMessage({ type: "SUPERFLEX_AI_PERMISSION_GET" }).then((result) =>
+        setPermissionStatus(result?.status || "denied"),
+      );
     };
-    loadProfileImage();
-    window.addEventListener("superflex-profile-image-changed", loadProfileImage);
+    loadPermission();
+    const identityChanged = () => {
+      window.superflex_ai_context = null;
+      setStudentId(getActiveStudentId());
+      setDataContext({});
+      setMessages([]);
+      setPermissionStatus("pending");
+      loadPermission();
+    };
+    window.addEventListener("superflex-student-identity-changed", identityChanged);
+    window.addEventListener("superflex-permission-updated", loadPermission);
+    window.addEventListener("superflex-ai-enabled-changed", loadPermission);
     return () => {
-      active = false;
-      window.removeEventListener("superflex-profile-image-changed", loadProfileImage);
+      window.removeEventListener("superflex-student-identity-changed", identityChanged);
+      window.removeEventListener("superflex-permission-updated", loadPermission);
+      window.removeEventListener("superflex-ai-enabled-changed", loadPermission);
     };
   }, []);
 
@@ -379,15 +401,14 @@ const SuperFlexAI = () => {
         setHasApiKey(Boolean(result.configured));
         setActiveModel(result.model || null);
         setAvailableModels(result.availableModels || []);
-        if (result.warning) setConnectionError(result.warning);
       });
     };
 
     fetchConfig();
 
     const handleKeyUpdate = () => fetchConfig();
-    const handleEnabledChange = (e) => {
-      setAiEnabled(e.detail !== false && localStorage.getItem("superflex_ai_enabled") !== "false");
+    const handleEnabledChange = () => {
+      setAiEnabled(localStorage.getItem("superflex_ai_enabled") !== "false");
     };
 
     window.addEventListener("superflex-ai-key-updated", handleKeyUpdate);
@@ -415,10 +436,8 @@ const SuperFlexAI = () => {
     loadPersistedAiData();
 
     try {
-      const savedTeachers = JSON.parse(
-        localStorage.getItem("superflex_course_teachers_v1") || "null",
-      );
-      const savedRollNo = localStorage.getItem("superflex_student_roll_number_v1") || "";
+      const savedTeachers = readStudentJson("superflex_course_teachers_v1", null, studentId);
+      const savedRollNo = studentId;
       if (savedTeachers || savedRollNo) {
         setDataContext((prev) => ({
           ...prev,
@@ -450,21 +469,25 @@ const SuperFlexAI = () => {
       window.removeEventListener("superflex-data-updated", handleDataUpdate);
       window.removeEventListener("superflex-teachers-updated", handleTeachersUpdate);
     };
-  }, [permissionStatus]);
+  }, [permissionStatus, studentId]);
 
   useEffect(() => {
-    const handleToggle = () => setIsOpen((prev) => !prev);
+    const handleToggle = (event) => {
+      if (event instanceof CustomEvent || event.isTrusted) {
+        setIsOpen((prev) => !prev);
+      }
+    };
     window.addEventListener("superflex-toggle-ai", handleToggle);
     return () => window.removeEventListener("superflex-toggle-ai", handleToggle);
   }, []);
 
   useEffect(() => {
     if (messages.length > 0) {
-      setAiMessages(messages).catch((error) =>
+      setAiMessages(messages, studentId).catch((error) =>
         console.error("Failed to save AI chat history", error),
       );
     }
-  }, [messages]);
+  }, [messages, studentId]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -472,12 +495,24 @@ const SuperFlexAI = () => {
     }
   }, [messages, isLoading]);
 
-  const handleSend = async (txt) => {
+  const handleSend = async (txt, event) => {
+    if (!event?.nativeEvent?.isTrusted) return;
     const textToSend = txt || input;
     if (!textToSend.trim() || isLoading || requestInProgressRef.current) return;
 
     if (permissionStatus !== "granted") {
       setIsOpen(false);
+      return;
+    }
+    if (!studentId) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content:
+            "Open the Home page first so SuperFlex can identify your student account, then try again.",
+        },
+      ]);
       return;
     }
 
@@ -500,15 +535,10 @@ const SuperFlexAI = () => {
       const currentTeachers =
         dataContext.teachers ||
         (() => {
-          try {
-            return JSON.parse(localStorage.getItem("superflex_course_teachers_v1") || "null");
-          } catch {
-            return null;
-          }
+          return readStudentJson("superflex_course_teachers_v1", null, studentId);
         })();
 
-      const currentRollNumber =
-        dataContext.rollNumber || localStorage.getItem("superflex_student_roll_number_v1") || "";
+      const currentRollNumber = dataContext.rollNumber || studentId;
 
       const payload = buildGeminiPayload({
         question: userMessage,
@@ -520,7 +550,6 @@ const SuperFlexAI = () => {
         history: messages,
       });
 
-      // Attempt real-time streaming via Chrome port
       const streamed = await new Promise((resolve) => {
         let streamPort;
         try {
@@ -570,7 +599,7 @@ const SuperFlexAI = () => {
               streamPort.disconnect();
             } catch {}
             streamPortRef.current = null;
-            // Fall back to standard request if streaming hit an error
+
             resolve(false);
           }
         });
@@ -587,7 +616,6 @@ const SuperFlexAI = () => {
         streamPort.postMessage({ type: "START", payload });
       });
 
-      // If streaming wasn't successful, fall back to standard runtimeMessage
       if (!streamed && activeRequestIdRef.current === requestId) {
         const result = await runtimeMessage({
           type: "SUPERFLEX_AI_CHAT",
@@ -653,14 +681,16 @@ const SuperFlexAI = () => {
     }
   };
 
-  const handlePermission = (status) => {
-    setPermissionStatus(status);
-    localStorage.setItem("superflex_ai_data_permission", status);
-    window.dispatchEvent(new CustomEvent("superflex-permission-updated", { detail: status }));
+  const handlePermission = async (status, event) => {
+    if (!event?.nativeEvent?.isTrusted) return;
+    const result = await runtimeMessage({ type: "SUPERFLEX_AI_PERMISSION_SET", status });
+    if (!result?.status) return;
+    setPermissionStatus(result.status);
+    window.dispatchEvent(new CustomEvent("superflex-permission-updated"));
   };
 
   const clearChat = async () => {
-    await deleteAiMessages();
+    await deleteAiMessages(studentId);
     setMessages([]);
   };
 
@@ -752,7 +782,77 @@ const SuperFlexAI = () => {
 
   return (
     <>
-      {/* Blurred Modal Backdrop when active */}
+      {showKeyModal && (
+        <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm">
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="gemini-key-title"
+            className="w-full max-w-md rounded-3xl border border-black/10 bg-white p-6 text-foreground shadow-2xl dark:border-white/15 dark:bg-[#101014]"
+          >
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <div>
+                <h2 id="gemini-key-title" className="text-lg font-bold">
+                  Connect Gemini API key
+                </h2>
+                <p className="mt-1 text-sm text-foreground/60">
+                  Your key is verified and saved in this extension's local storage.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowKeyModal(false)}
+                aria-label="Close"
+                className="rounded-full p-2 text-foreground/60 hover:bg-black/5 dark:hover:bg-white/10"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <a
+              href="https://aistudio.google.com/app/apikey"
+              target="_blank"
+              rel="noreferrer"
+              className="mb-4 inline-flex text-sm font-semibold text-[#230052] hover:underline dark:text-white"
+            >
+              Get a free Gemini API key ↗
+            </a>
+            <form onSubmit={saveApiKey} className="space-y-3">
+              <input
+                type="password"
+                autoComplete="off"
+                autoFocus
+                value={apiKeyInput}
+                onChange={(event) => {
+                  setApiKeyInput(event.target.value);
+                  setKeyError("");
+                }}
+                placeholder="Paste Gemini API key"
+                aria-label="Gemini API key"
+                className="min-h-12 w-full rounded-xl border border-black/10 bg-slate-50 px-4 text-sm text-foreground outline-none focus:ring-2 focus:ring-[#230052]/30 dark:border-white/10 dark:bg-white/[0.06]"
+              />
+              {keyError && (
+                <p role="alert" className="text-sm text-rose-500">
+                  {keyError}
+                </p>
+              )}
+              <button
+                type="submit"
+                disabled={!apiKeyInput.trim() || isConnecting}
+                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#230052] px-4 text-sm font-bold text-white disabled:opacity-50 dark:bg-white dark:text-[#0a192f]"
+              >
+                {isConnecting ? (
+                  <>
+                    <LoaderCircle size={16} className="animate-spin" /> Verifying…
+                  </>
+                ) : (
+                  "Verify and save key"
+                )}
+              </button>
+            </form>
+          </section>
+        </div>
+      )}
+      {}
       {isOpen && (
         <div
           onClick={() => {
@@ -764,12 +864,12 @@ const SuperFlexAI = () => {
         />
       )}
 
-      {/* Floating Center Dock (Card + Input Pill) */}
+      {}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999] w-[min(520px,calc(100vw-2rem))] pointer-events-auto">
-        {/* Pop-up Response Card */}
+        {}
         {isOpen && (
           <div className="absolute bottom-full mb-3.5 left-1/2 -translate-x-1/2 w-[min(720px,calc(100vw-2rem))] max-h-[min(580px,calc(100vh-140px))] flex flex-col rounded-[24px] border border-black/[0.08] bg-white/95 p-4 sm:p-5 shadow-2xl backdrop-blur-2xl dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] animate-in fade-in slide-in-from-bottom-3 duration-200 overflow-hidden">
-            {/* Card Top Header */}
+            {}
             <div className="flex items-center justify-between pb-3 mb-2 border-b border-black/[0.06] dark:border-white/[0.08] shrink-0">
               <div className="flex items-center gap-2">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] shadow-xs">
@@ -808,7 +908,7 @@ const SuperFlexAI = () => {
               </div>
             </div>
 
-            {/* Card Body */}
+            {}
             <div className="flex-1 overflow-y-auto min-h-0 pr-1 scrollbar-hide">
               {permissionStatus !== "granted" ? (
                 <div className="flex flex-col gap-3 py-3">
@@ -829,8 +929,8 @@ const SuperFlexAI = () => {
                   <div className="flex gap-2 justify-end pt-1">
                     <button
                       type="button"
-                      onClick={() => {
-                        handlePermission("denied");
+                      onClick={(event) => {
+                        handlePermission("denied", event);
                         setIsOpen(false);
                       }}
                       className="rounded-full px-4 py-1.5 text-xs font-semibold text-foreground/60 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
@@ -839,7 +939,7 @@ const SuperFlexAI = () => {
                     </button>
                     <button
                       type="button"
-                      onClick={() => handlePermission("granted")}
+                      onClick={(event) => handlePermission("granted", event)}
                       className="rounded-full bg-[#230052] px-4 py-1.5 text-xs font-bold text-white transition-all hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80"
                     >
                       Enable Octopus
@@ -861,27 +961,13 @@ const SuperFlexAI = () => {
                       </span>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <input
-                      type="password"
-                      value={apiKeyInput}
-                      onChange={(e) => setApiKeyInput(e.target.value)}
-                      placeholder="Paste Gemini API key (AIzaSy...)"
-                      className="min-w-0 flex-1 rounded-xl border border-black/[0.08] bg-slate-50 px-3 py-2 text-xs text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-[#230052]/30 dark:border-white/[0.1] dark:bg-white/[0.06]"
-                    />
-                    <button
-                      type="button"
-                      onClick={connectGemini}
-                      disabled={!apiKeyInput.trim() || isConnecting}
-                      className="flex items-center gap-1.5 rounded-xl bg-[#230052] px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[#370c72] disabled:opacity-50 dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80"
-                    >
-                      {isConnecting ? (
-                        <LoaderCircle size={14} className="animate-spin" />
-                      ) : (
-                        "Connect"
-                      )}
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={openSecureKeySettings}
+                    className="self-start rounded-xl bg-[#230052] px-4 py-2 text-xs font-bold text-white hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f]"
+                  >
+                    Add Gemini API key
+                  </button>
                   <div className="flex items-center justify-between text-[11px]">
                     <a
                       href="https://aistudio.google.com/app/apikey"
@@ -891,9 +977,6 @@ const SuperFlexAI = () => {
                     >
                       Get free Gemini API key ↗
                     </a>
-                    {connectionError && (
-                      <span className="text-rose-500 font-medium">{connectionError}</span>
-                    )}
                   </div>
                 </div>
               ) : messages.length === 0 ? (
@@ -908,7 +991,7 @@ const SuperFlexAI = () => {
                     Ask Octopus anything about your marks, attendance, GPA, or teachers.
                   </p>
 
-                  {/* 4 Data Sync Cards */}
+                  {}
                   <div className="mt-3.5 grid w-full grid-cols-4 gap-2 text-left">
                     {syncCards.map((card) => {
                       const Icon = card.icon;
@@ -916,7 +999,9 @@ const SuperFlexAI = () => {
                         <button
                           key={card.id}
                           type="button"
-                          onClick={card.active ? () => handleSend(card.prompt) : undefined}
+                          onClick={
+                            card.active ? (event) => handleSend(card.prompt, event) : undefined
+                          }
                           disabled={!card.active}
                           title={
                             card.active
@@ -965,14 +1050,14 @@ const SuperFlexAI = () => {
                     })}
                   </div>
 
-                  {/* Additional Quick Prompts */}
+                  {}
                   <div className="mt-3 flex w-full flex-nowrap justify-center gap-1.5">
                     {["Who are my course instructors?", "Draft an email to my teacher"].map(
                       (prompt, i) => (
                         <button
                           key={i}
                           type="button"
-                          onClick={() => handleSend(prompt)}
+                          onClick={(event) => handleSend(prompt, event)}
                           className="whitespace-nowrap rounded-full border border-black/[0.08] bg-slate-100/80 px-2.5 py-1 text-[11px] font-semibold text-foreground/80 hover:bg-[#230052] hover:text-white dark:border-white/10 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white dark:hover:text-[#0a192f] transition-colors"
                         >
                           {prompt}
@@ -1138,7 +1223,7 @@ const SuperFlexAI = () => {
           </div>
         )}
 
-        {/* Electric Border SVG Displacement Filter */}
+        {}
         <svg className="absolute w-0 h-0 pointer-events-none overflow-hidden" aria-hidden="true">
           <defs>
             <filter
@@ -1217,7 +1302,7 @@ const SuperFlexAI = () => {
                 />
               </feOffset>
 
-              {/* Arithmetic blend ensures zero-bias (mean = 0.5) so displacement is centered on the border */}
+              {}
               <feComposite
                 in="offsetNoise1"
                 in2="offsetNoise2"
@@ -1260,14 +1345,14 @@ const SuperFlexAI = () => {
           </defs>
         </svg>
 
-        {/* Floating Center Input Bar with Skyblue Electric Border */}
+        {}
         <div className="group relative flex items-center gap-2 rounded-full border border-black/20 bg-white/95 p-1.5 shadow-md shadow-black/5 backdrop-blur-2xl transition-all focus-within:border-black/20 dark:border-white/20 dark:bg-black/95 dark:focus-within:border-white/20">
-          {/* Pure electric line effect bound seamlessly to the perimeter */}
+          {}
           <div
             className="absolute inset-0 rounded-full border-[1.5px] border-black/20 pointer-events-none z-10 dark:border-white/20"
             style={{ filter: isOpen ? "none" : "url(#turbulent-displace)" }}
           />
-          {/* Model switcher button */}
+          {}
           <div className="relative pl-1">
             <button
               type="button"
@@ -1280,7 +1365,7 @@ const SuperFlexAI = () => {
 
             {showAiSettings && (
               <div className="absolute bottom-full mb-3 left-0 w-[min(360px,calc(100vw-2rem))] rounded-[20px] border border-black/[0.06] bg-white p-4 shadow-2xl backdrop-blur-2xl dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] z-[1000] animate-in fade-in slide-in-from-bottom-2 duration-200">
-                {/* Only show API Key Section if not configured yet */}
+                {}
                 {!hasApiKey && (
                   <div className="border-b border-black/[0.06] pb-3 mb-3 dark:border-white/[0.08]">
                     <div className="mb-2 flex items-center justify-between text-xs font-bold text-foreground">
@@ -1297,36 +1382,17 @@ const SuperFlexAI = () => {
                         Get Free Key ↗
                       </a>
                     </div>
-                    <div className="flex gap-2">
-                      <input
-                        type="password"
-                        value={apiKeyInput}
-                        onChange={(event) => setApiKeyInput(event.target.value)}
-                        placeholder="Paste your Gemini API key"
-                        className="min-w-0 flex-1 rounded-xl border border-black/[0.08] bg-slate-50 px-3 py-2 text-xs text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-[#230052]/30 dark:border-white/[0.1] dark:bg-white/[0.06]"
-                      />
-                      <button
-                        type="button"
-                        onClick={connectGemini}
-                        disabled={!apiKeyInput.trim() || isConnecting}
-                        className="rounded-xl bg-[#230052] px-3.5 py-2 text-xs font-bold text-white transition-colors hover:bg-[#370c72] disabled:opacity-50 dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80"
-                      >
-                        {isConnecting ? (
-                          <LoaderCircle size={14} className="animate-spin" />
-                        ) : (
-                          "Save"
-                        )}
-                      </button>
-                    </div>
-                    {connectionError && (
-                      <p className="mt-2 text-[11px] text-rose-500 font-medium">
-                        {connectionError}
-                      </p>
-                    )}
+                    <button
+                      type="button"
+                      onClick={openSecureKeySettings}
+                      className="rounded-xl bg-[#230052] px-3.5 py-2 text-xs font-bold text-white dark:bg-white dark:text-[#0a192f]"
+                    >
+                      Add Gemini API key
+                    </button>
                   </div>
                 )}
 
-                {/* Model list section */}
+                {}
                 <div>
                   <div className="mb-2 flex items-center justify-between">
                     <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
@@ -1445,17 +1511,17 @@ const SuperFlexAI = () => {
             )}
           </div>
 
-          {/* Input field */}
+          {}
           <input
             type="text"
             value={input}
             onFocus={() => setIsOpen(true)}
             onClick={() => setIsOpen(true)}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                handleSend(undefined, event);
               }
             }}
             placeholder="Ask Octopus..."
@@ -1463,7 +1529,7 @@ const SuperFlexAI = () => {
             className="flex-1 bg-transparent px-3 py-2 text-sm text-[#101010] placeholder:text-slate-500 focus:outline-none dark:text-[#f5f6fb] dark:placeholder:text-slate-400 font-medium"
           />
 
-          {/* Send or Stop Button */}
+          {}
           {isLoading ? (
             <button
               type="button"
@@ -1476,7 +1542,7 @@ const SuperFlexAI = () => {
           ) : (
             <button
               type="button"
-              onClick={() => handleSend()}
+              onClick={(event) => handleSend(undefined, event)}
               disabled={!input.trim()}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#230052] text-white shadow-sm transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:hover:scale-100 dark:bg-white dark:text-[#0a192f]"
               title="Send message"

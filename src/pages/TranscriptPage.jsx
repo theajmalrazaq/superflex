@@ -9,7 +9,6 @@ import {
   AlertTriangle,
   Scale,
   TrendingUp,
-  X,
 } from "lucide-react";
 import { MCA_DATA } from "../constants/mcaData";
 import NotificationBanner from "../components/ui/NotificationBanner";
@@ -20,7 +19,7 @@ import SuperTabs from "../components/ui/SuperTabs";
 import { PageSkeleton } from "../components/ui/Skeleton";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
-import BottomSheet, { BottomSheetClose, BottomSheetDescription, BottomSheetTitle } from "../components/ui/BottomSheet";
+import Modal from "../components/ui/Modal";
 import SelectMenu from "../components/ui/SelectMenu";
 import { useAiSync } from "../hooks/useAiSync";
 import { usePreferencesStore } from "../stores/preferencesStore";
@@ -80,17 +79,17 @@ const GradeSelector = ({ value, grades, onChange }) => {
 
 const TranscriptBottomSheet = ({ isOpen, onClose, title, subtitle, icon, children }) => {
   return (
-    <BottomSheet open={isOpen} onClose={onClose}>
-        <div className="flex shrink-0 justify-center pt-3"><span className="h-1.5 w-14 rounded-full bg-[#ded9e5] dark:bg-white" /></div>
-        <BottomSheetClose asChild><button type="button" aria-label="Close" className="absolute right-4 top-6 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"><X size={20} /></button></BottomSheetClose>
-        <header className="flex shrink-0 flex-col items-center px-6 pb-3 pt-3 text-center sm:px-8">
-          <span className="mb-2 flex h-11 w-11 items-center justify-center rounded-[16px] bg-[#230052] text-white dark:bg-white dark:text-[#101027]">{icon}</span>
-          <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#230052]/65 dark:text-white">Transcript tools</p>
-          <BottomSheetTitle className="mt-1 text-xl font-bold tracking-tight sm:text-2xl">{title}</BottomSheetTitle>
-          <BottomSheetDescription className="mt-1 text-sm text-slate-500 dark:text-slate-400">{subtitle}</BottomSheetDescription>
-        </header>
-        <div className="min-h-0 overflow-y-auto px-5 pb-5 pt-1 sm:px-8">{children}</div>
-    </BottomSheet>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title}
+      subtitle={subtitle}
+      eyebrow="Transcript tools"
+      icon={icon}
+      maxWidth="max-w-2xl"
+    >
+      {children}
+    </Modal>
   );
 };
 
@@ -444,7 +443,9 @@ function TranscriptPage() {
           recordedGrade !== "U" &&
           GRADE_POINTS[recordedGrade] !== undefined;
         if (isRecordedCreditCourse && recordedGrade !== "F") {
-          const courseCode = String(course.code || "").trim().toUpperCase();
+          const courseCode = String(course.code || "")
+            .trim()
+            .toUpperCase();
           if (courseCode) {
             recordedPassedUniqueCredits.set(
               courseCode,
@@ -463,9 +464,10 @@ function TranscriptPage() {
         if (isNonCredit) return;
 
         semCreditsAttempted += course.crHrs;
-        // Count a course once across the full transcript, including summer
-        // terms, even when it has a failed attempt followed by a retake.
-        const courseCode = String(course.code || "").trim().toUpperCase();
+
+        const courseCode = String(course.code || "")
+          .trim()
+          .toUpperCase();
         if (courseCode) attemptedUniqueCredits.set(courseCode, course.crHrs);
 
         if (isGraded) {
@@ -529,13 +531,12 @@ function TranscriptPage() {
     );
     const latestSemester = semesters[semesters.length - 1];
     const hasGradeOverrides = Object.keys(overriddenGrades).length > 0;
-    // FLEX reports cumulative credits in each semester summary. Use the newest
-    // summary even when that term contains only in-progress courses; the
-    // simulated change is applied as a delta to this portal-reported baseline.
+
     const reportedCreditsEarned = Number(latestSemester?.summary.crEarned);
     const reportedCreditsAttempted = Number(latestSemester?.summary.crRegistered);
     const creditsEarned = Number.isFinite(reportedCreditsEarned)
-      ? reportedCreditsEarned + (hasGradeOverrides ? totalCreditsEarned - totalRecordedCreditsEarned : 0)
+      ? reportedCreditsEarned +
+        (hasGradeOverrides ? totalCreditsEarned - totalRecordedCreditsEarned : 0)
       : totalCreditsEarned;
     const creditsAttempted = Number.isFinite(reportedCreditsAttempted)
       ? reportedCreditsAttempted
@@ -562,34 +563,46 @@ function TranscriptPage() {
     const lineColor = themeMode === "dark" ? "#ffffff" : "#230052";
     const createDataset = (label, data) => ({
       labels: calculatedStats.history.map((h) => h.title.split(" ")[0]),
-      datasets: [{
-        label,
-        data,
-        borderColor: lineColor,
-        backgroundColor: "transparent",
-        tension: 0,
-        fill: false,
-        pointBackgroundColor: lineColor,
-        pointBorderWidth: 0,
-        pointRadius: 1.5,
-        pointHoverRadius: 5,
-        borderWidth: 3,
-      }],
+      datasets: [
+        {
+          label,
+          data,
+          borderColor: lineColor,
+          backgroundColor: "transparent",
+          tension: 0,
+          fill: false,
+          pointBackgroundColor: lineColor,
+          pointBorderWidth: 0,
+          pointRadius: 1.5,
+          pointHoverRadius: 5,
+          borderWidth: 3,
+        },
+      ],
     });
     return {
-      sgpa: createDataset("SGPA", calculatedStats.history.map((h) => h.sgpa)),
-      cgpa: createDataset("CGPA", calculatedStats.history.map((h) => h.cgpa)),
+      sgpa: createDataset(
+        "SGPA",
+        calculatedStats.history.map((h) => h.sgpa),
+      ),
+      cgpa: createDataset(
+        "CGPA",
+        calculatedStats.history.map((h) => h.cgpa),
+      ),
     };
   }, [calculatedStats, themeMode]);
 
-  const shownHistory = hoveredHistoryIndex == null
-    ? calculatedStats?.history.at(-1)
-    : calculatedStats?.history[hoveredHistoryIndex];
-  const previousHistory = hoveredHistoryIndex == null
-    ? calculatedStats?.history.at(-2)
-    : calculatedStats?.history[hoveredHistoryIndex - 1];
-  const sgpaDelta = shownHistory && previousHistory ? shownHistory.sgpa - previousHistory.sgpa : null;
-  const cgpaDelta = shownHistory && previousHistory ? shownHistory.cgpa - previousHistory.cgpa : null;
+  const shownHistory =
+    hoveredHistoryIndex == null
+      ? calculatedStats?.history.at(-1)
+      : calculatedStats?.history[hoveredHistoryIndex];
+  const previousHistory =
+    hoveredHistoryIndex == null
+      ? calculatedStats?.history.at(-2)
+      : calculatedStats?.history[hoveredHistoryIndex - 1];
+  const sgpaDelta =
+    shownHistory && previousHistory ? shownHistory.sgpa - previousHistory.sgpa : null;
+  const cgpaDelta =
+    shownHistory && previousHistory ? shownHistory.cgpa - previousHistory.cgpa : null;
   const valueRange = (values = []) => ({
     min: values.length ? Math.max(0, Math.min(...values) - 0.18) : 0,
     max: values.length ? Math.min(4, Math.max(...values) + 0.18) : 4,
@@ -598,40 +611,43 @@ function TranscriptPage() {
   const cgpaRange = valueRange(calculatedStats?.history.map((semester) => semester.cgpa));
 
   const createChartOptions = ({ min, max }) => ({
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: "nearest", intersect: false },
-      onHover: (_event, activeElements) => {
-        const nextIndex = activeElements.length ? activeElements[0].index : null;
-        setHoveredHistoryIndex((current) => current === nextIndex ? current : nextIndex);
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: themeMode === "dark" ? "rgba(18, 18, 18, 0.9)" : "rgba(255, 255, 255, 0.9)",
-          titleColor: themeMode === "dark" ? "#fff" : "#000",
-          bodyColor: themeMode === "dark" ? "#fff" : "#000",
-          titleFont: { size: 13, weight: "bold" },
-          bodyFont: { size: 12 },
-          padding: 16,
-          borderRadius: 16,
-          borderColor: themeMode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
-          borderWidth: 1,
-          displayColors: false,
-          callbacks: { label: (context) => `${context.dataset.label}: ${context.parsed.y.toFixed(2)}` },
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: "nearest", intersect: false },
+    onHover: (_event, activeElements) => {
+      const nextIndex = activeElements.length ? activeElements[0].index : null;
+      setHoveredHistoryIndex((current) => (current === nextIndex ? current : nextIndex));
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor:
+          themeMode === "dark" ? "rgba(18, 18, 18, 0.9)" : "rgba(255, 255, 255, 0.9)",
+        titleColor: themeMode === "dark" ? "#fff" : "#000",
+        bodyColor: themeMode === "dark" ? "#fff" : "#000",
+        titleFont: { size: 13, weight: "bold" },
+        bodyFont: { size: 12 },
+        padding: 16,
+        borderRadius: 16,
+        borderColor: themeMode === "dark" ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)",
+        borderWidth: 1,
+        displayColors: false,
+        callbacks: {
+          label: (context) => `${context.dataset.label}: ${context.parsed.y.toFixed(2)}`,
         },
       },
-      scales: {
-        y: {
-          min,
-          max: max > min ? max : min + 0.7,
-          ticks: { display: false },
-          grid: { display: false },
-          border: { display: false },
-        },
-        x: { ticks: { display: false }, grid: { display: false }, border: { display: false } },
+    },
+    scales: {
+      y: {
+        min,
+        max: max > min ? max : min + 0.7,
+        ticks: { display: false },
+        grid: { display: false },
+        border: { display: false },
       },
-    });
+      x: { ticks: { display: false }, grid: { display: false }, border: { display: false } },
+    },
+  });
   const sgpaChartOptions = createChartOptions(sgpaRange);
   const cgpaChartOptions = createChartOptions(cgpaRange);
 
@@ -656,14 +672,48 @@ function TranscriptPage() {
       <div className="relative z-10 mx-auto w-full max-w-[1680px] space-y-7 px-4 py-6 pb-24 sm:px-6 lg:px-8 lg:py-8">
         <header className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
           <div className="space-y-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p>
-            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Official Transcript</h1>
-            <p className="text-sm text-white/80">Four years of questionable decisions, beautifully documented.</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+              Academics
+            </p>
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              Official Transcript
+            </h1>
+            <p className="text-sm text-white/80">
+              Four years of questionable decisions, beautifully documented.
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <button type="button" onClick={() => setIsPlannerOpen(true)} className="flex items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"><Target size={15} />Strategic planner</button>
-            <button type="button" onClick={() => setIsMCALookupOpen(true)} className="flex items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"><Scale size={15} />MCA lookup</button>
-            <button type="button" onClick={() => simulationMode ? (setOverriddenGrades({}), setSimulationMode(false)) : setSimulationMode(true)} className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold transition-colors ${simulationMode ? "bg-amber-500 text-white" : "bg-white/55 text-[#230052] hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"}`} title={simulationMode ? "Exit simulation and restore grades" : "Enable grade simulation"}><Zap size={15} fill={simulationMode ? "currentColor" : "none"} />{simulationMode ? "Simulating" : "Simulate"}</button>
+            <button
+              type="button"
+              onClick={() => setIsPlannerOpen(true)}
+              className="flex items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"
+            >
+              <Target size={15} />
+              Strategic planner
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsMCALookupOpen(true)}
+              className="flex items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"
+            >
+              <Scale size={15} />
+              MCA lookup
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                simulationMode
+                  ? (setOverriddenGrades({}), setSimulationMode(false))
+                  : setSimulationMode(true)
+              }
+              className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold transition-colors ${simulationMode ? "bg-amber-500 text-white" : "bg-white/55 text-[#230052] hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"}`}
+              title={
+                simulationMode ? "Exit simulation and restore grades" : "Enable grade simulation"
+              }
+            >
+              <Zap size={15} fill={simulationMode ? "currentColor" : "none"} />
+              {simulationMode ? "Simulating" : "Simulate"}
+            </button>
           </div>
         </header>
 
@@ -671,39 +721,110 @@ function TranscriptPage() {
 
         <section aria-labelledby="transcript-overview-heading" className="space-y-4">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-            <div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Overview</p><h2 id="transcript-overview-heading" className="text-xl font-bold tracking-tight text-white">Academic snapshot</h2></div>
-            <p className="text-xs text-white/75">Current GPA, cleared credits, and semester trends.</p>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+                Overview
+              </p>
+              <h2
+                id="transcript-overview-heading"
+                className="text-xl font-bold tracking-tight text-white"
+              >
+                Academic snapshot
+              </h2>
+            </div>
+            <p className="text-xs text-white/75">
+              Current GPA, cleared credits, and semester trends.
+            </p>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
-            <StatsCard icon={TrendingUp} label="Cumulative GPA" value={calculatedStats?.currentCGPA.toFixed(2) || "0.00"} subValue={simulationMode ? `(Was ${originalCGPA.toFixed(2)})` : "Current"} variant="dashboard" />
-            <StatsCard icon={Award} label="Credits Cleared" value={calculatedStats?.totalCreditsEarned || "0"} subValue={`of ${calculatedStats?.totalCreditsAttempted || 0} attempted`} variant="dashboard" />
-            <div className="flex min-h-[156px] min-w-0 flex-col rounded-[32px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6" onMouseLeave={() => setHoveredHistoryIndex(null)}>
-              <p className="text-sm font-semibold text-[#40404a] dark:text-[#c4cad6]">Semester GPA</p>
+            <StatsCard
+              icon={TrendingUp}
+              label="Cumulative GPA"
+              value={calculatedStats?.currentCGPA.toFixed(2) || "0.00"}
+              subValue={simulationMode ? `(Was ${originalCGPA.toFixed(2)})` : "Current"}
+              variant="dashboard"
+            />
+            <StatsCard
+              icon={Award}
+              label="Credits Cleared"
+              value={calculatedStats?.totalCreditsEarned || "0"}
+              subValue={`of ${calculatedStats?.totalCreditsAttempted || 0} attempted`}
+              variant="dashboard"
+            />
+            <div
+              className="flex min-h-[156px] min-w-0 flex-col rounded-[32px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6"
+              onMouseLeave={() => setHoveredHistoryIndex(null)}
+            >
+              <p className="text-sm font-semibold text-[#40404a] dark:text-[#c4cad6]">
+                Semester GPA
+              </p>
               <div className="mt-auto flex items-end justify-between gap-2">
-                <span className="text-[28px] font-bold leading-none tracking-tight text-foreground">{shownHistory?.sgpa.toFixed(2) || "0.00"}</span>
-                <span className="truncate text-right text-[10px] font-medium text-foreground/55">{shownHistory?.title || ""}{sgpaDelta != null && <> · {sgpaDelta >= 0 ? "+" : ""}{sgpaDelta.toFixed(2)}</>}</span>
+                <span className="text-[28px] font-bold leading-none tracking-tight text-foreground">
+                  {shownHistory?.sgpa.toFixed(2) || "0.00"}
+                </span>
+                <span className="truncate text-right text-[10px] font-medium text-foreground/55">
+                  {shownHistory?.title || ""}
+                  {sgpaDelta != null && (
+                    <>
+                      {" "}
+                      · {sgpaDelta >= 0 ? "+" : ""}
+                      {sgpaDelta.toFixed(2)}
+                    </>
+                  )}
+                </span>
               </div>
-              <div className="mt-2 h-11 w-full">{chartData && <Line data={chartData.sgpa} options={sgpaChartOptions} />}</div>
+              <div className="mt-2 h-11 w-full">
+                {chartData && <Line data={chartData.sgpa} options={sgpaChartOptions} />}
+              </div>
             </div>
-            <div className="flex min-h-[156px] min-w-0 flex-col rounded-[32px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6" onMouseLeave={() => setHoveredHistoryIndex(null)}>
-              <p className="text-sm font-semibold text-[#40404a] dark:text-[#c4cad6]">Cumulative GPA</p>
+            <div
+              className="flex min-h-[156px] min-w-0 flex-col rounded-[32px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6"
+              onMouseLeave={() => setHoveredHistoryIndex(null)}
+            >
+              <p className="text-sm font-semibold text-[#40404a] dark:text-[#c4cad6]">
+                Cumulative GPA
+              </p>
               <div className="mt-auto flex items-end justify-between gap-2">
-                <span className="text-[28px] font-bold leading-none tracking-tight text-foreground">{shownHistory?.cgpa.toFixed(2) || "0.00"}</span>
-                <span className="truncate text-right text-[10px] font-medium text-foreground/55">{shownHistory?.title || ""}{cgpaDelta != null && <> · {cgpaDelta >= 0 ? "+" : ""}{cgpaDelta.toFixed(2)}</>}</span>
+                <span className="text-[28px] font-bold leading-none tracking-tight text-foreground">
+                  {shownHistory?.cgpa.toFixed(2) || "0.00"}
+                </span>
+                <span className="truncate text-right text-[10px] font-medium text-foreground/55">
+                  {shownHistory?.title || ""}
+                  {cgpaDelta != null && (
+                    <>
+                      {" "}
+                      · {cgpaDelta >= 0 ? "+" : ""}
+                      {cgpaDelta.toFixed(2)}
+                    </>
+                  )}
+                </span>
               </div>
-              <div className="mt-2 h-11 w-full">{chartData && <Line data={chartData.cgpa} options={cgpaChartOptions} />}</div>
+              <div className="mt-2 h-11 w-full">
+                {chartData && <Line data={chartData.cgpa} options={cgpaChartOptions} />}
+              </div>
             </div>
           </div>
         </section>
 
         <section aria-labelledby="semester-report-heading" className="space-y-4">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-            <div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academic record</p><h2 id="semester-report-heading" className="text-xl font-bold tracking-tight text-white">Semester History</h2></div>
-            <p className="text-xs text-white/75">Every semester has a story. Some are horror stories.</p>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+                Academic record
+              </p>
+              <h2
+                id="semester-report-heading"
+                className="text-xl font-bold tracking-tight text-white"
+              >
+                Semester History
+              </h2>
+            </div>
+            <p className="text-xs text-white/75">
+              Every semester has a story. Some are horror stories.
+            </p>
           </div>
           <div>
             <div className="flex flex-col gap-5 overflow-hidden rounded-[24px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6">
-
               <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
                 <SuperTabs
                   tabs={semesters.map((s, idx) => ({
@@ -940,7 +1061,9 @@ function TranscriptPage() {
                                   <GradeSelector
                                     value={currentGrade}
                                     grades={Object.keys(GRADE_POINTS).concat(["I", "S", "U", "W"])}
-                                    onChange={(grade) => handleGradeChange(activeSemData.title, course.code, grade)}
+                                    onChange={(grade) =>
+                                      handleGradeChange(activeSemData.title, course.code, grade)
+                                    }
                                   />
                                 ) : (
                                   <div className="flex justify-center">
@@ -986,7 +1109,6 @@ function TranscriptPage() {
               )}
             </div>
           </div>
-
         </section>
       </div>
 

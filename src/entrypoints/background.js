@@ -29,13 +29,42 @@ const CAMPUS_DIRECTORY_URLS = {
 };
 
 const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
+const AI_PERMISSION_KEY = "superflex_ai_permission_status";
+const STORAGE_RESET_FLAG = "superflex_storage_reset_v1";
+const PORTAL_ORIGIN = "https://flexstudent.nu.edu.pk";
+
+const isPortalSender = (sender) => {
+  try {
+    return new URL(sender?.url || "").origin === "https://flexstudent.nu.edu.pk";
+  } catch {
+    return false;
+  }
+};
+
+const hasAiPermission = async () =>
+  (await chrome.storage.local.get(AI_PERMISSION_KEY))[AI_PERMISSION_KEY] === "granted";
+
+const notifyPortalTabsOfKeyUpdate = () => {
+  chrome.tabs.query({ url: "https://flexstudent.nu.edu.pk/*" }, (tabs) => {
+    tabs.forEach((tab) => {
+      if (tab.id != null)
+        chrome.tabs.sendMessage(
+          tab.id,
+          { type: "SUPERFLEX_AI_KEY_UPDATED" },
+          () => void chrome.runtime.lastError,
+        );
+    });
+  });
+};
 
 const fetchAvailableGeminiModels = async (apiKey) => {
   const listUrl = `${GEMINI_API_BASE}?key=${encodeURIComponent(apiKey)}`;
   const listRes = await fetch(listUrl);
   const listData = await listRes.json().catch(() => ({}));
   if (!listRes.ok) {
-    throw new Error(listData.error?.message || `Failed to fetch Gemini models (status ${listRes.status})`);
+    throw new Error(
+      listData.error?.message || `Failed to fetch Gemini models (status ${listRes.status})`,
+    );
   }
 
   const rawModels = listData.models || [];
@@ -51,7 +80,7 @@ const fetchAvailableGeminiModels = async (apiKey) => {
     ) {
       return false;
     }
-    // Exclude retired gemini-2.0-flash (except flash-lite)
+
     if (name.endsWith("gemini-2.0-flash")) return false;
     return true;
   });
@@ -69,7 +98,6 @@ const fetchAvailableGeminiModels = async (apiKey) => {
     };
   });
 
-  // Prioritize stable, high-capacity Flash models first
   const priorityOrder = [
     "gemini-2.5-flash",
     "gemini-1.5-flash",
@@ -135,7 +163,11 @@ const streamGeminiContent = async (modelId, apiKey, payload, onChunk) => {
 
   const reader = res.body?.getReader();
   if (!reader) {
-    return { ok: false, status: 500, errorData: { error: { message: "Streaming not supported by browser" } } };
+    return {
+      ok: false,
+      status: 500,
+      errorData: { error: { message: "Streaming not supported by browser" } },
+    };
   }
 
   const decoder = new TextDecoder();
@@ -163,9 +195,7 @@ const streamGeminiContent = async (modelId, apiKey, payload, onChunk) => {
           fullText += chunkText;
           onChunk(chunkText, fullText);
         }
-      } catch {
-        // partial json, ignore
-      }
+      } catch {}
     }
   }
 
@@ -189,6 +219,10 @@ const streamGeminiContent = async (modelId, apiKey, payload, onChunk) => {
 export default defineBackground(() => {
   chrome.runtime.onConnect.addListener((port) => {
     if (port.name !== "SUPERFLEX_AI_STREAM") return;
+    if (!isPortalSender(port.sender)) {
+      port.disconnect();
+      return;
+    }
 
     let isDisconnected = false;
     port.onDisconnect.addListener(() => {
@@ -198,13 +232,24 @@ export default defineBackground(() => {
     port.onMessage.addListener(async (msg) => {
       if (msg?.type !== "START") return;
 
+      if (!(await hasAiPermission())) {
+        port.postMessage({
+          type: "ERROR",
+          error: "Enable AI and grant data permission in SuperFlex settings first.",
+        });
+        return;
+      }
+
       chrome.storage.local.get(
         ["superflex_gemini_api_key", "superflex_gemini_model", "superflex_gemini_models"],
         async (stored) => {
           if (isDisconnected) return;
           const apiKey = stored.superflex_gemini_api_key;
           if (!apiKey) {
-            port.postMessage({ type: "ERROR", error: "Add your Google Gemini API key to connect." });
+            port.postMessage({
+              type: "ERROR",
+              error: "Add your Google Gemini API key to connect.",
+            });
             return;
           }
 
@@ -214,7 +259,11 @@ export default defineBackground(() => {
               available = await fetchAvailableGeminiModels(apiKey);
               chrome.storage.local.set({ superflex_gemini_models: available });
             } catch (err) {
-              if (!isDisconnected) port.postMessage({ type: "ERROR", error: err.message || "Failed to list Gemini models." });
+              if (!isDisconnected)
+                port.postMessage({
+                  type: "ERROR",
+                  error: err.message || "Failed to list Gemini models.",
+                });
               return;
             }
           }
@@ -225,10 +274,7 @@ export default defineBackground(() => {
             chrome.storage.local.set({ superflex_gemini_model: currentModel });
           }
 
-          const queue = [
-            currentModel,
-            ...available.filter((m) => m.id !== currentModel.id),
-          ];
+          const queue = [currentModel, ...available.filter((m) => m.id !== currentModel.id)];
 
           let lastError = null;
           let usedModel = null;
@@ -296,8 +342,64 @@ export default defineBackground(() => {
     });
   });
 
-  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message?.type === "SUPERFLEX_RESET_STORAGE_ONCE") {
+      if (!isPortalSender(sender)) return undefined;
+      chrome.storage.local.get(STORAGE_RESET_FLAG, (stored) => {
+        if (stored[STORAGE_RESET_FLAG]) {
+          sendResponse({ reset: false });
+          return;
+        }
+        chrome.browsingData.remove(
+          { origins: [PORTAL_ORIGIN] },
+          {
+            cache: true,
+            cacheStorage: true,
+            cookies: true,
+            fileSystems: true,
+            indexedDB: true,
+            localStorage: true,
+            serviceWorkers: true,
+          },
+          () => {
+            if (chrome.runtime.lastError) {
+              sendResponse({ error: chrome.runtime.lastError.message });
+              return;
+            }
+            chrome.storage.local.clear(() => {
+              if (chrome.runtime.lastError) {
+                sendResponse({ error: chrome.runtime.lastError.message });
+                return;
+              }
+              chrome.storage.local.set({ [STORAGE_RESET_FLAG]: true }, () =>
+                sendResponse({ reset: !chrome.runtime.lastError }),
+              );
+            });
+          },
+        );
+      });
+      return true;
+    }
+
+    if (message?.type === "SUPERFLEX_AI_PERMISSION_GET") {
+      if (!isPortalSender(sender)) return undefined;
+      chrome.storage.local.get(AI_PERMISSION_KEY, (stored) =>
+        sendResponse({ status: stored[AI_PERMISSION_KEY] === "granted" ? "granted" : "denied" }),
+      );
+      return true;
+    }
+
+    if (message?.type === "SUPERFLEX_AI_PERMISSION_SET") {
+      if (!isPortalSender(sender) || !["granted", "denied"].includes(message.status))
+        return undefined;
+      chrome.storage.local.set({ [AI_PERMISSION_KEY]: message.status }, () =>
+        sendResponse({ status: message.status }),
+      );
+      return true;
+    }
+
     if (message?.type === "SUPERFLEX_AI_CONFIG") {
+      if (!isPortalSender(sender)) return undefined;
       chrome.storage.local.get(
         ["superflex_gemini_api_key", "superflex_gemini_model", "superflex_gemini_models"],
         async (saved) => {
@@ -316,6 +418,7 @@ export default defineBackground(() => {
     }
 
     if (message?.type === "SUPERFLEX_AI_SAVE_KEY") {
+      if (!isPortalSender(sender)) return undefined;
       const apiKey = String(message.apiKey || "").trim();
       if (!apiKey) {
         sendResponse({ error: "Enter a Google Gemini API key first." });
@@ -333,7 +436,10 @@ export default defineBackground(() => {
               superflex_gemini_model: activeModel,
               superflex_gemini_models: models,
             },
-            () => sendResponse({ configured: true, model: activeModel, availableModels: models }),
+            () => {
+              notifyPortalTabsOfKeyUpdate();
+              sendResponse({ configured: true, model: activeModel, availableModels: models });
+            },
           );
         })
         .catch((error) =>
@@ -343,23 +449,28 @@ export default defineBackground(() => {
     }
 
     if (message?.type === "SUPERFLEX_AI_REFRESH_MODELS") {
-      chrome.storage.local.get(["superflex_gemini_api_key"], async ({ superflex_gemini_api_key: apiKey }) => {
-        if (!apiKey) {
-          sendResponse({ error: "Add your Google Gemini API key first." });
-          return;
-        }
-        try {
-          const models = await fetchAvailableGeminiModels(apiKey);
-          chrome.storage.local.set({ superflex_gemini_models: models });
-          sendResponse({ success: true, models });
-        } catch (error) {
-          sendResponse({ error: error.message || "Failed to refresh models." });
-        }
-      });
+      if (!isPortalSender(sender)) return undefined;
+      chrome.storage.local.get(
+        ["superflex_gemini_api_key"],
+        async ({ superflex_gemini_api_key: apiKey }) => {
+          if (!apiKey) {
+            sendResponse({ error: "Add your Google Gemini API key first." });
+            return;
+          }
+          try {
+            const models = await fetchAvailableGeminiModels(apiKey);
+            chrome.storage.local.set({ superflex_gemini_models: models });
+            sendResponse({ success: true, models });
+          } catch (error) {
+            sendResponse({ error: error.message || "Failed to refresh models." });
+          }
+        },
+      );
       return true;
     }
 
     if (message?.type === "SUPERFLEX_AI_SELECT_MODEL") {
+      if (!isPortalSender(sender)) return undefined;
       const model = message.model;
       if (!model?.id) {
         sendResponse({ error: "Invalid model specified." });
@@ -371,10 +482,20 @@ export default defineBackground(() => {
       return true;
     }
 
+    if (message?.type === "SUPERFLEX_GET_CAMPUS_FACULTY" && !isPortalSender(sender))
+      return undefined;
+
     if (message?.type === "SUPERFLEX_AI_CHAT") {
+      if (!isPortalSender(sender)) return undefined;
       chrome.storage.local.get(
         ["superflex_gemini_api_key", "superflex_gemini_model", "superflex_gemini_models"],
         async (stored) => {
+          if (!(await hasAiPermission())) {
+            sendResponse({
+              error: "Enable AI and grant data permission in SuperFlex settings first.",
+            });
+            return;
+          }
           const apiKey = stored.superflex_gemini_api_key;
           if (!apiKey) {
             sendResponse({ error: "Add your Google Gemini API key to connect." });
@@ -398,11 +519,7 @@ export default defineBackground(() => {
             chrome.storage.local.set({ superflex_gemini_model: currentModel });
           }
 
-          // Build queue to try: currentModel first, then other available models as fallback
-          const queue = [
-            currentModel,
-            ...available.filter((m) => m.id !== currentModel.id),
-          ];
+          const queue = [currentModel, ...available.filter((m) => m.id !== currentModel.id)];
 
           let lastError = null;
           let usedModel = null;
@@ -426,7 +543,6 @@ export default defineBackground(() => {
             const errorMsg = data.error?.message || `API error ${status}`;
             lastError = errorMsg;
 
-            // If it's high demand / rate limit / 503 / 429 / retired model, try next model
             if (
               isHighDemandOrUnavailable(status, errorMsg) ||
               status === 404 ||
@@ -438,7 +554,6 @@ export default defineBackground(() => {
               continue;
             }
 
-            // For other errors (e.g. invalid request structure), break immediately
             break;
           }
 
@@ -472,15 +587,17 @@ export default defineBackground(() => {
       return undefined;
     }
 
-    Promise.all(urls.map(async (url) => {
-      try {
-        const response = await fetch(url, { credentials: "omit" });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return { url, html: await response.text() };
-      } catch (error) {
-        return { url, error: error.message };
-      }
-    })).then((pages) => sendResponse({ pages }));
+    Promise.all(
+      urls.map(async (url) => {
+        try {
+          const response = await fetch(url, { credentials: "omit" });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return { url, html: await response.text() };
+        } catch (error) {
+          return { url, error: error.message };
+        }
+      }),
+    ).then((pages) => sendResponse({ pages }));
     return true;
   });
 });

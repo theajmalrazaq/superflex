@@ -12,7 +12,6 @@ export const parseEmailDraftUrl = (href) => {
     const subject = url.searchParams.get(isMailto ? "subject" : "su") || "";
     const body = url.searchParams.get("body") || "";
 
-    // A mailto without subject or body is just an email contact link, not a draft!
     if (isMailto && !subject && !body) return null;
     if (!to && !subject && !body) return null;
 
@@ -63,19 +62,22 @@ export const parseEmailDraftContent = (content) => {
       ) {
         break;
       }
-      bodyLines.push(line.replace(/^\s*>\s?/, "").replace(/\*\*/g, "").trimEnd());
+      bodyLines.push(
+        line
+          .replace(/^\s*>\s?/, "")
+          .replace(/\*\*/g, "")
+          .trimEnd(),
+      );
     }
     plainBody = bodyLines.join("\n").trim();
   }
 
-  // Must have linkedDraft OR (subjectIndex >= 0 && (plainTo || plainSubject || plainBody))
   if (!linkedDraft && (subjectIndex < 0 || (!plainTo && !plainSubject && !plainBody))) {
     return null;
   }
 
   const firstDraftIndex = [toIndex, subjectIndex].filter((i) => i >= 0).sort((a, b) => a - b)[0];
-  const introText =
-    firstDraftIndex > 0 ? lines.slice(0, firstDraftIndex).join("\n").trim() : "";
+  const introText = firstDraftIndex > 0 ? lines.slice(0, firstDraftIndex).join("\n").trim() : "";
 
   return {
     to: linkedDraft?.to || plainTo,
@@ -100,12 +102,7 @@ const openDraftInGmail = (draft) => {
   );
 };
 
-export default function GmailComposer({
-  draft,
-  status = "reviewing",
-  senderName,
-  onClose,
-}) {
+export default function GmailComposer({ draft, status = "reviewing", senderName, onClose }) {
   const composerData = {
     to: draft?.to || "",
     subject: draft?.subject || "",

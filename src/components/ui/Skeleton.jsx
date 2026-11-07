@@ -104,7 +104,11 @@ export const LoginSkeleton = () => (
 
 export const MarksSkeleton = () => {
   return (
-    <div className="flex flex-1 flex-col gap-7" aria-label="Loading course performance" role="status">
+    <div
+      className="flex flex-1 flex-col gap-7"
+      aria-label="Loading course performance"
+      role="status"
+    >
       <div className="flex gap-2 overflow-hidden">
         {[0, 1, 2, 3].map((i) => (
           <Skeleton key={i} className="h-9 w-20 shrink-0 rounded-full" />
@@ -125,10 +129,17 @@ export const MarksSkeleton = () => {
 
 export const AttendanceSkeleton = () => {
   return (
-    <div className="flex-1 space-y-4 overflow-hidden py-1" aria-label="Loading attendance heatmap" role="status">
+    <div
+      className="flex-1 space-y-4 overflow-hidden py-1"
+      aria-label="Loading attendance heatmap"
+      role="status"
+    >
       <div className="flex items-center justify-between gap-3">
         <Skeleton className="h-3 w-48" />
-        <div className="flex gap-3"><Skeleton className="h-3 w-12" /><Skeleton className="h-3 w-12" /></div>
+        <div className="flex gap-3">
+          <Skeleton className="h-3 w-12" />
+          <Skeleton className="h-3 w-12" />
+        </div>
       </div>
       <div className="grid grid-cols-2 gap-x-4 gap-y-5 md:grid-cols-3 xl:grid-cols-5">
         {[0, 1, 2, 3, 4].map((subject) => (

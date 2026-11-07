@@ -11,7 +11,6 @@ const databasePromise = openDB(DATABASE_NAME, DATABASE_VERSION, {
     }
   },
 });
-const migrationPromises = new Map();
 
 export const getAppData = async (key) => {
   const database = await databasePromise;
@@ -38,52 +37,4 @@ export const updateAppData = async (key, updater) => {
   else await store.put(nextValue, key);
   await transaction.done;
   return nextValue ?? null;
-};
-
-export const migrateLocalStorageValue = async (key, legacyKey = key) => {
-  if (!migrationPromises.has(key)) {
-    migrationPromises.set(
-      key,
-      (async () => {
-        const stored = await getAppData(key);
-        if (stored != null) return stored;
-
-        const legacy = localStorage.getItem(legacyKey);
-        if (legacy == null) return null;
-
-        await setAppData(key, legacy);
-        localStorage.removeItem(legacyKey);
-        return legacy;
-      })(),
-    );
-  }
-  await migrationPromises.get(key);
-  return getAppData(key);
-};
-
-export const migrateLocalStorageJson = async (key, legacyKey = key, fallback = null) => {
-  if (!migrationPromises.has(key)) {
-    migrationPromises.set(
-      key,
-      (async () => {
-        const stored = await getAppData(key);
-        if (stored != null) return stored;
-
-        const legacy = localStorage.getItem(legacyKey);
-        if (legacy == null) return fallback;
-
-        try {
-          const parsed = JSON.parse(legacy);
-          await setAppData(key, parsed);
-          localStorage.removeItem(legacyKey);
-          return parsed;
-        } catch {
-          localStorage.removeItem(legacyKey);
-          return fallback;
-        }
-      })(),
-    );
-  }
-  await migrationPromises.get(key);
-  return (await getAppData(key)) ?? fallback;
 };

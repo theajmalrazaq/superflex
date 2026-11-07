@@ -57,7 +57,9 @@ export default function SelectMenu({
                 )}
               >
                 <Select.ItemText>{option.label}</Select.ItemText>
-                <Select.ItemIndicator><Check size={15} className="shrink-0" /></Select.ItemIndicator>
+                <Select.ItemIndicator>
+                  <Check size={15} className="shrink-0" />
+                </Select.ItemIndicator>
               </Select.Item>
             ))}
           </Select.Viewport>

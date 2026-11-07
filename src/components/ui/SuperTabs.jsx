@@ -30,7 +30,10 @@ const SuperTabs = ({ tabs, activeTab, onTabChange, className = "", size = "md" }
   };
 
   return (
-    <Tabs.Root value={activeTab == null ? undefined : String(activeTab)} onValueChange={handleValueChange}>
+    <Tabs.Root
+      value={activeTab == null ? undefined : String(activeTab)}
+      onValueChange={handleValueChange}
+    >
       <Tabs.List
         className={cn(
           "flex max-w-full gap-1.5 overflow-x-auto rounded-full border border-foreground/10 bg-secondary/50 p-1 backdrop-blur-md scrollbar-hide",

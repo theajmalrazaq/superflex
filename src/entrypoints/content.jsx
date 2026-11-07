@@ -4,11 +4,23 @@ import LoadingOverlay from "../components/ui/LoadingOverlay";
 import LoginPageStyles from "../components/LoginPageStyles";
 import PathRouter from "../components/PathRouter";
 import { getExtensionUrl } from "../utils/extensionApi";
+import { clearActiveStudentId } from "../utils/studentIdentity";
+import { cleanStorageOnce } from "../utils/clean.js";
 import "../styles/tailwind.css";
 
 export default defineContentScript({
   matches: ["https://flexstudent.nu.edu.pk/*"],
-  main() {
+  async main() {
+    try {
+      if (await cleanStorageOnce()) {
+        sessionStorage.clear();
+        window.location.reload();
+        return;
+      }
+    } catch (error) {
+      console.error("SuperFlex storage reset failed", error);
+    }
+
     (() => {
       const scriptBridge = document.createElement("script");
       scriptBridge.src = getExtensionUrl("scripts/bridge.js");
@@ -47,7 +59,15 @@ export default defineContentScript({
 
     const root = createRoot(container);
 
-    const isLoginPage = window.location.href.includes("Login");
+    chrome.runtime.onMessage.addListener((message, sender) => {
+      if (sender.id === chrome.runtime.id && message?.type === "SUPERFLEX_AI_KEY_UPDATED") {
+        window.dispatchEvent(new CustomEvent("superflex-ai-key-updated"));
+      }
+    });
+
+    const loginPaths = new Set(["/login", "/login/index", "/login/logout"]);
+    const isLoginPage = loginPaths.has(window.location.pathname.replace(/\/$/, "").toLowerCase());
+    if (isLoginPage) clearActiveStudentId();
 
     if (document.getElementById("overlay23")) {
       document.getElementById("overlay23").remove();

@@ -6,13 +6,7 @@ export const BottomSheetTitle = Dialog.Title;
 export const BottomSheetDescription = Dialog.Description;
 export const BottomSheetClose = Dialog.Close;
 
-export default function BottomSheet({
-  open,
-  onClose,
-  children,
-  className,
-  animated = false,
-}) {
+export default function BottomSheet({ open, onClose, children, className, animated = false }) {
   return (
     <Dialog.Root open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
       <Dialog.Portal>

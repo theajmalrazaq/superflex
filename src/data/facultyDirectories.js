@@ -8,7 +8,9 @@ export const CAMPUS_BY_ROLL_PREFIX = {
 };
 
 export const getCampusFromRollNumber = (rollNumber = "") => {
-  const match = String(rollNumber).trim().toUpperCase().match(/^\d{2}([KLIFMP])/);
+  const match = String(rollNumber)
+    .trim()
+    .toUpperCase()
+    .match(/^\d{2}([KLIFMP])/);
   return match ? CAMPUS_BY_ROLL_PREFIX[match[1]] || null : null;
 };
-

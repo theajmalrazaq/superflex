@@ -8,7 +8,7 @@ export default defineConfig({
   manifest: {
     name: "SuperFlex",
     description: "A modern UI overlay and AI academic assistant for the Flex Student Portal.",
-    permissions: ["tabs", "storage"],
+    permissions: ["tabs", "storage", "browsingData"],
     icons: {
       16: "assets/favicon.png",
       32: "assets/favicon.png",

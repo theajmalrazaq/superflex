@@ -1,48 +1,13 @@
-import {
-  deleteAcademicState,
-  readAcademicState,
-  updateAcademicState,
-  writeAcademicState,
-} from "./academicStorage";
+import { deleteAcademicState, readAcademicState, updateAcademicState } from "./academicStorage";
+import { getActiveStudentId, getStudentStorageKey } from "./studentIdentity";
 
 const SNAPSHOT_KEY = "snapshot";
 const UPDATES_KEY = "pending-updates";
-const LEGACY_SNAPSHOT_STORAGE_KEY = "superflex_academic_snapshot_v1";
-const LEGACY_UPDATES_STORAGE_KEY = "superflex_academic_updates_v1";
-
-let migrationPromise;
-
-const migrateLegacyAcademicState = () => {
-  if (migrationPromise) return migrationPromise;
-  migrationPromise = (async () => {
-    const [snapshot, updates] = await Promise.all([
-      readAcademicState(SNAPSHOT_KEY),
-      readAcademicState(UPDATES_KEY),
-    ]);
-
-    try {
-      const legacySnapshot = JSON.parse(
-        localStorage.getItem(LEGACY_SNAPSHOT_STORAGE_KEY) || "null",
-      );
-      const legacyUpdates = JSON.parse(localStorage.getItem(LEGACY_UPDATES_STORAGE_KEY) || "null");
-      if (!snapshot && legacySnapshot) await writeAcademicState(SNAPSHOT_KEY, legacySnapshot);
-      if (!updates && legacyUpdates) await writeAcademicState(UPDATES_KEY, legacyUpdates);
-      localStorage.removeItem(LEGACY_SNAPSHOT_STORAGE_KEY);
-      localStorage.removeItem(LEGACY_UPDATES_STORAGE_KEY);
-    } catch {
-      // Invalid legacy data is intentionally discarded.
-    }
-  })();
-  return migrationPromise;
-};
 
 const dispatchAcademicEvent = (name, detail) => {
   window.dispatchEvent(new CustomEvent(name, detail === undefined ? undefined : { detail }));
 };
 
-/**
- * Extracts clean display title, removing section codes like "(BCS-7A)" or "(Lab)"
- */
 export const getCleanCourseTitle = (raw = "") => {
   if (!raw) return "";
   let name = String(raw).trim();
@@ -54,18 +19,12 @@ export const getCleanCourseTitle = (raw = "") => {
   return name;
 };
 
-/**
- * Extracts course code (e.g. "CS4001") if present
- */
 export const getCourseCode = (raw = "") => {
   if (!raw) return "";
   const match = String(raw).match(/([A-Z]{2,4}\s*[-–]?\s*\d{3,4})/i);
   return match ? match[1].replace(/[\s-–]+/g, "").toUpperCase() : "";
 };
 
-/**
- * Returns a stable, normalized course key across home, marks, and attendance pages
- */
 export const getNormalizedCourseKey = (course = {}) => {
   if (!course) return "";
   const idStr = String(course.id || "");
@@ -76,9 +35,6 @@ export const getNormalizedCourseKey = (course = {}) => {
   return cleanTitle.toLowerCase().replace(/[^a-z0-9]/g, "");
 };
 
-/**
- * Formats attendance status string into human-friendly text
- */
 export const formatAttendanceStatus = (status = "") => {
   const s = String(status).trim().toUpperCase();
   if (s.includes("P") || s === "PRESENT") return "Present";
@@ -87,37 +43,34 @@ export const formatAttendanceStatus = (status = "") => {
   return status || "Present";
 };
 
-/**
- * Formats a clean date, e.g. "24-Oct"
- */
 export const formatCleanDate = (rawDate = "") => {
   if (!rawDate) return "";
   const str = String(rawDate).trim();
   return str.replace(/[-/]\d{4}$/, "");
 };
 
-export const getAcademicSnapshot = async () => {
+export const getAcademicSnapshot = async (studentId = getActiveStudentId()) => {
   try {
-    await migrateLegacyAcademicState();
-    return await readAcademicState(SNAPSHOT_KEY);
+    const key = getStudentStorageKey(SNAPSHOT_KEY, studentId);
+    return key ? await readAcademicState(key) : null;
   } catch {
     return null;
   }
 };
 
 export const getPendingUpdates = async () => {
+  const studentId = getActiveStudentId();
   try {
-    await migrateLegacyAcademicState();
-    return await updateAcademicState(UPDATES_KEY, (current) => {
+    const key = getStudentStorageKey(UPDATES_KEY, studentId);
+    if (!key) return null;
+    const updates = await updateAcademicState(key, (current) => {
       if (!current) return null;
       const data = { ...current };
 
-      // Sanitize any corrupted legacy dump where a course has >= 10 "new sessions" in attendance
       if (Array.isArray(data.newAttendance)) {
         data.newAttendance = data.newAttendance.filter((a) => (a.newCount || 0) < 10);
       }
 
-      // Sanitize any corrupted legacy dump where an entire semester of marks was dumped
       if (Array.isArray(data.newMarks)) {
         const totalNew = data.newMarks.reduce(
           (sum, mark) => sum + (mark.newCount || mark.items?.length || 0),
@@ -132,23 +85,30 @@ export const getPendingUpdates = async () => {
       const hasAny = (data.newMarks?.length || 0) > 0 || (data.newAttendance?.length || 0) > 0;
       return hasAny ? data : null;
     });
+    return getActiveStudentId() === studentId ? updates : null;
   } catch {
     return null;
   }
 };
 
 export const clearPendingUpdates = async () => {
+  const studentId = getActiveStudentId();
   try {
-    await migrateLegacyAcademicState();
-    await deleteAcademicState(UPDATES_KEY);
-    dispatchAcademicEvent("superflex-academic-updates-cleared");
+    const key = getStudentStorageKey(UPDATES_KEY, studentId);
+    if (!key) return;
+    await deleteAcademicState(key);
+    if (getActiveStudentId() === studentId) {
+      dispatchAcademicEvent("superflex-academic-updates-cleared");
+    }
   } catch {}
 };
 
 export const clearPendingUpdateType = async (type) => {
+  const studentId = getActiveStudentId();
   try {
-    await migrateLegacyAcademicState();
-    const existing = await updateAcademicState(UPDATES_KEY, (current) => {
+    const key = getStudentStorageKey(UPDATES_KEY, studentId);
+    if (!key) return;
+    const existing = await updateAcademicState(key, (current) => {
       if (!current) return null;
       const next = { ...current };
       if (type === "marks") delete next.newMarks;
@@ -157,6 +117,7 @@ export const clearPendingUpdateType = async (type) => {
         (next.newMarks?.length || 0) > 0 || (next.newAttendance?.length || 0) > 0;
       return hasRemaining ? next : null;
     });
+    if (getActiveStudentId() !== studentId) return;
     if (existing) {
       dispatchAcademicEvent("superflex-academic-updates-detected", existing);
     } else {
@@ -165,9 +126,6 @@ export const clearPendingUpdateType = async (type) => {
   } catch {}
 };
 
-/**
- * Checks if a course has pending marks updates
- */
 export const isCourseMarksUpdated = (pendingUpdates, course) => {
   if (!pendingUpdates?.newMarks?.length || !course) return false;
   const key = getNormalizedCourseKey(course);
@@ -176,9 +134,6 @@ export const isCourseMarksUpdated = (pendingUpdates, course) => {
   );
 };
 
-/**
- * Checks if a specific section (e.g. "Quizzes", "Assignments") has pending marks updates
- */
 export const isSectionMarksUpdated = (pendingUpdates, course, sectionTitle) => {
   if (!pendingUpdates?.newMarks?.length || !course || !sectionTitle) return false;
   const key = getNormalizedCourseKey(course);
@@ -190,9 +145,6 @@ export const isSectionMarksUpdated = (pendingUpdates, course, sectionTitle) => {
   return (courseMatch.sections || []).some((s) => String(s).trim().toLowerCase() === target);
 };
 
-/**
- * Checks if a specific assessment row (e.g. "Quiz 3") has pending marks updates
- */
 export const isAssessmentMarksUpdated = (pendingUpdates, course, assessmentTitle) => {
   if (!pendingUpdates?.newMarks?.length || !course || !assessmentTitle) return false;
   const key = getNormalizedCourseKey(course);
@@ -204,17 +156,15 @@ export const isAssessmentMarksUpdated = (pendingUpdates, course, assessmentTitle
   return (courseMatch.assessmentNames || []).some((a) => String(a).trim().toLowerCase() === target);
 };
 
-/**
- * Compares incoming marks against previous snapshot and records any new assessments
- */
 export const checkAndRecordMarksSnapshot = async (currentCourses) => {
   if (!Array.isArray(currentCourses) || currentCourses.length === 0) return { newMarks: [] };
-
-  await migrateLegacyAcademicState();
-  const prevSnapshot = (await getAcademicSnapshot()) || {};
+  const studentId = getActiveStudentId();
+  const snapshotKey = getStudentStorageKey(SNAPSHOT_KEY, studentId);
+  const updatesKey = getStudentStorageKey(UPDATES_KEY, studentId);
+  if (!snapshotKey || !updatesKey) return { newMarks: [] };
+  const prevSnapshot = (await getAcademicSnapshot(studentId)) || {};
   const prevMarks = prevSnapshot.marks || null;
 
-  // Build current marks map: normalizedKey -> { id, title, items }
   const currentMarksMap = {};
   currentCourses.forEach((c) => {
     const key = getNormalizedCourseKey(c);
@@ -262,7 +212,7 @@ export const checkAndRecordMarksSnapshot = async (currentCourses) => {
       if (prev && Array.isArray(prev.items)) {
         const prevKeys = new Set(prev.items.map((it) => (typeof it === "string" ? it : it.key)));
         const added = curr.items.filter((it) => !prevKeys.has(it.key));
-        // Only record if 1 to 4 new items are added (prevents whole-semester dump)
+
         if (added.length > 0 && added.length < 5) {
           newMarks.push({
             courseId: curr.id || key,
@@ -278,10 +228,8 @@ export const checkAndRecordMarksSnapshot = async (currentCourses) => {
     });
   }
 
-  // Keep every record already seen. Home uses a compact marks parser, while the
-  // Marks page has the complete list; replacing one with the other made old
-  // assessments look new again on every navigation.
-  await updateAcademicState(SNAPSHOT_KEY, (latestSnapshot) => {
+  if (getActiveStudentId() !== studentId) return { newMarks: [] };
+  await updateAcademicState(snapshotKey, (latestSnapshot) => {
     const latestMarks = latestSnapshot?.marks || prevMarks || {};
     const mergedMarks = { ...latestMarks };
     Object.entries(currentMarksMap).forEach(([key, current]) => {
@@ -296,7 +244,8 @@ export const checkAndRecordMarksSnapshot = async (currentCourses) => {
   });
 
   if (newMarks.length > 0) {
-    const merged = await updateAcademicState(UPDATES_KEY, (latestUpdates) => ({
+    if (getActiveStudentId() !== studentId) return { newMarks: [] };
+    const merged = await updateAcademicState(updatesKey, (latestUpdates) => ({
       ...latestUpdates,
       detectedAt: Date.now(),
       newMarks: [...(latestUpdates?.newMarks || []), ...newMarks].filter(
@@ -312,17 +261,15 @@ export const checkAndRecordMarksSnapshot = async (currentCourses) => {
   return { newMarks };
 };
 
-/**
- * Compares incoming attendance against previous snapshot and records any new sessions
- */
 export const checkAndRecordAttendanceSnapshot = async (currentSubjects) => {
   if (!Array.isArray(currentSubjects) || currentSubjects.length === 0) return { newAttendance: [] };
-
-  await migrateLegacyAcademicState();
-  const prevSnapshot = (await getAcademicSnapshot()) || {};
+  const studentId = getActiveStudentId();
+  const snapshotKey = getStudentStorageKey(SNAPSHOT_KEY, studentId);
+  const updatesKey = getStudentStorageKey(UPDATES_KEY, studentId);
+  if (!snapshotKey || !updatesKey) return { newAttendance: [] };
+  const prevSnapshot = (await getAcademicSnapshot(studentId)) || {};
   const prevAttendance = prevSnapshot.attendance || null;
 
-  // Build current attendance map: normalizedKey -> { id, title, records, ... }
   const currentAttendanceMap = {};
   currentSubjects.forEach((s) => {
     const key = getNormalizedCourseKey(s);
@@ -353,7 +300,7 @@ export const checkAndRecordAttendanceSnapshot = async (currentSubjects) => {
   if (prevAttendance) {
     Object.entries(currentAttendanceMap).forEach(([key, curr]) => {
       const prev = prevAttendance[key];
-      // Only check for additions if previous records existed for this course
+
       if (prev && Array.isArray(prev.records)) {
         const prevKeys = new Set(prev.records.map((r) => (typeof r === "string" ? r : r.key)));
         const added = curr.records.filter((r) => !prevKeys.has(r.key));
@@ -370,7 +317,8 @@ export const checkAndRecordAttendanceSnapshot = async (currentSubjects) => {
     });
   }
 
-  await updateAcademicState(SNAPSHOT_KEY, (latestSnapshot) => {
+  if (getActiveStudentId() !== studentId) return { newAttendance: [] };
+  await updateAcademicState(snapshotKey, (latestSnapshot) => {
     const latestAttendance = latestSnapshot?.attendance || prevAttendance || {};
     const mergedAttendance = { ...latestAttendance };
     Object.entries(currentAttendanceMap).forEach(([key, current]) => {
@@ -389,7 +337,8 @@ export const checkAndRecordAttendanceSnapshot = async (currentSubjects) => {
   });
 
   if (newAttendance.length > 0) {
-    const merged = await updateAcademicState(UPDATES_KEY, (latestUpdates) => ({
+    if (getActiveStudentId() !== studentId) return { newAttendance: [] };
+    const merged = await updateAcademicState(updatesKey, (latestUpdates) => ({
       ...latestUpdates,
       detectedAt: Date.now(),
       newAttendance: [...(latestUpdates?.newAttendance || []), ...newAttendance].filter(

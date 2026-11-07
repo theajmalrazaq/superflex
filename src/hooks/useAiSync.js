@@ -1,22 +1,33 @@
 import { useState, useEffect } from "react";
 import { getAiContext, updateAiContext } from "../utils/userDataStorage";
+import { sendExtensionMessage } from "../utils/extensionApi";
+import { getActiveStudentId } from "../utils/studentIdentity";
+
+const readPermission = () =>
+  new Promise((resolve) => {
+    sendExtensionMessage({ type: "SUPERFLEX_AI_PERMISSION_GET" }, (result) =>
+      resolve(result?.status || "denied"),
+    );
+  });
 
 export const useAiSync = ({ data, dataKey, syncKey, isEnabled = true, eventExtras = {} }) => {
   const serializedEventExtras = JSON.stringify(eventExtras);
-  const [permissionStatus, setPermissionStatus] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("superflex_ai_data_permission");
-    }
-    return "pending";
-  });
+  const [permissionStatus, setPermissionStatus] = useState("pending");
+  const [studentId, setStudentId] = useState(getActiveStudentId);
 
   useEffect(() => {
-    const handlePermissionUpdate = (e) => {
-      setPermissionStatus(e.detail);
+    const handlePermissionUpdate = () => {
+      readPermission().then(setPermissionStatus);
     };
+    const handleIdentityUpdate = () => setStudentId(getActiveStudentId());
+    handlePermissionUpdate();
     window.addEventListener("superflex-permission-updated", handlePermissionUpdate);
+    window.addEventListener("superflex-ai-enabled-changed", handlePermissionUpdate);
+    window.addEventListener("superflex-student-identity-changed", handleIdentityUpdate);
     return () => {
       window.removeEventListener("superflex-permission-updated", handlePermissionUpdate);
+      window.removeEventListener("superflex-ai-enabled-changed", handlePermissionUpdate);
+      window.removeEventListener("superflex-student-identity-changed", handleIdentityUpdate);
     };
   }, []);
 
@@ -24,9 +35,13 @@ export const useAiSync = ({ data, dataKey, syncKey, isEnabled = true, eventExtra
     if (isEnabled && permissionStatus === "granted") {
       const syncData = async () => {
         try {
-          await getAiContext();
-          const newContext = await updateAiContext((storedContext) => {
-            const existing = storedContext || window.superflex_ai_context || {};
+          const studentId = getActiveStudentId();
+          if (!studentId || (await readPermission()) !== "granted") return;
+          const storedContext = await getAiContext(studentId);
+          if (getActiveStudentId() !== studentId || (await readPermission()) !== "granted") return;
+          const newContext = await updateAiContext((latestContext) => {
+            if (getActiveStudentId() !== studentId) return latestContext;
+            const existing = latestContext || storedContext || {};
             const nextContext = dataKey
               ? { ...existing, [dataKey]: data }
               : typeof data === "object" && data !== null
@@ -38,8 +53,9 @@ export const useAiSync = ({ data, dataKey, syncKey, isEnabled = true, eventExtra
               [syncKey]: new Date().toISOString(),
             };
             return nextContext;
-          });
+          }, studentId);
 
+          if (getActiveStudentId() !== studentId || (await readPermission()) !== "granted") return;
           window.superflex_ai_context = newContext;
           window.dispatchEvent(
             new CustomEvent("superflex-data-updated", {
@@ -52,7 +68,7 @@ export const useAiSync = ({ data, dataKey, syncKey, isEnabled = true, eventExtra
       };
       syncData();
     }
-  }, [data, permissionStatus, isEnabled, dataKey, syncKey, serializedEventExtras]);
+  }, [data, permissionStatus, isEnabled, dataKey, syncKey, serializedEventExtras, studentId]);
 
   return permissionStatus;
 };

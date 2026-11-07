@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import "../styles/login.css";
 import { getExtensionUrl, getExtensionVersion } from "../utils/extensionApi";
 import { LoginSkeleton } from "./ui/Skeleton";
-import { deleteAiMessages } from "../utils/userDataStorage";
 import {
   getDecryptedCredentials,
   saveCredentials,
@@ -15,9 +14,6 @@ function LoginPageStyles() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    deleteAiMessages();
-
-    // Keep the reference palette while giving sign-in a product-specific layout.
     document.body.classList.add("superflex-login-page");
     document.body.classList.add("!min-h-screen", "!overflow-x-hidden");
     document.body.style.color = "#101010";
@@ -49,7 +45,6 @@ function LoginPageStyles() {
       aside.classList.add("!w-full", "!p-0");
     }
 
-    // Let the login shell manage its own full-height spacing.
     const mainContainer = document.querySelector(".m-stack__item.m-stack__item--fluid");
     if (mainContainer) {
       mainContainer.classList.add(
@@ -76,7 +71,6 @@ function LoginPageStyles() {
       );
     });
 
-    // Form inputs spacing & layout
     document
       .querySelectorAll(".m-login__signin .form-group, .m-login__form .form-group")
       .forEach((group) => {
@@ -108,7 +102,6 @@ function LoginPageStyles() {
       element.remove();
     });
 
-    // Pill Inputs: Clean, flat, border-focused pills without glow rings or shadows
     document.querySelectorAll(".form-control.m-input").forEach((element) => {
       element.classList.add(
         "!rounded-full",
@@ -141,13 +134,11 @@ function LoginPageStyles() {
     const oldLogo = document.querySelector(".m-login__logo");
     if (oldLogo) oldLogo.remove();
 
-    // Form actions container
     const formActions = document.querySelector(".m-form__actions");
     if (formActions) {
       formActions.classList.add("!p-0", "!w-full", "!flex", "!flex-col", "!items-center");
     }
 
-    // Primary action: colors live in login.css so dark mode can switch to a white pill.
     const loginButtonObservers = [];
     document.querySelectorAll(".btn-primary").forEach((button) => {
       button.classList.add(
@@ -173,7 +164,6 @@ function LoginPageStyles() {
       );
       button.style.fontFamily = "'Google Sans Flex', sans-serif";
 
-      // Render the white right arrow icon matching reference image
       button.innerHTML = `
         <span>Sign In</span>
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:translate-x-0.5">
@@ -190,7 +180,6 @@ function LoginPageStyles() {
       let resetTimer;
       let hasSavedVault = false;
 
-      // Inject "Remember Me" checkbox before the Sign In button
       if (
         isLoginSubmit &&
         button.parentElement &&
@@ -250,7 +239,6 @@ function LoginPageStyles() {
         setTimeout(updateLoginButtonState, 0);
         setTimeout(updateLoginButtonState, 500);
 
-        // Returning users only need to choose Auto-Fill; credentials auto-decrypt securely
         getCredentialMetadata().then((metadata) => {
           const rememberCheckbox = document.getElementById("superflex-remember-me-checkbox");
 
@@ -292,6 +280,7 @@ function LoginPageStyles() {
 
               const fillBtn = promptCard.querySelector("#superflex-autofill-trigger-btn");
               fillBtn?.addEventListener("click", (e) => {
+                if (!e.isTrusted) return;
                 e.preventDefault();
                 e.stopPropagation();
                 if (creds && usernameInput && passwordInput) {
@@ -379,7 +368,6 @@ function LoginPageStyles() {
           const rememberCheckbox = document.getElementById("superflex-remember-me-checkbox");
           const isRemember = rememberCheckbox?.checked ?? false;
 
-          // First-time saving: if Remember Me is checked and vault isn't saved yet
           if (username && password && isRemember && !hasSavedVault) {
             event.preventDefault();
             event.stopImmediatePropagation();
@@ -417,7 +405,6 @@ function LoginPageStyles() {
             hasSavedVault = false;
           }
 
-          // Normal login or returning user with saved vault: submit directly with no passphrase prompt
           isSubmitting = true;
           loadingStartedAt = performance.now();
           button.innerHTML = `
@@ -442,7 +429,6 @@ function LoginPageStyles() {
       logintitle.style.display = "none";
     }
 
-    // Centered white login card over the sky-to-white page background.
     const bglogin = document.querySelector(".m-login__signin");
     if (bglogin) {
       bglogin.classList.add(
@@ -473,7 +459,6 @@ function LoginPageStyles() {
       const existingHeader = bglogin.querySelector(".login-header");
       if (existingHeader) existingHeader.remove();
 
-      // Card header: use the same black and purple mark as the extension favicon.
       const header = document.createElement("div");
       header.className = "login-header w-full text-left mb-6";
       header.innerHTML = `
@@ -495,7 +480,6 @@ function LoginPageStyles() {
       bglogin.insertBefore(header, bglogin.firstChild);
     }
 
-    // Reset uses the same card shell and header positions as sign-in.
     const forgotPasswordSection = document.querySelector(".m-login__forget-password");
     if (forgotPasswordSection) {
       forgotPasswordSection.classList.add(
@@ -753,11 +737,9 @@ function LoginPageStyles() {
       }
     }
 
-    // Remove the previous all-screen decorative background when navigating back to login.
     const rightImage = document.getElementById("login-background-image");
     if (rightImage) rightImage.remove();
 
-    // Real cloud sprites in the sky half of the page (behind the card, non-interactive).
     document.getElementById("login-clouds")?.remove();
     const cloudLayer = document.createElement("div");
     cloudLayer.id = "login-clouds";
@@ -771,7 +753,6 @@ function LoginPageStyles() {
 
     const CURRENT_VERSION = getExtensionVersion("6.0.0");
 
-    // Keep only the useful links below the card.
     const footerWrapper = document.createElement("div");
     footerWrapper.className =
       "login-outer-footer flex items-center justify-center gap-3 text-center w-full mt-7 relative z-10 flex-wrap select-none";

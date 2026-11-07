@@ -1,4 +1,3 @@
-/** Safe wrappers for extension APIs that can become unavailable after a reload. */
 export function getExtensionUrl(path) {
   try {
     return globalThis.chrome?.runtime?.getURL(path) || "";

@@ -3,28 +3,25 @@ import SuperFlexSettingsModal from "./SuperFlexSettingsModal";
 import { getCampusFromRollNumber } from "../data/facultyDirectories";
 import { parseFacultyPages } from "../utils/facultyDirectory";
 import { sendExtensionMessage } from "../utils/extensionApi";
+import { getActiveStudentId, getStudentStorageKey } from "../utils/studentIdentity";
+import { readLocalJson } from "../utils/jsonStorage";
 
 const SELECTIONS_KEY = "superflex_course_teachers_v1";
 const COURSES_KEY = "superflex_cached_courses_v1";
-const ROLL_NUMBER_KEY = "superflex_student_roll_number_v1";
 const ONBOARDING_KEY = "superflex_teacher_onboarding_complete_v1";
 const FIRST_TIME_SETUP_KEY = "superflex_first_time_setup_v1";
 
-const readJson = (key, fallback) => {
-  try {
-    return JSON.parse(localStorage.getItem(key) || "null") || fallback;
-  } catch {
-    return fallback;
-  }
-};
-
 export default function TeacherSettingsController() {
-  const [courses, setCourses] = useState(() => readJson(COURSES_KEY, []));
-  const [rollNumber, setRollNumber] = useState(() => localStorage.getItem(ROLL_NUMBER_KEY) || "");
-  const [selections, setSelections] = useState(() => readJson(SELECTIONS_KEY, {}));
+  const [courses, setCourses] = useState(() =>
+    readLocalJson(getStudentStorageKey(COURSES_KEY), []),
+  );
+  const [rollNumber, setRollNumber] = useState(getActiveStudentId);
+  const [selections, setSelections] = useState(() =>
+    readLocalJson(getStudentStorageKey(SELECTIONS_KEY), {}),
+  );
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState("settings"); // "setup" | "settings"
-  const [initialTab, setInitialTab] = useState("teachers"); // "teachers" | "ai"
+  const [mode, setMode] = useState("settings");
+  const [initialTab, setInitialTab] = useState("teachers");
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -34,18 +31,18 @@ export default function TeacherSettingsController() {
 
   useEffect(() => {
     const openSettings = () => {
-      setCourses(readJson(COURSES_KEY, []));
-      setRollNumber(localStorage.getItem(ROLL_NUMBER_KEY) || "");
-      setSelections(readJson(SELECTIONS_KEY, {}));
+      setCourses(readLocalJson(getStudentStorageKey(COURSES_KEY), []));
+      setRollNumber(getActiveStudentId());
+      setSelections(readLocalJson(getStudentStorageKey(SELECTIONS_KEY), {}));
       setMode("settings");
       setInitialTab("teachers");
       setOpen(true);
     };
 
     const openGlobalSettings = (event) => {
-      setCourses(readJson(COURSES_KEY, []));
-      setRollNumber(localStorage.getItem(ROLL_NUMBER_KEY) || "");
-      setSelections(readJson(SELECTIONS_KEY, {}));
+      setCourses(readLocalJson(getStudentStorageKey(COURSES_KEY), []));
+      setRollNumber(getActiveStudentId());
+      setSelections(readLocalJson(getStudentStorageKey(SELECTIONS_KEY), {}));
       setMode("settings");
       setInitialTab(event?.detail?.tab || "teachers");
       setOpen(true);
@@ -55,6 +52,7 @@ export default function TeacherSettingsController() {
       const { nextCourses = [], nextRollNumber = "" } = event.detail || {};
       setCourses(nextCourses);
       setRollNumber(nextRollNumber);
+      setSelections(readLocalJson(getStudentStorageKey(SELECTIONS_KEY, nextRollNumber), {}));
       if (
         localStorage.getItem(FIRST_TIME_SETUP_KEY) !== "complete" &&
         nextCourses.length &&
@@ -84,30 +82,35 @@ export default function TeacherSettingsController() {
     setLoading(true);
     setError(false);
 
-    sendExtensionMessage({ type: "SUPERFLEX_GET_CAMPUS_FACULTY", campusId: campus.id }, (response, error) => {
-      if (error || !response?.pages) {
-        setError(true);
+    sendExtensionMessage(
+      { type: "SUPERFLEX_GET_CAMPUS_FACULTY", campusId: campus.id },
+      (response, error) => {
+        if (error || !response?.pages) {
+          setError(true);
+          setLoading(false);
+          return;
+        }
+        const parsedTeachers = parseFacultyPages(response.pages);
+        setTeachers(parsedTeachers);
+        setError(!parsedTeachers.length || response.pages.every((page) => page.error));
         setLoading(false);
-        return;
-      }
-      const parsedTeachers = parseFacultyPages(response.pages);
-      setTeachers(parsedTeachers);
-      setError(!parsedTeachers.length || response.pages.every((page) => page.error));
-      setLoading(false);
-    });
+      },
+    );
   }, [open, campus, retryKey]);
 
   const updateSelection = (courseId, teacher) => {
     setSelections((current) => {
       const next = { ...current, [courseId]: teacher };
-      localStorage.setItem(SELECTIONS_KEY, JSON.stringify(next));
+      const key = getStudentStorageKey(SELECTIONS_KEY);
+      if (key) localStorage.setItem(key, JSON.stringify(next));
       window.dispatchEvent(new CustomEvent("superflex-teachers-updated", { detail: next }));
       return next;
     });
   };
 
   const finish = () => {
-    localStorage.setItem(SELECTIONS_KEY, JSON.stringify(selections));
+    const key = getStudentStorageKey(SELECTIONS_KEY);
+    if (key) localStorage.setItem(key, JSON.stringify(selections));
     localStorage.setItem(FIRST_TIME_SETUP_KEY, "complete");
     localStorage.setItem(ONBOARDING_KEY, "complete");
     setOpen(false);

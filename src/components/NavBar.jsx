@@ -24,15 +24,16 @@ import {
   GripVertical,
   Settings,
 } from "lucide-react";
-import { DragDropProvider } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { Logo } from "./ui/Logo";
 import ProfileImageModal from "./ui/ProfileImageModal";
+import DeferredDragDropProvider from "./ui/DeferredDragDropProvider";
 import { getExtensionUrl } from "../utils/extensionApi";
 import { usePreferencesStore } from "../stores/preferencesStore";
 import { sidebarLinksSchema } from "../stores/preferencesSchemas";
+import { readLocalJson } from "../utils/jsonStorage";
 import { getPendingUpdates } from "../utils/academicSnapshot";
-import { getProfileImage } from "../utils/userDataStorage";
+import { useProfileImage } from "../hooks/useProfileImage";
 
 const LINK_GROUPS = {
   Home: "Overview",
@@ -73,12 +74,10 @@ const ICONS = {
 const DEFAULT_ICON = FileText;
 
 function readSidebarLinks() {
-  try {
-    const parsed = sidebarLinksSchema.safeParse(
-      JSON.parse(localStorage.getItem("superflex-sidebar-links") || "[]"),
-    );
-    if (!parsed.success) return [];
-    return parsed.data.flatMap((link) => {
+  const parsed = sidebarLinksSchema.safeParse(readLocalJson("superflex-sidebar-links", []));
+  if (!parsed.success) return [];
+  return parsed.data
+    .flatMap((link) => {
       try {
         const url = new URL(link.href, window.location.origin);
         if (url.origin !== window.location.origin || !url.pathname.startsWith("/")) return [];
@@ -86,10 +85,8 @@ function readSidebarLinks() {
       } catch {
         return [];
       }
-    }).filter((link) => link.text && link.text !== "Grade Report");
-  } catch {
-    return [];
-  }
+    })
+    .filter((link) => link.text && link.text !== "Grade Report");
 }
 
 function SidebarLink({ link, active, onNavigate, compact = false, hasUpdate = false }) {
@@ -140,7 +137,15 @@ function SidebarLink({ link, active, onNavigate, compact = false, hasUpdate = fa
 
 const getLinkId = (link) => (link.text || "").trim();
 
-function SortableSidebarLink({ link, active, onNavigate, index, group, disabled, hasUpdate = false }) {
+function SortableSidebarLink({
+  link,
+  active,
+  onNavigate,
+  index,
+  group,
+  disabled,
+  hasUpdate = false,
+}) {
   const { ref, handleRef, isDragging } = useSortable({
     id: getLinkId(link),
     index,
@@ -169,7 +174,7 @@ function SortableSidebarLink({ link, active, onNavigate, index, group, disabled,
 
 function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   const [menuLinks, setMenuLinks] = useState(readSidebarLinks);
-  const [profileImage, setProfileImage] = useState("/Login/GetImage");
+  const profileImage = useProfileImage();
   const [userName, setUserName] = useState("Student Account");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
@@ -190,10 +195,12 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     handleUpdates();
     window.addEventListener("superflex-academic-updates-detected", handleUpdates);
     window.addEventListener("superflex-academic-updates-cleared", handleUpdates);
+    window.addEventListener("superflex-student-identity-changed", handleUpdates);
     return () => {
       active = false;
       window.removeEventListener("superflex-academic-updates-detected", handleUpdates);
       window.removeEventListener("superflex-academic-updates-cleared", handleUpdates);
+      window.removeEventListener("superflex-student-identity-changed", handleUpdates);
     };
   }, []);
 
@@ -218,7 +225,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     const groups = Object.fromEntries(GROUP_ORDER.map((group) => [group, []]));
     const placedLinkIds = new Set();
 
-    (navOrder || []).forEach((item, idx) => {
+    (navOrder || []).forEach((item) => {
       let group;
       let linkId;
       if (item.includes(":")) {
@@ -227,22 +234,12 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
         linkId = item.slice(colonIndex + 1).trim();
       } else {
         linkId = item.trim();
-        // If legacy flat order placed Course Registration or Attendance before Marks, infer Overview
-        const marksIndex = (navOrder || []).indexOf("Marks");
-        if (
-          (linkId === "Course Registration" || linkId === "Attendance") &&
-          marksIndex !== -1 &&
-          idx < marksIndex
-        ) {
-          group = "Overview";
-        } else {
-          group = LINK_GROUPS[linkId] || "More";
-        }
+        group = LINK_GROUPS[linkId] || "More";
       }
 
       if (linkMap.has(linkId) && !placedLinkIds.has(linkId)) {
         const link = linkMap.get(linkId);
-        const targetGroup = groups[group] ? group : (LINK_GROUPS[linkId] || "More");
+        const targetGroup = groups[group] ? group : LINK_GROUPS[linkId] || "More";
         if (groups[targetGroup]) {
           groups[targetGroup].push(link);
           placedLinkIds.add(linkId);
@@ -250,10 +247,12 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
       }
     });
 
-    // Place any menuLinks not in navOrder yet into their default groups
     menuLinks.forEach((link) => {
       const name = link.text.trim();
-      if (!placedLinkIds.has(name) && !["Grade Report", "My Teachers", "Change Password"].includes(name)) {
+      if (
+        !placedLinkIds.has(name) &&
+        !["Grade Report", "My Teachers", "Change Password"].includes(name)
+      ) {
         const defaultGroup = LINK_GROUPS[name] || "More";
         if (groups[defaultGroup]) {
           groups[defaultGroup].push(link);
@@ -264,19 +263,6 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
     return groups;
   }, [menuLinks, navOrder]);
-
-  useEffect(() => {
-    if (!navOrder || !navOrder.length || !menuLinks.length) return;
-    const hasColons = navOrder.some((item) => item.includes(":"));
-    if (!hasColons) {
-      const migrated = GROUP_ORDER.flatMap((group) =>
-        (groupedLinks[group] || []).map((link) => `${group}:${getLinkId(link)}`),
-      );
-      if (migrated.length) {
-        setNavOrder(migrated);
-      }
-    }
-  }, [navOrder, groupedLinks, menuLinks.length, setNavOrder]);
 
   const changeThemeMode = (mode) => {
     setThemeMode(mode);
@@ -363,20 +349,6 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   }, []);
 
   useEffect(() => {
-    let active = true;
-    const loadProfileImage = async (event) => {
-      const image = event?.detail || (await getProfileImage());
-      if (active) setProfileImage(image);
-    };
-    loadProfileImage();
-    window.addEventListener("superflex-profile-image-changed", loadProfileImage);
-    return () => {
-      active = false;
-      window.removeEventListener("superflex-profile-image-changed", loadProfileImage);
-    };
-  }, []);
-
-  useEffect(() => {
     document.documentElement.classList.toggle("dark", themeMode === "dark");
     localStorage.setItem("superflex-theme-mode", themeMode);
   }, [themeMode]);
@@ -395,9 +367,6 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
     const sortable = source?.sortable;
     if (event.canceled || !source || !sortable) return;
 
-    // dnd-kit updates the dragged sortable's group and index while it moves.
-    // The final drop target can be the source item itself, so deriving the new
-    // position from operation.target loses otherwise valid reorder operations.
     const sourceId = source.id;
     const sourceGroup = sortable.initialGroup;
     const targetGroup = sortable.group;
@@ -432,43 +401,54 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   };
 
   const renderGroups = (dragDisabled = false) => (
-    <DragDropProvider onDragEnd={handleDragEnd}>
+    <DeferredDragDropProvider onDragEnd={handleDragEnd}>
       <nav aria-label="Main navigation" className="space-y-5">
-      {GROUP_ORDER.map((group) => {
-        const links = groupedLinks[group];
-        if (!links.length) return null;
-        return (
-          <div key={group}>
-            <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.14em] text-white/70 dark:text-white/70">
-              {group}
-            </p>
-            <div className="space-y-1">
-              {links.map((link, index) => (
-                <SortableSidebarLink
-                  key={`${link.path}-${link.text}`}
-                  link={link}
-                  active={isLinkActive(link)}
-                  onNavigate={navigate}
-                  index={index}
-                  group={group}
-                  disabled={dragDisabled}
-                  hasUpdate={checkHasUpdate(link)}
-                />
-              ))}
+        {GROUP_ORDER.map((group) => {
+          const links = groupedLinks[group];
+          if (!links.length) return null;
+          return (
+            <div key={group}>
+              <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.14em] text-white/70 dark:text-white/70">
+                {group}
+              </p>
+              <div className="space-y-1">
+                {links.map((link, index) => (
+                  <SortableSidebarLink
+                    key={`${link.path}-${link.text}`}
+                    link={link}
+                    active={isLinkActive(link)}
+                    onNavigate={navigate}
+                    index={index}
+                    group={group}
+                    disabled={dragDisabled}
+                    hasUpdate={checkHasUpdate(link)}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        );
-      })}
-      {!menuLinks.length && <p className="px-3 text-xs text-white/75">Loading navigation…</p>}
+          );
+        })}
+        {!menuLinks.length && <p className="px-3 text-xs text-white/75">Loading navigation…</p>}
       </nav>
-    </DragDropProvider>
+    </DeferredDragDropProvider>
   );
 
   const sidebarContents = (mobile = false) => (
     <>
       <div className="flex items-center justify-between px-5 py-5">
-        <a href="/" aria-label="SuperFlex home" className="inline-flex items-center gap-2.5 rounded-lg">
-          <Logo className="h-9 w-auto" style={{ "--accent": sidebarLogoColor, "--foreground": sidebarLogoColor, "--bolt": sidebarLogoBoltColor }} />
+        <a
+          href="/"
+          aria-label="SuperFlex home"
+          className="inline-flex items-center gap-2.5 rounded-lg"
+        >
+          <Logo
+            className="h-9 w-auto"
+            style={{
+              "--accent": sidebarLogoColor,
+              "--foreground": sidebarLogoColor,
+              "--bolt": sidebarLogoBoltColor,
+            }}
+          />
         </a>
         {mobile && (
           <button
@@ -519,7 +499,9 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
               <button
                 type="button"
-                onClick={() => window.dispatchEvent(new CustomEvent("superflex-open-global-settings"))}
+                onClick={() =>
+                  window.dispatchEvent(new CustomEvent("superflex-open-global-settings"))
+                }
                 aria-label="SuperFlex Settings"
                 title="SuperFlex Settings"
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/70 text-slate-700 hover:bg-white hover:text-[#230052] dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/20 dark:hover:text-white transition-all shadow-xs"
@@ -573,7 +555,12 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
   return (
     <>
       <aside
-        style={currentPage.startsWith("/Student/CourseRegistration") && window.matchMedia("(min-width: 1024px)").matches ? { display: "flex" } : undefined}
+        style={
+          currentPage.startsWith("/Student/CourseRegistration") &&
+          window.matchMedia("(min-width: 1024px)").matches
+            ? { display: "flex" }
+            : undefined
+        }
         className="fixed bottom-4 left-4 top-4 z-40 hidden w-[252px] flex-col overflow-hidden rounded-[28px] border-0 bg-transparent text-slate-900 dark:text-[#f5f6fb] lg:flex"
       >
         {sidebarContents()}
@@ -581,7 +568,14 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }) {
 
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-white/50 bg-white/55 px-4 py-3 backdrop-blur-xl dark:border-white/[0.14] dark:bg-black lg:hidden">
         <a href="/" aria-label="SuperFlex home">
-          <Logo className="h-6 w-auto" style={{ "--accent": sidebarLogoColor, "--foreground": sidebarLogoColor, "--bolt": sidebarLogoBoltColor }} />
+          <Logo
+            className="h-6 w-auto"
+            style={{
+              "--accent": sidebarLogoColor,
+              "--foreground": sidebarLogoColor,
+              "--bolt": sidebarLogoBoltColor,
+            }}
+          />
         </a>
         <button
           type="button"

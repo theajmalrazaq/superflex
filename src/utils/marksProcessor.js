@@ -55,10 +55,13 @@ export const processCourseMarks = (course) => {
     if (isSimMode) {
       if (section.itemLimit && section.itemLimit > 0 && section.itemLimit < sorted.length) {
         const configuredWeight = parseFloatOrZero(section.weight);
-        secWeight = configuredWeight > 0
-          ? configuredWeight
-          : sorted.slice(0, section.itemLimit).reduce((sum, item) => sum + item.weight, 0);
-        sorted.slice(0, section.itemLimit).forEach((item) => includedIndices.add(item._originalIdx));
+        secWeight =
+          configuredWeight > 0
+            ? configuredWeight
+            : sorted.slice(0, section.itemLimit).reduce((sum, item) => sum + item.weight, 0);
+        sorted
+          .slice(0, section.itemLimit)
+          .forEach((item) => includedIndices.add(item._originalIdx));
       } else {
         secWeight = rowsWeightSum;
         sorted.forEach((item) => includedIndices.add(item._originalIdx));
@@ -66,9 +69,10 @@ export const processCourseMarks = (course) => {
     } else {
       if (section.itemLimit && section.itemLimit > 0 && section.itemLimit < sorted.length) {
         const configuredWeight = parseFloatOrZero(section.weight);
-        secWeight = configuredWeight > 0
-          ? configuredWeight
-          : sorted.slice(0, section.itemLimit).reduce((sum, item) => sum + item.weight, 0);
+        secWeight =
+          configuredWeight > 0
+            ? configuredWeight
+            : sorted.slice(0, section.itemLimit).reduce((sum, item) => sum + item.weight, 0);
       } else if (secWeight === undefined || secWeight === null || secWeight <= 0) {
         secWeight = rowsWeightSum;
       }

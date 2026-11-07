@@ -64,16 +64,16 @@ export default function SuperFlexSettingsModal({
   onRetryTeachers,
 }) {
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [step, setStep] = useState(1); // 1 = teachers, 2 = ai (used in setup mode)
+  const [step, setStep] = useState(1);
   const [courseIndex, setCourseIndex] = useState(0);
   const [query, setQuery] = useState("");
   const [manualName, setManualName] = useState("");
   const [manualEmail, setManualEmail] = useState("");
 
-  // AI Settings State
   const [aiEnabled, setAiEnabled] = useState(() => {
     return localStorage.getItem("superflex_ai_enabled") !== "false";
   });
+  const [permissionStatus, setPermissionStatus] = useState("pending");
   const [hasApiKey, setHasApiKey] = useState(false);
   const [activeModel, setActiveModel] = useState(null);
   const [apiKeyInput, setApiKeyInput] = useState("");
@@ -81,7 +81,6 @@ export default function SuperFlexSettingsModal({
   const [saveError, setSaveError] = useState("");
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Auto-Fill Settings State
   const [savedCreds, setSavedCreds] = useState(null);
   const [autofillUser, setAutofillUser] = useState("");
   const [autofillPass, setAutofillPass] = useState("");
@@ -96,8 +95,10 @@ export default function SuperFlexSettingsModal({
       setQuery("");
       setSaveError("");
       setSaveSuccess(false);
+      sendExtensionMessage({ type: "SUPERFLEX_AI_PERMISSION_GET" }, (result) => {
+        setPermissionStatus(result?.status || "denied");
+      });
 
-      // Check Gemini API configuration status
       sendExtensionMessage({ type: "SUPERFLEX_AI_CONFIG" }, (response) => {
         if (response && !response.error) {
           setHasApiKey(Boolean(response.configured));
@@ -105,7 +106,6 @@ export default function SuperFlexSettingsModal({
         }
       });
 
-      // Check saved credentials for Auto-Fill
       getCredentialMetadata().then((metadata) => {
         setSavedCreds(metadata.hasCredentials ? metadata : null);
       });
@@ -113,6 +113,7 @@ export default function SuperFlexSettingsModal({
   }, [open, initialTab]);
 
   const activeCourse = (courses || [])[courseIndex] || null;
+  const dockEnabled = open ? localStorage.getItem("superflex_ai_enabled") !== "false" : aiEnabled;
   const filteredTeachers = useMemo(() => {
     const search = query.trim().toLowerCase();
     if (!search) return teachers;
@@ -121,14 +122,15 @@ export default function SuperFlexSettingsModal({
     );
   }, [teachers, query]);
 
-  const handleToggleAi = (enabled) => {
+  const handleToggleAi = (enabled, event) => {
+    if (!event?.nativeEvent?.isTrusted) return;
     setAiEnabled(enabled);
     localStorage.setItem("superflex_ai_enabled", String(enabled));
-    localStorage.setItem("superflex_ai_data_permission", enabled ? "granted" : "denied");
-    window.dispatchEvent(new CustomEvent("superflex-ai-enabled-changed", { detail: enabled }));
+    window.dispatchEvent(new CustomEvent("superflex-ai-enabled-changed"));
   };
 
-  const handleConnectGemini = () => {
+  const handleConnectGemini = (event) => {
+    if (!event?.nativeEvent?.isTrusted) return;
     if (!apiKeyInput.trim()) return;
     setIsConnecting(true);
     setSaveError("");
@@ -186,7 +188,7 @@ export default function SuperFlexSettingsModal({
         </button>
       </BottomSheetClose>
 
-      {/* Header */}
+      {}
       <header className="flex shrink-0 flex-col items-center px-6 pb-2 pt-2 text-center sm:px-8">
         <div className="mb-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#230052] text-white dark:bg-white dark:text-[#101027] shadow-sm">
           {currentTab === "teachers" ? (
@@ -220,7 +222,7 @@ export default function SuperFlexSettingsModal({
               : "Manage your course instructors, AI permissions, and API key preferences."}
         </BottomSheetDescription>
 
-        {/* Mode & Navigation Tabs */}
+        {}
         {mode === "settings" ? (
           <div className="mt-3 flex gap-1.5 rounded-full border border-black/[0.08] bg-slate-100/80 p-1 dark:border-white/10 dark:bg-white/[0.06]">
             <button
@@ -261,7 +263,6 @@ export default function SuperFlexSettingsModal({
             </button>
           </div>
         ) : (
-          /* Setup Steps Indicator */
           <div className="mt-3 flex items-center gap-2">
             <span
               className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${
@@ -286,10 +287,9 @@ export default function SuperFlexSettingsModal({
         )}
       </header>
 
-      {/* Body Content */}
+      {}
       <div className="min-h-0 flex-1 overflow-y-auto px-5 py-3 sm:px-8">
         {currentTab === "teachers" && (
-          /* ================= TEACHERS SELECTION TAB ================= */
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-2 text-xs dark:bg-white/[.06]">
               <span className="font-semibold text-foreground">
@@ -300,7 +300,7 @@ export default function SuperFlexSettingsModal({
               </span>
             </div>
 
-            {/* Courses horizontal scroll chips */}
+            {}
             {courses.length > 0 ? (
               <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
                 {courses.map((course, index) => {
@@ -352,7 +352,7 @@ export default function SuperFlexSettingsModal({
               </div>
             )}
 
-            {/* Search Input */}
+            {}
             <label className="flex items-center gap-2 rounded-2xl border border-slate-200 px-3.5 py-2 focus-within:border-[#230052] dark:border-white/15 dark:focus-within:border-white">
               <Search size={15} className="text-slate-400 shrink-0" />
               <input
@@ -373,7 +373,7 @@ export default function SuperFlexSettingsModal({
               )}
             </label>
 
-            {/* Faculty List */}
+            {}
             <div className="max-h-56 space-y-1.5 overflow-y-auto pr-1 scrollbar-hide">
               {loadingTeachers ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center text-xs text-slate-400">
@@ -446,7 +446,7 @@ export default function SuperFlexSettingsModal({
               )}
             </div>
 
-            {/* Manual Teacher Fallback */}
+            {}
             <div className="rounded-2xl border border-dashed border-slate-200 p-3 text-xs dark:border-white/15">
               <p className="font-bold text-foreground">Can't find your teacher?</p>
               <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -477,10 +477,10 @@ export default function SuperFlexSettingsModal({
           </div>
         )}
 
-        {/* ================= OCTOPUS AI TAB ================= */}
+        {}
         {currentTab === "ai" && (
           <div className="space-y-4">
-            {/* AI Toggle Card */}
+            {}
             <div className="flex items-center justify-between gap-4 rounded-2xl border border-black/[0.08] bg-slate-50/80 p-4 dark:border-white/10 dark:bg-white/[0.04]">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] shadow-xs shrink-0">
@@ -497,27 +497,33 @@ export default function SuperFlexSettingsModal({
                 </div>
               </div>
 
-              {/* iOS style Toggle Switch */}
+              {}
               <button
                 type="button"
                 role="switch"
-                aria-checked={aiEnabled}
-                onClick={() => handleToggleAi(!aiEnabled)}
+                aria-checked={dockEnabled}
+                onClick={(event) => handleToggleAi(!dockEnabled, event)}
                 className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  aiEnabled ? "bg-[#230052] dark:bg-white" : "bg-slate-300 dark:bg-white/20"
+                  dockEnabled ? "bg-[#230052] dark:bg-white" : "bg-slate-300 dark:bg-white/20"
                 }`}
               >
                 <span
                   className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out dark:bg-[#0a192f] ${
-                    aiEnabled ? "translate-x-5" : "translate-x-0"
+                    dockEnabled ? "translate-x-5" : "translate-x-0"
                   }`}
                 />
               </button>
             </div>
 
-            {aiEnabled ? (
+            <p className="text-xs text-foreground/60" role="status">
+              {permissionStatus === "granted"
+                ? "Academic data permission is enabled for AI requests."
+                : "Academic data permission is not enabled. You can still configure your Gemini key; Octopus will ask before using academic data."}
+            </p>
+
+            {dockEnabled ? (
               <div className="space-y-3.5 animate-in fade-in duration-200">
-                {/* 1. Where to get API key */}
+                {}
                 <div className="rounded-2xl border border-sky-400/30 bg-sky-500/[0.07] p-4 dark:border-sky-400/20 dark:bg-sky-500/[0.05]">
                   <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0">
@@ -541,7 +547,6 @@ export default function SuperFlexSettingsModal({
                   </div>
                 </div>
 
-                {/* 2. Paste API key */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs font-bold text-foreground">
                     <span>2. Connect Gemini API Key</span>
@@ -561,6 +566,12 @@ export default function SuperFlexSettingsModal({
                         setSaveError("");
                         setSaveSuccess(false);
                       }}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" && apiKeyInput.trim() && !isConnecting) {
+                          event.preventDefault();
+                          handleConnectGemini(event);
+                        }
+                      }}
                       placeholder={
                         hasApiKey
                           ? "Enter new key to replace existing"
@@ -570,7 +581,7 @@ export default function SuperFlexSettingsModal({
                     />
                     <button
                       type="button"
-                      onClick={handleConnectGemini}
+                      onClick={(event) => handleConnectGemini(event)}
                       disabled={!apiKeyInput.trim() || isConnecting}
                       className="min-h-11 flex items-center gap-1.5 rounded-xl bg-[#230052] px-4 py-2.5 text-xs font-bold text-white transition-all hover:bg-[#370c72] disabled:opacity-50 dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 shrink-0"
                     >
@@ -606,7 +617,7 @@ export default function SuperFlexSettingsModal({
           </div>
         )}
 
-        {/* Tab 3: Auto-Fill & Security */}
+        {}
         {currentTab === "autofill" && (
           <div className="space-y-5 animate-in fade-in duration-200">
             <div className="rounded-2xl border border-black/[0.08] bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.04]">
@@ -620,7 +631,8 @@ export default function SuperFlexSettingsModal({
                     </span>
                   </div>
                   <p className="text-xs text-foreground/60">
-                    Saves your Roll No & password securely in local extension storage so you can easily Auto-Fill on future logins.
+                    Saves your Roll No & password securely in local extension storage so you can
+                    easily Auto-Fill on future logins.
                   </p>
                 </div>
               </div>
@@ -709,10 +721,7 @@ export default function SuperFlexSettingsModal({
                     onClick={async () => {
                       if (!autofillUser.trim() || !autofillPass) return;
                       setAutofillSaving(true);
-                      const saved = await saveCredentials(
-                        autofillUser.trim(),
-                        autofillPass,
-                      );
+                      const saved = await saveCredentials(autofillUser.trim(), autofillPass);
                       const metadata = await getCredentialMetadata();
                       setSavedCreds(saved ? metadata : null);
                       setAutofillSaving(false);
@@ -740,7 +749,7 @@ export default function SuperFlexSettingsModal({
         )}
       </div>
 
-      {/* Footer Actions */}
+      {}
       <footer className="flex shrink-0 items-center justify-between border-t border-black/[0.06] p-4 sm:px-8 dark:border-white/[0.08]">
         {mode === "setup" ? (
           <>

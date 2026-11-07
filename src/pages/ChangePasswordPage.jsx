@@ -1,11 +1,27 @@
 import React, { useEffect, useState } from "react";
+import { parsePortalAlerts } from "../parsers/dom";
 import PageLayout from "../components/layouts/PageLayout";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import Skeleton from "../components/ui/Skeleton";
 
 const ChangePasswordSkeleton = () => (
-  <main className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1680px] flex-col justify-center gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8" role="status" aria-label="Loading security settings">
-    <div className="mx-auto w-full max-w-[480px] space-y-5 rounded-[32px] bg-white p-6 dark:bg-black sm:p-8"><Skeleton className="h-12 w-12 rounded-2xl" /><Skeleton className="h-6 w-48" /><Skeleton className="h-4 w-72 max-w-full" />{[0, 1, 2].map((item) => <div key={item} className="space-y-2"><Skeleton className="h-3 w-28" /><Skeleton className="h-12 w-full rounded-full" /></div>)}<Skeleton className="h-12 w-full rounded-full" /></div>
+  <main
+    className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1680px] flex-col justify-center gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8"
+    role="status"
+    aria-label="Loading security settings"
+  >
+    <div className="mx-auto w-full max-w-[480px] space-y-5 rounded-[32px] bg-white p-6 dark:bg-black sm:p-8">
+      <Skeleton className="h-12 w-12 rounded-2xl" />
+      <Skeleton className="h-6 w-48" />
+      <Skeleton className="h-4 w-72 max-w-full" />
+      {[0, 1, 2].map((item) => (
+        <div key={item} className="space-y-2">
+          <Skeleton className="h-3 w-28" />
+          <Skeleton className="h-12 w-full rounded-full" />
+        </div>
+      ))}
+      <Skeleton className="h-12 w-full rounded-full" />
+    </div>
   </main>
 );
 
@@ -22,43 +38,15 @@ function ChangePasswordPage() {
         return;
       }
 
-      const alertList = [];
-      targetElement.querySelectorAll(".m-alert, .alert").forEach((alert) => {
-        if (
-          alert.style.display === "none" ||
-          alert.id === "DataErrormsgdiv" ||
-          alert.closest(".modal")
-        )
-          return;
-
-        const textContainer = alert.querySelector(".m-alert__text") || alert;
-        const clone = textContainer.cloneNode(true);
-
-        clone
-          .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
-          .forEach((el) => el.remove());
-
-        let message = clone.textContent
-          .replace(/Alert!/gi, "")
-          .replace(/Close/gi, "")
-          .replace(/&nbsp;/g, " ")
-          .replace(/\s+/g, " ")
-          .trim();
-
-        if (message && message.length > 3) {
-          const type =
-            alert.classList.contains("alert-danger") ||
-            alert.classList.contains("m-alert--outline-danger")
-              ? "error"
-              : "info";
-          const displayMessage =
-            type !== "error" && /password.*(success|updated|changed)/i.test(message)
+      setAlerts(
+        parsePortalAlerts(targetElement).map((alert) => ({
+          ...alert,
+          message:
+            alert.type !== "error" && /password.*(success|updated|changed)/i.test(alert.message)
               ? "Password updated. Now if only GPA worked like that."
-              : message;
-          alertList.push({ type, message: displayMessage });
-        }
-      });
-      setAlerts(alertList);
+              : alert.message,
+        })),
+      );
 
       applyCustomStyling(targetElement);
 
@@ -103,7 +91,13 @@ function ChangePasswordPage() {
 
     const portletBody = element.querySelector(".m-portlet__body");
     if (portletBody) {
-      portletBody.classList.add("!p-5", "sm:!p-8", "!text-[#101010]", "dark:!text-[#f5f6fb]", "!bg-transparent");
+      portletBody.classList.add(
+        "!p-5",
+        "sm:!p-8",
+        "!text-[#101010]",
+        "dark:!text-[#f5f6fb]",
+        "!bg-transparent",
+      );
     }
 
     const portalStatusButtons = element.querySelectorAll("#success, #error");
@@ -192,13 +186,37 @@ function ChangePasswordPage() {
             clonedInput.style.setProperty("border-radius", "999px", "important");
             clonedInput.style.setProperty("font-size", "14px", "important");
             clonedInput.style.setProperty("font-weight", "400", "important");
-            clonedInput.style.setProperty("font-family", "'Google Sans Flex', sans-serif", "important");
+            clonedInput.style.setProperty(
+              "font-family",
+              "'Google Sans Flex', sans-serif",
+              "important",
+            );
             clonedInput.style.setProperty("line-height", "normal", "important");
-            clonedInput.style.setProperty("background-color", isDarkMode ? "rgb(217 217 217 / 4%)" : "#fff", "important");
-            clonedInput.style.setProperty("border", isDarkMode ? "2px solid rgba(255,255,255,.12)" : "2px solid #e0e0e0", "important");
+            clonedInput.style.setProperty(
+              "background-color",
+              isDarkMode ? "rgb(217 217 217 / 4%)" : "#fff",
+              "important",
+            );
+            clonedInput.style.setProperty(
+              "border",
+              isDarkMode ? "2px solid rgba(255,255,255,.12)" : "2px solid #e0e0e0",
+              "important",
+            );
             clonedInput.style.setProperty("color", isDarkMode ? "#f9f9f9" : "#111", "important");
-            clonedInput.addEventListener("focus", () => clonedInput.style.setProperty("border-color", isDarkMode ? "#fff" : "#230052", "important"));
-            clonedInput.addEventListener("blur", () => clonedInput.style.setProperty("border-color", isDarkMode ? "rgba(255,255,255,.12)" : "#e0e0e0", "important"));
+            clonedInput.addEventListener("focus", () =>
+              clonedInput.style.setProperty(
+                "border-color",
+                isDarkMode ? "#fff" : "#230052",
+                "important",
+              ),
+            );
+            clonedInput.addEventListener("blur", () =>
+              clonedInput.style.setProperty(
+                "border-color",
+                isDarkMode ? "rgba(255,255,255,.12)" : "#e0e0e0",
+                "important",
+              ),
+            );
 
             const inputWrapper = document.createElement("div");
             inputWrapper.classList.add("relative", "w-full", "group");

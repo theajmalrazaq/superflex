@@ -19,7 +19,6 @@ const LoadingOverlay = ({ show = true }) => {
 
     window.addEventListener("superflex-update-loading", handleCustomLoading);
 
-    // Initial load auto-dismiss: overlay hides once React pages & Skeletons are ready
     const timer = setTimeout(() => {
       setLoading(false);
     }, 700);
@@ -52,11 +51,8 @@ const LoadingOverlay = ({ show = true }) => {
   const cloudUrl = getExtensionUrl("assets/clouds/cloud-2.webp");
 
   return (
-    <div
-      aria-hidden="true"
-      className={`loading-overlay ${isFading ? "fade-out" : ""}`}
-    >
-      {/* Animated background clouds */}
+    <div aria-hidden="true" className={`loading-overlay ${isFading ? "fade-out" : ""}`}>
+      {}
       {cloudUrl && (
         <>
           <img
@@ -72,7 +68,7 @@ const LoadingOverlay = ({ show = true }) => {
         </>
       )}
 
-      {/* Center logo card */}
+      {}
       <div className="relative z-10 flex h-24 w-24 items-center justify-center overflow-hidden rounded-[28px] border border-white/40 bg-white/60 shadow-none backdrop-blur-md dark:border-white/10 dark:bg-black/40">
         <svg
           viewBox="0 0 24 24"

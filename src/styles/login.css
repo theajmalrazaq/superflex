@@ -1,4 +1,3 @@
-/* Compact FLEX sign-in with a blue upper half and white lower half. */
 html:has(body.superflex-login-page) {
   height: 100dvh;
   overflow: hidden !important;
@@ -183,7 +182,6 @@ body.superflex-login-page #forgot-password-popup .m-login__desc {
   letter-spacing: -0.015em;
 }
 
-/* Sign-in header: favicon mark centered above the title and subtitle */
 body.superflex-login-page #login-popup .login-header {
   display: flex !important;
   flex-direction: column;
@@ -207,7 +205,6 @@ body.superflex-login-page #login-popup .login-header p {
   text-align: center !important;
 }
 
-/* Decorative cloud sprites floating in the blue upper half of the page */
 .login-clouds {
   position: fixed;
   inset: 0;
@@ -399,7 +396,6 @@ body.superflex-login-page #login-popup .m-form__actions {
   margin-top: 8px !important;
 }
 
-/* Cloudflare Turnstile captcha: full-width row with the widget iframe centered inside it */
 body.superflex-login-page .cf-turnstile {
   display: flex !important;
   width: 100% !important;
@@ -878,7 +874,6 @@ body.superflex-login-page .form-control-feedback {
   font-size: 10px;
 }
 
-/* Change-password controls reuse the login input's placeholder treatment. */
 .superflex-password-input::placeholder {
   color: #9ca3af !important;
   opacity: 1 !important;
@@ -894,7 +889,6 @@ html.dark .superflex-password-input::placeholder {
   }
 }
 
-/* Compact password recovery view, styled as a focused companion to sign-in. */
 body.superflex-login-page #forgot-password-popup {
   height: auto !important;
   min-height: 0 !important;

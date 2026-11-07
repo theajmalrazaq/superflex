@@ -23,14 +23,18 @@ const StatsCard = ({
         className={`flex h-full min-h-[156px] min-w-0 flex-col rounded-[32px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6 ${className}`}
       >
         <div className="flex min-w-0 items-center gap-3">
-          <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-[36%] ${dashboardIconTones[iconTone] || dashboardIconTones.lavender}`}>
+          <div
+            className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-[36%] ${dashboardIconTones[iconTone] || dashboardIconTones.lavender}`}
+          >
             <Icon size={25} strokeWidth={2} />
           </div>
           <p className="truncate text-sm font-semibold text-[#40404a] dark:text-[#c4cad6]">
             {label}
           </p>
         </div>
-        <h3 className={`mt-auto truncate pt-5 font-sans text-[28px] font-bold leading-none tracking-[-0.04em] text-[#101010] dark:text-[#f5f6fb] sm:text-[32px] ${valueClassName}`}>
+        <h3
+          className={`mt-auto truncate pt-5 font-sans text-[28px] font-bold leading-none tracking-[-0.04em] text-[#101010] dark:text-[#f5f6fb] sm:text-[32px] ${valueClassName}`}
+        >
           {value}
         </h3>
         {subValue && (

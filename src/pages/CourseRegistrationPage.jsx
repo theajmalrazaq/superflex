@@ -12,7 +12,6 @@ function CourseRegistrationPage() {
   const [tables, setTables] = useState([]);
 
   useEffect(() => {
-
     const parseData = () => {
       try {
         const root = findFlexPageRoot(document);
@@ -41,13 +40,25 @@ function CourseRegistrationPage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="mx-auto w-full max-w-[1600px] space-y-7">
         <header className="space-y-1">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p>
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Course Registration</h1>
-          <p className="text-sm text-white/80">Choose your fighters. Naya semester, naye subjects, same old trauma.</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+            Academics
+          </p>
+          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            Course Registration
+          </h1>
+          <p className="text-sm text-white/80">
+            Choose your fighters. Naya semester, naye subjects, same old trauma.
+          </p>
         </header>
 
         {loading ? (
-          <PageSkeleton label="Loading course registration" cards={0} rows={7} showTabs={false} showHeader={false} />
+          <PageSkeleton
+            label="Loading course registration"
+            cards={0}
+            rows={7}
+            showTabs={false}
+            showHeader={false}
+          />
         ) : (
           <div className="space-y-6">
             {tables.length > 0 ? (
@@ -110,10 +121,15 @@ function CourseRegistrationPage() {
                 <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
                   <BookOpen size={25} />
                 </div>
-                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#230052]/70 dark:text-white">Registration status</p>
-                <h2 className="text-xl font-bold tracking-tight text-[#101010] dark:text-[#f5f6fb] sm:text-2xl">Registration Closed</h2>
+                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#230052]/70 dark:text-white">
+                  Registration status
+                </p>
+                <h2 className="text-xl font-bold tracking-tight text-[#101010] dark:text-[#f5f6fb] sm:text-2xl">
+                  Registration Closed
+                </h2>
                 <p className="mt-2 max-w-lg text-sm leading-relaxed text-[#626262] dark:text-[#c4cad6]">
-                  {alerts[0]?.message || "The registration window is closed. Registrar ka mood badalne ka wait karo."}
+                  {alerts[0]?.message ||
+                    "The registration window is closed. Registrar ka mood badalne ka wait karo."}
                 </p>
               </section>
             )}

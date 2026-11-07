@@ -22,24 +22,20 @@ const readCustomBackground = () => {
   return parsed.success ? parsed.data : { enabled: false, url: "" };
 };
 
-const readNavOrder = () => {
-  if (typeof localStorage === "undefined") return [];
+export const readNavOrder = () => {
+  if (typeof localStorage === "undefined") return null;
   try {
     const raw = localStorage.getItem("superflex-nav-order");
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    }
-    const legacy = localStorage.getItem("superflex-preferences-v1");
-    if (legacy) {
-      const parsedLegacy = JSON.parse(legacy);
-      if (Array.isArray(parsedLegacy?.state?.navOrder) && parsedLegacy.state.navOrder.length > 0) {
-        return parsedLegacy.state.navOrder;
-      }
-    }
-  } catch {}
-  return [];
+    if (raw === null) return null;
+    const parsed = navOrderSchema.safeParse(JSON.parse(raw));
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
 };
+
+export const resolveNavOrder = (storedOrder, parsed, currentOrder) =>
+  storedOrder !== null ? storedOrder : parsed.success ? parsed.data.navOrder : currentOrder;
 
 const initialThemeMode = readThemeMode();
 
@@ -75,12 +71,7 @@ export const usePreferencesStore = create(
       merge: (persisted, current) => {
         const parsed = persistedPreferencesSchema.safeParse(persisted);
         const storedOrder = readNavOrder();
-        const mergedOrder =
-          storedOrder.length > 0
-            ? storedOrder
-            : parsed.success && parsed.data.navOrder.length > 0
-              ? parsed.data.navOrder
-              : current.navOrder;
+        const mergedOrder = resolveNavOrder(storedOrder, parsed, current.navOrder);
         return { ...current, navOrder: mergedOrder };
       },
     },

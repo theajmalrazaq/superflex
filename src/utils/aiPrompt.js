@@ -1,3 +1,6 @@
+import { getActiveStudentId } from "./studentIdentity";
+import { readStudentJson } from "./jsonStorage";
+
 const SYSTEM_PROMPT = `You are Octopus, a brilliant, warm, perceptive, and supportive female academic companion and university advisor for students.
 
 Tone & Feminine Persona:
@@ -65,7 +68,7 @@ Strict Output Rules:
    - Format answers cleanly using bullet points, bold text, or markdown tables when helpful.
 `;
 
-const FREE_TIER_CONTEXT_CHAR_BUDGET = 250000; // Gemini supports 1M tokens easily
+const FREE_TIER_CONTEXT_CHAR_BUDGET = 250000;
 const MIN_SECTION_CHAR_BUDGET = 4000;
 
 const normalize = (value) =>
@@ -136,7 +139,8 @@ const renderMarksMarkdown = (courses) => {
               const weightVal = Number(r.weight || 0);
               const obtVal = Number(r.obtained || 0);
               const totVal = Number(r.total || 0);
-              const weightedContrib = totVal > 0 ? ((obtVal / totVal) * weightVal).toFixed(2) : "0.00";
+              const weightedContrib =
+                totVal > 0 ? ((obtVal / totVal) * weightVal).toFixed(2) : "0.00";
               return `    * ${escapeMarkdown(r.title)}: ${obtVal}/${totVal} (Item Weight: ${weightVal}% of course, Contributes: ${weightedContrib} marks)`;
             })
             .join("\n");
@@ -157,29 +161,35 @@ const renderAttendanceMarkdown = (subjects) => {
         (/\blab\b/i.test(`${s.title} ${s.id}`)
           ? 1
           : /\b(?:pak(?:istan)?\s*studies|islamic\s*(?:studies|ethics)|islamiat|ethics|quranic|ideology|constitution)\b/i.test(
-              `${s.title} ${s.id}`,
-            )
-          ? 2
-          : 3);
+                `${s.title} ${s.id}`,
+              )
+            ? 2
+            : 3);
       const allowed = s.allowedAbsents || (cr === 3 ? 6 : cr <= 2 ? 3 : 6);
       const absentsCount =
         s.absent ??
         (s.records || []).filter((r) =>
-          String(r.status || "").trim().toUpperCase().startsWith("A"),
+          String(r.status || "")
+            .trim()
+            .toUpperCase()
+            .startsWith("A"),
         ).length;
       const remaining = allowed - absentsCount;
       const marginStatus =
         remaining > 0
           ? `${remaining} allowed absents remaining`
           : remaining === 0
-          ? "NO ABSENTS LEFT (Limit reached)"
-          : `EXCEEDED LIMIT BY ${Math.abs(remaining)} (Debarment penalty)`;
+            ? "NO ABSENTS LEFT (Limit reached)"
+            : `EXCEEDED LIMIT BY ${Math.abs(remaining)} (Debarment penalty)`;
 
       let header = `### ${escapeMarkdown(s.title || s.id || "Course")} (${cr} Cr Hr): **${s.percentage ?? 0}%**`;
       let stats = `  - **Attendance Policy & Stats**: ${s.present ?? 0} Present, **${absentsCount}/${allowed} Absents Used** (${marginStatus}), ${s.total ?? (s.records?.length || 0)} Total Sessions`;
       const records = s.records || [];
-      const absents = records.filter(
-        (r) => String(r.status || "").trim().toUpperCase().startsWith("A"),
+      const absents = records.filter((r) =>
+        String(r.status || "")
+          .trim()
+          .toUpperCase()
+          .startsWith("A"),
       );
       let details = "";
       if (absents.length) {
@@ -235,19 +245,16 @@ const renderTeachersMarkdown = (teacherData, courses = []) => {
     return "- _No course instructors have been selected yet in My Teachers settings._";
   }
 
-  // Build a lookup map from course IDs to their full titles
   const courseTitles = {};
   courses.forEach((c) => {
     if (c.id && c.title) courseTitles[c.id] = c.title;
   });
 
-  if (typeof localStorage !== "undefined") {
-    try {
-      const cached = JSON.parse(localStorage.getItem("superflex_cached_courses_v1") || "[]");
-      cached.forEach((c) => {
-        if (c.id && c.title && !courseTitles[c.id]) courseTitles[c.id] = c.title;
-      });
-    } catch {}
+  const cached = readStudentJson("superflex_cached_courses_v1", []);
+  if (Array.isArray(cached)) {
+    cached.forEach((c) => {
+      if (c.id && c.title && !courseTitles[c.id]) courseTitles[c.id] = c.title;
+    });
   }
 
   const entries = Object.entries(teacherData).filter(([, t]) => t && (t.name || t.email));
@@ -297,11 +304,7 @@ const renderMarkdownTree = (value, indent = 0) => {
 export function buildAcademicSnapshot(dataContext = {}) {
   const studentData = {
     name: dataContext.studentName || null,
-    rollNumber:
-      dataContext.rollNumber ||
-      (typeof localStorage !== "undefined"
-        ? localStorage.getItem("superflex_student_roll_number_v1")
-        : null),
+    rollNumber: dataContext.rollNumber || getActiveStudentId() || null,
     personalInfo: dataContext.personalInfo || null,
     universityInfo: dataContext.universityInfo || null,
     profileSections: dataContext.profileSections || null,
@@ -313,9 +316,7 @@ export function buildAcademicSnapshot(dataContext = {}) {
 
   let teachers = dataContext.teachers;
   if (!teachers && typeof localStorage !== "undefined") {
-    try {
-      teachers = JSON.parse(localStorage.getItem("superflex_course_teachers_v1") || "null");
-    } catch {}
+    teachers = readStudentJson("superflex_course_teachers_v1", null);
   }
 
   return {
@@ -331,7 +332,8 @@ export function buildAcademicSnapshot(dataContext = {}) {
 
 const compactMarkdown = (markdown, maxChars) => {
   if (markdown.length <= maxChars) return markdown;
-  const marker = "\n\n> Remaining records were compacted to stay within GroqCloud free-tier limits.";
+  const marker =
+    "\n\n> Remaining records were compacted to stay within GroqCloud free-tier limits.";
   const available = Math.max(0, maxChars - marker.length);
   const clipped = markdown.slice(0, available);
   const lastLineBreak = clipped.lastIndexOf("\n");
@@ -341,12 +343,26 @@ const compactMarkdown = (markdown, maxChars) => {
 const sectionPriority = (name, question) => {
   const query = normalize(question).toLowerCase();
   if (/overview|summary|how am i doing|academic status/.test(query)) return 2;
-  if (name === "teachers" && /teacher|instructor|faculty|professor|teach|sir|maam|miss|email|draft|write to|contact|cc|os|algo|db|pf|oop|cn|ai|sda|ap|se/.test(query)) return 5;
+  if (
+    name === "teachers" &&
+    /teacher|instructor|faculty|professor|teach|sir|maam|miss|email|draft|write to|contact|cc|os|algo|db|pf|oop|cn|ai|sda|ap|se/.test(
+      query,
+    )
+  )
+    return 5;
   if (name === "attendance" && /attend|present|absent|late|missed|att\b/.test(query)) return 5;
-  if (name === "marks" && /mark|score|quiz|qz|assignment|asst|ass\b|assessment|exam|sessional|sess|mid|test|what if|percentage|pct|calc|gpa|total/.test(query)) return 5;
-  if (name === "transcript" && /transcript|cgpa|sgpa|gpa|credit|semester|grade/.test(query)) return 4;
+  if (
+    name === "marks" &&
+    /mark|score|quiz|qz|assignment|asst|ass\b|assessment|exam|sessional|sess|mid|test|what if|percentage|pct|calc|gpa|total/.test(
+      query,
+    )
+  )
+    return 5;
+  if (name === "transcript" && /transcript|cgpa|sgpa|gpa|credit|semester|grade/.test(query))
+    return 4;
   if (name === "mcaAndGrading" && /mca|grading|grade point|scheme/.test(query)) return 4;
-  if (name === "studyPlan" && /study plan|degree plan|remaining course|planned course/.test(query)) return 4;
+  if (name === "studyPlan" && /study plan|degree plan|remaining course|planned course/.test(query))
+    return 4;
   if (name === "student" && /profile|program|section|campus|who am i/.test(query)) return 4;
   return 1;
 };
@@ -361,10 +377,7 @@ export function buildAcademicMarkdown(
 
 > Reference portal data for student academic and instructor inquiries.`;
 
-  const allCourses = [
-    ...(dataContext.marks || []),
-    ...(dataContext.attendance || []),
-  ];
+  const allCourses = [...(dataContext.marks || []), ...(dataContext.attendance || [])];
 
   const rawSections = Object.entries(academicSections).map(([name, value]) => {
     let content = "";
@@ -394,13 +407,15 @@ export function buildAcademicMarkdown(
   }));
   const totalWeight = weighted.reduce((sum, item) => sum + item.weight, 0);
   const distributable = Math.max(0, available - minimumTotal);
-  const sections = weighted.map((item) => compactMarkdown(
-    item.markdown,
-    Math.min(
-      item.markdown.length,
-      MIN_SECTION_CHAR_BUDGET + Math.floor(distributable * (item.weight / totalWeight)),
+  const sections = weighted.map((item) =>
+    compactMarkdown(
+      item.markdown,
+      Math.min(
+        item.markdown.length,
+        MIN_SECTION_CHAR_BUDGET + Math.floor(distributable * (item.weight / totalWeight)),
+      ),
     ),
-  ));
+  );
 
   return `${introduction}
 
@@ -426,10 +441,7 @@ export function buildGeminiPayload({ question, dataContext, history = [] }) {
     ],
   };
 
-  const contents = [
-    ...cleanHistory,
-    { role: "user", parts: [{ text: cleanQuestion(question) }] },
-  ];
+  const contents = [...cleanHistory, { role: "user", parts: [{ text: cleanQuestion(question) }] }];
 
   return {
     system_instruction: systemInstruction,

@@ -15,11 +15,13 @@ export function parseCourseRegistrationPage(root: ParentNode): ParsedCourseRegis
     if (rows.length === 0) return [];
 
     const portlet = table.closest(".m-portlet");
-    return [{
-      title: readText(portlet?.querySelector(".m-portlet__head-text"), "Course List"),
-      headers,
-      rows,
-    }];
+    return [
+      {
+        title: readText(portlet?.querySelector(".m-portlet__head-text"), "Course List"),
+        headers,
+        rows,
+      },
+    ];
   });
 
   return { alerts: parsePortalAlerts(root), tables };

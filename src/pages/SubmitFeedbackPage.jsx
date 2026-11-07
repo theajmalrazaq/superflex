@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { parsePortalAlerts } from "../parsers/dom";
 import PageLayout from "../components/layouts/PageLayout";
 import { MessageSquare, Send, CheckCircle2, AlertCircle, Zap } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
@@ -58,7 +59,6 @@ function SubmitFeedbackPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-
     const parseFeedbackQuestions = () => {
       const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
       if (!root) {
@@ -67,30 +67,9 @@ function SubmitFeedbackPage() {
       }
 
       try {
-        const alertList = [];
-        root.querySelectorAll(".m-alert, .alert").forEach((alert) => {
-          if (
-            alert.style.display === "none" ||
-            alert.id === "DataErrormsgdiv" ||
-            alert.closest(".modal")
-          )
-            return;
-
-          const textContainer = alert.querySelector(".m-alert__text") || alert;
-          const clone = textContainer.cloneNode(true);
-          clone
-            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
-            .forEach((el) => el.remove());
-
-          let message = clone.textContent.trim();
-          if (message.length > 3) {
-            alertList.push({
-              type: alert.classList.contains("alert-danger") ? "error" : "info",
-              message,
-            });
-          }
-        });
-        setAlerts(alertList);
+        setAlerts(
+          parsePortalAlerts(root, undefined, { normalizeText: false, includeOutlineDanger: false }),
+        );
 
         const titleText = root.querySelector(".m-portlet__head-text");
         if (titleText) {
@@ -275,10 +254,13 @@ function SubmitFeedbackPage() {
   return (
     <PageLayout currentPage={window.location.pathname}>
       <div className="w-full min-h-screen p-4 md:p-8 space-y-8 relative z-10 animate-in fade-in duration-500">
-
         <PageHeader
           title="Submit Course Feedback"
-          subtitle={courseTitle ? `${courseTitle} is now under review. The tables have turned.` : "Your course is now under review. The tables have turned."}
+          subtitle={
+            courseTitle
+              ? `${courseTitle} is now under review. The tables have turned.`
+              : "Your course is now under review. The tables have turned."
+          }
         />
 
         <NotificationBanner alerts={alerts} />

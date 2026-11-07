@@ -31,11 +31,11 @@ export function getCourseCreditHours(rawTitle: string, id: string = ""): number 
     }
     return parseInt(crMatch[1], 10) || 3;
   }
-  // All Lab courses are 1 credit hour
+
   if (/\blab\b/i.test(fullText)) {
     return 1;
   }
-  // Standard 2 Credit Hour university subjects (Islamic Studies, Pak Studies, Ethics, Ideology & Constitution)
+
   if (
     /\b(?:pak(?:istan)?\s*studies|islamic\s*(?:studies|ethics)|islamiat|ethics|quranic|ideology|constitution)\b/i.test(
       fullText,
@@ -43,15 +43,11 @@ export function getCourseCreditHours(rawTitle: string, id: string = ""): number 
   ) {
     return 2;
   }
-  // Standard university lecture is 3 credit hours
+
   return 3;
 }
 
 export function getAllowedAbsents(creditHours: number): number {
-  // 80% attendance policy:
-  // 3 credit hours: 6 leaves (absents)
-  // 2 credit hours: 3 leaves (absents)
-  // 1 credit hour: 3 leaves (absents)
   if (creditHours === 3) return 6;
   if (creditHours === 2) return 3;
   if (creditHours === 1) return 3;
@@ -59,15 +55,18 @@ export function getAllowedAbsents(creditHours: number): number {
   return 6;
 }
 
-export function parseAttendancePage(root: ParentNode, form: ParentNode | null): ParsedAttendancePage {
+export function parseAttendancePage(
+  root: ParentNode,
+  form: ParentNode | null,
+): ParsedAttendancePage {
   const courses = Array.from(root.querySelectorAll<HTMLElement>(".tab-pane")).map((pane) => {
     const rawHeading = readText(pane.querySelector("h5"), pane.id);
-    const title = rawHeading
-      .replace(/\(.*\)/, "")
-      .trim();
+    const title = rawHeading.replace(/\(.*\)/, "").trim();
     const creditHours = getCourseCreditHours(rawHeading, pane.id);
     const allowedAbsents = getAllowedAbsents(creditHours);
-    const percentage = parseNumber(pane.querySelector(".progress-bar")?.getAttribute("aria-valuenow"));
+    const percentage = parseNumber(
+      pane.querySelector(".progress-bar")?.getAttribute("aria-valuenow"),
+    );
     const records = Array.from(pane.querySelectorAll("tbody tr")).flatMap((row) => {
       const cells = row.querySelectorAll("td");
       if (cells.length < 4) return [];
@@ -80,13 +79,15 @@ export function parseAttendancePage(root: ParentNode, form: ParentNode | null): 
           day = parsedDate.toLocaleDateString("en-US", { weekday: "short" });
         }
       }
-      return [{
-        date,
-        day,
-        time: readText(cells[2]),
-        status: readText(cells[3]),
-        type: readText(cells[4], "Lecture"),
-      }];
+      return [
+        {
+          date,
+          day,
+          time: readText(cells[2]),
+          status: readText(cells[3]),
+          type: readText(cells[4], "Lecture"),
+        },
+      ];
     });
 
     return {
@@ -102,5 +103,9 @@ export function parseAttendancePage(root: ParentNode, form: ParentNode | null): 
     };
   });
 
-  return { alerts: parsePortalAlerts(root, ".alert"), courses, semesters: parseSemesterOptions(form) };
+  return {
+    alerts: parsePortalAlerts(root, ".alert"),
+    courses,
+    semesters: parseSemesterOptions(form),
+  };
 }

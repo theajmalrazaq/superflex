@@ -15,7 +15,6 @@ function StudyPlanPage() {
   const [activeSemIdx, setActiveSemIdx] = useState(0);
 
   useEffect(() => {
-
     const parseData = () => {
       try {
         const root = findFlexPageRoot(document);
@@ -79,9 +78,13 @@ function StudyPlanPage() {
       <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-5 pb-24">
         <header className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
           <div className="space-y-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+              Academics
+            </p>
             <h1 className="text-3xl font-bold tracking-tight text-white">Tentative Study Plan</h1>
-            <p className="text-sm text-white/80">Future suffering, planned. Agle semesters mein kya kya zaleel karega? Find out here.</p>
+            <p className="text-sm text-white/80">
+              Future suffering, planned. Agle semesters mein kya kya zaleel karega? Find out here.
+            </p>
           </div>
           <div className="flex w-fit items-center gap-3 rounded-full bg-white/15 px-4 py-2.5 text-[#101010] dark:bg-white/10 dark:text-white">
             <GraduationCap size={19} />
@@ -151,8 +154,12 @@ function StudyPlanPage() {
                     <BookOpen size={21} />
                   </div>
                   <div className="min-w-0">
-                    <h2 className="truncate text-lg font-bold tracking-tight">{activeSemData.title}</h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">The Roadmap to Graduation (Hopefully)</p>
+                    <h2 className="truncate text-lg font-bold tracking-tight">
+                      {activeSemData.title}
+                    </h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      The Roadmap to Graduation (Hopefully)
+                    </p>
                   </div>
                 </div>
                 {activeSemData.courses.length ? (
@@ -168,14 +175,25 @@ function StudyPlanPage() {
                       </thead>
                       <tbody>
                         {activeSemData.courses.map((course, index) => (
-                          <tr key={`${course.code}-${index}`} className="border-t border-black/[0.05] dark:border-white/[0.08]">
+                          <tr
+                            key={`${course.code}-${index}`}
+                            className="border-t border-black/[0.05] dark:border-white/[0.08]"
+                          >
                             <td className="px-5 py-4 sm:px-6">
-                              <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-bold text-slate-700 dark:bg-white/[0.08] dark:text-slate-200">{course.code}</span>
+                              <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-bold text-slate-700 dark:bg-white/[0.08] dark:text-slate-200">
+                                {course.code}
+                              </span>
                             </td>
-                            <td className="max-w-[520px] truncate px-5 py-4 text-sm font-semibold">{course.title}</td>
-                            <td className="px-5 py-4 text-center text-sm font-bold">{course.crHrs}</td>
+                            <td className="max-w-[520px] truncate px-5 py-4 text-sm font-semibold">
+                              {course.title}
+                            </td>
+                            <td className="px-5 py-4 text-center text-sm font-bold">
+                              {course.crHrs}
+                            </td>
                             <td className="px-5 py-4 text-right sm:px-6">
-                              <span className="rounded-full bg-[#f2ecfc] px-3 py-1.5 text-[11px] font-bold text-[#230052] dark:bg-white/[0.1] dark:text-white">{course.type}</span>
+                              <span className="rounded-full bg-[#f2ecfc] px-3 py-1.5 text-[11px] font-bold text-[#230052] dark:bg-white/[0.1] dark:text-white">
+                                {course.type}
+                              </span>
                             </td>
                           </tr>
                         ))}
@@ -185,7 +203,9 @@ function StudyPlanPage() {
                 ) : (
                   <div className="px-6 pb-6 text-center">
                     <p className="text-sm font-bold text-foreground">Future trauma not found.</p>
-                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">No courses listed for this semester yet.</p>
+                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                      No courses listed for this semester yet.
+                    </p>
                   </div>
                 )}
               </>
@@ -194,7 +214,9 @@ function StudyPlanPage() {
         ) : (
           <section className="rounded-[24px] border border-black/[0.06] bg-white p-8 text-center dark:border-white/[0.14] dark:bg-black">
             <p className="text-sm font-bold text-foreground">Future trauma not found.</p>
-            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">No tentative study plan is available yet.</p>
+            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+              No tentative study plan is available yet.
+            </p>
           </section>
         )}
       </div>

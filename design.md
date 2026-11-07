@@ -85,14 +85,14 @@ Both states use the same `480px` card width, responsive padding, `32px` radius, 
 
 The homepage, sidebar, and account pages use the same light and dark color rules as the login screen. Read the saved `superflex-theme-mode` value and apply the `.dark` class to the document root. All `dark:` styles must follow that class so the interface does not change when the operating system theme differs from the saved app theme.
 
-| Surface           | Light mode                                                                 | Dark mode                                                                                 |
-| :---------------- | :------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------- |
-| Page backdrop     | Blue sky gradient beginning at `#62ABE0` | Dark blue-to-black night gradient |
-| Main dashboard cards | Solid white, fine `rgba(0,0,0,0.06)` border, no shadow | Solid black, fine `rgba(255,255,255,0.14)` border, no shadow |
-| Main text         | `#101010`                                                                  | `#f5f6fb`; supporting copy `#c4cad6`                                                      |
-| Primary buttons   | `#230052` with white text; hover `#370c72`                                 | Accent lavender `#a098ff` with `#0a192f` text; hover `#b7b0ff`                           |
-| Secondary buttons | Lilac `#dfc8fc` with `#230052` text; hover `#d2afff`                       | Accent lavender `#a098ff` with `#0a192f` text, or translucent white for neutral controls |
-| Cloud artwork     | Visible over the sky gradient                | `12%` opacity over the night gradient                  |
+| Surface              | Light mode                                             | Dark mode                                                                                |
+| :------------------- | :----------------------------------------------------- | :--------------------------------------------------------------------------------------- |
+| Page backdrop        | Blue sky gradient beginning at `#62ABE0`               | Dark blue-to-black night gradient                                                        |
+| Main dashboard cards | Solid white, fine `rgba(0,0,0,0.06)` border, no shadow | Solid black, fine `rgba(255,255,255,0.14)` border, no shadow                             |
+| Main text            | `#101010`                                              | `#f5f6fb`; supporting copy `#c4cad6`                                                     |
+| Primary buttons      | `#230052` with white text; hover `#370c72`             | Accent lavender `#a098ff` with `#0a192f` text; hover `#b7b0ff`                           |
+| Secondary buttons    | Lilac `#dfc8fc` with `#230052` text; hover `#d2afff`   | Accent lavender `#a098ff` with `#0a192f` text, or translucent white for neutral controls |
+| Cloud artwork        | Visible over the sky gradient                          | `12%` opacity over the night gradient                                                    |
 
 The homepage greeting is a transparent masthead over the sky backdrop; keep it separate from content cards. Use solid dashboard cards in both themes with `rounded-[32px]` corners. Keep the four overview stat cards in equal-width columns on wide screens and two columns on tablet screens. Align the Course Performance and Attendance Overview panels to equal heights with consistent padding and icon-led headers. Course Performance shows course tabs and expandable assessment categories. Attendance Overview shows a row for each subject with one square per class session; use the theme accent for present sessions, rose for absent sessions, and a neutral fill when status is unknown. Keep the login form card flat and separate from dashboard cards.
 

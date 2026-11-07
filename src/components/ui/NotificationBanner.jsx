@@ -33,14 +33,14 @@ const NotificationBanner = ({
         const borderClass = isError
           ? "border-rose-500/20"
           : isSuccess
-          ? "border-emerald-500/30"
-          : "border-blue-500/20";
+            ? "border-emerald-500/30"
+            : "border-blue-500/20";
 
         const iconBgClass = isError
           ? "bg-rose-500/10 text-rose-600 dark:text-rose-300"
           : isSuccess
-          ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300"
-          : "bg-blue-500/10 text-blue-600 dark:text-blue-300";
+            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300"
+            : "bg-blue-500/10 text-blue-600 dark:text-blue-300";
 
         return (
           <div
@@ -57,7 +57,9 @@ const NotificationBanner = ({
                   {alert.title}
                 </p>
               )}
-              <div className="text-xs md:text-sm font-medium leading-relaxed">{alert.message || alert.text}</div>
+              <div className="text-xs md:text-sm font-medium leading-relaxed">
+                {alert.message || alert.text}
+              </div>
             </div>
 
             {alert.dismissible && onDismissAlert && (

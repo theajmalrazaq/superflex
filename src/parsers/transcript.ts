@@ -4,10 +4,13 @@ import type { PortalAlert, TranscriptSemester } from "./types";
 export type ParsedTranscriptPage = { alerts: PortalAlert[]; semesters: TranscriptSemester[] };
 
 export function parseTranscriptPage(root: ParentNode, document: Document): ParsedTranscriptPage {
-  const semesters = Array.from(root.querySelectorAll<HTMLElement>(".m-section__content .row .col-md-6")).map((column) => {
+  const semesters = Array.from(
+    root.querySelectorAll<HTMLElement>(".m-section__content .row .col-md-6"),
+  ).map((column) => {
     const title = readText(column.querySelector("h5"), "Untitled Semester");
-    const summaryValues = Array.from(column.querySelectorAll(".pull-right span"), (span) =>
-      (span.textContent || "").split(":")[1]?.trim() || "0",
+    const summaryValues = Array.from(
+      column.querySelectorAll(".pull-right span"),
+      (span) => (span.textContent || "").split(":")[1]?.trim() || "0",
     );
     const summary = {
       crRegistered: parseInteger(summaryValues[0], Number.NaN),
@@ -45,18 +48,20 @@ export function parseTranscriptPage(root: ParentNode, document: Document): Parse
         }
       }
 
-      return [{
-        code: readText(codeCell),
-        description: readText(cells[1]),
-        section: readText(cells[2]),
-        crHrs: parseNumber(readText(cells[3])),
-        grade: readText(cells[4]),
-        points: parseNumber(readText(cells[5])),
-        type: readText(cells[6]),
-        mca,
-        gradingScheme,
-        schemeDetailId,
-      }];
+      return [
+        {
+          code: readText(codeCell),
+          description: readText(cells[1]),
+          section: readText(cells[2]),
+          crHrs: parseNumber(readText(cells[3])),
+          grade: readText(cells[4]),
+          points: parseNumber(readText(cells[5])),
+          type: readText(cells[6]),
+          mca,
+          gradingScheme,
+          schemeDetailId,
+        },
+      ];
     });
 
     return { title, summary, courses };

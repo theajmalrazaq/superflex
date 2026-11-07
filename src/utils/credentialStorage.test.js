@@ -10,7 +10,6 @@ import {
   getCredentialMetadata,
 } from "./credentialStorage";
 
-// Mock chrome.storage.local for node/vitest environment
 const storageMock = new Map();
 globalThis.chrome = {
   storage: {

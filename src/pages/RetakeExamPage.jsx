@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
+import { parsePortalAlerts, parseSelectOptions } from "../parsers/dom";
 import PageLayout from "../components/layouts/PageLayout";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import StatsCard from "../components/ui/StatsCard";
-import SuperTabs from "../components/ui/SuperTabs";
+import LabeledTabsRow from "../components/ui/LabeledTabsRow";
 import Skeleton from "../components/ui/Skeleton";
 import {
   AlertCircle,
@@ -27,11 +28,57 @@ import SelectMenu from "../components/ui/SelectMenu";
 import { hideFlexPageRoot } from "../parsers/dom";
 
 const RetakeExamSkeleton = () => (
-  <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8" role="status" aria-label="Loading retake exam details">
-    <header className="space-y-2"><Skeleton className="h-3 w-20" /><Skeleton className="h-9 w-56" /><Skeleton className="h-4 w-72 max-w-full" /></header>
-    <div className="flex flex-wrap gap-3"><Skeleton className="h-10 w-72 rounded-full" /><Skeleton className="h-10 w-64 rounded-full" /></div>
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">{[0, 1, 2, 3].map((item) => <div key={item} className="flex min-h-[156px] flex-col rounded-[32px] bg-white p-5 dark:bg-black sm:p-6"><Skeleton className="h-12 w-12 rounded-[36%]" /><Skeleton className="mt-auto h-7 w-28" /><Skeleton className="mt-2 h-3 w-20" /></div>)}</div>
-    <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)]"><div className="space-y-3 rounded-[24px] bg-white p-5 dark:bg-black sm:p-6"><Skeleton className="h-4 w-44" />{[0, 1, 2, 3].map((item) => <div key={item} className="flex items-center gap-4 border-t border-black/[0.05] py-4 dark:border-white/[0.08]"><Skeleton className="h-10 w-10 rounded-[36%]" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-56 max-w-full" /><Skeleton className="h-3 w-32" /></div><Skeleton className="h-6 w-6 rounded-full" /></div>)}</div><div className="space-y-5 rounded-[24px] bg-white p-5 dark:bg-black sm:p-6"><Skeleton className="h-5 w-36" /><Skeleton className="h-12 w-full rounded-xl" /><Skeleton className="h-32 w-full rounded-2xl" /><Skeleton className="h-11 w-full rounded-full" /><Skeleton className="h-11 w-full rounded-full" /></div></div>
+  <main
+    className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8"
+    role="status"
+    aria-label="Loading retake exam details"
+  >
+    <header className="space-y-2">
+      <Skeleton className="h-3 w-20" />
+      <Skeleton className="h-9 w-56" />
+      <Skeleton className="h-4 w-72 max-w-full" />
+    </header>
+    <div className="flex flex-wrap gap-3">
+      <Skeleton className="h-10 w-72 rounded-full" />
+      <Skeleton className="h-10 w-64 rounded-full" />
+    </div>
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {[0, 1, 2, 3].map((item) => (
+        <div
+          key={item}
+          className="flex min-h-[156px] flex-col rounded-[32px] bg-white p-5 dark:bg-black sm:p-6"
+        >
+          <Skeleton className="h-12 w-12 rounded-[36%]" />
+          <Skeleton className="mt-auto h-7 w-28" />
+          <Skeleton className="mt-2 h-3 w-20" />
+        </div>
+      ))}
+    </div>
+    <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)]">
+      <div className="space-y-3 rounded-[24px] bg-white p-5 dark:bg-black sm:p-6">
+        <Skeleton className="h-4 w-44" />
+        {[0, 1, 2, 3].map((item) => (
+          <div
+            key={item}
+            className="flex items-center gap-4 border-t border-black/[0.05] py-4 dark:border-white/[0.08]"
+          >
+            <Skeleton className="h-10 w-10 rounded-[36%]" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-56 max-w-full" />
+              <Skeleton className="h-3 w-32" />
+            </div>
+            <Skeleton className="h-6 w-6 rounded-full" />
+          </div>
+        ))}
+      </div>
+      <div className="space-y-5 rounded-[24px] bg-white p-5 dark:bg-black sm:p-6">
+        <Skeleton className="h-5 w-36" />
+        <Skeleton className="h-12 w-full rounded-xl" />
+        <Skeleton className="h-32 w-full rounded-2xl" />
+        <Skeleton className="h-11 w-full rounded-full" />
+        <Skeleton className="h-11 w-full rounded-full" />
+      </div>
+    </div>
   </main>
 );
 
@@ -212,15 +259,36 @@ const RetakeCourseCard = ({ course, isSelected, onToggle, index }) => {
       className={`group flex w-full cursor-pointer flex-col gap-4 px-1 py-4 text-left transition-colors sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-5 ${course.isDisabled ? "cursor-not-allowed opacity-55" : "hover:bg-slate-50 dark:hover:bg-white/[0.025]"}`}
     >
       <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
-        <span className="hidden w-7 shrink-0 text-right text-xs font-semibold tabular-nums text-slate-400 sm:block">{index}</span>
-        <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[36%] ${isSelected ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "bg-slate-100 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300"}`}><BookOpen size={19} /></span>
+        <span className="hidden w-7 shrink-0 text-right text-xs font-semibold tabular-nums text-slate-400 sm:block">
+          {index}
+        </span>
+        <span
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[36%] ${isSelected ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "bg-slate-100 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300"}`}
+        >
+          <BookOpen size={19} />
+        </span>
         <span className="min-w-0 flex-1">
-          <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1"><span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 dark:bg-white/[0.08] dark:text-slate-300">{course.code}</span><span className="truncate text-sm font-bold text-slate-900 dark:text-white">{course.courseName}</span></span>
-          <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400"><span>{course.credits} credits</span><span>Section {course.section}</span>{course.status && <span>{course.status}</span>}</span>
+          <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 dark:bg-white/[0.08] dark:text-slate-300">
+              {course.code}
+            </span>
+            <span className="truncate text-sm font-bold text-slate-900 dark:text-white">
+              {course.courseName}
+            </span>
+          </span>
+          <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+            <span>{course.credits} credits</span>
+            <span>Section {course.section}</span>
+            {course.status && <span>{course.status}</span>}
+          </span>
         </span>
       </div>
 
-      <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition-colors ${isSelected ? "border-[#230052] bg-[#230052] text-white dark:border-white dark:bg-white dark:text-[#0a192f]" : "border-slate-300 text-transparent dark:border-white/25"}`}>{isSelected && <Check size={15} strokeWidth={3} />}</span>
+      <span
+        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition-colors ${isSelected ? "border-[#230052] bg-[#230052] text-white dark:border-white dark:bg-white dark:text-[#0a192f]" : "border-slate-300 text-transparent dark:border-white/25"}`}
+      >
+        {isSelected && <Check size={15} strokeWidth={3} />}
+      </span>
     </button>
   );
 };
@@ -246,7 +314,6 @@ function RetakeExamPage() {
   const visibleAlerts = areAlertsExpanded ? alerts : alerts.slice(0, 1);
 
   useEffect(() => {
-
     const parseRetakeData = () => {
       const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
       if (!root) {
@@ -255,67 +322,21 @@ function RetakeExamPage() {
       }
 
       try {
-        const alertList = [];
-        root.querySelectorAll(".m-alert, .alert").forEach((alert) => {
-          if (
-            alert.style.display === "none" ||
-            alert.id === "DataErrormsgdiv" ||
-            alert.closest(".modal")
-          )
-            return;
-
-          const textContainer = alert.querySelector(".m-alert__text") || alert;
-          const clone = textContainer.cloneNode(true);
-
-          clone
-            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
-            .forEach((el) => el.remove());
-
-          let message = clone.textContent
-            .replace(/Alert!/gi, "")
-            .replace(/Close/gi, "")
-            .replace(/&nbsp;/g, " ")
-            .replace(/\s+/g, " ")
-            .trim();
-
-          if (message && message.length > 3) {
-            const type =
-              alert.classList.contains("alert-danger") ||
-              alert.classList.contains("m-alert--outline-danger")
-                ? "error"
-                : "info";
-            alertList.push({ type, message });
-          }
-        });
-        setAlerts(alertList);
+        setAlerts(parsePortalAlerts(root));
 
         const semSelect = root.querySelector("#SemId");
         if (semSelect) {
-          const sems = Array.from(semSelect.options).map((opt) => ({
-            value: opt.value,
-            label: opt.textContent.trim(),
-            selected: opt.selected,
-          }));
-          setSemesters(sems);
+          setSemesters(parseSelectOptions(semSelect));
         }
 
         const evalSelect = root.querySelector("#EvalTypeId");
         if (evalSelect) {
-          const evals = Array.from(evalSelect.options).map((opt) => ({
-            value: opt.value,
-            label: opt.textContent.trim(),
-            selected: opt.selected,
-          }));
-          setExamTypes(evals);
+          setExamTypes(parseSelectOptions(evalSelect));
         }
 
         const reasonSelect = root.querySelector("#DrpDwnRetakeReason");
         if (reasonSelect) {
-          const res = Array.from(reasonSelect.options).map((opt) => ({
-            value: opt.value,
-            label: opt.textContent.trim(),
-            selected: opt.selected,
-          }));
+          const res = parseSelectOptions(reasonSelect);
           setReasons(res);
           const selected = res.find((r) => r.selected);
           if (selected) setSelectedReason(selected.value);
@@ -500,11 +521,23 @@ function RetakeExamPage() {
 
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p>
-            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Retake Exam Request</h1>
-            <p className="text-sm text-white/80">Round two, fight! Paper ne pehli baar hara diya? Time for a comeback.</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+              Academics
+            </p>
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              Retake Exam Request
+            </h1>
+            <p className="text-sm text-white/80">
+              Round two, fight! Paper ne pehli baar hara diya? Time for a comeback.
+            </p>
           </div>
-          <button type="button" onClick={() => setIsInstructionsOpen(true)} className="flex cursor-pointer items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"><Shield size={15} /> Rules &amp; procedures</button>
+          <button
+            type="button"
+            onClick={() => setIsInstructionsOpen(true)}
+            className="flex cursor-pointer items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"
+          >
+            <Shield size={15} /> Rules &amp; procedures
+          </button>
         </header>
 
         {alerts.length > 0 && (
@@ -518,45 +551,205 @@ function RetakeExamPage() {
                 className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white/45 px-3 py-1.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/65 dark:bg-black/20 dark:text-white dark:hover:bg-black/35"
               >
                 {areAlertsExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                {areAlertsExpanded ? "Show fewer notifications" : `Show ${alerts.length - 1} more notification${alerts.length > 2 ? "s" : ""}`}
+                {areAlertsExpanded
+                  ? "Show fewer notifications"
+                  : `Show ${alerts.length - 1} more notification${alerts.length > 2 ? "s" : ""}`}
               </button>
             )}
           </section>
         )}
 
         <section aria-label="Request period" className="space-y-3">
-          {semesters.length > 0 && <div className="flex flex-col gap-2 sm:flex-row sm:items-center"><span className="w-20 shrink-0 text-xs font-semibold text-white/85">Semester</span><SuperTabs tabs={semesters} activeTab={semesters.find((semester) => semester.selected)?.value} onTabChange={handleSemesterChange} size="sm" className="!border-0 !bg-white/55 !backdrop-blur-xl dark:!bg-black/25 dark:!backdrop-blur-xl" /></div>}
-          {examTypes.length > 0 && <div className="flex flex-col gap-2 sm:flex-row sm:items-center"><span className="w-20 shrink-0 text-xs font-semibold text-white/85">Exam type</span><SuperTabs tabs={examTypes} activeTab={examTypes.find((type) => type.selected)?.value} onTabChange={handleExamTypeChange} size="sm" className="!border-0 !bg-white/55 !backdrop-blur-xl dark:!bg-black/25 dark:!backdrop-blur-xl" /></div>}
+          {semesters.length > 0 && (
+            <LabeledTabsRow label="Semester" tabs={semesters} onTabChange={handleSemesterChange} />
+          )}
+          {examTypes.length > 0 && (
+            <LabeledTabsRow label="Exam type" tabs={examTypes} onTabChange={handleExamTypeChange} />
+          )}
         </section>
 
         <section aria-labelledby="retake-overview-heading" className="space-y-4">
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Overview</p><h2 id="retake-overview-heading" className="text-xl font-bold tracking-tight text-white">Retake Summary</h2></div><p className="text-xs text-white/75">The redemption arc. Select your papers and calculate the comeback cost.</p></div>
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+                Overview
+              </p>
+              <h2
+                id="retake-overview-heading"
+                className="text-xl font-bold tracking-tight text-white"
+              >
+                Retake Summary
+              </h2>
+            </div>
+            <p className="text-xs text-white/75">
+              The redemption arc. Select your papers and calculate the comeback cost.
+            </p>
+          </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
-            <StatsCard variant="dashboard" icon={Layout} label="Total courses" value={courses.length} subValue="Eligible for retake" />
-            <StatsCard variant="dashboard" icon={CheckCircle2} label="Selected papers" value={selectedCourses.size} subValue="For this application" />
-            <StatsCard variant="dashboard" icon={ShieldCheck} label="Processed" value={courses.filter((course) => course.status?.trim().toLowerCase() === "processed").length} subValue="Already processed" />
-            <StatsCard variant="dashboard" icon={AlertCircle} label="Application fee" value={`Rs. ${(selectedCourses.size * 2000).toLocaleString()}`} subValue="Rs. 2,000 per paper" />
+            <StatsCard
+              variant="dashboard"
+              icon={Layout}
+              label="Total courses"
+              value={courses.length}
+              subValue="Eligible for retake"
+            />
+            <StatsCard
+              variant="dashboard"
+              icon={CheckCircle2}
+              label="Selected papers"
+              value={selectedCourses.size}
+              subValue="For this application"
+            />
+            <StatsCard
+              variant="dashboard"
+              icon={ShieldCheck}
+              label="Processed"
+              value={
+                courses.filter((course) => course.status?.trim().toLowerCase() === "processed")
+                  .length
+              }
+              subValue="Already processed"
+            />
+            <StatsCard
+              variant="dashboard"
+              icon={AlertCircle}
+              label="Application fee"
+              value={`Rs. ${(selectedCourses.size * 2000).toLocaleString()}`}
+              subValue="Rs. 2,000 per paper"
+            />
           </div>
         </section>
 
         <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.8fr)]">
-          <section aria-labelledby="retake-courses-heading" className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]">
+          <section
+            aria-labelledby="retake-courses-heading"
+            className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]"
+          >
             <header className="flex flex-col gap-3 border-b border-black/[0.06] px-4 py-4 dark:border-white/[0.1] sm:flex-row sm:items-center sm:justify-between sm:px-6">
-              <div><h2 id="retake-courses-heading" className="text-base font-bold">Available papers</h2><p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Showing {filteredCourses.length} of {courses.length} courses</p></div>
-              <div className="flex items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/[0.06]" role="group" aria-label="Filter retake courses">
-                {[{ value: "all", label: "All" }, { value: "available", label: "Selectable" }, { value: "selected", label: "Selected" }].map((filter) => <button key={filter.value} type="button" onClick={() => setCourseFilter(filter.value)} aria-pressed={courseFilter === filter.value} className={`cursor-pointer rounded-full px-3 py-2 text-xs font-bold transition-colors ${courseFilter === filter.value ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"}`}>{filter.label}</button>)}
+              <div>
+                <h2 id="retake-courses-heading" className="text-base font-bold">
+                  Available papers
+                </h2>
+                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                  Showing {filteredCourses.length} of {courses.length} courses
+                </p>
+              </div>
+              <div
+                className="flex items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/[0.06]"
+                role="group"
+                aria-label="Filter retake courses"
+              >
+                {[
+                  { value: "all", label: "All" },
+                  { value: "available", label: "Selectable" },
+                  { value: "selected", label: "Selected" },
+                ].map((filter) => (
+                  <button
+                    key={filter.value}
+                    type="button"
+                    onClick={() => setCourseFilter(filter.value)}
+                    aria-pressed={courseFilter === filter.value}
+                    className={`cursor-pointer rounded-full px-3 py-2 text-xs font-bold transition-colors ${courseFilter === filter.value ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"}`}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
               </div>
             </header>
-            {filteredCourses.length ? <div className="divide-y divide-black/[0.05] px-4 dark:divide-white/[0.08] sm:px-6">{filteredCourses.map((course, index) => <RetakeCourseCard key={course.id} course={course} index={index + 1} isSelected={selectedCourses.has(course.id)} onToggle={() => toggleCourse(course.id)} />)}</div> : <div className="flex min-h-[220px] flex-col items-center justify-center px-6 py-10 text-center"><span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[36%] bg-slate-100 text-slate-500 dark:bg-white/[0.08] dark:text-slate-300"><FileText size={22} /></span><h3 className="text-base font-bold">No Papers Available</h3><p className="mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">No rematches available. No eligible papers found for this selection.</p></div>}
+            {filteredCourses.length ? (
+              <div className="divide-y divide-black/[0.05] px-4 dark:divide-white/[0.08] sm:px-6">
+                {filteredCourses.map((course, index) => (
+                  <RetakeCourseCard
+                    key={course.id}
+                    course={course}
+                    index={index + 1}
+                    isSelected={selectedCourses.has(course.id)}
+                    onToggle={() => toggleCourse(course.id)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex min-h-[220px] flex-col items-center justify-center px-6 py-10 text-center">
+                <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[36%] bg-slate-100 text-slate-500 dark:bg-white/[0.08] dark:text-slate-300">
+                  <FileText size={22} />
+                </span>
+                <h3 className="text-base font-bold">No Papers Available</h3>
+                <p className="mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">
+                  No rematches available. No eligible papers found for this selection.
+                </p>
+              </div>
+            )}
           </section>
 
           <aside className="relative rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] xl:sticky xl:top-6">
-            <div className="border-b border-black/[0.06] px-5 py-4 dark:border-white/[0.1] sm:px-6"><h2 className="text-base font-bold">Request details</h2><p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Review the reason and fee before continuing.</p></div>
+            <div className="border-b border-black/[0.06] px-5 py-4 dark:border-white/[0.1] sm:px-6">
+              <h2 className="text-base font-bold">Request details</h2>
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                Review the reason and fee before continuing.
+              </p>
+            </div>
             <div className="space-y-5 p-5 sm:p-6">
-              <div className="space-y-2"><p className="text-xs font-semibold text-slate-600 dark:text-slate-300">Retake situation</p><ReasonSelector reasons={reasons} selectedReason={selectedReason} onChange={handleReasonChange} /></div>
-              <div className="rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.05]"><div className="mb-4 flex items-center gap-2"><span className="flex h-9 w-9 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><ShieldCheck size={17} /></span><h3 className="text-sm font-bold">Fee Breakdown</h3></div><div className="space-y-3 text-xs"><div className="flex justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Selected papers</span><span className="font-semibold">{selectedCourses.size}</span></div><div className="flex justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Fee per paper</span><span className="font-semibold">Rs. 2,000</span></div><div className="flex justify-between gap-3 border-t border-black/[0.06] pt-3 text-sm dark:border-white/[0.1]"><span className="font-bold">Total fee</span><span className="font-bold">Rs. {(selectedCourses.size * 2000).toLocaleString()}</span></div></div></div>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-1"><Button variant="secondary" disabled={selectedCourses.size === 0} onClick={handleDownloadForm} className="w-full rounded-full" icon={<Download size={16} />}>Download form</Button><Button disabled={selectedCourses.size === 0} onClick={handleInitiateRequest} className="w-full rounded-full" variant="primary" icon={<ChevronRight size={16} />}>Continue request</Button></div>
-              <p className="flex items-start gap-2 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400"><AlertTriangle size={15} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-300" />A processing fee of Rs. 2,000 applies to each selected paper.</p>
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                  Retake situation
+                </p>
+                <ReasonSelector
+                  reasons={reasons}
+                  selectedReason={selectedReason}
+                  onChange={handleReasonChange}
+                />
+              </div>
+              <div className="rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.05]">
+                <div className="mb-4 flex items-center gap-2">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+                    <ShieldCheck size={17} />
+                  </span>
+                  <h3 className="text-sm font-bold">Fee Breakdown</h3>
+                </div>
+                <div className="space-y-3 text-xs">
+                  <div className="flex justify-between gap-3">
+                    <span className="text-slate-500 dark:text-slate-400">Selected papers</span>
+                    <span className="font-semibold">{selectedCourses.size}</span>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <span className="text-slate-500 dark:text-slate-400">Fee per paper</span>
+                    <span className="font-semibold">Rs. 2,000</span>
+                  </div>
+                  <div className="flex justify-between gap-3 border-t border-black/[0.06] pt-3 text-sm dark:border-white/[0.1]">
+                    <span className="font-bold">Total fee</span>
+                    <span className="font-bold">
+                      Rs. {(selectedCourses.size * 2000).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-1">
+                <Button
+                  variant="secondary"
+                  disabled={selectedCourses.size === 0}
+                  onClick={handleDownloadForm}
+                  className="w-full rounded-full"
+                  icon={<Download size={16} />}
+                >
+                  Download form
+                </Button>
+                <Button
+                  disabled={selectedCourses.size === 0}
+                  onClick={handleInitiateRequest}
+                  className="w-full rounded-full"
+                  variant="primary"
+                  icon={<ChevronRight size={16} />}
+                >
+                  Continue request
+                </Button>
+              </div>
+              <p className="flex items-start gap-2 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                <AlertTriangle
+                  size={15}
+                  className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-300"
+                />
+                A processing fee of Rs. 2,000 applies to each selected paper.
+              </p>
             </div>
           </aside>
         </div>

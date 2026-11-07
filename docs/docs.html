@@ -7,7 +7,10 @@
     <link rel="icon" type="image/svg+xml" href="res/favicon.svg" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      document.documentElement.classList.toggle("dark", localStorage.getItem("superflex-theme-mode") === "dark");
+      document.documentElement.classList.toggle(
+        "dark",
+        localStorage.getItem("superflex-theme-mode") === "dark",
+      );
     </script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script
@@ -31,8 +34,14 @@
         font-family: "Google Sans Flex", sans-serif;
       }
 
-      html { font-size: 80%; }
-      @media (max-width: 640px) { html { font-size: 70%; } }
+      html {
+        font-size: 80%;
+      }
+      @media (max-width: 640px) {
+        html {
+          font-size: 70%;
+        }
+      }
 
       body {
         font-family: "Google Sans Flex", sans-serif;
@@ -251,7 +260,14 @@
         z-index: 0;
         overflow: hidden;
         pointer-events: none;
-        background: linear-gradient(180deg, #62abe0 0%, #73b3e1 24%, #9ac7e8 38%, #dcebf5 49%, #fff 57%);
+        background: linear-gradient(
+          180deg,
+          #62abe0 0%,
+          #73b3e1 24%,
+          #9ac7e8 38%,
+          #dcebf5 49%,
+          #fff 57%
+        );
       }
 
       .animated-bg::before,
@@ -288,7 +304,10 @@
         display: none;
       }
 
-      .glow-1, .glow-2 { display: none; }
+      .glow-1,
+      .glow-2 {
+        display: none;
+      }
 
       #main-nav {
         background: rgba(255, 255, 255, 0.82);
@@ -323,7 +342,7 @@
         border-radius: 999px;
         color: #230052;
         background: rgba(255, 255, 255, 0.35);
-        box-shadow: 0 4px 14px rgba(35, 0, 82, .06);
+        box-shadow: 0 4px 14px rgba(35, 0, 82, 0.06);
       }
 
       #hero-title {
@@ -413,43 +432,152 @@
         }
       }
 
-      html.dark body { color: #f5f6fb; background: #000; }
+      html.dark body {
+        color: #f5f6fb;
+        background: #000;
+      }
       html.dark .animated-bg {
-        background: linear-gradient(180deg, #0f1422 0%, #0f1422 24%, #0b0e17 38%, #06070c 49%, #000 57%);
+        background: linear-gradient(
+          180deg,
+          #0f1422 0%,
+          #0f1422 24%,
+          #0b0e17 38%,
+          #06070c 49%,
+          #000 57%
+        );
       }
       html.dark .animated-bg::before,
-      html.dark .animated-bg::after { filter: brightness(.78) saturate(.72); }
-      html.dark .animated-bg::before { opacity: .26; }
-      html.dark .animated-bg::after { opacity: .34; }
-      html.dark #main-nav { background: rgba(0,0,0,.72); border-color: rgba(255,255,255,.12); box-shadow: none; }
-      html.dark #main-nav a, html.dark #main-nav button { color: #c4cad6; }
-      html.dark #main-nav a.nav-active { background: #a098ff; color: #101027; border-color: #a098ff; }
-      html.dark #main-nav a.nav-active { background: #fff; color: #0a192f; border-color: #fff; }
-      html.dark #main-nav a:not(.nav-active):hover { background: rgba(255,255,255,.08); color: #fff; }
-      html.dark #mobile-overlay { background: rgba(0,0,0,.96); }
-      html.dark #mobile-overlay .mobile-link > span:first-child { color: #f5f6fb; }
-      html.dark #mobile-overlay .mobile-link > span:last-child { color: #a098ff; }
-      html.dark #page-tag { color: #fff; border: 0; background: rgba(255,255,255,.08); box-shadow: none; }
-      html.dark #hero-title { background-image: none; color: #fff; -webkit-text-fill-color: #fff; }
-      html.dark #hero-subtitle { color: #aeb5c3; }
-      html.dark #markdown-content { color: #d4d4d4; background: rgba(12,12,18,.84); border-color: rgba(255,255,255,.12); box-shadow: none; }
-      html.dark .prose, html.dark .prose p { color: #c4cad6; }
-      html.dark .prose h1, html.dark .prose h2 { color: #fff; }
-      html.dark .prose h3, html.dark .prose strong { color: #f5f6fb; }
-      html.dark .prose a { color: #fff; }
-      html.dark .prose code { color: #f5f6fb; background: rgba(255,255,255,.08); }
-      html.dark .prose blockquote { color: #aeb5c3; border-left-color: #fff; }
-      html.dark .prose th, html.dark .prose td { border-bottom-color: rgba(255,255,255,.12); }
-      html.dark footer { color: #f5f6fb; border-color: rgba(255,255,255,.12); }
-      html.dark footer .text-zinc-400, html.dark footer .text-zinc-500 { color: #aeb5c3; }
-      html.dark footer .text-zinc-600, html.dark footer .text-zinc-700 { color: #7d8491; }
-      html.dark footer p, html.dark footer .footer-tagline { color: #c4cad6 !important; }
-      html.dark footer .text-zinc-600, html.dark footer .text-zinc-700 { color: #9aa3b2 !important; }
-      html.dark footer a.text-zinc-500 { color: #d0d4df !important; }
-      html.dark #theme-toggle { color: #e5e7eb; background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); }
-      html:not(.dark) #theme-toggle { color: #596579; background: rgba(35,0,82,.05); border-color: rgba(35,0,82,.12); }
-      #theme-toggle { display: inline-flex; align-items: center; gap: 7px; }
-      #theme-toggle .theme-icon { width: 16px; height: 16px; flex: none; }
+      html.dark .animated-bg::after {
+        filter: brightness(0.78) saturate(0.72);
+      }
+      html.dark .animated-bg::before {
+        opacity: 0.26;
+      }
+      html.dark .animated-bg::after {
+        opacity: 0.34;
+      }
+      html.dark #main-nav {
+        background: rgba(0, 0, 0, 0.72);
+        border-color: rgba(255, 255, 255, 0.12);
+        box-shadow: none;
+      }
+      html.dark #main-nav a,
+      html.dark #main-nav button {
+        color: #c4cad6;
+      }
+      html.dark #main-nav a.nav-active {
+        background: #a098ff;
+        color: #101027;
+        border-color: #a098ff;
+      }
+      html.dark #main-nav a.nav-active {
+        background: #fff;
+        color: #0a192f;
+        border-color: #fff;
+      }
+      html.dark #main-nav a:not(.nav-active):hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+      }
+      html.dark #mobile-overlay {
+        background: rgba(0, 0, 0, 0.96);
+      }
+      html.dark #mobile-overlay .mobile-link > span:first-child {
+        color: #f5f6fb;
+      }
+      html.dark #mobile-overlay .mobile-link > span:last-child {
+        color: #a098ff;
+      }
+      html.dark #page-tag {
+        color: #fff;
+        border: 0;
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: none;
+      }
+      html.dark #hero-title {
+        background-image: none;
+        color: #fff;
+        -webkit-text-fill-color: #fff;
+      }
+      html.dark #hero-subtitle {
+        color: #aeb5c3;
+      }
+      html.dark #markdown-content {
+        color: #d4d4d4;
+        background: rgba(12, 12, 18, 0.84);
+        border-color: rgba(255, 255, 255, 0.12);
+        box-shadow: none;
+      }
+      html.dark .prose,
+      html.dark .prose p {
+        color: #c4cad6;
+      }
+      html.dark .prose h1,
+      html.dark .prose h2 {
+        color: #fff;
+      }
+      html.dark .prose h3,
+      html.dark .prose strong {
+        color: #f5f6fb;
+      }
+      html.dark .prose a {
+        color: #fff;
+      }
+      html.dark .prose code {
+        color: #f5f6fb;
+        background: rgba(255, 255, 255, 0.08);
+      }
+      html.dark .prose blockquote {
+        color: #aeb5c3;
+        border-left-color: #fff;
+      }
+      html.dark .prose th,
+      html.dark .prose td {
+        border-bottom-color: rgba(255, 255, 255, 0.12);
+      }
+      html.dark footer {
+        color: #f5f6fb;
+        border-color: rgba(255, 255, 255, 0.12);
+      }
+      html.dark footer .text-zinc-400,
+      html.dark footer .text-zinc-500 {
+        color: #aeb5c3;
+      }
+      html.dark footer .text-zinc-600,
+      html.dark footer .text-zinc-700 {
+        color: #7d8491;
+      }
+      html.dark footer p,
+      html.dark footer .footer-tagline {
+        color: #c4cad6 !important;
+      }
+      html.dark footer .text-zinc-600,
+      html.dark footer .text-zinc-700 {
+        color: #9aa3b2 !important;
+      }
+      html.dark footer a.text-zinc-500 {
+        color: #d0d4df !important;
+      }
+      html.dark #theme-toggle {
+        color: #e5e7eb;
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.14);
+      }
+      html:not(.dark) #theme-toggle {
+        color: #596579;
+        background: rgba(35, 0, 82, 0.05);
+        border-color: rgba(35, 0, 82, 0.12);
+      }
+      #theme-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+      #theme-toggle .theme-icon {
+        width: 16px;
+        height: 16px;
+        flex: none;
+      }
 
       /* Animated Background */
       .animated-bg {
@@ -517,48 +645,135 @@
         }
       }
 
-      #main-nav a:hover, #main-nav button:hover { color: #230052; }
-      #main-nav a.nav-active { background: #230052; color: #fff; border-color: #230052; }
-      #main-nav a:not(.nav-active):hover { background: rgba(35, 0, 82, .08); color: #230052; }
-      #mobile-overlay .mobile-link:hover > span:first-child { color: #230052; }
-      .toc-link:hover, .toc-link.active { color: #230052; }
-      .prose a { color: #4b2a88; text-decoration-color: rgba(35, 0, 82, .3); }
-      .prose a:hover { color: #230052; }
-      .prose h1, .prose h2 { color: #230052; }
-      .brand-mark { background: #000 !important; border-width: 0 !important; border-color: transparent !important; border-radius: 28% !important; box-shadow: none !important; }
-      .brand-mark path { animation: none !important; transform: none !important; fill: #a098ff !important; }
+      #main-nav a:hover,
+      #main-nav button:hover {
+        color: #230052;
+      }
+      #main-nav a.nav-active {
+        background: #230052;
+        color: #fff;
+        border-color: #230052;
+      }
+      #main-nav a:not(.nav-active):hover {
+        background: rgba(35, 0, 82, 0.08);
+        color: #230052;
+      }
+      #mobile-overlay .mobile-link:hover > span:first-child {
+        color: #230052;
+      }
+      .toc-link:hover,
+      .toc-link.active {
+        color: #230052;
+      }
+      .prose a {
+        color: #4b2a88;
+        text-decoration-color: rgba(35, 0, 82, 0.3);
+      }
+      .prose a:hover {
+        color: #230052;
+      }
+      .prose h1,
+      .prose h2 {
+        color: #230052;
+      }
+      .brand-mark {
+        background: #000 !important;
+        border-width: 0 !important;
+        border-color: transparent !important;
+        border-radius: 28% !important;
+        box-shadow: none !important;
+      }
+      .brand-mark path {
+        animation: none !important;
+        transform: none !important;
+        fill: #a098ff !important;
+      }
       .site-footer {
-        position: relative; isolation: isolate; overflow: hidden;
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
         margin: 0 clamp(12px, 3vw, 40px);
         padding: clamp(32px, 4vw, 52px) clamp(20px, 4vw, 40px) 96px !important;
-        color: #101027 !important; background: #fff !important;
-        border: 1px solid rgba(35, 0, 82, .1) !important; border-radius: 32px 32px 0 0;
-        box-shadow: 0 18px 54px rgba(35, 0, 82, .1);
+        color: #101027 !important;
+        background: #fff !important;
+        border: 1px solid rgba(35, 0, 82, 0.1) !important;
+        border-radius: 32px 32px 0 0;
+        box-shadow: 0 18px 54px rgba(35, 0, 82, 0.1);
       }
-      .site-footer > div:first-child { z-index: 0; }
+      .site-footer > div:first-child {
+        z-index: 0;
+      }
       .site-footer .footer-watermark {
-        position: absolute; bottom: -72px; left: 50%; width: min(82%, 820px); height: auto;
-        opacity: .11; transform: translateX(-50%);
+        position: absolute;
+        bottom: -72px;
+        left: 50%;
+        width: min(82%, 820px);
+        height: auto;
+        opacity: 0.11;
+        transform: translateX(-50%);
       }
-      .site-footer .flex.gap-4 a { color: #4b3b71; background: rgba(35, 0, 82, .05); border-color: rgba(35, 0, 82, .1); }
-      .site-footer .flex.gap-4 a:hover { color: #230052; background: rgba(35, 0, 82, .1); }
-      .site-footer .border-t { border-color: rgba(35, 0, 82, .1); }
-      .site-footer .max-w-7xl > .flex { gap: 24px !important; }
-      .site-footer .flex.flex-col.items-center.gap-6 { gap: 14px !important; }
-      .site-footer .brand-mark { width: 56px; height: 56px; border-width: 4px; border-radius: 28% !important; overflow: hidden; }
-      .site-footer .brand-mark svg { width: 56px; height: 56px; }
-      .site-footer img[alt="SuperFlex"] { width: 200px; }
-      .site-footer .border-t { padding-top: 16px; }
-      .site-footer .footer-tagline { max-width: none; white-space: nowrap; }
-      @media (max-width: 640px) { .site-footer .footer-tagline { white-space: normal; } }
-      h1, h2, h3, h4, h5, h6 { font-weight: 700 !important; text-transform: capitalize; }
+      .site-footer .flex.gap-4 a {
+        color: #4b3b71;
+        background: rgba(35, 0, 82, 0.05);
+        border-color: rgba(35, 0, 82, 0.1);
+      }
+      .site-footer .flex.gap-4 a:hover {
+        color: #230052;
+        background: rgba(35, 0, 82, 0.1);
+      }
+      .site-footer .border-t {
+        border-color: rgba(35, 0, 82, 0.1);
+      }
+      .site-footer .max-w-7xl > .flex {
+        gap: 24px !important;
+      }
+      .site-footer .flex.flex-col.items-center.gap-6 {
+        gap: 14px !important;
+      }
+      .site-footer .brand-mark {
+        width: 56px;
+        height: 56px;
+        border-width: 4px;
+        border-radius: 28% !important;
+        overflow: hidden;
+      }
+      .site-footer .brand-mark svg {
+        width: 56px;
+        height: 56px;
+      }
+      .site-footer img[alt="SuperFlex"] {
+        width: 200px;
+      }
+      .site-footer .border-t {
+        padding-top: 16px;
+      }
+      .site-footer .footer-tagline {
+        max-width: none;
+        white-space: nowrap;
+      }
+      @media (max-width: 640px) {
+        .site-footer .footer-tagline {
+          white-space: normal;
+        }
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-weight: 700 !important;
+        text-transform: capitalize;
+      }
       #hero-title {
         color: #fff !important;
         -webkit-text-fill-color: #fff;
         background: none !important;
         background-image: none !important;
       }
-      #hero-subtitle { color: #230052 !important; }
+      #hero-subtitle {
+        color: #230052 !important;
+      }
       #markdown-content {
         padding: 12px 0 32px !important;
         border: 0 !important;
@@ -571,46 +786,99 @@
       #markdown-content * {
         color: #475467 !important;
         background-color: transparent !important;
-        border-color: rgba(35, 0, 82, .12) !important;
+        border-color: rgba(35, 0, 82, 0.12) !important;
         box-shadow: none !important;
       }
-      #markdown-content h1, #markdown-content h2, #markdown-content h3,
-      #markdown-content h4, #markdown-content strong, #markdown-content th,
-      #markdown-content a { color: #230052 !important; }
+      #markdown-content h1,
+      #markdown-content h2,
+      #markdown-content h3,
+      #markdown-content h4,
+      #markdown-content strong,
+      #markdown-content th,
+      #markdown-content a {
+        color: #230052 !important;
+      }
       /* Reapply the dark palette after the light docs-content defaults above. */
-      html.dark #hero-subtitle { color: #c4cad6 !important; }
+      html.dark #hero-subtitle {
+        color: #c4cad6 !important;
+      }
       html.dark #markdown-content,
       html.dark #markdown-content p,
       html.dark #markdown-content li,
       html.dark #markdown-content td,
-      html.dark #markdown-content blockquote { color: #c4cad6 !important; }
+      html.dark #markdown-content blockquote {
+        color: #c4cad6 !important;
+      }
       html.dark #markdown-content h1,
       html.dark #markdown-content h2,
       html.dark #markdown-content h3,
       html.dark #markdown-content h4,
       html.dark #markdown-content strong,
-      html.dark #markdown-content th { color: #f5f6fb !important; }
-      html.dark #markdown-content a { color: #fff !important; }
-      html.dark #markdown-content code { color: #f5f6fb !important; background: rgba(255,255,255,.08) !important; }
-      html.dark #markdown-content pre { background: #08080c !important; border-color: rgba(255,255,255,.12) !important; }
+      html.dark #markdown-content th {
+        color: #f5f6fb !important;
+      }
+      html.dark #markdown-content a {
+        color: #fff !important;
+      }
+      html.dark #markdown-content code {
+        color: #f5f6fb !important;
+        background: rgba(255, 255, 255, 0.08) !important;
+      }
+      html.dark #markdown-content pre {
+        background: #08080c !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+      }
       html.dark #markdown-content hr,
       html.dark #markdown-content th,
-      html.dark #markdown-content td { border-color: rgba(255,255,255,.14) !important; }
-      html.dark .site-footer { color: #f5f6fb !important; background: #000 !important; border-color: rgba(255,255,255,.12) !important; box-shadow: none; }
-      html.dark .site-footer p { color: #c4cad6 !important; }
+      html.dark #markdown-content td {
+        border-color: rgba(255, 255, 255, 0.14) !important;
+      }
+      html.dark .site-footer {
+        color: #f5f6fb !important;
+        background: #000 !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        box-shadow: none;
+      }
+      html.dark .site-footer p {
+        color: #c4cad6 !important;
+      }
       html.dark .site-footer .text-zinc-600,
       html.dark .site-footer .text-zinc-700,
-      html.dark .site-footer a.text-zinc-500 { color: #aeb5c3 !important; }
-      html.dark .site-footer .border-t { border-color: rgba(255,255,255,.14) !important; }
-      html.dark .site-footer .brand-mark { background: #fff !important; }
-      html.dark .site-footer .footer-watermark { opacity: .04; }
-      body *, body *::before, body *::after { box-shadow: none !important; text-shadow: none !important; }
-      .glow-1, .glow-2, .site-footer .group > div:first-child { display: none !important; }
-      img { filter: none !important; }
-      html.dark #main-nav a:hover, html.dark #main-nav button:hover,
+      html.dark .site-footer a.text-zinc-500 {
+        color: #aeb5c3 !important;
+      }
+      html.dark .site-footer .border-t {
+        border-color: rgba(255, 255, 255, 0.14) !important;
+      }
+      html.dark .site-footer .brand-mark {
+        background: #fff !important;
+      }
+      html.dark .site-footer .footer-watermark {
+        opacity: 0.04;
+      }
+      body *,
+      body *::before,
+      body *::after {
+        box-shadow: none !important;
+        text-shadow: none !important;
+      }
+      .glow-1,
+      .glow-2,
+      .site-footer .group > div:first-child {
+        display: none !important;
+      }
+      img {
+        filter: none !important;
+      }
+      html.dark #main-nav a:hover,
+      html.dark #main-nav button:hover,
       html.dark #main-nav a:not(.nav-active):hover,
-      html.dark #mobile-overlay .mobile-link:hover > span:first-child { color: #fff; }
-      html.dark #mobile-overlay .mobile-link > span:last-child { color: #d0d4df; }
+      html.dark #mobile-overlay .mobile-link:hover > span:first-child {
+        color: #fff;
+      }
+      html.dark #mobile-overlay .mobile-link > span:last-child {
+        color: #d0d4df;
+      }
       .animated-bg {
         position: absolute;
         top: 0;
@@ -624,7 +892,6 @@
     </style>
   </head>
   <body>
-    <!-- Animated Background -->
     <div class="animated-bg">
       <div class="glow-1"></div>
       <div class="glow-2"></div>
@@ -636,8 +903,6 @@
       <div class="fixed inset-0 bg-gradient-to-b from-black/40 via-black/80 to-black z-10"></div>
     </div>
 
-    <!-- Standard Navbar from Index -->
-    <!-- Navigation Bar -->
     <nav
       class="sticky top-5 w-[90%] sm:w-fit mt-10 mx-auto z-[100] bg-black/60 backdrop-blur-2xl border border-white/10 rounded-full"
       id="main-nav"
@@ -677,9 +942,14 @@
             >
           </div>
 
-          <button id="theme-toggle" type="button" class="shrink-0 rounded-full border px-3 py-2 text-xs font-semibold transition-colors" aria-label="Switch to dark mode" aria-pressed="false"></button>
+          <button
+            id="theme-toggle"
+            type="button"
+            class="shrink-0 rounded-full border px-3 py-2 text-xs font-semibold transition-colors"
+            aria-label="Switch to dark mode"
+            aria-pressed="false"
+          ></button>
 
-          <!-- Mobile Toggle -->
           <button
             id="mobile-toggle"
             class="lg:hidden relative w-10 h-10 flex items-center justify-center text-zinc-400"
@@ -699,7 +969,6 @@
       </div>
     </nav>
 
-    <!-- Full Screen Mobile Overlay -->
     <div
       id="mobile-overlay"
       class="fixed inset-0 z-[90] bg-black/40 backdrop-blur-3xl lg:hidden flex flex-col items-center justify-center pointer-events-none"
@@ -740,9 +1009,7 @@
       </div>
     </div>
 
-    <!-- Main Content Container -->
     <main class="relative z-20 max-w-[800px] mx-auto px-6 mt-5 pb-24">
-      <!-- Meta Header -->
       <div class="mb-16 pt-32 text-center">
         <span
           id="page-tag"
@@ -765,7 +1032,6 @@
         </p>
       </div>
 
-      <!-- Content Container (Centered, No Sidebar) -->
       <article id="markdown-content" class="prose min-w-0 mx-auto">
         <div class="animate-pulse space-y-4">
           <div class="h-4 bg-white/5 rounded w-3/4"></div>
@@ -775,9 +1041,9 @@
       </article>
     </main>
 
-    <!-- Footer from Index -->
-    <footer class="site-footer py-24 px-4 sm:px-6 relative z-20 border-t border-white/10 overflow-hidden">
-      <!-- Large Gradient Text Background -->
+    <footer
+      class="site-footer py-24 px-4 sm:px-6 relative z-20 border-t border-white/10 overflow-hidden"
+    >
       <div
         class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden"
       >
@@ -786,7 +1052,6 @@
 
       <div class="max-w-7xl mx-auto relative z-10">
         <div class="flex flex-col items-center gap-12">
-          <!-- Logo Section -->
           <div class="flex flex-col items-center gap-6">
             <div class="group relative">
               <div
@@ -816,12 +1081,10 @@
             <img src="res/logo-light.svg" alt="SuperFlex" class="w-64 filter opacity-90" />
           </div>
 
-          <!-- Tagline -->
           <p class="footer-tagline text-zinc-400 text-sm font-medium text-center max-w-md">
             Independent, open-source, and built for a clearer academic workflow.
           </p>
 
-          <!-- Social Links -->
           <div class="flex gap-4">
             <a
               href="https://github.com/theajmalrazaq/superflex"
@@ -842,7 +1105,6 @@
             </a>
           </div>
 
-          <!-- Copyright -->
           <div class="text-center pt-8 border-t border-white/5 w-full">
             <p class="text-zinc-600 text-xs font-medium">
               © 2026 SuperFlex · Open source under the MIT License
@@ -966,17 +1228,26 @@
         const isDark = mode === "dark";
         document.documentElement.classList.toggle("dark", isDark);
         localStorage.setItem("superflex-theme-mode", isDark ? "dark" : "light");
-        document.querySelectorAll('img[src$="logo-light.svg"], img[src$="logo-dark.svg"]').forEach((logo) => {
-          const lightSource = logo.dataset.lightSource || logo.getAttribute("src").replace("logo-dark.svg", "logo-light.svg");
-          logo.dataset.lightSource = lightSource;
-          logo.src = isDark ? lightSource.replace("logo-light.svg", "logo-dark.svg") : lightSource;
-        });
+        document
+          .querySelectorAll('img[src$="logo-light.svg"], img[src$="logo-dark.svg"]')
+          .forEach((logo) => {
+            const lightSource =
+              logo.dataset.lightSource ||
+              logo.getAttribute("src").replace("logo-dark.svg", "logo-light.svg");
+            logo.dataset.lightSource = lightSource;
+            logo.src = isDark
+              ? lightSource.replace("logo-light.svg", "logo-dark.svg")
+              : lightSource;
+          });
         themeToggle?.setAttribute("aria-pressed", String(isDark));
         themeToggle?.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
-        if (themeToggle) themeToggle.innerHTML = `${isDark ? '<svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>' : '<svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6.5 6.5 0 0 0 8.268 8.268c.344-.215.825-.003.803.401"/></svg>'}<span>${isDark ? "Light" : "Dark"}</span>`;
+        if (themeToggle)
+          themeToggle.innerHTML = `${isDark ? '<svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>' : '<svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6.5 6.5 0 0 0 8.268 8.268c.344-.215.825-.003.803.401"/></svg>'}<span>${isDark ? "Light" : "Dark"}</span>`;
       };
       applyTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
-      themeToggle?.addEventListener("click", () => applyTheme(document.documentElement.classList.contains("dark") ? "light" : "dark"));
+      themeToggle?.addEventListener("click", () =>
+        applyTheme(document.documentElement.classList.contains("dark") ? "light" : "dark"),
+      );
 
       if (mobileToggle) {
         mobileToggle.addEventListener("click", () => {

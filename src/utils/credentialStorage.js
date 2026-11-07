@@ -1,9 +1,3 @@
-/**
- * Secure Credential Storage & Encryption for SuperFlex Auto-Fill.
- * Uses Web Crypto API (PBKDF2 + AES-GCM 256-bit) to encrypt Roll No and Password.
- * Stored strictly in chrome.storage.local to isolate from web page scripts.
- */
-
 const STORAGE_KEY = "superflex_encrypted_credentials";
 const DEVICE_KEY = "superflex_credential_device_key";
 const SESSION_PENDING_KEY = "superflex_pending_login";
@@ -143,10 +137,6 @@ async function getVaultKey(record, passphrase) {
   return deriveVaultKey(passphrase, record.kdf.salt, record.kdf.iterations || PBKDF2_ITERATIONS);
 }
 
-/**
- * Encrypts and securely saves credentials into chrome.storage.local.
- * Automatically generates a cryptographically random passphrase if none is provided.
- */
 export async function saveCredentials(username, password, passphrase) {
   if (!username || !password) return false;
 
@@ -217,9 +207,6 @@ export async function saveCredentials(username, password, passphrase) {
   }
 }
 
-/**
- * Retrieves and decrypts saved credentials.
- */
 export async function getDecryptedCredentials(passphrase) {
   try {
     const record = await getStorageItem(STORAGE_KEY);
@@ -250,17 +237,11 @@ export async function getDecryptedCredentials(passphrase) {
   }
 }
 
-/**
- * Fast check if credentials exist without performing decryption.
- */
 export async function hasSavedCredentials() {
   const record = await getStorageItem(STORAGE_KEY);
   return Boolean(record && record.ciphertext && record.iv);
 }
 
-/**
- * Returns non-sensitive vault information without decrypting credentials.
- */
 export async function getCredentialMetadata() {
   const record = await getStorageItem(STORAGE_KEY);
   if (!record || !record.ciphertext || !record.iv) {
@@ -276,9 +257,6 @@ export async function getCredentialMetadata() {
   };
 }
 
-/**
- * Deletes saved credentials from extension storage.
- */
 export async function clearSavedCredentials() {
   await removeStorageItem(STORAGE_KEY);
   await removeStorageItem(DEVICE_KEY);
@@ -289,9 +267,6 @@ export async function clearSavedCredentials() {
   }
 }
 
-/**
- * Temporarily records login details during sign-in so HomePage can offer to remember them.
- */
 export function savePendingLogin(username, password) {
   try {
     if (!username || !password) return;
@@ -311,7 +286,7 @@ export function getPendingLogin() {
     const raw = sessionStorage.getItem(SESSION_PENDING_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    // Ignore stale entries (> 5 minutes)
+
     if (Date.now() - parsed.timestamp > 5 * 60 * 1000) {
       clearPendingLogin();
       return null;

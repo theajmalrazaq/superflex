@@ -16,7 +16,8 @@ function PageLayout({
   useEffect(() => {
     const handleCustomBackground = (event) => setCustomBackground(event.detail);
     window.addEventListener("superflex-custom-background-changed", handleCustomBackground);
-    return () => window.removeEventListener("superflex-custom-background-changed", handleCustomBackground);
+    return () =>
+      window.removeEventListener("superflex-custom-background-changed", handleCustomBackground);
   }, [setCustomBackground]);
 
   const customUrl = (() => {
@@ -36,11 +37,20 @@ function PageLayout({
         aria-hidden="true"
         className="superflex-account-backdrop pointer-events-none fixed inset-0 z-0 overflow-hidden"
       >
-        {customBackground.enabled && customUrl && (customVideo ? (
-          <video src={customUrl} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" />
-        ) : (
-          <img src={customUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
-        ))}
+        {customBackground.enabled &&
+          customUrl &&
+          (customVideo ? (
+            <video
+              src={customUrl}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          ) : (
+            <img src={customUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          ))}
         {cloudAssetUrl && (
           <>
             <img

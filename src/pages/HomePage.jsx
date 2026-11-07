@@ -33,25 +33,14 @@ import {
   isSectionMarksUpdated,
   isAssessmentMarksUpdated,
 } from "../utils/academicSnapshot";
-import { getAiContext, getProfileImage } from "../utils/userDataStorage";
+import { useProfileImage } from "../hooks/useProfileImage";
+import { parseAcademicDate } from "../utils/academicDate";
+import { getStudentStorageKey, setActiveStudentId } from "../utils/studentIdentity";
+import { readStudentJson } from "../utils/jsonStorage";
 
 const TEACHER_SELECTIONS_KEY = "superflex_course_teachers_v1";
 const TEACHER_COURSES_KEY = "superflex_cached_courses_v1";
-const STUDENT_ROLL_NUMBER_KEY = "superflex_student_roll_number_v1";
-const readTeacherSelections = () => {
-  try { return JSON.parse(localStorage.getItem(TEACHER_SELECTIONS_KEY) || "{}"); }
-  catch { return {}; }
-};
-
-const parseAttendanceDate = (value) => {
-  const text = String(value || "").trim();
-  const dayFirst = text.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})/);
-  if (dayFirst) {
-    return new Date(+dayFirst[3], +dayFirst[2] - 1, +dayFirst[1]).getTime();
-  }
-  const parsed = Date.parse(text);
-  return Number.isNaN(parsed) ? 0 : parsed;
-};
+const readTeacherSelections = () => readStudentJson(TEACHER_SELECTIONS_KEY, {});
 
 const SectionAccordion = ({ section, isOpen, onToggle, course, pendingUpdates }) => {
   const rows = section.rows || [];
@@ -93,9 +82,15 @@ const SectionAccordion = ({ section, isOpen, onToggle, course, pendingUpdates })
           <table className="sf-data-table w-full border-collapse text-left">
             <thead>
               <tr className="bg-foreground/[0.02]">
-                <th className="w-16 border-b border-foreground/10 p-3 text-[11px] font-bold text-foreground/50">Assessment</th>
-                <th className="border-b border-foreground/10 p-3 text-right text-[11px] font-bold text-foreground/50">Score</th>
-                <th className="w-24 border-b border-foreground/10 p-3 text-right text-[11px] font-bold text-foreground/50">Status</th>
+                <th className="w-16 border-b border-foreground/10 p-3 text-[11px] font-bold text-foreground/50">
+                  Assessment
+                </th>
+                <th className="border-b border-foreground/10 p-3 text-right text-[11px] font-bold text-foreground/50">
+                  Score
+                </th>
+                <th className="w-24 border-b border-foreground/10 p-3 text-right text-[11px] font-bold text-foreground/50">
+                  Status
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-foreground/5">
@@ -103,7 +98,10 @@ const SectionAccordion = ({ section, isOpen, onToggle, course, pendingUpdates })
                 const percentage = row.total > 0 ? (row.obtained / row.total) * 100 : 0;
                 const isRowUpdated = isAssessmentMarksUpdated(pendingUpdates, course, row.title);
                 return (
-                  <tr key={index} className={`transition-colors hover:bg-foreground/[0.02] ${row.included ? "" : "opacity-40"} ${isRowUpdated ? "bg-[#230052]/[0.04] dark:bg-white/[0.05]" : ""}`}>
+                  <tr
+                    key={index}
+                    className={`transition-colors hover:bg-foreground/[0.02] ${row.included ? "" : "opacity-40"} ${isRowUpdated ? "bg-[#230052]/[0.04] dark:bg-white/[0.05]" : ""}`}
+                  >
                     <td className="p-3 text-sm font-medium text-foreground/70">
                       <div className="flex items-center gap-2">
                         <span>{row.title}</span>
@@ -116,10 +114,13 @@ const SectionAccordion = ({ section, isOpen, onToggle, course, pendingUpdates })
                       </div>
                     </td>
                     <td className="p-3 text-right text-sm font-bold text-foreground">
-                      {row.obtained} <span className="text-xs font-normal text-foreground/40">/ {row.total}</span>
+                      {row.obtained}{" "}
+                      <span className="text-xs font-normal text-foreground/40">/ {row.total}</span>
                     </td>
                     <td className="p-3 text-right">
-                      <span className={`rounded-full border px-2 py-1 text-[10px] font-bold ${percentage >= 80 ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500" : percentage >= 60 ? "border-amber-500/20 bg-amber-500/10 text-amber-500" : "border-rose-500/20 bg-rose-500/10 text-rose-500"}`}>
+                      <span
+                        className={`rounded-full border px-2 py-1 text-[10px] font-bold ${percentage >= 80 ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500" : percentage >= 60 ? "border-amber-500/20 bg-amber-500/10 text-amber-500" : "border-rose-500/20 bg-rose-500/10 text-rose-500"}`}
+                      >
                         {percentage.toFixed(0)}%
                       </span>
                     </td>
@@ -143,13 +144,21 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
       <div className="flex flex-wrap items-center justify-between gap-3 text-[10px] text-foreground/50">
         <span>Each square represents one class session</span>
         <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[3px] bg-[#230052] dark:bg-white" /> Present</span>
-          <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[3px] bg-rose-500" /> Absent</span>
+          <span className="flex items-center gap-1.5">
+            <i className="h-2.5 w-2.5 rounded-[3px] bg-[#230052] dark:bg-white" /> Present
+          </span>
+          <span className="flex items-center gap-1.5">
+            <i className="h-2.5 w-2.5 rounded-[3px] bg-rose-500" /> Absent
+          </span>
         </div>
       </div>
       <div className="grid max-h-[390px] grid-cols-2 gap-x-4 gap-y-5 overflow-y-auto px-1 pr-2 md:grid-cols-3 xl:grid-cols-5">
         {subjects.map((subject, index) => {
-          const records = [...(subject.records || [])].sort((a, b) => parseAttendanceDate(a.date) - parseAttendanceDate(b.date));
+          const records = [...(subject.records || [])].sort(
+            (a, b) =>
+              (parseAcademicDate(a.date, "day-first")?.getTime() || 0) -
+              (parseAcademicDate(b.date, "day-first")?.getTime() || 0),
+          );
           const isUpdated = updatedSubjectKeys.has(subject.title);
           const columns = [];
           for (let i = 0; i < records.length; i += ROWS_PER_COL) {
@@ -160,8 +169,15 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
           }
 
           return (
-            <div key={`${subject.title}-${index}`} className="flex min-w-0 flex-col items-start py-1">
-              <div className="mb-2 flex min-h-[180px] min-w-0 items-end gap-1.5 px-2 py-1" role="list" aria-label={`${subject.title} class sessions`}>
+            <div
+              key={`${subject.title}-${index}`}
+              className="flex min-w-0 flex-col items-start py-1"
+            >
+              <div
+                className="mb-2 flex min-h-[180px] min-w-0 items-end gap-1.5 px-2 py-1"
+                role="list"
+                aria-label={`${subject.title} class sessions`}
+              >
                 {columns.map((colRecords, colIndex) => (
                   <div key={colIndex} className="flex flex-col-reverse gap-1">
                     {colRecords.map((record, recordIndex) => {
@@ -197,9 +213,16 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
                     title="New attendance marked!"
                   />
                 )}
-                <p className="w-full truncate text-xs font-semibold text-foreground" title={subject.title}>{subject.title}</p>
+                <p
+                  className="w-full truncate text-xs font-semibold text-foreground"
+                  title={subject.title}
+                >
+                  {subject.title}
+                </p>
               </div>
-              <p className="mt-0.5 text-[10px] text-foreground/50">{subject.percentage.toFixed(0)}% · {subject.present}P / {subject.absent}A</p>
+              <p className="mt-0.5 text-[10px] text-foreground/50">
+                {subject.percentage.toFixed(0)}% · {subject.present}P / {subject.absent}A
+              </p>
             </div>
           );
         })}
@@ -214,7 +237,9 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
           }}
         >
           <div className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-black/10 bg-white/95 px-3 py-1 text-[11px] font-medium text-slate-900 shadow-lg backdrop-blur-md dark:border-white/20 dark:bg-zinc-900/95 dark:text-white dark:shadow-2xl">
-            <span className="font-semibold text-slate-900 dark:text-white">{hoveredDot.record.date}</span>
+            <span className="font-semibold text-slate-900 dark:text-white">
+              {hoveredDot.record.date}
+            </span>
             <span className="text-slate-400 dark:text-white/40">·</span>
             <span
               className={`font-bold ${
@@ -240,41 +265,11 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
 
 function HomePage() {
   const [universityInfo, setUniversityInfo] = useState(null);
-  const [personalInfo, setPersonalInfo] = useState(() => {
-    try {
-      const saved = localStorage.getItem("superflex_cached_personal_info");
-      if (saved) return JSON.parse(saved);
-      const aiCtx = window.superflex_ai_context;
-      if (aiCtx?.personalInfo) return aiCtx.personalInfo;
-      if (aiCtx?.studentName) return { Name: aiCtx.studentName };
-    } catch {}
-    return null;
-  });
+  const [personalInfo, setPersonalInfo] = useState(null);
   const [profileSections, setProfileSections] = useState([]);
   const [activeMainTab, setActiveMainTab] = useState("stats");
   const [alerts, setAlerts] = useState([]);
-  const [profileImage, setProfileImage] = useState("/Login/GetImage");
-
-  useEffect(() => {
-    let active = true;
-    const loadStoredData = async (event) => {
-      const [image, aiContext] = await Promise.all([
-        event?.detail || getProfileImage(),
-        getAiContext(),
-      ]);
-      if (!active) return;
-      setProfileImage(image);
-      setPersonalInfo((current) =>
-        current || aiContext.personalInfo || (aiContext.studentName ? { Name: aiContext.studentName } : null),
-      );
-    };
-    loadStoredData();
-    window.addEventListener("superflex-profile-image-changed", loadStoredData);
-    return () => {
-      active = false;
-      window.removeEventListener("superflex-profile-image-changed", loadStoredData);
-    };
-  }, []);
+  const profileImage = useProfileImage();
 
   const [attendanceData, setAttendanceData] = useState(null);
   const [coursesData, setCoursesData] = useState([]);
@@ -298,20 +293,14 @@ function HomePage() {
     handleUpdates();
     window.addEventListener("superflex-academic-updates-detected", handleUpdates);
     window.addEventListener("superflex-academic-updates-cleared", handleUpdates);
+    window.addEventListener("superflex-student-identity-changed", handleUpdates);
     return () => {
       active = false;
       window.removeEventListener("superflex-academic-updates-detected", handleUpdates);
       window.removeEventListener("superflex-academic-updates-cleared", handleUpdates);
+      window.removeEventListener("superflex-student-identity-changed", handleUpdates);
     };
   }, []);
-
-  const updatedCourseIds = useMemo(() => {
-    const set = new Set();
-    (pendingUpdates?.newMarks || []).forEach((item) => {
-      if (item.courseId) set.add(item.courseId);
-    });
-    return set;
-  }, [pendingUpdates]);
 
   const updatedAttendanceSubjectTitles = useMemo(() => {
     const set = new Set();
@@ -365,7 +354,9 @@ function HomePage() {
               const extraCount = recordsList.length - 3;
               return (
                 <div key={idx} className="flex flex-wrap items-baseline gap-1.5">
-                  <span className="font-bold text-foreground">{a.subjectTitle || a.courseTitle}:</span>
+                  <span className="font-bold text-foreground">
+                    {a.subjectTitle || a.courseTitle}:
+                  </span>
                   <span className="text-foreground/80">
                     {displayRecords || `${a.newCount} session${a.newCount > 1 ? "s" : ""} marked`}
                   </span>
@@ -404,20 +395,47 @@ function HomePage() {
 
   useEffect(() => {
     if (!rollNumber) return;
-    localStorage.setItem(STUDENT_ROLL_NUMBER_KEY, rollNumber);
+    setActiveStudentId(rollNumber);
     if (!coursesData.length) return;
-    localStorage.setItem(TEACHER_COURSES_KEY, JSON.stringify(coursesData.map(({ id, title }) => ({ id, title }))));
-    window.setTimeout(() => window.dispatchEvent(new CustomEvent("superflex-teacher-course-data", {
-      detail: { nextCourses: coursesData.map(({ id, title }) => ({ id, title })), nextRollNumber: rollNumber },
-    })), 0);
+    const coursesKey = getStudentStorageKey(TEACHER_COURSES_KEY, rollNumber);
+    if (coursesKey)
+      localStorage.setItem(
+        coursesKey,
+        JSON.stringify(coursesData.map(({ id, title }) => ({ id, title }))),
+      );
+    window.setTimeout(
+      () =>
+        window.dispatchEvent(
+          new CustomEvent("superflex-teacher-course-data", {
+            detail: {
+              nextCourses: coursesData.map(({ id, title }) => ({ id, title })),
+              nextRollNumber: rollNumber,
+            },
+          }),
+        ),
+      0,
+    );
+  }, [coursesData, rollNumber]);
+
+  useEffect(() => {
+    if (attendanceData?.length && rollNumber) void checkAndRecordAttendanceSnapshot(attendanceData);
+  }, [attendanceData, rollNumber]);
+
+  useEffect(() => {
+    if (coursesData.length && rollNumber) void checkAndRecordMarksSnapshot(coursesData);
   }, [coursesData, rollNumber]);
 
   useEffect(() => {
     const syncTeacherSelections = (event) => {
       setTeacherSelections(event.detail || readTeacherSelections());
     };
+    const syncStudentIdentity = () => setTeacherSelections(readTeacherSelections());
     window.addEventListener("superflex-teachers-updated", syncTeacherSelections);
-    return () => window.removeEventListener("superflex-teachers-updated", syncTeacherSelections);
+    window.addEventListener("superflex-student-identity-changed", syncStudentIdentity);
+    return () => {
+      window.removeEventListener("superflex-teachers-updated", syncTeacherSelections);
+      window.removeEventListener("superflex-student-identity-changed", syncStudentIdentity);
+    };
   }, []);
 
   const mostAbsentSubject = useMemo(() => {
@@ -476,12 +494,6 @@ function HomePage() {
       setProfileSections(profile.sections);
       setUniversityInfo(profile.universityInfo);
       setPersonalInfo(profile.personalInfo);
-      if (profile.personalInfo && Object.keys(profile.personalInfo).length > 0) {
-        try {
-          localStorage.setItem("superflex_cached_personal_info", JSON.stringify(profile.personalInfo));
-        } catch {}
-      }
-
       targetElement.remove();
     }
 
@@ -560,7 +572,6 @@ function HomePage() {
       const doc = parser.parseFromString(html, "text/html");
       const parsedAttendance = parseHomeAttendanceReport(doc);
       setAttendanceData(parsedAttendance);
-      await checkAndRecordAttendanceSnapshot(parsedAttendance);
     } catch (e) {
       console.error("Attendance fetch error", e);
     }
@@ -576,7 +587,6 @@ function HomePage() {
 
       setCoursesData(parsedCourses);
       if (parsedCourses.length) setActiveCourse(parsedCourses[0].id);
-      await checkAndRecordMarksSnapshot(parsedCourses);
     } catch (e) {
       console.error("Marks fetch error", e);
     }
@@ -621,9 +631,7 @@ function HomePage() {
                 <h1 className="truncate text-[28px] font-bold leading-tight tracking-[-0.045em] text-white sm:text-4xl">
                   {greetingHeading}
                 </h1>
-                <p className="mt-1 text-sm text-white/80">
-                  {greetingSubheading}
-                </p>
+                <p className="mt-1 text-sm text-white/80">{greetingSubheading}</p>
               </div>
             </div>
 
@@ -685,7 +693,11 @@ function HomePage() {
                     iconTone="plum"
                     label="Degree Program"
                     value={universityInfo?.Degree || "..."}
-                    subValue={universityInfo?.Campus ? `${universityInfo.Campus} Campus` : "Active enrollment"}
+                    subValue={
+                      universityInfo?.Campus
+                        ? `${universityInfo.Campus} Campus`
+                        : "Active enrollment"
+                    }
                   />
                   <StatsCard
                     variant="dashboard"
@@ -693,7 +705,9 @@ function HomePage() {
                     iconTone="lavender"
                     label="Section"
                     value={universityInfo?.Section || "..."}
-                    subValue={universityInfo?.Batch ? `Batch of ${universityInfo.Batch}` : "Current cohort"}
+                    subValue={
+                      universityInfo?.Batch ? `Batch of ${universityInfo.Batch}` : "Current cohort"
+                    }
                   />
                   <StatsCard
                     variant="dashboard"
@@ -708,8 +722,22 @@ function HomePage() {
                     icon={Activity}
                     iconTone="lavender"
                     label="Critical Attendance"
-                    value={loadingAttendance ? <Skeleton className="my-1 h-6 w-24" /> : mostAbsentSubject?.title || "None"}
-                    subValue={loadingAttendance ? <Skeleton className="h-3 w-16" /> : mostAbsentSubject ? `${mostAbsentSubject.absent} Absents taken` : "All courses 80%+ safe"}
+                    value={
+                      loadingAttendance ? (
+                        <Skeleton className="my-1 h-6 w-24" />
+                      ) : (
+                        mostAbsentSubject?.title || "None"
+                      )
+                    }
+                    subValue={
+                      loadingAttendance ? (
+                        <Skeleton className="h-3 w-16" />
+                      ) : mostAbsentSubject ? (
+                        `${mostAbsentSubject.absent} Absents taken`
+                      ) : (
+                        "All courses 80%+ safe"
+                      )
+                    }
                   />
                 </div>
               </section>
@@ -718,15 +746,30 @@ function HomePage() {
                 <div className="flex h-full flex-col gap-6 overflow-hidden rounded-[24px] border border-black/[0.06] bg-white p-5 text-slate-900 shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-7 xl:p-8">
                   <div className="flex min-h-[52px] flex-col items-start justify-between gap-4 sm:flex-row">
                     <div className="flex items-center gap-3">
-                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><Award size={22} /></span>
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+                        <Award size={22} />
+                      </span>
                       <div className="space-y-1">
-                        <h3 className="text-lg font-bold tracking-tight text-foreground">Assessments</h3>
-                        <p className="text-xs text-foreground/50">Let's see how badly those quizzes went.</p>
+                        <h3 className="text-lg font-bold tracking-tight text-foreground">
+                          Assessments
+                        </h3>
+                        <p className="text-xs text-foreground/50">
+                          Let's see how badly those quizzes went.
+                        </p>
                       </div>
                     </div>
-                    {links.marks && <a href={links.marks} className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#230052] px-4 text-xs font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80">View Details <ArrowRight size={12} /></a>}
+                    {links.marks && (
+                      <a
+                        href={links.marks}
+                        className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#230052] px-4 text-xs font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80"
+                      >
+                        View Details <ArrowRight size={12} />
+                      </a>
+                    )}
                   </div>
-                  {loadingMarks ? <MarksSkeleton /> : coursesData.length ? (
+                  {loadingMarks ? (
+                    <MarksSkeleton />
+                  ) : coursesData.length ? (
                     <>
                       <div className="w-full overflow-x-auto scrollbar-hide">
                         <div className="flex w-fit gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/[0.08]">
@@ -765,14 +808,43 @@ function HomePage() {
                       {activeCourseData && (
                         <div key={activeCourse}>
                           <div className="mb-4 flex flex-col gap-2">
-                            <h2 className="text-xl font-bold leading-tight text-foreground">{activeCourseData.title}</h2>
-                            {teacherSelections[activeCourseData.id] && <div className="flex items-center gap-2 text-xs text-foreground/60">
-                              {teacherSelections[activeCourseData.id].image ? <img src={teacherSelections[activeCourseData.id].image} alt="" className="h-6 w-6 rounded-full object-cover" /> : <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#230052]/10 text-[9px] font-bold text-[#230052] dark:bg-white/15 dark:text-white">{teacherSelections[activeCourseData.id].name.slice(0, 1)}</span>}
-                              <span>Instructor: <span className="font-semibold text-foreground">{teacherSelections[activeCourseData.id].name}</span></span>
-                            </div>}
+                            <h2 className="text-xl font-bold leading-tight text-foreground">
+                              {activeCourseData.title}
+                            </h2>
+                            {teacherSelections[activeCourseData.id] && (
+                              <div className="flex items-center gap-2 text-xs text-foreground/60">
+                                {teacherSelections[activeCourseData.id].image ? (
+                                  <img
+                                    src={teacherSelections[activeCourseData.id].image}
+                                    alt=""
+                                    className="h-6 w-6 rounded-full object-cover"
+                                  />
+                                ) : (
+                                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#230052]/10 text-[9px] font-bold text-[#230052] dark:bg-white/15 dark:text-white">
+                                    {teacherSelections[activeCourseData.id].name.slice(0, 1)}
+                                  </span>
+                                )}
+                                <span>
+                                  Instructor:{" "}
+                                  <span className="font-semibold text-foreground">
+                                    {teacherSelections[activeCourseData.id].name}
+                                  </span>
+                                </span>
+                              </div>
+                            )}
                             <div className="flex items-center gap-2">
-                              <span className="rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-foreground/60">{activeCourseData.id}</span>
-                              <span className="text-xs text-foreground/50">{activeCourseData.sections.filter((section) => !section.id.endsWith("Grand_Total_Marks")).reduce((sum, section) => sum + (section.rows?.length || 0), 0)} Assessments</span>
+                              <span className="rounded-md bg-secondary px-2 py-0.5 text-xs font-medium text-foreground/60">
+                                {activeCourseData.id}
+                              </span>
+                              <span className="text-xs text-foreground/50">
+                                {activeCourseData.sections
+                                  .filter((section) => !section.id.endsWith("Grand_Total_Marks"))
+                                  .reduce(
+                                    (sum, section) => sum + (section.rows?.length || 0),
+                                    0,
+                                  )}{" "}
+                                Assessments
+                              </span>
                             </div>
                           </div>
                           <div className="space-y-3">
@@ -785,36 +857,72 @@ function HomePage() {
                                   course={activeCourseData}
                                   pendingUpdates={pendingUpdates}
                                   isOpen={openCategoryIdx === index}
-                                  onToggle={() => setOpenCategoryIdx(openCategoryIdx === index ? null : index)}
+                                  onToggle={() =>
+                                    setOpenCategoryIdx(openCategoryIdx === index ? null : index)
+                                  }
                                 />
                               ))}
                           </div>
                         </div>
                       )}
                     </>
-                  ) : <div className="flex flex-1 flex-col items-center justify-center text-center">
-                    <div className="mb-4 rounded-3xl bg-foreground/5 p-6"><Award size={40} className="text-foreground/40" /></div>
-                    <h4 className="text-lg font-bold text-foreground/60">No Assessments Uploaded</h4>
-                    <p className="mt-1 text-xs text-foreground/40">Enjoy the peace while it lasts.</p>
-                  </div>}
+                  ) : (
+                    <div className="flex flex-1 flex-col items-center justify-center text-center">
+                      <div className="mb-4 rounded-3xl bg-foreground/5 p-6">
+                        <Award size={40} className="text-foreground/40" />
+                      </div>
+                      <h4 className="text-lg font-bold text-foreground/60">
+                        No Assessments Uploaded
+                      </h4>
+                      <p className="mt-1 text-xs text-foreground/40">
+                        Enjoy the peace while it lasts.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex h-full flex-col gap-6 rounded-[24px] border border-black/[0.06] bg-white p-5 text-slate-900 shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-7 xl:p-8">
                   <div className="flex min-h-[52px] items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><Activity size={22} /></span>
+                      <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+                        <Activity size={22} />
+                      </span>
                       <div className="space-y-1">
-                        <h3 className="text-lg font-bold tracking-tight text-foreground">Attendance Overview</h3>
+                        <h3 className="text-lg font-bold tracking-tight text-foreground">
+                          Attendance Overview
+                        </h3>
                         <p className="text-xs text-foreground/50">Ek aur chutti aur game over?</p>
                       </div>
                     </div>
-                    {links.attendance && <a href={links.attendance} className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#230052] px-4 text-xs font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80">View Details <ArrowRight size={12} /></a>}
+                    {links.attendance && (
+                      <a
+                        href={links.attendance}
+                        className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-[#230052] px-4 text-xs font-bold text-white transition-colors hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80"
+                      >
+                        View Details <ArrowRight size={12} />
+                      </a>
+                    )}
                   </div>
-                  {loadingAttendance ? <AttendanceSkeleton /> : attendanceData?.length ? <AttendanceHeatmap subjects={attendanceData} updatedSubjectKeys={updatedAttendanceSubjectTitles} /> : <div className="flex flex-1 flex-col items-center justify-center text-center">
-                    <div className="mb-4 rounded-3xl bg-foreground/5 p-6"><Activity size={40} className="text-foreground/40" /></div>
-                    <h4 className="text-lg font-bold text-foreground/60">No Attendance Records</h4>
-                    <p className="mt-1 text-xs text-foreground/40">Attendance hasn't been uploaded. Innocent until proven absent.</p>
-                  </div>}
+                  {loadingAttendance ? (
+                    <AttendanceSkeleton />
+                  ) : attendanceData?.length ? (
+                    <AttendanceHeatmap
+                      subjects={attendanceData}
+                      updatedSubjectKeys={updatedAttendanceSubjectTitles}
+                    />
+                  ) : (
+                    <div className="flex flex-1 flex-col items-center justify-center text-center">
+                      <div className="mb-4 rounded-3xl bg-foreground/5 p-6">
+                        <Activity size={40} className="text-foreground/40" />
+                      </div>
+                      <h4 className="text-lg font-bold text-foreground/60">
+                        No Attendance Records
+                      </h4>
+                      <p className="mt-1 text-xs text-foreground/40">
+                        Attendance hasn't been uploaded. Innocent until proven absent.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

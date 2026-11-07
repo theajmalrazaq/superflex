@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { parsePortalAlerts, parseSelectOptions } from "../parsers/dom";
 import PageLayout from "../components/layouts/PageLayout";
 import {
   FileText,
@@ -19,7 +20,7 @@ import {
 } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import StatsCard from "../components/ui/StatsCard";
-import SuperTabs from "../components/ui/SuperTabs";
+import LabeledTabsRow from "../components/ui/LabeledTabsRow";
 import Modal from "../components/ui/Modal";
 import Button from "../components/ui/Button";
 import { TextArea } from "../components/ui/Input";
@@ -27,11 +28,53 @@ import Skeleton from "../components/ui/Skeleton";
 import { hideFlexPageRoot } from "../parsers/dom";
 
 const CourseWithdrawSkeleton = () => (
-  <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8" role="status" aria-label="Loading course withdrawal details">
-    <header className="space-y-2"><Skeleton className="h-3 w-20" /><Skeleton className="h-9 w-64" /><Skeleton className="h-4 w-80 max-w-full" /></header>
+  <main
+    className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8"
+    role="status"
+    aria-label="Loading course withdrawal details"
+  >
+    <header className="space-y-2">
+      <Skeleton className="h-3 w-20" />
+      <Skeleton className="h-9 w-64" />
+      <Skeleton className="h-4 w-80 max-w-full" />
+    </header>
     <Skeleton className="h-10 w-72 max-w-full rounded-full" />
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">{[0, 1, 2, 3].map((item) => <div key={item} className="flex min-h-[156px] flex-col rounded-[24px] bg-white p-5 dark:bg-black sm:p-6"><Skeleton className="h-12 w-12 rounded-[36%]" /><Skeleton className="mt-auto h-7 w-28" /><Skeleton className="mt-2 h-3 w-20" /></div>)}</div>
-    <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,.8fr)]"><section className="space-y-3 rounded-[24px] bg-white p-5 dark:bg-black sm:p-6"><Skeleton className="h-5 w-44" />{[0, 1, 2, 3].map((item) => <div key={item} className="flex items-center gap-4 border-t border-black/[0.05] py-4 dark:border-white/[0.08]"><Skeleton className="h-10 w-10 rounded-[36%]" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-56 max-w-full" /><Skeleton className="h-3 w-32" /></div><Skeleton className="h-6 w-6 rounded-full" /></div>)}</section><section className="space-y-4 rounded-[24px] bg-white p-5 dark:bg-black sm:p-6"><Skeleton className="h-5 w-36" /><Skeleton className="h-24 w-full rounded-2xl" /><Skeleton className="h-11 w-full rounded-full" /><Skeleton className="h-11 w-full rounded-full" /></section></div>
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {[0, 1, 2, 3].map((item) => (
+        <div
+          key={item}
+          className="flex min-h-[156px] flex-col rounded-[24px] bg-white p-5 dark:bg-black sm:p-6"
+        >
+          <Skeleton className="h-12 w-12 rounded-[36%]" />
+          <Skeleton className="mt-auto h-7 w-28" />
+          <Skeleton className="mt-2 h-3 w-20" />
+        </div>
+      ))}
+    </div>
+    <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,.8fr)]">
+      <section className="space-y-3 rounded-[24px] bg-white p-5 dark:bg-black sm:p-6">
+        <Skeleton className="h-5 w-44" />
+        {[0, 1, 2, 3].map((item) => (
+          <div
+            key={item}
+            className="flex items-center gap-4 border-t border-black/[0.05] py-4 dark:border-white/[0.08]"
+          >
+            <Skeleton className="h-10 w-10 rounded-[36%]" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-56 max-w-full" />
+              <Skeleton className="h-3 w-32" />
+            </div>
+            <Skeleton className="h-6 w-6 rounded-full" />
+          </div>
+        ))}
+      </section>
+      <section className="space-y-4 rounded-[24px] bg-white p-5 dark:bg-black sm:p-6">
+        <Skeleton className="h-5 w-36" />
+        <Skeleton className="h-24 w-full rounded-2xl" />
+        <Skeleton className="h-11 w-full rounded-full" />
+        <Skeleton className="h-11 w-full rounded-full" />
+      </section>
+    </div>
   </main>
 );
 
@@ -211,19 +254,54 @@ const InstructionsModal = ({ isOpen, onClose }) => {
 
 const WithdrawalCourseCard = ({ course, isSelected, onToggle, index }) => {
   return (
-    <button type="button" onClick={onToggle} disabled={!course.canSelect} aria-pressed={isSelected} className={`group flex w-full cursor-pointer flex-col gap-3 px-1 py-4 text-left transition-colors sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-5 ${course.canSelect ? "hover:bg-slate-50 dark:hover:bg-white/[0.025]" : "cursor-not-allowed opacity-60"}`}>
+    <button
+      type="button"
+      onClick={onToggle}
+      disabled={!course.canSelect}
+      aria-pressed={isSelected}
+      className={`group flex w-full cursor-pointer flex-col gap-3 px-1 py-4 text-left transition-colors sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-5 ${course.canSelect ? "hover:bg-slate-50 dark:hover:bg-white/[0.025]" : "cursor-not-allowed opacity-60"}`}
+    >
       <div className="flex items-center gap-3 min-w-0 flex-1">
-        <span className="hidden w-7 shrink-0 text-right text-xs font-semibold tabular-nums text-slate-400 sm:block">{index}</span>
-        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[36%] ${isSelected ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "bg-slate-100 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300"}`}><BookOpen size={18} /></span>
+        <span className="hidden w-7 shrink-0 text-right text-xs font-semibold tabular-nums text-slate-400 sm:block">
+          {index}
+        </span>
+        <span
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[36%] ${isSelected ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "bg-slate-100 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300"}`}
+        >
+          <BookOpen size={18} />
+        </span>
         <span className="min-w-0 flex-1">
-          <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1"><span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 dark:bg-white/[0.08] dark:text-slate-300">{course.code}</span><span className="truncate text-sm font-bold text-slate-900 dark:text-white">{course.name}</span></span>
-          <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400"><span>{course.credits} credits</span><span>{course.type}</span></span>
+          <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 dark:bg-white/[0.08] dark:text-slate-300">
+              {course.code}
+            </span>
+            <span className="truncate text-sm font-bold text-slate-900 dark:text-white">
+              {course.name}
+            </span>
+          </span>
+          <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+            <span>{course.credits} credits</span>
+            <span>{course.type}</span>
+          </span>
         </span>
       </div>
 
       <span className="flex w-full items-center justify-between gap-3 border-t border-black/[0.05] pt-3 dark:border-white/[0.08] sm:w-auto sm:justify-end sm:border-0 sm:pt-0">
-        {course.status && <span className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${course.status.toLowerCase().includes("withdraw") ? "bg-rose-50 text-rose-700 dark:bg-rose-300/10 dark:text-rose-200" : course.status.toLowerCase().includes("not applied") ? "bg-slate-100 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-300/10 dark:text-emerald-200"}`}>{course.status}</span>}
-        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition-colors ${isSelected ? "border-[#230052] bg-[#230052] text-white dark:border-white dark:bg-white dark:text-[#0a192f]" : "border-slate-300 text-transparent dark:border-white/25"}`}>{isSelected && <Check size={15} strokeWidth={3} />}{!isSelected && !course.canSelect && <X size={13} className="text-slate-400 dark:text-slate-500" />}</span>
+        {course.status && (
+          <span
+            className={`rounded-full px-3 py-1.5 text-[11px] font-bold ${course.status.toLowerCase().includes("withdraw") ? "bg-rose-50 text-rose-700 dark:bg-rose-300/10 dark:text-rose-200" : course.status.toLowerCase().includes("not applied") ? "bg-slate-100 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-300/10 dark:text-emerald-200"}`}
+          >
+            {course.status}
+          </span>
+        )}
+        <span
+          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition-colors ${isSelected ? "border-[#230052] bg-[#230052] text-white dark:border-white dark:bg-white dark:text-[#0a192f]" : "border-slate-300 text-transparent dark:border-white/25"}`}
+        >
+          {isSelected && <Check size={15} strokeWidth={3} />}
+          {!isSelected && !course.canSelect && (
+            <X size={13} className="text-slate-400 dark:text-slate-500" />
+          )}
+        </span>
       </span>
     </button>
   );
@@ -241,7 +319,6 @@ function CourseWithdrawPage() {
   const hiddenContentRef = useRef(null);
 
   useEffect(() => {
-
     const parseWithdrawData = () => {
       try {
         const root = document.querySelector(".m-grid.m-grid--hor.m-grid--root.m-page");
@@ -252,42 +329,10 @@ function CourseWithdrawPage() {
 
         const select = root.querySelector("select#SemId");
         if (select) {
-          const opts = Array.from(select.options).map((o) => ({
-            label: o.text.trim(),
-            value: o.value,
-            selected: o.selected,
-          }));
-          setSemesters(opts);
+          setSemesters(parseSelectOptions(select));
         }
 
-        const alertList = [];
-        root.querySelectorAll(".m-alert, .alert").forEach((alert) => {
-          if (alert.style.display === "none") return;
-
-          const textEl = alert.querySelector(".m-alert__text") || alert;
-          const clone = textEl.cloneNode(true);
-
-          clone
-            .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
-            .forEach((el) => el.remove());
-
-          let message = clone.textContent
-            .replace(/Alert!/gi, "")
-            .replace(/Close/gi, "")
-            .replace(/&nbsp;/g, " ")
-            .replace(/\s+/g, " ")
-            .trim();
-
-          if (message && message.length > 3) {
-            const type =
-              alert.classList.contains("alert-danger") ||
-              alert.classList.contains("m-alert--outline-danger")
-                ? "error"
-                : "info";
-            alertList.push({ type, message });
-          }
-        });
-        setAlerts(alertList);
+        setAlerts(parsePortalAlerts(root));
 
         const courseData = [];
         const table = root.querySelector(".table");
@@ -464,43 +509,229 @@ function CourseWithdrawPage() {
         />
 
         <header className="flex flex-wrap items-end justify-between gap-4">
-          <div className="space-y-1"><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Academics</p><h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Course Withdrawal</h1><p className="text-sm text-white/80">Sometimes giving up is strategy. Bhai har battle jeetna zaroori nahi.</p></div>
-          <button type="button" onClick={() => setIsInstructionsOpen(true)} className="flex cursor-pointer items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"><ShieldCheck size={15} /> Rules &amp; procedures</button>
+          <div className="space-y-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+              Academics
+            </p>
+            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              Course Withdrawal
+            </h1>
+            <p className="text-sm text-white/80">
+              Sometimes giving up is strategy. Bhai har battle jeetna zaroori nahi.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsInstructionsOpen(true)}
+            className="flex cursor-pointer items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"
+          >
+            <ShieldCheck size={15} /> Rules &amp; procedures
+          </button>
         </header>
 
-        {semesters.length > 0 && <section aria-label="Select semester" className="flex flex-col gap-2 sm:flex-row sm:items-center"><span className="w-20 shrink-0 text-xs font-semibold text-white/85">Semester</span><SuperTabs tabs={semesters} activeTab={semesters.find((semester) => semester.selected)?.value} onTabChange={handleSemesterChange} size="sm" className="!border-0 !bg-white/55 !backdrop-blur-xl dark:!bg-black/25 dark:!backdrop-blur-xl" /></section>}
+        {semesters.length > 0 && (
+          <LabeledTabsRow
+            label="Semester"
+            tabs={semesters}
+            onTabChange={handleSemesterChange}
+            ariaLabel="Select semester"
+          />
+        )}
 
         <section aria-labelledby="withdraw-overview-heading" className="space-y-4">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">Overview</p>
-              <h2 id="withdraw-overview-heading" className="text-xl font-bold tracking-tight text-white">Withdrawal summary</h2>
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+                Overview
+              </p>
+              <h2
+                id="withdraw-overview-heading"
+                className="text-xl font-bold tracking-tight text-white"
+              >
+                Withdrawal summary
+              </h2>
             </div>
-            <p className="text-xs text-white/75">{isWithdrawActive ? "Choose eligible courses to prepare a request." : "No withdrawal window is currently open."}</p>
+            <p className="text-xs text-white/75">
+              {isWithdrawActive
+                ? "Choose eligible courses to prepare a request."
+                : "No withdrawal window is currently open."}
+            </p>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
-            <StatsCard variant="dashboard" icon={BookOpen} label="Total courses" value={courses.length} subValue="Enrolled this term" />
-            <StatsCard variant="dashboard" icon={Trash2} label="Selected" value={selectedCount} subValue="For this request" />
-            <StatsCard variant="dashboard" icon={ShieldCheck} label="Withdrawal status" value={isWithdrawActive ? "Open" : "Closed"} subValue={isWithdrawActive ? "Submission window open" : "Window closed"} />
-            <StatsCard variant="dashboard" icon={Clock} label="Pending requests" value={courses.filter((course) => course.status.toLowerCase().includes("pending")).length} subValue="Awaiting review" />
+            <StatsCard
+              variant="dashboard"
+              icon={BookOpen}
+              label="Total courses"
+              value={courses.length}
+              subValue="Enrolled this term"
+            />
+            <StatsCard
+              variant="dashboard"
+              icon={Trash2}
+              label="Selected"
+              value={selectedCount}
+              subValue="For this request"
+            />
+            <StatsCard
+              variant="dashboard"
+              icon={ShieldCheck}
+              label="Withdrawal status"
+              value={isWithdrawActive ? "Open" : "Closed"}
+              subValue={isWithdrawActive ? "Submission window open" : "Window closed"}
+            />
+            <StatsCard
+              variant="dashboard"
+              icon={Clock}
+              label="Pending requests"
+              value={
+                courses.filter((course) => course.status.toLowerCase().includes("pending")).length
+              }
+              subValue="Awaiting review"
+            />
           </div>
         </section>
 
-        {alerts.length > 0 && <NotificationBanner alerts={alerts} onActionClick={() => setIsInstructionsOpen(true)} />}
+        {alerts.length > 0 && (
+          <NotificationBanner alerts={alerts} onActionClick={() => setIsInstructionsOpen(true)} />
+        )}
 
         <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,.8fr)]">
-          <section aria-labelledby="withdraw-courses-heading" className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]">
-            <header className="flex flex-col gap-3 border-b border-black/[0.06] px-4 py-4 dark:border-white/[0.1] sm:flex-row sm:items-center sm:justify-between sm:px-6"><div><h2 id="withdraw-courses-heading" className="text-base font-bold">Courses</h2><p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Showing {filteredCourses.length} of {courses.length} courses</p></div><div className="flex items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/[0.06]" role="group" aria-label="Filter courses">{[{ value: "all", label: "All" }, { value: "eligible", label: "Eligible" }, { value: "selected", label: "Selected" }, { value: "processed", label: "Unavailable" }].map((filter) => <button key={filter.value} type="button" onClick={() => setCourseFilter(filter.value)} aria-pressed={courseFilter === filter.value} className={`cursor-pointer rounded-full px-3 py-2 text-xs font-bold transition-colors ${courseFilter === filter.value ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"}`}>{filter.label}</button>)}</div></header>
-            {filteredCourses.length ? <div className="divide-y divide-black/[0.05] px-4 dark:divide-white/[0.08] sm:px-6">{filteredCourses.map((course, index) => <WithdrawalCourseCard key={course.id} course={course} index={index + 1} isSelected={course.isSelected} onToggle={() => toggleCourseSelection(course.id)} />)}</div> : <div className="flex min-h-[220px] flex-col items-center justify-center px-6 py-10 text-center"><span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[36%] bg-slate-100 text-slate-500 dark:bg-white/[0.08] dark:text-slate-300"><Layers size={22} /></span><h3 className="text-base font-bold">No Courses Found</h3><p className="mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">Nothing to escape from. No courses match your current filter.</p></div>}
+          <section
+            aria-labelledby="withdraw-courses-heading"
+            className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]"
+          >
+            <header className="flex flex-col gap-3 border-b border-black/[0.06] px-4 py-4 dark:border-white/[0.1] sm:flex-row sm:items-center sm:justify-between sm:px-6">
+              <div>
+                <h2 id="withdraw-courses-heading" className="text-base font-bold">
+                  Courses
+                </h2>
+                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                  Showing {filteredCourses.length} of {courses.length} courses
+                </p>
+              </div>
+              <div
+                className="flex items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-white/[0.06]"
+                role="group"
+                aria-label="Filter courses"
+              >
+                {[
+                  { value: "all", label: "All" },
+                  { value: "eligible", label: "Eligible" },
+                  { value: "selected", label: "Selected" },
+                  { value: "processed", label: "Unavailable" },
+                ].map((filter) => (
+                  <button
+                    key={filter.value}
+                    type="button"
+                    onClick={() => setCourseFilter(filter.value)}
+                    aria-pressed={courseFilter === filter.value}
+                    className={`cursor-pointer rounded-full px-3 py-2 text-xs font-bold transition-colors ${courseFilter === filter.value ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"}`}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
+            </header>
+            {filteredCourses.length ? (
+              <div className="divide-y divide-black/[0.05] px-4 dark:divide-white/[0.08] sm:px-6">
+                {filteredCourses.map((course, index) => (
+                  <WithdrawalCourseCard
+                    key={course.id}
+                    course={course}
+                    index={index + 1}
+                    isSelected={course.isSelected}
+                    onToggle={() => toggleCourseSelection(course.id)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="flex min-h-[220px] flex-col items-center justify-center px-6 py-10 text-center">
+                <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[36%] bg-slate-100 text-slate-500 dark:bg-white/[0.08] dark:text-slate-300">
+                  <Layers size={22} />
+                </span>
+                <h3 className="text-base font-bold">No Courses Found</h3>
+                <p className="mt-1 max-w-sm text-sm text-slate-500 dark:text-slate-400">
+                  Nothing to escape from. No courses match your current filter.
+                </p>
+              </div>
+            )}
           </section>
 
           <aside className="rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] xl:sticky xl:top-6">
-            <header className="border-b border-black/[0.06] px-5 py-4 dark:border-white/[0.1] sm:px-6"><h2 className="text-base font-bold">Withdrawal Confirmation</h2><p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Double-check before you officially break up with this course.</p></header>
+            <header className="border-b border-black/[0.06] px-5 py-4 dark:border-white/[0.1] sm:px-6">
+              <h2 className="text-base font-bold">Withdrawal Confirmation</h2>
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                Double-check before you officially break up with this course.
+              </p>
+            </header>
             <div className="space-y-5 p-5 sm:p-6">
-              <div className="rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.05]"><div className="mb-4 flex items-center gap-2"><span className="flex h-9 w-9 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"><ShieldCheck size={17} /></span><h3 className="text-sm font-bold">Action summary</h3></div><div className="space-y-3 text-xs"><div className="flex justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Selected courses</span><span className="font-semibold">{selectedCount}</span></div><div className="flex justify-between gap-3"><span className="text-slate-500 dark:text-slate-400">Request status</span><span className="font-semibold">{isWithdrawActive ? "Available" : "Closed"}</span></div><div className="flex justify-between gap-3 border-t border-black/[0.06] pt-3 text-sm dark:border-white/[0.1]"><span className="font-bold">Transcript impact</span><span className="font-bold">W grade</span></div></div></div>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-1"><Button variant="secondary" onClick={handlePrintForm} disabled={selectedCount === 0} className="w-full rounded-full" icon={<Download size={16} />}>Download form</Button><Button variant="primary" onClick={handleWithdrawAction} disabled={selectedCount === 0 || isSubmitting} isLoading={isSubmitting} className="w-full rounded-full" icon={<ChevronRight size={16} />}>Continue request</Button></div>
-              <p className="flex items-start gap-2 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400"><Info size={15} className="mt-0.5 shrink-0 text-[#230052] dark:text-white" />A ‘W’ grade will appear on the transcript. Withdrawal does not refund tuition fees.</p>
-              <div className="border-t border-black/[0.06] pt-4 dark:border-white/[0.1]"><div className="mb-2 flex items-center gap-2 text-slate-600 dark:text-slate-300"><Zap size={14} /><span className="text-xs font-bold">File size help</span></div><p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">Each uploaded image must be under 650 KB. Use an <a href="https://imageresizer.com/" target="_blank" rel="noreferrer" className="font-semibold text-[#230052] underline-offset-2 hover:underline dark:text-white">image resizer</a> if needed.</p></div>
+              <div className="rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.05]">
+                <div className="mb-4 flex items-center gap-2">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+                    <ShieldCheck size={17} />
+                  </span>
+                  <h3 className="text-sm font-bold">Action summary</h3>
+                </div>
+                <div className="space-y-3 text-xs">
+                  <div className="flex justify-between gap-3">
+                    <span className="text-slate-500 dark:text-slate-400">Selected courses</span>
+                    <span className="font-semibold">{selectedCount}</span>
+                  </div>
+                  <div className="flex justify-between gap-3">
+                    <span className="text-slate-500 dark:text-slate-400">Request status</span>
+                    <span className="font-semibold">
+                      {isWithdrawActive ? "Available" : "Closed"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between gap-3 border-t border-black/[0.06] pt-3 text-sm dark:border-white/[0.1]">
+                    <span className="font-bold">Transcript impact</span>
+                    <span className="font-bold">W grade</span>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-1">
+                <Button
+                  variant="secondary"
+                  onClick={handlePrintForm}
+                  disabled={selectedCount === 0}
+                  className="w-full rounded-full"
+                  icon={<Download size={16} />}
+                >
+                  Download form
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleWithdrawAction}
+                  disabled={selectedCount === 0 || isSubmitting}
+                  isLoading={isSubmitting}
+                  className="w-full rounded-full"
+                  icon={<ChevronRight size={16} />}
+                >
+                  Continue request
+                </Button>
+              </div>
+              <p className="flex items-start gap-2 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                <Info size={15} className="mt-0.5 shrink-0 text-[#230052] dark:text-white" />A ‘W’
+                grade will appear on the transcript. Withdrawal does not refund tuition fees.
+              </p>
+              <div className="border-t border-black/[0.06] pt-4 dark:border-white/[0.1]">
+                <div className="mb-2 flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                  <Zap size={14} />
+                  <span className="text-xs font-bold">File size help</span>
+                </div>
+                <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                  Each uploaded image must be under 650 KB. Use an{" "}
+                  <a
+                    href="https://imageresizer.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-semibold text-[#230052] underline-offset-2 hover:underline dark:text-white"
+                  >
+                    image resizer
+                  </a>{" "}
+                  if needed.
+                </p>
+              </div>
             </div>
           </aside>
         </div>

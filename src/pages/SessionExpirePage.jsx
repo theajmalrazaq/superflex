@@ -18,9 +18,7 @@ const SessionExpirePage = () => {
         </div>
 
         <div className="space-y-4">
-          <h1 className="text-4xl !font-bold !text-foreground">
-            Session Expired
-          </h1>
+          <h1 className="text-4xl !font-bold !text-foreground">Session Expired</h1>
           <p className="!text-foreground/50 text-sm leading-relaxed">
             Even FLEX needs a break. Sign back in, the ragra isn't over.
           </p>

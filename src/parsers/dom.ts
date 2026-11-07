@@ -8,42 +8,80 @@ export const readText = (element: Element | null | undefined, fallback = ""): st
   element?.textContent?.replace(/\s+/g, " ").trim() || fallback;
 
 export const parseNumber = (value: string | null | undefined, fallback = 0): number => {
-  const parsed = Number.parseFloat(String(value ?? "").replace(/,/g, "").trim());
+  const parsed = Number.parseFloat(
+    String(value ?? "")
+      .replace(/,/g, "")
+      .trim(),
+  );
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
 export const parseInteger = (value: string | null | undefined, fallback = 0): number => {
-  const parsed = Number.parseInt(String(value ?? "").replace(/,/g, "").trim(), 10);
+  const parsed = Number.parseInt(
+    String(value ?? "")
+      .replace(/,/g, "")
+      .trim(),
+    10,
+  );
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
-export function parsePortalAlerts(root: ParentNode, selector = ".m-alert, .alert"): PortalAlert[] {
+export function parsePortalAlerts(
+  root: ParentNode,
+  selector = ".m-alert, .alert",
+  options: { extraTokens?: string[]; normalizeText?: boolean; includeOutlineDanger?: boolean } = {},
+): PortalAlert[] {
+  const { extraTokens = [], normalizeText = true, includeOutlineDanger = true } = options;
   return Array.from(root.querySelectorAll<HTMLElement>(selector)).flatMap((alert) => {
-    if (alert.style.display === "none" || alert.id === "DataErrormsgdiv" || alert.closest(".modal")) {
+    if (
+      alert.style.display === "none" ||
+      alert.id === "DataErrormsgdiv" ||
+      alert.closest(".modal")
+    ) {
       return [];
     }
 
     const clone = (alert.querySelector(".m-alert__text") || alert).cloneNode(true) as HTMLElement;
-    clone.querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon").forEach((el) => el.remove());
-    const message = (clone.textContent || "")
-      .replace(/Alert!/gi, "")
-      .replace(/Close/gi, "")
-      .replace(/&nbsp;/gi, " ")
-      .replace(/\s+/g, " ")
-      .trim();
+    clone
+      .querySelectorAll(".m-alert__close, button, a, strong, .m-alert__icon")
+      .forEach((el) => el.remove());
+    let message = clone.textContent || "";
+    if (normalizeText) {
+      message = message
+        .replace(/Alert!/gi, "")
+        .replace(/Close/gi, "")
+        .replace(/&nbsp;/gi, " ");
+      extraTokens.forEach((token) => {
+        message = message.replace(
+          new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"),
+          "",
+        );
+      });
+      message = message.replace(/\s+/g, " ").trim();
+    } else {
+      message = message.trim();
+    }
 
     if (message.length <= 3) return [];
-    return [{
-      type: alert.classList.contains("alert-danger") || alert.classList.contains("m-alert--outline-danger")
-        ? "error" as const
-        : "info" as const,
-      message,
-    }];
+    return [
+      {
+        type:
+          alert.classList.contains("alert-danger") ||
+          (includeOutlineDanger && alert.classList.contains("m-alert--outline-danger"))
+            ? ("error" as const)
+            : ("info" as const),
+        message,
+      },
+    ];
   });
 }
 
 export function parseSemesterOptions(form: ParentNode | null): SemesterOption[] {
   const select = form?.querySelector("select");
+  return parseSelectOptions(select);
+}
+
+export function parseSelectOptions(select: Element | null | undefined): SemesterOption[] {
   if (!(select instanceof HTMLSelectElement)) return [];
   return Array.from(select.options).map((option) => ({
     label: option.text.trim(),

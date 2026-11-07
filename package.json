@@ -13,9 +13,10 @@
     "test:watch": "vitest",
     "typecheck:parsers": "tsc -p tsconfig.parsers.json",
     "format": "oxfmt",
-    "format:check": "oxfmt --check",
+    "format:check": "oxfmt --check"
   },
   "dependencies": {
+    "@dnd-kit/dom": "^0.5.3",
     "@dnd-kit/helpers": "^0.5.3",
     "@dnd-kit/react": "^0.5.3",
     "@tailwindcss/postcss": "^4.1.13",
