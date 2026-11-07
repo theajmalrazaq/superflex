@@ -12,7 +12,7 @@
     <link rel="icon" type="image/svg+xml" href="res/favicon.svg" />
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module" src="./scripts/theme.ts"></script>
+    <script src="./scripts/generated/theme.js"></script>
     <script
       defer
       strategy="afterInteractive"
@@ -1285,14 +1285,14 @@
     >
       <div class="flex items-center justify-between px-4 lg:px-6 py-3">
         <div
-          class="flex items-center gap-4 lg:gap-8 w-full lg:w-auto justify-between lg:justify-start"
+          class="flex items-center gap-2 lg:gap-8 w-full lg:w-auto justify-between lg:justify-start"
         >
           <a href="index.html" class="flex items-center shrink-0">
             <img
               src="res/logo-light.svg"
               data-light-source="res/logo-light.svg"
               alt="Logo"
-              class="h-6 lg:h-8 w-auto"
+              class="h-5 sm:h-6 lg:h-8 w-auto"
             />
           </a>
 
@@ -1326,10 +1326,29 @@
             class="shrink-0 rounded-full border px-3 py-2 text-xs font-semibold transition-colors"
             aria-label="Switch to dark mode"
             aria-pressed="false"
-          ></button>
+          >
+            <svg
+              class="theme-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path
+                d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6.5 6.5 0 0 0 8.268 8.268c.344-.215.825-.003.803.401"
+              /></svg
+            ><span>Dark</span>
+          </button>
 
           <button
             id="mobile-toggle"
+            type="button"
+            aria-label="Open navigation"
+            aria-controls="mobile-overlay"
+            aria-expanded="false"
             class="lg:hidden relative w-10 h-10 flex items-center justify-center text-zinc-400"
           >
             <div class="flex flex-col gap-1.5 transition-all duration-300" id="hamburger">
@@ -1904,6 +1923,6 @@
       </div>
     </footer>
 
-    <script type="module" src="./scripts/index.ts"></script>
+    <script defer src="./scripts/generated/index.js"></script>
   </body>
 </html>

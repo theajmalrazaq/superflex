@@ -158,7 +158,7 @@ npm run dev:docs
 npm run build:docs
 ```
 
-The docs pages load TypeScript modules through Vite. Publish `dist-docs/` after building; serving the raw HTML directly does not compile those modules. HTML, CSS, JSON, Markdown, and media remain in their native formats.
+The website works directly from `docs/` on static hosting. Author behavior in `docs/scripts/*.ts` and run `npm run build:docs:scripts` to regenerate the committed browser bundles in `docs/scripts/generated/`. Vite serves TypeScript directly during development; `npm run build:docs` refreshes those bundles and creates `dist-docs/` for artifact hosting. Reviews are bundled from `public/reviews.json`, the shared source for the website and extension. HTML, CSS, JSON, Markdown, and media remain in their native formats.
 
 ### Project map
 

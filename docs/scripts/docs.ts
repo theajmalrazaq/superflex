@@ -1,3 +1,7 @@
+import { initSiteNavigation } from "./navigation";
+
+initSiteNavigation();
+
 declare const marked: { parse(markdown: string): string };
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -84,57 +88,6 @@ const generateTOC = () => {
     if (rtEl) rtEl.textContent = `${readTime} min read`;
   }
 };
-
-const mobileToggle = document.getElementById("mobile-toggle");
-const mobileOverlay = document.getElementById("mobile-overlay");
-const line1 = document.getElementById("line1");
-const line2 = document.getElementById("line2");
-const navPill = document.getElementById("main-nav");
-
-const themeToggle = document.getElementById("theme-toggle");
-const applyTheme = (mode) => {
-  const isDark = mode === "dark";
-  document.documentElement.classList.toggle("dark", isDark);
-  localStorage.setItem("superflex-theme-mode", isDark ? "dark" : "light");
-  document
-    .querySelectorAll<HTMLImageElement>(
-      'img[data-light-source], img[src$="logo-light.svg"], img[src$="logo-dark.svg"]',
-    )
-    .forEach((logo) => {
-      const lightSource =
-        logo.dataset.lightSource ||
-        logo.getAttribute("src").replace("logo-dark.svg", "logo-light.svg");
-      logo.dataset.lightSource = lightSource;
-      logo.src = isDark ? lightSource.replace("logo-light.svg", "logo-dark.svg") : lightSource;
-    });
-  themeToggle?.setAttribute("aria-pressed", String(isDark));
-  themeToggle?.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
-  if (themeToggle)
-    themeToggle.innerHTML = `${isDark ? '<svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>' : '<svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6.5 6.5 0 0 0 8.268 8.268c.344-.215.825-.003.803.401"/></svg>'}<span>${isDark ? "Light" : "Dark"}</span>`;
-};
-applyTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
-themeToggle?.addEventListener("click", () =>
-  applyTheme(document.documentElement.classList.contains("dark") ? "light" : "dark"),
-);
-
-if (mobileToggle) {
-  mobileToggle.addEventListener("click", () => {
-    const isActive = mobileOverlay.classList.toggle("active");
-    mobileOverlay.classList.toggle("pointer-events-none");
-
-    if (isActive) {
-      line1.style.transform = "rotate(45deg) translateY(4px)";
-      line2.style.transform = "rotate(-45deg) translateY(-4px)";
-      navPill.classList.add("bg-white/10", "border-[#a098ff]/30");
-      document.body.style.overflow = "hidden";
-    } else {
-      line1.style.transform = "none";
-      line2.style.transform = "none";
-      navPill.classList.remove("bg-white/10", "border-[#a098ff]/30");
-      document.body.style.overflow = "auto";
-    }
-  });
-}
 
 async function loadContent() {
   try {
