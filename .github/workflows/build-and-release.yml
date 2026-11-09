@@ -124,6 +124,12 @@ jobs:
             BODY="$AUTO_CHANGELOG"
           fi
 
+          # Substitute unresolved date placeholder with ISO release date
+          BODY="${BODY//#\{\{DATE\}\}/$DATE}"
+
+          # Strip empty bullet points (- \n or - $) and empty category sections
+          BODY=$(printf "%s\n" "$BODY" | sed -E '/^[[:space:]]*-[[:space:]]*$/d')
+
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "body<<$EOF" >> $GITHUB_OUTPUT
           echo "$BODY" >> $GITHUB_OUTPUT

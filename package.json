@@ -19,7 +19,8 @@
     "build:docs": "bun run build:docs:scripts && vite build --config vite.docs.config.ts && cp -R docs/res docs/articles docs/reviews.json dist-docs/ && mkdir -p dist-docs/scripts && cp -R docs/scripts/generated dist-docs/scripts/",
     "build:docs:scripts": "esbuild docs/scripts/theme.ts docs/scripts/index.ts docs/scripts/docs.ts --bundle --format=iife --platform=browser --target=es2022 --outdir=docs/scripts/generated --minify",
     "build:apk:assets": "bash scripts/bundle-apk-assets.sh",
-    "build:apk": "bun run build:apk:assets && bash android/build.sh"
+    "build:apk": "bun run build:apk:assets && bash android/build.sh",
+    "build:apk:cloud": "bash scripts/cloud-apk-build.sh"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.13",

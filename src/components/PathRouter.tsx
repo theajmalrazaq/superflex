@@ -18,6 +18,7 @@ import SessionExpirePage from "../pages/SessionExpirePage";
 import NotFoundPage from "../pages/NotFoundPage";
 import SuperFlexAI from "./SuperFlexAI";
 import TeacherSettingsController from "./TeacherSettingsController";
+import { restoreCachedPage } from "../utils/pjaxNavigator";
 
 function PathRouter() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
@@ -25,6 +26,7 @@ function PathRouter() {
 
   useEffect(() => {
     const handleLocationChange = () => {
+      restoreCachedPage(window.location.pathname);
       setCurrentPath(window.location.pathname);
     };
 

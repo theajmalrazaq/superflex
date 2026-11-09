@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { Logo } from "./ui/Logo";
 import ProfileImageModal from "./ui/ProfileImageModal";
+import { pjaxNavigate } from "../utils/pjaxNavigator";
 import { getExtensionUrl } from "../utils/extensionApi";
 import { usePreferencesStore } from "../stores/preferencesStore";
 import { sidebarLinksSchema } from "../stores/preferencesSchemas";
@@ -224,6 +225,13 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
     callbacksRef.current = { onAttendanceLinkFound, onLinksFound };
   }, [onAttendanceLinkFound, onLinksFound]);
 
+  const [navigating, setNavigating] = useState(false);
+  useEffect(() => {
+    const handleNavigating = (e: any) => setNavigating(Boolean(e?.detail));
+    window.addEventListener("superflex-navigating", handleNavigating);
+    return () => window.removeEventListener("superflex-navigating", handleNavigating);
+  }, []);
+
   const groupedLinks = useMemo(() => {
     const groups = Object.fromEntries(GROUP_ORDER.map((group) => [group, []]));
     const seen = new Set<string>();
@@ -326,7 +334,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
       return;
     }
     if (href && href !== "#") {
-      window.location.href = href;
+      pjaxNavigate(href);
     }
   };
 
@@ -530,6 +538,13 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
 
   return (
     <>
+      {navigating && (
+        <div
+          role="progressbar"
+          aria-label="Loading page"
+          className="fixed inset-x-0 top-0 z-[999999] h-1 bg-[#230052] shadow-sm animate-pulse dark:bg-white"
+        />
+      )}
       <aside
         style={
           currentPage.startsWith("/Student/CourseRegistration") &&
@@ -544,13 +559,14 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
 
       {!isHomePage && (
         <header className="relative z-30 flex items-center justify-between px-4 pb-1 pt-3.5 lg:hidden">
-          <a
-            href="/"
+          <button
+            type="button"
+            onClick={() => pjaxNavigate("/")}
             aria-label="Back to Home"
             className="flex h-10 w-10 items-center justify-center rounded-full bg-white/25 text-white backdrop-blur-md transition-colors active:scale-95 dark:bg-white/10"
           >
             <ArrowLeft size={19} strokeWidth={2.2} />
-          </a>
+          </button>
           <button
             type="button"
             onClick={() => setProfileModalOpen(true)}
