@@ -97,17 +97,37 @@ jobs:
           path: superflex.zip
           if-no-files-found: error
 
-      - name: Get current date
-        id: date
-        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
-
       - name: Generate Changelog
         id: build_changelog
         uses: mikepenz/release-changelog-builder-action@v5
         with:
           configuration: ".github/changelog-config.json"
+          mode: "HYBRID"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare Release Notes
+        id: release_notes
+        env:
+          INPUT_UPDATES: ${{ github.event.inputs.updates }}
+          AUTO_CHANGELOG: ${{ steps.build_changelog.outputs.changelog }}
+        run: |
+          DATE=$(date +'%Y-%m-%d')
+
+          if [ -n "$INPUT_UPDATES" ]; then
+            if [[ "$INPUT_UPDATES" == *"# 🚀 SuperFlex Update"* ]]; then
+              BODY="$INPUT_UPDATES"
+            else
+              BODY=$(printf "# 🚀 SuperFlex Update\n\n## 🆕 Change Logs\n\n%s\n\n---\nBuilt on: %s" "$INPUT_UPDATES" "$DATE")
+            fi
+          else
+            BODY="$AUTO_CHANGELOG"
+          fi
+
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "body<<$EOF" >> $GITHUB_OUTPUT
+          echo "$BODY" >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
 
       - name: Create Release
         if: github.event.inputs.version != '' || startsWith(github.ref, 'refs/tags/v')
@@ -116,8 +136,7 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.version != '' && format('v{0}', github.event.inputs.version) || github.ref_name }}
           name: SuperFlex ${{ github.event.inputs.version || github.ref_name }}
-          body: |
-            ${{ github.event.inputs.updates != '' && format('{0}\n\n', github.event.inputs.updates) || '' }}${{ steps.build_changelog.outputs.changelog }}
+          body: ${{ steps.release_notes.outputs.body }}
           files: |
             superflex.zip
             SuperFlex.apk

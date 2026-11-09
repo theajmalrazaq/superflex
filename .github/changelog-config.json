@@ -1,23 +1,64 @@
 {
   "categories": [
     {
-      "title": "## Additions",
-      "labels": ["enhancement", "feature"]
+      "title": "### 🤖 Features & Additions",
+      "labels": ["feature", "feat", "enhancement"]
     },
     {
-      "title": "## Fixes",
-      "labels": ["bug", "fix"]
+      "title": "### ⏰ Fixes & Adjustments",
+      "labels": ["fix", "bug"]
     },
     {
-      "title": "## Documentation",
-      "labels": ["documentation"]
+      "title": "### 📊 UI, Performance & Refactoring",
+      "labels": ["refactor", "style", "perf"]
     },
     {
-      "title": "## Other Changes",
+      "title": "### 🗂️ Architecture, Tooling & Docs",
+      "labels": ["chore", "docs", "documentation", "ci", "build"]
+    },
+    {
+      "title": "### 📦 Other Changes",
       "labels": []
     }
   ],
-  "template": "## What changed?\n\n#{{CHANGELOG}}\n\n---\n*Built on #{{DATE}}*",
-  "pr_template": "* #{{TITLE}} by @#{{AUTHOR}}",
-  "empty_template": "## What changed?\n\nNo major changes in this release.\n\n---\n*Built on #{{DATE}}*"
+  "label_extractor": [
+    {
+      "pattern": "^(\\[[^\\]]+\\]\\s*)?(feat|feature)\\b(\\([\\w\\-\\.]+\\))?:?\\s*(.*)",
+      "target": "feature"
+    },
+    {
+      "pattern": "^(\\[[^\\]]+\\]\\s*)?(fix|fixed|bug)\\b(\\([\\w\\-\\.]+\\))?:?\\s*(.*)",
+      "target": "fix"
+    },
+    {
+      "pattern": "^(\\[[^\\]]+\\]\\s*)?(refactor|style|perf|improved|performace)\\b(\\([\\w\\-\\.]+\\))?:?\\s*(.*)",
+      "target": "refactor"
+    },
+    {
+      "pattern": "^(\\[[^\\]]+\\]\\s*)?(chore|docs|documentation|ci|build|moved)\\b(\\([\\w\\-\\.]+\\))?:?\\s*(.*)",
+      "target": "chore"
+    },
+    {
+      "pattern": "^(\\[[^\\]]+\\]\\s*)?Add\\s+(.*)",
+      "target": "feature"
+    },
+    {
+      "pattern": "^(\\[[^\\]]+\\]\\s*)?Refactor\\s+(.*)",
+      "target": "refactor"
+    }
+  ],
+  "custom_placeholders": [
+    {
+      "name": "CLEAN_TITLE",
+      "source": "TITLE",
+      "transformer": {
+        "pattern": "^(\\[[^\\]]+\\]\\s*)?((feat|feature|fix|fixed|bug|perf|performance|refactor|style|chore|docs|documentation|ci|build|improved)\\b(\\([\\w\\-\\.]+\\))?:?\\s*(and\\s+)?)*(.*)",
+        "target": "$6"
+      }
+    }
+  ],
+  "template": "# 🚀 SuperFlex Update\n\n## 🆕 Change Logs\n\n#{{CHANGELOG}}\n\n---\nBuilt on: #{{DATE}}",
+  "pr_template": "- #{{CLEAN_TITLE}}",
+  "commit_template": "- #{{CLEAN_TITLE}}",
+  "empty_template": "# 🚀 SuperFlex Update\n\n## 🆕 Change Logs\n\n- 📦 General maintenance and performance updates\n\n---\nBuilt on: #{{DATE}}"
 }
