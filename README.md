@@ -183,7 +183,7 @@ docs/
 
 ## Version notes
 
-The current V6 interface consolidates settings into a shared bottom-sheet system, introduces the Octopus AI setup flow, adds campus faculty and attendance-review tools, and replaces the previous fixed credential seed with a user-chosen passphrase vault. Historical implementation notes remain in [Behind the Scenes](docs/articles/bts.md), clearly separated from current behavior.
+The current V7 interface consolidates settings into a shared bottom-sheet system, introduces the Octopus AI setup flow, adds campus faculty and attendance-review tools, and replaces the previous fixed credential seed with a user-chosen passphrase vault. Historical implementation notes remain in [Behind the Scenes](docs/articles/bts.md), clearly separated from current behavior.
 
 ## Contributing
 

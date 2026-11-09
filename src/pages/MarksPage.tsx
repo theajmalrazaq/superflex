@@ -298,7 +298,8 @@ export const AssessmentView = ({
             className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 dark:bg-white/[.08] dark:text-slate-300 sm:py-1.5"
             title="Class average converted to this section's course weight"
           >
-            Avg{" "}
+            <span className="sm:hidden">Avg</span>
+            <span className="hidden sm:inline">Weighted avg</span>{" "}
             <b className="ml-1 text-slate-900 dark:text-white">
               ~{(section.stats?.weightedAvg ?? 0).toFixed(2)}
             </b>

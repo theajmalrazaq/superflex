@@ -501,34 +501,10 @@
         background: rgba(35, 0, 82, 0.08);
       }
 
-      #how-to-use-btn {
+      #download-apk-btn {
         color: #230052;
         background: rgba(255, 255, 255, 0.72);
         border: 1px solid rgba(35, 0, 82, 0.12);
-      }
-
-      #video-modal .relative.w-full {
-        background: #fff;
-        border-color: rgba(16, 16, 39, 0.1);
-        box-shadow: 0 24px 80px rgba(16, 16, 39, 0.2);
-      }
-
-      #video-modal .relative.w-full > div:first-child {
-        background: #fff;
-        border-color: rgba(16, 16, 39, 0.08);
-      }
-
-      #video-modal h3,
-      #video-modal button {
-        color: #101027;
-      }
-
-      #video-modal p {
-        color: #667085;
-      }
-
-      #video-modal .bg-black {
-        background: #101027;
       }
 
       footer {
@@ -690,7 +666,7 @@
         -webkit-text-fill-color: currentColor !important;
         color: inherit;
       }
-      #how-to-use-btn {
+      #download-apk-btn {
         color: #230052;
         background: transparent;
         background-image: none;
@@ -700,12 +676,12 @@
         -webkit-backdrop-filter: none;
         user-select: none;
       }
-      #how-to-use-btn:hover,
-      #how-to-use-btn span {
+      #download-apk-btn:hover,
+      #download-apk-btn span {
         background: transparent !important;
         background-image: none !important;
       }
-      #how-to-use-btn svg {
+      #download-apk-btn svg {
         color: #6551bd;
       }
       #features .text-\[\#a098ff\] {
@@ -1071,11 +1047,11 @@
         background: #fff;
         color: #0a192f;
       }
-      html.dark #how-to-use-btn,
-      html.dark #how-to-use-btn span {
+      html.dark #download-apk-btn,
+      html.dark #download-apk-btn span {
         color: #fff !important;
       }
-      html.dark #how-to-use-btn svg {
+      html.dark #download-apk-btn svg {
         color: #fff !important;
       }
       html.dark #version-text {
@@ -1089,19 +1065,6 @@
       html.dark #version-chip {
         color: #f5f6fb;
         background: #121212 !important;
-      }
-      html.dark #video-modal .relative.w-full,
-      html.dark #video-modal .relative.w-full > div:first-child {
-        color: #f5f6fb;
-        background: #101014;
-        border-color: rgba(255, 255, 255, 0.12);
-      }
-      html.dark #video-modal h3,
-      html.dark #video-modal button {
-        color: #f5f6fb;
-      }
-      html.dark #video-modal p {
-        color: #aeb5c3;
       }
       html.dark #hero-tagline {
         color: #d7d3ff;
@@ -1124,11 +1087,11 @@
       html.dark #add-to-chrome-btn svg {
         color: #0a192f;
       }
-      html.dark #how-to-use-btn,
-      html.dark #how-to-use-btn span {
+      html.dark #download-apk-btn,
+      html.dark #download-apk-btn span {
         color: #fff !important;
       }
-      html.dark #how-to-use-btn:hover {
+      html.dark #download-apk-btn:hover {
         color: #e5e7eb !important;
       }
       html.dark #features .feature-card-header > div:first-child {
@@ -1436,7 +1399,7 @@
                 <circle cx="12" cy="12" r="10" />
                 <path d="m9 12 2 2 4-4" />
               </svg>
-              <span id="version-text">v6.0.0</span>
+              <span id="version-text">v7.0.0</span>
             </span>
             <span id="version-brand" class="text-sm font-semibold text-white">SuperFlex</span>
           </span>
@@ -1535,90 +1498,30 @@
                 <line x1="15" y1="12" x2="3" y2="12" />
               </svg>
             </a>
-            <button
-              id="how-to-use-btn"
+            <a
+              id="download-apk-btn"
+              href="https://github.com/theajmalrazaq/superflex/releases/latest/download/SuperFlex.apk"
               class="group relative bg-transparent px-8 py-3.5 rounded-2xl text-white hover:bg-transparent transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto whitespace-nowrap h-[52px]"
               style="font-family: &quot;Google Sans Flex&quot;, sans-serif"
             >
-              <span class="text-sm font-medium">How to Use</span>
+              <span class="text-sm font-medium">Download APK</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
+                stroke-width="2.5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class="w-5 h-5 text-[#a098ff]"
+                class="w-4.5 h-4.5 text-[#a098ff]"
               >
-                <circle cx="12" cy="12" r="10" />
-                <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" />
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
-            </button>
-          </div>
-        </div>
-
-        <div id="video-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
-          <div class="absolute inset-0 bg-black/60 backdrop-blur-md" id="modal-backdrop"></div>
-          <div
-            class="relative w-full max-w-4xl bg-zinc-900 border border-white/10 rounded-[2rem] overflow-hidden animate-in zoom-in-95 duration-300"
-          >
-            <div
-              class="p-5 border-b border-white/5 flex justify-between items-center bg-zinc-900/50 backdrop-blur-xl"
-            >
-              <h3 class="font-bold text-sm text-white flex items-center gap-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="text-[#a098ff]"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" />
-                </svg>
-                How to Use SuperFlex
-              </h3>
-              <button
-                id="close-modal-btn"
-                class="p-2 rounded-full hover:bg-white/10 transition-all"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
-
-            <div class="p-6">
-              <div class="relative rounded-2xl overflow-hidden bg-black">
-                <video id="tutorial-video" class="w-full h-auto" controls>
-                  <source src="video.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-              <p class="text-zinc-400 text-sm mt-4 text-center font-medium">
-                Watch this quick tutorial to learn how to use SuperFlex and transform your Flex
-                Portal experience.
-              </p>
-            </div>
+            </a>
           </div>
         </div>
 

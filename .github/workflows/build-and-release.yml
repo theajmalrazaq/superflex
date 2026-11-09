@@ -2,17 +2,18 @@ name: Build and Release SuperFlex
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
+    tags: ["v*"]
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version (e.g. 6.0.0)"
-        required: true
-        default: "6.0.0"
+        description: "Release version (e.g. 7.0.0)"
+        required: false
+        default: "7.0.0"
       updates:
-        description: "Release notes / What's changed"
-        required: true
-        default: "SuperFlex Update"
+        description: "Release notes / What's changed (leave empty for auto changelog)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -23,7 +24,18 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -47,37 +59,61 @@ jobs:
       - name: Build documentation
         run: bun run build:docs
 
-      - name: Build
+      - name: Build Web Extension
         run: bun run build
-
-      - name: Debug dist content
-        run: |
-          echo "Listing dist directory:"
-          ls -F dist/
-          echo "Checking manifest.json in dist:"
-          cat dist/manifest.json
 
       - name: Zip extension
         run: |
-          # Zip the contents of the dist directory so manifest.json is at the root
           cd dist && zip -r ../superflex.zip .
+
+      - name: Bundle Web Assets for Android
+        run: |
+          chmod +x scripts/bundle-apk-assets.sh
+          ./scripts/bundle-apk-assets.sh
+
+      - name: Build Optimized Android APK
+        run: |
+          chmod +x android/build.sh
+          ./android/build.sh SuperFlex.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SuperFlex-APK
+          path: SuperFlex.apk
+          if-no-files-found: error
+
+      - name: Upload Web Extension ZIP Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SuperFlex-Extension-ZIP
+          path: superflex.zip
+          if-no-files-found: error
 
       - name: Get current date
         id: date
         run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
+      - name: Generate Changelog
+        id: build_changelog
+        uses: mikepenz/release-changelog-builder-action@v5
         with:
-          tag_name: v${{ github.event.inputs.version }}
-          name: SuperFlex ${{ github.event.inputs.version }}
-          body: |
-            ${{ github.event.inputs.updates }}
+          configuration: ".github/changelog-config.json"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-            ---
-            Built on: ${{ steps.date.outputs.date }}
-          files: superflex.zip
+      - name: Create Release
+        if: github.event.inputs.version != '' || startsWith(github.ref, 'refs/tags/v')
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.version != '' && format('v{0}', github.event.inputs.version) || github.ref_name }}
+          name: SuperFlex ${{ github.event.inputs.version || github.ref_name }}
+          body: |
+            ${{ github.event.inputs.updates != '' && format('{0}\n\n', github.event.inputs.updates) || '' }}${{ steps.build_changelog.outputs.changelog }}
+          files: |
+            superflex.zip
+            SuperFlex.apk
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

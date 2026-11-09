@@ -6,7 +6,7 @@
     "webextensions": true,
     "builtin": true
   },
-  "ignorePatterns": ["dist/**", "dist-docs/**", "docs/scripts/generated/**"],
+  "ignorePatterns": ["dist/**", "dist-docs/**", "docs/scripts/generated/**", "android/assets/web/**"],
   "categories": {
     "correctness": "warn"
   },

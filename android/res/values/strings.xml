@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SuperFlex</string>
+    <string name="offline_title">Cannot reach FLEX</string>
+    <string name="offline_body">Check your network connection and try again.</string>
+    <string name="retry">Retry</string>
+    <string name="saving">Downloading file</string>
+    <string name="blocked">Download blocked</string>
+</resources>

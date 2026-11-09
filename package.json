@@ -1,6 +1,6 @@
 {
   "name": "superflex",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -17,7 +17,9 @@
     "typecheck": "wxt prepare && tsc --noEmit && tsc -p tsconfig.parsers.json",
     "dev:docs": "vite --config vite.docs.config.ts",
     "build:docs": "npm run build:docs:scripts && vite build --config vite.docs.config.ts && cp -R docs/res docs/articles docs/reviews.json dist-docs/ && mkdir -p dist-docs/scripts && cp -R docs/scripts/generated dist-docs/scripts/",
-    "build:docs:scripts": "esbuild docs/scripts/theme.ts docs/scripts/index.ts docs/scripts/docs.ts --bundle --format=iife --platform=browser --target=es2022 --outdir=docs/scripts/generated --minify"
+    "build:docs:scripts": "esbuild docs/scripts/theme.ts docs/scripts/index.ts docs/scripts/docs.ts --bundle --format=iife --platform=browser --target=es2022 --outdir=docs/scripts/generated --minify",
+    "build:apk:assets": "bash scripts/bundle-apk-assets.sh",
+    "build:apk": "bun run build:apk:assets && bash android/build.sh"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.13",

@@ -34,7 +34,7 @@ I realized I needed persistent state management and proper component architectur
 **Phase 4: Version 2 - Architectural Rewrite (Late 2024)**
 Community feedback revealed calculation errors in SGPA logic (#7), incorrect grand totals (#2), and the legacy UI bleeding through my overlay (#6). The root cause was my naive approach to data synchronization. V2 represents a complete architectural rewrite with proper separation of concerns, a data service layer, and optimized rendering pipelines.
 
-**Phase 5: Version 6 - Product System (Current)**
+**Phase 5: Version 7 - Product System (Current)**
 The current release turns the overlay into a coherent academic toolkit. Shared bottom sheets and UI primitives now power settings and setup flows; typed parsers normalize portal HTML; persisted preference stores keep interface choices predictable; Octopus AI streams from Google Gemini with model fallback; campus faculty data powers instructor selection and attendance-review drafts; and optional login Auto-Fill uses a user-chosen passphrase instead of a key embedded in the open-source bundle.
 
 ---

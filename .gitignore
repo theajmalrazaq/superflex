@@ -27,3 +27,5 @@ dist-ssr
 
 .env
 dist-docs/
+android/build/
+*.apk

@@ -130,6 +130,9 @@ export default defineContentScript({
 
     setTimeout(() => {
       document.body.classList.add("!visible");
+      try {
+        (globalThis as any).SFNative?.ready?.();
+      } catch {}
     }, 450);
   },
 });
