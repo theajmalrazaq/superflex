@@ -52,6 +52,7 @@ public class Client extends WebViewClient {
             InputStream stream = assets.open("web/" + sub);
             Map<String, String> headers = new HashMap<>();
             headers.put("Cache-Control", "no-cache");
+            headers.put("Access-Control-Allow-Origin", "*");
             return new WebResourceResponse(mime(sub), "utf-8", 200, "OK", headers, stream);
         } catch (Exception e) {
             return missing();
@@ -85,9 +86,20 @@ public class Client extends WebViewClient {
         Uri uri = Uri.parse(url);
         if (portal(uri)) {
             if (!owner.failed) {
+                view.evaluateJavascript(owner.early, null);
                 view.evaluateJavascript(owner.main, null);
             }
             owner.perform();
+        }
+    }
+
+    @Override
+    public void onReceivedSslError(WebView view, android.webkit.SslErrorHandler handler, android.net.http.SslError error) {
+        String url = error != null ? error.getUrl() : null;
+        if (url != null && (url.contains("nu.edu.pk") || url.contains("challenges.cloudflare.com"))) {
+            handler.proceed();
+        } else {
+            handler.cancel();
         }
     }
 

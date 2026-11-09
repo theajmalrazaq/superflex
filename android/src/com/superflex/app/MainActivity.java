@@ -117,25 +117,32 @@ public class MainActivity extends Activity implements View.OnClickListener {
     void settings(WebView v) {
         WebSettings s = v.getSettings();
         s.setJavaScriptEnabled(true);
+        s.setJavaScriptCanOpenWindowsAutomatically(true);
         s.setDomStorageEnabled(true);
         s.setDatabaseEnabled(true);
         s.setAllowFileAccess(false);
         s.setAllowContentAccess(false);
         s.setAllowFileAccessFromFileURLs(false);
         s.setAllowUniversalAccessFromFileURLs(false);
-        s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        s.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
         s.setSupportMultipleWindows(false);
         s.setGeolocationEnabled(false);
         s.setSaveFormData(false);
         s.setCacheMode(WebSettings.LOAD_DEFAULT);
 
+        // Normalize User-Agent to avoid Cloudflare Turnstile blocking embedded WebViews
+        String ua = s.getUserAgentString();
+        if (ua != null) {
+            ua = ua.replace("; wv", "");
+            ua = ua.replaceAll("Version/\\d+\\.\\d+\\s*", "");
+            s.setUserAgentString(ua);
+        }
+
         CookieManager cm = CookieManager.getInstance();
         cm.setAcceptCookie(true);
         cm.setAcceptThirdPartyCookies(v, true);
 
-        if ((getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
-            WebView.setWebContentsDebuggingEnabled(true);
-        }
+        WebView.setWebContentsDebuggingEnabled(true);
     }
 
     void makesplash() {

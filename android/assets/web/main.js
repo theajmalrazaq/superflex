@@ -1,8 +1,15 @@
 (function () {
-  var tag = null;
   if (window.__sfmain) return;
   window.__sfmain = true;
-  tag = document.createElement("script");
+
+  var root = document.head || document.documentElement || document.body;
+  if (!root) return;
+
+  var b = document.createElement("script");
+  b.src = "/__superflex__/bridge.js";
+  root.appendChild(b);
+
+  var tag = document.createElement("script");
   tag.src = "/__superflex__/superflex.js";
-  (document.head || document.documentElement).appendChild(tag);
+  root.appendChild(tag);
 })();
