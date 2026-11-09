@@ -32,20 +32,30 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
-          java-version: "17"
+          java-version: "21"
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
       - name: Update version
-        if: github.event.inputs.version != ''
+        if: github.event.inputs.version != '' || startsWith(github.ref, 'refs/tags/v')
         run: |
-          bun pm pkg set version="${{ github.event.inputs.version }}"
+          RELEASE_VER="${{ github.event.inputs.version || github.ref_name }}"
+          RELEASE_VER="${RELEASE_VER#v}"
+          bun pm pkg set version="$RELEASE_VER"
 
       - name: Typecheck
         run: bun run typecheck

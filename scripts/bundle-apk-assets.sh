@@ -4,8 +4,12 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-echo "==> Building web extension bundle..."
-bun run build
+if [ ! -d "dist" ] || [ ! -f "dist/content-scripts/content.js" ]; then
+  echo "==> Building web extension bundle..."
+  bun run build
+else
+  echo "==> Using existing dist build..."
+fi
 
 echo "==> Syncing web assets to android/assets/web/..."
 mkdir -p android/assets/web/assets
