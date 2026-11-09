@@ -33,7 +33,8 @@ import java.io.InputStream;
 
 public class MainActivity extends Activity implements View.OnClickListener {
     static final String HOST = "flexstudent.nu.edu.pk";
-    static final String HOME = "https://flexstudent.nu.edu.pk/Login";
+    static final String HOME = "https://flexstudent.nu.edu.pk/__app__/index.html";
+    static final String REFERER = "https://flexstudent.nu.edu.pk/";
     static final int LIGHT = Color.parseColor("#FFFFFF");
     static final int NIGHT = Color.parseColor("#0B0B0F");
     static final int GRANT = 101;
@@ -352,7 +353,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             String cookie = CookieManager.getInstance().getCookie(url);
             if (cookie != null) req.addRequestHeader("Cookie", cookie);
             if (userAgent != null) req.addRequestHeader("User-Agent", userAgent);
-            req.addRequestHeader("Referer", HOME);
+            req.addRequestHeader("Referer", REFERER);
 
             String fileName = URLUtil.guessFileName(url, contentDisposition, mimeType);
             if (mimeType != null && mimeType.length() > 0) req.setMimeType(mimeType);

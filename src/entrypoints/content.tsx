@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { usePreferencesStore } from "../stores/preferencesStore";
 import { defineContentScript } from "wxt/utils/define-content-script";
 import { createRoot } from "react-dom/client";
@@ -7,11 +8,111 @@ import PathRouter from "../components/PathRouter";
 import { getExtensionUrl } from "../utils/extensionApi";
 import { clearActiveStudentId } from "../utils/studentIdentity";
 import { cleanStorageOnce } from "../utils/clean";
+import { initGlobalPjaxLinkInterceptor } from "../utils/pjaxNavigator";
+import {
+  isStandaloneApp,
+  checkPortalSession,
+  loadLoginPortalDom,
+} from "../utils/portalSession";
 import "../styles/tailwind.css";
+
+function AppRoot() {
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+  const [isBootstrapping, setIsBootstrapping] = useState(() => {
+    return isStandaloneApp() && window.location.pathname.startsWith("/__app__");
+  });
+
+  const isLoginPage = ["/login", "/login/index", "/login/logout"].includes(
+    currentPath.replace(/\/$/, "").toLowerCase(),
+  );
+
+  useEffect(() => {
+    if (isLoginPage) {
+      clearActiveStudentId();
+    } else {
+      const savedMode = usePreferencesStore.getState().themeMode;
+      if (savedMode === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+      document.body.style.backgroundColor = "transparent";
+    }
+  }, [isLoginPage]);
+
+  useEffect(() => {
+    // 1. Standalone App Shell Bootstrapping
+    if (isStandaloneApp() && window.location.pathname.startsWith("/__app__")) {
+      async function bootstrap() {
+        try {
+          const res = await checkPortalSession();
+          if (res.authenticated) {
+            window.history.replaceState({ pjax: true, href: "/" }, "", "/");
+            setCurrentPath("/");
+          } else {
+            await loadLoginPortalDom();
+            window.history.replaceState({ pjax: true, href: "/Login" }, "", "/Login");
+            setCurrentPath("/Login");
+          }
+        } catch (err) {
+          console.warn("SuperFlex bootstrap error, defaulting to Login", err);
+          await loadLoginPortalDom();
+          window.history.replaceState({ pjax: true, href: "/Login" }, "", "/Login");
+          setCurrentPath("/Login");
+        } finally {
+          setIsBootstrapping(false);
+          document.body.classList.add("!visible");
+          try {
+            (globalThis as any).SFNative?.ready?.();
+          } catch {}
+        }
+      }
+
+      bootstrap();
+    } else {
+      setIsBootstrapping(false);
+      setTimeout(() => {
+        document.body.classList.add("!visible");
+        try {
+          (globalThis as any).SFNative?.ready?.();
+        } catch {}
+      }, 150);
+    }
+
+    // 2. Global route listeners
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+
+    const handleCustomRoute = (e: any) => {
+      if (e.detail) {
+        setCurrentPath(e.detail);
+      }
+    };
+
+    window.addEventListener("popstate", handleLocationChange);
+    window.addEventListener("superflex-route-change" as any, handleCustomRoute);
+
+    return () => {
+      window.removeEventListener("popstate", handleLocationChange);
+      window.removeEventListener("superflex-route-change" as any, handleCustomRoute);
+    };
+  }, []);
+
+  return (
+    <>
+      <LoadingOverlay show={isBootstrapping} />
+      {isLoginPage ? <LoginPageStyles /> : <PathRouter currentPath={currentPath} />}
+    </>
+  );
+}
 
 export default defineContentScript({
   matches: ["https://flexstudent.nu.edu.pk/*"],
   async main() {
+    if ((globalThis as any).__superflex_loaded) return;
+    (globalThis as any).__superflex_loaded = true;
+
     try {
       if (await cleanStorageOnce()) {
         sessionStorage.clear();
@@ -54,9 +155,12 @@ export default defineContentScript({
       }
     });
 
-    const container = document.createElement("div");
-    container.id = "react-chrome-app";
-    document.body.insertBefore(container, document.body.firstChild);
+    let container = document.getElementById("react-chrome-app");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "react-chrome-app";
+      document.body.insertBefore(container, document.body.firstChild);
+    }
 
     const root = createRoot(container);
 
@@ -68,9 +172,8 @@ export default defineContentScript({
       });
     }
 
-    const loginPaths = new Set(["/login", "/login/index", "/login/logout"]);
-    const isLoginPage = loginPaths.has(window.location.pathname.replace(/\/$/, "").toLowerCase());
-    if (isLoginPage) clearActiveStudentId();
+    // Intercept internal relative links to use PJAX
+    initGlobalPjaxLinkInterceptor();
 
     if (document.getElementById("overlay23")) {
       document.getElementById("overlay23").remove();
@@ -113,28 +216,6 @@ export default defineContentScript({
       button.style.fontFamily = "'Google Sans Flex', sans-serif";
     });
 
-    if (!isLoginPage) {
-      const savedMode = usePreferencesStore.getState().themeMode;
-      if (savedMode === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-      document.body.style.backgroundColor = "transparent";
-    }
-
-    root.render(
-      <>
-        <LoadingOverlay />
-        {isLoginPage ? <LoginPageStyles /> : <PathRouter />}
-      </>,
-    );
-
-    setTimeout(() => {
-      document.body.classList.add("!visible");
-      try {
-        (globalThis as any).SFNative?.ready?.();
-      } catch {}
-    }, 450);
+    root.render(<AppRoot />);
   },
 });

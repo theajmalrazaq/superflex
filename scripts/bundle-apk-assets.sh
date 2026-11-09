@@ -6,7 +6,7 @@ cd "$ROOT_DIR"
 
 if [ ! -d "dist" ] || [ ! -f "dist/content-scripts/content.js" ]; then
   echo "==> Building web extension bundle..."
-  bun run build
+  bunx wxt build
 else
   echo "==> Using existing dist build..."
 fi
@@ -19,6 +19,9 @@ cp dist/content-scripts/content.js android/assets/web/superflex.js
 cp -r dist/assets/* android/assets/web/assets/
 cp dist/reviews.json android/assets/web/reviews.json
 cp dist/bridge.js android/assets/web/bridge.js
+if [ -f "android/templates/index.html" ]; then
+  cp android/templates/index.html android/assets/web/index.html
+fi
 
 echo "==> Web assets successfully bundled into android/assets/web/"
 ls -lh android/assets/web/

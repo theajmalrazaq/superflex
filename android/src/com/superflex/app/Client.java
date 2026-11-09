@@ -59,12 +59,35 @@ public class Client extends WebViewClient {
         }
     }
 
+    boolean isAppRoute(String path) {
+        if (path == null) return false;
+        return path.startsWith("/__app__/") || path.equals("/__app__") || path.equals("/app") || path.equals("/app/");
+    }
+
+    WebResourceResponse serveApp() {
+        try {
+            AssetManager assets = owner.getAssets();
+            InputStream stream = assets.open("web/index.html");
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Cache-Control", "no-cache");
+            headers.put("Access-Control-Allow-Origin", "*");
+            return new WebResourceResponse("text/html", "utf-8", 200, "OK", headers, stream);
+        } catch (Exception e) {
+            return missing();
+        }
+    }
+
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
         if (request != null && request.getUrl() != null) {
             String path = request.getUrl().getPath();
-            if (path != null && path.startsWith(VIRTUAL)) {
-                return serve(path);
+            if (path != null) {
+                if (isAppRoute(path)) {
+                    return serveApp();
+                }
+                if (path.startsWith(VIRTUAL)) {
+                    return serve(path);
+                }
             }
         }
         return super.shouldInterceptRequest(view, request);
@@ -75,8 +98,13 @@ public class Client extends WebViewClient {
         if (url != null) {
             Uri uri = Uri.parse(url);
             String path = uri.getPath();
-            if (path != null && path.startsWith(VIRTUAL)) {
-                return serve(path);
+            if (path != null) {
+                if (isAppRoute(path)) {
+                    return serveApp();
+                }
+                if (path.startsWith(VIRTUAL)) {
+                    return serve(path);
+                }
             }
         }
         return super.shouldInterceptRequest(view, url);
@@ -107,7 +135,8 @@ public class Client extends WebViewClient {
     public void onPageFinished(WebView view, String url) {
         Uri uri = Uri.parse(url);
         if (portal(uri)) {
-            if (!owner.failed) {
+            String path = uri.getPath();
+            if (!owner.failed && !isAppRoute(path)) {
                 inject(view);
             }
         }
