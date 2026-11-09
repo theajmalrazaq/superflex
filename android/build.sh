@@ -2,10 +2,15 @@
 # Ultra-lean build script for SuperFlex Android APK using raw Android SDK command-line tools.
 # Zero Gradle daemon overhead, zero Gradle cache bloat. Builds in under 10 seconds.
 set -euo pipefail
+TARGET_APK="${1:-}"
+if [ -n "$TARGET_APK" ] && [[ "$TARGET_APK" != /* ]]; then
+  TARGET_APK="$PWD/$TARGET_APK"
+fi
+
 cd "$(dirname "$0")"
 
 OUT_DIR="build"
-OUT_APK="${1:-$OUT_DIR/SuperFlex.apk}"
+OUT_APK="${TARGET_APK:-$PWD/$OUT_DIR/SuperFlex.apk}"
 
 # 1. Resolve Android SDK location
 SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Android/Sdk}}"
