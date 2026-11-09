@@ -108,11 +108,14 @@
     observer.observe(document.documentElement, { childList: true, subtree: true });
   }
 
-  // 3. Failsafe visibility: prevent any blank screen state
+  // 3. Failsafe visibility: only trigger as fallback if React mount times out
   setTimeout(function () {
-    if (document.body) {
+    if (document.body && !document.body.classList.contains("!visible")) {
       document.body.classList.add("!visible");
       document.body.style.setProperty("visibility", "visible", "important");
+      try {
+        if (window.SFNative && window.SFNative.ready) window.SFNative.ready();
+      } catch (e) {}
     }
-  }, 1200);
+  }, 3500);
 })();

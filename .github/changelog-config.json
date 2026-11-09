@@ -37,6 +37,11 @@
       "target": "ignore"
     },
     {
+      "pattern": "^(bump|update version).*",
+      "on_property": "title",
+      "target": "ignore"
+    },
+    {
       "pattern": "^Closes #.*",
       "on_property": "title",
       "target": "ignore"

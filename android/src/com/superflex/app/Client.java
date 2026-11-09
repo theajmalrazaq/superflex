@@ -61,14 +61,36 @@ public class Client extends WebViewClient {
 
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-        Uri uri = request.getUrl();
-        if (portal(uri) && "GET".equals(request.getMethod())) {
+        if (request != null && request.getUrl() != null) {
+            String path = request.getUrl().getPath();
+            if (path != null && path.startsWith(VIRTUAL)) {
+                return serve(path);
+            }
+        }
+        return super.shouldInterceptRequest(view, request);
+    }
+
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+        if (url != null) {
+            Uri uri = Uri.parse(url);
             String path = uri.getPath();
             if (path != null && path.startsWith(VIRTUAL)) {
                 return serve(path);
             }
         }
-        return null;
+        return super.shouldInterceptRequest(view, url);
+    }
+
+    void inject(WebView view) {
+        if (owner.failed) return;
+        view.evaluateJavascript(owner.early, null);
+        if (owner.bridgeScript != null && !owner.bridgeScript.isEmpty()) {
+            view.evaluateJavascript(owner.bridgeScript, null);
+        }
+        if (owner.bundle != null && !owner.bundle.isEmpty()) {
+            view.evaluateJavascript(owner.bundle, null);
+        }
     }
 
     @Override
@@ -86,10 +108,8 @@ public class Client extends WebViewClient {
         Uri uri = Uri.parse(url);
         if (portal(uri)) {
             if (!owner.failed) {
-                view.evaluateJavascript(owner.early, null);
-                view.evaluateJavascript(owner.main, null);
+                inject(view);
             }
-            owner.perform();
         }
     }
 

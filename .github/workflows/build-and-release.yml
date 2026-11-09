@@ -113,27 +113,55 @@ jobs:
           AUTO_CHANGELOG: ${{ steps.build_changelog.outputs.changelog }}
         run: |
           DATE=$(date +'%Y-%m-%d')
+          bun -e '
+            const fs = require("fs");
+            const input = (process.env.INPUT_UPDATES || "").trim();
+            const auto = process.env.AUTO_CHANGELOG || "";
+            const date = process.env.DATE || new Date().toISOString().slice(0, 10);
 
-          if [ -n "$INPUT_UPDATES" ]; then
-            if [[ "$INPUT_UPDATES" == *"# 🚀 SuperFlex Update"* ]]; then
-              BODY="$INPUT_UPDATES"
-            else
-              BODY=$(printf "# 🚀 SuperFlex Update\n\n## 🆕 Change Logs\n\n%s\n\n---\nBuilt on: %s" "$INPUT_UPDATES" "$DATE")
-            fi
-          else
-            BODY="$AUTO_CHANGELOG"
-          fi
+            let body = "";
+            if (input) {
+              if (input.includes("# 🚀 SuperFlex Update")) {
+                body = input;
+              } else {
+                body = `# 🚀 SuperFlex Update\n\n## 🆕 Change Logs\n\n${input}\n\n---\nBuilt on: ${date}`;
+              }
+            } else {
+              body = auto;
+            }
 
-          # Substitute unresolved date placeholder with ISO release date
-          BODY="${BODY//#\{\{DATE\}\}/$DATE}"
+            let lines = body.split("\n");
+            // Strip empty bullet points (- , * , • )
+            lines = lines.filter((l) => !/^\s*[-*•]\s*$/.test(l));
 
-          # Strip empty bullet points (- \n or - $) and empty category sections
-          BODY=$(printf "%s\n" "$BODY" | sed -E '/^[[:space:]]*-[[:space:]]*$/d')
+            // Remove empty category sections
+            const cleaned = [];
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i];
+              if (/^###\s+/.test(line)) {
+                let hasItem = false;
+                for (let j = i + 1; j < lines.length; j++) {
+                  if (/^\s*[-*•]\s+\S+/.test(lines[j])) {
+                    hasItem = true;
+                    break;
+                  }
+                  if (/^###\s+/.test(lines[j]) || /^---\s*$/.test(lines[j])) {
+                    break;
+                  }
+                }
+                if (!hasItem) continue;
+              }
+              cleaned.push(line);
+            }
 
-          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
-          echo "body<<$EOF" >> $GITHUB_OUTPUT
-          echo "$BODY" >> $GITHUB_OUTPUT
-          echo "$EOF" >> $GITHUB_OUTPUT
+            let result = cleaned.join("\n");
+            result = result.replaceAll("#{{DATE}}", date);
+            result = result.replace(/\n{3,}/g, "\n\n").trim();
+
+            const eof = "EOF_" + Math.random().toString(36).substring(2);
+            const output = `body<<${eof}\n${result}\n${eof}\n`;
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, output);
+          '
 
       - name: Create Release
         if: github.event.inputs.version != '' || startsWith(github.ref, 'refs/tags/v')

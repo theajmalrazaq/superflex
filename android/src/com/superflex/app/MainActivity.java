@@ -48,7 +48,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     Bridge bridge;
     ValueCallback<Uri[]> chooser;
     String early = "";
-    String main = "";
+    String bridgeScript = "";
+    String bundle = "";
     boolean failed = false;
     boolean shown = false;
     boolean dark = false;
@@ -56,8 +57,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        dark = systemdark();
         early = readasset("web/early.js");
-        main = readasset("web/main.js");
+        bridgeScript = readasset("web/bridge.js");
+        bundle = readasset("web/superflex.js");
 
         root = new FrameLayout(this);
         root.setFitsSystemWindows(true);
@@ -79,7 +82,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         root.addView(splash, new FrameLayout.LayoutParams(-1, -1));
         setContentView(root);
 
-        dark = systemdark();
         style(dark);
         askstorage();
 
@@ -89,13 +91,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
             webview.loadUrl(HOME);
         }
 
-        // Safety fallback: dismiss splash after 3s max if network lags
+        // Safety fallback: dismiss splash after 4s max if network lags or offline
         root.postDelayed(new Runnable() {
             @Override
             public void run() {
                 perform();
             }
-        }, 3000);
+        }, 4000);
     }
 
     String readasset(String path) {
@@ -147,7 +149,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     void makesplash() {
         splash = new FrameLayout(this);
-        splash.setBackgroundResource(R.drawable.splash);
+        int bg = dark ? NIGHT : LIGHT;
+        splash.setBackgroundColor(bg);
         ImageView img = new ImageView(this);
         img.setImageResource(R.drawable.logo);
         int sz = px(120);
@@ -222,6 +225,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         decor.setSystemUiVisibility(flags);
         root.setBackgroundColor(bg);
         webview.setBackgroundColor(bg);
+        if (splash != null && !shown) {
+            splash.setBackgroundColor(bg);
+        }
     }
 
     public void perform() {
