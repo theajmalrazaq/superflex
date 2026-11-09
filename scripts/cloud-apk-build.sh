@@ -32,7 +32,8 @@ echo "==> Monitoring cloud build #$RUN_ID..."
 gh run watch "$RUN_ID"
 
 echo "==> Downloading SuperFlex.apk artifact directly to workspace..."
-gh run download "$RUN_ID" -n SuperFlex-APK -D . --clobber
+rm -f SuperFlex.apk
+gh run download "$RUN_ID" -n SuperFlex-APK -D .
 
 if [ -f "SuperFlex.apk" ]; then
   echo "✅ SuperFlex.apk downloaded successfully: $(ls -lh SuperFlex.apk | awk '{print $5, $9}')"
