@@ -20,15 +20,9 @@ import SuperFlexAI from "./SuperFlexAI";
 import TeacherSettingsController from "./TeacherSettingsController";
 import { restoreCachedPage } from "../utils/pjaxNavigator";
 
-function PathRouter({ currentPath: propPath }: { currentPath?: string } = {}) {
-  const [currentPath, setCurrentPath] = useState(propPath || window.location.pathname);
+function PathRouter() {
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
   const [isSessionExpired, setIsSessionExpired] = useState(false);
-
-  useEffect(() => {
-    if (propPath) {
-      setCurrentPath(propPath);
-    }
-  }, [propPath]);
 
   useEffect(() => {
     const handleLocationChange = () => {
@@ -85,13 +79,7 @@ function PathRouter({ currentPath: propPath }: { currentPath?: string } = {}) {
       return <SessionExpirePage />;
     }
 
-    if (
-      currentPath === "/" ||
-      currentPath.startsWith("/?dump=") ||
-      currentPath.startsWith("/__app__") ||
-      currentPath === "/app" ||
-      currentPath === "/app/"
-    ) {
+    if (currentPath === "/" || currentPath.startsWith("/?dump=")) {
       return <HomePage />;
     }
 

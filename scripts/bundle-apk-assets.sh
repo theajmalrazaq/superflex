@@ -6,21 +6,20 @@ cd "$ROOT_DIR"
 
 if [ ! -d "dist" ] || [ ! -f "dist/content-scripts/content.js" ]; then
   echo "==> Building web extension bundle..."
-  bunx wxt build
+  if command -v bun >/dev/null 2>&1; then
+    bunx wxt build
+  else
+    npx wxt build
+  fi
 else
   echo "==> Using existing dist build..."
 fi
 
-echo "==> Syncing web assets to android/assets/web/..."
-mkdir -p android/assets/web/assets
-
-cp dist/content-scripts/content.css android/assets/web/content.css
-cp dist/content-scripts/content.js android/assets/web/superflex.js
-cp -r dist/assets/* android/assets/web/assets/
-cp dist/reviews.json android/assets/web/reviews.json
-cp dist/bridge.js android/assets/web/bridge.js
-if [ -f "android/templates/index.html" ]; then
-  cp android/templates/index.html android/assets/web/index.html
+echo "==> Assembling Android web bundle with shim..."
+if command -v bun >/dev/null 2>&1; then
+  bun scripts/android-bundle.mjs
+else
+  node scripts/android-bundle.mjs
 fi
 
 echo "==> Web assets successfully bundled into android/assets/web/"

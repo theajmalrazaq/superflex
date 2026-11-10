@@ -4,11 +4,9 @@
  * eliminating the white screen / loading flash on Android WebView and desktop.
  */
 
-import { clearActiveStudentId } from "./studentIdentity";
-
 let isNavigating = false;
 let navigationAbortController: AbortController | null = null;
-export const pageCache = new Map<string, string>();
+const pageCache = new Map<string, string>();
 
 export function getIsNavigating(): boolean {
   return isNavigating;
@@ -55,43 +53,9 @@ export async function pjaxNavigate(href: string): Promise<boolean> {
     return true;
   }
 
-  // Auth / Login / Logout handling
+  // Auth / Login / Logout: perform full reload to clear credentials cleanly
   const authPaths = ["/login", "/login/index", "/login/logout"];
   if (authPaths.includes(targetPath.toLowerCase())) {
-    if (targetPath.toLowerCase().includes("logout")) {
-      try {
-        await fetch(href, { credentials: "include" });
-      } catch {}
-      clearActiveStudentId();
-    }
-
-    if (
-      document.body?.classList.contains("superflex-standalone") ||
-      (window as any).SFNative
-    ) {
-      try {
-        const res = await fetch("/Login", { credentials: "include" });
-        const html = await res.text();
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        const loginPortal =
-          doc.querySelector<HTMLElement>(".m-grid.m-grid--hor.m-grid--root.m-page") ||
-          doc.querySelector<HTMLElement>(".m-login");
-        let target = document.getElementById("superflex-login-container");
-        if (!target) {
-          target = document.createElement("div");
-          target.id = "superflex-login-container";
-          document.body.appendChild(target);
-        }
-        if (loginPortal) {
-          target.innerHTML = loginPortal.outerHTML;
-        }
-      } catch {}
-      window.history.pushState({ pjax: true, href: "/Login" }, "", "/Login");
-      window.dispatchEvent(new CustomEvent("superflex-route-change", { detail: "/Login" }));
-      window.dispatchEvent(new PopStateEvent("popstate"));
-      return true;
-    }
-
     window.location.href = href;
     return false;
   }
@@ -132,27 +96,6 @@ export async function pjaxNavigate(href: string): Promise<boolean> {
       nextDoc.querySelector(".m-login") !== null;
 
     if (isLoginRedirect) {
-      if (
-        document.body?.classList.contains("superflex-standalone") ||
-        (window as any).SFNative
-      ) {
-        let target = document.getElementById("superflex-login-container");
-        if (!target) {
-          target = document.createElement("div");
-          target.id = "superflex-login-container";
-          document.body.appendChild(target);
-        }
-        const loginPortal =
-          nextDoc.querySelector<HTMLElement>(".m-grid.m-grid--hor.m-grid--root.m-page") ||
-          nextDoc.querySelector<HTMLElement>(".m-login");
-        if (loginPortal) {
-          target.innerHTML = loginPortal.outerHTML;
-        }
-        window.history.pushState({ pjax: true, href: "/Login" }, "", "/Login");
-        window.dispatchEvent(new CustomEvent("superflex-route-change", { detail: "/Login" }));
-        window.dispatchEvent(new PopStateEvent("popstate"));
-        return false;
-      }
       window.location.href = "/Login";
       return false;
     }
@@ -246,32 +189,4 @@ export function restoreCachedPage(path: string): boolean {
     return true;
   }
   return false;
-}
-
-/**
- * Global link interceptor to prevent accidental hard browser reloads
- */
-export function initGlobalPjaxLinkInterceptor(): () => void {
-  if (typeof document === "undefined") return () => {};
-
-  const handleClick = (e: MouseEvent) => {
-    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
-      return;
-    }
-    const anchor = (e.target as HTMLElement)?.closest?.("a");
-    if (!anchor || !anchor.href) return;
-    if (anchor.target && anchor.target !== "_self") return;
-    if (anchor.hasAttribute("download")) return;
-
-    try {
-      const url = new URL(anchor.href, window.location.origin);
-      if (url.origin === window.location.origin) {
-        e.preventDefault();
-        pjaxNavigate(url.pathname + url.search + url.hash);
-      }
-    } catch {}
-  };
-
-  document.addEventListener("click", handleClick, { capture: true });
-  return () => document.removeEventListener("click", handleClick, { capture: true });
 }

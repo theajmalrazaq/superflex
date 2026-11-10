@@ -15,10 +15,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.CookieManager;
 import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
 import android.webkit.WebChromeClient.FileChooserParams;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -26,6 +28,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
@@ -33,7 +36,7 @@ import java.io.InputStream;
 
 public class MainActivity extends Activity implements View.OnClickListener {
     static final String HOST = "flexstudent.nu.edu.pk";
-    static final String HOME = "https://flexstudent.nu.edu.pk/__app__/index.html";
+    static final String HOME = "https://flexstudent.nu.edu.pk/Login";
     static final String REFERER = "https://flexstudent.nu.edu.pk/";
     static final int LIGHT = Color.parseColor("#FFFFFF");
     static final int NIGHT = Color.parseColor("#0B0B0F");
@@ -49,56 +52,55 @@ public class MainActivity extends Activity implements View.OnClickListener {
     Bridge bridge;
     ValueCallback<Uri[]> chooser;
     String early = "";
-    String bridgeScript = "";
-    String bundle = "";
+    String main = "";
+    volatile boolean dark = false;
     boolean failed = false;
-    boolean shown = false;
-    boolean dark = false;
+    boolean shown = true;
+    int crashes = 0;
+    Task limitTask = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dark = systemdark();
         early = readasset("web/early.js");
-        bridgeScript = readasset("web/bridge.js");
-        bundle = readasset("web/superflex.js");
+        main = readasset("web/main.js");
 
         root = new FrameLayout(this);
         root.setFitsSystemWindows(true);
 
+        bridge = new Bridge(this);
+
         webview = new WebView(this);
         settings(webview);
-
-        bridge = new Bridge(this);
         webview.addJavascriptInterface(bridge, "SFNative");
         webview.setWebViewClient(new Client(this));
         webview.setWebChromeClient(new Chrome(this));
         webview.setDownloadListener(new Loader(this));
 
-        makesplash();
-        makeproblem();
+        splash = makesplash();
+        problem = makeproblem();
 
-        root.addView(webview, new FrameLayout.LayoutParams(-1, -1));
-        root.addView(problem, new FrameLayout.LayoutParams(-1, -1));
-        root.addView(splash, new FrameLayout.LayoutParams(-1, -1));
+        ViewGroup.LayoutParams fill = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        root.addView(webview, fill);
+        root.addView(problem, fill);
+        root.addView(splash, fill);
         setContentView(root);
 
         style(dark);
         askstorage();
 
+        boolean restored = false;
         if (savedInstanceState != null) {
-            webview.restoreState(savedInstanceState);
-        } else {
+            restored = webview.restoreState(savedInstanceState) != null;
+        }
+        if (!restored) {
             webview.loadUrl(HOME);
         }
 
-        // Safety fallback: dismiss splash after 4s max if network lags or offline
-        root.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                perform();
-            }
-        }, 4000);
+        // Safety fallback: dismiss splash after 8s max if network lags or offline
+        limitTask = new Task(this, 1);
+        splash.postDelayed(limitTask, 8000);
     }
 
     String readasset(String path) {
@@ -145,35 +147,45 @@ public class MainActivity extends Activity implements View.OnClickListener {
         cm.setAcceptCookie(true);
         cm.setAcceptThirdPartyCookies(v, true);
 
-        WebView.setWebContentsDebuggingEnabled(true);
+        if ((getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
     }
 
-    void makesplash() {
-        splash = new FrameLayout(this);
+    FrameLayout makesplash() {
+        FrameLayout layer = new FrameLayout(this);
         int bg = dark ? NIGHT : LIGHT;
-        splash.setBackgroundColor(bg);
+        layer.setBackgroundColor(bg);
+
         ImageView img = new ImageView(this);
         img.setImageResource(R.drawable.logo);
-        int sz = px(120);
+        int sz = px(112);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(sz, sz, Gravity.CENTER);
-        splash.addView(img, lp);
-        splash.setClickable(true);
+        layer.addView(img, lp);
+
+        ProgressBar spin = new ProgressBar(this);
+        FrameLayout.LayoutParams spinbox = new FrameLayout.LayoutParams(px(32), px(32), Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
+        spinbox.bottomMargin = px(96);
+        layer.addView(spin, spinbox);
+
+        layer.setClickable(true);
+        return layer;
     }
 
-    void makeproblem() {
-        problem = new LinearLayout(this);
-        problem.setOrientation(LinearLayout.VERTICAL);
-        problem.setGravity(Gravity.CENTER);
-        int p = px(24);
-        problem.setPadding(p, p, p, p);
-        problem.setBackgroundColor(NIGHT);
+    LinearLayout makeproblem() {
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setGravity(Gravity.CENTER);
+        int p = px(32);
+        box.setPadding(p, p, p, p);
+        box.setBackgroundColor(NIGHT);
 
         TextView title = new TextView(this);
         title.setText(R.string.offline_title);
         title.setTextSize(20);
         title.setTextColor(Color.WHITE);
         title.setGravity(Gravity.CENTER);
-        problem.addView(title);
+        box.addView(title);
 
         TextView body = new TextView(this);
         body.setText(R.string.offline_body);
@@ -181,15 +193,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
         body.setTextColor(Color.GRAY);
         body.setGravity(Gravity.CENTER);
         body.setPadding(0, px(8), 0, px(24));
-        problem.addView(body);
+        box.addView(body);
 
         retry = new Button(this);
         retry.setText(R.string.retry);
         retry.setOnClickListener(this);
-        problem.addView(retry);
+        box.addView(retry);
 
-        problem.setVisibility(View.GONE);
-        problem.setClickable(true);
+        box.setVisibility(View.GONE);
+        box.setClickable(true);
+        return box;
     }
 
     int px(float dp) {
@@ -226,28 +239,71 @@ public class MainActivity extends Activity implements View.OnClickListener {
         decor.setSystemUiVisibility(flags);
         root.setBackgroundColor(bg);
         webview.setBackgroundColor(bg);
-        if (splash != null && !shown) {
+        if (splash != null && shown) {
             splash.setBackgroundColor(bg);
         }
     }
 
+    public void cover() {
+        if (splash != null) {
+            int bg = dark ? NIGHT : LIGHT;
+            splash.setBackgroundColor(bg);
+            splash.setVisibility(View.VISIBLE);
+            splash.setAlpha(1.0f);
+            if (limitTask != null) {
+                splash.removeCallbacks(limitTask);
+            }
+            limitTask = new Task(this, 1);
+            splash.postDelayed(limitTask, 8000);
+        }
+    }
+
+    public void perform(int kind) {
+        if (kind == 1) perform();
+        if (kind == 2) style(dark);
+    }
+
     public void perform() {
-        if (!shown) {
-            shown = true;
+        if (failed) return;
+        if (splash != null && splash.getVisibility() == View.VISIBLE) {
             splash.animate().alpha(0f).setDuration(250).withEndAction(new Runnable() {
                 @Override
                 public void run() {
                     splash.setVisibility(View.GONE);
+                    splash.setAlpha(1.0f);
                 }
             }).start();
         }
+        shown = false;
+    }
+
+    public void revive() {
+        crashes++;
+        if (crashes > 3) {
+            offline();
+            return;
+        }
+        try {
+            root.removeView(webview);
+            webview.removeJavascriptInterface("SFNative");
+            webview.destroy();
+        } catch (Exception ignored) {}
+        webview = new WebView(this);
+        settings(webview);
+        webview.addJavascriptInterface(bridge, "SFNative");
+        webview.setWebViewClient(new Client(this));
+        webview.setWebChromeClient(new Chrome(this));
+        webview.setDownloadListener(new Loader(this));
+        root.addView(webview, 0, new FrameLayout.LayoutParams(-1, -1));
+        cover();
+        webview.loadUrl(HOME);
     }
 
     public void offline() {
         failed = true;
         webview.stopLoading();
+        if (splash != null) splash.setVisibility(View.GONE);
         problem.setVisibility(View.VISIBLE);
-        perform();
     }
 
     @Override
@@ -255,6 +311,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if (v == retry) {
             problem.setVisibility(View.GONE);
             failed = false;
+            cover();
             String url = webview.getUrl();
             if (url == null || url.startsWith("data:") || !url.contains(HOST)) {
                 webview.loadUrl(HOME);
@@ -295,6 +352,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if (chooser != null) {
             chooser.onReceiveValue(null);
             chooser = null;
+        }
+        if (limitTask != null && splash != null) {
+            splash.removeCallbacks(limitTask);
+            limitTask = null;
         }
         root.removeView(webview);
         webview.removeJavascriptInterface("SFNative");
@@ -344,7 +405,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     void save(String url, String userAgent, String contentDisposition, String mimeType, long contentLength) {
         try {
             Uri uri = Uri.parse(url);
-            if (!"https".equals(uri.getScheme()) || !HOST.equals(uri.getHost())) {
+            if (!Client.portal(uri)) {
                 Toast.makeText(this, R.string.blocked, Toast.LENGTH_SHORT).show();
                 return;
             }

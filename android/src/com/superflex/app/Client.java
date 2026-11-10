@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.webkit.RenderProcessGoneDetail;
+import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -22,57 +24,36 @@ public class Client extends WebViewClient {
         this.owner = owner;
     }
 
-    private static String mime(String path) {
-        if (path.endsWith(".js")) return "text/javascript";
-        if (path.endsWith(".css")) return "text/css";
-        if (path.endsWith(".json")) return "application/json";
-        if (path.endsWith(".png")) return "image/png";
-        if (path.endsWith(".svg")) return "image/svg+xml";
-        if (path.endsWith(".webp")) return "image/webp";
+    static boolean portal(Uri uri) {
+        return uri != null && "https".equals(uri.getScheme()) && MainActivity.HOST.equals(uri.getHost());
+    }
+
+    static String mime(String name) {
+        if (name.endsWith(".js")) return "text/javascript";
+        if (name.endsWith(".css")) return "text/css";
+        if (name.endsWith(".json")) return "application/json";
+        if (name.endsWith(".png")) return "image/png";
+        if (name.endsWith(".svg")) return "image/svg+xml";
+        if (name.endsWith(".webp")) return "image/webp";
         return "application/octet-stream";
     }
 
-    private static boolean portal(Uri uri) {
-        if (uri == null) return false;
-        return "https".equals(uri.getScheme()) && "flexstudent.nu.edu.pk".equals(uri.getHost());
-    }
-
     WebResourceResponse missing() {
-        Map<String, String> headers = new HashMap<>();
-        return new WebResourceResponse("text/plain", "utf-8", 404, "Not Found", headers, new ByteArrayInputStream(new byte[0]));
+        Map<String, String> heads = new HashMap<>();
+        return new WebResourceResponse("text/plain", "utf-8", 404, "Not Found", heads, new ByteArrayInputStream(new byte[0]));
     }
 
     WebResourceResponse serve(String path) {
-        String sub = path.substring(VIRTUAL.length());
-        if (sub.length() == 0 || sub.contains("..") || sub.contains("\\")) {
-            return missing();
-        }
+        String name = path.substring(VIRTUAL.length());
+        if (name.length() == 0 || name.contains("..") || name.contains("\\")) return missing();
         try {
             AssetManager assets = owner.getAssets();
-            InputStream stream = assets.open("web/" + sub);
-            Map<String, String> headers = new HashMap<>();
-            headers.put("Cache-Control", "no-cache");
-            headers.put("Access-Control-Allow-Origin", "*");
-            return new WebResourceResponse(mime(sub), "utf-8", 200, "OK", headers, stream);
-        } catch (Exception e) {
-            return missing();
-        }
-    }
-
-    boolean isAppRoute(String path) {
-        if (path == null) return false;
-        return path.startsWith("/__app__/") || path.equals("/__app__") || path.equals("/app") || path.equals("/app/");
-    }
-
-    WebResourceResponse serveApp() {
-        try {
-            AssetManager assets = owner.getAssets();
-            InputStream stream = assets.open("web/index.html");
-            Map<String, String> headers = new HashMap<>();
-            headers.put("Cache-Control", "no-cache");
-            headers.put("Access-Control-Allow-Origin", "*");
-            return new WebResourceResponse("text/html", "utf-8", 200, "OK", headers, stream);
-        } catch (Exception e) {
+            InputStream stream = assets.open("web/" + name);
+            Map<String, String> heads = new HashMap<>();
+            heads.put("Cache-Control", "no-cache");
+            heads.put("Access-Control-Allow-Origin", "*");
+            return new WebResourceResponse(mime(name), "utf-8", 200, "OK", heads, stream);
+        } catch (Exception error) {
             return missing();
         }
     }
@@ -80,12 +61,10 @@ public class Client extends WebViewClient {
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
         if (request != null && request.getUrl() != null) {
-            String path = request.getUrl().getPath();
-            if (path != null) {
-                if (isAppRoute(path)) {
-                    return serveApp();
-                }
-                if (path.startsWith(VIRTUAL)) {
+            Uri uri = request.getUrl();
+            if (portal(uri) && "GET".equals(request.getMethod())) {
+                String path = uri.getPath();
+                if (path != null && path.startsWith(VIRTUAL)) {
                     return serve(path);
                 }
             }
@@ -94,56 +73,56 @@ public class Client extends WebViewClient {
     }
 
     @Override
-    public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-        if (url != null) {
-            Uri uri = Uri.parse(url);
-            String path = uri.getPath();
-            if (path != null) {
-                if (isAppRoute(path)) {
-                    return serveApp();
-                }
-                if (path.startsWith(VIRTUAL)) {
-                    return serve(path);
-                }
-            }
-        }
-        return super.shouldInterceptRequest(view, url);
-    }
-
-    void inject(WebView view) {
-        if (owner.failed) return;
-        view.evaluateJavascript(owner.early, null);
-        if (owner.bridgeScript != null && !owner.bridgeScript.isEmpty()) {
-            view.evaluateJavascript(owner.bridgeScript, null);
-        }
-        if (owner.bundle != null && !owner.bundle.isEmpty()) {
-            view.evaluateJavascript(owner.bundle, null);
+    public void onPageCommitVisible(WebView view, String url) {
+        if (portal(Uri.parse(url))) {
+            view.evaluateJavascript(owner.early, null);
         }
     }
 
     @Override
-    public void onPageStarted(WebView view, String url, Bitmap favicon) {
-        Uri uri = Uri.parse(url);
-        if (portal(uri)) {
-            owner.bridge.trusted = true;
-            owner.failed = false;
+    public void onPageStarted(WebView view, String url, Bitmap icon) {
+        boolean trusted = portal(Uri.parse(url));
+        owner.bridge.trusted = trusted;
+        owner.failed = false;
+        owner.cover();
+        if (trusted) {
             view.evaluateJavascript(owner.early, null);
         }
     }
 
     @Override
     public void onPageFinished(WebView view, String url) {
-        Uri uri = Uri.parse(url);
-        if (portal(uri)) {
-            String path = uri.getPath();
-            if (!owner.failed && !isAppRoute(path)) {
-                inject(view);
-            }
+        boolean trusted = portal(Uri.parse(url));
+        if (owner.failed) return;
+        owner.crashes = 0;
+        if (trusted) {
+            view.evaluateJavascript(owner.main, null);
+        } else {
+            owner.perform();
         }
     }
 
     @Override
-    public void onReceivedSslError(WebView view, android.webkit.SslErrorHandler handler, android.net.http.SslError error) {
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        Uri uri = Uri.parse(url);
+        if (portal(uri)) return false;
+        if ("http".equals(uri.getScheme()) && MainActivity.HOST.equals(uri.getHost())) {
+            view.loadUrl(uri.buildUpon().scheme("https").build().toString());
+            return true;
+        }
+        String scheme = uri.getScheme();
+        boolean allowed = "https".equals(scheme) || "http".equals(scheme) || "mailto".equals(scheme) || "tel".equals(scheme);
+        if (!allowed) return true;
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            intent.addCategory(Intent.CATEGORY_BROWSABLE);
+            owner.startActivity(intent);
+        } catch (Exception ignored) {}
+        return true;
+    }
+
+    @Override
+    public void onReceivedSslError(WebView view, SslErrorHandler handler, android.net.http.SslError error) {
         String url = error != null ? error.getUrl() : null;
         if (url != null && (url.contains("nu.edu.pk") || url.contains("challenges.cloudflare.com"))) {
             handler.proceed();
@@ -153,25 +132,15 @@ public class Client extends WebViewClient {
     }
 
     @Override
-    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-        if (request.isForMainFrame()) {
-            owner.offline();
-        }
+    public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
+        owner.revive();
+        return true;
     }
 
     @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        Uri uri = Uri.parse(url);
-        if (portal(uri)) return false;
-        if ("http".equals(uri.getScheme()) && "flexstudent.nu.edu.pk".equals(uri.getHost())) {
-            view.loadUrl(uri.buildUpon().scheme("https").build().toString());
-            return true;
+    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+        if (request != null && request.isForMainFrame()) {
+            owner.offline();
         }
-        try {
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            intent.addCategory(Intent.CATEGORY_BROWSABLE);
-            owner.startActivity(intent);
-        } catch (Exception ignored) {}
-        return true;
     }
 }

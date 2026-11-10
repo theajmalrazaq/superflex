@@ -10,7 +10,6 @@ import {
   clearPendingLogin,
   getCredentialMetadata,
 } from "../utils/credentialStorage";
-import { isStandaloneApp, performStandaloneLogin } from "../utils/portalSession";
 
 function LoginPageStyles() {
   const [ready, setReady] = useState(false);
@@ -425,38 +424,6 @@ function LoginPageStyles() {
             clearSavedCredentials();
             clearPendingLogin();
             hasSavedVault = false;
-          }
-
-          if (isStandaloneApp() && loginForm) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            isSubmitting = true;
-            loadingStartedAt = performance.now();
-            button.innerHTML = `
-              <div class="flex items-center justify-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
-                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-                </svg>
-                <span>Logging in...</span>
-              </div>
-            `;
-            button.classList.add("superflex-login-submitting");
-
-            performStandaloneLogin(loginForm).then((res) => {
-              if (!res.success) {
-                resetLoginButton();
-                let alertEl = document.getElementById("superflex-login-alert");
-                if (!alertEl) {
-                  alertEl = document.createElement("div");
-                  alertEl.id = "superflex-login-alert";
-                  alertEl.className =
-                    "w-full rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs font-semibold px-4 py-3 mb-4 text-center animate-in fade-in";
-                  loginForm.insertBefore(alertEl, loginForm.firstChild);
-                }
-                alertEl.textContent = res.error || "Invalid Roll Number or Password";
-              }
-            });
-            return;
           }
 
           isSubmitting = true;
