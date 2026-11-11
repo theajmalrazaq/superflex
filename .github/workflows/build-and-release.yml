@@ -9,10 +9,6 @@ on:
         description: "Release version (e.g. 6.0.0)"
         required: true
         default: "6.0.0"
-      updates:
-        description: "Release notes / What's changed"
-        required: true
-        default: "SuperFlex Update"
 
 permissions:
   contents: write
@@ -62,22 +58,37 @@ jobs:
           # Zip the contents of the dist directory so manifest.json is at the root
           cd dist && zip -r ../superflex.zip .
 
-      - name: Get current date
-        id: date
-        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+      - name: Resolve release metadata
+        id: meta
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if [ -z "$VERSION" ]; then
+            VERSION="$(node -p "require('./package.json').version")"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "date=$(date +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"
 
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ github.event.inputs.version }}
-          name: SuperFlex ${{ github.event.inputs.version }}
+          tag_name: v${{ steps.meta.outputs.version }}
+          name: SuperFlex ${{ steps.meta.outputs.version }}
           body: |
-            ${{ github.event.inputs.updates }}
+            ## What's Changed
+
+            ### Added
+            -
+
+            ### Fixed
+            -
+
+            ### Improved
+            -
 
             ---
-            Built on: ${{ steps.date.outputs.date }}
+            Built on: ${{ steps.meta.outputs.date }}
           files: superflex.zip
-          draft: false
+          draft: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
