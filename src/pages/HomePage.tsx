@@ -647,66 +647,56 @@ function HomePage() {
       fullWidth={true}
     >
       <div className="relative">
-        <div className="relative z-10 mx-auto w-full max-w-[1680px] space-y-4 px-4 pb-6 pt-3.5 sm:space-y-7 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+        <div className="relative z-10 mx-auto w-full max-w-[1680px] space-y-5 px-4 pb-6 pt-4 sm:space-y-7 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
           {/* Mobile App Hero Header (Overview vs Profile) */}
           {activeMainTab === "stats" ? (
-            <header className="space-y-3 pb-2 pt-1 sm:hidden">
-              <div className="flex items-center justify-end gap-2 pb-1">
-                <button
-                  type="button"
-                  onClick={toggleTheme}
-                  aria-label={`Switch to ${themeMode === "dark" ? "light" : "dark"} mode`}
-                  title={`Switch to ${themeMode === "dark" ? "light" : "dark"} mode`}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/25 text-white backdrop-blur-md transition-transform active:scale-95"
-                >
-                  {themeMode === "dark" ? (
-                    <Sun size={18} strokeWidth={2.2} />
-                  ) : (
-                    <Moon size={18} strokeWidth={2.2} />
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveMainTab("info")}
-                  aria-label="Open student profile"
-                  className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/70 bg-white/25 transition-transform active:scale-95"
-                >
-                  <img
-                    src={profileImage}
-                    alt="Profile"
-                    className="h-full w-full object-cover"
-                    onError={(event) => {
-                      const fallbackUrl = getExtensionUrl("assets/favicon.png");
-                      if (fallbackUrl) event.currentTarget.src = fallbackUrl;
-                      else event.currentTarget.hidden = true;
-                    }}
-                  />
-                </button>
+            <header className="pb-1 pt-1 sm:hidden">
+              <div className="flex items-center justify-between gap-3">
+                <span className="inline-flex items-center rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold tracking-wide text-white backdrop-blur-md dark:bg-white/10">
+                  {rollNumber || universityInfo?.Section || "FLEX"}
+                </span>
+
+                <div className="flex shrink-0 items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={toggleTheme}
+                    aria-label={`Switch to ${themeMode === "dark" ? "light" : "dark"} mode`}
+                    title={`Switch to ${themeMode === "dark" ? "light" : "dark"} mode`}
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-md transition-transform active:scale-95 dark:bg-white/10"
+                  >
+                    {themeMode === "dark" ? (
+                      <Sun size={17} strokeWidth={2.2} />
+                    ) : (
+                      <Moon size={17} strokeWidth={2.2} />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveMainTab("info")}
+                    aria-label="Open student profile"
+                    className="h-9 w-9 shrink-0 overflow-hidden rounded-full border border-white/45 bg-white/20 transition-transform active:scale-95 dark:border-white/20 dark:bg-white/10"
+                  >
+                    <img
+                      src={profileImage}
+                      alt="Profile"
+                      className="h-full w-full object-cover"
+                      onError={(event) => {
+                        const fallbackUrl = getExtensionUrl("assets/favicon.png");
+                        if (fallbackUrl) event.currentTarget.src = fallbackUrl;
+                        else event.currentTarget.hidden = true;
+                      }}
+                    />
+                  </button>
+                </div>
               </div>
 
-              <div className="pt-1">
+              <div className="mt-6 space-y-1.5">
                 <h1 className="min-w-0 text-[28px] font-extrabold leading-[1.1] tracking-[-0.035em] text-white">
                   {greetingHeading}
                 </h1>
-              </div>
-
-              <div className="flex items-center justify-between gap-2 pt-0.5">
-                <div className="inline-flex min-w-0 items-center gap-2.5 rounded-full bg-white/30 p-1.5 pr-4 backdrop-blur-md dark:bg-white/10">
-                  <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-bold text-[#101027]">
-                    {rollNumber || universityInfo?.Section || "FLEX"}
-                  </span>
-                  <span className="truncate text-xs font-medium text-white">
-                    {greetingSubheading}
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setActiveMainTab("info")}
-                  className="shrink-0 rounded-full bg-white/95 px-3.5 py-2 text-xs font-bold text-[#101027] transition-transform active:scale-95 dark:bg-white/15 dark:text-white"
-                >
-                  Profile
-                </button>
+                <p className="text-xs font-medium leading-relaxed text-white/80">
+                  {greetingSubheading}
+                </p>
               </div>
             </header>
           ) : (
@@ -716,21 +706,21 @@ function HomePage() {
                   type="button"
                   onClick={() => setActiveMainTab("stats")}
                   aria-label="Back to Overview"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/25 text-white backdrop-blur-md transition-transform active:scale-95 dark:bg-white/10"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-md transition-transform active:scale-95 dark:bg-white/10"
                 >
-                  <ArrowLeft size={19} strokeWidth={2.2} />
+                  <ArrowLeft size={18} strokeWidth={2.2} />
                 </button>
                 <button
                   type="button"
                   onClick={toggleTheme}
                   aria-label={`Switch to ${themeMode === "dark" ? "light" : "dark"} mode`}
                   title={`Switch to ${themeMode === "dark" ? "light" : "dark"} mode`}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/25 text-white backdrop-blur-md transition-transform active:scale-95 dark:bg-white/10"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-md transition-transform active:scale-95 dark:bg-white/10"
                 >
                   {themeMode === "dark" ? (
-                    <Sun size={18} strokeWidth={2.2} />
+                    <Sun size={17} strokeWidth={2.2} />
                   ) : (
-                    <Moon size={18} strokeWidth={2.2} />
+                    <Moon size={17} strokeWidth={2.2} />
                   )}
                 </button>
               </div>
