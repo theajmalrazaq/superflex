@@ -186,7 +186,7 @@ function LoginPageStyles() {
       ) {
         const rememberContainer = document.createElement("div");
         rememberContainer.id = "superflex-remember-me-container";
-        rememberContainer.className = "w-full px-2 mb-3.5 mt-1 select-none";
+        rememberContainer.className = "w-full px-2 mb-2 mt-0.5 select-none";
         rememberContainer.innerHTML = `
           <div class="flex items-center justify-between">
             <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
@@ -271,7 +271,7 @@ function LoginPageStyles() {
               const promptCard = document.createElement("div");
               promptCard.id = "superflex-autofill-prompt-card";
               promptCard.className =
-                "w-full rounded-2xl bg-[#230052]/5 dark:bg-white/[0.08] border border-[#230052]/15 dark:border-white/15 p-3 flex items-center justify-between mb-4 transition-all";
+                "w-full rounded-2xl bg-[#230052]/5 dark:bg-white/[0.08] border border-[#230052]/15 dark:border-white/15 p-2.5 flex items-center justify-between mb-2.5 transition-all";
 
               promptCard.innerHTML = `
                 <div class="flex min-w-0 items-center gap-2.5">
@@ -755,7 +755,7 @@ function LoginPageStyles() {
 
     const footerWrapper = document.createElement("div");
     footerWrapper.className =
-      "login-outer-footer flex items-center justify-center gap-3 text-center w-full mt-7 relative z-10 flex-wrap select-none";
+      "login-outer-footer flex items-center justify-center gap-2.5 text-center w-full relative z-50 flex-wrap select-none";
     footerWrapper.innerHTML = `
       <a href="https://github.com/theajmalrazaq/superflex/issues/new" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/25 hover:bg-white/35 backdrop-blur-sm border border-white/20 text-[11px] font-semibold text-white transition-all shadow-none">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -777,7 +777,7 @@ function LoginPageStyles() {
         <span class="login-theme-icon" aria-hidden="true"></span>
         <span class="login-theme-label">Dark mode</span>
       </button>
-      <span class="basis-full mt-2 text-[11px] text-slate-500">
+      <span class="basis-full mt-0.5 text-[11px] text-slate-500">
         designed and built by
         <a href="https://github.com/theajmalrazaq" target="_blank" rel="noopener noreferrer">ajmal</a>
       </span>

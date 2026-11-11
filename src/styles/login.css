@@ -1,16 +1,14 @@
 html:has(body.superflex-login-page) {
-  min-height: 100dvh;
-  height: auto;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden !important;
 }
 
 body.superflex-login-page {
   --login-card-bg: #fff;
-  min-height: 100dvh !important;
-  height: auto !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  overflow: hidden !important;
   background: linear-gradient(
     180deg,
     #62abe0 0%,
@@ -40,12 +38,12 @@ html.dark body.superflex-login-page {
 body.superflex-login-page .m-login.m-login--1,
 body.superflex-login-page .m-login__aside {
   width: 100% !important;
-  min-height: 100dvh !important;
-  height: auto !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
   margin: 0 !important;
   padding: 0 !important;
   background: transparent !important;
-  overflow: visible !important;
+  overflow: hidden !important;
 }
 
 body.superflex-login-page .m-grid.m-grid--hor {
@@ -59,29 +57,33 @@ body.superflex-login-page .m-login__container {
   max-width: none !important;
   padding: 0 !important;
   margin: 0 !important;
-  align-items: stretch !important;
+  align-items: center !important;
   background: transparent !important;
 }
 
 body.superflex-login-page .m-stack__item.m-stack__item--fluid,
 body.superflex-login-page .m-login__wrapper {
-  min-height: 100dvh !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
 }
 
 body.superflex-login-page .m-login__container {
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
-  flex: 1 0 auto !important;
+  justify-content: center !important;
+  gap: clamp(6px, 1.1dvh, 12px) !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
 }
 
 body.superflex-login-page .m-login__wrapper {
-  min-height: 100dvh !important;
-  height: auto !important;
-  padding: max(16px, env(safe-area-inset-top)) 0 max(20px, env(safe-area-inset-bottom)) !important;
-  gap: 12px;
-  justify-content: flex-start !important;
-  overflow: visible !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  padding: max(8px, env(safe-area-inset-top)) 0 max(8px, env(safe-area-inset-bottom)) !important;
+  gap: clamp(6px, 1.1dvh, 12px);
+  justify-content: center !important;
+  overflow: hidden !important;
 }
 
 body.superflex-login-page #login-popup,
@@ -89,7 +91,7 @@ body.superflex-login-page #forgot-password-popup {
   width: min(100% - 32px, 480px) !important;
   max-width: 480px !important;
   margin: 0 auto !important;
-  padding: clamp(14px, 3dvh, 28px) clamp(20px, 3vw, 32px) !important;
+  padding: clamp(12px, 2dvh, 24px) clamp(20px, 3vw, 32px) !important;
   border: 0 !important;
   border-radius: 32px !important;
   box-shadow: none !important;
@@ -488,10 +490,10 @@ body.superflex-login-page .login-outer-footer {
   bottom: auto;
   left: auto;
   z-index: 50;
-  width: min(100% - 32px, 480px) !important;
-  margin: 4px auto auto !important;
+  width: min(100% - 16px, 480px) !important;
+  margin: 0 auto !important;
   flex: none;
-  gap: 6px 10px !important;
+  gap: 4px 10px !important;
   color: #777 !important;
 }
 
@@ -547,7 +549,7 @@ body.superflex-login-page .login-theme-label {
 
 body.superflex-login-page .login-version-pill {
   align-self: center;
-  margin: auto auto 0;
+  margin: 0 auto;
   display: inline-flex;
   align-items: center;
   gap: 12px;
@@ -989,12 +991,114 @@ body.superflex-login-page.superflex-login-dark #forgot-password-popup .forgot-pa
   }
 }
 
+@media (max-width: 640px), (max-height: 820px) {
+  body.superflex-login-page .login-version-pill {
+    padding: 5px 14px 5px 5px;
+    gap: 8px;
+    font-size: 12.5px;
+  }
+
+  body.superflex-login-page .login-version-chip {
+    padding: 5px 11px;
+    gap: 5px;
+    font-size: 12px;
+  }
+
+  body.superflex-login-page #login-popup,
+  body.superflex-login-page #forgot-password-popup {
+    padding: clamp(12px, 1.8dvh, 18px) 18px !important;
+  }
+
+  body.superflex-login-page #login-popup .login-header {
+    margin-bottom: 10px !important;
+  }
+
+  body.superflex-login-page #login-popup .login-header > div:first-child {
+    width: 40px !important;
+    height: 40px !important;
+    margin: 0 auto 8px !important;
+    border-radius: 12px !important;
+  }
+
+  body.superflex-login-page #login-popup .login-header .login-mark {
+    width: 28px;
+    height: 28px;
+  }
+
+  body.superflex-login-page #login-popup .login-header h1 {
+    margin-bottom: 2px !important;
+  }
+
+  body.superflex-login-page #superflex-autofill-prompt-card {
+    padding: 7px 10px !important;
+    margin-bottom: 8px !important;
+  }
+
+  body.superflex-login-page #superflex-autofill-trigger-btn {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding-inline: 12px !important;
+  }
+
+  body.superflex-login-page #login-popup .input-group,
+  body.superflex-login-page #forgot-password-popup .input-group {
+    margin-bottom: 4px !important;
+    gap: 2px !important;
+  }
+
+  body.superflex-login-page #login-popup .form-group {
+    margin-bottom: 6px !important;
+  }
+
+  body.superflex-login-page #login-popup .input-group label,
+  body.superflex-login-page #login-popup .form-group label {
+    font-size: 11px !important;
+    margin-bottom: 0 !important;
+  }
+
+  body.superflex-login-page #login-popup .form-control.m-input,
+  body.superflex-login-page #forgot-password-popup .form-control.m-input {
+    min-height: 42px !important;
+    height: 42px !important;
+    font-size: 14px !important;
+    padding: 0 18px !important;
+  }
+
+  body.superflex-login-page #login-popup .m-form__actions {
+    margin-top: 4px !important;
+  }
+
+  body.superflex-login-page #superflex-remember-me-container {
+    margin-top: 2px !important;
+    margin-bottom: 6px !important;
+  }
+
+  body.superflex-login-page #login-popup .btn-primary,
+  body.superflex-login-page #login-popup .login-primary-btn,
+  body.superflex-login-page #forgot-password-popup button[type="submit"],
+  body.superflex-login-page #forgot-password-popup .login-primary-btn {
+    min-height: 44px !important;
+    height: 44px !important;
+    font-size: 14px !important;
+  }
+
+  body.superflex-login-page .login-outer-footer a {
+    padding: 4px 10px !important;
+    font-size: 11.5px !important;
+  }
+
+  body.superflex-login-page .login-theme-toggle {
+    min-height: 30px;
+    padding: 0 12px;
+    font-size: 11.5px;
+  }
+}
+
 @media (max-width: 640px) {
   body.superflex-login-page #login-popup,
   body.superflex-login-page #forgot-password-popup {
     width: min(100% - 16px, 480px) !important;
-    border-radius: 24px !important;
-    padding: 18px 20px !important;
+    border-radius: 22px !important;
   }
 
   body.superflex-login-page #login-popup .login-header h1,
@@ -1004,23 +1108,37 @@ body.superflex-login-page.superflex-login-dark #forgot-password-popup .forgot-pa
 
   body.superflex-login-page #login-popup .login-header p,
   body.superflex-login-page #forgot-password-popup .m-login__desc {
-    font-size: 13px !important;
+    font-size: 12.5px !important;
+    line-height: 1.25 !important;
+  }
+}
+
+@media (max-height: 690px) {
+  body.superflex-login-page #login-popup .login-header > div:first-child {
+    width: 34px !important;
+    height: 34px !important;
+    margin-bottom: 4px !important;
+    border-radius: 10px !important;
+  }
+
+  body.superflex-login-page #login-popup .login-header .login-mark {
+    width: 24px;
+    height: 24px;
+  }
+
+  body.superflex-login-page #login-popup .login-header p {
+    display: none !important;
   }
 
   body.superflex-login-page #login-popup .form-control.m-input,
   body.superflex-login-page #forgot-password-popup .form-control.m-input {
-    min-height: 44px !important;
-    height: 44px !important;
-    font-size: 14px !important;
-    padding: 0 18px !important;
+    min-height: 38px !important;
+    height: 38px !important;
   }
 
   body.superflex-login-page #login-popup .btn-primary,
-  body.superflex-login-page #login-popup .login-primary-btn,
-  body.superflex-login-page #forgot-password-popup button[type="submit"],
-  body.superflex-login-page #forgot-password-popup .login-primary-btn {
-    min-height: 46px !important;
-    height: 46px !important;
-    font-size: 14px !important;
+  body.superflex-login-page #login-popup .login-primary-btn {
+    min-height: 40px !important;
+    height: 40px !important;
   }
 }
