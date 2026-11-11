@@ -17,7 +17,6 @@ import {
   ChevronUp,
   ArrowLeft,
   ArrowRight,
-  ChevronRight,
   Sun,
   Moon,
 } from "lucide-react";
@@ -1019,9 +1018,8 @@ function HomePage() {
                         <Award size={18} className="sm:h-[22px] sm:w-[22px]" />
                       </span>
                       <div className="min-w-0 space-y-0.5 sm:space-y-1">
-                        <h3 className="flex items-center gap-1 truncate text-base font-bold tracking-[-0.02em] text-foreground sm:text-lg">
+                        <h3 className="truncate text-base font-bold tracking-[-0.02em] text-foreground sm:text-lg">
                           Assessments
-                          <ChevronRight size={17} className="text-foreground/60 sm:hidden" />
                         </h3>
                         <p className="hidden truncate text-xs text-foreground/50 sm:block">
                           Let's see how badly those quizzes went.
@@ -1155,9 +1153,8 @@ function HomePage() {
                         <Activity size={18} className="sm:h-[22px] sm:w-[22px]" />
                       </span>
                       <div className="min-w-0 space-y-0.5 sm:space-y-1">
-                        <h3 className="flex items-center gap-1 truncate text-base font-bold tracking-[-0.02em] text-foreground sm:text-lg">
+                        <h3 className="truncate text-base font-bold tracking-[-0.02em] text-foreground sm:text-lg">
                           Attendance Overview
-                          <ChevronRight size={17} className="text-foreground/60 sm:hidden" />
                         </h3>
                         <p className="hidden truncate text-xs text-foreground/50 sm:block">
                           Ek aur chutti aur game over?
