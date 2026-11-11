@@ -40,20 +40,20 @@ function TeacherSelectionForm({
 
   return (
     <BottomSheet open={open} onClose={onSkip}>
-      <div className="flex shrink-0 justify-center pt-3">
+      <div className="flex shrink-0 justify-center pt-3.5 pb-1">
         <span className="h-1.5 w-14 rounded-full bg-[#ded9e5] dark:bg-white" />
       </div>
       <BottomSheetClose asChild>
         <button
           type="button"
           aria-label="Close teacher setup"
-          className="absolute right-4 top-6 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"
+          className="absolute right-4 top-4 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10 sm:right-5 sm:top-5"
         >
           <X size={20} />
         </button>
       </BottomSheetClose>
-      <header className="flex shrink-0 flex-col items-center px-6 pb-3 pt-3 text-center sm:px-8">
-        <span className="mb-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-[#230052] text-white dark:bg-white dark:text-[#101027]">
+      <header className="flex shrink-0 flex-col items-center px-6 pb-3.5 pt-1.5 text-center sm:px-8 sm:pb-4 sm:pt-2">
+        <span className="mb-2.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#230052] text-white dark:bg-white dark:text-[#101027] sm:h-11 sm:w-11 sm:rounded-[16px]">
           <GraduationCap size={23} />
         </span>
         <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#230052]/65 dark:text-white">
@@ -67,7 +67,7 @@ function TeacherSelectionForm({
         </BottomSheetDescription>
       </header>
 
-      <div className="shrink-0 px-5 pb-2 sm:px-8">
+      <div className="shrink-0 px-6 pb-2.5 sm:px-8">
         <div className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-2.5 text-xs dark:bg-white/[.06]">
           <span className="font-semibold">{campus?.name || "Campus"} faculty</span>
           <span className="text-slate-500 dark:text-slate-400">
@@ -98,8 +98,8 @@ function TeacherSelectionForm({
         )}
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-3 sm:px-8">
-        <label className="flex items-center gap-2 rounded-2xl border border-slate-200 px-3.5 py-2.5 focus-within:border-[#230052] dark:border-white/15 dark:focus-within:border-white">
+      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-3 sm:px-8 sm:py-4">
+        <label className="flex items-center gap-2.5 rounded-2xl border border-slate-200 px-3.5 py-2.5 focus-within:border-[#230052] dark:border-white/15 dark:focus-within:border-white">
           <Search size={17} className="text-slate-400" />
           <input
             value={query}
@@ -173,14 +173,14 @@ function TeacherSelectionForm({
           </div>
         )}
 
-        <div className="mt-3 rounded-2xl border border-dashed border-slate-300 p-3 dark:border-white">
+        <div className="mt-3.5 rounded-2xl border border-dashed border-slate-300 p-3.5 dark:border-white sm:p-4">
           <p className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300">
             <UserRound size={14} /> Add Your Final Boss.
           </p>
-          <p className="mb-2 text-[11px] text-slate-500 dark:text-slate-400">
+          <p className="mb-2.5 text-[11px] text-slate-500 dark:text-slate-400">
             Can't find them in the directory? Enter their details manually.
           </p>
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="flex flex-col gap-2.5 sm:flex-row">
             <input
               value={manualName}
               onChange={(event) => setManualName(event.target.value)}
@@ -213,7 +213,7 @@ function TeacherSelectionForm({
         </div>
       </div>
 
-      <footer className="flex shrink-0 flex-col gap-1.5 border-t border-slate-100 bg-white/95 px-5 pb-3 pt-2.5 dark:border-white/10 dark:bg-[#090909]/95 sm:px-8">
+      <footer className="flex shrink-0 flex-col gap-2 border-t border-slate-100 bg-white/95 px-6 py-3.5 dark:border-white/10 dark:bg-[#090909]/95 sm:px-8 sm:py-4">
         {courseIndex < courses.length - 1 ? (
           <button
             type="button"

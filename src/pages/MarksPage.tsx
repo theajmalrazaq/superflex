@@ -148,20 +148,20 @@ const BestOfForm = ({ isOpen, onClose, onApply, itemCount, sectionTitle }) => {
 
   return (
     <BottomSheet open={isOpen} onClose={onClose}>
-      <div className="flex shrink-0 justify-center pt-3">
+      <div className="flex shrink-0 justify-center pt-3.5 pb-1">
         <span className="h-1.5 w-14 rounded-full bg-[#ded9e5] dark:bg-white" />
       </div>
       <BottomSheetClose asChild>
         <button
           type="button"
           aria-label="Close calculator"
-          className="absolute right-4 top-6 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"
+          className="absolute right-4 top-4 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10 sm:right-5 sm:top-5"
         >
           <X size={20} />
         </button>
       </BottomSheetClose>
-      <header className="flex shrink-0 flex-col items-center px-6 pb-4 pt-3 text-center sm:px-8">
-        <span className="mb-2 flex h-11 w-11 items-center justify-center rounded-[16px] bg-[#230052] text-white dark:bg-white dark:text-[#101027]">
+      <header className="flex shrink-0 flex-col items-center px-6 pb-3.5 pt-1.5 text-center sm:px-8 sm:pb-4 sm:pt-2">
+        <span className="mb-2.5 flex h-10 w-10 items-center justify-center rounded-xl bg-[#230052] text-white dark:bg-white dark:text-[#101027] sm:h-11 sm:w-11 sm:rounded-[16px]">
           <Settings size={21} />
         </span>
         <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#230052]/65 dark:text-white">
@@ -175,7 +175,7 @@ const BestOfForm = ({ isOpen, onClose, onApply, itemCount, sectionTitle }) => {
         </BottomSheetDescription>
       </header>
 
-      <div className="min-h-0 space-y-4 overflow-y-auto px-5 pb-4 sm:px-8">
+      <div className="min-h-0 space-y-4 overflow-y-auto px-6 py-4 sm:px-8 sm:py-5">
         <label className="block text-sm font-semibold">
           Number of best {itemType.toLowerCase()}
           {plural}
@@ -218,7 +218,7 @@ const BestOfForm = ({ isOpen, onClose, onApply, itemCount, sectionTitle }) => {
         </div>
       </div>
 
-      <footer className="shrink-0 border-t border-slate-100 bg-white/95 px-5 pb-3 pt-3 dark:border-white/10 dark:bg-[#090909]/95 sm:px-8">
+      <footer className="shrink-0 border-t border-slate-100 bg-white/95 px-6 py-3.5 dark:border-white/10 dark:bg-[#090909]/95 sm:px-8 sm:py-4">
         <button
           type="button"
           disabled={!validCount || !validWeight}
@@ -420,7 +420,9 @@ export const AssessmentView = ({
                     <div className="shrink-0 text-right">
                       <p className={`text-xs font-bold ${scoreColor} sm:text-[13px]`}>
                         {row.obtained}{" "}
-                        <span className="text-[11px] font-normal text-[#667085]">/ {row.total}</span>
+                        <span className="text-[11px] font-normal text-[#667085]">
+                          / {row.total}
+                        </span>
                       </p>
                       <p className="text-[10px] font-medium text-[#230052] dark:text-white/80 sm:text-[11px]">
                         {weightedVal.toFixed(2)} pts
@@ -443,98 +445,98 @@ export const AssessmentView = ({
           {/* Desktop Table View */}
           <div className="hidden overflow-x-auto scrollbar-hide sm:block">
             <div className="min-w-[540px]">
-            <div className="grid grid-cols-[minmax(0,1fr)_64px_148px_76px] items-center gap-3 border-b border-black/[0.05] bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:border-white/[.08] dark:bg-white/[.04] dark:text-slate-400 sm:px-5">
-              <span>Assessment</span>
-              <span className="text-center">Weight</span>
-              <span className="text-center">Score</span>
-              <span className="text-right">Weighted</span>
-            </div>
-            {rows.map((row) => {
-              const rowIndex = section.rows.indexOf(row);
-              const uniqueId = `${courseId}-${section.id}-${row.title}`;
-              const isMarked = markedItems?.has(uniqueId);
-              const isRowUpdated = isAssessmentMarksUpdated(pendingUpdates, course, row.title);
-              const scoreRatio = row.total > 0 ? row.obtained / row.total : 0;
-              const scoreColor =
-                scoreRatio >= 0.8
-                  ? "text-emerald-700 dark:text-emerald-300"
-                  : scoreRatio >= 0.6
-                    ? "text-amber-700 dark:text-amber-300"
-                    : "text-rose-700 dark:text-rose-300";
-              return (
-                <div
-                  key={`${row.title}-${rowIndex}`}
-                  className={`grid grid-cols-[minmax(0,1fr)_64px_148px_76px] items-center gap-3 border-b border-black/[0.05] px-4 py-3.5 last:border-b-0 dark:border-white/[.08] sm:px-5 ${!row.included ? "opacity-45" : ""} ${isMarked ? "bg-[#230052]/[.05] dark:bg-white/[.08]" : isRowUpdated ? "bg-[#230052]/[0.03] dark:bg-white/[0.04]" : "hover:bg-slate-50 dark:hover:bg-white/[.025]"}`}
-                >
-                  <div className="flex min-w-0 items-center gap-2.5">
-                    <button
-                      type="button"
-                      onClick={() => onToggleMark?.(uniqueId)}
-                      aria-label={
-                        isMarked ? `Remove bookmark for ${row.title}` : `Bookmark ${row.title}`
-                      }
-                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors ${isMarked ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-400 hover:bg-slate-200 hover:text-[#230052] dark:hover:bg-white/10 dark:hover:text-white"}`}
-                    >
-                      <Bookmark size={14} fill={isMarked ? "currentColor" : "none"} />
-                    </button>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="truncate text-sm font-semibold">{row.title}</p>
-                        {isRowUpdated && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-[#230052]/10 px-2 py-0.5 text-[10px] font-bold text-[#230052] dark:bg-white/15 dark:text-white">
-                            <span className="h-1.5 w-1.5 rounded-full bg-[#230052] animate-pulse dark:bg-white" />
-                            New
-                          </span>
-                        )}
-                        {!row.included && (
-                          <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold text-slate-500 dark:bg-white/10 dark:text-slate-400">
-                            Dropped
-                          </span>
-                        )}
+              <div className="grid grid-cols-[minmax(0,1fr)_64px_148px_76px] items-center gap-3 border-b border-black/[0.05] bg-slate-50 px-4 py-3 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:border-white/[.08] dark:bg-white/[.04] dark:text-slate-400 sm:px-5">
+                <span>Assessment</span>
+                <span className="text-center">Weight</span>
+                <span className="text-center">Score</span>
+                <span className="text-right">Weighted</span>
+              </div>
+              {rows.map((row) => {
+                const rowIndex = section.rows.indexOf(row);
+                const uniqueId = `${courseId}-${section.id}-${row.title}`;
+                const isMarked = markedItems?.has(uniqueId);
+                const isRowUpdated = isAssessmentMarksUpdated(pendingUpdates, course, row.title);
+                const scoreRatio = row.total > 0 ? row.obtained / row.total : 0;
+                const scoreColor =
+                  scoreRatio >= 0.8
+                    ? "text-emerald-700 dark:text-emerald-300"
+                    : scoreRatio >= 0.6
+                      ? "text-amber-700 dark:text-amber-300"
+                      : "text-rose-700 dark:text-rose-300";
+                return (
+                  <div
+                    key={`${row.title}-${rowIndex}`}
+                    className={`grid grid-cols-[minmax(0,1fr)_64px_148px_76px] items-center gap-3 border-b border-black/[0.05] px-4 py-3.5 last:border-b-0 dark:border-white/[.08] sm:px-5 ${!row.included ? "opacity-45" : ""} ${isMarked ? "bg-[#230052]/[.05] dark:bg-white/[.08]" : isRowUpdated ? "bg-[#230052]/[0.03] dark:bg-white/[0.04]" : "hover:bg-slate-50 dark:hover:bg-white/[.025]"}`}
+                  >
+                    <div className="flex min-w-0 items-center gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => onToggleMark?.(uniqueId)}
+                        aria-label={
+                          isMarked ? `Remove bookmark for ${row.title}` : `Bookmark ${row.title}`
+                        }
+                        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors ${isMarked ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-400 hover:bg-slate-200 hover:text-[#230052] dark:hover:bg-white/10 dark:hover:text-white"}`}
+                      >
+                        <Bookmark size={14} fill={isMarked ? "currentColor" : "none"} />
+                      </button>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="truncate text-sm font-semibold">{row.title}</p>
+                          {isRowUpdated && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-[#230052]/10 px-2 py-0.5 text-[10px] font-bold text-[#230052] dark:bg-white/15 dark:text-white">
+                              <span className="h-1.5 w-1.5 rounded-full bg-[#230052] animate-pulse dark:bg-white" />
+                              New
+                            </span>
+                          )}
+                          {!row.included && (
+                            <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold text-slate-500 dark:bg-white/10 dark:text-slate-400">
+                              Dropped
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-0.5 truncate text-[10px] text-slate-500 dark:text-slate-400">
+                          Avg {row.avg.toFixed(1)} · Range {row.min.toFixed(1)}–{row.max.toFixed(1)}
+                        </p>
                       </div>
-                      <p className="mt-0.5 truncate text-[10px] text-slate-500 dark:text-slate-400">
-                        Avg {row.avg.toFixed(1)} · Range {row.min.toFixed(1)}–{row.max.toFixed(1)}
-                      </p>
                     </div>
-                  </div>
-                  <input
-                    type="number"
-                    aria-label={`${row.title} weight`}
-                    value={row.weight}
-                    onChange={(event) => onUpdate(rowIndex, "weight", event.target.value)}
-                    className="w-full rounded-lg bg-slate-50 px-1.5 py-1.5 text-center text-xs font-medium outline-none focus:ring-1 focus:ring-[#230052] dark:bg-white/[.06] dark:focus:ring-white"
-                  />
-                  <div className="flex items-center justify-center gap-1 text-xs">
                     <input
                       type="number"
-                      aria-label={`${row.title} score`}
-                      value={row.obtained ?? ""}
-                      onChange={(event) => onUpdate(rowIndex, "obtained", event.target.value)}
-                      className={`w-14 shrink-0 rounded-lg bg-slate-50 px-1 py-1.5 text-center text-xs font-bold outline-none focus:ring-1 focus:ring-[#230052] dark:bg-white/[.06] dark:focus:ring-white ${scoreColor}`}
+                      aria-label={`${row.title} weight`}
+                      value={row.weight}
+                      onChange={(event) => onUpdate(rowIndex, "weight", event.target.value)}
+                      className="w-full rounded-lg bg-slate-50 px-1.5 py-1.5 text-center text-xs font-medium outline-none focus:ring-1 focus:ring-[#230052] dark:bg-white/[.06] dark:focus:ring-white"
                     />
-                    <span className="text-slate-400">/</span>
-                    <input
-                      type="number"
-                      aria-label={`${row.title} total marks`}
-                      value={row.total}
-                      onChange={(event) => onUpdate(rowIndex, "total", event.target.value)}
-                      className="w-14 shrink-0 rounded-lg bg-slate-50 px-1 py-1.5 text-center text-xs text-slate-600 outline-none focus:ring-1 focus:ring-[#230052] dark:bg-white/[.06] dark:text-slate-300 dark:focus:ring-white"
-                    />
+                    <div className="flex items-center justify-center gap-1 text-xs">
+                      <input
+                        type="number"
+                        aria-label={`${row.title} score`}
+                        value={row.obtained ?? ""}
+                        onChange={(event) => onUpdate(rowIndex, "obtained", event.target.value)}
+                        className={`w-14 shrink-0 rounded-lg bg-slate-50 px-1 py-1.5 text-center text-xs font-bold outline-none focus:ring-1 focus:ring-[#230052] dark:bg-white/[.06] dark:focus:ring-white ${scoreColor}`}
+                      />
+                      <span className="text-slate-400">/</span>
+                      <input
+                        type="number"
+                        aria-label={`${row.title} total marks`}
+                        value={row.total}
+                        onChange={(event) => onUpdate(rowIndex, "total", event.target.value)}
+                        className="w-14 shrink-0 rounded-lg bg-slate-50 px-1 py-1.5 text-center text-xs text-slate-600 outline-none focus:ring-1 focus:ring-[#230052] dark:bg-white/[.06] dark:text-slate-300 dark:focus:ring-white"
+                      />
+                    </div>
+                    <span className="text-right text-xs font-bold text-[#230052] dark:text-white">
+                      {(row.total > 0 ? (row.obtained / row.total) * row.weight : 0).toFixed(2)}
+                    </span>
                   </div>
-                  <span className="text-right text-xs font-bold text-[#230052] dark:text-white">
-                    {(row.total > 0 ? (row.obtained / row.total) * row.weight : 0).toFixed(2)}
-                  </span>
-                </div>
-              );
-            })}
-            <div className="grid grid-cols-[minmax(0,1fr)_64px_148px_76px] items-center gap-3 bg-slate-50 px-4 py-4 text-xs font-bold dark:bg-white/[.04] sm:px-5">
-              <span>Total</span>
-              <span className="text-center">{section.weight.toFixed(2)}</span>
-              <span className="text-center">—</span>
-              <span className="text-right text-[#230052] dark:text-white">
-                {section.obtained.toFixed(2)}
-              </span>
-            </div>
+                );
+              })}
+              <div className="grid grid-cols-[minmax(0,1fr)_64px_148px_76px] items-center gap-3 bg-slate-50 px-4 py-4 text-xs font-bold dark:bg-white/[.04] sm:px-5">
+                <span>Total</span>
+                <span className="text-center">{section.weight.toFixed(2)}</span>
+                <span className="text-center">—</span>
+                <span className="text-right text-[#230052] dark:text-white">
+                  {section.obtained.toFixed(2)}
+                </span>
+              </div>
             </div>
           </div>
         </>

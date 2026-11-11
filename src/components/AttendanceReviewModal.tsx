@@ -37,20 +37,20 @@ function AttendanceReviewForm({ open, course, record, teacher, onClose }) {
 
   return (
     <BottomSheet open={open} onClose={onClose}>
-      <div className="flex shrink-0 justify-center pt-3">
+      <div className="flex shrink-0 justify-center pt-3.5 pb-1">
         <span className="h-1.5 w-14 rounded-full bg-[#ded9e5] dark:bg-white" />
       </div>
       <BottomSheetClose asChild>
         <button
           type="button"
           aria-label="Close"
-          className="absolute right-4 top-6 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10"
+          className="absolute right-4 top-4 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10 sm:right-5 sm:top-5"
         >
           <X size={20} />
         </button>
       </BottomSheetClose>
-      <header className="flex shrink-0 flex-col items-center px-6 pb-3 pt-3 text-center sm:px-8">
-        <span className="mb-2 flex h-11 w-11 items-center justify-center rounded-[16px] bg-[#230052] text-white dark:bg-white dark:text-[#101027]">
+      <header className="flex shrink-0 flex-col items-center px-6 pb-3.5 pt-1.5 text-center sm:px-8 sm:pb-4 sm:pt-2">
+        <span className="mb-2.5 flex h-10 w-10 items-center justify-center rounded-xl bg-[#230052] text-white dark:bg-white dark:text-[#101027] sm:h-11 sm:w-11 sm:rounded-[16px]">
           <Mail size={21} />
         </span>
         <p className="text-[10px] font-bold uppercase tracking-[.15em] text-[#230052]/65 dark:text-white">
@@ -65,9 +65,9 @@ function AttendanceReviewForm({ open, course, record, teacher, onClose }) {
         </BottomSheetDescription>
       </header>
 
-      <div className="min-h-0 space-y-3 overflow-y-auto px-5 pb-3 pt-1 sm:px-8">
+      <div className="min-h-0 space-y-3.5 overflow-y-auto px-6 py-4 sm:space-y-4 sm:px-8 sm:py-5">
         {teacher?.email ? (
-          <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3 dark:bg-white/[.06]">
+          <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3.5 dark:bg-white/[.06] sm:p-4">
             <TeacherAvatar teacher={teacher} size="sm" className="rounded-xl" />
             <div className="min-w-0">
               <p className="truncate text-sm font-bold">{teacher.name}</p>
@@ -116,7 +116,7 @@ function AttendanceReviewForm({ open, course, record, teacher, onClose }) {
           />
         </label>
 
-        <div className="rounded-2xl bg-slate-50 p-3 dark:bg-white/[.05]">
+        <div className="rounded-2xl bg-slate-50 p-4 dark:bg-white/[.05]">
           <p className="text-sm font-bold text-slate-600 dark:text-slate-300">
             The Formal Begging Draft.
           </p>
@@ -129,7 +129,7 @@ function AttendanceReviewForm({ open, course, record, teacher, onClose }) {
         </div>
       </div>
 
-      <footer className="flex shrink-0 items-center gap-2 border-t border-slate-100 bg-white/95 px-5 pb-3 pt-2.5 dark:border-white/10 dark:bg-[#090909]/95 sm:px-8">
+      <footer className="flex shrink-0 items-center gap-2.5 border-t border-slate-100 bg-white/95 px-6 py-3.5 dark:border-white/10 dark:bg-[#090909]/95 sm:px-8 sm:py-4">
         <a
           href={gmailComposeUrl}
           target="_blank"
@@ -153,7 +153,7 @@ function AttendanceReviewForm({ open, course, record, teacher, onClose }) {
           {copied ? "Copied" : "Copy draft"}
         </button>
       </footer>
-      <p className="shrink-0 pb-2 text-center text-[10px] text-slate-400">
+      <p className="shrink-0 px-6 pb-2.5 text-center text-[10px] text-slate-400 sm:px-8">
         Review the draft before sending it from your email app.
       </p>
     </BottomSheet>
