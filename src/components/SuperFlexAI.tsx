@@ -852,13 +852,13 @@ const SuperFlexAI = () => {
 
       {}
       <div
-        className={`fixed bottom-[78px] left-1/2 -translate-x-1/2 z-[999] w-[min(520px,calc(100dvw-2rem))] pointer-events-auto lg:bottom-6 lg:w-[min(520px,calc(100vw-2rem))] ${
+        className={`fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-[999] w-[min(520px,calc(100dvw-1.5rem))] pointer-events-auto lg:bottom-6 lg:w-[min(520px,calc(100vw-2rem))] ${
           isOpen ? "block" : "hidden lg:block"
         }`}
       >
         {}
         {isOpen && (
-          <div className="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 w-[min(720px,calc(100dvw-2rem))] max-h-[min(540px,calc(100dvh-160px))] flex flex-col rounded-[22px] border border-black/[0.08] bg-white/95 p-4 shadow-2xl backdrop-blur-2xl dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] animate-in fade-in slide-in-from-bottom-3 duration-200 overflow-hidden sm:mb-3.5 sm:w-[min(720px,calc(100vw-2rem))] sm:rounded-[24px] sm:p-5">
+          <div className="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 w-[min(720px,calc(100dvw-1.5rem))] max-h-[min(540px,calc(100dvh-110px))] flex flex-col rounded-[22px] border border-black/[0.08] bg-white/95 p-4 shadow-2xl backdrop-blur-2xl dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] animate-in fade-in slide-in-from-bottom-3 duration-200 overflow-hidden sm:mb-3.5 sm:w-[min(720px,calc(100vw-2rem))] sm:max-h-[min(540px,calc(100dvh-160px))] sm:rounded-[24px] sm:p-5">
             {}
             <div className="flex items-center justify-between pb-3 mb-2 border-b border-black/[0.06] dark:border-white/[0.08] shrink-0">
               <div className="flex items-center gap-2">
@@ -1041,7 +1041,7 @@ const SuperFlexAI = () => {
                   </div>
 
                   {}
-                  <div className="mt-3 flex w-full flex-nowrap justify-center gap-1.5">
+                  <div className="mt-3 flex w-full flex-wrap justify-center gap-1.5">
                     {["Who are my course instructors?", "Draft an email to my teacher"].map(
                       (prompt, i) => (
                         <button
