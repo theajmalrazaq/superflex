@@ -50,7 +50,7 @@ function AttendanceReviewForm({ open, course, record, teacher, onClose }) {
         </button>
       </BottomSheetClose>
       <header className="flex shrink-0 flex-col items-center px-6 pb-3.5 pt-1.5 text-center sm:px-8 sm:pb-4 sm:pt-2">
-        <span className="mb-2.5 flex h-10 w-10 items-center justify-center rounded-xl bg-[#230052] text-white dark:bg-white dark:text-[#101027] sm:h-11 sm:w-11 sm:rounded-[16px]">
+        <span className="mb-2.5 flex h-10 w-10 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#101027] sm:h-11 sm:w-11">
           <Mail size={21} />
         </span>
         <p className="text-[10px] font-bold uppercase tracking-[.15em] text-[#230052]/65 dark:text-white">

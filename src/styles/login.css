@@ -143,7 +143,7 @@ body.superflex-login-page #login-popup .login-header > div:first-child {
   width: 52px !important;
   height: 52px !important;
   margin-bottom: 0 !important;
-  border-radius: 16px !important;
+  border-radius: 28% !important;
   background: #000 !important;
   overflow: hidden;
   display: flex;
@@ -801,6 +801,18 @@ body.superflex-login-page.superflex-login-dark #terms-modal .terms-sheet-handle 
   background: rgb(255 255 255 / 20%) !important;
 }
 
+body.superflex-login-page #terms-modal .terms-brand-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 28% !important;
+}
+
+body.superflex-login-page #terms-modal .terms-section > span:first-child {
+  width: 32px;
+  height: 32px;
+  border-radius: 28% !important;
+}
+
 body.superflex-login-page.superflex-login-dark #terms-modal .terms-brand-icon {
   background: #fff !important;
   color: #101027 !important;
@@ -948,7 +960,7 @@ body.superflex-login-page #forgot-password-popup .forgot-password-mark {
   height: 52px;
   place-items: center;
   margin: 0 auto 18px;
-  border-radius: 16px;
+  border-radius: 28%;
   background: #000;
   color: #a098ff;
 }

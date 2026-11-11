@@ -447,8 +447,6 @@ const SuperFlexAI = () => {
     };
   }, [permissionStatus, studentId]);
 
-
-
   useEffect(() => {
     if (messages.length > 0) {
       setAiMessages(messages, studentId).catch((error) =>
@@ -847,7 +845,7 @@ const SuperFlexAI = () => {
             {}
             <div className="flex items-center justify-between pb-3 mb-2 border-b border-black/[0.06] dark:border-white/[0.08] shrink-0">
               <div className="flex items-center gap-2">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] shadow-xs">
+                <div className="flex h-7 w-7 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] shadow-xs">
                   <OctopusIcon size={14} />
                 </div>
                 <span className="font-bold text-sm tracking-tight text-foreground">Octopus</span>
@@ -888,7 +886,7 @@ const SuperFlexAI = () => {
               {permissionStatus !== "granted" ? (
                 <div className="flex flex-col gap-3 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:rounded-2xl">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
                       <Shield size={20} />
                     </div>
                     <div>
@@ -956,7 +954,7 @@ const SuperFlexAI = () => {
                 </div>
               ) : messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-2 px-2 text-center">
-                  <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] shadow-sm">
+                  <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] shadow-sm">
                     <OctopusIcon size={20} />
                   </div>
                   <h4 className="text-sm font-bold text-foreground tracking-tight">

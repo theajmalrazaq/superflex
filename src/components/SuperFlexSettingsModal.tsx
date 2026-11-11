@@ -155,7 +155,7 @@ function SuperFlexSettingsForm({
 
       {}
       <header className="flex shrink-0 flex-col items-center px-6 pb-3.5 pt-1.5 text-center sm:px-8 sm:pb-4 sm:pt-2">
-        <div className="mb-2.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#101027] sm:h-11 sm:w-11 sm:rounded-2xl">
+        <div className="mb-2.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-[28%] bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#101027] sm:h-11 sm:w-11">
           {currentTab === "teachers" ? (
             <GraduationCap size={18} className="sm:h-5 sm:w-5" />
           ) : currentTab === "autofill" ? (
@@ -472,7 +472,7 @@ function SuperFlexSettingsForm({
             {}
             <div className="flex items-center justify-between gap-3 rounded-2xl border border-black/[0.08] bg-slate-50/80 p-4 dark:border-white/10 dark:bg-white/[0.04] sm:gap-4 sm:p-5">
               <div className="flex min-w-0 items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] shadow-xs shrink-0">
+                <div className="flex h-10 w-10 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] shadow-xs shrink-0">
                   <Bot size={20} />
                 </div>
                 <div className="min-w-0">

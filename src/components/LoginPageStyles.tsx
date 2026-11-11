@@ -933,7 +933,7 @@ function LoginPageStyles() {
 
           <!-- Header -->
           <header class="flex shrink-0 flex-col items-center px-6 pb-3 pt-3 text-center sm:px-8">
-            <div class="terms-brand-icon mb-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] bg-[#230052] text-white select-none">
+            <div class="terms-brand-icon mb-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-[28%] bg-[#230052] text-white select-none">
               <svg viewBox="0 0 432 432" width="28" height="28" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M247.227 185.616L282.286 69L133 216L186.861 231.146L133 363L298 208.65L247.227 185.616Z" />
               </svg>
@@ -948,7 +948,7 @@ function LoginPageStyles() {
             <div class="terms-sections overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-50/70">
               <!-- Card 1: Independent Project -->
               <section class="terms-section flex gap-3 px-4 py-3.5">
-                <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#230052]/10 text-[#230052]">
+                <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[28%] bg-[#230052]/10 text-[#230052]">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <circle cx="12" cy="12" r="10"/>
                       <line x1="12" y1="16" x2="12" y2="12"/>
@@ -963,7 +963,7 @@ function LoginPageStyles() {
 
               <!-- Card 2: Security & Privacy (100% Local, Zero Analytics) -->
               <section class="terms-section flex gap-3 border-t border-slate-200/80 px-4 py-3.5">
-                <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
+                <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[28%] bg-emerald-500/10 text-emerald-600">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                     </svg>
@@ -976,7 +976,7 @@ function LoginPageStyles() {
 
               <!-- Card 3: User Responsibility -->
               <section class="terms-section flex gap-3 border-t border-slate-200/80 px-4 py-3.5">
-                <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
+                <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[28%] bg-amber-500/10 text-amber-600">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                       <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
