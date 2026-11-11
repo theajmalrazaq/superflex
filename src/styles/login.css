@@ -28,11 +28,13 @@ html.dark body.superflex-login-page {
   --login-card-bg: #000;
   background: linear-gradient(
     180deg,
-    #0f1422 0%,
-    #0f1422 24%,
-    #0b0e17 38%,
-    #06070c 49%,
-    #000 57%
+    #0f2b52 0%,
+    #0d2547 16%,
+    #091b35 32%,
+    #061122 48%,
+    #030812 64%,
+    #010308 76%,
+    #000000 86%
   ) !important;
   color: #f5f6fb !important;
 }
@@ -618,11 +620,13 @@ body.superflex-login-page.superflex-login-dark {
   color-scheme: dark;
   background: linear-gradient(
     180deg,
-    #0f1422 0%,
-    #0f1422 24%,
-    #0b0e17 38%,
-    #06070c 49%,
-    #000 57%
+    #0f2b52 0%,
+    #0d2547 16%,
+    #091b35 32%,
+    #061122 48%,
+    #030812 64%,
+    #010308 76%,
+    #000000 86%
   ) !important;
   color: #f5f6fb !important;
 }

@@ -32,7 +32,16 @@ body {
 }
 
 .dark .loading-overlay {
-  background: linear-gradient(180deg, #0f1422 0%, #0f1422 24%, #0b0e17 38%, #06070c 49%, #000 57%);
+  background: linear-gradient(
+    180deg,
+    #0f2b52 0%,
+    #0d2547 16%,
+    #091b35 32%,
+    #061122 48%,
+    #030812 64%,
+    #010308 76%,
+    #000000 86%
+  );
 }
 
 .dark .loading-overlay .overlay-cloud-left {

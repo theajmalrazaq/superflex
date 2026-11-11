@@ -65,10 +65,27 @@ body > [data-radix-portal] *::after {
   --foreground: #101010;
   --secondary: #f4f4f5;
   --tertiary: #e4e4e7;
+  --superflex-dark-dither: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 .superflex-account-backdrop {
   background: var(--superflex-account-gradient);
+}
+
+.dark .superflex-account-backdrop::before,
+body.superflex-login-page.superflex-login-dark .login-clouds::before,
+html.dark body.superflex-login-page .login-clouds::before,
+.dark .loading-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--superflex-dark-dither);
+  background-repeat: repeat;
+  background-size: 160px 160px;
+  opacity: 0.025;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 50%, transparent 86%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 50%, transparent 86%);
 }
 
 .superflex-account-cloud {
@@ -86,11 +103,13 @@ body > [data-radix-portal] *::after {
 .dark {
   --superflex-account-gradient: linear-gradient(
     180deg,
-    #0f1422 0%,
-    #0f1422 40%,
-    #0b0e17 65%,
-    #06070c 85%,
-    #000000 100%
+    #0f2b52 0%,
+    #0d2547 16%,
+    #091b35 32%,
+    #061122 48%,
+    #030812 64%,
+    #010308 76%,
+    #000000 86%
   );
   --accent: #ffffff;
   --accent-foreground: #000000;
