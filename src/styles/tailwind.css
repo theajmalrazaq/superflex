@@ -172,6 +172,8 @@ html {
 body {
   -ms-overflow-style: none;
   scrollbar-width: none;
+  overflow-x: clip;
+  max-width: 100%;
 }
 body::-webkit-scrollbar {
   display: none;
@@ -179,6 +181,8 @@ body::-webkit-scrollbar {
 html {
   -ms-overflow-style: none;
   scrollbar-width: none;
+  overflow-x: clip;
+  max-width: 100%;
 }
 html::-webkit-scrollbar {
   display: none;

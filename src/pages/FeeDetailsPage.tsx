@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { parsePortalAlerts } from "../parsers/dom";
 import PageLayout from "../components/layouts/PageLayout";
-import Skeleton from "../components/ui/Skeleton";
+import { PageSkeleton } from "../components/ui/Skeleton";
 import {
   DollarSign,
   ChevronDown,
@@ -13,76 +13,6 @@ import {
 } from "lucide-react";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import StatsCard from "../components/ui/StatsCard";
-
-const FeeDetailsSkeleton = () => (
-  <main
-    className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8"
-    role="status"
-    aria-label="Loading fee details"
-  >
-    <header className="space-y-2">
-      <Skeleton className="h-3 w-20" />
-      <Skeleton className="h-9 w-52" />
-      <Skeleton className="h-4 w-72 max-w-full" />
-    </header>
-    <section className="space-y-4">
-      <div className="space-y-2">
-        <Skeleton className="h-3 w-16" />
-        <Skeleton className="h-6 w-40" />
-      </div>
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4 xl:gap-5">
-        {[0, 1, 2, 3].map((item) => (
-          <div
-            key={item}
-            className="flex min-h-[156px] flex-col rounded-[32px] bg-white/80 p-5 dark:bg-black/80 sm:p-6"
-          >
-            <Skeleton className="h-12 w-12 rounded-[13px] sm:rounded-2xl" />
-            <Skeleton className="mt-auto h-7 w-32" />
-            <Skeleton className="mt-2 h-3 w-24" />
-          </div>
-        ))}
-      </div>
-    </section>
-    <section className="space-y-4">
-      <div className="space-y-2">
-        <Skeleton className="h-3 w-24" />
-        <Skeleton className="h-6 w-56" />
-      </div>
-      <div className="overflow-hidden rounded-[24px] bg-white p-5 dark:bg-black sm:p-6">
-        <Skeleton className="h-10 w-full max-w-2xl rounded-full" />
-        <div className="mt-5 space-y-3">
-          <Skeleton className="h-8 w-48" />
-          {[0, 1, 2, 3].map((item) => (
-            <Skeleton key={item} className="h-12 w-full rounded-xl" />
-          ))}
-        </div>
-      </div>
-    </section>
-    <section className="space-y-4">
-      <div className="space-y-2">
-        <Skeleton className="h-3 w-24" />
-        <Skeleton className="h-6 w-44" />
-      </div>
-      <div className="overflow-hidden rounded-[24px] bg-white dark:bg-black">
-        <div className="flex gap-8 bg-slate-50 px-5 py-4 dark:bg-white/[0.04]">
-          {[0, 1, 2, 3, 4, 5, 6].map((item) => (
-            <Skeleton key={item} className="h-3 min-w-16 flex-1" />
-          ))}
-        </div>
-        {[0, 1, 2, 3, 4, 5].map((item) => (
-          <div
-            key={item}
-            className="flex items-center gap-8 border-t border-black/[0.05] px-5 py-4 dark:border-white/[0.08]"
-          >
-            {[0, 1, 2, 3, 4, 5, 6].map((cell) => (
-              <Skeleton key={cell} className={`h-4 ${cell === 0 ? "w-28" : "min-w-12 flex-1"}`} />
-            ))}
-          </div>
-        ))}
-      </div>
-    </section>
-  </main>
-);
 
 const SemesterAccordion = ({ semester }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -253,6 +183,8 @@ function FeeDetailsPage() {
         return;
       }
 
+      root.style.display = "none";
+
       try {
         setAlerts(parsePortalAlerts(root));
 
@@ -374,13 +306,13 @@ function FeeDetailsPage() {
   if (loading)
     return (
       <PageLayout currentPage={window.location.pathname}>
-        <FeeDetailsSkeleton />
+        <PageSkeleton label="Loading fee details" cards={4} rows={5} showTabs={false} />
       </PageLayout>
     );
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-3.5 py-1 font-sans sm:gap-7 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1680px] min-w-0 flex-col gap-3.5 py-1 font-sans sm:gap-7 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
         <header className="flex flex-wrap items-end justify-between gap-3 sm:gap-4">
           <div className="space-y-1">
             <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/85 sm:text-[10px] sm:tracking-[0.16em] sm:text-white/80">
@@ -626,7 +558,7 @@ function FeeDetailsPage() {
             )}
           </div>
         </section>
-      </main>
+      </div>
     </PageLayout>
   );
 }
