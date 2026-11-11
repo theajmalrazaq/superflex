@@ -64,14 +64,8 @@ function LoginPageStyles() {
     }
 
     document.querySelectorAll<HTMLElement>(".m-login__wrapper").forEach((element) => {
-      element.classList.add(
-        "!flex",
-        "!flex-col",
-        "!items-center",
-        "!justify-center",
-        "!w-full",
-        "!max-w-full",
-      );
+      element.classList.add("!flex", "!flex-col", "!items-center", "!w-full", "!max-w-full");
+      element.classList.remove("!justify-center");
     });
 
     document
@@ -466,14 +460,6 @@ function LoginPageStyles() {
       );
       bglogin.setAttribute("id", "login-popup");
       bglogin.style.setProperty("background", "var(--login-card-bg)", "important");
-      bglogin.style.setProperty("border-radius", "32px", "important");
-      bglogin.style.setProperty(
-        "padding",
-        "clamp(14px, 3dvh, 28px) clamp(20px, 3vw, 32px)",
-        "important",
-      );
-      bglogin.style.setProperty("width", "min(480px, calc(100% - 32px))", "important");
-      bglogin.style.setProperty("max-width", "480px", "important");
       bglogin.style.setProperty("height", "auto", "important");
       bglogin.style.setProperty("min-height", "0", "important");
 
@@ -518,18 +504,6 @@ function LoginPageStyles() {
       );
       forgotPasswordSection.setAttribute("id", "forgot-password-popup");
       forgotPasswordSection.style.setProperty("background", "var(--login-card-bg)", "important");
-      forgotPasswordSection.style.setProperty("border-radius", "32px", "important");
-      forgotPasswordSection.style.setProperty(
-        "padding",
-        "clamp(14px, 3dvh, 28px) clamp(20px, 3vw, 32px)",
-        "important",
-      );
-      forgotPasswordSection.style.setProperty(
-        "width",
-        "min(480px, calc(100% - 32px))",
-        "important",
-      );
-      forgotPasswordSection.style.setProperty("max-width", "480px", "important");
       forgotPasswordSection.style.setProperty(
         "height",
         "var(--login-card-height, auto)",
@@ -783,18 +757,12 @@ function LoginPageStyles() {
     footerWrapper.className =
       "login-outer-footer flex items-center justify-center gap-3 text-center w-full mt-7 relative z-10 flex-wrap select-none";
     footerWrapper.innerHTML = `
-      <a href="https://theajmalrazaq.github.io/superflex/docs.html?page=privacy" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/25 hover:bg-white/35 backdrop-blur-sm border border-white/20 text-[11px] font-semibold text-white transition-all shadow-none">
-        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      <a href="https://github.com/theajmalrazaq/superflex/issues/new" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/25 hover:bg-white/35 backdrop-blur-sm border border-white/20 text-[11px] font-semibold text-white transition-all shadow-none">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
         </svg>
-        Privacy Policy
-      </a>
-      <span class="text-white/40 text-xs">•</span>
-      <a href="https://github.com/theajmalrazaq/superflex" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/25 hover:bg-white/35 backdrop-blur-sm border border-white/20 text-[11px] font-semibold text-white transition-all shadow-none">
-        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m12 2 3.09 6.26 6.91 1.01-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z"/>
-        </svg>
-        Star on GitHub
+        Raise Issue
       </a>
       <button type="button" class="login-theme-toggle" aria-label="Switch to dark mode" title="Switch to dark mode">
         <span class="login-theme-icon" aria-hidden="true"></span>

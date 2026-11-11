@@ -1,12 +1,16 @@
 html:has(body.superflex-login-page) {
-  height: 100dvh;
-  overflow: hidden !important;
+  min-height: 100dvh;
+  height: auto;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
 }
 
 body.superflex-login-page {
   --login-card-bg: #fff;
-  height: 100dvh !important;
-  overflow: hidden !important;
+  min-height: 100dvh !important;
+  height: auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
   background: linear-gradient(
     180deg,
     #62abe0 0%,
@@ -36,12 +40,12 @@ html.dark body.superflex-login-page {
 body.superflex-login-page .m-login.m-login--1,
 body.superflex-login-page .m-login__aside {
   width: 100% !important;
-  height: 100dvh !important;
-  min-height: 0 !important;
+  min-height: 100dvh !important;
+  height: auto !important;
   margin: 0 !important;
   padding: 0 !important;
   background: transparent !important;
-  overflow: hidden !important;
+  overflow: visible !important;
 }
 
 body.superflex-login-page .m-grid.m-grid--hor {
@@ -49,23 +53,35 @@ body.superflex-login-page .m-grid.m-grid--hor {
 }
 
 body.superflex-login-page .m-stack__item.m-stack__item--fluid,
-body.superflex-login-page .m-login__wrapper {
+body.superflex-login-page .m-login__wrapper,
+body.superflex-login-page .m-login__container {
   width: 100% !important;
   max-width: none !important;
-  min-height: 100dvh !important;
   padding: 0 !important;
   margin: 0 !important;
   align-items: stretch !important;
   background: transparent !important;
 }
 
+body.superflex-login-page .m-stack__item.m-stack__item--fluid,
 body.superflex-login-page .m-login__wrapper {
-  height: 100dvh !important;
-  min-height: 0 !important;
-  padding: 12px 0 !important;
-  gap: 10px;
-  justify-content: center !important;
-  overflow: hidden !important;
+  min-height: 100dvh !important;
+}
+
+body.superflex-login-page .m-login__container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  flex: 1 0 auto !important;
+}
+
+body.superflex-login-page .m-login__wrapper {
+  min-height: 100dvh !important;
+  height: auto !important;
+  padding: max(16px, env(safe-area-inset-top)) 0 max(20px, env(safe-area-inset-bottom)) !important;
+  gap: 12px;
+  justify-content: flex-start !important;
+  overflow: visible !important;
 }
 
 body.superflex-login-page #login-popup,
@@ -467,21 +483,22 @@ body.superflex-login-page .login-version-pill:focus-visible {
 }
 
 body.superflex-login-page .login-outer-footer {
-  position: fixed !important;
-  right: 0;
-  bottom: max(16px, env(safe-area-inset-bottom));
-  left: 0;
-  z-index: 10;
+  position: relative !important;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  z-index: 50;
   width: min(100% - 32px, 480px) !important;
-  margin: 0 auto !important;
+  margin: 4px auto auto !important;
   flex: none;
-  gap: 4px !important;
+  gap: 6px 10px !important;
   color: #777 !important;
 }
 
 body.superflex-login-page .login-outer-footer a {
   border: 0 !important;
   background: transparent !important;
+  padding: 6px 10px !important;
   color: #686868 !important;
   font-size: 12px !important;
 }
@@ -530,6 +547,7 @@ body.superflex-login-page .login-theme-label {
 
 body.superflex-login-page .login-version-pill {
   align-self: center;
+  margin: auto auto 0;
   display: inline-flex;
   align-items: center;
   gap: 12px;
@@ -974,9 +992,9 @@ body.superflex-login-page.superflex-login-dark #forgot-password-popup .forgot-pa
 @media (max-width: 640px) {
   body.superflex-login-page #login-popup,
   body.superflex-login-page #forgot-password-popup {
-    width: min(100% - 24px, 440px) !important;
-    border-radius: 20px !important;
-    padding: 16px 18px !important;
+    width: min(100% - 16px, 480px) !important;
+    border-radius: 24px !important;
+    padding: 18px 20px !important;
   }
 
   body.superflex-login-page #login-popup .login-header h1,
