@@ -134,6 +134,11 @@ const SectionAccordion = ({ section, isOpen, onToggle, course, pendingUpdates })
                     <td className="p-3 text-[13px] font-semibold text-foreground sm:text-sm">
                       <div className="flex items-center gap-2">
                         <span>{row.title}</span>
+                        {!row.included && (
+                          <span className="rounded-full bg-foreground/[0.06] px-2 py-0.5 text-[10px] font-bold text-foreground/55">
+                            Dropped
+                          </span>
+                        )}
                         {isRowUpdated && (
                           <span className="inline-flex items-center gap-1 rounded-full bg-[#230052]/10 px-2 py-0.5 text-[10px] font-bold text-[#230052] dark:bg-white/15 dark:text-white">
                             <span className="h-1.5 w-1.5 rounded-full bg-[#230052] animate-pulse dark:bg-white" />
@@ -143,15 +148,25 @@ const SectionAccordion = ({ section, isOpen, onToggle, course, pendingUpdates })
                       </div>
                     </td>
                     <td className="p-3 text-right text-xs font-bold text-foreground sm:text-sm">
-                      {row.obtained}{" "}
+                      {row.ungraded ? "—" : row.obtained}{" "}
                       <span className="text-[11px] font-normal text-foreground/40 sm:text-xs">/ {row.total}</span>
                     </td>
                     <td className="p-3 text-right">
-                      <span
-                        className={`rounded-full border px-2 py-1 text-[10px] font-bold ${percentage >= 80 ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500" : percentage >= 60 ? "border-amber-500/20 bg-amber-500/10 text-amber-500" : "border-rose-500/20 bg-rose-500/10 text-rose-500"}`}
-                      >
-                        {percentage.toFixed(0)}%
-                      </span>
+                      {row.ungraded ? (
+                        <span className="rounded-full border border-foreground/10 bg-foreground/[0.05] px-2 py-1 text-[10px] font-bold text-foreground/55">
+                          Pending
+                        </span>
+                      ) : !row.included ? (
+                        <span className="rounded-full border border-foreground/10 bg-foreground/[0.05] px-2 py-1 text-[10px] font-bold text-foreground/55">
+                          Dropped
+                        </span>
+                      ) : (
+                        <span
+                          className={`rounded-full border px-2 py-1 text-[10px] font-bold ${percentage >= 80 ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-500" : percentage >= 60 ? "border-amber-500/20 bg-amber-500/10 text-amber-500" : "border-rose-500/20 bg-rose-500/10 text-rose-500"}`}
+                        >
+                          {percentage.toFixed(0)}%
+                        </span>
+                      )}
                     </td>
                   </tr>
                 );

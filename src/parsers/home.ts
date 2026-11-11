@@ -76,7 +76,7 @@ export function parseHomeAttendanceReport(document: ParentNode) {
 export function parseHomeMarksReport(document: ParentNode): RawMarkCourse[] {
   try {
     const parsed = parseMarksPage(document, null);
-    if (parsed.courses && parsed.courses.length > 0) {
+    if (parsed.courses && parsed.courses.some((course) => course.sections.length > 0)) {
       return parsed.courses.map((course) => ({
         id: course.id,
         title: course.title,
@@ -90,7 +90,7 @@ export function parseHomeMarksReport(document: ParentNode): RawMarkCourse[] {
             title: sec.title,
             weight: sec.weight,
             rows: sec.rows.filter(
-              (row) => !row.ungraded && row.title !== "Total" && row.title !== "Grand Total",
+              (row) => row.title !== "Total" && row.title !== "Grand Total",
             ),
           }))
           .filter((sec) => sec.rows.length > 0),
@@ -115,9 +115,10 @@ export function parseHomeMarksReport(document: ParentNode): RawMarkCourse[] {
         const name = readText(cells[0]);
         if (name === "Total" || name === "Grand Total") return [];
         const obtainedText = readText(cells[2]);
-        if (!obtainedText || obtainedText === "-") return [];
-        const obtained = Number.parseFloat(obtainedText);
-        if (!Number.isFinite(obtained)) return [];
+        const ungraded = !obtainedText || obtainedText === "-";
+        const parsedObtained = Number.parseFloat(obtainedText);
+        if (!ungraded && !Number.isFinite(parsedObtained)) return [];
+        const obtained = ungraded ? 0 : parsedObtained;
         return [
           {
             title: name,
@@ -129,6 +130,7 @@ export function parseHomeMarksReport(document: ParentNode): RawMarkCourse[] {
             min: parseNumber(readText(cells[6])),
             max: parseNumber(readText(cells[7])),
             included: true,
+            ungraded,
           },
         ];
       });
