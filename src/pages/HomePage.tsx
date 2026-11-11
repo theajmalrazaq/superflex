@@ -17,6 +17,7 @@ import {
   ChevronUp,
   ArrowLeft,
   ArrowRight,
+  Camera,
   Sun,
   Moon,
 } from "lucide-react";
@@ -428,7 +429,21 @@ function HomePage() {
   const universityInfo = profile?.universityInfo || null;
   const personalInfo = profile?.personalInfo || null;
   const profileSections = profile?.sections || EMPTY_PROFILE_SECTIONS;
-  const [activeMainTab, setActiveMainTab] = useState("stats");
+  const [activeMainTab, setActiveMainTab] = useState(() => {
+    if (typeof window === "undefined") return "stats";
+    return new URLSearchParams(window.location.search).get("tab") === "info" ? "info" : "stats";
+  });
+  const selectMainTab = (tab: "stats" | "info") => {
+    setActiveMainTab(tab);
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (tab === "info") {
+      url.searchParams.set("tab", "info");
+    } else {
+      url.searchParams.delete("tab");
+    }
+    window.history.replaceState(null, "", url.toString());
+  };
   const [alerts, setAlerts] = useState(() => profile?.alerts || []);
   const profileImage = useProfileImage();
   const themeMode = usePreferencesStore((state) => state.themeMode);
@@ -784,7 +799,7 @@ function HomePage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setActiveMainTab("info")}
+                    onClick={() => selectMainTab("info")}
                     aria-label="Open student profile"
                     className="h-9 w-9 shrink-0 overflow-hidden rounded-full border border-white/45 bg-white/20 transition-transform active:scale-95 dark:border-white/20 dark:bg-white/10"
                   >
@@ -816,7 +831,7 @@ function HomePage() {
               <div className="flex w-full items-center justify-between pb-1">
                 <button
                   type="button"
-                  onClick={() => setActiveMainTab("stats")}
+                  onClick={() => selectMainTab("stats")}
                   aria-label="Back to Overview"
                   className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-md transition-transform active:scale-95 dark:bg-white/10"
                 >
@@ -837,10 +852,16 @@ function HomePage() {
                 </button>
               </div>
 
-              <div className="relative mt-1">
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent("superflex-open-profile-image"))}
+                aria-label="Change profile picture"
+                title="Change profile picture"
+                className="group relative mt-1 rounded-full transition-transform active:scale-95"
+              >
                 <img
                   src={profileImage}
-                  alt=""
+                  alt="Profile"
                   className="h-24 w-24 rounded-full border-2 border-white/50 bg-white object-cover"
                   onError={(event) => {
                     const fallbackUrl = getExtensionUrl("assets/favicon.png");
@@ -848,7 +869,10 @@ function HomePage() {
                     else event.currentTarget.hidden = true;
                   }}
                 />
-              </div>
+                <span className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#230052] text-white shadow-md dark:border-[#0a192f] dark:bg-white dark:text-[#0a192f]">
+                  <Camera size={14} strokeWidth={2.3} />
+                </span>
+              </button>
 
               <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/25 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-md dark:bg-white/10">
                 <span className="font-bold opacity-90">@</span>
@@ -873,16 +897,37 @@ function HomePage() {
           {/* Desktop Header */}
           <header className="hidden flex-col justify-between gap-3.5 sm:flex sm:flex-row sm:items-center sm:gap-5">
             <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-              <img
-                src={profileImage}
-                alt=""
-                className="h-10 w-10 shrink-0 rounded-full border-2 border-white/80 bg-white object-cover sm:h-14 sm:w-14"
-                onError={(event) => {
-                  const fallbackUrl = getExtensionUrl("assets/favicon.png");
-                  if (fallbackUrl) event.currentTarget.src = fallbackUrl;
-                  else event.currentTarget.hidden = true;
+              <button
+                type="button"
+                onClick={() => {
+                  if (activeMainTab === "info") {
+                    window.dispatchEvent(new CustomEvent("superflex-open-profile-image"));
+                  } else {
+                    selectMainTab("info");
+                  }
                 }}
-              />
+                aria-label={
+                  activeMainTab === "info" ? "Change profile picture" : "Open student profile"
+                }
+                title={activeMainTab === "info" ? "Change profile picture" : "Open student profile"}
+                className="group relative h-10 w-10 shrink-0 rounded-full border-2 border-white/80 bg-white transition-transform hover:scale-105 active:scale-95 sm:h-14 sm:w-14"
+              >
+                <img
+                  src={profileImage}
+                  alt="Profile"
+                  className="h-full w-full rounded-full object-cover"
+                  onError={(event) => {
+                    const fallbackUrl = getExtensionUrl("assets/favicon.png");
+                    if (fallbackUrl) event.currentTarget.src = fallbackUrl;
+                    else event.currentTarget.hidden = true;
+                  }}
+                />
+                {activeMainTab === "info" && (
+                  <span className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full border border-white bg-[#230052] text-white shadow-sm dark:border-[#0a192f] dark:bg-white dark:text-[#0a192f]">
+                    <Camera size={10} strokeWidth={2.3} />
+                  </span>
+                )}
+              </button>
               <div className="min-w-0">
                 <p className="mb-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-white/80 dark:text-white/80 sm:mb-1 sm:text-[10px]">
                   Student dashboard
@@ -899,7 +944,7 @@ function HomePage() {
             <div className="flex w-fit items-center gap-1 rounded-full border border-white/60 bg-white/45 p-1 backdrop-blur-md dark:border-white/10 dark:bg-black/35">
               <button
                 type="button"
-                onClick={() => setActiveMainTab("stats")}
+                onClick={() => selectMainTab("stats")}
                 className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm ${
                   activeMainTab === "stats"
                     ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"
@@ -911,7 +956,7 @@ function HomePage() {
               </button>
               <button
                 type="button"
-                onClick={() => setActiveMainTab("info")}
+                onClick={() => selectMainTab("info")}
                 className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm ${
                   activeMainTab === "info"
                     ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"

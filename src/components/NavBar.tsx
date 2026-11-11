@@ -202,14 +202,19 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
       if (active) setPendingUpdates(updates);
     };
     handleUpdates();
+    const handleOpenProfileImage = () => {
+      if (active) setProfileModalOpen(true);
+    };
     window.addEventListener("superflex-academic-updates-detected", handleUpdates);
     window.addEventListener("superflex-academic-updates-cleared", handleUpdates);
     window.addEventListener("superflex-student-identity-changed", handleUpdates);
+    window.addEventListener("superflex-open-profile-image", handleOpenProfileImage);
     return () => {
       active = false;
       window.removeEventListener("superflex-academic-updates-detected", handleUpdates);
       window.removeEventListener("superflex-academic-updates-cleared", handleUpdates);
       window.removeEventListener("superflex-student-identity-changed", handleUpdates);
+      window.removeEventListener("superflex-open-profile-image", handleOpenProfileImage);
     };
   }, []);
 
@@ -243,11 +248,23 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
   const sidebarLogoBoltColor = themeMode === "dark" ? "#a098ff" : "#0a192f";
 
   const isLinkActive = (link) => {
-    if (link.text.trim() === "Home")
-      return currentPage === "/" || currentPage.startsWith("/?dump=");
-    if (link.text.trim() === "Course Registration")
-      return currentPage.startsWith("/Student/CourseRegistration");
-    return Boolean(link.path && currentPage && currentPage.includes(link.path));
+    const path = (currentPage || "").toLowerCase();
+    const linkPath = (link.path || "").toLowerCase();
+    const name = link.text.trim();
+    if (name === "Home") {
+      return path === "/" || path.startsWith("/?dump=") || path.startsWith("/?tab=");
+    }
+    if (name === "Course Registration") {
+      return path.startsWith("/student/courseregistration");
+    }
+    if (name === "Course Feedback") {
+      return (
+        path.includes("/student/coursefeedback") ||
+        path.includes("/student/submitfeedback") ||
+        path.includes("/student/feedbackquestions")
+      );
+    }
+    return Boolean(linkPath && path && path.includes(linkPath));
   };
 
   useEffect(() => {
@@ -472,12 +489,29 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
   );
 
   const isHomePage =
-    !currentPage || currentPage === "/" || currentPage.startsWith("/?dump=");
+    !currentPage ||
+    currentPage === "/" ||
+    currentPage.startsWith("/?dump=") ||
+    currentPage.startsWith("/?tab=");
+
+  const openStudentProfile = () => {
+    const url = new URL("/", window.location.origin);
+    const currentDump = new URLSearchParams(window.location.search).get("dump");
+    if (currentDump) url.searchParams.set("dump", currentDump);
+    url.searchParams.set("tab", "info");
+    window.location.href = url.toString();
+  };
+
+  const hasRemainingActiveLink = useMemo(
+    () => remainingLinks.some((link) => isLinkActive(link)),
+    [remainingLinks, currentPage],
+  );
 
   const bottomNavItems = useMemo(() => {
     const findHref = (name: string, fallback: string) =>
       menuLinks.find((l) => l.text.trim() === name)?.href ||
       `${window.location.origin}${fallback}`;
+    const lowerPage = (currentPage || "").toLowerCase();
 
     return [
       {
@@ -493,7 +527,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
         label: "Attendance",
         href: findHref("Attendance", "/Student/StudentAttendance"),
         icon: CalendarDays,
-        active: Boolean(currentPage && currentPage.includes("Attendance")),
+        active: Boolean(lowerPage && lowerPage.includes("attendance")),
         hasUpdate: Boolean(pendingUpdates?.newAttendance?.length > 0),
       },
       {
@@ -502,9 +536,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
         href: findHref("Marks", "/Student/StudentMarks"),
         icon: TrendingUp,
         active: Boolean(
-          currentPage &&
-            currentPage.includes("Marks") &&
-            !currentPage.includes("Plo"),
+          lowerPage && lowerPage.includes("marks") && !lowerPage.includes("plo"),
         ),
         hasUpdate: Boolean(pendingUpdates?.newMarks?.length > 0),
       },
@@ -513,7 +545,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
         label: "Transcript",
         href: findHref("Transcript", "/Student/Transcript"),
         icon: GraduationCap,
-        active: Boolean(currentPage && currentPage.includes("Transcript")),
+        active: Boolean(lowerPage && lowerPage.includes("transcript")),
         hasUpdate: false,
       },
       {
@@ -553,9 +585,9 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
           </a>
           <button
             type="button"
-            onClick={() => setProfileModalOpen(true)}
-            aria-label="Profile"
-            className="h-9 w-9 overflow-hidden rounded-full border border-white/60 bg-white/20"
+            onClick={openStudentProfile}
+            aria-label="Open student profile"
+            className="h-9 w-9 overflow-hidden rounded-full border border-white/60 bg-white/20 transition-transform active:scale-95"
           >
             <img
               src={profileImage}
@@ -607,7 +639,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
           aria-label="All links and quick actions"
           aria-expanded={plusMenuOpen}
           className={`sf-floating-dock pointer-events-auto flex h-[58px] w-[58px] shrink-0 items-center justify-center rounded-full border border-black/[0.06] backdrop-blur-xl transition-all active:scale-95 ${
-            plusMenuOpen
+            plusMenuOpen || hasRemainingActiveLink
               ? "bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#0a192f]"
               : "bg-white/95 text-[#52525b] hover:text-[#230052] dark:border-white/15 dark:bg-[#12121a]/95 dark:text-slate-400 dark:hover:text-white"
           }`}
@@ -615,7 +647,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
           {plusMenuOpen ? (
             <X size={22} strokeWidth={2.3} />
           ) : (
-            <LayoutGrid size={22} strokeWidth={1.9} />
+            <LayoutGrid size={22} strokeWidth={hasRemainingActiveLink ? 2.3 : 1.9} />
           )}
         </button>
       </div>
@@ -645,25 +677,28 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
                     setPlusMenuOpen(false);
                     navigate(link.href, link.action);
                   }}
+                  aria-current={active ? "page" : undefined}
                   className="group flex items-center gap-3 transition-transform active:scale-95"
                   role="menuitem"
                 >
                   <span
-                    className={`text-[16px] font-bold tracking-tight transition-colors ${
+                    className={`rounded-full px-3 py-1 text-[15px] font-bold tracking-tight transition-colors ${
                       active
-                        ? "text-[#230052] dark:text-white"
-                        : "text-foreground group-hover:text-[#230052] dark:group-hover:text-white"
+                        ? "bg-[#230052] text-white shadow-sm dark:bg-white dark:text-[#0a192f]"
+                        : "text-foreground/80 group-hover:text-[#230052] dark:group-hover:text-white"
                     }`}
                   >
                     {link.text}
                   </span>
                   <div className="flex w-[58px] shrink-0 items-center justify-center">
                     <div
-                      className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-[13px] bg-[#230052] text-white shadow-[0_4px_16px_rgba(35,0,82,0.18)] transition-transform group-hover:scale-105 dark:bg-white dark:text-[#0a192f] dark:shadow-none ${
-                        active ? "ring-2 ring-[#230052]/40 dark:ring-white/50" : ""
+                      className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-[13px] transition-transform group-hover:scale-105 ${
+                        active
+                          ? "bg-[#230052] text-white shadow-[0_4px_16px_rgba(35,0,82,0.28)] ring-2 ring-[#230052]/25 dark:bg-white dark:text-[#0a192f] dark:shadow-none dark:ring-white/30"
+                          : "border border-black/[0.08] bg-white/95 text-[#230052]/80 shadow-xs dark:border-white/15 dark:bg-[#181822] dark:text-white/80"
                       }`}
                     >
-                      <Icon size={20} strokeWidth={2.2} />
+                      <Icon size={20} strokeWidth={active ? 2.3 : 1.9} />
                       {hasUpdate && (
                         <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
                           <span className="h-full w-full rounded-full bg-emerald-500 animate-pulse ring-2 ring-white dark:ring-[#12121a]" />
@@ -684,12 +719,12 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
               className="group flex items-center gap-3 transition-transform active:scale-95"
               role="menuitem"
             >
-              <span className="text-[16px] font-bold tracking-tight text-foreground transition-colors group-hover:text-[#230052] dark:group-hover:text-white">
+              <span className="px-3 py-1 text-[15px] font-bold tracking-tight text-foreground/80 transition-colors group-hover:text-[#230052] dark:group-hover:text-white">
                 Settings
               </span>
               <div className="flex w-[58px] shrink-0 items-center justify-center">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[13px] bg-[#230052] text-white shadow-[0_4px_16px_rgba(35,0,82,0.18)] transition-transform group-hover:scale-105 dark:bg-white dark:text-[#0a192f] dark:shadow-none">
-                  <Settings size={20} strokeWidth={2.2} />
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[13px] border border-black/[0.08] bg-white/95 text-[#230052]/80 shadow-xs transition-transform group-hover:scale-105 dark:border-white/15 dark:bg-[#181822] dark:text-white/80">
+                  <Settings size={20} strokeWidth={1.9} />
                 </div>
               </div>
             </button>
