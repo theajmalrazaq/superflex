@@ -265,6 +265,23 @@
         );
       }
 
+      @supports (background: linear-gradient(in oklab, #000, #fff)) {
+        .animated-bg {
+          background: linear-gradient(
+            180deg in oklab,
+            #62abe0 0%,
+            #73b3e1 24%,
+            #9ac7e8 38%,
+            #dcebf5 49%,
+            #fff 57%
+          );
+        }
+      }
+
+      .animated-bg-dither {
+        display: none;
+      }
+
       .animated-bg::before,
       .animated-bg::after {
         content: "";
@@ -434,12 +451,40 @@
       html.dark .animated-bg {
         background: linear-gradient(
           180deg,
-          #0f1422 0%,
-          #0f1422 24%,
-          #0b0e17 38%,
-          #06070c 49%,
-          #000 57%
+          #0f2b52 0%,
+          #0b2140 20%,
+          #07152b 40%,
+          #040b18 58%,
+          #01040a 72%,
+          #000000 82%
         );
+      }
+      @supports (background: linear-gradient(in oklab, #000, #fff)) {
+        html.dark .animated-bg {
+          background: linear-gradient(
+            180deg in oklab,
+            oklch(0.29 0.095 256) 0%,
+            oklch(0.24 0.078 256) 20%,
+            oklch(0.17 0.052 256) 40%,
+            oklch(0.1 0.026 256) 58%,
+            oklch(0.04 0.009 256) 72%,
+            #000000 82%
+          );
+        }
+      }
+      html.dark .animated-bg-dither {
+        display: block;
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='6' intercept='-2.5'/%3E%3CfeFuncG type='linear' slope='6' intercept='-2.5'/%3E%3CfeFuncB type='linear' slope='6' intercept='-2.5'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+        background-size: 128px 128px;
+        image-rendering: pixelated;
+        opacity: 0.032;
+        -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 45%, transparent 82%);
+        mask-image: linear-gradient(180deg, #000 0%, #000 45%, transparent 82%);
       }
       html.dark .animated-bg::before,
       html.dark .animated-bg::after {
@@ -888,6 +933,7 @@
   </head>
   <body>
     <div class="animated-bg">
+      <div class="animated-bg-dither" aria-hidden="true"></div>
       <div class="glow-1"></div>
       <div class="glow-2"></div>
       <img
@@ -899,12 +945,12 @@
     </div>
 
     <nav
-      class="sticky top-5 w-[90%] sm:w-fit mt-10 mx-auto z-[100] bg-black/60 backdrop-blur-2xl border border-white/10 rounded-full"
+      class="sticky top-5 w-[92%] lg:w-fit mt-6 sm:mt-10 mx-auto z-[100] bg-black/60 backdrop-blur-2xl border border-white/10 rounded-full"
       id="main-nav"
     >
-      <div class="flex items-center justify-between px-4 lg:px-6 py-3">
+      <div class="flex items-center justify-between px-4 sm:px-5 lg:px-6 py-2.5 lg:py-3">
         <div
-          class="flex items-center gap-2 lg:gap-8 w-full lg:w-auto justify-between lg:justify-start"
+          class="flex items-center gap-3 lg:gap-8 w-full lg:w-auto justify-between lg:justify-start"
         >
           <a href="index.html" class="flex items-center shrink-0">
             <img
@@ -942,48 +988,50 @@
             >
           </div>
 
-          <button
-            id="theme-toggle"
-            type="button"
-            class="shrink-0 rounded-full border px-3 py-2 text-xs font-semibold transition-colors"
-            aria-label="Switch to dark mode"
-            aria-pressed="false"
-          >
-            <svg
-              class="theme-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
+          <div class="flex items-center gap-2 shrink-0">
+            <button
+              id="theme-toggle"
+              type="button"
+              class="shrink-0 rounded-full border px-3 py-1.5 lg:py-2 text-xs font-semibold transition-colors"
+              aria-label="Switch to dark mode"
+              aria-pressed="false"
             >
-              <path
-                d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6.5 6.5 0 0 0 8.268 8.268c.344-.215.825-.003.803.401"
-              /></svg
-            ><span>Dark</span>
-          </button>
+              <svg
+                class="theme-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path
+                  d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6.5 6.5 0 0 0 8.268 8.268c.344-.215.825-.003.803.401"
+                /></svg
+              ><span>Dark</span>
+            </button>
 
-          <button
-            id="mobile-toggle"
-            type="button"
-            aria-label="Open navigation"
-            aria-controls="mobile-overlay"
-            aria-expanded="false"
-            class="lg:hidden relative w-10 h-10 flex items-center justify-center text-zinc-400"
-          >
-            <div class="flex flex-col gap-1.5 transition-all duration-300" id="hamburger">
-              <span
-                class="w-5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center"
-                id="line1"
-              ></span>
-              <span
-                class="w-5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center"
-                id="line2"
-              ></span>
-            </div>
-          </button>
+            <button
+              id="mobile-toggle"
+              type="button"
+              aria-label="Open navigation"
+              aria-controls="mobile-overlay"
+              aria-expanded="false"
+              class="lg:hidden relative w-9 h-9 flex items-center justify-center rounded-full text-zinc-400"
+            >
+              <div class="flex flex-col gap-1.5 transition-all duration-300" id="hamburger">
+                <span
+                  class="w-5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center"
+                  id="line1"
+                ></span>
+                <span
+                  class="w-5 h-0.5 bg-current rounded-full transition-all duration-300 origin-center"
+                  id="line2"
+                ></span>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     </nav>
