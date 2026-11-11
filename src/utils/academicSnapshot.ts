@@ -5,7 +5,9 @@ const SNAPSHOT_KEY = "snapshot";
 const UPDATES_KEY = "pending-updates";
 
 const dispatchAcademicEvent = (name: string, detail?: unknown) => {
-  window.dispatchEvent(new CustomEvent(name, detail === undefined ? undefined : { detail }));
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(name, detail === undefined ? undefined : { detail }));
+  }
 };
 
 export const getCleanCourseTitle = (raw = "") => {
@@ -126,34 +128,178 @@ export const clearPendingUpdateType = async (type) => {
   } catch {}
 };
 
-export const isCourseMarksUpdated = (pendingUpdates, course) => {
+export const normalizeSectionTitle = (title = "") =>
+  String(title || "")
+    .replace(/\s*\([^)]*\)/g, "")
+    .trim()
+    .toLowerCase();
+
+export const normalizeItemKey = (rawKeyOrItem: any): string => {
+  if (typeof rawKeyOrItem === "object" && rawKeyOrItem !== null) {
+    const sec = normalizeSectionTitle(rawKeyOrItem.section || "");
+    const name = String(rawKeyOrItem.name || rawKeyOrItem.title || "")
+      .trim()
+      .replace(/\s+/g, " ")
+      .toLowerCase();
+    const obt = Number(rawKeyOrItem.obtained) || 0;
+    const tot = Number(rawKeyOrItem.total) || 0;
+    return `${sec}#${name}#${obt}#${tot}`;
+  }
+  const str = String(rawKeyOrItem || "").trim();
+  const parts = str.split("#");
+  if (parts.length >= 4) {
+    const sec = normalizeSectionTitle(parts[0]);
+    const name = parts[1].trim().replace(/\s+/g, " ").toLowerCase();
+    const obt = Number(parts[2]) || 0;
+    const tot = Number(parts[3]) || 0;
+    return `${sec}#${name}#${obt}#${tot}`;
+  }
+  return str.toLowerCase();
+};
+
+export const normalizeAttendanceRecordKey = (rawKeyOrRecord: any): string => {
+  if (typeof rawKeyOrRecord === "object" && rawKeyOrRecord !== null) {
+    const date = String(rawKeyOrRecord.date || "")
+      .trim()
+      .replace(/[-/]/g, "");
+    const status = formatAttendanceStatus(rawKeyOrRecord.status);
+    return `${date}#${status}`;
+  }
+  const str = String(rawKeyOrRecord || "").trim();
+  const parts = str.split("#");
+  const date = (parts[0] || "").trim().replace(/[-/]/g, "");
+  const status = formatAttendanceStatus(parts[1] || "");
+  return `${date}#${status}`;
+};
+
+export const findMatchingCourse = (
+  currentKey: string,
+  currentCourse: any,
+  snapshotMap: Record<string, any> | null | undefined,
+) => {
+  if (!snapshotMap) return null;
+  if (snapshotMap[currentKey]) return snapshotMap[currentKey];
+
+  const currentCode =
+    getCourseCode(currentCourse?.rawTitle || "") ||
+    getCourseCode(currentCourse?.title || "") ||
+    getCourseCode(currentCourse?.id || "") ||
+    getCourseCode(currentKey);
+  const currentClean = getCleanCourseTitle(
+    currentCourse?.rawTitle || currentCourse?.title || currentCourse?.id || currentKey,
+  )
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+
+  for (const [snapKey, snapCourse] of Object.entries(snapshotMap)) {
+    if (snapKey === currentKey) return snapCourse;
+    if (currentCode) {
+      const snapCode =
+        getCourseCode(snapCourse?.rawTitle || "") ||
+        getCourseCode(snapCourse?.title || "") ||
+        getCourseCode(snapCourse?.id || "") ||
+        getCourseCode(snapKey);
+      if (snapCode && snapCode === currentCode) return snapCourse;
+    }
+    if (currentClean) {
+      const snapClean = getCleanCourseTitle(
+        snapCourse?.rawTitle || snapCourse?.title || snapCourse?.id || snapKey,
+      )
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+      if (snapClean && snapClean === currentClean) return snapCourse;
+    }
+  }
+  return null;
+};
+
+export const isCourseMarksUpdated = (pendingUpdates: any, course: any) => {
   if (!pendingUpdates?.newMarks?.length || !course) return false;
   const key = getNormalizedCourseKey(course);
-  return pendingUpdates.newMarks.some(
-    (m) => m.courseKey === key || m.courseId === course.id || m.courseTitle === course.title,
-  );
+  const code = getCourseCode(course.title || "") || getCourseCode(course.id || "");
+  const cleanTitle = getCleanCourseTitle(course.title || course.id || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+
+  return pendingUpdates.newMarks.some((m: any) => {
+    if (m.courseKey === key || m.courseId === course.id || m.courseTitle === course.title) return true;
+    if (code) {
+      const mCode =
+        getCourseCode(m.courseTitle || "") ||
+        getCourseCode(m.courseId || "") ||
+        getCourseCode(m.courseKey || "");
+      if (mCode && mCode === code) return true;
+    }
+    if (cleanTitle) {
+      const mClean = getCleanCourseTitle(m.courseTitle || m.courseId || m.courseKey || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+      if (mClean && mClean === cleanTitle) return true;
+    }
+    return false;
+  });
 };
 
-export const isSectionMarksUpdated = (pendingUpdates, course, sectionTitle) => {
+export const isSectionMarksUpdated = (pendingUpdates: any, course: any, sectionTitle: any) => {
   if (!pendingUpdates?.newMarks?.length || !course || !sectionTitle) return false;
   const key = getNormalizedCourseKey(course);
-  const courseMatch = pendingUpdates.newMarks.find(
-    (m) => m.courseKey === key || m.courseId === course.id || m.courseTitle === course.title,
-  );
+  const code = getCourseCode(course.title || "") || getCourseCode(course.id || "");
+  const cleanTitle = getCleanCourseTitle(course.title || course.id || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+
+  const courseMatch = pendingUpdates.newMarks.find((m: any) => {
+    if (m.courseKey === key || m.courseId === course.id || m.courseTitle === course.title) return true;
+    if (code) {
+      const mCode =
+        getCourseCode(m.courseTitle || "") ||
+        getCourseCode(m.courseId || "") ||
+        getCourseCode(m.courseKey || "");
+      if (mCode && mCode === code) return true;
+    }
+    if (cleanTitle) {
+      const mClean = getCleanCourseTitle(m.courseTitle || m.courseId || m.courseKey || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+      if (mClean && mClean === cleanTitle) return true;
+    }
+    return false;
+  });
   if (!courseMatch) return false;
-  const target = String(sectionTitle).trim().toLowerCase();
-  return (courseMatch.sections || []).some((s) => String(s).trim().toLowerCase() === target);
+  const target = normalizeSectionTitle(sectionTitle);
+  return (courseMatch.sections || []).some((s: any) => normalizeSectionTitle(s) === target);
 };
 
-export const isAssessmentMarksUpdated = (pendingUpdates, course, assessmentTitle) => {
+export const isAssessmentMarksUpdated = (pendingUpdates: any, course: any, assessmentTitle: any) => {
   if (!pendingUpdates?.newMarks?.length || !course || !assessmentTitle) return false;
   const key = getNormalizedCourseKey(course);
-  const courseMatch = pendingUpdates.newMarks.find(
-    (m) => m.courseKey === key || m.courseId === course.id || m.courseTitle === course.title,
-  );
+  const code = getCourseCode(course.title || "") || getCourseCode(course.id || "");
+  const cleanTitle = getCleanCourseTitle(course.title || course.id || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+
+  const courseMatch = pendingUpdates.newMarks.find((m: any) => {
+    if (m.courseKey === key || m.courseId === course.id || m.courseTitle === course.title) return true;
+    if (code) {
+      const mCode =
+        getCourseCode(m.courseTitle || "") ||
+        getCourseCode(m.courseId || "") ||
+        getCourseCode(m.courseKey || "");
+      if (mCode && mCode === code) return true;
+    }
+    if (cleanTitle) {
+      const mClean = getCleanCourseTitle(m.courseTitle || m.courseId || m.courseKey || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+      if (mClean && mClean === cleanTitle) return true;
+    }
+    return false;
+  });
   if (!courseMatch) return false;
-  const target = String(assessmentTitle).trim().toLowerCase();
-  return (courseMatch.assessmentNames || []).some((a) => String(a).trim().toLowerCase() === target);
+  const target = String(assessmentTitle).trim().replace(/\s+/g, " ").toLowerCase();
+  return (courseMatch.assessmentNames || []).some(
+    (a: any) => String(a).trim().replace(/\s+/g, " ").toLowerCase() === target,
+  );
 };
 
 export const checkAndRecordMarksSnapshot = async (currentCourses) => {
@@ -169,28 +315,30 @@ export const checkAndRecordMarksSnapshot = async (currentCourses) => {
   currentCourses.forEach((c) => {
     const key = getNormalizedCourseKey(c);
     const displayTitle = getCleanCourseTitle(c.title || c.id) || c.title || c.id;
-    const items = [];
+    const items: any[] = [];
 
-    (c.sections || []).forEach((sec) => {
+    (c.sections || []).forEach((sec: any) => {
       if (sec.id?.endsWith("Grand_Total_Marks") || sec.title === "Grand Total Marks") return;
-      const secTitle = (sec.title || "").trim();
+      const secTitle = (sec.title || "").replace(/\s*\([^)]*\)/g, "").trim();
 
-      (sec.rows || []).forEach((row) => {
+      (sec.rows || []).forEach((row: any) => {
         let name = (row.title || "").trim();
         if (/^\d+$/.test(name) && secTitle) {
           const singularSec = secTitle.replace(/s$/i, "");
           name = `${singularSec} ${name}`;
         }
-        const scoreStr = row.total > 0 ? `${row.obtained}/${row.total}` : `${row.obtained}`;
-        const itemKey = `${secTitle}#${row.title}#${row.obtained}#${row.total}`;
+        const obt = Number(row.obtained) || 0;
+        const tot = Number(row.total) || 0;
+        const scoreStr = tot > 0 ? `${obt}/${tot}` : `${obt}`;
+        const itemKey = `${normalizeSectionTitle(secTitle)}#${name.trim().toLowerCase()}#${obt}#${tot}`;
         const label = scoreStr ? `${name} (${scoreStr})` : name;
 
         items.push({
           key: itemKey,
           label,
           name: row.title || name,
-          obtained: row.obtained,
-          total: row.total,
+          obtained: obt,
+          total: tot,
           section: secTitle,
         });
       });
@@ -204,23 +352,23 @@ export const checkAndRecordMarksSnapshot = async (currentCourses) => {
     };
   });
 
-  const newMarks = [];
+  const newMarks: any[] = [];
 
   if (prevMarks) {
     Object.entries(currentMarksMap).forEach(([key, curr]) => {
-      const prev = prevMarks[key];
+      const prev = findMatchingCourse(key, curr, prevMarks);
       if (prev && Array.isArray(prev.items)) {
-        const prevKeys = new Set(prev.items.map((it) => (typeof it === "string" ? it : it.key)));
-        const added = curr.items.filter((it) => !prevKeys.has(it.key));
+        const prevKeys = new Set(prev.items.map(normalizeItemKey));
+        const added = curr.items.filter((it: any) => !prevKeys.has(normalizeItemKey(it)));
 
         if (added.length > 0 && added.length < 5) {
           newMarks.push({
             courseId: curr.id || key,
             courseKey: key,
             courseTitle: curr.title,
-            sections: Array.from(new Set(added.map((it) => it.section).filter(Boolean))),
-            assessmentNames: added.map((it) => it.name),
-            items: added.map((it) => it.label),
+            sections: Array.from(new Set(added.map((it: any) => it.section).filter(Boolean))),
+            assessmentNames: added.map((it: any) => it.name),
+            items: added.map((it: any) => it.label),
             newCount: added.length,
           });
         }
@@ -233,12 +381,24 @@ export const checkAndRecordMarksSnapshot = async (currentCourses) => {
     const latestMarks = latestSnapshot?.marks || prevMarks || {};
     const mergedMarks = { ...latestMarks };
     Object.entries(currentMarksMap).forEach(([key, current]) => {
-      const previousItems = mergedMarks[key]?.items || [];
+      const matchedCourse = findMatchingCourse(key, current, mergedMarks);
+      const targetKey = matchedCourse
+        ? Object.keys(mergedMarks).find((k) => mergedMarks[k] === matchedCourse) || key
+        : key;
+      const previousItems = matchedCourse?.items || [];
       const seenItems = new Map(
-        previousItems.map((item) => [typeof item === "string" ? item : item.key, item]),
+        previousItems.map((item: any) => [normalizeItemKey(item), item]),
       );
-      current.items.forEach((item) => seenItems.set(item.key, item));
-      mergedMarks[key] = { ...mergedMarks[key], ...current, items: [...seenItems.values()] };
+      current.items.forEach((item: any) => seenItems.set(normalizeItemKey(item), item));
+      const updatedCourseData = {
+        ...matchedCourse,
+        ...current,
+        items: [...seenItems.values()],
+      };
+      mergedMarks[targetKey] = updatedCourseData;
+      if (targetKey !== key) {
+        mergedMarks[key] = updatedCourseData;
+      }
     });
     return { ...latestSnapshot, timestamp: Date.now(), marks: mergedMarks };
   });
@@ -278,7 +438,7 @@ export const checkAndRecordAttendanceSnapshot = async (currentSubjects) => {
       const dateStr = formatCleanDate(r.date);
       const statusStr = formatAttendanceStatus(r.status);
       return {
-        key: `${r.date}#${r.status || ""}`,
+        key: `${r.date}#${statusStr}`,
         label: `${dateStr} (${statusStr})`,
         date: r.date,
         status: statusStr,
@@ -295,21 +455,21 @@ export const checkAndRecordAttendanceSnapshot = async (currentSubjects) => {
     };
   });
 
-  const newAttendance = [];
+  const newAttendance: any[] = [];
 
   if (prevAttendance) {
     Object.entries(currentAttendanceMap).forEach(([key, curr]) => {
-      const prev = prevAttendance[key];
+      const prev = findMatchingCourse(key, curr, prevAttendance);
 
       if (prev && Array.isArray(prev.records)) {
-        const prevKeys = new Set(prev.records.map((r) => (typeof r === "string" ? r : r.key)));
-        const added = curr.records.filter((r) => !prevKeys.has(r.key));
+        const prevKeys = new Set(prev.records.map(normalizeAttendanceRecordKey));
+        const added = curr.records.filter((r: any) => !prevKeys.has(normalizeAttendanceRecordKey(r)));
         if (added.length > 0 && added.length < 5) {
           newAttendance.push({
             subjectKey: key,
             subjectTitle: curr.title,
             courseTitle: curr.title,
-            records: added.map((r) => r.label),
+            records: added.map((r: any) => r.label),
             newCount: added.length,
           });
         }
@@ -322,16 +482,24 @@ export const checkAndRecordAttendanceSnapshot = async (currentSubjects) => {
     const latestAttendance = latestSnapshot?.attendance || prevAttendance || {};
     const mergedAttendance = { ...latestAttendance };
     Object.entries(currentAttendanceMap).forEach(([key, current]) => {
-      const previousRecords = mergedAttendance[key]?.records || [];
+      const matchedCourse = findMatchingCourse(key, current, mergedAttendance);
+      const targetKey = matchedCourse
+        ? Object.keys(mergedAttendance).find((k) => mergedAttendance[k] === matchedCourse) || key
+        : key;
+      const previousRecords = matchedCourse?.records || [];
       const seenRecords = new Map(
-        previousRecords.map((record) => [typeof record === "string" ? record : record.key, record]),
+        previousRecords.map((record: any) => [normalizeAttendanceRecordKey(record), record]),
       );
-      current.records.forEach((record) => seenRecords.set(record.key, record));
-      mergedAttendance[key] = {
-        ...mergedAttendance[key],
+      current.records.forEach((record: any) => seenRecords.set(normalizeAttendanceRecordKey(record), record));
+      const updatedAttendanceData = {
+        ...matchedCourse,
         ...current,
         records: [...seenRecords.values()],
       };
+      mergedAttendance[targetKey] = updatedAttendanceData;
+      if (targetKey !== key) {
+        mergedAttendance[key] = updatedAttendanceData;
+      }
     });
     return { ...latestSnapshot, timestamp: Date.now(), attendance: mergedAttendance };
   });

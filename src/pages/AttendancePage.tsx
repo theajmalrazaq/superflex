@@ -24,7 +24,11 @@ import BookmarksModal from "../components/ui/BookmarksModal";
 import { findAttendanceForm, parseAttendancePage } from "../parsers/attendance";
 import { findFlexPageRoot } from "../parsers/dom";
 import { useAiSync } from "../hooks/useAiSync";
-import { checkAndRecordAttendanceSnapshot } from "../utils/academicSnapshot";
+import {
+  checkAndRecordAttendanceSnapshot,
+  clearPendingUpdateType,
+  getPendingUpdates,
+} from "../utils/academicSnapshot";
 import { getMarkedAttendance, setMarkedAttendance } from "../utils/userDataStorage";
 import { parseAcademicDate } from "../utils/academicDate";
 
@@ -236,6 +240,23 @@ function AttendancePage() {
 
   const [semesters, setSemesters] = useState([]);
   const hiddenFormRef = useRef<HTMLDivElement | null>(null);
+  const clearedFromStorageRef = useRef(false);
+
+  useEffect(() => {
+    let active = true;
+    const handleUpdates = async () => {
+      const updates = await getPendingUpdates();
+      if (!active) return;
+      if (updates?.newAttendance?.length && !clearedFromStorageRef.current) {
+        clearedFromStorageRef.current = true;
+        await clearPendingUpdateType("attendance");
+      }
+    };
+    void handleUpdates();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     const parseData = async () => {

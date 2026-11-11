@@ -1,4 +1,6 @@
 import { parseNumber, parsePortalAlerts, readText } from "./dom";
+import { parseMarksPage } from "./marks";
+import { parseAttendancePage } from "./attendance";
 import { parseStudyPlanSemesters } from "./studyPlan";
 import type { HomeProfileData, RawMarkCourse, RawMarkRow, StudyPlanSemester } from "./types";
 
@@ -28,19 +30,23 @@ export function parseHomeProfile(root: ParentNode): HomeProfileData {
 }
 
 export function parseHomeAttendanceReport(document: ParentNode) {
+  try {
+    const parsed = parseAttendancePage(document, null);
+    if (parsed.courses && parsed.courses.length > 0) {
+      return parsed.courses.map((c) => ({
+        ...c,
+        total: c.records.length,
+      }));
+    }
+  } catch {}
+
   return Array.from(
     document.querySelectorAll<HTMLTableElement>(".table.table-bordered.table-responsive"),
   ).map((table) => {
     const tabPane = table.closest(".tab-pane");
-    let title = readText(tabPane?.querySelector("h5"), "Course");
-    const titleParts = title.split("-");
-    if (titleParts.length > 1)
-      title = titleParts
-        .slice(1)
-        .join("-")
-        .trim()
-        .replace(/\(.*\)/, "")
-        .trim();
+    const title = readText(tabPane?.querySelector("h5"), "Course")
+      .replace(/\s*\([^)]*\)/g, "")
+      .trim();
 
     const rows = Array.from(table.querySelectorAll("tbody tr"));
     let present = 0;
@@ -63,22 +69,23 @@ export function parseHomeAttendanceReport(document: ParentNode) {
     const percentage = parseNumber(
       tabPane?.querySelector(".progress-bar")?.getAttribute("aria-valuenow"),
     );
-    return { title, present, absent, total: rows.length, percentage, records };
+    return { id: tabPane?.id || "", title, present, absent, total: rows.length, percentage, records };
   });
 }
 
 export function parseHomeMarksReport(document: ParentNode): RawMarkCourse[] {
+  try {
+    const parsed = parseMarksPage(document, null);
+    if (parsed.courses && parsed.courses.length > 0) {
+      return parsed.courses as unknown as RawMarkCourse[];
+    }
+  } catch {}
+
   return Array.from(document.querySelectorAll<HTMLElement>(".tab-pane")).map((pane) => {
     const id = pane.id;
-    let title = readText(pane.querySelector("h5"), id);
-    const titleParts = title.split("-");
-    if (titleParts.length > 1)
-      title = titleParts
-        .slice(1)
-        .join("-")
-        .trim()
-        .replace(/\(.*\)/, "")
-        .trim();
+    const title = readText(pane.querySelector("h5"), id)
+      .replace(/\s*\([^)]*\)/g, "")
+      .trim();
 
     const sections = Array.from(pane.querySelectorAll<HTMLElement>(".card")).flatMap((card) => {
       const title = readText(card.querySelector(".card-header button"));

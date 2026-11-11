@@ -18,6 +18,7 @@ import { findFlexPageRoot } from "../parsers/dom";
 import { useAiSync } from "../hooks/useAiSync";
 import {
   checkAndRecordMarksSnapshot,
+  clearPendingUpdateType,
   getPendingUpdates,
   isCourseMarksUpdated,
   isSectionMarksUpdated,
@@ -558,6 +559,7 @@ function MarksPage() {
   const [semesters, setSemesters] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [pendingUpdates, setPendingUpdates] = useState(null);
+  const clearedFromStorageRef = useRef(false);
   const hiddenFormRef = useRef<HTMLDivElement | null>(null);
   const initialCoursesRef = useRef([]);
 
@@ -565,16 +567,23 @@ function MarksPage() {
     let active = true;
     const handleUpdates = async () => {
       const updates = await getPendingUpdates();
-      if (active) setPendingUpdates(updates);
+      if (!active) return;
+      if (updates?.newMarks?.length) {
+        setPendingUpdates(updates);
+        if (!clearedFromStorageRef.current) {
+          clearedFromStorageRef.current = true;
+          await clearPendingUpdateType("marks");
+        }
+      } else if (!clearedFromStorageRef.current) {
+        setPendingUpdates(updates);
+      }
     };
-    handleUpdates();
+    void handleUpdates();
     window.addEventListener("superflex-academic-updates-detected", handleUpdates);
-    window.addEventListener("superflex-academic-updates-cleared", handleUpdates);
     window.addEventListener("superflex-student-identity-changed", handleUpdates);
     return () => {
       active = false;
       window.removeEventListener("superflex-academic-updates-detected", handleUpdates);
-      window.removeEventListener("superflex-academic-updates-cleared", handleUpdates);
       window.removeEventListener("superflex-student-identity-changed", handleUpdates);
     };
   }, []);
