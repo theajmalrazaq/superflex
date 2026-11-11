@@ -236,13 +236,13 @@ function FeeChallanPage() {
       <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-3.5 pb-6 sm:gap-5 sm:pb-24">
         <header className="flex flex-col justify-between gap-3 xl:flex-row xl:items-end sm:gap-4">
           <div className="space-y-1">
-            <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-[10px] sm:font-bold sm:tracking-[0.16em] sm:text-white/80">
+            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/85 sm:text-[10px] sm:tracking-[0.16em] sm:text-white/80">
               Finance
             </p>
-            <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:text-3xl sm:font-bold sm:tracking-tight">
+            <h1 className="text-[28px] font-extrabold leading-[1.1] tracking-[-0.035em] text-white sm:text-3xl sm:font-bold sm:tracking-tight">
               Fee Challan
             </h1>
-            <p className="text-xs text-white/85 sm:text-sm">
+            <p className="text-xs font-medium leading-relaxed text-white/85 sm:text-sm">
               FAST wants its money again. Your wallet's least favorite page.
             </p>
           </div>
@@ -306,8 +306,10 @@ function FeeChallanPage() {
                 <FileText size={20} />
               </div>
               <div>
-                <h2 className="text-lg font-bold tracking-tight">Challan History</h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <h2 className="text-base font-bold tracking-[-0.02em] sm:text-lg">
+                  Challan History
+                </h2>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                   A timeline of financial pain. Every challan, every payment, every heartbreak.
                 </p>
               </div>
@@ -512,8 +514,10 @@ function FeeChallanPage() {
                 <Printer size={19} />
               </div>
               <div>
-                <h2 className="text-lg font-bold tracking-tight">Payment Instructions</h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <h2 className="text-base font-bold tracking-[-0.02em] sm:text-lg">
+                  Payment Instructions
+                </h2>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                   How to fund the ragra. Choose your payment method and settle the bill.
                 </p>
               </div>

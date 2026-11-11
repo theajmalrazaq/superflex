@@ -272,11 +272,11 @@ const RetakeCourseCard = ({ course, isSelected, onToggle, index }) => {
             <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600 dark:bg-white/[0.08] dark:text-slate-300">
               {course.code}
             </span>
-            <span className="truncate text-sm font-bold text-slate-900 dark:text-white">
+            <span className="truncate text-[13px] font-semibold text-slate-900 dark:text-white sm:text-sm">
               {course.courseName}
             </span>
           </span>
-          <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+          <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">
             <span>{course.credits} credits</span>
             <span>Section {course.section}</span>
             {course.status && <span>{course.status}</span>}
@@ -525,13 +525,13 @@ function RetakeExamPage() {
 
         <header className="flex flex-wrap items-end justify-between gap-3 sm:gap-4">
           <div className="space-y-1">
-            <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-[10px] sm:font-bold sm:tracking-[0.16em] sm:text-white/80">
+            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/85 sm:text-[10px] sm:tracking-[0.16em] sm:text-white/80">
               Academics
             </p>
-            <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:text-4xl sm:font-bold sm:tracking-tight">
+            <h1 className="text-[28px] font-extrabold leading-[1.1] tracking-[-0.035em] text-white sm:text-4xl sm:font-bold sm:tracking-tight">
               Retake Exam Request
             </h1>
-            <p className="text-xs text-white/85 sm:text-sm">
+            <p className="text-xs font-medium leading-relaxed text-white/85 sm:text-sm">
               Round two, fight! Paper ne pehli baar hara diya? Time for a comeback.
             </p>
           </div>

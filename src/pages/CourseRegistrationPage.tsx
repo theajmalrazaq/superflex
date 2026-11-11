@@ -40,13 +40,13 @@ function CourseRegistrationPage() {
     <PageLayout currentPage={window.location.pathname}>
       <div className="mx-auto w-full max-w-[1600px] space-y-3.5 sm:space-y-7">
         <header className="space-y-1">
-          <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-[10px] sm:font-bold sm:tracking-[0.16em] sm:text-white/80">
+          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/85 sm:text-[10px] sm:tracking-[0.16em] sm:text-white/80">
             Academics
           </p>
-          <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:text-4xl sm:font-bold sm:tracking-tight">
+          <h1 className="text-[28px] font-extrabold leading-[1.1] tracking-[-0.035em] text-white sm:text-4xl sm:font-bold sm:tracking-tight">
             Course Registration
           </h1>
-          <p className="text-xs text-white/85 sm:text-sm">
+          <p className="text-xs font-medium leading-relaxed text-white/85 sm:text-sm">
             Choose your fighters. Naya semester, naye subjects, same old trauma.
           </p>
         </header>

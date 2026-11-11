@@ -100,8 +100,8 @@ const SemesterAccordion = ({ semester }) => {
             <Layers size={20} />
           </div>
           <div className="min-w-0">
-            <h2 className="truncate text-base font-bold tracking-tight">{semester.name}</h2>
-            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 dark:text-slate-400">
+            <h2 className="truncate text-base font-bold tracking-[-0.02em]">{semester.name}</h2>
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">
               <span>{semester.courses.length} registered courses</span>
               <span>SGPA {semester.academic.sgpa || "0.00"}</span>
               <span>CGPA {semester.academic.cgpa || "0.00"}</span>
@@ -383,13 +383,13 @@ function FeeDetailsPage() {
       <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-3.5 py-1 font-sans sm:gap-7 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
         <header className="flex flex-wrap items-end justify-between gap-3 sm:gap-4">
           <div className="space-y-1">
-            <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-xs sm:font-bold sm:tracking-[0.18em] sm:text-white/80">
+            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/85 sm:text-[10px] sm:tracking-[0.16em] sm:text-white/80">
               Finance
             </p>
-            <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:mt-1 sm:text-4xl sm:font-bold sm:tracking-tight">
+            <h1 className="text-[28px] font-extrabold leading-[1.1] tracking-[-0.035em] text-white sm:mt-1 sm:text-4xl sm:font-bold sm:tracking-tight">
               Fee Details
             </h1>
-            <p className="text-xs text-white/85 sm:mt-1 sm:text-sm">
+            <p className="text-xs font-medium leading-relaxed text-white/85 sm:mt-1 sm:text-sm">
               The financial damage report. Dekh le bhai, degree pe kitna investment ho chuka hai.
             </p>
           </div>
@@ -587,8 +587,10 @@ function FeeDetailsPage() {
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-bold">{transaction.semester}</p>
-                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                            <p className="truncate text-[13px] font-semibold sm:text-sm">
+                              {transaction.semester}
+                            </p>
+                            <p className="mt-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">
                               Challan {transaction.challanNo || "—"}
                             </p>
                           </div>

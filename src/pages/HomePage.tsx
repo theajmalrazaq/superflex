@@ -86,7 +86,7 @@ const SectionAccordion = ({ section, isOpen, onToggle, course, pendingUpdates })
           >
             {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </span>
-          <span className="truncate text-xs font-semibold text-foreground sm:text-sm">
+          <span className="truncate text-[13px] font-semibold text-foreground sm:text-sm">
             {section.title}
           </span>
           {hasSectionUpdate && (
@@ -97,13 +97,13 @@ const SectionAccordion = ({ section, isOpen, onToggle, course, pendingUpdates })
               />
             </span>
           )}
-          <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold text-foreground/50">
+          <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-foreground/55">
             {rows.length}
           </span>
         </div>
-        <div className="shrink-0 text-xs font-medium text-foreground/60">
-          <span className="text-foreground">{section.obtained.toFixed(1)}</span>
-          <span className="text-foreground/40"> / {section.weight.toFixed(1)}</span>
+        <div className="shrink-0 text-xs font-semibold text-foreground/60">
+          <span className="font-bold text-foreground">{section.obtained.toFixed(1)}</span>
+          <span className="text-foreground/45"> / {section.weight.toFixed(1)}</span>
         </div>
       </button>
       {isOpen && (
@@ -131,7 +131,7 @@ const SectionAccordion = ({ section, isOpen, onToggle, course, pendingUpdates })
                     key={index}
                     className={`transition-colors hover:bg-foreground/[0.02] ${row.included ? "" : "opacity-40"} ${isRowUpdated ? "bg-[#230052]/[0.04] dark:bg-white/[0.05]" : ""}`}
                   >
-                    <td className="p-3 text-sm font-medium text-foreground/70">
+                    <td className="p-3 text-[13px] font-semibold text-foreground sm:text-sm">
                       <div className="flex items-center gap-2">
                         <span>{row.title}</span>
                         {isRowUpdated && (
@@ -249,13 +249,13 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
                   />
                 )}
                 <p
-                  className="w-full truncate text-xs font-semibold text-foreground"
+                  className="w-full truncate text-[13px] font-semibold text-foreground"
                   title={subject.title}
                 >
                   {subject.title}
                 </p>
               </div>
-              <p className="mt-0.5 text-[10px] text-foreground/50">
+              <p className="mt-0.5 text-[11px] font-medium text-foreground/55">
                 {subject.percentage.toFixed(0)}% · {subject.present}P / {subject.absent}A
               </p>
             </div>
@@ -647,46 +647,47 @@ function HomePage() {
       fullWidth={true}
     >
       <div className="relative">
-        <div className="relative z-10 mx-auto w-full max-w-[1680px] space-y-3.5 px-4 pb-6 pt-3.5 sm:space-y-7 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+        <div className="relative z-10 mx-auto w-full max-w-[1680px] space-y-4 px-4 pb-6 pt-3.5 sm:space-y-7 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
           {/* Mobile App Hero Header (Overview vs Profile) */}
           {activeMainTab === "stats" ? (
-            <header className="space-y-2.5 pb-1 sm:hidden">
-              <div className="flex items-center justify-between gap-3">
-                <h1 className="min-w-0 text-[26px] font-extrabold leading-[1.12] tracking-[-0.035em] text-white">
+            <header className="space-y-3 pb-2 pt-1 sm:hidden">
+              <div className="flex items-center justify-end gap-2 pb-1">
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  aria-label={`Switch to ${themeMode === "dark" ? "light" : "dark"} mode`}
+                  title={`Switch to ${themeMode === "dark" ? "light" : "dark"} mode`}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/25 text-white backdrop-blur-md transition-transform active:scale-95"
+                >
+                  {themeMode === "dark" ? (
+                    <Sun size={18} strokeWidth={2.2} />
+                  ) : (
+                    <Moon size={18} strokeWidth={2.2} />
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveMainTab("info")}
+                  aria-label="Open student profile"
+                  className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/70 bg-white/25 transition-transform active:scale-95"
+                >
+                  <img
+                    src={profileImage}
+                    alt="Profile"
+                    className="h-full w-full object-cover"
+                    onError={(event) => {
+                      const fallbackUrl = getExtensionUrl("assets/favicon.png");
+                      if (fallbackUrl) event.currentTarget.src = fallbackUrl;
+                      else event.currentTarget.hidden = true;
+                    }}
+                  />
+                </button>
+              </div>
+
+              <div className="pt-1">
+                <h1 className="min-w-0 text-[28px] font-extrabold leading-[1.1] tracking-[-0.035em] text-white">
                   {greetingHeading}
                 </h1>
-                <div className="flex shrink-0 items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={toggleTheme}
-                    aria-label={`Switch to ${themeMode === "dark" ? "light" : "dark"} mode`}
-                    title={`Switch to ${themeMode === "dark" ? "light" : "dark"} mode`}
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/25 text-white backdrop-blur-md transition-transform active:scale-95"
-                  >
-                    {themeMode === "dark" ? (
-                      <Sun size={18} strokeWidth={2.2} />
-                    ) : (
-                      <Moon size={18} strokeWidth={2.2} />
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveMainTab("info")}
-                    aria-label="Open student profile"
-                    className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/70 bg-white/25 transition-transform active:scale-95"
-                  >
-                    <img
-                      src={profileImage}
-                      alt="Profile"
-                      className="h-full w-full object-cover"
-                      onError={(event) => {
-                        const fallbackUrl = getExtensionUrl("assets/favicon.png");
-                        if (fallbackUrl) event.currentTarget.src = fallbackUrl;
-                        else event.currentTarget.hidden = true;
-                      }}
-                    />
-                  </button>
-                </div>
               </div>
 
               <div className="flex items-center justify-between gap-2 pt-0.5">
@@ -709,8 +710,8 @@ function HomePage() {
               </div>
             </header>
           ) : (
-            <header className="flex flex-col items-center pb-2 pt-1 text-center sm:hidden">
-              <div className="flex w-full items-center justify-between">
+            <header className="flex flex-col items-center pb-2.5 pt-1 text-center sm:hidden">
+              <div className="flex w-full items-center justify-between pb-1">
                 <button
                   type="button"
                   onClick={() => setActiveMainTab("stats")}
@@ -747,7 +748,7 @@ function HomePage() {
                 />
               </div>
 
-              <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/25 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md dark:bg-white/10">
+              <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/25 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-md dark:bg-white/10">
                 <span className="font-bold opacity-90">@</span>
                 <span>
                   {(rollNumber || personalInfo?.Name || "student")
@@ -756,11 +757,11 @@ function HomePage() {
                 </span>
               </div>
 
-              <p className="mt-3 text-xs font-medium text-white/95">
+              <p className="mt-3 text-xs font-semibold text-white/95">
                 {universityInfo?.Degree || "Student"}
                 {universityInfo?.Batch ? ` · Batch ${universityInfo.Batch}` : ""}
               </p>
-              <p className="mt-0.5 text-xs text-white/75">
+              <p className="mt-0.5 text-xs font-medium text-white/80">
                 {universityInfo?.Campus ? `${universityInfo.Campus} Campus` : "FAST NUCES"}
                 {universityInfo?.Section ? ` (${universityInfo.Section})` : ""}
               </p>
@@ -828,7 +829,7 @@ function HomePage() {
 
           {}
           {activeMainTab === "stats" && (
-            <div className="space-y-3 sm:space-y-7">
+            <div className="space-y-4 sm:space-y-7">
               <section aria-labelledby="overview-heading" className="space-y-2.5 sm:space-y-4">
                 <div className="hidden flex-col gap-0.5 sm:flex sm:flex-row sm:items-end sm:justify-between sm:gap-1">
                   <div>
@@ -907,7 +908,7 @@ function HomePage() {
                 </div>
               </section>
 
-              <div className="grid grid-cols-1 items-stretch gap-3 sm:gap-6 lg:grid-cols-2 xl:gap-8">
+              <div className="grid grid-cols-1 items-stretch gap-4 sm:gap-6 lg:grid-cols-2 xl:gap-8">
                 <div className="flex h-full flex-col gap-3.5 overflow-hidden rounded-[22px] border border-black/[0.05] bg-white p-4 text-slate-900 shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:gap-6 sm:rounded-[24px] sm:p-7 xl:p-8">
                   <div className="flex items-center justify-between gap-3 sm:min-h-[52px] sm:gap-4">
                     <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
@@ -915,7 +916,7 @@ function HomePage() {
                         <Award size={18} className="sm:h-[22px] sm:w-[22px]" />
                       </span>
                       <div className="min-w-0 space-y-0.5 sm:space-y-1">
-                        <h3 className="flex items-center gap-1 truncate text-[17px] font-bold tracking-[-0.02em] text-foreground sm:text-lg">
+                        <h3 className="flex items-center gap-1 truncate text-base font-bold tracking-[-0.02em] text-foreground sm:text-lg">
                           Assessments
                           <ChevronRight size={17} className="text-foreground/60 sm:hidden" />
                         </h3>
@@ -1051,7 +1052,7 @@ function HomePage() {
                         <Activity size={18} className="sm:h-[22px] sm:w-[22px]" />
                       </span>
                       <div className="min-w-0 space-y-0.5 sm:space-y-1">
-                        <h3 className="flex items-center gap-1 truncate text-[17px] font-bold tracking-[-0.02em] text-foreground sm:text-lg">
+                        <h3 className="flex items-center gap-1 truncate text-base font-bold tracking-[-0.02em] text-foreground sm:text-lg">
                           Attendance Overview
                           <ChevronRight size={17} className="text-foreground/60 sm:hidden" />
                         </h3>
@@ -1138,17 +1139,19 @@ const ProfileInfoTabs = ({ profileSections }) => {
                 return <Activity size={18} className="sm:h-6 sm:w-6" />;
               })()}
             </div>
-            <h3 className="text-base font-bold tracking-tight text-foreground sm:text-xl">{section.title}</h3>
+            <h3 className="text-base font-bold tracking-[-0.02em] text-foreground sm:text-xl">
+              {section.title}
+            </h3>
           </div>
 
           {/* Mobile Grouped Key-Value Rows (matches Screenshot 3) */}
           <div className="divide-y divide-black/[0.06] dark:divide-white/[0.08] sm:hidden">
             {Object.entries(section.data as Record<string, string>).map(([key, val], i) => (
               <div key={i} className="flex items-center justify-between gap-3 py-2.5">
-                <span className="shrink-0 text-xs font-semibold text-[#101027] dark:text-white">
+                <span className="shrink-0 text-[13px] font-semibold text-[#101027] dark:text-white">
                   {key}
                 </span>
-                <span className="min-w-0 truncate text-right text-xs font-normal text-[#667085] dark:text-[#9ca3b3]">
+                <span className="min-w-0 truncate text-right text-xs font-medium text-[#667085] dark:text-[#9ca3b3]">
                   {val}
                 </span>
               </div>

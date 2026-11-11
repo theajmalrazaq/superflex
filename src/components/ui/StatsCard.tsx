@@ -28,7 +28,7 @@ const StatsCard = ({
           >
             <Icon size={19} strokeWidth={2} className="sm:h-[25px] sm:w-[25px]" />
           </div>
-          <p className="w-full truncate text-[13px] font-medium leading-snug text-[#667085] dark:text-[#c4cad6] sm:text-sm sm:font-semibold sm:text-[#40404a]">
+          <p className="w-full truncate text-xs font-semibold leading-snug text-[#667085] dark:text-[#c4cad6] sm:text-sm sm:font-semibold sm:text-[#40404a]">
             {label}
           </p>
         </div>
@@ -55,15 +55,15 @@ const StatsCard = ({
           <Icon size={19} strokeWidth={2.25} className="sm:h-6 sm:w-6" />
         </div>
       </div>
-      <p className="mb-1 truncate text-[12px] font-medium text-[#667085] dark:text-[#c4cad6] sm:text-[11px] sm:font-bold sm:uppercase sm:tracking-wide">
+      <p className="mb-1 truncate text-xs font-semibold text-[#667085] dark:text-[#c4cad6] sm:text-[11px] sm:font-bold sm:uppercase sm:tracking-wide">
         {label}
       </p>
       <div className="flex items-baseline gap-1.5 overflow-hidden sm:gap-2">
-        <h3 className="truncate font-sans text-[22px] font-extrabold tracking-tight text-[#101027] dark:text-[#f5f6fb] sm:text-2xl md:text-3xl">
+        <h3 className="truncate font-sans text-[22px] font-bold tracking-[-0.035em] text-[#101027] dark:text-[#f5f6fb] sm:text-2xl md:text-3xl">
           {value}
         </h3>
         {subValue && (
-          <span className="min-w-0 truncate text-[10px] font-semibold text-[#667085] dark:text-[#c4cad6]">
+          <span className="min-w-0 truncate text-[11px] font-medium text-[#667085] dark:text-[#c4cad6]">
             {subValue}
           </span>
         )}

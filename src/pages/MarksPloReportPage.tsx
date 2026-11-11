@@ -176,13 +176,13 @@ function MarksPloReportPage() {
       <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-3.5 pb-6 sm:gap-5 sm:pb-24 print:p-0">
         <header className="flex flex-col justify-between gap-3 xl:flex-row xl:items-end sm:gap-4 print:hidden">
           <div className="space-y-1">
-            <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-[10px] sm:font-bold sm:tracking-[0.16em] sm:text-white/80">
+            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/85 sm:text-[10px] sm:tracking-[0.16em] sm:text-white/80">
               Academics
             </p>
-            <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:text-3xl sm:font-bold sm:tracking-tight">
+            <h1 className="text-[28px] font-extrabold leading-[1.1] tracking-[-0.035em] text-white sm:text-3xl sm:font-bold sm:tracking-tight">
               Marks PLO Report
             </h1>
-            <p className="text-xs text-white/85 sm:text-sm">
+            <p className="text-xs font-medium leading-relaxed text-white/85 sm:text-sm">
               Wait, we're grading outcomes too? Because apparently, marks alone weren't enough.
             </p>
           </div>
@@ -234,11 +234,11 @@ function MarksPloReportPage() {
                       </span>
                     </div>
                     <p
-                      className={`mt-auto pt-2.5 text-xl font-bold leading-none tracking-tight sm:pt-5 sm:text-3xl ${valueClass}`}
+                      className={`mt-auto pt-2.5 text-[22px] font-bold leading-none tracking-[-0.035em] sm:pt-5 sm:text-3xl ${valueClass}`}
                     >
                       {value}
                     </p>
-                    <p className="mt-1 text-[10px] text-[#777780] dark:text-[#9ca3b3] sm:mt-2 sm:text-[11px]">
+                    <p className="mt-1 text-[11px] font-medium text-[#667085] dark:text-[#9ca3b3] sm:mt-2">
                       {detail}
                     </p>
                   </div>

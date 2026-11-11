@@ -678,13 +678,13 @@ function TranscriptPage() {
       <div className="relative z-10 mx-auto w-full max-w-[1680px] space-y-3.5 px-4 pb-6 pt-2 sm:space-y-7 sm:px-6 sm:py-6 sm:pb-24 lg:px-8 lg:py-8">
         <header className="flex flex-col justify-between gap-3 xl:flex-row xl:items-end sm:gap-4">
           <div className="space-y-1">
-            <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-[10px] sm:font-bold sm:tracking-[0.16em] sm:text-white/80">
+            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/85 sm:text-[10px] sm:tracking-[0.16em] sm:text-white/80">
               Academics
             </p>
-            <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:text-4xl sm:font-bold sm:tracking-tight">
+            <h1 className="text-[28px] font-extrabold leading-[1.1] tracking-[-0.035em] text-white sm:text-4xl sm:font-bold sm:tracking-tight">
               Official Transcript
             </h1>
-            <p className="text-xs text-white/85 sm:text-sm">
+            <p className="text-xs font-medium leading-relaxed text-white/85 sm:text-sm">
               Four years of questionable decisions, beautifully documented.
             </p>
           </div>
@@ -761,11 +761,11 @@ function TranscriptPage() {
               className="sf-mobile-card-wide flex min-h-[132px] min-w-0 flex-col rounded-[22px] border border-black/[0.05] bg-white p-4 text-[#101027] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:min-h-[156px] sm:rounded-[32px] sm:p-6"
               onMouseLeave={() => setHoveredHistoryIndex(null)}
             >
-              <p className="text-[13px] font-medium text-[#667085] dark:text-[#c4cad6] sm:text-sm sm:font-semibold sm:text-[#40404a]">
+              <p className="text-xs font-semibold text-[#667085] dark:text-[#c4cad6] sm:text-sm sm:font-semibold sm:text-[#40404a]">
                 Semester GPA
               </p>
               <div className="mt-auto flex items-end justify-between gap-2 pt-2 sm:pt-0">
-                <span className="text-[22px] font-bold leading-none tracking-tight text-foreground sm:text-[28px]">
+                <span className="text-[22px] font-bold leading-none tracking-[-0.035em] text-foreground sm:text-[28px]">
                   {shownHistory?.sgpa.toFixed(2) || "0.00"}
                 </span>
                 <span className="truncate text-right text-[11px] font-medium text-[#667085]">
@@ -787,11 +787,11 @@ function TranscriptPage() {
               className="sf-mobile-card-wide flex min-h-[132px] min-w-0 flex-col rounded-[22px] border border-black/[0.05] bg-white p-4 text-[#101027] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:min-h-[156px] sm:rounded-[32px] sm:p-6"
               onMouseLeave={() => setHoveredHistoryIndex(null)}
             >
-              <p className="text-[13px] font-medium text-[#667085] dark:text-[#c4cad6] sm:text-sm sm:font-semibold sm:text-[#40404a]">
+              <p className="text-xs font-semibold text-[#667085] dark:text-[#c4cad6] sm:text-sm sm:font-semibold sm:text-[#40404a]">
                 Cumulative GPA
               </p>
               <div className="mt-auto flex items-end justify-between gap-2 pt-2 sm:pt-0">
-                <span className="text-[22px] font-bold leading-none tracking-tight text-foreground sm:text-[28px]">
+                <span className="text-[22px] font-bold leading-none tracking-[-0.035em] text-foreground sm:text-[28px]">
                   {shownHistory?.cgpa.toFixed(2) || "0.00"}
                 </span>
                 <span className="truncate text-right text-[11px] font-medium text-[#667085]">
@@ -848,10 +848,10 @@ function TranscriptPage() {
                 <div className="space-y-3.5 sm:space-y-5">
                   <div className="flex flex-col justify-between gap-3.5 border-b border-slate-100 pb-3.5 dark:border-white/10 sm:gap-5 sm:pb-5 md:flex-row md:items-end">
                     <div className="space-y-0.5 sm:space-y-1">
-                      <h2 className="text-lg font-bold text-foreground sm:text-3xl">
+                      <h2 className="text-base font-bold tracking-[-0.02em] text-foreground sm:text-3xl">
                         {activeSemData.title}
                       </h2>
-                      <p className="text-[11px] font-bold tracking-[0px] text-foreground/50 sm:text-xs">
+                      <p className="text-[11px] font-medium text-foreground/55 sm:text-xs">
                         Semester Detail Report
                       </p>
                     </div>
@@ -939,11 +939,11 @@ function TranscriptPage() {
                       return (
                         <div key={idx} className="flex items-center justify-between gap-3 py-3">
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-xs font-semibold text-slate-900 dark:text-white sm:text-sm">
+                            <p className="truncate text-[13px] font-semibold text-slate-900 dark:text-white sm:text-sm">
                               {course.description}
                             </p>
-                            <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] text-[#667085] dark:text-slate-400">
-                              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-700 dark:bg-white/10 dark:text-white">
+                            <div className="mt-1 flex flex-wrap items-center gap-1.5 text-[11px] font-medium text-[#667085] dark:text-slate-400">
+                              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:bg-white/10 dark:text-white">
                                 {course.code}
                               </span>
                               <span>·</span>

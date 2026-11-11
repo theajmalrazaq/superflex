@@ -78,13 +78,13 @@ function StudyPlanPage() {
       <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-3.5 pb-6 sm:gap-5 sm:pb-24">
         <header className="flex flex-col justify-between gap-3 xl:flex-row xl:items-end sm:gap-4">
           <div className="space-y-1">
-            <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-[10px] sm:font-bold sm:tracking-[0.16em] sm:text-white/80">
+            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/85 sm:text-[10px] sm:tracking-[0.16em] sm:text-white/80">
               Academics
             </p>
-            <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:text-3xl sm:font-bold sm:tracking-tight">
+            <h1 className="text-[28px] font-extrabold leading-[1.1] tracking-[-0.035em] text-white sm:text-3xl sm:font-bold sm:tracking-tight">
               Tentative Study Plan
             </h1>
-            <p className="text-xs text-white/85 sm:text-sm">
+            <p className="text-xs font-medium leading-relaxed text-white/85 sm:text-sm">
               Future suffering, planned. Agle semesters mein kya kya zaleel karega? Find out here.
             </p>
           </div>
@@ -158,10 +158,10 @@ function StudyPlanPage() {
                     <BookOpen size={20} />
                   </div>
                   <div className="min-w-0">
-                    <h2 className="truncate text-[17px] font-bold tracking-tight sm:text-lg">
+                    <h2 className="truncate text-base font-bold tracking-[-0.02em] sm:text-lg">
                       {activeSemData.title}
                     </h2>
-                    <p className="text-xs text-[#667085] dark:text-slate-400">
+                    <p className="text-xs font-medium text-[#667085] dark:text-slate-400">
                       The Roadmap to Graduation (Hopefully)
                     </p>
                   </div>
@@ -176,11 +176,11 @@ function StudyPlanPage() {
                           className="flex items-center justify-between gap-3 py-3"
                         >
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-xs font-semibold text-slate-900 dark:text-white sm:text-sm">
+                            <p className="truncate text-[13px] font-semibold text-slate-900 dark:text-white sm:text-sm">
                               {course.title}
                             </p>
-                            <div className="mt-1 flex items-center gap-1.5 text-[11px] text-[#667085] dark:text-slate-400">
-                              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-700 dark:bg-white/10 dark:text-slate-300">
+                            <div className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-[#667085] dark:text-slate-400">
+                              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:bg-white/10 dark:text-slate-300">
                                 {course.code}
                               </span>
                               <span>·</span>

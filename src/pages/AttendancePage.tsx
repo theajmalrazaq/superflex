@@ -113,10 +113,12 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark, onRequestReview
       <span className="w-6 text-center text-[10px] font-semibold text-foreground/35">{index}</span>
       <div className="min-w-0">
         <div className="flex min-w-0 items-center gap-2">
-          <span className="truncate text-sm font-semibold text-foreground">{record.date}</span>
-          <span className="shrink-0 text-[10px] text-foreground/45">{record.day}</span>
+          <span className="truncate text-[13px] font-semibold text-foreground sm:text-sm">
+            {record.date}
+          </span>
+          <span className="shrink-0 text-[11px] font-medium text-foreground/45">{record.day}</span>
         </div>
-        <div className="mt-0.5 flex min-w-0 items-center gap-3 text-[10px] text-foreground/50">
+        <div className="mt-0.5 flex min-w-0 items-center gap-3 text-[11px] font-medium text-foreground/55">
           <span className="flex shrink-0 items-center gap-1">
             <Clock size={11} />
             {record.time || "N/A"}
@@ -332,13 +334,13 @@ function AttendancePage() {
       <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-3 sm:gap-4">
         <header className="flex flex-col justify-between gap-3 xl:flex-row xl:items-end sm:gap-4">
           <div className="space-y-1">
-            <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-[10px] sm:font-bold sm:tracking-[0.16em] sm:text-white/80">
+            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/85 sm:text-[10px] sm:tracking-[0.16em] sm:text-white/80">
               Academics
             </p>
-            <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:text-3xl sm:font-bold sm:tracking-tight">
+            <h1 className="text-[28px] font-extrabold leading-[1.1] tracking-[-0.035em] text-white sm:text-3xl sm:font-bold sm:tracking-tight">
               Attendance
             </h1>
-            <p className="text-xs text-white/85 sm:text-sm">
+            <p className="text-xs font-medium leading-relaxed text-white/85 sm:text-sm">
               80% or RIP? Dekh le bhai, aur kitni classes bunk kar sakta hai.
             </p>
           </div>
