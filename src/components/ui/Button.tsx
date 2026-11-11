@@ -11,9 +11,9 @@ export const buttonVariants = cva(
         secondary:
           "border border-foreground/10 bg-foreground/5 text-foreground/60 hover:bg-foreground/10 hover:text-foreground",
         danger:
-          "border-none bg-error text-foreground hover:opacity-90 disabled:bg-tertiary disabled:text-foreground/60",
+          "border-none bg-error text-white hover:opacity-90 disabled:bg-tertiary disabled:text-foreground/60",
         success:
-          "border-none bg-success text-foreground hover:opacity-90 disabled:bg-tertiary disabled:text-foreground/60",
+          "border-none bg-success text-white hover:opacity-90 disabled:bg-tertiary disabled:text-foreground/60",
         outline:
           "border border-foreground/10 bg-transparent text-foreground/60 hover:border-foreground/20 hover:text-foreground",
       },

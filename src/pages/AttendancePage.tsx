@@ -109,8 +109,8 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark, onRequestReview
       ? "text-amber-700 bg-amber-500/10 dark:text-amber-300"
       : "text-rose-700 bg-rose-500/10 dark:text-rose-300";
   return (
-    <div className="grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-3 border-b border-black/[0.05] px-3 py-2.5 last:border-b-0 dark:border-white/[0.08]">
-      <span className="w-6 text-center text-[10px] font-semibold text-foreground/35">{index}</span>
+    <div className="grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-2.5 border-b border-black/[0.05] px-1.5 py-2.5 last:border-b-0 dark:border-white/[0.08] sm:gap-3 sm:px-3">
+      <span className="w-5 text-center text-[10px] font-semibold text-foreground/35 sm:w-6">{index}</span>
       <div className="min-w-0">
         <div className="flex min-w-0 items-center gap-2">
           <span className="truncate text-[13px] font-semibold text-foreground sm:text-sm">
@@ -531,8 +531,8 @@ function AttendancePage() {
                         </span>
                       </div>
                     </div>
-                    <section className="flex min-h-[240px] flex-1 flex-col overflow-hidden rounded-[22px] border border-black/[0.05] bg-white p-4 text-[#101027] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px] sm:p-5">
-                      <div className="mb-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                    <section className="flex min-h-[240px] flex-1 flex-col overflow-hidden rounded-[22px] border border-black/[0.05] bg-white px-2.5 py-3.5 text-[#101027] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px] sm:p-5">
+                      <div className="mb-3 flex flex-col justify-between gap-2.5 px-1 sm:flex-row sm:items-center sm:gap-3 sm:px-0">
                         <p className="text-[11px] text-[#626262] dark:text-[#9ca3b3]">
                           Showing {filteredRecords.length} of {selectedCourseData.records.length}{" "}
                           sessions
@@ -556,7 +556,7 @@ function AttendancePage() {
                           ))}
                         </div>
                       </div>
-                      <div className="max-h-[calc(100dvh-390px)] min-h-[180px] flex-1 overflow-y-auto rounded-2xl bg-transparent px-2">
+                      <div className="max-h-[calc(100dvh-390px)] min-h-[180px] flex-1 overflow-y-auto rounded-2xl bg-transparent px-0 sm:px-2">
                         {filteredRecords.map((record) => {
                           const originalIndex = selectedCourseData.records.indexOf(record);
                           const recordId = `${selectedCourseId}-${originalIndex}`;

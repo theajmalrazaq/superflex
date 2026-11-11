@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Activity,
   ArrowLeft,
   Award,
   BarChart3,
@@ -27,6 +26,7 @@ import {
   Settings,
 } from "lucide-react";
 import { Logo } from "./ui/Logo";
+import OctopusIcon from "./ui/OctopusIcon";
 import ProfileImageModal from "./ui/ProfileImageModal";
 import { getExtensionUrl } from "../utils/extensionApi";
 import { usePreferencesStore } from "../stores/preferencesStore";
@@ -553,7 +553,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
         label: "Octopus AI",
         href: "#",
         action: "octopus",
-        icon: Activity,
+        icon: OctopusIcon,
         active: false,
         hasUpdate: false,
       },
