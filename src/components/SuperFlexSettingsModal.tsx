@@ -189,43 +189,28 @@ function SuperFlexSettingsForm({
 
         {/* Tab switch / step breadcrumbs */}
         {mode === "settings" ? (
-          <div className="mt-3 inline-flex max-w-full items-center gap-1 rounded-full border border-black/[0.08] bg-slate-100/80 p-1 dark:border-white/10 dark:bg-white/[0.06] sm:gap-1.5">
-            <button
-              type="button"
-              onClick={() => setActiveTab("teachers")}
-              className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-[11px] font-bold transition-all sm:px-4 sm:py-1.5 sm:text-xs ${
-                activeTab === "teachers"
-                  ? "bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#0a192f]"
-                  : "text-foreground/70 hover:text-foreground"
-              }`}
-            >
-              <GraduationCap size={13} />
-              Course Faculty
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("ai")}
-              className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-[11px] font-bold transition-all sm:px-4 sm:py-1.5 sm:text-xs ${
-                activeTab === "ai"
-                  ? "bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#0a192f]"
-                  : "text-foreground/70 hover:text-foreground"
-              }`}
-            >
-              <Bot size={13} />
-              Octopus AI
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("autofill")}
-              className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-[11px] font-bold transition-all sm:px-4 sm:py-1.5 sm:text-xs ${
-                activeTab === "autofill"
-                  ? "bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#0a192f]"
-                  : "text-foreground/70 hover:text-foreground"
-              }`}
-            >
-              <KeyRound size={13} />
-              Auto-Fill
-            </button>
+          <div className="mt-3 grid w-full grid-cols-3 gap-1 rounded-2xl border border-black/[0.08] bg-slate-100/80 p-1 dark:border-white/10 dark:bg-white/[0.06] sm:inline-flex sm:w-auto sm:max-w-full sm:items-center sm:gap-1.5 sm:rounded-full">
+            {(
+              [
+                { id: "teachers", label: "Course Faculty", Icon: GraduationCap },
+                { id: "ai", label: "Octopus AI", Icon: Bot },
+                { id: "autofill", label: "Auto-Fill", Icon: KeyRound },
+              ] as const
+            ).map(({ id, label, Icon }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setActiveTab(id)}
+                className={`flex flex-col items-center justify-center gap-1 whitespace-nowrap rounded-xl px-2 py-2 text-[10px] font-bold leading-tight transition-all sm:flex-row sm:gap-1.5 sm:rounded-full sm:px-4 sm:py-1.5 sm:text-xs ${
+                  activeTab === id
+                    ? "bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#0a192f]"
+                    : "text-foreground/70 hover:text-foreground"
+                }`}
+              >
+                <Icon size={14} className="shrink-0 sm:h-[13px] sm:w-[13px]" />
+                <span>{label}</span>
+              </button>
+            ))}
           </div>
         ) : (
           <div className="mt-3.5 flex items-center gap-2">
@@ -311,7 +296,9 @@ function SuperFlexSettingsForm({
                       {selections[activeCourse.id].name}
                     </span>
                   ) : (
-                    <span className="font-medium text-amber-600 dark:text-amber-400">Not assigned yet</span>
+                    <span className="font-medium text-amber-600 dark:text-amber-400">
+                      Not assigned yet
+                    </span>
                   )}
                 </div>
               </div>
@@ -387,9 +374,7 @@ function SuperFlexSettingsForm({
                         className="h-8 w-8 rounded-lg sm:h-9 sm:w-9 sm:rounded-xl"
                       />
                       <div className="min-w-0 flex-1 space-y-0.5">
-                        <p className="truncate text-xs font-bold text-foreground">
-                          {teacher.name}
-                        </p>
+                        <p className="truncate text-xs font-bold text-foreground">{teacher.name}</p>
                         {teacher.designation ? (
                           <p className="truncate text-[10px] text-foreground/50 sm:text-[11px]">
                             {teacher.designation}
@@ -453,7 +438,9 @@ function SuperFlexSettingsForm({
                       value={manualEmail}
                       aria-invalid={!manualEmailValid}
                       title={
-                        manualEmailValid ? undefined : "Enter a valid email address or leave it blank"
+                        manualEmailValid
+                          ? undefined
+                          : "Enter a valid email address or leave it blank"
                       }
                       onChange={(e) => setManualEmail(e.target.value)}
                       placeholder="Email (optional)"
