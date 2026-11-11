@@ -186,7 +186,7 @@ function LoginPageStyles() {
       ) {
         const rememberContainer = document.createElement("div");
         rememberContainer.id = "superflex-remember-me-container";
-        rememberContainer.className = "w-full px-2 mb-2 mt-0.5 select-none";
+        rememberContainer.className = "w-full px-2 mb-3.5 mt-1 select-none";
         rememberContainer.innerHTML = `
           <div class="flex items-center justify-between">
             <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
@@ -271,7 +271,7 @@ function LoginPageStyles() {
               const promptCard = document.createElement("div");
               promptCard.id = "superflex-autofill-prompt-card";
               promptCard.className =
-                "w-full rounded-2xl bg-[#230052]/5 dark:bg-white/[0.08] border border-[#230052]/15 dark:border-white/15 p-2.5 flex items-center justify-between mb-2.5 transition-all";
+                "w-full rounded-2xl bg-[#230052]/5 dark:bg-white/[0.08] border border-[#230052]/15 dark:border-white/15 p-3 flex items-center justify-between mb-4 transition-all";
 
               promptCard.innerHTML = `
                 <div class="flex min-w-0 items-center gap-2.5">
@@ -480,6 +480,10 @@ function LoginPageStyles() {
         <h1 class="text-[30px] sm:text-[34px] font-black text-slate-900 tracking-tight leading-[1.14] mb-2.5">
           Superflex
         </h1>
+        <span class="login-credit">
+          designed and built by
+          <a href="https://github.com/theajmalrazaq" target="_blank" rel="noopener noreferrer">ajmal</a>
+        </span>
         <p class="text-slate-500 text-xs sm:text-[13px] font-normal leading-relaxed">
          Aaja bhai, trauma tera wait kar raha hai 😭
         </p>
@@ -755,21 +759,12 @@ function LoginPageStyles() {
 
     const footerWrapper = document.createElement("div");
     footerWrapper.className =
-      "login-outer-footer flex items-center justify-center gap-2.5 text-center w-full relative z-50 flex-wrap select-none";
+      "login-outer-footer flex items-center justify-center gap-3 text-center w-full mt-7 relative z-10 flex-wrap select-none";
     footerWrapper.innerHTML = `
       <a href="https://github.com/theajmalrazaq/superflex/issues/new" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/25 hover:bg-white/35 backdrop-blur-sm border border-white/20 text-[11px] font-semibold text-white transition-all shadow-none">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="m8 2 1.88 1.88"/>
-          <path d="M14.12 3.88 16 2"/>
-          <path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/>
-          <path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/>
-          <path d="M12 20v-9"/>
-          <path d="M6.53 9C4.6 8.8 3 7.1 3 5"/>
-          <path d="M6 13H2"/>
-          <path d="M3 21c0-2.1 1.7-3.9 3.8-4"/>
-          <path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/>
-          <path d="M22 13h-4"/>
-          <path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/>
+          <circle cx="12" cy="12" r="10"/>
+          <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
         </svg>
         Raise Issue
       </a>
@@ -777,10 +772,6 @@ function LoginPageStyles() {
         <span class="login-theme-icon" aria-hidden="true"></span>
         <span class="login-theme-label">Dark mode</span>
       </button>
-      <span class="basis-full mt-0.5 text-[11px] text-slate-500">
-        designed and built by
-        <a href="https://github.com/theajmalrazaq" target="_blank" rel="noopener noreferrer">ajmal</a>
-      </span>
     `;
 
     const themeToggle = footerWrapper.querySelector<HTMLElement>(".login-theme-toggle");
