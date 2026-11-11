@@ -1,7 +1,8 @@
 import TeacherAvatar from "../components/TeacherAvatar";
 import { useCurrentTime } from "../hooks/useCurrentTime";
 import { useTeacherStore } from "../stores/teacherStore";
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import PageLayout from "../components/layouts/PageLayout";
 import { useAiSync } from "../hooks/useAiSync";
 import { processCourseMarks } from "../utils/marksProcessor";
@@ -179,24 +180,160 @@ const SectionAccordion = ({ section, isOpen, onToggle, course, pendingUpdates })
   );
 };
 
+const HeatmapTooltip = ({ hoveredDot }: { hoveredDot: { record: any; rect: DOMRect } }) => {
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const [coords, setCoords] = useState<{ left: number; top: number; below: boolean } | null>(null);
+
+  useLayoutEffect(() => {
+    const el = tooltipRef.current;
+    if (!el || typeof window === "undefined") return;
+    const width = el.offsetWidth || 180;
+    const height = el.offsetHeight || 28;
+    const margin = 12;
+    const halfW = width / 2;
+    const targetCenterX = hoveredDot.rect.left + hoveredDot.rect.width / 2;
+    const clampedLeft = Math.min(
+      Math.max(targetCenterX, halfW + margin),
+      Math.max(halfW + margin, window.innerWidth - halfW - margin),
+    );
+    const below = hoveredDot.rect.top - height - 10 < margin;
+    const top = below ? hoveredDot.rect.bottom + 8 : hoveredDot.rect.top - 8;
+    setCoords({ left: clampedLeft, top, below });
+  }, [hoveredDot]);
+
+  const statusText = /\bp\b|present/i.test(hoveredDot.record.status)
+    ? "Present"
+    : /\bl\b|late/i.test(hoveredDot.record.status)
+      ? "Late"
+      : "Absent";
+  const statusColor =
+    statusText === "Present"
+      ? "text-emerald-600 dark:text-emerald-400"
+      : statusText === "Late"
+        ? "text-amber-600 dark:text-amber-400"
+        : "text-rose-600 dark:text-rose-400";
+
+  const content = (
+    <div
+      ref={tooltipRef}
+      className={`pointer-events-none fixed z-[9999] -translate-x-1/2 transform transition-opacity duration-75 ${coords?.below ? "" : "-translate-y-full"} ${coords ? "opacity-100" : "opacity-0"}`}
+      style={{
+        left: coords?.left ?? hoveredDot.rect.left + hoveredDot.rect.width / 2,
+        top: coords?.top ?? hoveredDot.rect.top - 8,
+      }}
+    >
+      <div className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-black/10 bg-white/95 px-3 py-1.5 text-[11px] font-medium text-slate-900 shadow-lg backdrop-blur-md dark:border-white/20 dark:bg-zinc-900/95 dark:text-white dark:shadow-2xl">
+        <span className="font-semibold text-slate-900 dark:text-white">
+          {hoveredDot.record.date}
+        </span>
+        <span className="text-slate-400 dark:text-white/40">·</span>
+        <span className={`font-bold ${statusColor}`}>{statusText}</span>
+        {hoveredDot.record.type && (
+          <>
+            <span className="text-slate-400 dark:text-white/40">·</span>
+            <span className="text-slate-600 dark:text-white/70">{hoveredDot.record.type}</span>
+          </>
+        )}
+      </div>
+    </div>
+  );
+
+  if (typeof document !== "undefined") {
+    return createPortal(content, document.body);
+  }
+  return content;
+};
+
 const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
   const ROWS_PER_COL = 15;
-  const [hoveredDot, setHoveredDot] = useState(null);
+  const [hoveredDot, setHoveredDot] = useState<{
+    key: string;
+    record: any;
+    rect: DOMRect;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!hoveredDot) return;
+    const dismiss = (event?: Event) => {
+      if (
+        event?.type === "pointerdown" &&
+        event.target instanceof Element &&
+        event.target.closest("[data-heatmap-dot]")
+      ) {
+        return;
+      }
+      setHoveredDot(null);
+    };
+    window.addEventListener("scroll", dismiss, { capture: true, passive: true });
+    document.addEventListener("pointerdown", dismiss);
+    return () => {
+      window.removeEventListener("scroll", dismiss, { capture: true });
+      document.removeEventListener("pointerdown", dismiss);
+    };
+  }, [hoveredDot]);
+
+  const renderDotButton = (record: any, dotKey: string, variant: "mobile" | "desktop") => {
+    const status = String(record.status || "").trim();
+    const color = /\bp\b|present/i.test(status)
+      ? "bg-[#230052] dark:bg-white"
+      : /\ba\b|absent/i.test(status)
+        ? "bg-rose-500"
+        : "bg-slate-200 dark:bg-white/15";
+    const isSelected = hoveredDot?.key === dotKey;
+
+    return (
+      <button
+        key={dotKey}
+        type="button"
+        data-heatmap-dot
+        role="listitem"
+        aria-label={`${record.date}: ${status || "Unknown attendance status"}`}
+        onClick={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          setHoveredDot((prev) => (prev?.key === dotKey ? null : { key: dotKey, record, rect }));
+        }}
+        onMouseEnter={(e) => {
+          if (typeof window !== "undefined" && window.matchMedia?.("(hover: hover)").matches) {
+            setHoveredDot({
+              key: dotKey,
+              record,
+              rect: e.currentTarget.getBoundingClientRect(),
+            });
+          }
+        }}
+        onMouseLeave={() => {
+          if (typeof window !== "undefined" && window.matchMedia?.("(hover: hover)").matches) {
+            setHoveredDot(null);
+          }
+        }}
+        className={
+          variant === "mobile"
+            ? "flex h-8 w-8 shrink-0 touch-manipulation items-center justify-center rounded-lg transition-transform active:scale-90"
+            : "flex shrink-0 cursor-pointer items-center justify-center rounded-[3px] transition-transform hover:scale-125"
+        }
+      >
+        <span
+          className={`${variant === "mobile" ? "h-5 w-5 rounded-[5px]" : "h-3.5 w-3.5 rounded-[3px]"} ${color} ${isSelected ? "ring-2 ring-foreground/60 ring-offset-2 ring-offset-background dark:ring-white/80" : ""}`}
+        />
+      </button>
+    );
+  };
 
   return (
-    <div className="flex-1 space-y-4 overflow-hidden" aria-label="Attendance by subject">
-      <div className="flex flex-wrap items-center justify-between gap-3 text-[10px] text-foreground/50">
+    <div className="min-w-0 flex-1 space-y-4" aria-label="Attendance by subject">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-[11px] text-foreground/55 sm:text-[10px] sm:text-foreground/50">
         <span>Each square represents one class session</span>
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-1.5">
-            <i className="h-2.5 w-2.5 rounded-[3px] bg-[#230052] dark:bg-white" /> Present
+            <i className="h-3 w-3 rounded-[3px] bg-[#230052] dark:bg-white sm:h-2.5 sm:w-2.5" />{" "}
+            Present
           </span>
           <span className="flex items-center gap-1.5">
-            <i className="h-2.5 w-2.5 rounded-[3px] bg-rose-500" /> Absent
+            <i className="h-3 w-3 rounded-[3px] bg-rose-500 sm:h-2.5 sm:w-2.5" /> Absent
           </span>
         </div>
       </div>
-      <div className="flex flex-col gap-4 sm:grid sm:max-h-[390px] sm:grid-cols-2 sm:gap-x-4 sm:gap-y-5 sm:overflow-y-auto sm:px-1 sm:pb-0 sm:pr-2 md:grid-cols-3 xl:grid-cols-5">
+      <div className="flex flex-col gap-5 sm:grid sm:max-h-[390px] sm:grid-cols-2 sm:gap-x-4 sm:gap-y-5 sm:overflow-y-auto sm:px-1 sm:pb-0 sm:pr-2 md:grid-cols-3 xl:grid-cols-5">
         {subjects.map((subject, index) => {
           const records = [...(subject.records || [])].sort(
             (a, b) =>
@@ -217,46 +354,37 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
               key={`${subject.title}-${index}`}
               className="flex w-full flex-col items-start py-1 sm:min-w-0"
             >
+              {/* Mobile: larger squares with generous 32x32 tap targets */}
               <div
-                className="mb-2 flex flex-col gap-1.5 py-1 sm:min-h-[180px] sm:flex-row sm:items-end sm:gap-1.5 sm:px-2"
+                className="mb-2 flex flex-wrap gap-0.5 py-0.5 sm:hidden"
+                role="list"
+                aria-label={`${subject.title} class sessions`}
+              >
+                {records.map((record, recordIndex) =>
+                  renderDotButton(record, `${index}-m-${record.date}-${recordIndex}`, "mobile"),
+                )}
+              </div>
+
+              {/* Desktop / tablet: stacked vertical columns */}
+              <div
+                className="mb-2 hidden min-h-[180px] flex-row items-end gap-1.5 px-2 py-1 sm:flex"
                 role="list"
                 aria-label={`${subject.title} class sessions`}
               >
                 {columns.map((colRecords, colIndex) => (
-                  <div key={colIndex} className="flex flex-row flex-wrap gap-1 sm:flex-col-reverse">
-                    {colRecords.map((record, recordIndex) => {
-                      const status = String(record.status || "").trim();
-                      const color = /\bp\b|present/i.test(status)
-                        ? "bg-[#230052] dark:bg-white"
-                        : /\ba\b|absent/i.test(status)
-                          ? "bg-rose-500"
-                          : "bg-slate-200 dark:bg-white/15";
-                      return (
-                        <span
-                          key={`${record.date}-${recordIndex}`}
-                          role="listitem"
-                          aria-label={`${record.date}: ${status || "Unknown attendance status"}`}
-                          onClick={(e) => {
-                            const rect = e.currentTarget.getBoundingClientRect();
-                            setHoveredDot((prev) =>
-                              prev?.record === record ? null : { record, rect },
-                            );
-                          }}
-                          onMouseEnter={(e) =>
-                            setHoveredDot({
-                              record,
-                              rect: e.currentTarget.getBoundingClientRect(),
-                            })
-                          }
-                          onMouseLeave={() => setHoveredDot(null)}
-                          className={`h-3.5 w-3.5 shrink-0 rounded-[3px] cursor-pointer transition-transform hover:scale-125 ${color}`}
-                        />
-                      );
-                    })}
+                  <div key={colIndex} className="flex flex-col-reverse gap-1">
+                    {colRecords.map((record, recordIndex) =>
+                      renderDotButton(
+                        record,
+                        `${index}-d-${colIndex}-${record.date}-${recordIndex}`,
+                        "desktop",
+                      ),
+                    )}
                   </div>
                 ))}
               </div>
-              <div className="flex items-center gap-1.5 w-full">
+
+              <div className="flex w-full items-center gap-1.5">
                 {isUpdated && (
                   <span
                     className="h-2 w-2 shrink-0 rounded-full bg-emerald-500 animate-pulse ring-2 ring-emerald-500/30"
@@ -278,37 +406,7 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
         })}
       </div>
 
-      {hoveredDot && (
-        <div
-          className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full transform transition-opacity animate-in fade-in duration-75"
-          style={{
-            left: hoveredDot.rect.left + hoveredDot.rect.width / 2,
-            top: hoveredDot.rect.top - 6,
-          }}
-        >
-          <div className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-black/10 bg-white/95 px-3 py-1 text-[11px] font-medium text-slate-900 shadow-lg backdrop-blur-md dark:border-white/20 dark:bg-zinc-900/95 dark:text-white dark:shadow-2xl">
-            <span className="font-semibold text-slate-900 dark:text-white">
-              {hoveredDot.record.date}
-            </span>
-            <span className="text-slate-400 dark:text-white/40">·</span>
-            <span
-              className={`font-bold ${
-                /\bp\b|present/i.test(hoveredDot.record.status)
-                  ? "text-emerald-600 dark:text-emerald-400"
-                  : "text-rose-600 dark:text-rose-400"
-              }`}
-            >
-              {/\bp\b|present/i.test(hoveredDot.record.status) ? "Present" : "Absent"}
-            </span>
-            {hoveredDot.record.type && (
-              <>
-                <span className="text-slate-400 dark:text-white/40">·</span>
-                <span className="text-slate-600 dark:text-white/70">{hoveredDot.record.type}</span>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      {hoveredDot && <HeatmapTooltip hoveredDot={hoveredDot} />}
     </div>
   );
 };
