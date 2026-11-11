@@ -4,39 +4,6 @@ import { initSiteNavigation } from "./navigation";
 
 initSiteNavigation();
 
-const modal = document.getElementById("video-modal");
-const openModalBtn = document.getElementById("how-to-use-btn");
-const closeModalBtn = document.getElementById("close-modal-btn");
-const modalBackdrop = document.getElementById("modal-backdrop");
-const tutorialVideo = document.getElementById("tutorial-video") as HTMLVideoElement | null;
-
-if (openModalBtn) {
-  openModalBtn.addEventListener("click", () => {
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-    document.body.style.overflow = "hidden";
-  });
-}
-
-const closeModal = () => {
-  if (modal) {
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
-    document.body.style.overflow = "auto";
-    if (tutorialVideo) tutorialVideo.pause();
-  }
-};
-
-if (closeModalBtn) closeModalBtn.addEventListener("click", closeModal);
-
-if (modalBackdrop) modalBackdrop.addEventListener("click", closeModal);
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && modal && !modal.classList.contains("hidden")) {
-    closeModal();
-  }
-});
-
 const generateReviewCards = (items: Review[]): DocumentFragment => {
   const fragment = document.createDocumentFragment();
   for (const item of items) {
