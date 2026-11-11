@@ -11,7 +11,7 @@ const ChangePasswordSkeleton = () => (
     aria-label="Loading security settings"
   >
     <div className="mx-auto w-full max-w-[480px] space-y-5 rounded-2xl bg-white p-5 dark:bg-black sm:rounded-[32px] sm:p-8">
-      <Skeleton className="h-12 w-12 rounded-2xl" />
+      <Skeleton className="h-12 w-12 rounded-[28%]" />
       <Skeleton className="h-6 w-48" />
       <Skeleton className="h-4 w-72 max-w-full" />
       {[0, 1, 2].map((item) => (
@@ -87,7 +87,7 @@ const applyCustomStyling = (element: HTMLElement) => {
     headerDiv.className = "space-y-1.5 text-center";
     headerDiv.innerHTML = `
           <h3 class="text-xl font-bold text-slate-900 dark:text-white flex flex-col items-center gap-3">
-              <div class="h-12 w-12 rounded-2xl bg-black flex items-center justify-center dark:bg-white">
+              <div class="h-12 w-12 rounded-[28%] bg-black flex items-center justify-center dark:bg-white">
                   <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 432 432" fill="#a098ff"><path d="M247.227 185.616L282.286 69L133 216L186.861 231.146L133 363L298 208.65L247.227 185.616Z"/></svg>
               </div>
               Change Password

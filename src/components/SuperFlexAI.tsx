@@ -922,7 +922,7 @@ const SuperFlexAI = () => {
               ) : !hasApiKey ? (
                 <div className="flex flex-col gap-3 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:rounded-2xl">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
                       <KeyRound size={20} />
                     </div>
                     <div className="min-w-0">
@@ -989,7 +989,7 @@ const SuperFlexAI = () => {
                         >
                           <div className="flex items-center justify-between mb-2">
                             <div
-                              className={`flex h-8 w-8 items-center justify-center rounded-xl transition-transform group-hover:scale-105 ${
+                              className={`flex h-8 w-8 items-center justify-center rounded-[28%] transition-transform group-hover:scale-105 ${
                                 card.active
                                   ? "bg-[#230052]/10 text-[#230052] dark:bg-white/10 dark:text-white"
                                   : "bg-black/5 text-foreground/40 dark:bg-white/5 dark:text-white/40"

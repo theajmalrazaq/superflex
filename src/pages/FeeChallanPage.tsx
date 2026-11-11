@@ -302,7 +302,7 @@ function FeeChallanPage() {
         <div className="grid grid-cols-1 items-start gap-4 sm:gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)]">
           <section className="min-w-0 overflow-hidden rounded-2xl border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px]">
             <div className="flex items-center gap-3 border-b border-black/[0.06] px-5 py-4 dark:border-white/[0.1] sm:px-6">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:rounded-2xl">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
                 <FileText size={20} />
               </div>
               <div>
@@ -492,7 +492,7 @@ function FeeChallanPage() {
 
               {challans.length === 0 && (
                 <div className="flex flex-col items-center gap-3 px-6 py-14 text-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-[13px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:rounded-2xl">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
                     <Receipt size={22} />
                   </div>
                   <div>
@@ -510,7 +510,7 @@ function FeeChallanPage() {
 
           <section className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white p-4 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px] sm:p-6">
             <div className="mb-5 flex items-center gap-3 border-b border-black/[0.06] pb-4 dark:border-white/[0.1]">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:rounded-2xl">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
                 <Printer size={19} />
               </div>
               <div>

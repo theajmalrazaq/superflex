@@ -154,7 +154,7 @@ function StudyPlanPage() {
             {activeSemData && (
               <>
                 <div className="flex items-center gap-3 px-4 pb-3 pt-4 sm:px-6 sm:pt-5">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-11 sm:w-11 sm:rounded-2xl">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-11 sm:w-11">
                     <BookOpen size={20} />
                   </div>
                   <div className="min-w-0">
@@ -196,42 +196,42 @@ function StudyPlanPage() {
 
                     {/* Desktop Table */}
                     <div className="hidden overflow-x-auto sm:block">
-                    <table className="sf-data-table w-full min-w-[620px] text-left">
-                      <thead className="bg-slate-50 text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:bg-white/[0.04] dark:text-slate-400">
-                        <tr>
-                          <th className="px-5 py-3 sm:px-6">Course</th>
-                          <th className="px-5 py-3">Course title</th>
-                          <th className="px-5 py-3 text-center">Credits</th>
-                          <th className="px-5 py-3 text-right sm:px-6">Category</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {activeSemData.courses.map((course, index) => (
-                          <tr
-                            key={`${course.code}-${index}`}
-                            className="border-t border-black/[0.05] dark:border-white/[0.08]"
-                          >
-                            <td className="px-5 py-4 sm:px-6">
-                              <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-bold text-slate-700 dark:bg-white/[0.08] dark:text-slate-200">
-                                {course.code}
-                              </span>
-                            </td>
-                            <td className="max-w-[520px] truncate px-5 py-4 text-sm font-semibold">
-                              {course.title}
-                            </td>
-                            <td className="px-5 py-4 text-center text-sm font-bold">
-                              {course.crHrs}
-                            </td>
-                            <td className="px-5 py-4 text-right sm:px-6">
-                              <span className="rounded-full bg-[#f2ecfc] px-3 py-1.5 text-[11px] font-bold text-[#230052] dark:bg-white/[0.1] dark:text-white">
-                                {course.type}
-                              </span>
-                            </td>
+                      <table className="sf-data-table w-full min-w-[620px] text-left">
+                        <thead className="bg-slate-50 text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:bg-white/[0.04] dark:text-slate-400">
+                          <tr>
+                            <th className="px-5 py-3 sm:px-6">Course</th>
+                            <th className="px-5 py-3">Course title</th>
+                            <th className="px-5 py-3 text-center">Credits</th>
+                            <th className="px-5 py-3 text-right sm:px-6">Category</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody>
+                          {activeSemData.courses.map((course, index) => (
+                            <tr
+                              key={`${course.code}-${index}`}
+                              className="border-t border-black/[0.05] dark:border-white/[0.08]"
+                            >
+                              <td className="px-5 py-4 sm:px-6">
+                                <span className="rounded-md bg-slate-100 px-2 py-1 text-xs font-bold text-slate-700 dark:bg-white/[0.08] dark:text-slate-200">
+                                  {course.code}
+                                </span>
+                              </td>
+                              <td className="max-w-[520px] truncate px-5 py-4 text-sm font-semibold">
+                                {course.title}
+                              </td>
+                              <td className="px-5 py-4 text-center text-sm font-bold">
+                                {course.crHrs}
+                              </td>
+                              <td className="px-5 py-4 text-right sm:px-6">
+                                <span className="rounded-full bg-[#f2ecfc] px-3 py-1.5 text-[11px] font-bold text-[#230052] dark:bg-white/[0.1] dark:text-white">
+                                  {course.type}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </>
                 ) : (
                   <div className="px-6 pb-6 text-center">

@@ -110,7 +110,9 @@ const AttendanceCard = ({ record, index, isMarked, onToggleMark, onRequestReview
       : "text-rose-700 bg-rose-500/10 dark:text-rose-300";
   return (
     <div className="grid grid-cols-[auto_minmax(0,1fr)_auto_auto] items-center gap-2.5 border-b border-black/[0.05] px-1.5 py-2.5 last:border-b-0 dark:border-white/[0.08] sm:gap-3 sm:px-3">
-      <span className="w-5 text-center text-[10px] font-semibold text-foreground/35 sm:w-6">{index}</span>
+      <span className="w-5 text-center text-[10px] font-semibold text-foreground/35 sm:w-6">
+        {index}
+      </span>
       <div className="min-w-0">
         <div className="flex min-w-0 items-center gap-2">
           <span className="truncate text-[13px] font-semibold text-foreground sm:text-sm">
@@ -395,7 +397,10 @@ function AttendancePage() {
                 const absentsRemaining = allowedAbsents - absentsTaken;
 
                 return (
-                  <div key={selectedCourseId} className="flex min-h-0 flex-1 flex-col gap-3 sm:gap-4">
+                  <div
+                    key={selectedCourseId}
+                    className="flex min-h-0 flex-1 flex-col gap-3 sm:gap-4"
+                  >
                     <div className="sf-mobile-cards-scroll pb-1 scrollbar-hide sm:grid sm:grid-cols-3 sm:gap-3 sm:pb-0 xl:grid-cols-6">
                       <AttendanceMetric
                         icon={Percent}
@@ -469,7 +474,7 @@ function AttendancePage() {
                         }`}
                       >
                         <div
-                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[28%] ${
                             absentsRemaining < 0
                               ? "bg-rose-500/15 text-rose-600 dark:bg-rose-500/20 dark:text-rose-300"
                               : "bg-amber-500/15 text-amber-600 dark:bg-amber-500/20 dark:text-amber-300"
@@ -611,7 +616,7 @@ function AttendancePage() {
           </>
         ) : (
           <section className="flex min-h-[300px] flex-1 flex-col items-center justify-center rounded-[24px] border border-black/[0.06] bg-white px-6 py-10 text-center dark:border-white/[0.14] dark:bg-black">
-            <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+            <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
               <BookOpen size={24} />
             </span>
             <h2 className="text-xl font-bold text-[#101010] dark:text-[#f5f6fb]">

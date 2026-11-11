@@ -70,7 +70,7 @@ function CourseRegistrationPage() {
                     className="rounded-2xl border border-black/[0.06] bg-white p-3.5 text-[#101010] shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[32px] sm:p-7 xl:p-8"
                   >
                     <div className="mb-4 flex items-center gap-2.5 sm:mb-6 sm:gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12 sm:rounded-2xl">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12">
                         <Layers size={18} className="sm:h-[21px] sm:w-[21px]" />
                       </div>
                       <h2 className="text-base font-bold tracking-tight sm:text-xl">
@@ -120,7 +120,7 @@ function CourseRegistrationPage() {
               </>
             ) : (
               <section className="flex min-h-[220px] flex-col items-center justify-center rounded-2xl border border-black/[0.06] bg-white px-5 py-8 text-center dark:border-white/[0.14] dark:bg-black sm:min-h-[320px] sm:rounded-[32px] sm:px-6 sm:py-12">
-                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
                   <BookOpen size={25} />
                 </div>
                 <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#230052]/70 dark:text-white">

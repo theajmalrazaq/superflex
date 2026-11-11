@@ -161,7 +161,7 @@ const BestOfForm = ({ isOpen, onClose, onApply, itemCount, sectionTitle }) => {
         </button>
       </BottomSheetClose>
       <header className="flex shrink-0 flex-col items-center px-6 pb-3.5 pt-1.5 text-center sm:px-8 sm:pb-4 sm:pt-2">
-        <span className="mb-2.5 flex h-10 w-10 items-center justify-center rounded-xl bg-[#230052] text-white dark:bg-white dark:text-[#101027] sm:h-11 sm:w-11 sm:rounded-[16px]">
+        <span className="mb-2.5 flex h-10 w-10 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#101027] sm:h-11 sm:w-11">
           <Settings size={21} />
         </span>
         <p className="text-[10px] font-bold uppercase tracking-[.16em] text-[#230052]/65 dark:text-white">
@@ -207,7 +207,7 @@ const BestOfForm = ({ isOpen, onClose, onApply, itemCount, sectionTitle }) => {
           />
         </label>
         <div className="flex items-start gap-3 rounded-2xl bg-slate-50 p-4 text-slate-700 dark:bg-white/[.06] dark:text-slate-300">
-          <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#230052]/10 text-[#230052] dark:bg-white/15 dark:text-white">
+          <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[28%] bg-[#230052]/10 text-[#230052] dark:bg-white/15 dark:text-white">
             <AlertCircle size={17} />
           </span>
           <p className="text-sm leading-relaxed">
@@ -925,7 +925,7 @@ function MarksPage() {
               </div>
             ) : (
               <div className="flex min-h-[300px] flex-col items-center justify-center rounded-[24px] border border-black/[0.06] bg-white px-6 py-12 text-center dark:border-white/[0.14] dark:bg-black">
-                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
                   <Layers size={24} />
                 </div>
                 <h4 className="text-xl font-bold text-[#101010] dark:text-[#f5f6fb]">

@@ -24,7 +24,7 @@ const StatsCard = ({
       >
         <div className="flex min-w-0 flex-col items-start gap-2.5 sm:flex-row sm:items-center sm:gap-3">
           <div
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] sm:h-14 sm:w-14 sm:rounded-2xl ${dashboardIconTones[iconTone] || dashboardIconTones.lavender}`}
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[28%] sm:h-14 sm:w-14 ${dashboardIconTones[iconTone] || dashboardIconTones.lavender}`}
           >
             <Icon size={19} strokeWidth={2} className="sm:h-[25px] sm:w-[25px]" />
           </div>
@@ -51,7 +51,7 @@ const StatsCard = ({
       className={`min-w-[152px] flex-1 rounded-[22px] border border-black/[0.05] bg-white p-4 text-[#101027] shadow-none transition-colors hover:bg-white dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] dark:hover:bg-black sm:min-w-[200px] sm:rounded-[32px] sm:p-6 ${className}`}
     >
       <div className="mb-3 flex items-start justify-between sm:mb-6">
-        <div className="rounded-[11px] bg-[#230052] p-2.5 text-white dark:bg-white dark:text-[#0a192f] sm:rounded-2xl sm:p-3.5">
+        <div className="rounded-[28%] bg-[#230052] p-2.5 text-white dark:bg-white dark:text-[#0a192f] sm:p-3.5">
           <Icon size={19} strokeWidth={2.25} className="sm:h-6 sm:w-6" />
         </div>
       </div>

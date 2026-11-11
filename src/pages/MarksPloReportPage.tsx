@@ -226,7 +226,7 @@ function MarksPloReportPage() {
                     className="flex min-h-[106px] flex-col rounded-2xl border border-black/[0.06] bg-white p-3.5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:min-h-[150px] sm:rounded-[24px] sm:p-6 print:border-gray-200"
                   >
                     <div className="flex items-center gap-2.5 sm:gap-3">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12 sm:rounded-2xl">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12">
                         <Icon size={18} className="sm:h-[22px] sm:w-[22px]" />
                       </span>
                       <span className="text-xs font-semibold text-[#40404a] dark:text-[#c4cad6] sm:text-sm">
@@ -245,7 +245,7 @@ function MarksPloReportPage() {
                 ))}
                 <div className="sf-mobile-card-wide rounded-2xl border border-black/[0.06] bg-white p-3.5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px] sm:p-6 print:border-gray-200">
                   <div className="mb-3 flex items-center gap-2.5 sm:mb-4 sm:gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12 sm:rounded-2xl">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12">
                       <FileBarChart size={18} className="sm:h-[22px] sm:w-[22px]" />
                     </span>
                     <h2 className="text-xs font-semibold sm:text-sm">Outcome Breakdown</h2>
@@ -272,7 +272,7 @@ function MarksPloReportPage() {
             {reportHtml ? (
               <section className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px] print:border-gray-200">
                 <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4 dark:border-white/10 sm:px-6">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:rounded-2xl">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
                     <FileBarChart size={20} />
                   </span>
                   <div>
@@ -292,7 +292,7 @@ function MarksPloReportPage() {
               </section>
             ) : (
               <div className="flex min-h-[300px] flex-col items-center justify-center rounded-[24px] border border-black/[0.06] bg-white px-6 py-12 text-center dark:border-white/[0.14] dark:bg-black">
-                <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+                <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
                   <Info size={25} />
                 </span>
                 <p className="text-xl font-bold text-[#101010] dark:text-[#f5f6fb]">

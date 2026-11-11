@@ -42,7 +42,7 @@ const GradeChangeSkeleton = () => (
           key={item}
           className="flex min-h-[156px] flex-col rounded-[24px] bg-white p-5 dark:bg-black sm:p-6"
         >
-          <Skeleton className="h-12 w-12 rounded-[13px] sm:rounded-2xl" />
+          <Skeleton className="h-12 w-12 rounded-[28%]" />
           <Skeleton className="mt-auto h-7 w-28" />
           <Skeleton className="mt-2 h-3 w-20" />
         </div>
@@ -56,7 +56,7 @@ const GradeChangeSkeleton = () => (
             key={item}
             className="flex items-center gap-4 border-t border-black/[0.05] py-4 dark:border-white/[0.08]"
           >
-            <Skeleton className="h-10 w-10 rounded-[11px] sm:rounded-2xl" />
+            <Skeleton className="h-10 w-10 rounded-[28%]" />
             <div className="flex-1 space-y-2">
               <Skeleton className="h-4 w-56 max-w-full" />
               <Skeleton className="h-3 w-32" />
@@ -160,7 +160,7 @@ const GradeChangeCard = ({ req, isSelected, onToggle, index }) => {
           {index}
         </span>
         <span
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[11px] sm:rounded-2xl ${isSelected ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "bg-slate-100 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300"}`}
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[28%] ${isSelected ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "bg-slate-100 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300"}`}
         >
           <FileText size={18} />
         </span>
@@ -611,7 +611,7 @@ function GradeChangePage() {
               </div>
             ) : (
               <div className="flex min-h-[220px] flex-col items-center justify-center px-6 py-10 text-center">
-                <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[13px] bg-slate-100 text-slate-500 dark:bg-white/[0.08] dark:text-slate-300 sm:rounded-2xl">
+                <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[28%] bg-slate-100 text-slate-500 dark:bg-white/[0.08] dark:text-slate-300">
                   <Search size={22} />
                 </span>
                 <h3 className="text-base font-bold">No Records Found</h3>
@@ -632,7 +632,7 @@ function GradeChangePage() {
             <div className="space-y-5 p-5 sm:p-6">
               <div className="rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.05]">
                 <div className="mb-4 flex items-center gap-2">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:rounded-xl">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
                     <ClipboardEdit size={17} />
                   </span>
                   <h3 className="text-sm font-bold">Selection summary</h3>

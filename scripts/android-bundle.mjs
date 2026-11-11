@@ -139,7 +139,7 @@ ${fadeOutRule}
   width: 96px;
   height: 96px;
   overflow: hidden;
-  border-radius: 28px;
+  border-radius: 28%;
   border: 1px solid rgb(255 255 255 / 0.4);
   background: rgb(255 255 255 / 0.6);
   -webkit-backdrop-filter: blur(12px);

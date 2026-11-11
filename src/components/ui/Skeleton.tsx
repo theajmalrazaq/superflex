@@ -41,7 +41,7 @@ export const PageSkeleton = ({
             key={item}
             className="flex min-h-[132px] flex-col rounded-[22px] border border-black/[0.04] bg-white/80 p-4 dark:border-white/[0.08] dark:bg-black/70 sm:min-h-[150px] sm:rounded-[24px] sm:p-6"
           >
-            <Skeleton className="h-10 w-10 rounded-[11px] sm:h-11 sm:w-11 sm:rounded-2xl" />
+            <Skeleton className="h-10 w-10 rounded-[28%] sm:h-11 sm:w-11" />
             <Skeleton className="mt-auto h-6 w-20 sm:h-7 sm:w-24" />
             <Skeleton className="mt-2 h-3 w-28 max-w-full sm:w-32" />
           </div>
@@ -63,7 +63,7 @@ export const PageSkeleton = ({
             key={item}
             className="flex items-center gap-4 border-t border-black/[0.05] py-4 first:border-0 dark:border-white/[0.08]"
           >
-            <Skeleton className="h-10 w-10 shrink-0 rounded-[11px] sm:rounded-2xl" />
+            <Skeleton className="h-10 w-10 shrink-0 rounded-[28%]" />
             <div className="min-w-0 flex-1 space-y-2">
               <Skeleton className="h-4 w-64 max-w-full" />
               <Skeleton className="h-3 w-40 max-w-[70%]" />

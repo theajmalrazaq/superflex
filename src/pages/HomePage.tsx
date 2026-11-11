@@ -150,7 +150,9 @@ const SectionAccordion = ({ section, isOpen, onToggle, course, pendingUpdates })
                     </td>
                     <td className="p-3 text-right text-xs font-bold text-foreground sm:text-sm">
                       {row.ungraded ? "—" : row.obtained}{" "}
-                      <span className="text-[11px] font-normal text-foreground/40 sm:text-xs">/ {row.total}</span>
+                      <span className="text-[11px] font-normal text-foreground/40 sm:text-xs">
+                        / {row.total}
+                      </span>
                     </td>
                     <td className="p-3 text-right">
                       {row.ungraded ? (
@@ -854,7 +856,9 @@ function HomePage() {
 
               <button
                 type="button"
-                onClick={() => window.dispatchEvent(new CustomEvent("superflex-open-profile-image"))}
+                onClick={() =>
+                  window.dispatchEvent(new CustomEvent("superflex-open-profile-image"))
+                }
                 aria-label="Change profile picture"
                 title="Change profile picture"
                 className="group relative mt-1 rounded-full transition-transform active:scale-95"
@@ -1059,7 +1063,7 @@ function HomePage() {
                 <div className="flex h-full flex-col gap-3.5 overflow-hidden rounded-[22px] border border-black/[0.05] bg-white p-4 text-slate-900 shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:gap-6 sm:rounded-[24px] sm:p-7 xl:p-8">
                   <div className="flex items-center justify-between gap-3 sm:min-h-[52px] sm:gap-4">
                     <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12 sm:rounded-2xl">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12">
                         <Award size={18} className="sm:h-[22px] sm:w-[22px]" />
                       </span>
                       <div className="min-w-0 space-y-0.5 sm:space-y-1">
@@ -1194,7 +1198,7 @@ function HomePage() {
                 <div className="flex h-full flex-col gap-3.5 rounded-[22px] border border-black/[0.05] bg-white p-4 text-slate-900 shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:gap-6 sm:rounded-[24px] sm:p-7 xl:p-8">
                   <div className="flex items-center justify-between gap-3 sm:min-h-[52px] sm:gap-4">
                     <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12 sm:rounded-2xl">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12">
                         <Activity size={18} className="sm:h-[22px] sm:w-[22px]" />
                       </span>
                       <div className="min-w-0 space-y-0.5 sm:space-y-1">
@@ -1274,11 +1278,12 @@ const ProfileInfoTabs = ({ profileSections }) => {
         >
           {/* Section Header */}
           <div className="mb-3 flex items-center gap-2.5 sm:mb-6 sm:gap-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12 sm:rounded-2xl">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12">
               {(() => {
                 const title = section.title.toLowerCase();
                 if (title.includes("personal")) return <User size={18} className="sm:h-6 sm:w-6" />;
-                if (title.includes("university")) return <Building size={18} className="sm:h-6 sm:w-6" />;
+                if (title.includes("university"))
+                  return <Building size={18} className="sm:h-6 sm:w-6" />;
                 if (title.includes("guardian") || title.includes("family"))
                   return <Users size={18} className="sm:h-6 sm:w-6" />;
                 return <Activity size={18} className="sm:h-6 sm:w-6" />;

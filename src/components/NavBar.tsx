@@ -509,8 +509,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
 
   const bottomNavItems = useMemo(() => {
     const findHref = (name: string, fallback: string) =>
-      menuLinks.find((l) => l.text.trim() === name)?.href ||
-      `${window.location.origin}${fallback}`;
+      menuLinks.find((l) => l.text.trim() === name)?.href || `${window.location.origin}${fallback}`;
     const lowerPage = (currentPage || "").toLowerCase();
 
     return [
@@ -535,9 +534,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
         label: "Marks",
         href: findHref("Marks", "/Student/StudentMarks"),
         icon: TrendingUp,
-        active: Boolean(
-          lowerPage && lowerPage.includes("marks") && !lowerPage.includes("plo"),
-        ),
+        active: Boolean(lowerPage && lowerPage.includes("marks") && !lowerPage.includes("plo")),
         hasUpdate: Boolean(pendingUpdates?.newMarks?.length > 0),
       },
       {
@@ -692,7 +689,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
                   </span>
                   <div className="flex w-[58px] shrink-0 items-center justify-center">
                     <div
-                      className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-[13px] transition-transform group-hover:scale-105 ${
+                      className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-[28%] transition-transform group-hover:scale-105 ${
                         active
                           ? "bg-[#230052] text-white shadow-[0_4px_16px_rgba(35,0,82,0.28)] ring-2 ring-[#230052]/25 dark:bg-white dark:text-[#0a192f] dark:shadow-none dark:ring-white/30"
                           : "border border-black/[0.08] bg-white/95 text-[#230052]/80 shadow-xs dark:border-white/15 dark:bg-[#181822] dark:text-white/80"
@@ -723,7 +720,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
                 Settings
               </span>
               <div className="flex w-[58px] shrink-0 items-center justify-center">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[13px] border border-black/[0.08] bg-white/95 text-[#230052]/80 shadow-xs transition-transform group-hover:scale-105 dark:border-white/15 dark:bg-[#181822] dark:text-white/80">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[28%] border border-black/[0.08] bg-white/95 text-[#230052]/80 shadow-xs transition-transform group-hover:scale-105 dark:border-white/15 dark:bg-[#181822] dark:text-white/80">
                   <Settings size={20} strokeWidth={1.9} />
                 </div>
               </div>

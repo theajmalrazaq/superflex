@@ -69,7 +69,7 @@ const LoadingOverlay = ({ show = true }) => {
       )}
 
       {}
-      <div className="relative z-10 flex h-24 w-24 items-center justify-center overflow-hidden rounded-[28px] border border-white/40 bg-white/60 shadow-none backdrop-blur-md dark:border-white/10 dark:bg-black/40">
+      <div className="relative z-10 flex h-24 w-24 items-center justify-center overflow-hidden rounded-[28%] border border-white/40 bg-white/60 shadow-none backdrop-blur-md dark:border-white/10 dark:bg-black/40">
         <svg
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
