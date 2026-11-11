@@ -11,14 +11,7 @@ body.superflex-login-page {
   height: auto !important;
   overflow-x: hidden !important;
   overflow-y: auto !important;
-  background: linear-gradient(
-    180deg,
-    #62abe0 0%,
-    #73b3e1 24%,
-    #9ac7e8 38%,
-    #dcebf5 49%,
-    #fff 57%
-  ) !important;
+  background: var(--superflex-light-login-gradient) !important;
   background-attachment: fixed !important;
   color: #101010 !important;
 }
@@ -26,16 +19,7 @@ body.superflex-login-page {
 body.superflex-login-page.superflex-login-dark,
 html.dark body.superflex-login-page {
   --login-card-bg: #000;
-  background: linear-gradient(
-    180deg,
-    #0f2b52 0%,
-    #0d2547 16%,
-    #091b35 32%,
-    #061122 48%,
-    #030812 64%,
-    #010308 76%,
-    #000000 86%
-  ) !important;
+  background: var(--superflex-dark-sky-gradient) !important;
   color: #f5f6fb !important;
 }
 
@@ -618,16 +602,7 @@ body.superflex-login-page .login-version-pill:hover {
 body.superflex-login-page.superflex-login-dark {
   --login-card-bg: #000;
   color-scheme: dark;
-  background: linear-gradient(
-    180deg,
-    #0f2b52 0%,
-    #0d2547 16%,
-    #091b35 32%,
-    #061122 48%,
-    #030812 64%,
-    #010308 76%,
-    #000000 86%
-  ) !important;
+  background: var(--superflex-dark-sky-gradient) !important;
   color: #f5f6fb !important;
 }
 

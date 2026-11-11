@@ -13,14 +13,7 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 99999;
-  background: linear-gradient(
-    180deg,
-    #62abe0 0%,
-    #73b3e1 24%,
-    #9ac7e8 40%,
-    #dcebf5 65%,
-    #ffffff 100%
-  );
+  background: var(--superflex-light-loading-gradient);
   opacity: 1;
   visibility: visible;
   transition:
@@ -32,16 +25,7 @@ body {
 }
 
 .dark .loading-overlay {
-  background: linear-gradient(
-    180deg,
-    #0f2b52 0%,
-    #0d2547 16%,
-    #091b35 32%,
-    #061122 48%,
-    #030812 64%,
-    #010308 76%,
-    #000000 86%
-  );
+  background: var(--superflex-dark-sky-gradient);
 }
 
 .dark .loading-overlay .overlay-cloud-left {
