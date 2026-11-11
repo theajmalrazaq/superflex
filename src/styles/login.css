@@ -970,3 +970,39 @@ body.superflex-login-page.superflex-login-dark #forgot-password-popup .forgot-pa
     margin-bottom: 12px;
   }
 }
+
+@media (max-width: 640px) {
+  body.superflex-login-page #login-popup,
+  body.superflex-login-page #forgot-password-popup {
+    width: min(100% - 24px, 440px) !important;
+    border-radius: 20px !important;
+    padding: 16px 18px !important;
+  }
+
+  body.superflex-login-page #login-popup .login-header h1,
+  body.superflex-login-page #forgot-password-popup .m-login__title {
+    font-size: 22px !important;
+  }
+
+  body.superflex-login-page #login-popup .login-header p,
+  body.superflex-login-page #forgot-password-popup .m-login__desc {
+    font-size: 13px !important;
+  }
+
+  body.superflex-login-page #login-popup .form-control.m-input,
+  body.superflex-login-page #forgot-password-popup .form-control.m-input {
+    min-height: 44px !important;
+    height: 44px !important;
+    font-size: 14px !important;
+    padding: 0 18px !important;
+  }
+
+  body.superflex-login-page #login-popup .btn-primary,
+  body.superflex-login-page #login-popup .login-primary-btn,
+  body.superflex-login-page #forgot-password-popup button[type="submit"],
+  body.superflex-login-page #forgot-password-popup .login-primary-btn {
+    min-height: 46px !important;
+    height: 46px !important;
+    font-size: 14px !important;
+  }
+}

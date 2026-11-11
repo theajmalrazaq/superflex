@@ -36,7 +36,7 @@ const FeeDetailsSkeleton = () => (
             key={item}
             className="flex min-h-[156px] flex-col rounded-[32px] bg-white/80 p-5 dark:bg-black/80 sm:p-6"
           >
-            <Skeleton className="h-12 w-12 rounded-[36%]" />
+            <Skeleton className="h-12 w-12 rounded-[13px] sm:rounded-2xl" />
             <Skeleton className="mt-auto h-7 w-32" />
             <Skeleton className="mt-2 h-3 w-24" />
           </div>
@@ -88,7 +88,7 @@ const SemesterAccordion = ({ semester }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <section className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]">
+    <section className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px]">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -96,7 +96,7 @@ const SemesterAccordion = ({ semester }) => {
         className="flex w-full cursor-pointer flex-col justify-between gap-4 p-4 text-left transition-colors hover:bg-slate-50 dark:hover:bg-white/[0.03] sm:flex-row sm:items-center sm:p-5"
       >
         <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:rounded-2xl">
             <Layers size={20} />
           </div>
           <div className="min-w-0">
@@ -380,45 +380,50 @@ function FeeDetailsPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8">
-        <header className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/80">Finance</p>
-            <h1 className="mt-1 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+      <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-3.5 py-1 font-sans sm:gap-7 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+        <header className="flex flex-wrap items-end justify-between gap-3 sm:gap-4">
+          <div className="space-y-1">
+            <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-xs sm:font-bold sm:tracking-[0.18em] sm:text-white/80">
+              Finance
+            </p>
+            <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:mt-1 sm:text-4xl sm:font-bold sm:tracking-tight">
               Fee Details
             </h1>
-            <p className="mt-1 text-sm text-white/80">
+            <p className="text-xs text-white/85 sm:mt-1 sm:text-sm">
               The financial damage report. Dekh le bhai, degree pe kitna investment ho chuka hai.
             </p>
           </div>
-          <div className="flex items-center gap-3 rounded-2xl bg-white/15 px-4 py-3 text-[#101010] backdrop-blur-sm dark:text-white">
-            <CreditCard size={19} />
+          <div className="flex items-center gap-2.5 rounded-full bg-white/25 px-4 py-2 text-white backdrop-blur-md dark:bg-white/10 sm:gap-3 sm:rounded-2xl sm:bg-white/15 sm:px-4 sm:py-3 sm:text-[#101010] sm:dark:text-white">
+            <CreditCard size={16} className="sm:h-[19px] sm:w-[19px]" />
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-wide opacity-70">
+              <p className="text-[9px] font-semibold uppercase tracking-wide opacity-80 sm:text-[10px]">
                 Total paid
               </p>
-              <p className="text-base font-bold">Rs. {totalPaid}</p>
+              <p className="text-sm font-bold sm:text-base">Rs. {totalPaid}</p>
             </div>
           </div>
         </header>
 
         <NotificationBanner alerts={alerts} />
 
-        <section aria-labelledby="fee-overview-heading" className="space-y-4">
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <section aria-labelledby="fee-overview-heading" className="space-y-2.5 sm:space-y-4">
+          <div className="hidden flex-col gap-0.5 sm:flex sm:flex-row sm:items-end sm:justify-between sm:gap-1">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/80 sm:text-[10px]">
                 Overview
               </p>
-              <h2 id="fee-overview-heading" className="text-xl font-bold tracking-tight text-white">
+              <h2
+                id="fee-overview-heading"
+                className="text-base font-bold tracking-tight text-white sm:text-xl"
+              >
                 Financial Summary
               </h2>
             </div>
-            <p className="text-xs text-white/75">
+            <p className="text-[11px] text-white/75 sm:text-xs">
               Where did all the money go? Payments, remaining dues, and everything in between.
             </p>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
+          <div className="sf-mobile-cards-scroll pb-1 scrollbar-hide sm:grid sm:grid-cols-2 sm:gap-4 sm:pb-0 xl:grid-cols-4 xl:gap-5">
             <StatsCard
               variant="dashboard"
               icon={DollarSign}
@@ -496,7 +501,7 @@ function FeeDetailsPage() {
               Wallet's villain origin story. A complete history of your financial sacrifices.
             </p>
           </div>
-          <div className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-white">
+          <div className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-white sm:rounded-[24px]">
             {transactions.length ? (
               <>
                 <div className="hidden overflow-x-auto py-4 md:block">

@@ -60,19 +60,23 @@ const NotificationBanner = ({
         return (
           <div
             key={idx}
-            className={`relative flex items-center gap-4 overflow-hidden rounded-[24px] border bg-white p-4 text-slate-900 dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] ${borderClass} shadow-xs`}
+            className={`relative flex items-center gap-3.5 overflow-hidden rounded-[22px] border bg-white p-4 text-[#101027] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:gap-4 sm:rounded-[24px] ${borderClass} shadow-xs`}
           >
-            <div className={`shrink-0 rounded-xl p-3 ${iconBgClass}`}>
-              {isSuccess ? <Bell size={20} /> : <AlertTriangle size={20} />}
+            <div className={`shrink-0 rounded-[14px] p-2.5 sm:rounded-xl sm:p-3 ${iconBgClass}`}>
+              {isSuccess ? (
+                <Bell size={18} className="sm:h-5 sm:w-5" />
+              ) : (
+                <AlertTriangle size={18} className="sm:h-5 sm:w-5" />
+              )}
             </div>
 
-            <div className="space-y-0.5 flex-1 min-w-0">
+            <div className="min-w-0 flex-1 space-y-0.5">
               {alert.title && (
-                <p className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                <p className="text-[14px] font-bold tracking-tight text-[#101027] dark:text-white sm:text-xs sm:uppercase sm:tracking-wider sm:text-emerald-600 sm:dark:text-emerald-400">
                   {alert.title}
                 </p>
               )}
-              <div className="text-xs md:text-sm font-medium leading-relaxed">
+              <div className="text-[12px] font-medium leading-relaxed text-[#667085] dark:text-slate-300 sm:text-xs sm:text-foreground md:text-sm">
                 {alert.message || alert.text}
               </div>
             </div>

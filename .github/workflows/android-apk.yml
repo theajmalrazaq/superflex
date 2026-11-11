@@ -1,0 +1,58 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'android/**'
+      - 'scripts/**'
+      - '.github/workflows/android-apk.yml'
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Android build tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y aapt apksigner zipalign dalvik-exchange
+
+      - name: Download Android 26 platform jar
+        run: |
+          sudo mkdir -p /opt/android
+          curl -sL https://dl.google.com/android/repository/platform-26_r01.zip -o /tmp/platform.zip
+          sudo unzip -p /tmp/platform.zip android-8.0.0/android.jar > /tmp/android.jar
+          sudo mv /tmp/android.jar /opt/android/android.jar
+          rm -f /tmp/platform.zip
+          echo "ANDROID_JAR=/opt/android/android.jar" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build web bundle and APK
+        run: ./android/build.sh debug
+
+      - name: Verify APK
+        run: |
+          test -f dist/SuperFlex.apk || { echo "SuperFlex.apk was not produced"; exit 1; }
+          aapt dump badging dist/SuperFlex.apk | grep -E "^package: name='com.superflex.app'"
+          apksigner verify dist/SuperFlex.apk
+          unzip -l dist/SuperFlex.apk | grep -q classes.dex
+          unzip -l dist/SuperFlex.apk | grep -q assets/web/superflex.js
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SuperFlex-apk
+          path: dist/SuperFlex.apk
+          if-no-files-found: error

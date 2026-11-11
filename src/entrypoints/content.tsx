@@ -60,11 +60,13 @@ export default defineContentScript({
 
     const root = createRoot(container);
 
-    chrome.runtime.onMessage.addListener((message, sender) => {
-      if (sender.id === chrome.runtime.id && message?.type === "SUPERFLEX_AI_KEY_UPDATED") {
-        window.dispatchEvent(new CustomEvent("superflex-ai-key-updated"));
-      }
-    });
+    if (globalThis.chrome?.runtime?.onMessage?.addListener) {
+      chrome.runtime.onMessage.addListener((message, sender) => {
+        if (sender?.id === chrome?.runtime?.id && message?.type === "SUPERFLEX_AI_KEY_UPDATED") {
+          window.dispatchEvent(new CustomEvent("superflex-ai-key-updated"));
+        }
+      });
+    }
 
     const loginPaths = new Set(["/login", "/login/index", "/login/logout"]);
     const isLoginPage = loginPaths.has(window.location.pathname.replace(/\/$/, "").toLowerCase());
@@ -130,6 +132,9 @@ export default defineContentScript({
 
     setTimeout(() => {
       document.body.classList.add("!visible");
+      try {
+        (globalThis as any).SFNative?.ready?.();
+      } catch {}
     }, 450);
   },
 });

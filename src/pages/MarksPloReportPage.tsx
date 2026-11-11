@@ -173,14 +173,16 @@ function MarksPloReportPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-5 pb-24 print:p-0">
-        <header className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end print:hidden">
+      <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-3.5 pb-6 sm:gap-5 sm:pb-24 print:p-0">
+        <header className="flex flex-col justify-between gap-3 xl:flex-row xl:items-end sm:gap-4 print:hidden">
           <div className="space-y-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+            <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-[10px] sm:font-bold sm:tracking-[0.16em] sm:text-white/80">
               Academics
             </p>
-            <h1 className="text-3xl font-bold tracking-tight text-white">Marks PLO Report</h1>
-            <p className="text-sm text-white/80">
+            <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:text-3xl sm:font-bold sm:tracking-tight">
+              Marks PLO Report
+            </h1>
+            <p className="text-xs text-white/85 sm:text-sm">
               Wait, we're grading outcomes too? Because apparently, marks alone weren't enough.
             </p>
           </div>
@@ -198,11 +200,11 @@ function MarksPloReportPage() {
         {loading ? (
           <PageSkeleton label="Loading marks PLO report" cards={3} rows={6} showHeader={false} />
         ) : (
-          <div className="space-y-5">
+          <div className="space-y-3.5 sm:space-y-5">
             <NotificationBanner alerts={alerts} />
 
             {summaryData && (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 print:gap-3">
+              <div className="sf-mobile-cards-scroll pb-1 scrollbar-hide sm:grid sm:grid-cols-2 sm:gap-4 sm:pb-0 xl:grid-cols-3 print:gap-3">
                 {[
                   {
                     icon: Target,
@@ -221,41 +223,43 @@ function MarksPloReportPage() {
                 ].map(({ icon: Icon, label, value, detail, valueClass }) => (
                   <div
                     key={label}
-                    className="flex min-h-[150px] flex-col rounded-[24px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6 print:border-gray-200"
+                    className="flex min-h-[106px] flex-col rounded-2xl border border-black/[0.06] bg-white p-3.5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:min-h-[150px] sm:rounded-[24px] sm:p-6 print:border-gray-200"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="flex h-12 w-12 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
-                        <Icon size={22} />
+                    <div className="flex items-center gap-2.5 sm:gap-3">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12 sm:rounded-2xl">
+                        <Icon size={18} className="sm:h-[22px] sm:w-[22px]" />
                       </span>
-                      <span className="text-sm font-semibold text-[#40404a] dark:text-[#c4cad6]">
+                      <span className="text-xs font-semibold text-[#40404a] dark:text-[#c4cad6] sm:text-sm">
                         {label}
                       </span>
                     </div>
                     <p
-                      className={`mt-auto pt-5 text-3xl font-bold leading-none tracking-tight ${valueClass}`}
+                      className={`mt-auto pt-2.5 text-xl font-bold leading-none tracking-tight sm:pt-5 sm:text-3xl ${valueClass}`}
                     >
                       {value}
                     </p>
-                    <p className="mt-2 text-[11px] text-[#777780] dark:text-[#9ca3b3]">{detail}</p>
+                    <p className="mt-1 text-[10px] text-[#777780] dark:text-[#9ca3b3] sm:mt-2 sm:text-[11px]">
+                      {detail}
+                    </p>
                   </div>
                 ))}
-                <div className="rounded-[24px] border border-black/[0.06] bg-white p-5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-6 print:border-gray-200">
-                  <div className="mb-4 flex items-center gap-3">
-                    <span className="flex h-12 w-12 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
-                      <FileBarChart size={22} />
+                <div className="sf-mobile-card-wide rounded-2xl border border-black/[0.06] bg-white p-3.5 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px] sm:p-6 print:border-gray-200">
+                  <div className="mb-3 flex items-center gap-2.5 sm:mb-4 sm:gap-3">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12 sm:rounded-2xl">
+                      <FileBarChart size={18} className="sm:h-[22px] sm:w-[22px]" />
                     </span>
-                    <h2 className="text-sm font-semibold">Outcome Breakdown</h2>
+                    <h2 className="text-xs font-semibold sm:text-sm">Outcome Breakdown</h2>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                  <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4 sm:gap-2">
                     {summaryData.ploBreakdown.map((plo) => (
                       <div
                         key={plo.id}
-                        className="flex flex-col items-center rounded-xl bg-slate-50 px-2 py-2.5 dark:bg-white/[.06]"
+                        className="flex flex-col items-center rounded-xl bg-slate-50 px-2 py-2 dark:bg-white/[.06] sm:py-2.5"
                       >
-                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                        <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 sm:text-[10px]">
                           PLO{plo.id}
                         </span>
-                        <span className="mt-1 text-xs font-bold text-[#230052] dark:text-white">
+                        <span className="mt-0.5 text-[11px] font-bold text-[#230052] dark:text-white sm:mt-1 sm:text-xs">
                           {plo.value}%
                         </span>
                       </div>
@@ -266,9 +270,9 @@ function MarksPloReportPage() {
             )}
 
             {reportHtml ? (
-              <section className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] print:border-gray-200">
+              <section className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px] print:border-gray-200">
                 <div className="flex items-center gap-3 border-b border-slate-100 px-5 py-4 dark:border-white/10 sm:px-6">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-[12px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:rounded-2xl">
                     <FileBarChart size={20} />
                   </span>
                   <div>
@@ -288,7 +292,7 @@ function MarksPloReportPage() {
               </section>
             ) : (
               <div className="flex min-h-[300px] flex-col items-center justify-center rounded-[24px] border border-black/[0.06] bg-white px-6 py-12 text-center dark:border-white/[0.14] dark:bg-black">
-                <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+                <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
                   <Info size={25} />
                 </span>
                 <p className="text-xl font-bold text-[#101010] dark:text-[#f5f6fb]">

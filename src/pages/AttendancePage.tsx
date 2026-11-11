@@ -30,7 +30,7 @@ import { parseAcademicDate } from "../utils/academicDate";
 
 const AttendanceCourseTabs = ({ courses, selectedId, onSelect }) => (
   <div
-    className="inline-flex w-fit max-w-full gap-2 overflow-x-auto rounded-full border-0 bg-white/55 p-1.5 shadow-sm shadow-black/[0.03] backdrop-blur-xl scrollbar-hide dark:bg-black/25 dark:shadow-none"
+    className="flex w-full max-w-full gap-2 overflow-x-auto pb-0.5 scrollbar-hide sm:inline-flex sm:w-fit sm:rounded-full sm:bg-white/55 sm:p-1.5 sm:shadow-sm sm:shadow-black/[0.03] sm:backdrop-blur-xl sm:dark:bg-black/25 sm:dark:shadow-none"
     aria-label="Select course"
   >
     {courses.map((course) => {
@@ -46,14 +46,19 @@ const AttendanceCourseTabs = ({ courses, selectedId, onSelect }) => (
       const allowed = course.allowedAbsents || (cr === 3 ? 6 : cr <= 2 ? 3 : 6);
       const isOver = course.absent > allowed;
       const isAtLimit = course.absent === allowed;
+      const isActive = selectedId === course.id;
       return (
         <button
           key={course.id}
           type="button"
           onClick={() => onSelect(course.id)}
-          aria-pressed={selectedId === course.id}
+          aria-pressed={isActive}
           title={`${course.title} (${cr} Cr Hr · ${course.absent}/${allowed} absents)`}
-          className={`flex min-w-[120px] shrink-0 items-center justify-between gap-3 rounded-full px-4 py-2.5 text-xs font-bold transition-colors ${selectedId === course.id ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "text-slate-600 hover:bg-white/80 hover:text-[#230052] dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white"}`}
+          className={`flex shrink-0 items-center justify-between gap-2.5 rounded-full px-4 py-2 text-xs font-bold transition-colors sm:min-w-[120px] sm:gap-3 sm:py-2.5 ${
+            isActive
+              ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"
+              : "bg-white text-[#101027] hover:bg-white/90 dark:bg-white/10 dark:text-slate-200 sm:bg-transparent sm:text-slate-600 sm:hover:bg-white/80 sm:hover:text-[#230052]"
+          }`}
         >
           <div className="flex items-center gap-1.5 truncate">
             {isOver ? (
@@ -316,14 +321,16 @@ function AttendancePage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-4">
-        <header className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
+      <div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-[1600px] flex-col gap-3 sm:gap-4">
+        <header className="flex flex-col justify-between gap-3 xl:flex-row xl:items-end sm:gap-4">
           <div className="space-y-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+            <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-[10px] sm:font-bold sm:tracking-[0.16em] sm:text-white/80">
               Academics
             </p>
-            <h1 className="text-3xl font-bold tracking-tight text-white">Attendance</h1>
-            <p className="text-sm text-white/80">
+            <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:text-3xl sm:font-bold sm:tracking-tight">
+              Attendance
+            </h1>
+            <p className="text-xs text-white/85 sm:text-sm">
               80% or RIP? Dekh le bhai, aur kitni classes bunk kar sakta hai.
             </p>
           </div>
@@ -378,8 +385,8 @@ function AttendancePage() {
                 const absentsRemaining = allowedAbsents - absentsTaken;
 
                 return (
-                  <div key={selectedCourseId} className="flex min-h-0 flex-1 flex-col gap-4">
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+                  <div key={selectedCourseId} className="flex min-h-0 flex-1 flex-col gap-3 sm:gap-4">
+                    <div className="sf-mobile-cards-scroll pb-1 scrollbar-hide sm:grid sm:grid-cols-3 sm:gap-3 sm:pb-0 xl:grid-cols-6">
                       <AttendanceMetric
                         icon={Percent}
                         label="Attendance"
@@ -486,34 +493,35 @@ function AttendancePage() {
                       </div>
                     )}
 
-                    <div className="-mb-1 flex flex-wrap items-center justify-between gap-2">
-                      <div>
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h2 className="text-lg font-bold tracking-tight text-[#101010] dark:text-[#f5f6fb]">
-                            {selectedCourseData.title}
-                          </h2>
-                          <span className="rounded-full bg-[#230052]/10 px-2.5 py-0.5 text-[10px] font-bold text-[#230052] dark:bg-white/10 dark:text-white">
-                            {creditHours} Cr Hr
-                          </span>
-                          <span
-                            className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
-                              absentsRemaining < 0
-                                ? "bg-rose-500/20 text-rose-600 dark:text-rose-300"
-                                : absentsRemaining === 0
-                                  ? "bg-amber-500/20 text-amber-700 dark:text-amber-300"
-                                  : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                            }`}
-                          >
-                            {absentsRemaining > 0
-                              ? `${absentsRemaining} of ${allowedAbsents} absents left`
+                    <div className="-mb-1 flex w-full min-w-0 items-center justify-between gap-2">
+                      <div className="flex w-full min-w-0 items-center gap-2">
+                        <h2
+                          className="min-w-0 flex-1 truncate text-base font-bold tracking-tight text-white sm:text-lg"
+                          title={selectedCourseData.title}
+                        >
+                          {selectedCourseData.title}
+                        </h2>
+                        <span className="shrink-0 rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-md dark:bg-white/15">
+                          {creditHours} Cr Hr
+                        </span>
+                        <span
+                          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold backdrop-blur-md ${
+                            absentsRemaining < 0
+                              ? "bg-rose-500/25 text-rose-100 dark:bg-rose-500/30 dark:text-rose-200"
                               : absentsRemaining === 0
-                                ? `0 of ${allowedAbsents} absents left (At Limit)`
-                                : `Exceeded by ${Math.abs(absentsRemaining)}!`}
-                          </span>
-                        </div>
+                                ? "bg-amber-500/25 text-amber-100 dark:bg-amber-500/30 dark:text-amber-200"
+                                : "bg-emerald-500/25 text-emerald-100 dark:bg-emerald-500/30 dark:text-emerald-200"
+                          }`}
+                        >
+                          {absentsRemaining > 0
+                            ? `${absentsRemaining} of ${allowedAbsents} absents left`
+                            : absentsRemaining === 0
+                              ? `0 of ${allowedAbsents} left`
+                              : `Exceeded by ${Math.abs(absentsRemaining)}!`}
+                        </span>
                       </div>
                     </div>
-                    <section className="flex min-h-[240px] flex-1 flex-col overflow-hidden rounded-[24px] border border-black/[0.06] bg-white p-4 text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-5">
+                    <section className="flex min-h-[240px] flex-1 flex-col overflow-hidden rounded-[22px] border border-black/[0.05] bg-white p-4 text-[#101027] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px] sm:p-5">
                       <div className="mb-3 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                         <p className="text-[11px] text-[#626262] dark:text-[#9ca3b3]">
                           Showing {filteredRecords.length} of {selectedCourseData.records.length}{" "}
@@ -593,7 +601,7 @@ function AttendancePage() {
           </>
         ) : (
           <section className="flex min-h-[300px] flex-1 flex-col items-center justify-center rounded-[24px] border border-black/[0.06] bg-white px-6 py-10 text-center dark:border-white/[0.14] dark:bg-black">
-            <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+            <span className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
               <BookOpen size={24} />
             </span>
             <h2 className="text-xl font-bold text-[#101010] dark:text-[#f5f6fb]">

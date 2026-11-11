@@ -54,6 +54,7 @@ function SuperFlexSettingsForm({
   const [query, setQuery] = useState("");
   const [manualName, setManualName] = useState("");
   const [manualEmail, setManualEmail] = useState("");
+  const [showManual, setShowManual] = useState(false);
   const manualEmailValid = optionalEmailSchema.safeParse(manualEmail.trim()).success;
 
   const aiEnabled = usePreferencesStore((state) => state.aiEnabled);
@@ -130,6 +131,7 @@ function SuperFlexSettingsForm({
     onSelectTeacher(activeCourse.id, teacher);
     setManualName("");
     setManualEmail("");
+    setShowManual(false);
   };
 
   const currentTab = mode === "setup" ? (step === 1 ? "teachers" : "ai") : activeTab;
@@ -152,18 +154,18 @@ function SuperFlexSettingsForm({
       </BottomSheetClose>
 
       {}
-      <header className="flex shrink-0 flex-col items-center px-6 pb-2 pt-2 text-center sm:px-8">
-        <div className="mb-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#230052] text-white dark:bg-white dark:text-[#101027] shadow-sm">
+      <header className="flex shrink-0 flex-col items-center px-4 pb-2 pt-1 text-center sm:px-8 sm:pt-2">
+        <div className="mb-1.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#101027] sm:h-10 sm:w-10 sm:rounded-2xl">
           {currentTab === "teachers" ? (
-            <GraduationCap size={22} />
+            <GraduationCap size={18} className="sm:h-5 sm:w-5" />
           ) : currentTab === "autofill" ? (
-            <KeyRound size={22} />
+            <KeyRound size={18} className="sm:h-5 sm:w-5" />
           ) : (
-            <Bot size={22} />
+            <Bot size={18} className="sm:h-5 sm:w-5" />
           )}
         </div>
 
-        <BottomSheetTitle className="text-xl font-bold tracking-tight sm:text-2xl text-foreground">
+        <BottomSheetTitle className="text-base font-bold tracking-tight text-foreground sm:text-xl">
           {mode === "setup"
             ? step === 1
               ? "Select Your Course Instructors"
@@ -175,7 +177,7 @@ function SuperFlexSettingsForm({
                 : "Course Faculty Settings"}
         </BottomSheetTitle>
 
-        <BottomSheetDescription className="mt-0.5 max-w-md text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+        <BottomSheetDescription className="mt-0.5 hidden text-xs text-slate-500 dark:text-slate-400 sm:block sm:max-w-md">
           {mode === "setup"
             ? step === 1
               ? "Select instructors to personalize attendance reviews, grades, and email drafts."
@@ -185,13 +187,13 @@ function SuperFlexSettingsForm({
               : "Manage your course instructors, AI permissions, and API key preferences."}
         </BottomSheetDescription>
 
-        {}
+        {/* Tab switch / step breadcrumbs */}
         {mode === "settings" ? (
-          <div className="mt-3 flex gap-1.5 rounded-full border border-black/[0.08] bg-slate-100/80 p-1 dark:border-white/10 dark:bg-white/[0.06]">
+          <div className="mt-2 flex gap-1 rounded-full border border-black/[0.08] bg-slate-100/80 p-0.5 dark:border-white/10 dark:bg-white/[0.06] sm:gap-1.5 sm:p-1">
             <button
               type="button"
               onClick={() => setActiveTab("teachers")}
-              className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold transition-all sm:px-4 sm:py-1.5 sm:text-xs ${
                 activeTab === "teachers"
                   ? "bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#0a192f]"
                   : "text-foreground/70 hover:text-foreground"
@@ -203,7 +205,7 @@ function SuperFlexSettingsForm({
             <button
               type="button"
               onClick={() => setActiveTab("ai")}
-              className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold transition-all sm:px-4 sm:py-1.5 sm:text-xs ${
                 activeTab === "ai"
                   ? "bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#0a192f]"
                   : "text-foreground/70 hover:text-foreground"
@@ -215,7 +217,7 @@ function SuperFlexSettingsForm({
             <button
               type="button"
               onClick={() => setActiveTab("autofill")}
-              className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold transition-all sm:px-4 sm:py-1.5 sm:text-xs ${
                 activeTab === "autofill"
                   ? "bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#0a192f]"
                   : "text-foreground/70 hover:text-foreground"
@@ -250,22 +252,23 @@ function SuperFlexSettingsForm({
         )}
       </header>
 
-      {}
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-3 sm:px-8">
+      {/* Scrollable content body */}
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-2.5 sm:px-8 sm:py-3.5">
         {currentTab === "teachers" && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between gap-3 rounded-2xl bg-slate-50 px-4 py-2 text-xs dark:bg-white/[.06]">
+          <div className="space-y-2.5 sm:space-y-3">
+            {/* Faculty Directory Info & Progress */}
+            <div className="flex items-center justify-between px-0.5 text-[11px] text-foreground/60">
               <span className="font-semibold text-foreground">
                 {campus?.name || "Campus"} Faculty Directory
               </span>
-              <span className="text-slate-500 dark:text-slate-400">
+              <span>
                 {Object.keys(selections).length} of {courses.length} assigned
               </span>
             </div>
 
-            {}
+            {/* Course Chips */}
             {courses.length > 0 ? (
-              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+              <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide">
                 {courses.map((course, index) => {
                   const chosen = selections[course.id];
                   return (
@@ -276,13 +279,13 @@ function SuperFlexSettingsForm({
                         setCourseIndex(index);
                         setQuery("");
                       }}
-                      className={`flex min-w-0 max-w-[200px] shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold transition-colors ${
+                      className={`flex min-w-0 max-w-[180px] shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold transition-colors ${
                         index === courseIndex
                           ? "bg-[#230052] text-white dark:bg-white dark:text-[#101027]"
                           : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-white/[.08] dark:text-slate-300 dark:hover:bg-white/15"
                       }`}
                     >
-                      {chosen && <Check size={12} strokeWidth={3} />}
+                      {chosen && <Check size={11} strokeWidth={3} />}
                       <span className="truncate">{course.id}</span>
                     </button>
                   );
@@ -294,30 +297,29 @@ function SuperFlexSettingsForm({
               </p>
             )}
 
+            {/* Active Course & Assigned Instructor Bar */}
             {activeCourse && (
-              <div className="rounded-xl border border-black/[0.06] bg-slate-50/70 p-2.5 dark:border-white/[0.08] dark:bg-white/[0.03]">
-                <div className="flex items-center gap-2">
-                  {courses.length > 1 && (
-                    <span className="rounded-md bg-[#230052]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#230052] dark:bg-white/10 dark:text-white shrink-0">
-                      {courseIndex + 1} of {courses.length}
-                    </span>
-                  )}
-                  <p className="text-[11px] font-bold text-foreground truncate">
+              <div className="flex items-center justify-between gap-2 rounded-xl border border-black/[0.05] bg-slate-50/90 px-3 py-1.5 text-xs dark:border-white/[0.08] dark:bg-white/[0.04]">
+                <div className="min-w-0 flex items-center gap-1.5">
+                  <span className="truncate font-bold text-foreground">
                     {activeCourse.id}: {activeCourse.title}
-                  </p>
-                </div>
-                <p className="mt-0.5 text-[10px] text-foreground/60 pl-0.5">
-                  Current Instructor:{" "}
-                  <span className="font-semibold text-foreground">
-                    {selections[activeCourse.id]?.name || "Not assigned yet"}
                   </span>
-                </p>
+                </div>
+                <div className="shrink-0 text-[11px]">
+                  {selections[activeCourse.id]?.name ? (
+                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                      {selections[activeCourse.id].name}
+                    </span>
+                  ) : (
+                    <span className="font-medium text-amber-600 dark:text-amber-400">Not assigned yet</span>
+                  )}
+                </div>
               </div>
             )}
 
-            {}
-            <label className="flex items-center gap-2 rounded-2xl border border-slate-200 px-3.5 py-2 focus-within:border-[#230052] dark:border-white/15 dark:focus-within:border-white">
-              <Search size={15} className="text-slate-400 shrink-0" />
+            {/* Search Input */}
+            <label className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-1.5 focus-within:border-[#230052] dark:border-white/15 dark:focus-within:border-white">
+              <Search size={14} className="text-slate-400 shrink-0" />
               <input
                 type="text"
                 value={query}
@@ -331,13 +333,13 @@ function SuperFlexSettingsForm({
                   onClick={() => setQuery("")}
                   className="text-slate-400 hover:text-slate-600"
                 >
-                  <X size={14} />
+                  <X size={13} />
                 </button>
               )}
             </label>
 
-            {}
-            <div className="max-h-56 space-y-1.5 overflow-y-auto pr-1 scrollbar-hide">
+            {/* Teacher Selection List (clean, low-noise rows) */}
+            <div className="max-h-[290px] space-y-1 overflow-y-auto pr-0.5 scrollbar-hide sm:max-h-[350px]">
               {loadingTeachers ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center text-xs text-slate-400">
                   <LoaderCircle
@@ -373,32 +375,33 @@ function SuperFlexSettingsForm({
                       key={`${teacher.source}:${teacher.id || teacher.email || teacher.name}`}
                       type="button"
                       onClick={() => activeCourse && onSelectTeacher(activeCourse.id, teacher)}
-                      className={`group flex w-full items-center gap-3 rounded-2xl border p-2.5 text-left transition-all ${
+                      className={`group flex w-full items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-left transition-all sm:gap-3 sm:px-3 sm:py-2 ${
                         isSelected
-                          ? "border-[#230052] bg-[#230052]/[0.05] shadow-xs dark:border-white dark:bg-white/[0.08]"
-                          : "border-slate-100 hover:border-slate-300 dark:border-white/[0.05] dark:hover:border-white/15"
+                          ? "border border-[#230052] bg-[#230052]/[0.06] shadow-xs dark:border-white/30 dark:bg-white/[0.10]"
+                          : "border border-black/[0.04] bg-white/40 hover:bg-black/[0.03] dark:border-white/[0.05] dark:bg-white/[0.02] dark:hover:bg-white/[0.05]"
                       }`}
                     >
-                      <TeacherAvatar teacher={teacher} size="sm" />
+                      <TeacherAvatar
+                        teacher={teacher}
+                        size="xs"
+                        className="h-8 w-8 rounded-lg sm:h-9 sm:w-9 sm:rounded-xl"
+                      />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-xs font-bold text-slate-900 dark:text-white">
+                        <p className="truncate text-xs font-bold text-foreground">
                           {teacher.name}
                         </p>
-                        <p className="truncate text-[11px] text-slate-500 dark:text-slate-400">
-                          {teacher.designation || "Faculty Member"}
-                        </p>
-                        {teacher.email && (
-                          <p className="truncate text-[10px] text-slate-400 dark:text-slate-500 font-mono">
-                            {teacher.email}
+                        {teacher.designation ? (
+                          <p className="truncate text-[10px] text-foreground/50 sm:text-[11px]">
+                            {teacher.designation}
                           </p>
-                        )}
+                        ) : null}
                       </div>
                       {isSelected ? (
-                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] shrink-0">
-                          <Check size={13} strokeWidth={3} />
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] shrink-0">
+                          <Check size={11} strokeWidth={3} />
                         </span>
                       ) : (
-                        <span className="h-4 w-4 rounded-full border border-slate-300 dark:border-white/20 shrink-0 group-hover:border-[#230052] dark:group-hover:border-white" />
+                        <span className="h-3.5 w-3.5 rounded-full border border-slate-300 dark:border-white/20 shrink-0 group-hover:border-[#230052] dark:group-hover:border-white" />
                       )}
                     </button>
                   );
@@ -415,41 +418,62 @@ function SuperFlexSettingsForm({
               </p>
             )}
 
-            {}
-            <div className="rounded-2xl border border-dashed border-slate-200 p-3 text-xs dark:border-white/15">
-              <p className="font-bold text-foreground">Can't find your teacher?</p>
-              <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <input
-                  type="text"
-                  value={manualName}
-                  onChange={(e) => setManualName(e.target.value)}
-                  placeholder="Teacher Name"
-                  className="rounded-xl border border-slate-200 px-3 py-1.5 text-xs outline-none focus:border-[#230052] dark:border-white/15 dark:bg-white/5 dark:focus:border-white"
-                />
-                <input
-                  type="email"
-                  value={manualEmail}
-                  aria-invalid={!manualEmailValid}
-                  title={
-                    manualEmailValid ? undefined : "Enter a valid email address or leave it blank"
-                  }
-                  onChange={(e) => setManualEmail(e.target.value)}
-                  placeholder="Teacher Email (optional)"
-                  className="rounded-xl border border-slate-200 px-3 py-1.5 text-xs outline-none focus:border-[#230052] dark:border-white/15 dark:bg-white/5 dark:focus:border-white"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={addManualTeacher}
-                disabled={!manualName.trim() || !activeCourse || !manualEmailValid}
-                className="mt-2 rounded-xl bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
-              >
-                Add Manual Instructor
-              </button>
-              {!manualEmailValid && (
-                <p role="status" className="mt-2 text-xs text-rose-500">
-                  Enter a valid email address or leave it blank.
-                </p>
+            {/* Can't find your teacher (clean collapsible form) */}
+            <div className="pt-0.5">
+              {!showManual ? (
+                <button
+                  type="button"
+                  onClick={() => setShowManual(true)}
+                  className="text-[11px] font-semibold text-[#230052] hover:underline dark:text-purple-300"
+                >
+                  + Can't find your teacher? Add manually
+                </button>
+              ) : (
+                <div className="rounded-xl border border-dashed border-black/10 p-2.5 text-xs dark:border-white/15 animate-in fade-in duration-150">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <p className="text-[11px] font-bold text-foreground">Add Custom Instructor</p>
+                    <button
+                      type="button"
+                      onClick={() => setShowManual(false)}
+                      className="text-[10px] text-slate-400 hover:text-slate-600"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                    <input
+                      type="text"
+                      value={manualName}
+                      onChange={(e) => setManualName(e.target.value)}
+                      placeholder="Teacher Name"
+                      className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs outline-none focus:border-[#230052] dark:border-white/15 dark:bg-white/5 dark:focus:border-white"
+                    />
+                    <input
+                      type="email"
+                      value={manualEmail}
+                      aria-invalid={!manualEmailValid}
+                      title={
+                        manualEmailValid ? undefined : "Enter a valid email address or leave it blank"
+                      }
+                      onChange={(e) => setManualEmail(e.target.value)}
+                      placeholder="Email (optional)"
+                      className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs outline-none focus:border-[#230052] dark:border-white/15 dark:bg-white/5 dark:focus:border-white"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={addManualTeacher}
+                    disabled={!manualName.trim() || !activeCourse || !manualEmailValid}
+                    className="mt-1.5 rounded-lg bg-[#230052] px-3 py-1 text-[11px] font-bold text-white hover:bg-[#370c72] disabled:opacity-40 dark:bg-white dark:text-[#0a192f]"
+                  >
+                    Save Instructor
+                  </button>
+                  {!manualEmailValid && (
+                    <p role="status" className="mt-1 text-[10px] text-rose-500">
+                      Enter a valid email address or leave it blank.
+                    </p>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -728,7 +752,7 @@ function SuperFlexSettingsForm({
       </div>
 
       {}
-      <footer className="flex shrink-0 items-center justify-between border-t border-black/[0.06] p-4 sm:px-8 dark:border-white/[0.08]">
+      <footer className="flex shrink-0 items-center justify-between border-t border-black/[0.06] px-4 py-2.5 sm:px-8 sm:py-3.5 dark:border-white/[0.08]">
         {mode === "setup" ? (
           <>
             {step === 1 ? (

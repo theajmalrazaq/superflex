@@ -48,7 +48,7 @@ const RetakeExamSkeleton = () => (
           key={item}
           className="flex min-h-[156px] flex-col rounded-[32px] bg-white p-5 dark:bg-black sm:p-6"
         >
-          <Skeleton className="h-12 w-12 rounded-[36%]" />
+          <Skeleton className="h-12 w-12 rounded-[13px] sm:rounded-2xl" />
           <Skeleton className="mt-auto h-7 w-28" />
           <Skeleton className="mt-2 h-3 w-20" />
         </div>
@@ -62,7 +62,7 @@ const RetakeExamSkeleton = () => (
             key={item}
             className="flex items-center gap-4 border-t border-black/[0.05] py-4 dark:border-white/[0.08]"
           >
-            <Skeleton className="h-10 w-10 rounded-[36%]" />
+            <Skeleton className="h-10 w-10 rounded-[11px] sm:rounded-2xl" />
             <div className="flex-1 space-y-2">
               <Skeleton className="h-4 w-56 max-w-full" />
               <Skeleton className="h-3 w-32" />
@@ -263,7 +263,7 @@ const RetakeCourseCard = ({ course, isSelected, onToggle, index }) => {
           {index}
         </span>
         <span
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[36%] ${isSelected ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "bg-slate-100 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300"}`}
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] sm:rounded-2xl ${isSelected ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]" : "bg-slate-100 text-slate-600 dark:bg-white/[0.08] dark:text-slate-300"}`}
         >
           <BookOpen size={19} />
         </span>
@@ -510,7 +510,7 @@ function RetakeExamPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname} fullWidth>
-      <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8">
+      <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-4 px-3 py-3.5 font-sans sm:gap-7 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
         <RetakeModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
@@ -523,24 +523,24 @@ function RetakeExamPage() {
           onClose={() => setIsInstructionsOpen(false)}
         />
 
-        <header className="flex flex-wrap items-end justify-between gap-4">
+        <header className="flex flex-wrap items-end justify-between gap-3 sm:gap-4">
           <div className="space-y-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+            <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-[10px] sm:font-bold sm:tracking-[0.16em] sm:text-white/80">
               Academics
             </p>
-            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:text-4xl sm:font-bold sm:tracking-tight">
               Retake Exam Request
             </h1>
-            <p className="text-sm text-white/80">
+            <p className="text-xs text-white/85 sm:text-sm">
               Round two, fight! Paper ne pehli baar hara diya? Time for a comeback.
             </p>
           </div>
           <button
             type="button"
             onClick={() => setIsInstructionsOpen(true)}
-            className="flex cursor-pointer items-center gap-2 rounded-full bg-white/55 px-4 py-2.5 text-xs font-bold text-[#230052] transition-colors hover:bg-white/75 dark:bg-black/25 dark:text-white dark:hover:bg-black/40"
+            className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-xs font-bold text-[#101027] transition-colors hover:bg-white/90 dark:bg-white/10 dark:text-white sm:gap-2 sm:bg-white/55 sm:px-4 sm:py-2.5 sm:text-[#230052]"
           >
-            <Shield size={15} /> Rules &amp; procedures
+            <Shield size={14} /> Rules &amp; procedures
           </button>
         </header>
 
@@ -563,7 +563,7 @@ function RetakeExamPage() {
           </section>
         )}
 
-        <section aria-label="Request period" className="space-y-3">
+        <section aria-label="Request period" className="space-y-2.5 sm:space-y-3">
           {semesters.length > 0 && (
             <LabeledTabsRow label="Semester" tabs={semesters} onTabChange={handleSemesterChange} />
           )}
@@ -572,24 +572,24 @@ function RetakeExamPage() {
           )}
         </section>
 
-        <section aria-labelledby="retake-overview-heading" className="space-y-4">
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <section aria-labelledby="retake-overview-heading" className="space-y-2.5 sm:space-y-4">
+          <div className="hidden flex-col gap-0.5 sm:flex sm:flex-row sm:items-end sm:justify-between sm:gap-1">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/80 sm:text-[10px]">
                 Overview
               </p>
               <h2
                 id="retake-overview-heading"
-                className="text-xl font-bold tracking-tight text-white"
+                className="text-base font-bold tracking-tight text-white sm:text-xl"
               >
                 Retake Summary
               </h2>
             </div>
-            <p className="text-xs text-white/75">
+            <p className="text-[11px] text-white/75 sm:text-xs">
               The redemption arc. Select your papers and calculate the comeback cost.
             </p>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
+          <div className="sf-mobile-cards-scroll pb-1 scrollbar-hide sm:grid sm:grid-cols-2 sm:gap-4 sm:pb-0 xl:grid-cols-4 xl:gap-5">
             <StatsCard
               variant="dashboard"
               icon={Layout}
@@ -624,10 +624,10 @@ function RetakeExamPage() {
           </div>
         </section>
 
-        <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.8fr)]">
+        <div className="grid grid-cols-1 items-start gap-4 sm:gap-5 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.8fr)]">
           <section
             aria-labelledby="retake-courses-heading"
-            className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]"
+            className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px]"
           >
             <header className="flex flex-col gap-3 border-b border-black/[0.06] px-4 py-4 dark:border-white/[0.1] sm:flex-row sm:items-center sm:justify-between sm:px-6">
               <div>
@@ -674,7 +674,7 @@ function RetakeExamPage() {
               </div>
             ) : (
               <div className="flex min-h-[220px] flex-col items-center justify-center px-6 py-10 text-center">
-                <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[36%] bg-slate-100 text-slate-500 dark:bg-white/[0.08] dark:text-slate-300">
+                <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[13px] bg-slate-100 text-slate-500 dark:bg-white/[0.08] dark:text-slate-300 sm:rounded-2xl">
                   <FileText size={22} />
                 </span>
                 <h3 className="text-base font-bold">No Papers Available</h3>
@@ -685,7 +685,7 @@ function RetakeExamPage() {
             )}
           </section>
 
-          <aside className="relative rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] xl:sticky xl:top-6">
+          <aside className="relative rounded-2xl border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px] xl:sticky xl:top-6">
             <div className="border-b border-black/[0.06] px-5 py-4 dark:border-white/[0.1] sm:px-6">
               <h2 className="text-base font-bold">Request details</h2>
               <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
@@ -705,7 +705,7 @@ function RetakeExamPage() {
               </div>
               <div className="rounded-2xl bg-slate-50 p-4 dark:bg-white/[0.05]">
                 <div className="mb-4 flex items-center gap-2">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:rounded-xl">
                     <ShieldCheck size={17} />
                   </span>
                   <h3 className="text-sm font-bold">Fee Breakdown</h3>

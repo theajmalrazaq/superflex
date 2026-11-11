@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SuperFlex</string>
+    <string name="offline_title">Cannot reach FLEX</string>
+    <string name="offline_body">Check your internet connection and try again.</string>
+    <string name="retry">Retry</string>
+    <string name="saving">Downloading file</string>
+    <string name="blocked">This download type is not supported</string>
+    <string name="bundle">https://raw.githubusercontent.com/theajmalrazaq/superflex/android-bundle/</string>
+</resources>

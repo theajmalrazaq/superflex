@@ -33,7 +33,7 @@ const CourseFeedbackSkeleton = () => (
           key={item}
           className="flex min-h-[156px] flex-col rounded-[32px] bg-white p-5 dark:bg-black sm:p-6"
         >
-          <Skeleton className="h-12 w-12 rounded-[36%]" />
+          <Skeleton className="h-12 w-12 rounded-[13px] sm:rounded-2xl" />
           <Skeleton className="mt-auto h-7 w-28" />
           <Skeleton className="mt-2 h-3 w-20" />
         </div>
@@ -49,7 +49,7 @@ const CourseFeedbackSkeleton = () => (
           key={item}
           className="flex items-center gap-4 border-t border-black/[0.05] py-4 dark:border-white/[0.08]"
         >
-          <Skeleton className="h-10 w-10 rounded-[36%]" />
+          <Skeleton className="h-10 w-10 rounded-[11px] sm:rounded-2xl" />
           <div className="flex-1 space-y-2">
             <Skeleton className="h-4 w-56 max-w-full" />
             <Skeleton className="h-3 w-32" />
@@ -72,7 +72,7 @@ const FeedbackCard = ({ course, onAction, onQuickAction, index }) => {
           {index}
         </span>
         <span
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[36%] ${isPending ? "bg-amber-50 text-amber-700 dark:bg-amber-300/10 dark:text-amber-200" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-300/10 dark:text-emerald-200"}`}
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] sm:rounded-2xl ${isPending ? "bg-amber-50 text-amber-700 dark:bg-amber-300/10 dark:text-amber-200" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-300/10 dark:text-emerald-200"}`}
         >
           {isPending ? <Clock size={19} /> : <CircleCheck size={19} />}
         </span>
@@ -329,39 +329,39 @@ function CourseFeedbackPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname} fullWidth>
-      <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8">
+      <main className="relative z-10 mx-auto flex w-full max-w-[1680px] flex-col gap-3.5 px-4 pb-6 pt-2 font-sans sm:gap-7 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
         <header className="space-y-1">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+          <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-[10px] sm:font-bold sm:tracking-[0.16em] sm:text-white/80">
             Services
           </p>
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:text-4xl sm:font-bold sm:tracking-tight">
             Course Feedback
           </h1>
-          <p className="text-sm text-white/80">
+          <p className="text-xs text-white/85 sm:text-sm">
             Now it's your turn. Poora semester tum evaluate huay, ab teachers ki baari.
           </p>
         </header>
 
         <NotificationBanner alerts={alerts} />
 
-        <section aria-labelledby="feedback-overview-heading" className="space-y-4">
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <section aria-labelledby="feedback-overview-heading" className="space-y-2.5 sm:space-y-4">
+          <div className="hidden flex-col gap-0.5 sm:flex sm:flex-row sm:items-end sm:justify-between sm:gap-1">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/80 sm:text-[10px]">
                 Overview
               </p>
               <h2
                 id="feedback-overview-heading"
-                className="text-xl font-bold tracking-tight text-white"
+                className="text-base font-bold tracking-tight text-white sm:text-xl"
               >
                 Your Feedback Progress
               </h2>
             </div>
-            <p className="text-xs text-white/75">
+            <p className="text-[11px] text-white/75 sm:text-xs">
               How many evaluations are done, and how many remain?
             </p>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
+          <div className="sf-mobile-cards-scroll pb-1 scrollbar-hide sm:grid sm:grid-cols-2 sm:gap-4 sm:pb-0 xl:grid-cols-4 xl:gap-5">
             <StatsCard
               variant="dashboard"
               icon={Layout}
@@ -393,25 +393,25 @@ function CourseFeedbackPage() {
           </div>
         </section>
 
-        <section aria-labelledby="feedback-courses-heading" className="space-y-4">
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <section aria-labelledby="feedback-courses-heading" className="space-y-2.5 sm:space-y-4">
+          <div className="flex flex-col gap-0.5 sm:flex-row sm:items-end sm:justify-between sm:gap-1">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-white/80 sm:text-[10px]">
                 Course list
               </p>
               <h2
                 id="feedback-courses-heading"
-                className="text-xl font-bold tracking-tight text-white"
+                className="text-base font-bold tracking-tight text-white sm:text-xl"
               >
                 Course Feedback Forms
               </h2>
             </div>
-            <p className="text-xs text-white/75">
+            <p className="text-[11px] text-white/75 sm:text-xs">
               The semester review session. Select a course and share your honest feedback.
             </p>
           </div>
 
-          <div className="overflow-hidden rounded-[24px] border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb]">
+          <div className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white text-[#101010] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[24px]">
             <div className="flex flex-col gap-3 border-b border-black/[0.06] px-4 py-4 dark:border-white/[0.1] sm:flex-row sm:items-center sm:justify-between sm:px-6">
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                 Showing {filteredCourses.length} of {courses.length} surveys
@@ -453,7 +453,7 @@ function CourseFeedbackPage() {
               </div>
             ) : (
               <div className="flex min-h-[220px] flex-col items-center justify-center px-6 py-10 text-center">
-                <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[36%] bg-emerald-50 text-emerald-700 dark:bg-emerald-300/10 dark:text-emerald-200">
+                <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-[13px] bg-emerald-50 text-emerald-700 dark:bg-emerald-300/10 dark:text-emerald-200 sm:rounded-2xl">
                   <CheckCircle2 size={22} />
                 </span>
                 <h3 className="text-base font-bold">

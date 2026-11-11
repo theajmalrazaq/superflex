@@ -38,15 +38,15 @@ function CourseRegistrationPage() {
 
   return (
     <PageLayout currentPage={window.location.pathname}>
-      <div className="mx-auto w-full max-w-[1600px] space-y-7">
+      <div className="mx-auto w-full max-w-[1600px] space-y-3.5 sm:space-y-7">
         <header className="space-y-1">
-          <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+          <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/90 sm:text-[10px] sm:font-bold sm:tracking-[0.16em] sm:text-white/80">
             Academics
           </p>
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          <h1 className="text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-white sm:text-4xl sm:font-bold sm:tracking-tight">
             Course Registration
           </h1>
-          <p className="text-sm text-white/80">
+          <p className="text-xs text-white/85 sm:text-sm">
             Choose your fighters. Naya semester, naye subjects, same old trauma.
           </p>
         </header>
@@ -60,20 +60,22 @@ function CourseRegistrationPage() {
             showHeader={false}
           />
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {tables.length > 0 ? (
               <>
                 <NotificationBanner alerts={alerts} />
                 {tables.map((table, tIdx) => (
                   <div
                     key={tIdx}
-                    className="rounded-[32px] border border-black/[0.06] bg-white p-5 text-[#101010] shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:p-7 xl:p-8"
+                    className="rounded-2xl border border-black/[0.06] bg-white p-3.5 text-[#101010] shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:rounded-[32px] sm:p-7 xl:p-8"
                   >
-                    <div className="mb-6 flex items-center gap-3">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
-                        <Layers size={21} />
+                    <div className="mb-4 flex items-center gap-2.5 sm:mb-6 sm:gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12 sm:rounded-2xl">
+                        <Layers size={18} className="sm:h-[21px] sm:w-[21px]" />
                       </div>
-                      <h2 className="text-xl font-bold tracking-tight">{table.title}</h2>
+                      <h2 className="text-base font-bold tracking-tight sm:text-xl">
+                        {table.title}
+                      </h2>
                     </div>
 
                     <div className="overflow-x-auto scrollbar-hide">
@@ -117,8 +119,8 @@ function CourseRegistrationPage() {
                 ))}
               </>
             ) : (
-              <section className="flex min-h-[260px] flex-col items-center justify-center rounded-[32px] border border-black/[0.06] bg-white px-6 py-12 text-center dark:border-white/[0.14] dark:bg-black sm:min-h-[320px]">
-                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-[36%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
+              <section className="flex min-h-[220px] flex-col items-center justify-center rounded-2xl border border-black/[0.06] bg-white px-5 py-8 text-center dark:border-white/[0.14] dark:bg-black sm:min-h-[320px] sm:rounded-[32px] sm:px-6 sm:py-12">
+                <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]">
                   <BookOpen size={25} />
                 </div>
                 <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[#230052]/70 dark:text-white">

@@ -55,6 +55,9 @@ const readCustomBackground = (): CustomBackground => {
 function applyTheme(mode: ThemeMode) {
   if (typeof document === "undefined") return;
   document.documentElement.classList.toggle("dark", mode === "dark");
+  try {
+    (globalThis as any).SFNative?.theme?.(mode === "dark");
+  } catch {}
 }
 
 export const createPreferencesStore = () =>

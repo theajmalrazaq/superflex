@@ -35,21 +35,21 @@ export const PageSkeleton = ({
     )}
 
     {cards > 0 && (
-      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+      <div className="sf-mobile-cards-scroll pb-1 scrollbar-hide sm:grid sm:grid-cols-2 sm:gap-4 sm:pb-0 xl:grid-cols-4">
         {Array.from({ length: cards }, (_, item) => (
           <div
             key={item}
-            className="flex min-h-[150px] flex-col rounded-[24px] border border-black/[0.04] bg-white/80 p-5 dark:border-white/[0.08] dark:bg-black/70 sm:p-6"
+            className="flex min-h-[132px] flex-col rounded-[22px] border border-black/[0.04] bg-white/80 p-4 dark:border-white/[0.08] dark:bg-black/70 sm:min-h-[150px] sm:rounded-[24px] sm:p-6"
           >
-            <Skeleton className="h-11 w-11 rounded-[36%]" />
-            <Skeleton className="mt-auto h-7 w-24" />
-            <Skeleton className="mt-2 h-3 w-32 max-w-full" />
+            <Skeleton className="h-10 w-10 rounded-[11px] sm:h-11 sm:w-11 sm:rounded-2xl" />
+            <Skeleton className="mt-auto h-6 w-20 sm:h-7 sm:w-24" />
+            <Skeleton className="mt-2 h-3 w-28 max-w-full sm:w-32" />
           </div>
         ))}
       </div>
     )}
 
-    <section className="overflow-hidden rounded-[24px] border border-black/[0.04] bg-white/80 p-5 dark:border-white/[0.08] dark:bg-black/70 sm:p-6">
+    <section className="overflow-hidden rounded-2xl border border-black/[0.04] bg-white/80 p-3.5 dark:border-white/[0.08] dark:bg-black/70 sm:rounded-[24px] sm:p-6">
       <div className="mb-5 flex items-center justify-between gap-4">
         <div className="space-y-2">
           <Skeleton className="h-5 w-44" />
@@ -63,7 +63,7 @@ export const PageSkeleton = ({
             key={item}
             className="flex items-center gap-4 border-t border-black/[0.05] py-4 first:border-0 dark:border-white/[0.08]"
           >
-            <Skeleton className="h-10 w-10 shrink-0 rounded-[36%]" />
+            <Skeleton className="h-10 w-10 shrink-0 rounded-[11px] sm:rounded-2xl" />
             <div className="min-w-0 flex-1 space-y-2">
               <Skeleton className="h-4 w-64 max-w-full" />
               <Skeleton className="h-3 w-40 max-w-[70%]" />
@@ -141,13 +141,20 @@ export const AttendanceSkeleton = () => {
           <Skeleton className="h-3 w-12" />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-5 md:grid-cols-3 xl:grid-cols-5">
+      <div className="flex flex-col gap-4 sm:grid sm:grid-cols-2 sm:gap-x-4 sm:gap-y-5 md:grid-cols-3 xl:grid-cols-5">
         {[0, 1, 2, 3, 4].map((subject) => (
-          <div key={subject} className="flex min-w-0 flex-col items-start py-1">
-            <div className="mb-2 flex h-[154px] max-h-[180px] flex-col flex-wrap content-start gap-1 overflow-hidden py-1">
-              {Array.from({ length: 28 }, (_, dot) => (
-                <Skeleton key={dot} className="h-3.5 w-3.5 shrink-0 rounded-[3px]" />
-              ))}
+          <div key={subject} className="flex w-full min-w-0 flex-col items-start py-1">
+            <div className="mb-2 flex flex-col gap-1.5 py-1 sm:h-[154px] sm:max-h-[180px] sm:flex-row sm:items-end sm:gap-1.5">
+              <div className="flex flex-row flex-wrap gap-1 sm:flex-col-reverse">
+                {Array.from({ length: 15 }, (_, dot) => (
+                  <Skeleton key={dot} className="h-3.5 w-3.5 shrink-0 rounded-[3px]" />
+                ))}
+              </div>
+              <div className="flex flex-row flex-wrap gap-1 sm:flex-col-reverse">
+                {Array.from({ length: 13 }, (_, dot) => (
+                  <Skeleton key={`sub-${dot}`} className="h-3.5 w-3.5 shrink-0 rounded-[3px]" />
+                ))}
+              </div>
             </div>
             <Skeleton className="h-3 w-4/5" />
             <Skeleton className="mt-1 h-2.5 w-2/3" />

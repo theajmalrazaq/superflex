@@ -27,3 +27,16 @@ dist-ssr
 
 .env
 dist-docs/
+
+# Android build outputs
+android/build/
+android/assets/
+android/app/
+android/debug.keystore
+*.keystore
+*.jks
+*.apk
+__pycache__/
+*.pyc
+
+

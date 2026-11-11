@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="back">#FFFFFF</color>
+    <color name="front">#230052</color>
+    <color name="bolt">#230052</color>
+    <color name="icon">#230052</color>
+</resources>
