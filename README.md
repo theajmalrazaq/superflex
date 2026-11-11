@@ -1,12 +1,16 @@
 <div align="center">
-  <img src="public/assets/logo.svg" alt="SuperFlex" width="300" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/res/logo-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/res/logo-light.svg" />
+    <img src="docs/res/logo-light.svg" alt="SuperFlex" width="300" />
+  </picture>
   <p>A privacy-first interface and academic toolkit for the FAST-NUCES Flex Student Portal.</p>
 
   <p>
-    <a href="https://github.com/theajmalrazaq/superflex/releases"><img src="https://img.shields.io/github/downloads/theajmalrazaq/superflex/total?style=for-the-badge&color=230052" alt="GitHub downloads"></a>
-    <a href="https://github.com/theajmalrazaq/superflex"><img src="https://img.shields.io/github/stars/theajmalrazaq/superflex?style=for-the-badge&color=230052" alt="GitHub stars"></a>
-    <a href="https://github.com/theajmalrazaq/superflex/issues"><img src="https://img.shields.io/github/issues-raw/theajmalrazaq/superflex?style=for-the-badge&color=230052" alt="GitHub issues"></a>
-    <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-230052?style=for-the-badge" alt="MIT License"></a>
+    <a href="https://github.com/theajmalrazaq/superflex/releases"><img src="https://img.shields.io/github/downloads/theajmalrazaq/superflex/total?style=for-the-badge&color=a098ff" alt="GitHub downloads"></a>
+    <a href="https://github.com/theajmalrazaq/superflex"><img src="https://img.shields.io/github/stars/theajmalrazaq/superflex?style=for-the-badge&color=a098ff" alt="GitHub stars"></a>
+    <a href="https://github.com/theajmalrazaq/superflex/issues"><img src="https://img.shields.io/github/issues-raw/theajmalrazaq/superflex?style=for-the-badge&color=a098ff" alt="GitHub issues"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-a098ff?style=for-the-badge" alt="MIT License"></a>
   </p>
 
   <p>
