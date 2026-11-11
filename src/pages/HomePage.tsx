@@ -308,12 +308,12 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
         }}
         className={
           variant === "mobile"
-            ? "flex h-8 w-8 shrink-0 touch-manipulation items-center justify-center rounded-lg transition-transform active:scale-90"
+            ? "flex h-6 w-6 shrink-0 touch-manipulation items-center justify-center rounded-[5px] transition-transform active:scale-90"
             : "flex shrink-0 cursor-pointer items-center justify-center rounded-[3px] transition-transform hover:scale-125"
         }
       >
         <span
-          className={`${variant === "mobile" ? "h-5 w-5 rounded-[5px]" : "h-3.5 w-3.5 rounded-[3px]"} ${color} ${isSelected ? "ring-2 ring-foreground/60 ring-offset-2 ring-offset-background dark:ring-white/80" : ""}`}
+          className={`${variant === "mobile" ? "h-6 w-6 rounded-[5px]" : "h-3.5 w-3.5 rounded-[3px]"} ${color} ${isSelected ? "ring-2 ring-foreground/60 ring-offset-1 ring-offset-background dark:ring-white/80" : ""}`}
         />
       </button>
     );
@@ -354,9 +354,9 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
               key={`${subject.title}-${index}`}
               className="flex w-full flex-col items-start py-1 sm:min-w-0"
             >
-              {/* Mobile: larger squares with generous 32x32 tap targets */}
+              {/* Mobile: larger 24x24 squares with compact 6px gap */}
               <div
-                className="mb-2 flex flex-wrap gap-0.5 py-0.5 sm:hidden"
+                className="mb-2 flex flex-wrap gap-1.5 py-0.5 sm:hidden"
                 role="list"
                 aria-label={`${subject.title} class sessions`}
               >
