@@ -29,6 +29,9 @@ public class Client extends WebViewClient {
     }
 
     static String mime(String str) {
+        if (str.endsWith(".html")) {
+            return "text/html";
+        }
         if (str.endsWith(".js")) {
             return "text/javascript";
         }

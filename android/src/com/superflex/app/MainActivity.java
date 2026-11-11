@@ -1,40 +1,37 @@
 package com.superflex.app;
 
-import android.animation.Keyframe;
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.LinearInterpolator;
-import android.view.animation.PathInterpolator;
 import android.webkit.CookieManager;
 import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.HashMap;
 
 /* JADX INFO: loaded from: /tmp/claude_apk/classes.dex */
 public class MainActivity extends Activity implements View.OnClickListener {
@@ -42,30 +39,36 @@ public class MainActivity extends Activity implements View.OnClickListener {
     static final String HOME = "https://flexstudent.nu.edu.pk/Login";
     static final String HOST = "flexstudent.nu.edu.pk";
     static final int LIGHT = -1;
-    static final int NIGHT = Color.parseColor("#0B0B0F");
+    static final int NIGHT = Color.BLACK;
     static final int PICK = 7;
+    static final String SPLASH_HOST = "splash.superflex.local";
     Bridge bridge;
     ValueCallback<Uri[]> chooser;
     Task limit;
     LinearLayout problem;
     Button retry;
     FrameLayout root;
-    FrameLayout splash;
-    ImageView splashCloudLeft;
-    ImageView splashCloudRight;
-    FrameLayout splashCard;
-    ImageView splashBolt;
-    ObjectAnimator splashAnim;
+    WebView splash;
     Bundle state;
     WebView webview;
     String early = "";
     String main = "";
     volatile boolean dark = false;
     boolean failed = false;
+    boolean hiding = false;
     boolean shown = true;
     boolean started = false;
     int crashes = 0;
     boolean gone = false;
+    final Runnable splashHide = new Runnable() {
+        @Override
+        public void run() {
+            if (MainActivity.this.splash != null && MainActivity.this.hiding) {
+                MainActivity.this.splash.setVisibility(View.GONE);
+                MainActivity.this.hiding = false;
+            }
+        }
+    };
 
     String readasset(String str) {
         InputStream inputStreamOpen;
@@ -96,42 +99,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         return (int) (i * getResources().getDisplayMetrics().density);
     }
 
-    GradientDrawable splashBackground(boolean night) {
-        int[] colors = night ? new int[] {
-            Color.parseColor("#0F1422"),
-            Color.parseColor("#0F1422"),
-            Color.parseColor("#0B0E17"),
-            Color.parseColor("#06070C"),
-            Color.parseColor("#000000")
-        } : new int[] {
-            Color.parseColor("#62ABE0"),
-            Color.parseColor("#73B3E1"),
-            Color.parseColor("#9AC7E8"),
-            Color.parseColor("#DCEBF5"),
-            Color.parseColor("#FFFFFF")
-        };
-        return new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
-    }
-
     void updateSplashTheme(boolean night) {
         if (this.splash != null) {
-            this.splash.setBackground(splashBackground(night));
-        }
-        if (this.splashCloudLeft != null) {
-            this.splashCloudLeft.setAlpha(night ? 0.26f : 0.80f);
-        }
-        if (this.splashCloudRight != null) {
-            this.splashCloudRight.setAlpha(night ? 0.34f : 0.75f);
-        }
-        if (this.splashCard != null) {
-            GradientDrawable cardBg = new GradientDrawable();
-            cardBg.setCornerRadius(px(28));
-            cardBg.setColor(night ? 0x66000000 : 0x99FFFFFF);
-            cardBg.setStroke(px(1), night ? 0x1AFFFFFF : 0x66FFFFFF);
-            this.splashCard.setBackground(cardBg);
-        }
-        if (this.splashBolt != null) {
-            this.splashBolt.setColorFilter(night ? Color.WHITE : Color.parseColor("#230052"));
+            this.splash.evaluateJavascript("if (window.setTheme) window.setTheme(" + night + ");", null);
         }
     }
 
@@ -152,87 +122,92 @@ public class MainActivity extends Activity implements View.OnClickListener {
         updateSplashTheme(z);
     }
 
-    FrameLayout makesplash() {
-        FrameLayout frameLayout = new FrameLayout(this);
-        frameLayout.setBackground(splashBackground(this.dark));
-        frameLayout.setClipChildren(false);
+    WebView makesplash() {
+        WebView view = new WebView(this);
+        WebSettings ws = view.getSettings();
+        ws.setJavaScriptEnabled(true);
+        ws.setDomStorageEnabled(false);
+        ws.setDatabaseEnabled(false);
+        ws.setAllowFileAccess(false);
+        ws.setAllowContentAccess(false);
+        ws.setAllowFileAccessFromFileURLs(false);
+        ws.setAllowUniversalAccessFromFileURLs(false);
+        ws.setGeolocationEnabled(false);
+        ws.setSaveFormData(false);
+        ws.setSupportZoom(false);
+        ws.setBuiltInZoomControls(false);
+        ws.setCacheMode(WebSettings.LOAD_NO_CACHE);
 
-        splashCloudLeft = new ImageView(this);
-        splashCloudLeft.setImageResource(R.drawable.cloud);
-        splashCloudLeft.setScaleType(ImageView.ScaleType.FIT_XY);
-        splashCloudLeft.setAlpha(this.dark ? 0.26f : 0.80f);
-        FrameLayout.LayoutParams leftParams = new FrameLayout.LayoutParams(px(320), px(160), Gravity.TOP | Gravity.START);
-        leftParams.leftMargin = -px(48);
-        leftParams.topMargin = px(40);
-        frameLayout.addView(splashCloudLeft, leftParams);
+        view.setBackgroundColor(Color.TRANSPARENT);
+        view.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        view.setVerticalScrollBarEnabled(false);
+        view.setHorizontalScrollBarEnabled(false);
+        view.setLongClickable(false);
+        view.setHapticFeedbackEnabled(false);
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return v.getVisibility() == View.VISIBLE;
+            }
+        });
 
-        splashCloudRight = new ImageView(this);
-        splashCloudRight.setImageResource(R.drawable.cloud);
-        splashCloudRight.setScaleType(ImageView.ScaleType.FIT_XY);
-        splashCloudRight.setAlpha(this.dark ? 0.34f : 0.75f);
-        FrameLayout.LayoutParams rightParams = new FrameLayout.LayoutParams(px(350), px(175), Gravity.BOTTOM | Gravity.END);
-        rightParams.rightMargin = -px(64);
-        rightParams.bottomMargin = px(64);
-        frameLayout.addView(splashCloudRight, rightParams);
+        view.setWebViewClient(new WebViewClient() {
+            WebResourceResponse emptyNotFound() {
+                return new WebResourceResponse(
+                    "text/plain",
+                    "utf-8",
+                    404,
+                    "Not Found",
+                    new HashMap<String, String>(),
+                    new ByteArrayInputStream(new byte[0])
+                );
+            }
 
-        splashCard = new FrameLayout(this);
-        GradientDrawable cardBg = new GradientDrawable();
-        cardBg.setCornerRadius(px(28));
-        cardBg.setColor(this.dark ? 0x66000000 : 0x99FFFFFF);
-        cardBg.setStroke(px(1), this.dark ? 0x1AFFFFFF : 0x66FFFFFF);
-        splashCard.setBackground(cardBg);
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView webView, WebResourceRequest request) {
+                Uri url = request.getUrl();
+                if (
+                    url == null
+                        || !"https".equals(url.getScheme())
+                        || !SPLASH_HOST.equals(url.getHost())
+                        || !"GET".equals(request.getMethod())
+                ) {
+                    return emptyNotFound();
+                }
+                String path = url.getPath();
+                if (path == null || path.length() <= 1 || path.contains("..") || path.contains("\\")) {
+                    return emptyNotFound();
+                }
+                String rel = path.substring(1);
+                try {
+                    File resolved = Updater.resolve(MainActivity.this.getFilesDir(), rel);
+                    InputStream stream = resolved != null
+                        ? new FileInputStream(resolved)
+                        : MainActivity.this.getAssets().open("web/" + rel);
+                    HashMap<String, String> headers = new HashMap<String, String>();
+                    headers.put("Cache-Control", "no-store");
+                    return new WebResourceResponse(Client.mime(rel), "utf-8", 200, "OK", headers, stream);
+                } catch (Exception e) {
+                    return emptyNotFound();
+                }
+            }
 
-        splashBolt = new ImageView(this);
-        splashBolt.setImageResource(R.drawable.ic_bolt);
-        splashBolt.setColorFilter(this.dark ? Color.WHITE : Color.parseColor("#230052"));
-        FrameLayout.LayoutParams boltParams = new FrameLayout.LayoutParams(px(56), px(56), Gravity.CENTER);
-        splashCard.addView(splashBolt, boltParams);
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+                return true;
+            }
 
-        startSplashAnim();
+            @Override
+            public void onPageFinished(WebView webView, String url) {
+                webView.evaluateJavascript("if (window.setTheme) window.setTheme(" + MainActivity.this.dark + ");", null);
+                if (!MainActivity.this.shown) {
+                    webView.evaluateJavascript("if (window.fadeOutSplash) window.fadeOutSplash();", null);
+                }
+            }
+        });
 
-        FrameLayout.LayoutParams cardParams = new FrameLayout.LayoutParams(px(96), px(96), Gravity.CENTER);
-        frameLayout.addView(splashCard, cardParams);
-
-        frameLayout.setClickable(true);
-        return frameLayout;
-    }
-
-    void startSplashAnim() {
-        if (splashBolt == null) return;
-        splashBolt.setPivotX(px(28));
-        splashBolt.setPivotY(px(28));
-        splashBolt.setScaleX(0.65f);
-        splashBolt.setScaleY(0.65f);
-        splashBolt.setAlpha(0.9f);
-
-        PathInterpolator ease = new PathInterpolator(0.4f, 0.0f, 0.2f, 1.0f);
-
-        Keyframe kfScale0 = Keyframe.ofFloat(0.0f, 0.65f);
-        Keyframe kfScale1 = Keyframe.ofFloat(0.5f, 1.05f);
-        kfScale1.setInterpolator(ease);
-        Keyframe kfScale2 = Keyframe.ofFloat(1.0f, 0.65f);
-        kfScale2.setInterpolator(ease);
-
-        PropertyValuesHolder pvhScaleX = PropertyValuesHolder.ofKeyframe(View.SCALE_X, kfScale0, kfScale1, kfScale2);
-        PropertyValuesHolder pvhScaleY = PropertyValuesHolder.ofKeyframe(View.SCALE_Y, kfScale0, kfScale1, kfScale2);
-
-        Keyframe kfAlpha0 = Keyframe.ofFloat(0.0f, 0.9f);
-        Keyframe kfAlpha1 = Keyframe.ofFloat(0.5f, 1.0f);
-        kfAlpha1.setInterpolator(ease);
-        Keyframe kfAlpha2 = Keyframe.ofFloat(1.0f, 0.9f);
-        kfAlpha2.setInterpolator(ease);
-
-        PropertyValuesHolder pvhAlpha = PropertyValuesHolder.ofKeyframe(View.ALPHA, kfAlpha0, kfAlpha1, kfAlpha2);
-
-        if (splashAnim != null) {
-            splashAnim.cancel();
-        }
-        splashAnim = ObjectAnimator.ofPropertyValuesHolder(splashBolt, pvhScaleX, pvhScaleY, pvhAlpha);
-        splashAnim.setDuration(2200);
-        splashAnim.setInterpolator(new LinearInterpolator());
-        splashAnim.setRepeatCount(ValueAnimator.INFINITE);
-        splashAnim.setRepeatMode(ValueAnimator.RESTART);
-        splashAnim.start();
+        view.loadUrl("https://" + SPLASH_HOST + "/splash.html?theme=" + (this.dark ? "dark" : "light"));
+        return view;
     }
 
     LinearLayout makeproblem() {
@@ -345,18 +320,17 @@ public class MainActivity extends Activity implements View.OnClickListener {
     void cover() {
         if (this.splash != null) {
             this.dark = systemdark();
+            this.hiding = false;
+            this.shown = true;
             style(this.dark);
-            updateSplashTheme(this.dark);
-            this.splash.animate().cancel();
-            this.splash.setAlpha(1.0f);
-            this.splash.setScaleX(1.0f);
-            this.splash.setScaleY(1.0f);
-            this.splash.setVisibility(View.VISIBLE);
+            this.splash.removeCallbacks(this.splashHide);
             this.splash.removeCallbacks(this.limit);
+            this.splash.evaluateJavascript(
+                "if (window.setTheme) window.setTheme(" + this.dark + "); if (window.resetSplash) window.resetSplash();",
+                null
+            );
+            this.splash.setVisibility(View.VISIBLE);
             this.splash.postDelayed(this.limit, 9000L);
-            if (splashAnim == null || !splashAnim.isRunning()) {
-                startSplashAnim();
-            }
         }
     }
 
@@ -431,23 +405,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     void perform(int i) {
         if (i == 1) {
-            if (!this.failed && this.splash != null && this.splash.getVisibility() == View.VISIBLE) {
-                this.splash.animate()
-                    .alpha(0.0f)
-                    .scaleX(1.03f)
-                    .scaleY(1.03f)
-                    .setDuration(300)
-                    .withEndAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            MainActivity.this.splash.setVisibility(View.GONE);
-                            MainActivity.this.splash.setAlpha(1.0f);
-                            MainActivity.this.splash.setScaleX(1.0f);
-                            MainActivity.this.splash.setScaleY(1.0f);
-                        }
-                    })
-                    .start();
+            if (!this.failed && this.splash != null && this.splash.getVisibility() == View.VISIBLE && !this.hiding) {
+                this.hiding = true;
                 this.shown = false;
+                this.splash.evaluateJavascript("if (window.fadeOutSplash) window.fadeOutSplash();", null);
+                this.splash.removeCallbacks(this.splashHide);
+                this.splash.postDelayed(this.splashHide, 600L);
             }
             return;
         }
@@ -464,8 +427,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     void offline() {
         this.failed = true;
+        this.hiding = false;
         this.webview.stopLoading();
-        this.splash.setVisibility(GRANT);
+        if (this.splash != null) {
+            this.splash.removeCallbacks(this.splashHide);
+            this.splash.setVisibility(View.GONE);
+        }
         this.problem.setVisibility(0);
     }
 
@@ -557,12 +524,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onPause() {
         super.onPause();
         CookieManager.getInstance().flush();
+        if (this.splash != null) {
+            this.splash.onPause();
+        }
         this.webview.onPause();
     }
 
     @Override // android.app.Activity
     protected void onResume() {
         super.onResume();
+        if (this.splash != null) {
+            this.splash.onResume();
+        }
         this.webview.onResume();
     }
 
@@ -571,6 +544,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
         this.gone = true;
         if (this.chooser != null) {
             this.chooser.onReceiveValue(null);
+        }
+        if (this.splash != null) {
+            this.splash.removeCallbacks(this.splashHide);
+            this.splash.removeCallbacks(this.limit);
+            this.root.removeView(this.splash);
+            this.splash.destroy();
+            this.splash = null;
         }
         this.root.removeView(this.webview);
         this.webview.removeJavascriptInterface("SFNative");

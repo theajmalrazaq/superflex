@@ -3,5 +3,5 @@
     <color name="back">#FFFFFF</color>
     <color name="front">#230052</color>
     <color name="bolt">#230052</color>
-    <color name="icon">#230052</color>
+    <color name="icon">#000000</color>
 </resources>
