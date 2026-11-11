@@ -777,7 +777,7 @@ function LoginPageStyles() {
     `;
     document.body.prepend(cloudLayer);
 
-    const CURRENT_VERSION = getExtensionVersion("6.0.0");
+    const CURRENT_VERSION = getExtensionVersion("7.0.0");
 
     const footerWrapper = document.createElement("div");
     footerWrapper.className =

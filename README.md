@@ -20,42 +20,40 @@
 
 ## Overview
 
-SuperFlex is an open-source Chrome extension that replaces the dated Flex Student Portal interface with a responsive React experience. It keeps the university portal as the source of truth while adding clearer dashboards, academic tools, optional AI assistance, instructor workflows, and a safer login Auto-Fill vault.
+SuperFlex (`v7.0.0`) is an open-source Chrome extension and Android WebView wrapper that replaces the dated Flex Student Portal interface with a responsive React experience. It keeps the university portal as the source of truth while adding clearer dashboards, academic tools, optional AI assistance, instructor workflows, mobile navigation, and an AES-GCM encrypted login Auto-Fill vault.
 
 SuperFlex runs on the client side. It has no SuperFlex backend, analytics pipeline, advertising SDK, or telemetry service.
 
 ## Features
 
-### Modern portal UI
+### Modern portal UI & mobile experience
 
-- Responsive dashboards using Google Sans Flex and a consistent light/dark design system.
-- Bottom-sheet settings, focused loading states, accessible controls, and mobile-friendly navigation.
-- Clear layouts for attendance, marks, transcript, study plan, fees, feedback, registration, withdrawal, retakes, and grade-change workflows.
-- Local preferences for theme, bookmarks, selected instructors, and interface settings.
+- Responsive dashboards using Google Sans Flex and a consistent light/dark design system across desktop, mobile browsers, and the native Android app.
+- Floating bottom navigation dock with Octopus AI launcher, active-route Speed Dial menu, and accessible bottom-sheet modals.
+- Interactive attendance heatmaps with viewport-clamped tooltips, quick profile navigation and photo upload from any screen, and clean skeleton loading states.
+- Clear layouts for home assessments (including ungraded and participation categories), attendance, marks, transcript, study plan, fees, feedback, registration, withdrawal, retakes, and grade-change workflows.
+- Local preferences for theme, bookmarks, custom profile image, selected instructors, and interface settings.
 
 ### Octopus AI assistant
 
-- Connects directly to Google's Gemini API with a key supplied by the user.
+- Connects directly to Google's Gemini API with a key supplied by the user, anchored to a bottom-docked panel on desktop and mobile.
 - Streams responses and automatically falls back to another compatible Gemini model when the selected model is unavailable.
 - Uses only the academic context the user permits, including attendance, marks, transcript, and study-plan data.
-- Supports Markdown answers, persistent local chat history, academic forecasts, summaries, and what-if questions.
+- Supports Markdown answers, wrapping quick-prompt chips, persistent local chat history, academic forecasts, summaries, and what-if questions.
 - Can be disabled completely from settings.
 
 ### Attendance and instructor tools
 
-- Course-level attendance breakdowns, threshold warnings, and leave calculations.
-- Campus-aware faculty directory with instructor search and manual instructor entry.
+- Course-level attendance breakdowns, interactive heatmaps, threshold warnings, and leave calculations.
+- Campus-aware faculty directory (`Course Faculty Settings`) with instructor search, course step navigation, and manual instructor entry.
 - Attendance-review workflow that prepares a respectful email draft, opens Gmail, or copies the message.
-- Instructor selections are stored locally and can be changed at any time.
+- Instructor selections are stored locally per student and can be changed at any time.
 
-### Passphrase-protected Auto-Fill
+### Encrypted Auto-Fill vault
 
-- Auto-Fill is optional and must be explicitly enabled.
-- The user creates a vault passphrase; the passphrase is never stored.
-- PBKDF2-HMAC-SHA256 with a unique random salt derives the encryption key.
-- Credentials are encrypted locally with AES-GCM 256-bit in `chrome.storage.local`.
-- The derived vault key is wrapped with a device key in isolated extension storage, so later logins
-  only require choosing Auto-Fill on that browser profile.
+- Auto-Fill is optional and enabled only when credentials are saved via the **Auto-Fill** tab in Settings or **Remember Me** on login.
+- Uses PBKDF2-HMAC-SHA256 (`600,000` iterations, 16-byte random salt) to derive an AES-GCM 256-bit key—either from a generated 256-bit random secret or an explicit passphrase—with fresh 12-byte IVs per encryption.
+- Wraps the derived vault key with a browser/device key stored in `chrome.storage.local` (or isolated WebView storage on Android), so subsequent logins can trigger 1-click Auto-Fill without re-entering credentials.
 
 ### Academic planning
 
@@ -84,7 +82,7 @@ SuperFlex runs on the client side. It has no SuperFlex backend, analytics pipeli
 - **Zero telemetry:** the extension does not send usage analytics or tracking events.
 - **No SuperFlex backend:** academic records and preferences remain in the browser.
 - **Direct AI connection:** permitted prompts and academic context go directly to Google's Gemini API using the user's key.
-- **Optional credential vault:** login credentials are stored only when Auto-Fill is enabled and are protected by the user's passphrase.
+- **Optional credential vault:** login credentials are stored only when Auto-Fill is enabled and are encrypted locally with AES-GCM 256-bit inside isolated extension or WebView storage.
 - **Official records win:** SuperFlex is a client-side interface. University records remain authoritative.
 
 Read the full [Privacy Policy](docs/articles/privacy.md).
@@ -106,7 +104,10 @@ Read the full [Privacy Policy](docs/articles/privacy.md).
 
 ### Android
 
-SuperFlex can run in Chromium-based Android browsers that support Chrome extensions, such as [Quetta Browser](https://www.quetta.net/features/extensions). Mobile extension support is controlled by the browser and may vary by version.
+SuperFlex v7.0.0 runs natively on Android via its built-in WebView shell ([android/README.md](android/README.md)) and also works in extension-capable Chromium Android browsers such as [Quetta Browser](https://www.quetta.net/features/extensions).
+
+1. Download `SuperFlex.apk` from [GitHub Releases](https://github.com/theajmalrazaq/superflex/releases) (or build locally with `npm run android:build`).
+2. Install the APK on your Android device and sign in to `flexstudent.nu.edu.pk`.
 
 ## Development
 
@@ -139,6 +140,7 @@ npm test
 npm run typecheck
 npm run format:check
 npm run build
+npm run android:bundle
 ```
 
 The project-wide TypeScript check covers source, tests, build configuration, and documentation scripts. Implicit parameter types and nullable legacy values are allowed during migration; the parser check remains fully strict.
@@ -163,6 +165,7 @@ The website works directly from `docs/` on static hosting. Author behavior in `d
 ### Project map
 
 ```text
+android/            Native Android WebView shell, chrome.* shim, and APK build scripts
 src/
 ├── components/       Shared UI, settings, AI, instructor and login experiences
 ├── components/ui/    Buttons, inputs, bottom sheets, modals and reusable states
@@ -183,7 +186,7 @@ docs/
 
 ## Version notes
 
-The current V6 interface consolidates settings into a shared bottom-sheet system, introduces the Octopus AI setup flow, adds campus faculty and attendance-review tools, and replaces the previous fixed credential seed with a user-chosen passphrase vault. Historical implementation notes remain in [Behind the Scenes](docs/articles/bts.md), clearly separated from current behavior.
+**v7.0.0** expands SuperFlex across desktop, mobile browsers, and a standalone Android WebView app (`android/`), introduces a bottom-docked mobile navigation bar with Octopus AI quick access and active Speed Dial states, refines bottom-sheet modal spacing and responsive layouts, preserves full assessment categories (including ungraded and participation items), adds one-tap profile photo access from any screen, and stores optional Auto-Fill credentials in an AES-GCM 256-bit device-wrapped vault configurable directly in Settings. Historical implementation notes remain in [Behind the Scenes](docs/articles/bts.md), clearly separated from current behavior.
 
 ## Contributing
 
