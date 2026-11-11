@@ -45,9 +45,11 @@ export function parseMarksPage(root: ParentNode, form: ParentNode | null): Parse
           const rows = Array.from(
             sectionElement.querySelectorAll<HTMLElement>(".calculationrow"),
           ).map((row) => {
+            const rawObtainedText = readText(row.querySelector(".ObtMarks"));
+            const ungraded = !rawObtainedText || rawObtainedText === "-";
             const weight = numberOrZero(row.querySelector(".weightage")?.textContent);
             const total = numberOrZero(row.querySelector(".GrandTotal")?.textContent);
-            const obtained = numberOrZero(row.querySelector(".ObtMarks")?.textContent);
+            const obtained = ungraded ? 0 : numberOrZero(rawObtainedText);
             const avg = numberOrZero(row.querySelector(".AverageMarks")?.textContent);
             const min = numberOrZero(row.querySelector(".MinMarks")?.textContent);
             const max = numberOrZero(row.querySelector(".MaxMarks")?.textContent);
@@ -63,6 +65,7 @@ export function parseMarksPage(root: ParentNode, form: ParentNode | null): Parse
               min,
               max,
               included: true,
+              ungraded,
             };
           });
 

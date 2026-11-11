@@ -77,7 +77,24 @@ export function parseHomeMarksReport(document: ParentNode): RawMarkCourse[] {
   try {
     const parsed = parseMarksPage(document, null);
     if (parsed.courses && parsed.courses.length > 0) {
-      return parsed.courses as unknown as RawMarkCourse[];
+      return parsed.courses.map((course) => ({
+        id: course.id,
+        title: course.title,
+        rawTitle: course.title,
+        sections: course.sections
+          .filter(
+            (sec) => !sec.id.endsWith("Grand_Total_Marks") && sec.title !== "Grand Total Marks",
+          )
+          .map((sec) => ({
+            id: sec.id,
+            title: sec.title,
+            weight: sec.weight,
+            rows: sec.rows.filter(
+              (row) => !row.ungraded && row.title !== "Total" && row.title !== "Grand Total",
+            ),
+          }))
+          .filter((sec) => sec.rows.length > 0),
+      }));
     }
   } catch {}
 

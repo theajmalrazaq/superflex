@@ -559,7 +559,6 @@ function MarksPage() {
   const [semesters, setSemesters] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [pendingUpdates, setPendingUpdates] = useState(null);
-  const clearedFromStorageRef = useRef(false);
   const hiddenFormRef = useRef<HTMLDivElement | null>(null);
   const initialCoursesRef = useRef([]);
 
@@ -570,20 +569,15 @@ function MarksPage() {
       if (!active) return;
       if (updates?.newMarks?.length) {
         setPendingUpdates(updates);
-        if (!clearedFromStorageRef.current) {
-          clearedFromStorageRef.current = true;
-          await clearPendingUpdateType("marks");
-        }
-      } else if (!clearedFromStorageRef.current) {
-        setPendingUpdates(updates);
+        await clearPendingUpdateType("marks");
+      } else {
+        setPendingUpdates(null);
       }
     };
     void handleUpdates();
-    window.addEventListener("superflex-academic-updates-detected", handleUpdates);
     window.addEventListener("superflex-student-identity-changed", handleUpdates);
     return () => {
       active = false;
-      window.removeEventListener("superflex-academic-updates-detected", handleUpdates);
       window.removeEventListener("superflex-student-identity-changed", handleUpdates);
     };
   }, []);
@@ -638,7 +632,8 @@ function MarksPage() {
         setCourses(parsed.courses);
         initialCoursesRef.current = structuredClone(parsed.courses);
         if (parsed.courses.length > 0) setSelectedCourseId(parsed.courses[0].id);
-        await checkAndRecordMarksSnapshot(parsed.courses);
+        await checkAndRecordMarksSnapshot(parsed.courses, { suppressNotifications: true });
+        await clearPendingUpdateType("marks");
 
         root.style.display = "none";
         setLoading(false);

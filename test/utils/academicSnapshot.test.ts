@@ -58,7 +58,7 @@ describe("academicSnapshot synchronization & diffing", () => {
     expect(normalizeSectionTitle(" Quizzes ( 15% ) ")).toBe("quizzes");
   });
 
-  it("normalizes item keys regardless of section formatting and numeric precision", () => {
+  it("normalizes item keys regardless of section formatting, numeric precision, or bare numeric titles", () => {
     const key1 = normalizeItemKey("Assignments (10%)#Assignment 1#10#10");
     const key2 = normalizeItemKey("Assignments#Assignment 1#10.0#10.00");
     const key3 = normalizeItemKey({
@@ -67,9 +67,18 @@ describe("academicSnapshot synchronization & diffing", () => {
       obtained: 10,
       total: 10,
     });
+    const key4 = normalizeItemKey({
+      section: "Assignments (10%)",
+      name: "1",
+      obtained: 10,
+      total: 10,
+    });
+    const key5 = normalizeItemKey("Assignments#1#10#10");
     expect(key1).toBe("assignments#assignment 1#10#10");
     expect(key2).toBe("assignments#assignment 1#10#10");
     expect(key3).toBe("assignments#assignment 1#10#10");
+    expect(key4).toBe("assignments#assignment 1#10#10");
+    expect(key5).toBe("assignments#assignment 1#10#10");
   });
 
   it("matches courses across different page key styles via findMatchingCourse", () => {
@@ -194,5 +203,63 @@ describe("academicSnapshot synchronization & diffing", () => {
     await clearPendingUpdateType("marks");
     const cleared = await getPendingUpdates();
     expect(cleared?.newMarks || []).toHaveLength(0);
+  });
+
+  it("merges legacy split course keys in snapshot without false notifications", async () => {
+    // Simulate legacy split snapshot where Home saved under 'datastructures' and Marks saved under 'CS2001'
+    memoryStore.set("snapshot:21K-1234", {
+      timestamp: Date.now(),
+      marks: {
+        datastructures: {
+          id: "tab_0",
+          title: "Data Structures",
+          rawTitle: "Data Structures",
+          items: [{ key: "Assignments#1#10#10", name: "1", section: "Assignments", obtained: 10, total: 10 }],
+        },
+        CS2001: {
+          id: "m_tabs_6_1",
+          title: "Data Structures",
+          rawTitle: "CS2001 - Data Structures",
+          items: [{ key: "Quizzes#1#8#10", name: "1", section: "Quizzes", obtained: 8, total: 10 }],
+        },
+      },
+    });
+
+    const courses = [
+      {
+        id: "m_tabs_6_1",
+        title: "CS2001 - Data Structures",
+        sections: [
+          {
+            id: "sec_assignments",
+            title: "Assignments (10%)",
+            weight: 10,
+            rows: [
+              { title: "1", obtained: 10, total: 10, weight: 5 },
+              { title: "2", obtained: 0, total: 10, weight: 5, ungraded: true },
+            ],
+          },
+          {
+            id: "sec_quizzes",
+            title: "Quizzes (10%)",
+            weight: 10,
+            rows: [{ title: "1", obtained: 8, total: 10, weight: 5 }],
+          },
+        ],
+      },
+    ];
+
+    // Navigating Home -> Marks (suppressNotifications: true) -> Home (suppressNotifications: false)
+    await checkAndRecordMarksSnapshot(courses, { suppressNotifications: true });
+    expect(await getPendingUpdates()).toBeNull();
+
+    const homeResult = await checkAndRecordMarksSnapshot(courses);
+    expect(homeResult.newMarks).toHaveLength(0);
+    expect(await getPendingUpdates()).toBeNull();
+
+    // Verify split keys were consolidated into canonical CS2001 key
+    const savedSnapshot = memoryStore.get("snapshot:21K-1234");
+    expect(savedSnapshot.marks.datastructures).toBeUndefined();
+    expect(savedSnapshot.marks.CS2001.items).toHaveLength(2);
   });
 });

@@ -27,13 +27,16 @@ export const getCourseCode = (raw = "") => {
   return match ? match[1].replace(/[\s-–]+/g, "").toUpperCase() : "";
 };
 
-export const getNormalizedCourseKey = (course: { id?: string; title?: string } = {}) => {
+export const getNormalizedCourseKey = (
+  course: { id?: string; title?: string; rawTitle?: string } = {},
+) => {
   if (!course) return "";
-  const idStr = String(course.id || "");
+  const rawStr = String(course.rawTitle || "");
   const titleStr = String(course.title || "");
-  const code = getCourseCode(titleStr) || getCourseCode(idStr);
+  const idStr = String(course.id || "");
+  const code = getCourseCode(rawStr) || getCourseCode(titleStr) || getCourseCode(idStr);
   if (code) return code;
-  const cleanTitle = getCleanCourseTitle(titleStr || idStr);
+  const cleanTitle = getCleanCourseTitle(rawStr || titleStr || idStr);
   return cleanTitle.toLowerCase().replace(/[^a-z0-9]/g, "");
 };
 
@@ -134,13 +137,23 @@ export const normalizeSectionTitle = (title = "") =>
     .trim()
     .toLowerCase();
 
+export const normalizeAssessmentName = (name = "", sectionTitle = "") => {
+  const cleanName = String(name || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+  const cleanSec = normalizeSectionTitle(sectionTitle);
+  if (/^\d+$/.test(cleanName) && cleanSec) {
+    const singularSec = cleanSec.replace(/s$/i, "");
+    return `${singularSec} ${cleanName}`;
+  }
+  return cleanName;
+};
+
 export const normalizeItemKey = (rawKeyOrItem: any): string => {
   if (typeof rawKeyOrItem === "object" && rawKeyOrItem !== null) {
     const sec = normalizeSectionTitle(rawKeyOrItem.section || "");
-    const name = String(rawKeyOrItem.name || rawKeyOrItem.title || "")
-      .trim()
-      .replace(/\s+/g, " ")
-      .toLowerCase();
+    const name = normalizeAssessmentName(rawKeyOrItem.name || rawKeyOrItem.title || "", sec);
     const obt = Number(rawKeyOrItem.obtained) || 0;
     const tot = Number(rawKeyOrItem.total) || 0;
     return `${sec}#${name}#${obt}#${tot}`;
@@ -149,7 +162,7 @@ export const normalizeItemKey = (rawKeyOrItem: any): string => {
   const parts = str.split("#");
   if (parts.length >= 4) {
     const sec = normalizeSectionTitle(parts[0]);
-    const name = parts[1].trim().replace(/\s+/g, " ").toLowerCase();
+    const name = normalizeAssessmentName(parts[1], sec);
     const obt = Number(parts[2]) || 0;
     const tot = Number(parts[3]) || 0;
     return `${sec}#${name}#${obt}#${tot}`;
@@ -172,13 +185,12 @@ export const normalizeAttendanceRecordKey = (rawKeyOrRecord: any): string => {
   return `${date}#${status}`;
 };
 
-export const findMatchingCourse = (
+export const findAllMatchingCourseEntries = (
   currentKey: string,
   currentCourse: any,
   snapshotMap: Record<string, any> | null | undefined,
-) => {
-  if (!snapshotMap) return null;
-  if (snapshotMap[currentKey]) return snapshotMap[currentKey];
+): Array<[string, any]> => {
+  if (!snapshotMap) return [];
 
   const currentCode =
     getCourseCode(currentCourse?.rawTitle || "") ||
@@ -191,15 +203,23 @@ export const findMatchingCourse = (
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
 
+  const matches: Array<[string, any]> = [];
   for (const [snapKey, snapCourse] of Object.entries(snapshotMap)) {
-    if (snapKey === currentKey) return snapCourse;
+    if (!snapCourse) continue;
+    if (snapKey === currentKey) {
+      matches.push([snapKey, snapCourse]);
+      continue;
+    }
     if (currentCode) {
       const snapCode =
         getCourseCode(snapCourse?.rawTitle || "") ||
         getCourseCode(snapCourse?.title || "") ||
         getCourseCode(snapCourse?.id || "") ||
         getCourseCode(snapKey);
-      if (snapCode && snapCode === currentCode) return snapCourse;
+      if (snapCode && snapCode === currentCode) {
+        matches.push([snapKey, snapCourse]);
+        continue;
+      }
     }
     if (currentClean) {
       const snapClean = getCleanCourseTitle(
@@ -207,10 +227,31 @@ export const findMatchingCourse = (
       )
         .toLowerCase()
         .replace(/[^a-z0-9]/g, "");
-      if (snapClean && snapClean === currentClean) return snapCourse;
+      if (snapClean && snapClean === currentClean) {
+        matches.push([snapKey, snapCourse]);
+      }
     }
   }
-  return null;
+  return matches;
+};
+
+export const findMatchingCourse = (
+  currentKey: string,
+  currentCourse: any,
+  snapshotMap: Record<string, any> | null | undefined,
+) => {
+  const matches = findAllMatchingCourseEntries(currentKey, currentCourse, snapshotMap);
+  if (matches.length === 0) return null;
+  if (matches.length === 1) return matches[0][1];
+
+  const merged = { ...matches[0][1] };
+  if (matches.some(([, c]) => Array.isArray(c.items))) {
+    merged.items = matches.flatMap(([, c]) => (Array.isArray(c.items) ? c.items : []));
+  }
+  if (matches.some(([, c]) => Array.isArray(c.records))) {
+    merged.records = matches.flatMap(([, c]) => (Array.isArray(c.records) ? c.records : []));
+  }
+  return merged;
 };
 
 export const isCourseMarksUpdated = (pendingUpdates: any, course: any) => {
@@ -302,7 +343,10 @@ export const isAssessmentMarksUpdated = (pendingUpdates: any, course: any, asses
   );
 };
 
-export const checkAndRecordMarksSnapshot = async (currentCourses) => {
+export const checkAndRecordMarksSnapshot = async (
+  currentCourses: any[],
+  options: { suppressNotifications?: boolean } = {},
+) => {
   if (!Array.isArray(currentCourses) || currentCourses.length === 0) return { newMarks: [] };
   const studentId = getActiveStudentId();
   const snapshotKey = getStudentStorageKey(SNAPSHOT_KEY, studentId);
@@ -314,7 +358,7 @@ export const checkAndRecordMarksSnapshot = async (currentCourses) => {
   const currentMarksMap: Record<string, any> = {};
   currentCourses.forEach((c) => {
     const key = getNormalizedCourseKey(c);
-    const displayTitle = getCleanCourseTitle(c.title || c.id) || c.title || c.id;
+    const displayTitle = getCleanCourseTitle(c.rawTitle || c.title || c.id) || c.title || c.id;
     const items: any[] = [];
 
     (c.sections || []).forEach((sec: any) => {
@@ -322,7 +366,11 @@ export const checkAndRecordMarksSnapshot = async (currentCourses) => {
       const secTitle = (sec.title || "").replace(/\s*\([^)]*\)/g, "").trim();
 
       (sec.rows || []).forEach((row: any) => {
-        let name = (row.title || "").trim();
+        if (row.ungraded) return;
+        const rawTitle = (row.title || "").trim();
+        if (!rawTitle || rawTitle === "Total" || rawTitle === "Grand Total") return;
+
+        let name = rawTitle;
         if (/^\d+$/.test(name) && secTitle) {
           const singularSec = secTitle.replace(/s$/i, "");
           name = `${singularSec} ${name}`;
@@ -330,13 +378,14 @@ export const checkAndRecordMarksSnapshot = async (currentCourses) => {
         const obt = Number(row.obtained) || 0;
         const tot = Number(row.total) || 0;
         const scoreStr = tot > 0 ? `${obt}/${tot}` : `${obt}`;
-        const itemKey = `${normalizeSectionTitle(secTitle)}#${name.trim().toLowerCase()}#${obt}#${tot}`;
+        const itemKey = `${normalizeSectionTitle(secTitle)}#${normalizeAssessmentName(name, secTitle)}#${obt}#${tot}`;
         const label = scoreStr ? `${name} (${scoreStr})` : name;
 
         items.push({
           key: itemKey,
           label,
-          name: row.title || name,
+          name,
+          rawName: rawTitle,
           obtained: obt,
           total: tot,
           section: secTitle,
@@ -347,14 +396,14 @@ export const checkAndRecordMarksSnapshot = async (currentCourses) => {
     currentMarksMap[key] = {
       id: c.id,
       title: displayTitle,
-      rawTitle: c.title,
+      rawTitle: c.rawTitle || c.title,
       items,
     };
   });
 
   const newMarks: any[] = [];
 
-  if (prevMarks) {
+  if (prevMarks && !options.suppressNotifications) {
     Object.entries(currentMarksMap).forEach(([key, curr]) => {
       const prev = findMatchingCourse(key, curr, prevMarks);
       if (prev && Array.isArray(prev.items)) {
@@ -362,12 +411,17 @@ export const checkAndRecordMarksSnapshot = async (currentCourses) => {
         const added = curr.items.filter((it: any) => !prevKeys.has(normalizeItemKey(it)));
 
         if (added.length > 0 && added.length < 5) {
+          const assessmentNames = Array.from(
+            new Set(
+              added.flatMap((it: any) => [it.name, it.rawName].filter(Boolean)),
+            ),
+          );
           newMarks.push({
             courseId: curr.id || key,
             courseKey: key,
             courseTitle: curr.title,
             sections: Array.from(new Set(added.map((it: any) => it.section).filter(Boolean))),
-            assessmentNames: added.map((it: any) => it.name),
+            assessmentNames,
             items: added.map((it: any) => it.label),
             newCount: added.length,
           });
@@ -381,29 +435,29 @@ export const checkAndRecordMarksSnapshot = async (currentCourses) => {
     const latestMarks = latestSnapshot?.marks || prevMarks || {};
     const mergedMarks = { ...latestMarks };
     Object.entries(currentMarksMap).forEach(([key, current]) => {
-      const matchedCourse = findMatchingCourse(key, current, mergedMarks);
-      const targetKey = matchedCourse
-        ? Object.keys(mergedMarks).find((k) => mergedMarks[k] === matchedCourse) || key
-        : key;
-      const previousItems = matchedCourse?.items || [];
+      const matchedEntries = findAllMatchingCourseEntries(key, current, mergedMarks);
+      const baseCourse = matchedEntries.length > 0 ? matchedEntries[0][1] : {};
+      const previousItems = matchedEntries.flatMap(([, c]) =>
+        Array.isArray(c?.items) ? c.items : [],
+      );
       const seenItems = new Map(
         previousItems.map((item: any) => [normalizeItemKey(item), item]),
       );
       current.items.forEach((item: any) => seenItems.set(normalizeItemKey(item), item));
       const updatedCourseData = {
-        ...matchedCourse,
+        ...baseCourse,
         ...current,
         items: [...seenItems.values()],
       };
-      mergedMarks[targetKey] = updatedCourseData;
-      if (targetKey !== key) {
-        mergedMarks[key] = updatedCourseData;
+      for (const [oldKey] of matchedEntries) {
+        if (oldKey !== key) delete mergedMarks[oldKey];
       }
+      mergedMarks[key] = updatedCourseData;
     });
     return { ...latestSnapshot, timestamp: Date.now(), marks: mergedMarks };
   });
 
-  if (newMarks.length > 0) {
+  if (newMarks.length > 0 && !options.suppressNotifications) {
     if (getActiveStudentId() !== studentId) return { newMarks: [] };
     const merged = await updateAcademicState(updatesKey, (latestUpdates) => ({
       ...latestUpdates,
@@ -421,7 +475,10 @@ export const checkAndRecordMarksSnapshot = async (currentCourses) => {
   return { newMarks };
 };
 
-export const checkAndRecordAttendanceSnapshot = async (currentSubjects) => {
+export const checkAndRecordAttendanceSnapshot = async (
+  currentSubjects: any[],
+  options: { suppressNotifications?: boolean } = {},
+) => {
   if (!Array.isArray(currentSubjects) || currentSubjects.length === 0) return { newAttendance: [] };
   const studentId = getActiveStudentId();
   const snapshotKey = getStudentStorageKey(SNAPSHOT_KEY, studentId);
@@ -433,7 +490,7 @@ export const checkAndRecordAttendanceSnapshot = async (currentSubjects) => {
   const currentAttendanceMap: Record<string, any> = {};
   currentSubjects.forEach((s) => {
     const key = getNormalizedCourseKey(s);
-    const displayTitle = getCleanCourseTitle(s.title || s.id) || s.title || s.id;
+    const displayTitle = getCleanCourseTitle(s.rawTitle || s.title || s.id) || s.title || s.id;
     const records = (s.records || []).map((r) => {
       const dateStr = formatCleanDate(r.date);
       const statusStr = formatAttendanceStatus(r.status);
@@ -448,7 +505,7 @@ export const checkAndRecordAttendanceSnapshot = async (currentSubjects) => {
     currentAttendanceMap[key] = {
       id: s.id,
       title: displayTitle,
-      rawTitle: s.title,
+      rawTitle: s.rawTitle || s.title,
       records,
       percentage: s.percentage,
       absent: s.absent,
@@ -457,7 +514,7 @@ export const checkAndRecordAttendanceSnapshot = async (currentSubjects) => {
 
   const newAttendance: any[] = [];
 
-  if (prevAttendance) {
+  if (prevAttendance && !options.suppressNotifications) {
     Object.entries(currentAttendanceMap).forEach(([key, curr]) => {
       const prev = findMatchingCourse(key, curr, prevAttendance);
 
@@ -482,29 +539,31 @@ export const checkAndRecordAttendanceSnapshot = async (currentSubjects) => {
     const latestAttendance = latestSnapshot?.attendance || prevAttendance || {};
     const mergedAttendance = { ...latestAttendance };
     Object.entries(currentAttendanceMap).forEach(([key, current]) => {
-      const matchedCourse = findMatchingCourse(key, current, mergedAttendance);
-      const targetKey = matchedCourse
-        ? Object.keys(mergedAttendance).find((k) => mergedAttendance[k] === matchedCourse) || key
-        : key;
-      const previousRecords = matchedCourse?.records || [];
+      const matchedEntries = findAllMatchingCourseEntries(key, current, mergedAttendance);
+      const baseCourse = matchedEntries.length > 0 ? matchedEntries[0][1] : {};
+      const previousRecords = matchedEntries.flatMap(([, c]) =>
+        Array.isArray(c?.records) ? c.records : [],
+      );
       const seenRecords = new Map(
         previousRecords.map((record: any) => [normalizeAttendanceRecordKey(record), record]),
       );
-      current.records.forEach((record: any) => seenRecords.set(normalizeAttendanceRecordKey(record), record));
+      current.records.forEach((record: any) =>
+        seenRecords.set(normalizeAttendanceRecordKey(record), record),
+      );
       const updatedAttendanceData = {
-        ...matchedCourse,
+        ...baseCourse,
         ...current,
         records: [...seenRecords.values()],
       };
-      mergedAttendance[targetKey] = updatedAttendanceData;
-      if (targetKey !== key) {
-        mergedAttendance[key] = updatedAttendanceData;
+      for (const [oldKey] of matchedEntries) {
+        if (oldKey !== key) delete mergedAttendance[oldKey];
       }
+      mergedAttendance[key] = updatedAttendanceData;
     });
     return { ...latestSnapshot, timestamp: Date.now(), attendance: mergedAttendance };
   });
 
-  if (newAttendance.length > 0) {
+  if (newAttendance.length > 0 && !options.suppressNotifications) {
     if (getActiveStudentId() !== studentId) return { newAttendance: [] };
     const merged = await updateAcademicState(updatesKey, (latestUpdates) => ({
       ...latestUpdates,

@@ -27,7 +27,6 @@ import { useAiSync } from "../hooks/useAiSync";
 import {
   checkAndRecordAttendanceSnapshot,
   clearPendingUpdateType,
-  getPendingUpdates,
 } from "../utils/academicSnapshot";
 import { getMarkedAttendance, setMarkedAttendance } from "../utils/userDataStorage";
 import { parseAcademicDate } from "../utils/academicDate";
@@ -240,22 +239,9 @@ function AttendancePage() {
 
   const [semesters, setSemesters] = useState([]);
   const hiddenFormRef = useRef<HTMLDivElement | null>(null);
-  const clearedFromStorageRef = useRef(false);
 
   useEffect(() => {
-    let active = true;
-    const handleUpdates = async () => {
-      const updates = await getPendingUpdates();
-      if (!active) return;
-      if (updates?.newAttendance?.length && !clearedFromStorageRef.current) {
-        clearedFromStorageRef.current = true;
-        await clearPendingUpdateType("attendance");
-      }
-    };
-    void handleUpdates();
-    return () => {
-      active = false;
-    };
+    void clearPendingUpdateType("attendance");
   }, []);
 
   useEffect(() => {
@@ -278,7 +264,8 @@ function AttendancePage() {
 
         setCourses(parsed.courses);
         if (parsed.courses.length > 0) setSelectedCourseId(parsed.courses[0].id);
-        await checkAndRecordAttendanceSnapshot(parsed.courses);
+        await checkAndRecordAttendanceSnapshot(parsed.courses, { suppressNotifications: true });
+        await clearPendingUpdateType("attendance");
 
         root.style.display = "none";
         setLoading(false);

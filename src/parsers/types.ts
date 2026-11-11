@@ -20,6 +20,7 @@ export type AttendanceRecord = {
 export type AttendanceCourse = {
   id: string;
   title: string;
+  rawTitle?: string;
   creditHours?: number;
   allowedAbsents?: number;
   percentage: number;
@@ -57,6 +58,7 @@ export type RawMarkRow = {
   min: number;
   max: number;
   included: boolean;
+  ungraded?: boolean;
 };
 
 export type RawMarkSection = {
@@ -69,6 +71,7 @@ export type RawMarkSection = {
 export type RawMarkCourse = {
   id: string;
   title: string;
+  rawTitle?: string;
   sections: RawMarkSection[];
 };
 
@@ -93,6 +96,7 @@ export type MarkSection = {
 export type MarkCourse = {
   id: string;
   title: string;
+  rawTitle?: string;
   sections: MarkSection[];
   grandTotalStats: { weight: number; obtained: number; percentage: number };
 };

@@ -307,7 +307,11 @@ function HomePage() {
     const snapshot = root.cloneNode(true) as HTMLElement;
     snapshot.querySelectorAll("script").forEach((script) => script.remove());
     snapshot.querySelector("#NotificationDetail")?.remove();
-    return parseHomeProfile(snapshot);
+    const parsed = parseHomeProfile(snapshot);
+    if (parsed.universityInfo?.["Roll No"]) {
+      setActiveStudentId(parsed.universityInfo["Roll No"]);
+    }
+    return parsed;
   });
   const universityInfo = profile?.universityInfo || null;
   const personalInfo = profile?.personalInfo || null;
