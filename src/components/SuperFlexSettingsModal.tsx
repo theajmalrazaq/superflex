@@ -138,7 +138,7 @@ function SuperFlexSettingsForm({
 
   return (
     <BottomSheet open={open} onClose={onClose}>
-      <div className="flex shrink-0 justify-center pt-3">
+      <div className="flex shrink-0 justify-center pt-3.5 pb-1">
         <span className="h-1.5 w-14 rounded-full bg-[#ded9e5] dark:bg-white/20" />
       </div>
 
@@ -147,15 +147,15 @@ function SuperFlexSettingsForm({
           type="button"
           onClick={onClose}
           aria-label="Close setup modal"
-          className="absolute right-4 top-5 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10 transition-colors"
+          className="absolute right-4 top-4 z-10 rounded-full p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10 transition-colors sm:right-5 sm:top-5"
         >
           <X size={18} />
         </button>
       </BottomSheetClose>
 
       {}
-      <header className="flex shrink-0 flex-col items-center px-4 pb-2 pt-1 text-center sm:px-8 sm:pt-2">
-        <div className="mb-1.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#101027] sm:h-10 sm:w-10 sm:rounded-2xl">
+      <header className="flex shrink-0 flex-col items-center px-6 pb-3.5 pt-1.5 text-center sm:px-8 sm:pb-4 sm:pt-2">
+        <div className="mb-2.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#101027] sm:h-11 sm:w-11 sm:rounded-2xl">
           {currentTab === "teachers" ? (
             <GraduationCap size={18} className="sm:h-5 sm:w-5" />
           ) : currentTab === "autofill" ? (
@@ -177,7 +177,7 @@ function SuperFlexSettingsForm({
                 : "Course Faculty Settings"}
         </BottomSheetTitle>
 
-        <BottomSheetDescription className="mt-0.5 hidden text-xs text-slate-500 dark:text-slate-400 sm:block sm:max-w-md">
+        <BottomSheetDescription className="mt-1 hidden text-xs text-slate-500 dark:text-slate-400 sm:block sm:max-w-md">
           {mode === "setup"
             ? step === 1
               ? "Select instructors to personalize attendance reviews, grades, and email drafts."
@@ -189,11 +189,11 @@ function SuperFlexSettingsForm({
 
         {/* Tab switch / step breadcrumbs */}
         {mode === "settings" ? (
-          <div className="mt-2 flex gap-1 rounded-full border border-black/[0.08] bg-slate-100/80 p-0.5 dark:border-white/10 dark:bg-white/[0.06] sm:gap-1.5 sm:p-1">
+          <div className="mt-3 inline-flex max-w-full items-center gap-1 rounded-full border border-black/[0.08] bg-slate-100/80 p-1 dark:border-white/10 dark:bg-white/[0.06] sm:gap-1.5">
             <button
               type="button"
               onClick={() => setActiveTab("teachers")}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold transition-all sm:px-4 sm:py-1.5 sm:text-xs ${
+              className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-[11px] font-bold transition-all sm:px-4 sm:py-1.5 sm:text-xs ${
                 activeTab === "teachers"
                   ? "bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#0a192f]"
                   : "text-foreground/70 hover:text-foreground"
@@ -205,7 +205,7 @@ function SuperFlexSettingsForm({
             <button
               type="button"
               onClick={() => setActiveTab("ai")}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold transition-all sm:px-4 sm:py-1.5 sm:text-xs ${
+              className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-[11px] font-bold transition-all sm:px-4 sm:py-1.5 sm:text-xs ${
                 activeTab === "ai"
                   ? "bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#0a192f]"
                   : "text-foreground/70 hover:text-foreground"
@@ -217,7 +217,7 @@ function SuperFlexSettingsForm({
             <button
               type="button"
               onClick={() => setActiveTab("autofill")}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold transition-all sm:px-4 sm:py-1.5 sm:text-xs ${
+              className={`flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-[11px] font-bold transition-all sm:px-4 sm:py-1.5 sm:text-xs ${
                 activeTab === "autofill"
                   ? "bg-[#230052] text-white shadow-xs dark:bg-white dark:text-[#0a192f]"
                   : "text-foreground/70 hover:text-foreground"
@@ -228,7 +228,7 @@ function SuperFlexSettingsForm({
             </button>
           </div>
         ) : (
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3.5 flex items-center gap-2">
             <span
               className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${
                 step === 1
@@ -253,22 +253,22 @@ function SuperFlexSettingsForm({
       </header>
 
       {/* Scrollable content body */}
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-2.5 sm:px-8 sm:py-3.5">
+      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4 sm:px-8 sm:py-5">
         {currentTab === "teachers" && (
-          <div className="space-y-2.5 sm:space-y-3">
+          <div className="space-y-3.5 sm:space-y-4">
             {/* Faculty Directory Info & Progress */}
-            <div className="flex items-center justify-between px-0.5 text-[11px] text-foreground/60">
+            <div className="flex items-center justify-between gap-2 text-xs text-foreground/60">
               <span className="font-semibold text-foreground">
                 {campus?.name || "Campus"} Faculty Directory
               </span>
-              <span>
+              <span className="shrink-0">
                 {Object.keys(selections).length} of {courses.length} assigned
               </span>
             </div>
 
             {/* Course Chips */}
             {courses.length > 0 ? (
-              <div className="flex gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide">
+              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
                 {courses.map((course, index) => {
                   const chosen = selections[course.id];
                   return (
@@ -279,7 +279,7 @@ function SuperFlexSettingsForm({
                         setCourseIndex(index);
                         setQuery("");
                       }}
-                      className={`flex min-w-0 max-w-[180px] shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold transition-colors ${
+                      className={`flex min-w-0 max-w-[180px] shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold transition-colors ${
                         index === courseIndex
                           ? "bg-[#230052] text-white dark:bg-white dark:text-[#101027]"
                           : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-white/[.08] dark:text-slate-300 dark:hover:bg-white/15"
@@ -299,13 +299,13 @@ function SuperFlexSettingsForm({
 
             {/* Active Course & Assigned Instructor Bar */}
             {activeCourse && (
-              <div className="flex items-center justify-between gap-2 rounded-xl border border-black/[0.05] bg-slate-50/90 px-3 py-1.5 text-xs dark:border-white/[0.08] dark:bg-white/[0.04]">
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-black/[0.06] bg-slate-50/90 px-3.5 py-2.5 text-xs dark:border-white/[0.08] dark:bg-white/[0.04]">
                 <div className="min-w-0 flex items-center gap-1.5">
                   <span className="truncate font-bold text-foreground">
                     {activeCourse.id}: {activeCourse.title}
                   </span>
                 </div>
-                <div className="shrink-0 text-[11px]">
+                <div className="max-w-[46%] shrink-0 truncate text-right text-[11px]">
                   {selections[activeCourse.id]?.name ? (
                     <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                       {selections[activeCourse.id].name}
@@ -318,7 +318,7 @@ function SuperFlexSettingsForm({
             )}
 
             {/* Search Input */}
-            <label className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-1.5 focus-within:border-[#230052] dark:border-white/15 dark:focus-within:border-white">
+            <label className="flex min-h-10 items-center gap-2.5 rounded-xl border border-slate-200 px-3.5 py-2 focus-within:border-[#230052] dark:border-white/15 dark:focus-within:border-white">
               <Search size={14} className="text-slate-400 shrink-0" />
               <input
                 type="text"
@@ -339,7 +339,7 @@ function SuperFlexSettingsForm({
             </label>
 
             {/* Teacher Selection List (clean, low-noise rows) */}
-            <div className="max-h-[290px] space-y-1 overflow-y-auto pr-0.5 scrollbar-hide sm:max-h-[350px]">
+            <div className="max-h-[280px] space-y-2 overflow-y-auto py-0.5 scrollbar-hide sm:max-h-[340px]">
               {loadingTeachers ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center text-xs text-slate-400">
                   <LoaderCircle
@@ -375,7 +375,7 @@ function SuperFlexSettingsForm({
                       key={`${teacher.source}:${teacher.id || teacher.email || teacher.name}`}
                       type="button"
                       onClick={() => activeCourse && onSelectTeacher(activeCourse.id, teacher)}
-                      className={`group flex w-full items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-left transition-all sm:gap-3 sm:px-3 sm:py-2 ${
+                      className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all sm:px-3.5 sm:py-2.5 ${
                         isSelected
                           ? "border border-[#230052] bg-[#230052]/[0.06] shadow-xs dark:border-white/30 dark:bg-white/[0.10]"
                           : "border border-black/[0.04] bg-white/40 hover:bg-black/[0.03] dark:border-white/[0.05] dark:bg-white/[0.02] dark:hover:bg-white/[0.05]"
@@ -386,7 +386,7 @@ function SuperFlexSettingsForm({
                         size="xs"
                         className="h-8 w-8 rounded-lg sm:h-9 sm:w-9 sm:rounded-xl"
                       />
-                      <div className="min-w-0 flex-1">
+                      <div className="min-w-0 flex-1 space-y-0.5">
                         <p className="truncate text-xs font-bold text-foreground">
                           {teacher.name}
                         </p>
@@ -413,40 +413,40 @@ function SuperFlexSettingsForm({
               )}
             </div>
             {filteredTeachers.length > 50 && (
-              <p className="text-[10px] text-slate-500 dark:text-slate-400">
+              <p className="pt-1 text-[11px] text-slate-500 dark:text-slate-400">
                 Showing 50 of {filteredTeachers.length} matches. Refine your search to see more.
               </p>
             )}
 
             {/* Can't find your teacher (clean collapsible form) */}
-            <div className="pt-0.5">
+            <div className="pt-1 pb-1">
               {!showManual ? (
                 <button
                   type="button"
                   onClick={() => setShowManual(true)}
-                  className="text-[11px] font-semibold text-[#230052] hover:underline dark:text-purple-300"
+                  className="inline-flex items-center py-1 text-xs font-semibold text-[#230052] hover:underline dark:text-purple-300"
                 >
                   + Can't find your teacher? Add manually
                 </button>
               ) : (
-                <div className="rounded-xl border border-dashed border-black/10 p-2.5 text-xs dark:border-white/15 animate-in fade-in duration-150">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <p className="text-[11px] font-bold text-foreground">Add Custom Instructor</p>
+                <div className="rounded-xl border border-dashed border-black/10 p-3.5 text-xs dark:border-white/15 sm:p-4 animate-in fade-in duration-150">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-bold text-foreground">Add Custom Instructor</p>
                     <button
                       type="button"
                       onClick={() => setShowManual(false)}
-                      className="text-[10px] text-slate-400 hover:text-slate-600"
+                      className="text-[11px] text-slate-400 hover:text-slate-600"
                     >
                       Cancel
                     </button>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <input
                       type="text"
                       value={manualName}
                       onChange={(e) => setManualName(e.target.value)}
                       placeholder="Teacher Name"
-                      className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs outline-none focus:border-[#230052] dark:border-white/15 dark:bg-white/5 dark:focus:border-white"
+                      className="rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#230052] dark:border-white/15 dark:bg-white/5 dark:focus:border-white"
                     />
                     <input
                       type="email"
@@ -457,19 +457,19 @@ function SuperFlexSettingsForm({
                       }
                       onChange={(e) => setManualEmail(e.target.value)}
                       placeholder="Email (optional)"
-                      className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs outline-none focus:border-[#230052] dark:border-white/15 dark:bg-white/5 dark:focus:border-white"
+                      className="rounded-lg border border-slate-200 px-3 py-2 text-xs outline-none focus:border-[#230052] dark:border-white/15 dark:bg-white/5 dark:focus:border-white"
                     />
                   </div>
                   <button
                     type="button"
                     onClick={addManualTeacher}
                     disabled={!manualName.trim() || !activeCourse || !manualEmailValid}
-                    className="mt-1.5 rounded-lg bg-[#230052] px-3 py-1 text-[11px] font-bold text-white hover:bg-[#370c72] disabled:opacity-40 dark:bg-white dark:text-[#0a192f]"
+                    className="mt-2.5 rounded-lg bg-[#230052] px-3.5 py-2 text-xs font-bold text-white hover:bg-[#370c72] disabled:opacity-40 dark:bg-white dark:text-[#0a192f]"
                   >
                     Save Instructor
                   </button>
                   {!manualEmailValid && (
-                    <p role="status" className="mt-1 text-[10px] text-rose-500">
+                    <p role="status" className="mt-1.5 text-[11px] text-rose-500">
                       Enter a valid email address or leave it blank.
                     </p>
                   )}
@@ -483,16 +483,16 @@ function SuperFlexSettingsForm({
         {currentTab === "ai" && (
           <div className="space-y-4">
             {}
-            <div className="flex items-center justify-between gap-4 rounded-2xl border border-black/[0.08] bg-slate-50/80 p-4 dark:border-white/10 dark:bg-white/[0.04]">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-black/[0.08] bg-slate-50/80 p-4 dark:border-white/10 dark:bg-white/[0.04] sm:gap-4 sm:p-5">
+              <div className="flex min-w-0 items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] shadow-xs shrink-0">
                   <Bot size={20} />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <span className="block text-sm font-bold text-foreground">
                     Enable Octopus AI Assistant
                   </span>
-                  <span className="text-xs text-foreground/60 leading-relaxed">
+                  <span className="block text-xs text-foreground/60 leading-relaxed">
                     AI calculations for 80% attendance leaves, grade forecasting, and teacher
                     emails.
                   </span>
@@ -524,16 +524,16 @@ function SuperFlexSettingsForm({
             </p>
 
             {dockEnabled ? (
-              <div className="space-y-3.5 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-in fade-in duration-200">
                 {}
-                <div className="rounded-2xl border border-sky-400/30 bg-sky-500/[0.07] p-4 dark:border-sky-400/20 dark:bg-sky-500/[0.05]">
-                  <div className="flex items-center justify-between gap-3">
+                <div className="rounded-2xl border border-sky-400/30 bg-sky-500/[0.07] p-4 dark:border-sky-400/20 dark:bg-sky-500/[0.05] sm:p-5">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="min-w-0">
                       <span className="text-xs font-bold text-sky-950 dark:text-sky-200 flex items-center gap-1.5">
                         <KeyRound size={14} className="text-sky-600 dark:text-sky-400" />
                         1. Get Free Google Gemini API Key
                       </span>
-                      <p className="mt-0.5 text-[11px] text-sky-900/70 dark:text-sky-300/70 leading-relaxed">
+                      <p className="mt-1 text-[11px] text-sky-900/70 dark:text-sky-300/70 leading-relaxed">
                         Official Gemini free-tier key from Google AI Studio. No credit card
                         required.
                       </p>
@@ -549,8 +549,8 @@ function SuperFlexSettingsForm({
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs font-bold text-foreground">
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-bold text-foreground">
                     <span>2. Connect Gemini API Key</span>
                     {hasApiKey && (
                       <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
@@ -559,7 +559,7 @@ function SuperFlexSettingsForm({
                       </span>
                     )}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2.5">
                     <input
                       type="password"
                       value={apiKeyInput}
@@ -604,14 +604,14 @@ function SuperFlexSettingsForm({
                   )}
                 </div>
 
-                <div className="rounded-xl bg-slate-100/60 p-3 text-[11px] text-foreground/60 dark:bg-white/[0.03]">
+                <div className="rounded-xl bg-slate-100/60 p-3.5 text-[11px] leading-relaxed text-foreground/60 dark:bg-white/[0.03]">
                   <strong>Privacy Note:</strong> Your API key is stored locally inside your browser
                   and never leaves your device. Data is processed directly through Google's official
                   Gemini API.
                 </div>
               </div>
             ) : (
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-center text-xs text-foreground/60 dark:border-white/10 dark:bg-white/[0.03]">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-center text-xs text-foreground/60 dark:border-white/10 dark:bg-white/[0.03] sm:p-5">
                 Octopus AI is currently disabled. The floating chat dock will remain hidden on all
                 portal pages.
               </div>
@@ -621,18 +621,18 @@ function SuperFlexSettingsForm({
 
         {}
         {currentTab === "autofill" && (
-          <div className="space-y-5 animate-in fade-in duration-200">
-            <div className="rounded-2xl border border-black/[0.08] bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.04]">
+          <div className="space-y-4 animate-in fade-in duration-200">
+            <div className="rounded-2xl border border-black/[0.08] bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.04] sm:p-5">
               <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-2">
+                <div className="space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
                     <h4 className="text-sm font-bold text-foreground">FLEX Login Auto-Fill</h4>
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
                       <ShieldCheck size={11} />
                       AES-GCM 256-bit
                     </span>
                   </div>
-                  <p className="text-xs text-foreground/60">
+                  <p className="text-xs leading-relaxed text-foreground/60">
                     Saves your Roll No & password securely in local extension storage so you can
                     easily Auto-Fill on future logins.
                   </p>
@@ -641,8 +641,8 @@ function SuperFlexSettingsForm({
             </div>
 
             {savedCreds ? (
-              <div className="space-y-4 rounded-2xl border border-black/[0.08] bg-white p-5 dark:border-white/10 dark:bg-black">
-                <div className="flex items-center justify-between">
+              <div className="space-y-4 rounded-2xl border border-black/[0.08] bg-white p-4 dark:border-white/10 dark:bg-black sm:p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-foreground/50">
                       Active Credentials
@@ -650,7 +650,7 @@ function SuperFlexSettingsForm({
                     <p className="mt-1 text-base font-bold text-foreground">
                       {savedCreds.maskedUsername || savedCreds.username}
                     </p>
-                    <p className="text-xs text-foreground/50">
+                    <p className="mt-0.5 text-xs text-foreground/50">
                       Password: <span className="font-mono tracking-widest">••••••••••••</span>
                     </p>
                   </div>
@@ -660,7 +660,7 @@ function SuperFlexSettingsForm({
                   </span>
                 </div>
 
-                <div className="border-t border-black/[0.06] pt-4 dark:border-white/[0.08] flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-black/[0.06] pt-4 dark:border-white/[0.08]">
                   <p className="text-xs text-foreground/50">
                     Credentials are encrypted and never leave this browser.
                   </p>
@@ -677,19 +677,19 @@ function SuperFlexSettingsForm({
                 </div>
               </div>
             ) : (
-              <div className="space-y-4 rounded-2xl border border-black/[0.08] bg-white p-5 dark:border-white/10 dark:bg-black">
+              <div className="space-y-4 rounded-2xl border border-black/[0.08] bg-white p-4 dark:border-white/10 dark:bg-black sm:p-5">
                 <div>
                   <h4 className="text-xs font-bold uppercase tracking-wider text-foreground/60">
                     Save Credentials Manually
                   </h4>
-                  <p className="mt-0.5 text-xs text-foreground/50">
+                  <p className="mt-1 text-xs text-foreground/50">
                     Or check "Remember Me" next time you sign into FLEX.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-foreground/70 uppercase">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="space-y-1.5">
+                    <label className="block text-[11px] font-bold text-foreground/70 uppercase">
                       Roll Number / Username
                     </label>
                     <input
@@ -697,11 +697,11 @@ function SuperFlexSettingsForm({
                       value={autofillUser}
                       onChange={(e) => setAutofillUser(e.target.value)}
                       placeholder="e.g. 21K-1234"
-                      className="w-full rounded-xl border border-black/[0.1] bg-slate-50 px-3.5 py-2 text-xs font-medium text-foreground outline-hidden focus:border-[#230052] dark:border-white/10 dark:bg-white/[0.05]"
+                      className="w-full rounded-xl border border-black/[0.1] bg-slate-50 px-3.5 py-2.5 text-xs font-medium text-foreground outline-hidden focus:border-[#230052] dark:border-white/10 dark:bg-white/[0.05]"
                     />
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-foreground/70 uppercase">
+                  <div className="space-y-1.5">
+                    <label className="block text-[11px] font-bold text-foreground/70 uppercase">
                       Password
                     </label>
                     <input
@@ -709,12 +709,12 @@ function SuperFlexSettingsForm({
                       value={autofillPass}
                       onChange={(e) => setAutofillPass(e.target.value)}
                       placeholder="FLEX Password"
-                      className="w-full rounded-xl border border-black/[0.1] bg-slate-50 px-3.5 py-2 text-xs font-medium text-foreground outline-hidden focus:border-[#230052] dark:border-white/10 dark:bg-white/[0.05]"
+                      className="w-full rounded-xl border border-black/[0.1] bg-slate-50 px-3.5 py-2.5 text-xs font-medium text-foreground outline-hidden focus:border-[#230052] dark:border-white/10 dark:bg-white/[0.05]"
                     />
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-2">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
                   <p className="text-[11px] text-foreground/50">
                     Stored in Chrome's sandboxed local extension storage.
                   </p>
@@ -752,7 +752,7 @@ function SuperFlexSettingsForm({
       </div>
 
       {}
-      <footer className="flex shrink-0 items-center justify-between border-t border-black/[0.06] px-4 py-2.5 sm:px-8 sm:py-3.5 dark:border-white/[0.08]">
+      <footer className="flex shrink-0 items-center justify-between gap-3 border-t border-black/[0.06] px-6 py-3.5 sm:px-8 sm:py-4 dark:border-white/[0.08]">
         {mode === "setup" ? (
           <>
             {step === 1 ? (
@@ -821,9 +821,9 @@ function SuperFlexSettingsForm({
             )}
           </>
         ) : (
-          <div className="flex w-full items-center justify-between gap-2">
+          <div className="flex w-full items-center justify-between gap-3">
             {currentTab === "teachers" && courses.length > 1 ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 {courseIndex > 0 && (
                   <button
                     type="button"
@@ -843,7 +843,7 @@ function SuperFlexSettingsForm({
                       setCourseIndex((i) => Math.min(courses.length - 1, i + 1));
                       setQuery("");
                     }}
-                    className="flex items-center gap-1 rounded-full border border-black/[0.08] bg-slate-100 px-3.5 py-1.5 text-xs font-bold text-foreground hover:bg-slate-200 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/20 cursor-pointer"
+                    className="flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-slate-100 px-4 py-2 text-xs font-bold text-foreground hover:bg-slate-200 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/20 cursor-pointer"
                   >
                     Next Course <ArrowRight size={13} />
                   </button>

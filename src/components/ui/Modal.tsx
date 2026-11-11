@@ -44,7 +44,7 @@ const Modal = ({
           <X size={18} className="sm:h-5 sm:w-5" />
         </button>
       </BottomSheetClose>
-      <header className="flex shrink-0 flex-col items-center px-4 pb-2.5 pt-2 text-center sm:px-8 sm:pb-3 sm:pt-3">
+      <header className="flex shrink-0 flex-col items-center px-5 pb-3 pt-2 text-center sm:px-8 sm:pb-3.5 sm:pt-3">
         {icon && (
           <span className="mb-1.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#230052] text-white dark:bg-white dark:text-[#101027] sm:mb-2 sm:h-11 sm:w-11 sm:rounded-[16px]">
             {icon}
@@ -83,7 +83,7 @@ const Modal = ({
           </>
         )}
       </header>
-      <div className="min-h-0 overflow-y-auto overscroll-contain px-4 pb-4 pt-1 sm:px-8 sm:pb-5">
+      <div className="min-h-0 overflow-y-auto overscroll-contain px-5 pb-5 pt-1.5 sm:px-8 sm:pb-6">
         {children}
       </div>
     </BottomSheet>
