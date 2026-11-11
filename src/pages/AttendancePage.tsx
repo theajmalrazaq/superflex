@@ -33,7 +33,7 @@ import { parseAcademicDate } from "../utils/academicDate";
 
 const AttendanceCourseTabs = ({ courses, selectedId, onSelect }) => (
   <div
-    className="flex w-full max-w-full gap-2 overflow-x-auto pb-0.5 scrollbar-hide sm:inline-flex sm:w-fit sm:rounded-full sm:bg-white/55 sm:p-1.5 sm:shadow-sm sm:shadow-black/[0.03] sm:backdrop-blur-xl sm:dark:bg-black/25 sm:dark:shadow-none"
+    className="inline-flex w-fit max-w-full gap-1.5 overflow-x-auto rounded-full bg-white/55 p-1.5 shadow-sm shadow-black/[0.03] backdrop-blur-xl scrollbar-hide dark:bg-black/25 dark:shadow-none"
     aria-label="Select course"
   >
     {courses.map((course) => {
@@ -57,10 +57,10 @@ const AttendanceCourseTabs = ({ courses, selectedId, onSelect }) => (
           onClick={() => onSelect(course.id)}
           aria-pressed={isActive}
           title={`${course.title} (${cr} Cr Hr · ${course.absent}/${allowed} absents)`}
-          className={`flex shrink-0 items-center justify-between gap-2.5 rounded-full px-4 py-2 text-xs font-bold transition-colors sm:min-w-[120px] sm:gap-3 sm:py-2.5 ${
+          className={`flex min-w-[120px] shrink-0 items-center justify-between gap-3 rounded-full px-4 py-2.5 text-xs font-bold transition-colors ${
             isActive
               ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"
-              : "bg-white text-[#101027] hover:bg-white/90 dark:bg-white/10 dark:text-slate-200 sm:bg-transparent sm:text-slate-600 sm:hover:bg-white/80 sm:hover:text-[#230052]"
+              : "bg-transparent text-slate-600 hover:bg-white/80 hover:text-[#230052] dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/20 dark:hover:text-white"
           }`}
         >
           <div className="flex items-center gap-1.5 truncate">

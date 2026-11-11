@@ -8,9 +8,9 @@ const tabVariants = cva(
   {
     variants: {
       size: {
-        sm: "px-2.5 py-1 text-[10px] sm:px-3 sm:py-1.5 sm:text-[11px]",
-        md: "px-3.5 py-1.5 text-[11px] sm:px-5 sm:py-2 sm:text-xs",
-        lg: "px-4 py-2 text-xs sm:px-6 sm:py-3 sm:text-sm",
+        sm: "px-3 py-1.5 text-[11px]",
+        md: "px-5 py-2 text-xs",
+        lg: "px-6 py-3 text-sm",
       },
       active: {
         true: "!text-[var(--accent-foreground)]",
