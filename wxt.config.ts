@@ -31,7 +31,6 @@ export default defineConfig({
           "assets/favicon.png",
           "assets/favicon.svg",
           "assets/logo.svg",
-          "assets/logo_sec.svg",
           "assets/clouds/cloud-2.webp",
           "reviews.json",
           "bridge.js",
