@@ -19,9 +19,9 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: "22"
+          bun-version: latest
 
       - name: Install Android build tools
         run: |
@@ -38,7 +38,7 @@ jobs:
           echo "ANDROID_JAR=/opt/android/android.jar" >> $GITHUB_ENV
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: bun install --frozen-lockfile
 
       - name: Build web bundle and APK
         run: ./android/build.sh debug

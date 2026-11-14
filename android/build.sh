@@ -10,14 +10,20 @@ if [ -n "${ANDROID_JAR:-}" ] && [ -f "$ANDROID_JAR" ]; then
 else
   jar="$(ls /usr/lib/android-sdk/platforms/android-*/android.jar 2>/dev/null | tail -n 1)"
 fi
-if command -v node >/dev/null 2>&1; then
+if command -v bun >/dev/null 2>&1; then
+  version="$(bun -e "console.log(require('$root/package.json').version)")"
+elif command -v node >/dev/null 2>&1; then
   version="$(node -p "require('$root/package.json').version")"
 else
   version="$(sed -n 's/.*"version": *"\{0,1\}\([^",]*\)".*/\1/p' "$root/package.json" | head -n 1)"
 fi
 
 if [ "${SKIP_WEB:-0}" != "1" ]; then
-  (cd "$root" && npx wxt build && node scripts/android-bundle.mjs)
+  if command -v bun >/dev/null 2>&1; then
+    (cd "$root" && bun x wxt build && bun scripts/android-bundle.mjs)
+  else
+    (cd "$root" && npx wxt build && node scripts/android-bundle.mjs)
+  fi
 fi
 
 if [ ! -f "$here/assets/web/superflex.js" ]; then

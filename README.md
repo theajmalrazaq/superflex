@@ -110,7 +110,7 @@ Read the full [Privacy Policy](docs/articles/privacy.md).
 
 SuperFlex v7.0.0 runs natively on Android via its built-in WebView shell ([android/README.md](android/README.md)) and also works in extension-capable Chromium Android browsers such as [Quetta Browser](https://www.quetta.net/features/extensions).
 
-1. Download `SuperFlex.apk` from [GitHub Releases](https://github.com/theajmalrazaq/superflex/releases) (or build locally with `npm run android:build`).
+1. Download `SuperFlex.apk` from [GitHub Releases](https://github.com/theajmalrazaq/superflex/releases) (or build locally with `bun run android:build`).
 2. Install the APK on your Android device and sign in to `flexstudent.nu.edu.pk`.
 
 ## Development
@@ -130,8 +130,8 @@ SuperFlex v7.0.0 runs natively on Android via its built-in WebView shell ([andro
 ```bash
 git clone https://github.com/theajmalrazaq/superflex.git
 cd superflex
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 WXT creates the development extension output. Load the generated Chrome MV3 directory shown by WXT in `chrome://extensions`.
@@ -139,12 +139,12 @@ WXT creates the development extension output. Load the generated Chrome MV3 dire
 ### Quality checks
 
 ```bash
-npm run lint
-npm test
-npm run typecheck
-npm run format:check
-npm run build
-npm run android:bundle
+bun run lint
+bun test
+bun run typecheck
+bun run format:check
+bun run build
+bun run android:bundle
 ```
 
 The project-wide TypeScript check covers source, tests, build configuration, and documentation scripts. Implicit parameter types and nullable legacy values are allowed during migration; the parser check remains fully strict.
@@ -160,11 +160,11 @@ The existing Radix primitives, `cva`, `cn` (`clsx` and `tailwind-merge`), Chart.
 ### Documentation website
 
 ```bash
-npm run dev:docs
-npm run build:docs
+bun run dev:docs
+bun run build:docs
 ```
 
-The website works directly from `docs/` on static hosting. Author behavior in `docs/scripts/*.ts` and run `npm run build:docs:scripts` to regenerate the committed browser bundles in `docs/scripts/generated/`. Vite serves TypeScript directly during development; `npm run build:docs` refreshes those bundles and creates `dist-docs/` for artifact hosting. Reviews are bundled from `public/reviews.json`, the shared source for the website and extension. HTML, CSS, JSON, Markdown, and media remain in their native formats.
+The website works directly from `docs/` on static hosting. Author behavior in `docs/scripts/*.ts` and run `bun run build:docs:scripts` to regenerate the committed browser bundles in `docs/scripts/generated/`. Vite serves TypeScript directly during development; `bun run build:docs` refreshes those bundles and creates `dist-docs/` for artifact hosting. Reviews are bundled from `public/reviews.json`, the shared source for the website and extension. HTML, CSS, JSON, Markdown, and media remain in their native formats.
 
 ### Project map
 

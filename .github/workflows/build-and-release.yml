@@ -36,11 +36,6 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
@@ -66,7 +61,7 @@ jobs:
       - name: Update version
         if: github.event.inputs.version != ''
         run: |
-          node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); p.version='${{ github.event.inputs.version }}'; fs.writeFileSync('package.json', JSON.stringify(p, null, 2)+'\n');"
+          bun -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); p.version='${{ github.event.inputs.version }}'; fs.writeFileSync('package.json', JSON.stringify(p, null, 2)+'\n');"
 
       - name: Typecheck
         run: bun run typecheck
@@ -86,7 +81,7 @@ jobs:
 
       - name: Build Android bundle and APK
         run: |
-          node scripts/android-bundle.mjs
+          bun scripts/android-bundle.mjs
           SKIP_WEB=1 ./android/build.sh debug
           cp dist/SuperFlex.apk ./SuperFlex.apk
 
@@ -104,7 +99,7 @@ jobs:
         run: |
           VERSION="${{ github.event.inputs.version }}"
           if [ -z "$VERSION" ]; then
-            VERSION="$(node -p "require('./package.json').version")"
+            VERSION="$(bun -p "require('./package.json').version")"
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "date=$(date +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"

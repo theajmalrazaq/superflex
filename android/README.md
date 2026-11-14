@@ -4,9 +4,9 @@ Runs the existing SuperFlex bundle (`background.js` and `content.js` from the WX
 
 ## Build
 
-Needs Java 17+, Node 22, and on Ubuntu: `aapt apksigner zipalign android-sdk-platform-23 dalvik-exchange`.
+Needs Java 17+, Bun 1.2+, and on Ubuntu: `aapt apksigner zipalign android-sdk-platform-23 dalvik-exchange`.
 
-    npm install
+    bun install
     ./android/build.sh debug
 
 Output: `dist/SuperFlex.apk` (also `android/app/build/outputs/apk/debug/app-debug.apk`). The extension build wipes `dist/`, so build the APK last.
@@ -21,7 +21,7 @@ or copy the file to the phone and open it (allow installs from unknown sources).
 
 ## Test
 
-    npm run test:android
+    bun run test:android
 
 Runs the shim and bundle in headless Chromium against a stand-in page. It does not contact the real FLEX portal.
 
