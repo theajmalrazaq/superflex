@@ -28,11 +28,11 @@ jobs:
           sudo apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y aapt apksigner zipalign dalvik-exchange
 
-      - name: Download Android 26 platform jar
+      - name: Download Android 28 platform jar
         run: |
           sudo mkdir -p /opt/android
-          curl -sL https://dl.google.com/android/repository/platform-26_r01.zip -o /tmp/platform.zip
-          sudo unzip -p /tmp/platform.zip android-8.0.0/android.jar > /tmp/android.jar
+          curl -sL https://dl.google.com/android/repository/platform-28_r04.zip -o /tmp/platform.zip
+          sudo unzip -p /tmp/platform.zip android-9/android.jar > /tmp/android.jar
           sudo mv /tmp/android.jar /opt/android/android.jar
           rm -f /tmp/platform.zip
           echo "ANDROID_JAR=/opt/android/android.jar" >> $GITHUB_ENV

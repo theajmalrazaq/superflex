@@ -284,10 +284,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         if (Build.VERSION.SDK_INT >= 28) {
-            android.view.WindowManager.LayoutParams lp = getWindow().getAttributes();
-            lp.layoutInDisplayCutoutMode =
-                    android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
-            getWindow().setAttributes(lp);
+            try {
+                android.view.WindowManager.LayoutParams lp = getWindow().getAttributes();
+                java.lang.reflect.Field field = lp.getClass().getField("layoutInDisplayCutoutMode");
+                field.setInt(lp, 1);
+                getWindow().setAttributes(lp);
+            } catch (Exception ignored) {
+            }
         }
         this.dark = initialdark();
         this.root = new FrameLayout(this);

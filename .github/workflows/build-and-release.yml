@@ -1,30 +1,64 @@
 name: Build and Release SuperFlex
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
     inputs:
       version:
         description: "Release version (e.g. 7.0.0)"
         required: true
         default: "7.0.0"
+        type: string
+      changelog:
+        description: "Release Changelog / What's Changed"
+        required: false
+        type: string
+        default: ""
+      draft:
+        description: "Create draft release (unpublished)"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
 
 jobs:
   build-and-release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+
+      - name: Install Android build tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y aapt apksigner zipalign dalvik-exchange
+
+      - name: Download Android 28 platform jar
+        run: |
+          sudo mkdir -p /opt/android
+          curl -sL https://dl.google.com/android/repository/platform-28_r04.zip -o /tmp/platform.zip
+          sudo unzip -p /tmp/platform.zip android-9/android.jar > /tmp/android.jar
+          sudo mv /tmp/android.jar /opt/android/android.jar
+          rm -f /tmp/platform.zip
+          echo "ANDROID_JAR=/opt/android/android.jar" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -32,7 +66,7 @@ jobs:
       - name: Update version
         if: github.event.inputs.version != ''
         run: |
-          bun pm pkg set version="${{ github.event.inputs.version }}"
+          node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('package.json','utf8')); p.version='${{ github.event.inputs.version }}'; fs.writeFileSync('package.json', JSON.stringify(p, null, 2)+'\n');"
 
       - name: Typecheck
         run: bun run typecheck
@@ -43,20 +77,27 @@ jobs:
       - name: Build documentation
         run: bun run build:docs
 
-      - name: Build
+      - name: Build extension
         run: bun run build
-
-      - name: Debug dist content
-        run: |
-          echo "Listing dist directory:"
-          ls -F dist/
-          echo "Checking manifest.json in dist:"
-          cat dist/manifest.json
 
       - name: Zip extension
         run: |
-          # Zip the contents of the dist directory so manifest.json is at the root
-          cd dist && zip -r ../superflex.zip .
+          cd dist && zip -r ../superflex.zip . && cd ..
+
+      - name: Build Android bundle and APK
+        run: |
+          node scripts/android-bundle.mjs
+          SKIP_WEB=1 ./android/build.sh debug
+          cp dist/SuperFlex.apk ./SuperFlex.apk
+
+      - name: Verify release artifacts
+        run: |
+          test -f superflex.zip || { echo "superflex.zip missing"; exit 1; }
+          test -f SuperFlex.apk || { echo "SuperFlex.apk missing"; exit 1; }
+          unzip -l superflex.zip | grep -q manifest.json
+          unzip -l SuperFlex.apk | grep -q classes.dex
+          unzip -l SuperFlex.apk | grep -q assets/web/superflex.js
+          echo "All release artifacts verified."
 
       - name: Resolve release metadata
         id: meta
@@ -68,27 +109,36 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "date=$(date +'%Y-%m-%d')" >> "$GITHUB_OUTPUT"
 
-      - name: Create Release
+      - name: Prepare Release Notes
+        env:
+          CHANGELOG_INPUT: ${{ github.event.inputs.changelog }}
+          RELEASE_VERSION: ${{ steps.meta.outputs.version }}
+          RELEASE_DATE: ${{ steps.meta.outputs.date }}
+        run: |
+          if [ -n "${CHANGELOG_INPUT// /}" ]; then
+            printf "%s\n\n---\nBuilt on: %s\n" "$CHANGELOG_INPUT" "$RELEASE_DATE" > release_notes.md
+          else
+            cat << EOF > release_notes.md
+          ## What's Changed in v${RELEASE_VERSION}
+
+          - SuperFlex v${RELEASE_VERSION} release
+          - Web extension (\`superflex.zip\`) and standalone Android APK (\`SuperFlex.apk\`)
+
+          ---
+          Built on: ${RELEASE_DATE}
+          EOF
+          fi
+
+      - name: Create GitHub Release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.meta.outputs.version }}
-          name: SuperFlex ${{ steps.meta.outputs.version }}
-          body: |
-            ## What's Changed
-
-            ### Added
-            -
-
-            ### Fixed
-            -
-
-            ### Improved
-            -
-
-            ---
-            Built on: ${{ steps.meta.outputs.date }}
-          files: superflex.zip
-          draft: true
+          name: SuperFlex v${{ steps.meta.outputs.version }}
+          body_path: release_notes.md
+          draft: ${{ github.event.inputs.draft || false }}
+          files: |
+            superflex.zip
+            SuperFlex.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
