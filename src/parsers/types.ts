@@ -1,6 +1,8 @@
 export type PortalAlert = {
-  type: "error" | "info";
+  type: "error" | "info" | "success" | "warning";
   message: string;
+  title?: string;
+  dismissible?: boolean;
 };
 
 export type SemesterOption = {

@@ -1,15 +1,15 @@
 import React from "react";
-import { AlertTriangle, ChevronRight, Bell, X } from "lucide-react";
+import { AlertCircle, AlertTriangle, CheckCircle2, ChevronRight, Info, Sparkles, X } from "lucide-react";
 
-interface NotificationAlert {
-  type: "error" | "info" | "success" | "update";
+export interface NotificationAlert {
+  type: "error" | "info" | "success" | "warning" | "update";
   message?: string;
   text?: string;
   title?: string;
   dismissible?: boolean;
 }
 
-interface NotificationBannerProps {
+export interface NotificationBannerProps {
   alerts: NotificationAlert[];
   onActionClick?: () => void;
   actionLabel?: string;
@@ -25,7 +25,7 @@ const NotificationBanner = ({
   if (!alerts || alerts.length === 0) return null;
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-3 sm:gap-3.5">
       {onActionClick && (
         <div className="flex justify-end">
           <button
@@ -42,43 +42,65 @@ const NotificationBanner = ({
       )}
 
       {alerts.map((alert, idx) => {
-        const isError = alert.type === "error";
-        const isSuccess = alert.type === "success" || alert.type === "update";
+        const type = alert.type || "info";
 
-        const borderClass = isError
-          ? "border-rose-500/20"
-          : isSuccess
-            ? "border-emerald-500/30"
-            : "border-blue-500/20";
+        let borderClass = "border-[#230052]/20 dark:border-white/20";
+        let iconBgClass =
+          "bg-[#230052]/8 text-[#230052] ring-1 ring-[#230052]/15 dark:bg-white/10 dark:text-white dark:ring-white/20";
+        let titleColor = "text-[#230052] dark:text-white";
+        let IconComponent = Info;
 
-        const iconBgClass = isError
-          ? "bg-rose-500/10 text-rose-600 dark:text-rose-300"
-          : isSuccess
-            ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300"
-            : "bg-blue-500/10 text-blue-600 dark:text-blue-300";
+        if (type === "success") {
+          borderClass = "border-emerald-500/30 dark:border-emerald-500/35";
+          iconBgClass =
+            "bg-emerald-500/10 text-emerald-600 ring-1 ring-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400 dark:ring-emerald-500/30";
+          titleColor = "text-emerald-700 dark:text-emerald-400";
+          IconComponent = CheckCircle2;
+        } else if (type === "error") {
+          borderClass = "border-rose-500/30 dark:border-rose-500/35";
+          iconBgClass =
+            "bg-rose-500/10 text-rose-600 ring-1 ring-rose-500/20 dark:bg-rose-500/20 dark:text-rose-400 dark:ring-rose-500/30";
+          titleColor = "text-rose-700 dark:text-rose-400";
+          IconComponent = AlertCircle;
+        } else if (type === "warning") {
+          borderClass = "border-amber-500/30 dark:border-amber-500/35";
+          iconBgClass =
+            "bg-amber-500/10 text-amber-600 ring-1 ring-amber-500/20 dark:bg-amber-500/20 dark:text-amber-400 dark:ring-amber-500/30";
+          titleColor = "text-amber-700 dark:text-amber-400";
+          IconComponent = AlertTriangle;
+        } else if (type === "update") {
+          borderClass = "border-violet-500/30 dark:border-violet-500/35";
+          iconBgClass =
+            "bg-violet-500/10 text-violet-600 ring-1 ring-violet-500/20 dark:bg-violet-500/20 dark:text-violet-400 dark:ring-violet-500/30";
+          titleColor = "text-violet-700 dark:text-violet-400";
+          IconComponent = Sparkles;
+        }
+
+        const messageText = alert.message || alert.text;
 
         return (
           <div
             key={idx}
-            className={`relative flex items-center gap-3.5 overflow-hidden rounded-[22px] border bg-white p-4 text-[#101027] dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:gap-4 sm:rounded-[24px] ${borderClass} shadow-xs`}
+            role="status"
+            className={`relative flex items-center gap-3.5 overflow-hidden rounded-[22px] border bg-white/95 p-4 text-[#101027] backdrop-blur-md dark:bg-[#0c0d12]/95 dark:text-[#f5f6fb] sm:gap-4 sm:rounded-[24px] sm:p-5 ${borderClass} shadow-xs animate-in fade-in slide-in-from-top-2 duration-300`}
           >
-            <div className={`shrink-0 rounded-[14px] p-2.5 sm:rounded-xl sm:p-3 ${iconBgClass}`}>
-              {isSuccess ? (
-                <Bell size={18} className="sm:h-5 sm:w-5" />
-              ) : (
-                <AlertTriangle size={18} className="sm:h-5 sm:w-5" />
-              )}
+            <div
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[28%] sm:h-11 sm:w-11 ${iconBgClass}`}
+            >
+              <IconComponent size={20} className="sm:h-[22px] sm:w-[22px]" />
             </div>
 
-            <div className="min-w-0 flex-1 space-y-0.5">
+            <div className="min-w-0 flex-1 space-y-1">
               {alert.title && (
-                <p className="text-[14px] font-bold tracking-tight text-[#101027] dark:text-white sm:text-xs sm:uppercase sm:tracking-wider sm:text-emerald-600 sm:dark:text-emerald-400">
+                <p className={`text-[13px] font-bold tracking-tight sm:text-sm ${titleColor}`}>
                   {alert.title}
                 </p>
               )}
-              <div className="text-[12px] font-medium leading-relaxed text-[#667085] dark:text-slate-300 sm:text-xs sm:text-foreground md:text-sm">
-                {alert.message || alert.text}
-              </div>
+              {messageText && (
+                <p className="text-xs font-medium leading-relaxed text-foreground/75 dark:text-foreground/80 sm:text-[13px]">
+                  {messageText}
+                </p>
+              )}
             </div>
 
             {alert.dismissible && onDismissAlert && (
@@ -87,6 +109,7 @@ const NotificationBanner = ({
                 onClick={() => onDismissAlert(alert)}
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-foreground/40 hover:bg-black/5 hover:text-foreground dark:hover:bg-white/10 transition-colors"
                 title="Dismiss"
+                aria-label="Dismiss notification"
               >
                 <X size={16} />
               </button>

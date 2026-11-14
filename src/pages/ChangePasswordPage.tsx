@@ -72,6 +72,9 @@ const applyCustomStyling = (element: HTMLElement) => {
   const portalStatusButtons = element.querySelectorAll<HTMLElement>("#success, #error");
   portalStatusButtons.forEach((btn) => btn.remove());
 
+  const portalAlerts = element.querySelectorAll<HTMLElement>(".m-alert, .alert");
+  portalAlerts.forEach((alert) => alert.remove());
+
   const form = element.querySelector<HTMLElement>("#ChangePassword");
   if (form) {
     const isDarkMode = document.documentElement.classList.contains("dark");
@@ -340,13 +343,24 @@ function ChangePasswordPage() {
       }
 
       setAlerts(
-        parsePortalAlerts(targetElement).map((alert) => ({
-          ...alert,
-          message:
-            alert.type !== "error" && /password.*(success|updated|changed)/i.test(alert.message)
+        parsePortalAlerts(targetElement).map((alert) => {
+          const isPasswordSuccess =
+            alert.type !== "error" &&
+            (/password.*(success|updated|changed)/i.test(alert.message) || alert.type === "success");
+          return {
+            ...alert,
+            type: isPasswordSuccess ? ("success" as const) : alert.type,
+            title: isPasswordSuccess
+              ? "Password Updated"
+              : alert.type === "error"
+                ? "Unable to Update Password"
+                : undefined,
+            message: isPasswordSuccess
               ? "Password updated. Now if only GPA worked like that."
               : alert.message,
-        })),
+            dismissible: true,
+          };
+        }),
       );
 
       const portlet = targetElement.querySelector<HTMLElement>(".m-portlet");

@@ -7,8 +7,12 @@ root="$(dirname "$here")"
 out="$here/build"
 if [ -n "${ANDROID_JAR:-}" ] && [ -f "$ANDROID_JAR" ]; then
   jar="$ANDROID_JAR"
+elif [ -n "${ANDROID_HOME:-}" ] && [ -d "$ANDROID_HOME/platforms" ]; then
+  jar="$(ls "$ANDROID_HOME"/platforms/android-*/android.jar 2>/dev/null | tail -n 1)"
+elif [ -n "${ANDROID_SDK_ROOT:-}" ] && [ -d "$ANDROID_SDK_ROOT/platforms" ]; then
+  jar="$(ls "$ANDROID_SDK_ROOT"/platforms/android-*/android.jar 2>/dev/null | tail -n 1)"
 else
-  jar="$(ls /usr/lib/android-sdk/platforms/android-*/android.jar 2>/dev/null | tail -n 1)"
+  jar="$(ls /usr/lib/android-sdk/platforms/android-*/android.jar /usr/local/lib/android/sdk/platforms/android-*/android.jar ~/Android/Sdk/platforms/android-*/android.jar 2>/dev/null | tail -n 1)"
 fi
 if command -v bun >/dev/null 2>&1; then
   version="$(bun -e "console.log(require('$root/package.json').version)")"

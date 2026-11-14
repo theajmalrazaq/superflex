@@ -136,8 +136,8 @@ export const MarksSkeleton = () => {
 
 export const AttendanceSkeleton = () => {
   return (
-    <div className="min-w-0 flex-1 space-y-4" aria-label="Loading attendance heatmap" role="status">
-      <div className="flex flex-wrap items-center justify-between gap-3 text-[11px] sm:text-[10px]">
+    <div className="flex flex-1 flex-col gap-4 min-w-0" aria-label="Loading attendance heatmap" role="status">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 text-[11px] sm:text-[10px]">
         <Skeleton className="h-3 w-56 max-w-[60vw]" />
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
@@ -152,11 +152,11 @@ export const AttendanceSkeleton = () => {
       </div>
       <div className="flex flex-col gap-5 sm:grid sm:max-h-[390px] sm:grid-cols-2 sm:gap-x-4 sm:gap-y-5 sm:overflow-y-auto sm:px-1 sm:pb-0 sm:pr-2 md:grid-cols-3 xl:grid-cols-5">
         {[
-          { mobile: 18, col1: 14, col2: 11, titleW: "w-3/4" },
-          { mobile: 21, col1: 15, col2: 13, titleW: "w-4/5" },
-          { mobile: 16, col1: 13, col2: 9, titleW: "w-2/3" },
-          { mobile: 20, col1: 15, col2: 12, titleW: "w-5/6" },
-          { mobile: 19, col1: 14, col2: 10, titleW: "w-3/4" },
+          { mobile: 18, col1: 12, col2: 9, titleW: "w-3/4" },
+          { mobile: 21, col1: 12, col2: 10, titleW: "w-4/5" },
+          { mobile: 16, col1: 11, col2: 8, titleW: "w-2/3" },
+          { mobile: 20, col1: 12, col2: 11, titleW: "w-5/6" },
+          { mobile: 19, col1: 11, col2: 9, titleW: "w-3/4" },
         ].map((subject, idx) => (
           <div key={idx} className="flex w-full flex-col items-start py-1 sm:min-w-0">
             {/* Mobile: larger 24x24 squares matching AttendanceHeatmap */}
@@ -167,7 +167,7 @@ export const AttendanceSkeleton = () => {
             </div>
 
             {/* Desktop / tablet: stacked vertical columns matching AttendanceHeatmap */}
-            <div className="mb-2 hidden min-h-[180px] flex-row items-end gap-1.5 px-2 py-1 sm:flex">
+            <div className="mb-2 hidden h-[220px] flex-row items-end gap-1.5 px-2 py-1 sm:flex">
               <div className="flex flex-col-reverse gap-1">
                 {Array.from({ length: subject.col1 }, (_, dot) => (
                   <Skeleton key={dot} className="h-3.5 w-3.5 shrink-0 rounded-[3px]" />

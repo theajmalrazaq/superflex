@@ -63,13 +63,31 @@ export function parsePortalAlerts(
     }
 
     if (message.length <= 3) return [];
+    const isError =
+      alert.classList.contains("alert-danger") ||
+      alert.classList.contains("m-alert--danger") ||
+      (includeOutlineDanger && alert.classList.contains("m-alert--outline-danger"));
+    const isSuccess =
+      alert.classList.contains("alert-success") ||
+      alert.classList.contains("m-alert--success") ||
+      alert.classList.contains("m-alert--outline-success") ||
+      /\b(success|successfully|password updated|password changed)\b/i.test(message);
+    const isWarning =
+      alert.classList.contains("alert-warning") ||
+      alert.classList.contains("m-alert--warning") ||
+      alert.classList.contains("m-alert--outline-warning");
+
+    const type: "error" | "success" | "warning" | "info" = isError
+      ? "error"
+      : isSuccess
+        ? "success"
+        : isWarning
+          ? "warning"
+          : "info";
+
     return [
       {
-        type:
-          alert.classList.contains("alert-danger") ||
-          (includeOutlineDanger && alert.classList.contains("m-alert--outline-danger"))
-            ? ("error" as const)
-            : ("info" as const),
+        type,
         message,
       },
     ];

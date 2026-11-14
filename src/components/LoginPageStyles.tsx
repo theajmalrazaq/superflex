@@ -686,26 +686,34 @@ function LoginPageStyles() {
         `;
       }
 
-      const showToast = (message, type = "success") => {
+      const showToast = (message: string, type: "success" | "error" = "success") => {
         const toast = document.createElement("div");
         toast.className =
-          "fixed bottom-10 left-1/2 -translate-x-1/2 z-[99999] px-6 py-3.5 rounded-2xl border flex items-center gap-3 animate-in slide-in-from-bottom-10 duration-300 ease-out transition-all shadow-none";
+          "fixed bottom-10 left-1/2 -translate-x-1/2 z-[99999] px-5 py-3 rounded-2xl border flex items-center gap-3 animate-in slide-in-from-bottom-5 duration-300 ease-out transition-all shadow-lg backdrop-blur-md";
+
+        const isDark =
+          document.documentElement.classList.contains("dark") ||
+          document.body.classList.contains("superflex-login-dark");
 
         if (type === "success") {
-          toast.classList.add("bg-white", "border-slate-200", "text-slate-900");
+          toast.className += isDark
+            ? " bg-[#0c0d12]/95 border-emerald-500/35 text-[#f5f6fb]"
+            : " bg-white/95 border-emerald-500/30 text-[#101027]";
           toast.innerHTML = `
-            <div class="p-1 rounded-full bg-emerald-50 text-emerald-600">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-[28%] ${isDark ? "bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/30" : "bg-emerald-500/10 text-emerald-600 ring-1 ring-emerald-500/20"}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
             </div>
-            <span class="text-xs font-semibold">${message}</span>
+            <span class="text-xs sm:text-[13px] font-semibold tracking-tight">${message}</span>
           `;
         } else {
-          toast.classList.add("bg-white", "border-rose-200", "text-slate-900");
+          toast.className += isDark
+            ? " bg-[#0c0d12]/95 border-rose-500/35 text-[#f5f6fb]"
+            : " bg-white/95 border-rose-500/30 text-[#101027]";
           toast.innerHTML = `
-            <div class="p-1 rounded-full bg-rose-50 text-rose-600">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-[28%] ${isDark ? "bg-rose-500/20 text-rose-400 ring-1 ring-rose-500/30" : "bg-rose-500/10 text-rose-600 ring-1 ring-rose-500/20"}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             </div>
-            <span class="text-xs font-semibold">${message}</span>
+            <span class="text-xs sm:text-[13px] font-semibold tracking-tight">${message}</span>
           `;
         }
 

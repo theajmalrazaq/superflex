@@ -322,7 +322,7 @@ const AttendanceHeatmap = ({ subjects, updatedSubjectKeys = new Set() }) => {
   };
 
   return (
-    <div className="min-w-0 flex-1 space-y-4" aria-label="Attendance by subject">
+    <div className="flex flex-1 flex-col gap-4 min-w-0" aria-label="Attendance by subject">
       <div className="flex flex-wrap items-center justify-between gap-3 text-[11px] text-foreground/55 sm:text-[10px] sm:text-foreground/50">
         <span>Each square represents one class session</span>
         <div className="flex items-center gap-3">
@@ -1195,7 +1195,7 @@ function HomePage() {
                   )}
                 </div>
 
-                <div className="flex h-full flex-col gap-3.5 rounded-[22px] border border-black/[0.05] bg-white p-4 text-slate-900 shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:gap-6 sm:rounded-[24px] sm:p-7 xl:p-8">
+                <div className="flex h-full flex-col gap-3.5 overflow-hidden rounded-[22px] border border-black/[0.05] bg-white p-4 text-slate-900 shadow-none dark:border-white/[0.14] dark:bg-black dark:text-[#f5f6fb] sm:gap-6 sm:rounded-[24px] sm:p-7 xl:p-8">
                   <div className="flex items-center justify-between gap-3 sm:min-h-[52px] sm:gap-4">
                     <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[28%] bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:h-12 sm:w-12">

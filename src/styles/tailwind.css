@@ -569,6 +569,96 @@ h6 {
   right: 12px;
 }
 
+html.dark #toast-container > div,
+body.superflex-login-dark #toast-container > div {
+  background-color: rgba(12, 13, 18, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  color: #f5f6fb !important;
+}
+
+/* SweetAlert & SweetAlert2 Modals (Portal Popups) */
+.swal2-container,
+.sweet-overlay {
+  backdrop-filter: blur(8px) !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  z-index: 999999 !important;
+}
+
+.swal2-popup,
+.sweet-alert {
+  font-family: "Google Sans Flex", sans-serif !important;
+  border-radius: 24px !important;
+  padding: 24px !important;
+  box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.25) !important;
+  background-color: #ffffff !important;
+  color: #101027 !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+html.dark .swal2-popup,
+html.dark .sweet-alert,
+body.superflex-login-dark .swal2-popup,
+body.superflex-login-dark .sweet-alert {
+  background-color: #0c0d12 !important;
+  color: #f5f6fb !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+.swal2-popup .swal2-title,
+.sweet-alert h2 {
+  font-family: "Google Sans Flex", sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+  color: inherit !important;
+}
+
+.swal2-popup .swal2-html-container,
+.sweet-alert p {
+  font-family: "Google Sans Flex", sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 0.9375rem !important;
+  color: inherit !important;
+  opacity: 0.8 !important;
+}
+
+.swal2-popup .swal2-confirm,
+.sweet-alert button.confirm {
+  font-family: "Google Sans Flex", sans-serif !important;
+  font-weight: 600 !important;
+  border-radius: 9999px !important;
+  padding: 10px 24px !important;
+  background-color: #230052 !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+}
+
+html.dark .swal2-popup .swal2-confirm,
+html.dark .sweet-alert button.confirm,
+body.superflex-login-dark .swal2-popup .swal2-confirm,
+body.superflex-login-dark .sweet-alert button.confirm {
+  background-color: #ffffff !important;
+  color: #0a192f !important;
+}
+
+.swal2-popup .swal2-cancel,
+.sweet-alert button.cancel {
+  font-family: "Google Sans Flex", sans-serif !important;
+  font-weight: 600 !important;
+  border-radius: 9999px !important;
+  padding: 10px 24px !important;
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  color: inherit !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+html.dark .swal2-popup .swal2-cancel,
+html.dark .sweet-alert button.cancel {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
 @keyframes border-beam {
   100% {
     offset-distance: 100%;
