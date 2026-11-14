@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +42,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
     static final int LIGHT = -1;
     static final int NIGHT = Color.BLACK;
     static final int PICK = 7;
+    static final long SPLASH_FADE_MS = 600L;
     static final String SPLASH_HOST = "splash.superflex.local";
+    static final long SPLASH_LIMIT_MS = 20000L;
+    static final long SPLASH_MIN_MS = 1400L;
+    static final long SPLASH_SETTLE_MS = 350L;
     Bridge bridge;
     ValueCallback<Uri[]> chooser;
     Task limit;
@@ -56,10 +61,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
     volatile boolean dark = false;
     boolean failed = false;
     boolean hiding = false;
+    boolean revealing = false;
     boolean shown = true;
     boolean started = false;
     int crashes = 0;
     boolean gone = false;
+    long coverAt = 0L;
+    final Runnable splashReveal = new Runnable() {
+        @Override
+        public void run() {
+            MainActivity.this.perform(5);
+        }
+    };
     final Runnable splashHide = new Runnable() {
         @Override
         public void run() {
@@ -91,6 +104,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
     }
 
+    boolean initialdark() {
+        android.content.SharedPreferences prefs = getSharedPreferences("superflex_prefs", MODE_PRIVATE);
+        if (prefs.contains("theme_dark")) {
+            return prefs.getBoolean("theme_dark", false);
+        }
+        return systemdark();
+    }
+
     boolean systemdark() {
         return (getResources().getConfiguration().uiMode & 48) == 32;
     }
@@ -107,16 +128,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     void style(boolean z) {
         int i = z ? NIGHT : LIGHT;
-        getWindow().setStatusBarColor(i);
-        getWindow().setNavigationBarColor(i);
-        int i2 = 0;
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);
+        int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         if (!z) {
-            i2 = 8192;
-            if (Build.VERSION.SDK_INT >= 26) {
-                i2 = 8208;
-            }
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
         }
-        getWindow().getDecorView().setSystemUiVisibility(i2);
+        getWindow().getDecorView().setSystemUiVisibility(flags);
         this.root.setBackgroundColor(i);
         this.webview.setBackgroundColor(i);
         updateSplashTheme(z);
@@ -260,12 +283,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override // android.app.Activity
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        this.dark = systemdark();
+        if (Build.VERSION.SDK_INT >= 28) {
+            android.view.WindowManager.LayoutParams lp = getWindow().getAttributes();
+            lp.layoutInDisplayCutoutMode =
+                    android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+            getWindow().setAttributes(lp);
+        }
+        this.dark = initialdark();
         this.root = new FrameLayout(this);
-        this.root.setFitsSystemWindows(true);
+        this.root.setFitsSystemWindows(false);
         this.bridge = new Bridge(this);
         makeview();
-        this.limit = new Task(this, 1);
+        this.limit = new Task(this, 5);
         this.splash = makesplash();
         this.problem = makeproblem();
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(LIGHT, LIGHT);
@@ -278,11 +307,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         stale();
         this.state = bundle;
         new Thread(new Worker(this)).start();
-        if (bundle != null) {
-            begin();
-        } else {
-            this.splash.postDelayed(new Task(this, 3), 4000L);
-        }
+        begin();
         cover();
     }
 
@@ -295,12 +320,25 @@ public class MainActivity extends Activity implements View.OnClickListener {
         webView.setWebChromeClient(new Chrome(this));
         webView.setDownloadListener(new Loader(this));
         webView.setBackgroundColor(this.dark ? NIGHT : LIGHT);
+        webView.setVerticalScrollBarEnabled(false);
+        webView.setHorizontalScrollBarEnabled(false);
         return webView;
+    }
+
+    @Override // android.app.Activity
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && this.root != null && this.webview != null) {
+            style(this.dark);
+        }
     }
 
     @Override
     public void onConfigurationChanged(android.content.res.Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        if (getSharedPreferences("superflex_prefs", MODE_PRIVATE).contains("theme_dark")) {
+            return;
+        }
         boolean isDark = systemdark();
         if (this.dark != isDark) {
             this.dark = isDark;
@@ -319,18 +357,25 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     void cover() {
         if (this.splash != null) {
-            this.dark = systemdark();
+            boolean fresh = this.coverAt == 0L || this.splash.getVisibility() != View.VISIBLE || this.hiding;
             this.hiding = false;
+            this.revealing = false;
             this.shown = true;
+            if (fresh) {
+                this.coverAt = SystemClock.elapsedRealtime();
+            }
             style(this.dark);
             this.splash.removeCallbacks(this.splashHide);
+            this.splash.removeCallbacks(this.splashReveal);
             this.splash.removeCallbacks(this.limit);
-            this.splash.evaluateJavascript(
-                "if (window.setTheme) window.setTheme(" + this.dark + "); if (window.resetSplash) window.resetSplash();",
-                null
-            );
-            this.splash.setVisibility(View.VISIBLE);
-            this.splash.postDelayed(this.limit, 9000L);
+            if (fresh) {
+                this.splash.evaluateJavascript(
+                    "if (window.setTheme) window.setTheme(" + this.dark + "); if (window.resetSplash) window.resetSplash();",
+                    null
+                );
+                this.splash.setVisibility(View.VISIBLE);
+            }
+            this.splash.postDelayed(this.limit, SPLASH_LIMIT_MS);
         }
     }
 
@@ -405,12 +450,31 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     void perform(int i) {
         if (i == 1) {
+            if (!this.failed && this.splash != null && this.splash.getVisibility() == View.VISIBLE && !this.hiding && !this.revealing) {
+                this.revealing = true;
+                long elapsed = SystemClock.elapsedRealtime() - this.coverAt;
+                long waitMs = Math.max(SPLASH_SETTLE_MS, SPLASH_MIN_MS - elapsed);
+                this.splash.removeCallbacks(this.splashReveal);
+                this.splash.postDelayed(this.splashReveal, waitMs);
+            }
+            return;
+        }
+        if (i == 5) {
             if (!this.failed && this.splash != null && this.splash.getVisibility() == View.VISIBLE && !this.hiding) {
                 this.hiding = true;
+                this.revealing = false;
                 this.shown = false;
-                this.splash.evaluateJavascript("if (window.fadeOutSplash) window.fadeOutSplash();", null);
+                this.splash.removeCallbacks(this.splashReveal);
+                this.splash.removeCallbacks(this.limit);
                 this.splash.removeCallbacks(this.splashHide);
-                this.splash.postDelayed(this.splashHide, 600L);
+                if (this.webview != null) {
+                    this.webview.evaluateJavascript(
+                        "if (document.body) { document.body.classList.add('!visible'); document.body.style.setProperty('visibility', 'visible', 'important'); }",
+                        null
+                    );
+                }
+                this.splash.evaluateJavascript("if (window.fadeOutSplash) window.fadeOutSplash();", null);
+                this.splash.postDelayed(this.splashHide, SPLASH_FADE_MS);
             }
             return;
         }
@@ -428,8 +492,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
     void offline() {
         this.failed = true;
         this.hiding = false;
+        this.revealing = false;
         this.webview.stopLoading();
         if (this.splash != null) {
+            this.splash.removeCallbacks(this.splashReveal);
+            this.splash.removeCallbacks(this.limit);
             this.splash.removeCallbacks(this.splashHide);
             this.splash.setVisibility(View.GONE);
         }

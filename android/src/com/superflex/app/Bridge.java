@@ -39,6 +39,12 @@ public class Bridge {
     }
 
     @JavascriptInterface
+    public void loading() {
+        if (!trusted) return;
+        owner.runOnUiThread(new Task(owner, 4));
+    }
+
+    @JavascriptInterface
     public void ready() {
         if (!trusted) return;
         owner.runOnUiThread(new Task(owner, 1));
@@ -48,6 +54,10 @@ public class Bridge {
     public void theme(boolean dark) {
         if (!trusted) return;
         owner.dark = dark;
+        owner.getSharedPreferences("superflex_prefs", android.content.Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean("theme_dark", dark)
+                .apply();
         owner.runOnUiThread(new Task(owner, 2));
     }
 

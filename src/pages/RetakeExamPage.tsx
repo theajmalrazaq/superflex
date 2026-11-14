@@ -538,7 +538,7 @@ function RetakeExamPage() {
           <button
             type="button"
             onClick={() => setIsInstructionsOpen(true)}
-            className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-xs font-bold text-[#101027] transition-colors hover:bg-white/90 dark:bg-white/10 dark:text-white sm:gap-2 sm:bg-white/55 sm:px-4 sm:py-2.5 sm:text-[#230052]"
+            className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white/55 px-3.5 py-2 text-xs font-bold text-[#230052] backdrop-blur-xl transition-colors hover:bg-white/80 dark:bg-black/25 dark:text-white dark:hover:bg-white/10 sm:gap-2 sm:px-4 sm:py-2.5"
           >
             <Shield size={14} /> Rules &amp; procedures
           </button>

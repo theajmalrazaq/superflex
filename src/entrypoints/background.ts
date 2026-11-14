@@ -146,13 +146,28 @@ const isHighDemandOrUnavailable = (status, errMsg = "") => {
   );
 };
 
+const adaptPayloadForModel = (modelId, payload) => {
+  if (!payload || typeof payload !== "object") return payload;
+  const cleanId = String(modelId || "").toLowerCase();
+  const targetMax = cleanId.includes("2.5") || cleanId.includes("3.") ? 16384 : 8192;
+  const currentMax = payload.generationConfig?.maxOutputTokens;
+  return {
+    ...payload,
+    generationConfig: {
+      ...payload.generationConfig,
+      maxOutputTokens: currentMax ? Math.max(currentMax, targetMax) : targetMax,
+    },
+  };
+};
+
 const callGeminiGenerateContent = async (modelId, apiKey, payload) => {
   const cleanId = modelId.startsWith("models/") ? modelId.slice(7) : modelId;
   const url = `${GEMINI_API_BASE}/${cleanId}:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const adaptedPayload = adaptPayloadForModel(cleanId, payload);
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(adaptedPayload),
   });
   const parsed = geminiResponseSchema.safeParse(await res.json().catch(() => null));
   if (!parsed.success)
@@ -167,10 +182,11 @@ const callGeminiGenerateContent = async (modelId, apiKey, payload) => {
 const streamGeminiContent = async (modelId, apiKey, payload, onChunk) => {
   const cleanId = modelId.startsWith("models/") ? modelId.slice(7) : modelId;
   const url = `${GEMINI_API_BASE}/${cleanId}:streamGenerateContent?alt=sse&key=${encodeURIComponent(apiKey)}`;
+  const adaptedPayload = adaptPayloadForModel(cleanId, payload);
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(adaptedPayload),
   });
 
   if (!res.ok) {

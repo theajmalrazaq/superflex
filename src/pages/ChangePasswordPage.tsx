@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { parsePortalAlerts } from "../parsers/dom";
+import type { PortalAlert } from "../parsers/types";
 import PageLayout from "../components/layouts/PageLayout";
 import NotificationBanner from "../components/ui/NotificationBanner";
 import Skeleton from "../components/ui/Skeleton";
 
 const ChangePasswordSkeleton = () => (
-  <main
-    className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1680px] flex-col justify-center gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8"
+  <div
+    className="mx-auto flex w-full max-w-[480px] flex-col items-center justify-center"
     role="status"
     aria-label="Loading security settings"
   >
-    <div className="mx-auto w-full max-w-[480px] space-y-5 rounded-2xl bg-white p-5 dark:bg-black sm:rounded-[32px] sm:p-8">
-      <Skeleton className="h-12 w-12 rounded-[28%]" />
-      <Skeleton className="h-6 w-48" />
-      <Skeleton className="h-4 w-72 max-w-full" />
+    <div className="w-full max-w-[480px] space-y-5 rounded-2xl bg-white p-5 dark:bg-black sm:rounded-[32px] sm:p-8">
+      <Skeleton className="mx-auto h-12 w-12 rounded-[28%]" />
+      <Skeleton className="mx-auto h-6 w-48" />
+      <Skeleton className="mx-auto h-4 w-72 max-w-full" />
       {[0, 1, 2].map((item) => (
         <div key={item} className="space-y-2">
           <Skeleton className="h-3 w-28" />
@@ -22,7 +23,7 @@ const ChangePasswordSkeleton = () => (
       ))}
       <Skeleton className="h-12 w-full rounded-full" />
     </div>
-  </main>
+  </div>
 );
 
 const applyCustomStyling = (element: HTMLElement) => {
@@ -46,11 +47,10 @@ const applyCustomStyling = (element: HTMLElement) => {
       "m-portlet--head-solid-bg",
       "m-portlet--bordered",
       "m-portlet--head-sm",
-      "m-portlet",
     );
     portlet.style.setProperty("width", "100%", "important");
     portlet.style.setProperty("max-width", "480px", "important");
-    portlet.style.setProperty("margin-inline", "auto", "important");
+    portlet.style.setProperty("margin", "0 auto", "important");
   }
 
   const portletHead = element.querySelector<HTMLElement>(".m-portlet__head");
@@ -99,11 +99,14 @@ const applyCustomStyling = (element: HTMLElement) => {
     const inputsContainer = document.createElement("div");
     inputsContainer.classList.add("flex", "flex-col", "gap-4", "w-full");
 
-    const formRows = form.querySelectorAll<HTMLElement>(".form-group.m-form__group.row");
+    let formRows = Array.from(form.querySelectorAll<HTMLElement>(".form-group.m-form__group.row"));
+    if (formRows.length === 0) {
+      formRows = Array.from(form.querySelectorAll<HTMLElement>(".form-group, .m-form__group"));
+    }
     const extractedInputs = [];
 
     formRows.forEach((row) => {
-      const inputContainer = row.querySelector<HTMLElement>(".m-input-icon");
+      const inputContainer = row.querySelector<HTMLElement>(".m-input-icon") || row;
       const label = row.querySelector<HTMLElement>("label");
 
       if (inputContainer) {
@@ -234,17 +237,30 @@ const applyCustomStyling = (element: HTMLElement) => {
 
     formColumn.appendChild(inputsContainer);
 
-    const buttonRow = form.querySelector<HTMLElement>(".row:not(.form-group)");
+    let buttonRow = form.querySelector<HTMLElement>(".row:not(.form-group)");
+    if (!buttonRow) {
+      const submitBtn = form.querySelector<HTMLElement>(
+        "button#submit, input#submit, button[type='submit']",
+      );
+      buttonRow =
+        submitBtn?.closest<HTMLElement>(".row, .form-group, .m-portlet__foot") ||
+        submitBtn?.parentElement ||
+        null;
+    }
+
     if (buttonRow) {
       const clonedBtnRow = buttonRow.cloneNode(true) as HTMLElement;
       buttonRow.remove();
 
       clonedBtnRow.classList.add("!mt-8", "flex");
       clonedBtnRow
-        .querySelectorAll<HTMLElement>(".col-lg-12")
+        .querySelectorAll<HTMLElement>(".col-lg-12, .col-12, [class*='col-']")
         .forEach((col) => (col.className = "w-full"));
 
-      const submitButton = clonedBtnRow.querySelector<HTMLElement>("button#submit");
+      const submitButton =
+        clonedBtnRow.querySelector<HTMLElement>(
+          "button#submit, input#submit, button[type='submit']",
+        ) || clonedBtnRow.querySelector<HTMLElement>("button");
       if (submitButton) {
         submitButton.innerHTML = "";
 
@@ -306,8 +322,8 @@ const applyCustomStyling = (element: HTMLElement) => {
 };
 
 function ChangePasswordPage() {
-  const [elemContent, setElemContent] = useState(null);
-  const [alerts, setAlerts] = useState([]);
+  const [elemContent, setElemContent] = useState<string | null>(null);
+  const [alerts, setAlerts] = useState<PortalAlert[]>([]);
 
   useEffect(() => {
     let active = true;
@@ -333,9 +349,18 @@ function ChangePasswordPage() {
         })),
       );
 
+      const portlet = targetElement.querySelector<HTMLElement>(".m-portlet");
+      const form = targetElement.querySelector<HTMLElement>("#ChangePassword");
+
       applyCustomStyling(targetElement);
 
-      setElemContent(targetElement.innerHTML);
+      const cardElement =
+        (portlet && form ? (portlet.contains(form) ? portlet : form) : portlet || form) ||
+        targetElement;
+
+      setElemContent(
+        cardElement === targetElement ? targetElement.innerHTML : cardElement.outerHTML,
+      );
       targetElement.remove();
     };
 
@@ -348,18 +373,22 @@ function ChangePasswordPage() {
   }, []);
 
   return (
-    <PageLayout currentPage={window.location.pathname} fullWidth>
-      <main className="relative z-10 mx-auto flex min-h-screen w-full max-w-[1680px] flex-col justify-center gap-7 px-4 py-6 font-sans sm:px-6 lg:px-8 lg:py-8">
-        {alerts.length > 0 && <NotificationBanner alerts={alerts} />}
+    <PageLayout currentPage={window.location.pathname} centered fullWidth>
+      <div className="relative z-10 mx-auto flex min-h-[calc(100dvh-5rem)] lg:min-h-screen w-full flex-col items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
+        {alerts.length > 0 && (
+          <div className="mb-4 w-full max-w-[480px]">
+            <NotificationBanner alerts={alerts} />
+          </div>
+        )}
         {elemContent ? (
           <div
-            className="mx-auto w-full max-w-[480px] animate-in fade-in duration-500"
+            className="flex w-full max-w-[480px] justify-center animate-in fade-in duration-500"
             dangerouslySetInnerHTML={{ __html: elemContent }}
           />
         ) : (
           <ChangePasswordSkeleton />
         )}
-      </main>
+      </div>
     </PageLayout>
   );
 }

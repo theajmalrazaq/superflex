@@ -7,6 +7,7 @@ interface PageLayoutProps {
   onAttendanceLinkFound?: (href: string) => void;
   onLinksFound?: (links: z.infer<typeof sidebarLinkSchema>[]) => void;
   fullWidth?: boolean;
+  centered?: boolean;
 }
 
 import React from "react";
@@ -20,6 +21,7 @@ function PageLayout({
   onAttendanceLinkFound,
   onLinksFound,
   fullWidth = false,
+  centered = false,
 }: PageLayoutProps) {
   const customBackground = usePreferencesStore((state) => state.customBackground);
   const customUrl = customBackground.url;
@@ -73,9 +75,9 @@ function PageLayout({
       />
 
       <main
-        className={`relative z-10 min-h-screen overflow-x-hidden lg:ml-[276px] ${
-          fullWidth ? "pb-24 lg:pb-0" : "px-4 pb-24 pt-2 sm:px-6 sm:py-6 lg:px-8 lg:py-8"
-        }`}
+        className={`relative z-10 min-h-screen overflow-x-hidden ${
+          centered ? "lg:ml-0" : "lg:ml-[276px]"
+        } ${fullWidth ? "pb-24 lg:pb-0" : "px-4 pb-24 pt-2 sm:px-6 sm:py-6 lg:px-8 lg:py-8"}`}
       >
         {children}
       </main>

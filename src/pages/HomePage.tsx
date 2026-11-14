@@ -776,7 +776,7 @@ function HomePage() {
       fullWidth={true}
     >
       <div className="relative">
-        <div className="relative z-10 mx-auto w-full max-w-[1680px] space-y-5 px-4 pb-6 pt-4 sm:space-y-7 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+        <div className="relative z-10 mx-auto w-full max-w-[1680px] space-y-5 px-4 pb-6 pt-[max(1.75rem,env(safe-area-inset-top))] sm:space-y-7 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
           {/* Mobile App Hero Header (Overview vs Profile) */}
           {activeMainTab === "stats" ? (
             <header className="pb-1 pt-1 sm:hidden">

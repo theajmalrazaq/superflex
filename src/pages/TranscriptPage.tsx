@@ -688,11 +688,11 @@ function TranscriptPage() {
               Four years of questionable decisions, beautifully documented.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex w-full items-center gap-2 overflow-x-auto pb-1 scrollbar-hide xl:w-auto xl:flex-wrap xl:pb-0">
             <button
               type="button"
               onClick={() => setIsPlannerOpen(true)}
-              className="flex items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-xs font-bold text-[#101027] transition-colors hover:bg-white/90 dark:bg-white/10 dark:text-white sm:gap-2 sm:bg-white/55 sm:px-4 sm:py-2.5 sm:text-[#230052]"
+              className="flex shrink-0 items-center gap-1.5 rounded-full bg-white/55 px-3.5 py-2 text-xs font-bold text-[#230052] backdrop-blur-xl transition-colors hover:bg-white/80 dark:bg-black/25 dark:text-white dark:hover:bg-white/10 sm:gap-2 sm:px-4 sm:py-2.5"
             >
               <Target size={14} />
               Strategic planner
@@ -700,7 +700,7 @@ function TranscriptPage() {
             <button
               type="button"
               onClick={() => setIsMCALookupOpen(true)}
-              className="flex items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-xs font-bold text-[#101027] transition-colors hover:bg-white/90 dark:bg-white/10 dark:text-white sm:gap-2 sm:bg-white/55 sm:px-4 sm:py-2.5 sm:text-[#230052]"
+              className="flex shrink-0 items-center gap-1.5 rounded-full bg-white/55 px-3.5 py-2 text-xs font-bold text-[#230052] backdrop-blur-xl transition-colors hover:bg-white/80 dark:bg-black/25 dark:text-white dark:hover:bg-white/10 sm:gap-2 sm:px-4 sm:py-2.5"
             >
               <Scale size={14} />
               MCA lookup
@@ -712,7 +712,7 @@ function TranscriptPage() {
                   ? (setOverriddenGrades({}), setSimulationMode(false))
                   : setSimulationMode(true)
               }
-              className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-bold transition-colors sm:gap-2 sm:px-4 sm:py-2.5 ${simulationMode ? "bg-amber-500 text-white" : "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f] sm:bg-white/55 sm:text-[#230052]"}`}
+              className={`flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-bold transition-colors sm:gap-2 sm:px-4 sm:py-2.5 ${simulationMode ? "bg-amber-500 text-white" : "bg-white/55 text-[#230052] backdrop-blur-xl hover:bg-white/80 dark:bg-black/25 dark:text-white dark:hover:bg-white/10"}`}
               title={
                 simulationMode ? "Exit simulation and restore grades" : "Enable grade simulation"
               }

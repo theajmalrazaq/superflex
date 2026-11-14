@@ -33,12 +33,20 @@ export const geminiModelListSchema = z.object({
     }),
   ),
 });
-const textPartSchema = z.object({ text: z.optional(z.string()) });
-export const geminiResponseSchema = z.object({
+const textPartSchema = z.looseObject({
+  text: z.optional(z.string()),
+  thought: z.optional(z.boolean()),
+});
+export const geminiResponseSchema = z.looseObject({
   candidates: z.optional(
-    z.array(z.object({ content: z.optional(z.object({ parts: z.array(textPartSchema) })) })),
+    z.array(
+      z.looseObject({
+        content: z.optional(z.looseObject({ parts: z.array(textPartSchema) })),
+        finishReason: z.optional(z.string()),
+      }),
+    ),
   ),
-  error: z.optional(z.object({ message: z.string() })),
+  error: z.optional(z.looseObject({ message: z.string() })),
 });
 const contentSchema = z.object({
   role: z.enum(["user", "model"]),
@@ -79,7 +87,10 @@ export const extensionRequestSchema = z.discriminatedUnion("type", [
 export function getGeminiText(value: unknown): string {
   const parsed = geminiResponseSchema.safeParse(value);
   return parsed.success
-    ? parsed.data.candidates?.[0]?.content?.parts.map((part) => part.text || "").join("") || ""
+    ? parsed.data.candidates?.[0]?.content?.parts
+        .filter((part) => !part.thought)
+        .map((part) => part.text || "")
+        .join("") || ""
     : "";
 }
 

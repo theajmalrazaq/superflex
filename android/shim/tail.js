@@ -7,12 +7,19 @@ function pushtheme() {
 }
 
 function revealnow() {
-  if (window.SFNative) window.SFNative.ready();
   pushtheme();
+  if (
+    window.SFNative &&
+    document.body &&
+    document.body.classList.contains("!visible")
+  ) {
+    window.SFNative.ready();
+  }
 }
 
 new MutationObserver(pushtheme).observe(document.documentElement, {
   attributes: true,
   attributeFilter: ["class"],
 });
-setTimeout(revealnow, 700);
+pushtheme();
+setTimeout(revealnow, 1500);

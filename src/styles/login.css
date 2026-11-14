@@ -418,6 +418,203 @@ body.superflex-login-page #login-popup .m-form__actions {
   margin-top: 8px !important;
 }
 
+body.superflex-login-page #superflex-remember-me-container {
+  width: 100% !important;
+  margin-top: 4px !important;
+  margin-bottom: 14px !important;
+  padding: 0 4px !important;
+  box-sizing: border-box;
+}
+
+body.superflex-login-page .login-remember-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  gap: 12px !important;
+  user-select: none !important;
+}
+
+body.superflex-login-page .login-remember-label {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  margin: 0 !important;
+  padding: 2px 0 !important;
+}
+
+body.superflex-login-page .login-checkbox-wrap {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  height: 20px !important;
+  flex: none !important;
+}
+
+body.superflex-login-page .login-remember-input {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  z-index: 2 !important;
+}
+
+body.superflex-login-page .login-checkbox-control {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 6px !important;
+  border: 1.5px solid #d1d5db !important;
+  background: #ffffff !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 5%) !important;
+  transition:
+    background-color 160ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 160ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 160ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 120ms ease !important;
+}
+
+body.superflex-login-page .login-remember-label:hover .login-checkbox-control {
+  border-color: #230052 !important;
+  background: #f8fafc !important;
+}
+
+body.superflex-login-page .login-remember-label:active .login-checkbox-control {
+  transform: scale(0.92) !important;
+}
+
+body.superflex-login-page .login-remember-input:focus-visible + .login-checkbox-control {
+  outline: 2px solid #230052 !important;
+  outline-offset: 2px !important;
+}
+
+body.superflex-login-page .login-remember-input:checked + .login-checkbox-control {
+  background: #230052 !important;
+  border-color: #230052 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgb(35 0 82 / 24%) !important;
+}
+
+body.superflex-login-page .login-checkbox-icon {
+  display: block !important;
+  width: 12px !important;
+  height: 12px !important;
+  stroke: currentColor !important;
+  stroke-dasharray: 18 !important;
+  stroke-dashoffset: 18 !important;
+  opacity: 0 !important;
+  transform: scale(0.65) !important;
+  transition:
+    stroke-dashoffset 180ms ease-out 30ms,
+    opacity 140ms ease-out,
+    transform 160ms cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+body.superflex-login-page .login-remember-input:checked + .login-checkbox-control .login-checkbox-icon {
+  stroke-dashoffset: 0 !important;
+  opacity: 1 !important;
+  transform: scale(1) !important;
+}
+
+body.superflex-login-page .login-remember-text {
+  font-family: 'Google Sans Flex', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+  color: #334155 !important;
+  transition: color 150ms ease !important;
+  line-height: 1 !important;
+}
+
+body.superflex-login-page .login-remember-label:hover .login-remember-text {
+  color: #0f172a !important;
+}
+
+body.superflex-login-page .login-encrypted-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 3px 8px !important;
+  border-radius: 999px !important;
+  font-family: 'Google Sans Flex', sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  letter-spacing: 0.01em !important;
+  background: rgb(35 0 82 / 5%) !important;
+  border: 1px solid rgb(35 0 82 / 10%) !important;
+  color: #230052 !important;
+  user-select: none !important;
+  transition: background-color 150ms ease, border-color 150ms ease !important;
+}
+
+body.superflex-login-page .login-encrypted-pill svg {
+  display: block !important;
+  flex: none !important;
+}
+
+body.superflex-login-page.superflex-login-dark .login-checkbox-control,
+html.dark body.superflex-login-page .login-checkbox-control {
+  border-color: rgb(255 255 255 / 22%) !important;
+  background: rgb(255 255 255 / 6%) !important;
+  box-shadow: none !important;
+}
+
+body.superflex-login-page.superflex-login-dark .login-remember-label:hover .login-checkbox-control,
+html.dark body.superflex-login-page .login-remember-label:hover .login-checkbox-control {
+  border-color: rgb(255 255 255 / 45%) !important;
+  background: rgb(255 255 255 / 10%) !important;
+}
+
+body.superflex-login-page.superflex-login-dark .login-remember-input:focus-visible + .login-checkbox-control,
+html.dark body.superflex-login-page .login-remember-input:focus-visible + .login-checkbox-control {
+  outline: 2px solid #ffffff !important;
+  outline-offset: 2px !important;
+}
+
+body.superflex-login-page.superflex-login-dark .login-remember-input:checked + .login-checkbox-control,
+html.dark body.superflex-login-page .login-remember-input:checked + .login-checkbox-control {
+  background: #ffffff !important;
+  border-color: #ffffff !important;
+  color: #0a192f !important;
+  box-shadow: 0 2px 8px rgb(255 255 255 / 20%) !important;
+}
+
+body.superflex-login-page.superflex-login-dark .login-remember-text,
+html.dark body.superflex-login-page .login-remember-text {
+  color: #cbd5e1 !important;
+}
+
+body.superflex-login-page.superflex-login-dark .login-remember-label:hover .login-remember-text,
+html.dark body.superflex-login-page .login-remember-label:hover .login-remember-text {
+  color: #ffffff !important;
+}
+
+body.superflex-login-page.superflex-login-dark .login-encrypted-pill,
+html.dark body.superflex-login-page .login-encrypted-pill {
+  background: rgb(255 255 255 / 8%) !important;
+  border-color: rgb(255 255 255 / 12%) !important;
+  color: #c4cad6 !important;
+}
+
+body.superflex-login-page.superflex-login-dark .login-encrypted-pill:hover,
+html.dark body.superflex-login-page .login-encrypted-pill:hover {
+  background: rgb(255 255 255 / 12%) !important;
+  color: #ffffff !important;
+}
+
 body.superflex-login-page .cf-turnstile {
   display: flex !important;
   width: 100% !important;
@@ -757,6 +954,25 @@ body.superflex-login-page.superflex-login-dark #login-popup .input-group button 
   color: #c1baff !important;
 }
 
+html.dark body.superflex-login-page #login-popup .m-alert,
+html.dark body.superflex-login-page #login-popup .alert,
+html.dark body.superflex-login-page #forgot-password-popup .m-alert,
+html.dark body.superflex-login-page #forgot-password-popup .alert,
+body.superflex-login-page.superflex-login-dark #login-popup .m-alert,
+body.superflex-login-page.superflex-login-dark #login-popup .alert,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .m-alert,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .alert,
+html.dark body.superflex-login-page #login-popup .m-alert *,
+html.dark body.superflex-login-page #login-popup .alert *,
+html.dark body.superflex-login-page #forgot-password-popup .m-alert *,
+html.dark body.superflex-login-page #forgot-password-popup .alert *,
+body.superflex-login-page.superflex-login-dark #login-popup .m-alert *,
+body.superflex-login-page.superflex-login-dark #login-popup .alert *,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .m-alert *,
+body.superflex-login-page.superflex-login-dark #forgot-password-popup .alert * {
+  color: #fff !important;
+}
+
 body.superflex-login-page.superflex-login-dark .login-outer-footer a,
 body.superflex-login-page.superflex-login-dark .login-theme-toggle {
   color: #d3d9e6 !important;
@@ -1042,4 +1258,19 @@ body.superflex-login-page.superflex-login-dark #forgot-password-popup .forgot-pa
     height: 46px !important;
     font-size: 14px !important;
   }
+}
+
+html,
+body,
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }

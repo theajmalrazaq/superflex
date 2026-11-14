@@ -7,13 +7,24 @@ const LoadingOverlay = ({ show = true }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let fallbackTimer: ReturnType<typeof setTimeout> | null = null;
+
     const handleCustomLoading = (e) => {
-      if (typeof e.detail === "boolean") {
-        setLoading(e.detail);
-        if (e.detail) setIsVisible(true);
-      } else if (e.detail?.isLoading !== undefined) {
-        setLoading(e.detail.isLoading);
-        if (e.detail.isLoading) setIsVisible(true);
+      const next =
+        typeof e.detail === "boolean"
+          ? e.detail
+          : e.detail?.isLoading !== undefined
+            ? Boolean(e.detail.isLoading)
+            : null;
+      if (next === null) return;
+      if (fallbackTimer) {
+        clearTimeout(fallbackTimer);
+        fallbackTimer = null;
+      }
+      setLoading(next);
+      if (next) {
+        setIsVisible(true);
+        fallbackTimer = setTimeout(() => setLoading(false), 10000);
       }
     };
 
@@ -31,6 +42,7 @@ const LoadingOverlay = ({ show = true }) => {
 
     return () => {
       clearTimeout(timer);
+      if (fallbackTimer) clearTimeout(fallbackTimer);
       window.removeEventListener("load", handleLoad);
       window.removeEventListener("superflex-update-loading", handleCustomLoading);
     };

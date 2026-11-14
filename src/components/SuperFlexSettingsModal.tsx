@@ -214,25 +214,29 @@ function SuperFlexSettingsForm({
           </div>
         ) : (
           <div className="mt-3.5 flex items-center gap-2">
-            <span
-              className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${
+            <button
+              type="button"
+              onClick={() => setStep(1)}
+              className={`flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold transition-colors cursor-pointer ${
                 step === 1
                   ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"
-                  : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  : "bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/15 dark:text-emerald-400"
               }`}
             >
               {step > 1 && <Check size={12} strokeWidth={3} />} 1. Teachers
-            </span>
+            </button>
             <span className="text-foreground/30">→</span>
-            <span
-              className={`flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${
+            <button
+              type="button"
+              onClick={() => setStep(2)}
+              className={`flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold transition-colors cursor-pointer ${
                 step === 2
                   ? "bg-[#230052] text-white dark:bg-white dark:text-[#0a192f]"
-                  : "bg-slate-100 text-slate-500 dark:bg-white/10 dark:text-white/50"
+                  : "bg-slate-100 text-slate-500 hover:text-slate-800 dark:bg-white/10 dark:text-white/50 dark:hover:text-white"
               }`}
             >
               2. Octopus AI
-            </span>
+            </button>
           </div>
         )}
       </header>
@@ -739,43 +743,36 @@ function SuperFlexSettingsForm({
       </div>
 
       {}
-      <footer className="flex shrink-0 items-center justify-between gap-3 border-t border-black/[0.06] px-6 py-3.5 sm:px-8 sm:py-4 dark:border-white/[0.08]">
+      <footer className="flex shrink-0 items-center justify-between gap-3 border-t border-black/[0.06] px-5 py-3.5 sm:px-8 sm:py-4 dark:border-white/[0.08]">
         {mode === "setup" ? (
           <>
             {step === 1 ? (
-              <div className="flex items-center gap-3">
-                {courseIndex > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCourseIndex((i) => Math.max(0, i - 1));
-                      setQuery("");
-                    }}
-                    className="flex items-center gap-1 text-xs font-bold text-foreground/70 hover:text-foreground cursor-pointer"
-                  >
-                    <ArrowLeft size={13} /> Prev Course
-                  </button>
-                )}
+              courseIndex > 0 ? (
                 <button
                   type="button"
-                  onClick={() => setStep(2)}
-                  className="text-xs font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white cursor-pointer"
+                  onClick={() => {
+                    setCourseIndex((i) => Math.max(0, i - 1));
+                    setQuery("");
+                  }}
+                  className="flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-bold text-foreground/70 hover:text-foreground cursor-pointer"
                 >
-                  {Object.keys(selections).length > 0 ? "Skip to Octopus AI" : "Skip Teachers"}
+                  <ArrowLeft size={13} /> Prev Course
                 </button>
-              </div>
+              ) : (
+                <div />
+              )
             ) : (
               <button
                 type="button"
                 onClick={() => setStep(1)}
-                className="flex items-center gap-1 text-xs font-bold text-foreground/70 hover:text-foreground cursor-pointer"
+                className="flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-bold text-foreground/70 hover:text-foreground cursor-pointer"
               >
-                <ArrowLeft size={13} /> Back to Teachers
+                <ArrowLeft size={13} /> Back<span className="hidden sm:inline"> to Teachers</span>
               </button>
             )}
 
             {step === 1 ? (
-              <div className="flex items-center gap-2">
+              <div className="flex shrink-0 items-center gap-2">
                 {courseIndex < courses.length - 1 ? (
                   <button
                     type="button"
@@ -783,7 +780,7 @@ function SuperFlexSettingsForm({
                       setCourseIndex((i) => Math.min(courses.length - 1, i + 1));
                       setQuery("");
                     }}
-                    className="flex items-center gap-1.5 rounded-full bg-[#230052] px-5 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 shadow-xs cursor-pointer"
+                    className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-[#230052] px-5 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 shadow-xs cursor-pointer"
                   >
                     Next Course <ArrowRight size={13} />
                   </button>
@@ -791,7 +788,7 @@ function SuperFlexSettingsForm({
                   <button
                     type="button"
                     onClick={() => setStep(2)}
-                    className="flex items-center gap-1.5 rounded-full bg-[#230052] px-5 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 shadow-xs cursor-pointer"
+                    className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-[#230052] px-5 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 shadow-xs cursor-pointer"
                   >
                     Next: Octopus AI <ArrowRight size={13} />
                   </button>
@@ -801,7 +798,7 @@ function SuperFlexSettingsForm({
               <button
                 type="button"
                 onClick={onSave}
-                className="flex items-center gap-1.5 rounded-full bg-[#230052] px-6 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 shadow-xs cursor-pointer"
+                className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-[#230052] px-5 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 shadow-xs cursor-pointer sm:px-6"
               >
                 Complete Setup & Launch
               </button>
@@ -818,7 +815,7 @@ function SuperFlexSettingsForm({
                       setCourseIndex((i) => Math.max(0, i - 1));
                       setQuery("");
                     }}
-                    className="flex items-center gap-1 text-xs font-bold text-foreground/70 hover:text-foreground cursor-pointer"
+                    className="flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-bold text-foreground/70 hover:text-foreground cursor-pointer"
                   >
                     <ArrowLeft size={13} /> Prev
                   </button>
@@ -830,7 +827,7 @@ function SuperFlexSettingsForm({
                       setCourseIndex((i) => Math.min(courses.length - 1, i + 1));
                       setQuery("");
                     }}
-                    className="flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-slate-100 px-4 py-2 text-xs font-bold text-foreground hover:bg-slate-200 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/20 cursor-pointer"
+                    className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-black/[0.08] bg-slate-100 px-4 py-2 text-xs font-bold text-foreground hover:bg-slate-200 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/20 cursor-pointer"
                   >
                     Next Course <ArrowRight size={13} />
                   </button>
@@ -842,7 +839,7 @@ function SuperFlexSettingsForm({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-full bg-[#230052] px-5 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 cursor-pointer"
+              className="shrink-0 whitespace-nowrap rounded-full bg-[#230052] px-5 py-2 text-xs font-bold text-white transition-all hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f] dark:hover:bg-white/80 cursor-pointer"
             >
               Done
             </button>

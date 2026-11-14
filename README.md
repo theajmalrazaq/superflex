@@ -79,7 +79,7 @@ SuperFlex runs on the client side. It has no SuperFlex backend, analytics pipeli
 - Grade change
 - Fee details and fee challan
 - Retake exam
-- Change password and session-expiry screens
+- Change password and automatic session-expiry redirection
 
 ## Privacy and security
 

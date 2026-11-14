@@ -63,7 +63,34 @@ Strict Output Rules:
    - 1 Credit Hour course (Labs): Maximum 3 leaves (absents) allowed. 4th absence causes debarment (failing grade / F).
    - State leaves taken out of total allowed and safe remaining leaves. If close to or over the limit, give an urgent warning.
 
-6. Output Formatting Guidelines:
+6. Rigorous CGPA, SGPA & Target GPA Calculations:
+   - FAST-NUCES and university GPA uses the Quality Points (Grade Points) formula:
+     * Quality Points = Grade Points per Credit × Course Credit Hours
+     * Current Total Quality Points = Current CGPA × Total Earned Credit Hours
+     * NEVER manually sum or invent past individual course points when official cumulative values (Current CGPA and Earned Credits) are already provided in the Official Academic Standing Summary!
+   - Calculating Target CGPA (The Exact Mathematical Formula):
+     * When a student asks "How can I get X CGPA?", "What SGPA needed for X CGPA?", "Can I reach X CGPA?", or sets a target CGPA:
+       1. Identify baseline numbers from Official Academic Standing Summary:
+          - Current CGPA (e.g. 2.36)
+          - Current Earned Credits (e.g. 95)
+          - Current Quality Points = Current CGPA × Earned Credits (e.g. 2.36 × 95 = 224.20)
+       2. Determine New Credits:
+          - If the student specifies credits or is currently enrolled in a semester (e.g. 18 credits), use that.
+          - If the student is asking about graduating or remaining semesters, check the remaining credits from their Tentative Study Plan.
+          - Total Future Credits = Current Earned Credits + New Credits (e.g. 95 + 18 = 113 credits).
+       3. Calculate Target Points:
+          - Target Total Quality Points Needed = Target CGPA × Total Future Credits (e.g. 2.50 × 113 = 282.50).
+       4. Calculate Points Needed from New Credits:
+          - Quality Points Needed = Target Total Quality Points - Current Quality Points (e.g. 282.50 - 224.20 = 58.30).
+       5. Calculate Required SGPA (or Average GPA):
+          - Required SGPA = Quality Points Needed / New Credits (e.g. 58.30 / 18 = 3.24 SGPA).
+   - Sanity Verification & Guidance:
+     * MATHEMATICAL SANITY CHECK: To RAISE a CGPA (e.g. from 2.36 to 2.50), the Required SGPA MUST be HIGHER than the current CGPA (e.g. 3.24 > 2.36). NEVER state that a lower GPA (like 1.80) will raise a CGPA!
+     * IF REQUIRED SGPA > 4.00: A single semester cannot mathematically achieve the target. Clearly inform the student that it is mathematically impossible in 1 semester, and calculate the required average GPA spread across their remaining semesters using the Tentative Study Plan.
+     * COURSE REPEATS / GRADE IMPROVEMENT POLICY: Remind the student that repeating courses with low grades (F, D, or D+) is the fastest way to raise their CGPA. In FAST's policy, the replacement grade replaces the old grade in CGPA calculation without adding extra denominator credits, providing pure point gains.
+     * UPCOMING COURSES INTEGRATION: When discussing target CGPAs and degree progress, reference the student's upcoming semesters and courses from their Tentative Study Plan to give them a concrete roadmap.
+
+7. Output Formatting Guidelines:
    - NEVER output emojis (such as ✉️, 📧, ℹ️, 🎓, etc.). Maintain clean, professional typography throughout.
    - NEVER output technical system jargon, code variable names, schema paths, internal metadata, or debugging tokens (such as "Evidence:", "transcript.data", "summary", "crRegistered", "crEarned", "lastSync", "schemaVersion", "dataContext", etc.).
    - NEVER create an "Evidence:" section. Present facts and answers directly to the student in clean English (e.g. "Your current Cumulative GPA (CGPA) is 2.36 and your latest semester GPA (SGPA) is 0.").
@@ -207,7 +234,33 @@ const renderTranscriptMarkdown = (transcriptObj) => {
 
   if (!Array.isArray(list) || !list.length) return "- _No semester records found_";
 
-  return list
+  const latestWithCgpa =
+    [...list]
+      .reverse()
+      .find((s) => s.summary?.cgpa && !isNaN(s.summary.cgpa) && s.summary.cgpa > 0) ||
+    list[list.length - 1];
+  const currentCgpa = latestWithCgpa?.summary?.cgpa ?? "N/A";
+  const earnedCredits = latestWithCgpa?.summary?.crEarned ?? "N/A";
+  const latestRegistered =
+    list[list.length - 1]?.summary?.crRegistered ?? latestWithCgpa?.summary?.crRegistered ?? "N/A";
+  const inProgressCredits =
+    typeof latestRegistered === "number" && typeof earnedCredits === "number"
+      ? Math.max(0, latestRegistered - earnedCredits)
+      : "N/A";
+  const currentPoints =
+    typeof currentCgpa === "number" && typeof earnedCredits === "number"
+      ? (currentCgpa * earnedCredits).toFixed(2)
+      : "N/A";
+
+  const summaryHeader = `### Official Academic Standing Summary
+- **Current Cumulative CGPA:** ${currentCgpa}
+- **Total Credits Earned:** ${earnedCredits}
+- **Total Credits Registered:** ${latestRegistered} (includes ${inProgressCredits} in-progress credits)
+- **Current Total Quality Points:** ${currentPoints} (${currentCgpa} × ${earnedCredits})
+- **Latest Evaluated Semester:** ${escapeMarkdown(latestWithCgpa?.title || "Latest")}
+`;
+
+  const semestersList = list
     .map((sem) => {
       const title = sem.title || "Semester";
       const summary = sem.summary || {};
@@ -216,7 +269,7 @@ const renderTranscriptMarkdown = (transcriptObj) => {
       const earned = summary.crEarned ?? summary.earnedCredits ?? "N/A";
       const registered = summary.crRegistered ?? summary.registeredCredits ?? "N/A";
 
-      const header = `### ${escapeMarkdown(title)}
+      const header = `#### ${escapeMarkdown(title)}
 - **Semester SGPA:** ${sgpa} | **Cumulative CGPA:** ${cgpa} | **Credits:** ${earned} earned / ${registered} registered`;
 
       const courses = (sem.courses || [])
@@ -233,6 +286,106 @@ const renderTranscriptMarkdown = (transcriptObj) => {
       return `${header}\n${courses || "  - No course entries"}`;
     })
     .join("\n\n");
+
+  return `${summaryHeader}\n${semestersList}`;
+};
+
+const renderStudyPlanMarkdown = (studyPlanList, transcriptObj) => {
+  if (!studyPlanList) return "- _Not available_";
+  const semesters = Array.isArray(studyPlanList) ? studyPlanList : studyPlanList.semesters || [];
+
+  if (!Array.isArray(semesters) || !semesters.length) return "- _No study plan records found_";
+
+  const passedCourseCodes = new Set<string>();
+  const inProgressCourseCodes = new Set<string>();
+  const gradeMap = new Map<string, string>();
+
+  const semList = Array.isArray(transcriptObj)
+    ? transcriptObj
+    : transcriptObj?.transcript || transcriptObj?.semesters || [];
+
+  semList.forEach((sem) => {
+    (sem.courses || []).forEach((c) => {
+      const code = String(c.code || "")
+        .trim()
+        .toUpperCase();
+      if (!code) return;
+      const grade = String(c.grade || "")
+        .trim()
+        .toUpperCase();
+      gradeMap.set(code, grade);
+      if (grade === "I" || grade === "IP" || grade === "") {
+        inProgressCourseCodes.add(code);
+      } else if (grade !== "F" && grade !== "W" && grade !== "U") {
+        passedCourseCodes.add(code);
+      }
+    });
+  });
+
+  let totalDegreeCredits = 0;
+  let totalDegreeCourses = 0;
+  let completedCredits = 0;
+  let inProgressCredits = 0;
+  let upcomingCredits = 0;
+
+  const renderedSemesters = semesters.map((sem, sIdx) => {
+    const semTitle = sem.title || `Semester ${sIdx + 1}`;
+    const semCr = sem.crHrs || 0;
+    const courses = sem.courses || [];
+    let semPassedCount = 0;
+    let semInProgressCount = 0;
+
+    const courseLines = courses.map((c) => {
+      const code = String(c.code || "").trim();
+      const codeUpper = code.toUpperCase();
+      const title = String(c.title || c.description || "").trim();
+      const cr = Number(c.crHrs || 0);
+      const type = c.type || "Core";
+
+      const isNC = /non\s*credit|\bnc\b/i.test(`${type} ${code}`);
+      if (!isNC) {
+        totalDegreeCredits += cr;
+        totalDegreeCourses++;
+      }
+
+      let status = "[Upcoming / Planned]";
+      if (passedCourseCodes.has(codeUpper)) {
+        const gr = gradeMap.get(codeUpper);
+        status = gr ? `[Completed - Grade: ${gr}]` : "[Completed]";
+        semPassedCount++;
+        if (!isNC) completedCredits += cr;
+      } else if (inProgressCourseCodes.has(codeUpper)) {
+        status = "[Currently Enrolled / In Progress]";
+        semInProgressCount++;
+        if (!isNC) inProgressCredits += cr;
+      } else {
+        if (!isNC) upcomingCredits += cr;
+      }
+
+      return `  - **${escapeMarkdown(code)}: ${escapeMarkdown(title)}** (${cr} Cr Hr, ${escapeMarkdown(type)}) — ${status}`;
+    });
+
+    const isFullyCompleted = courses.length > 0 && semPassedCount === courses.length;
+    const isCurrent = semInProgressCount > 0 || (!isFullyCompleted && semPassedCount > 0);
+    const semStatusBadge = isFullyCompleted
+      ? "— [Completed]"
+      : isCurrent
+        ? "— [Current / In Progress]"
+        : "— [Upcoming]";
+
+    return `#### ${escapeMarkdown(semTitle)} (${semCr} Cr Hrs) ${semStatusBadge}\n${courseLines.join("\n") || "  - No courses listed"}`;
+  });
+
+  const remainingCredits = Math.max(0, totalDegreeCredits - completedCredits);
+
+  const summary = `### Degree Progress & Study Plan Summary
+- **Total Degree Planned Credits:** ${totalDegreeCredits} Cr Hrs (${totalDegreeCourses} courses)
+- **Credits Earned / Completed:** ${completedCredits} Cr Hrs
+- **Credits Currently In Progress:** ${inProgressCredits} Cr Hrs
+- **Remaining Credits to Graduate:** ${remainingCredits} Cr Hrs (${upcomingCredits} in upcoming semesters)
+`;
+
+  return `${summary}\n${renderedSemesters.join("\n\n")}`;
 };
 
 const renderTeachersMarkdown = (teacherData: Record<string, any>, courses = []) => {
@@ -348,16 +501,26 @@ const sectionPriority = (name, question) => {
   if (name === "attendance" && /attend|present|absent|late|missed|att\b/.test(query)) return 5;
   if (
     name === "marks" &&
-    /mark|score|quiz|qz|assignment|asst|ass\b|assessment|exam|sessional|sess|mid|test|what if|percentage|pct|calc|gpa|total/.test(
+    /mark|score|quiz|qz|assignment|asst|ass\b|assessment|exam|sessional|sess|mid|test|what if|percentage|pct|weighted/.test(
       query,
     )
   )
     return 5;
-  if (name === "transcript" && /transcript|cgpa|sgpa|gpa|credit|semester|grade/.test(query))
-    return 4;
+  if (
+    name === "transcript" &&
+    /transcript|cgpa|sgpa|\bgpa\b|credit|semester|grade|target|calculate|standing|standing|fail|repeat|improve/.test(
+      query,
+    )
+  )
+    return 5;
   if (name === "mcaAndGrading" && /mca|grading|grade point|scheme/.test(query)) return 4;
-  if (name === "studyPlan" && /study plan|degree plan|remaining course|planned course/.test(query))
-    return 4;
+  if (
+    name === "studyPlan" &&
+    /study plan|degree plan|remaining|planned|upcoming|next sem|future sem|graduate|graduation|degree|target.*cgpa|reach.*cgpa|improve.*cgpa|how can i get|how to get.*cgpa|courses to take|what courses|which courses/.test(
+      query,
+    )
+  )
+    return 5;
   if (name === "student" && /profile|program|section|campus|who am i/.test(query)) return 4;
   return 1;
 };
@@ -386,6 +549,8 @@ export function buildAcademicMarkdown(
       content = renderAttendanceMarkdown(value.data);
     } else if (name === "transcript") {
       content = renderTranscriptMarkdown(value.data);
+    } else if (name === "studyPlan") {
+      content = renderStudyPlanMarkdown(value.data, dataContext.transcript);
     } else {
       content = renderMarkdownTree(value.data);
     }
@@ -443,7 +608,7 @@ export function buildGeminiPayload({ question, dataContext, history = [] }) {
     contents,
     generationConfig: {
       temperature: 0.3,
-      maxOutputTokens: 2048,
+      maxOutputTokens: 8192,
     },
   };
 }

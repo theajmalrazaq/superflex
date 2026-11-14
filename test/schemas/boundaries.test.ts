@@ -63,6 +63,17 @@ describe("external data schemas", () => {
         ],
       }),
     ).toBe("Hello world");
+    expect(
+      getGeminiText({
+        candidates: [
+          {
+            content: {
+              parts: [{ text: "Thinking deeply...", thought: true }, { text: "Final answer" }],
+            },
+          },
+        ],
+      }),
+    ).toBe("Final answer");
     expect(getGeminiText({ candidates: "invalid" })).toBe("");
     expect(
       geminiModelListSchema.parse({ models: [{ name: "models/embedding" }] }).models[0]

@@ -64,7 +64,13 @@ export default function TeacherSettingsController() {
   }, []);
 
   useEffect(() => {
-    if (open && campus) loadFaculty(campus.id);
+    if (!campus) return;
+    if (open) {
+      loadFaculty(campus.id);
+      return;
+    }
+    const timer = window.setTimeout(() => loadFaculty(campus.id), 150);
+    return () => window.clearTimeout(timer);
   }, [open, campus, loadFaculty]);
 
   const finish = () => {

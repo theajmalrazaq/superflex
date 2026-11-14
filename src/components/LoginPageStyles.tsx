@@ -182,27 +182,34 @@ function LoginPageStyles() {
       if (
         isLoginSubmit &&
         button.parentElement &&
-        !(document.getElementById("superflex-remember-me-container") as HTMLInputElement | null)
+        !document.getElementById("superflex-remember-me-container")
       ) {
         const rememberContainer = document.createElement("div");
         rememberContainer.id = "superflex-remember-me-container";
-        rememberContainer.className = "w-full px-2 mb-3.5 mt-1 select-none";
+        rememberContainer.className = "w-full select-none";
         rememberContainer.innerHTML = `
-          <div class="flex items-center justify-between">
-            <label class="flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
-              <input
-                type="checkbox"
-                id="superflex-remember-me-checkbox"
-                class="h-4 w-4 rounded border-slate-300 text-[#230052] focus:ring-0 dark:border-white/20 dark:bg-white/10 cursor-pointer accent-[#230052] dark:accent-white"
-              />
-              <span>Remember Me</span>
+          <div class="login-remember-row">
+            <label class="login-remember-label" for="superflex-remember-me-checkbox">
+              <span class="login-checkbox-wrap">
+                <input
+                  type="checkbox"
+                  id="superflex-remember-me-checkbox"
+                  class="login-remember-input"
+                />
+                <span class="login-checkbox-control" aria-hidden="true">
+                  <svg class="login-checkbox-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3.5 8.5L6.5 11.5L12.5 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </span>
+              <span class="login-remember-text">Remember Me</span>
             </label>
-            <span class="text-[11px] text-slate-400 dark:text-slate-500 font-medium flex items-center gap-1 select-none" title="Credentials encrypted via AES-GCM 256-bit in Chrome storage">
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <span class="login-encrypted-pill" title="Credentials encrypted via AES-GCM 256-bit on this device">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
               </svg>
-              Encrypted
+              <span>Encrypted</span>
             </span>
           </div>
         `;

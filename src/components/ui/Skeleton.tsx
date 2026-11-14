@@ -96,6 +96,13 @@ export const LoginSkeleton = () => (
           <Skeleton className="h-[52px] w-full rounded-full" />
         </div>
       ))}
+      <div className="flex items-center justify-between px-2 pt-1">
+        <div className="flex items-center gap-2.5">
+          <Skeleton className="h-5 w-5 rounded-[6px]" />
+          <Skeleton className="h-3.5 w-24 rounded-full" />
+        </div>
+        <Skeleton className="h-5 w-20 rounded-full" />
+      </div>
       <Skeleton className="h-[52px] w-full rounded-full" />
       <Skeleton className="mx-auto h-3 w-28" />
     </div>
@@ -129,35 +136,52 @@ export const MarksSkeleton = () => {
 
 export const AttendanceSkeleton = () => {
   return (
-    <div
-      className="flex-1 space-y-4 overflow-hidden py-1"
-      aria-label="Loading attendance heatmap"
-      role="status"
-    >
-      <div className="flex items-center justify-between gap-3">
-        <Skeleton className="h-3 w-48" />
-        <div className="flex gap-3">
-          <Skeleton className="h-3 w-12" />
-          <Skeleton className="h-3 w-12" />
+    <div className="min-w-0 flex-1 space-y-4" aria-label="Loading attendance heatmap" role="status">
+      <div className="flex flex-wrap items-center justify-between gap-3 text-[11px] sm:text-[10px]">
+        <Skeleton className="h-3 w-56 max-w-[60vw]" />
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <Skeleton className="h-2.5 w-2.5 rounded-[3px]" />
+            <Skeleton className="h-2.5 w-12" />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Skeleton className="h-2.5 w-2.5 rounded-[3px]" />
+            <Skeleton className="h-2.5 w-12" />
+          </div>
         </div>
       </div>
-      <div className="flex flex-col gap-4 sm:grid sm:grid-cols-2 sm:gap-x-4 sm:gap-y-5 md:grid-cols-3 xl:grid-cols-5">
-        {[0, 1, 2, 3, 4].map((subject) => (
-          <div key={subject} className="flex w-full min-w-0 flex-col items-start py-1">
-            <div className="mb-2 flex flex-col gap-1.5 py-1 sm:h-[154px] sm:max-h-[180px] sm:flex-row sm:items-end sm:gap-1.5">
-              <div className="flex flex-row flex-wrap gap-1 sm:flex-col-reverse">
-                {Array.from({ length: 15 }, (_, dot) => (
+      <div className="flex flex-col gap-5 sm:grid sm:max-h-[390px] sm:grid-cols-2 sm:gap-x-4 sm:gap-y-5 sm:overflow-y-auto sm:px-1 sm:pb-0 sm:pr-2 md:grid-cols-3 xl:grid-cols-5">
+        {[
+          { mobile: 18, col1: 14, col2: 11, titleW: "w-3/4" },
+          { mobile: 21, col1: 15, col2: 13, titleW: "w-4/5" },
+          { mobile: 16, col1: 13, col2: 9, titleW: "w-2/3" },
+          { mobile: 20, col1: 15, col2: 12, titleW: "w-5/6" },
+          { mobile: 19, col1: 14, col2: 10, titleW: "w-3/4" },
+        ].map((subject, idx) => (
+          <div key={idx} className="flex w-full flex-col items-start py-1 sm:min-w-0">
+            {/* Mobile: larger 24x24 squares matching AttendanceHeatmap */}
+            <div className="mb-2 flex flex-wrap gap-1.5 py-0.5 sm:hidden">
+              {Array.from({ length: subject.mobile }, (_, dot) => (
+                <Skeleton key={dot} className="h-6 w-6 shrink-0 rounded-[5px]" />
+              ))}
+            </div>
+
+            {/* Desktop / tablet: stacked vertical columns matching AttendanceHeatmap */}
+            <div className="mb-2 hidden min-h-[180px] flex-row items-end gap-1.5 px-2 py-1 sm:flex">
+              <div className="flex flex-col-reverse gap-1">
+                {Array.from({ length: subject.col1 }, (_, dot) => (
                   <Skeleton key={dot} className="h-3.5 w-3.5 shrink-0 rounded-[3px]" />
                 ))}
               </div>
-              <div className="flex flex-row flex-wrap gap-1 sm:flex-col-reverse">
-                {Array.from({ length: 13 }, (_, dot) => (
-                  <Skeleton key={`sub-${dot}`} className="h-3.5 w-3.5 shrink-0 rounded-[3px]" />
+              <div className="flex flex-col-reverse gap-1">
+                {Array.from({ length: subject.col2 }, (_, dot) => (
+                  <Skeleton key={dot} className="h-3.5 w-3.5 shrink-0 rounded-[3px]" />
                 ))}
               </div>
             </div>
-            <Skeleton className="h-3 w-4/5" />
-            <Skeleton className="mt-1 h-2.5 w-2/3" />
+
+            <Skeleton className={`h-3.5 ${subject.titleW}`} />
+            <Skeleton className="mt-1.5 h-2.5 w-24" />
           </div>
         ))}
       </div>

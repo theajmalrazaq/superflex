@@ -289,16 +289,15 @@ const SuperFlexAI = () => {
   const [availableModels, setAvailableModels] = useState([]);
   const [isRefreshingModels, setIsRefreshingModels] = useState(false);
   const [showAiSettings, setShowAiSettings] = useState(false);
-  const [showKeyModal, setShowKeyModal] = useState(false);
-  const [apiKeyInput, setApiKeyInput] = useState("");
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [keyError, setKeyError] = useState("");
   const [hasApiKey, setHasApiKey] = useState(false);
   const [emailDraft, setEmailDraft] = useState(null);
   const [dismissedDrafts, setDismissedDrafts] = useState({});
   const userImage = useProfileImage();
   const scrollRef = useRef(null);
   const activeRequestIdRef = useRef(null);
+  const hasApiKeyRef = useRef(false);
+  const aiEnabledRef = useRef(aiEnabled);
+  aiEnabledRef.current = aiEnabled;
 
   const runtimeMessage = (message) =>
     new Promise<RuntimeResponse>((resolve) => {
@@ -309,33 +308,14 @@ const SuperFlexAI = () => {
       );
     });
 
-  const openSecureKeySettings = () => {
+  const openAiSettings = () => {
+    setIsOpen(false);
     setShowAiSettings(false);
-    setApiKeyInput("");
-    setKeyError("");
-    setShowKeyModal(true);
-  };
-
-  const saveApiKey = async (event) => {
-    event.preventDefault();
-    if (!event?.nativeEvent?.isTrusted || !apiKeyInput.trim() || isConnecting) return;
-    setIsConnecting(true);
-    setKeyError("");
-    const result = await runtimeMessage({
-      type: "SUPERFLEX_AI_SAVE_KEY",
-      apiKey: apiKeyInput.trim(),
-    });
-    setIsConnecting(false);
-    if (result.error) {
-      setKeyError(result.error);
-      return;
-    }
-    setHasApiKey(true);
-    setActiveModel(result.model || null);
-    setAvailableModels(result.availableModels || []);
-    setApiKeyInput("");
-    setShowKeyModal(false);
-    window.dispatchEvent(new CustomEvent("superflex-ai-key-updated"));
+    window.dispatchEvent(
+      new CustomEvent("superflex-open-global-settings", {
+        detail: { tab: "ai" },
+      }),
+    );
   };
 
   const handleSelectModel = async (model) => {
@@ -388,7 +368,9 @@ const SuperFlexAI = () => {
     const fetchConfig = () => {
       runtimeMessage({ type: "SUPERFLEX_AI_CONFIG" }).then((result) => {
         if (!result || result.error) return;
-        setHasApiKey(Boolean(result.configured));
+        const configured = Boolean(result.configured);
+        hasApiKeyRef.current = configured;
+        setHasApiKey(configured);
         setActiveModel(result.model || null);
         setAvailableModels(result.availableModels || []);
       });
@@ -398,6 +380,10 @@ const SuperFlexAI = () => {
 
     const handleKeyUpdate = () => fetchConfig();
     const handleToggleAi = () => {
+      if (!hasApiKeyRef.current || !aiEnabledRef.current) {
+        openAiSettings();
+        return;
+      }
       setIsOpen((prev) => !prev);
       setShowAiSettings(false);
     };
@@ -751,76 +737,6 @@ const SuperFlexAI = () => {
 
   return (
     <>
-      {showKeyModal && (
-        <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm">
-          <section
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="gemini-key-title"
-            className="w-full max-w-md rounded-3xl border border-black/10 bg-white p-6 text-foreground shadow-2xl dark:border-white/15 dark:bg-[#101014]"
-          >
-            <div className="mb-4 flex items-start justify-between gap-4">
-              <div>
-                <h2 id="gemini-key-title" className="text-lg font-bold">
-                  Connect Gemini API key
-                </h2>
-                <p className="mt-1 text-sm text-foreground/60">
-                  Your key is verified and saved in this extension's local storage.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowKeyModal(false)}
-                aria-label="Close"
-                className="rounded-full p-2 text-foreground/60 hover:bg-black/5 dark:hover:bg-white/10"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <a
-              href="https://aistudio.google.com/app/apikey"
-              target="_blank"
-              rel="noreferrer"
-              className="mb-4 inline-flex text-sm font-semibold text-[#230052] hover:underline dark:text-white"
-            >
-              Get a free Gemini API key ↗
-            </a>
-            <form onSubmit={saveApiKey} className="space-y-3">
-              <input
-                type="password"
-                autoComplete="off"
-                autoFocus
-                value={apiKeyInput}
-                onChange={(event) => {
-                  setApiKeyInput(event.target.value);
-                  setKeyError("");
-                }}
-                placeholder="Paste Gemini API key"
-                aria-label="Gemini API key"
-                className="min-h-12 w-full rounded-xl border border-black/10 bg-slate-50 px-4 text-sm text-foreground outline-none focus:ring-2 focus:ring-[#230052]/30 dark:border-white/10 dark:bg-white/[0.06]"
-              />
-              {keyError && (
-                <p role="alert" className="text-sm text-rose-500">
-                  {keyError}
-                </p>
-              )}
-              <button
-                type="submit"
-                disabled={!apiKeyInput.trim() || isConnecting}
-                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#230052] px-4 text-sm font-bold text-white disabled:opacity-50 dark:bg-white dark:text-[#0a192f]"
-              >
-                {isConnecting ? (
-                  <>
-                    <LoaderCircle size={16} className="animate-spin" /> Verifying…
-                  </>
-                ) : (
-                  "Verify and save key"
-                )}
-              </button>
-            </form>
-          </section>
-        </div>
-      )}
       {}
       {isOpen && (
         <div
@@ -936,7 +852,7 @@ const SuperFlexAI = () => {
                   </div>
                   <button
                     type="button"
-                    onClick={openSecureKeySettings}
+                    onClick={openAiSettings}
                     className="self-start rounded-xl bg-[#230052] px-4 py-2 text-xs font-bold text-white hover:bg-[#370c72] dark:bg-white dark:text-[#0a192f]"
                   >
                     Add Gemini API key
@@ -1357,7 +1273,7 @@ const SuperFlexAI = () => {
                     </div>
                     <button
                       type="button"
-                      onClick={openSecureKeySettings}
+                      onClick={openAiSettings}
                       className="rounded-xl bg-[#230052] px-3.5 py-2 text-xs font-bold text-white dark:bg-white dark:text-[#0a192f]"
                     >
                       Add Gemini API key
@@ -1465,14 +1381,7 @@ const SuperFlexAI = () => {
                       </span>
                       <button
                         type="button"
-                        onClick={() => {
-                          setShowAiSettings(false);
-                          window.dispatchEvent(
-                            new CustomEvent("superflex-open-global-settings", {
-                              detail: { tab: "ai" },
-                            }),
-                          );
-                        }}
+                        onClick={openAiSettings}
                         className="font-semibold text-[#230052] dark:text-white hover:underline"
                       >
                         Manage in Settings ↗

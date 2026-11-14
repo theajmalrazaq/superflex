@@ -75,12 +75,28 @@ public class Client extends WebViewClient {
         }
     }
 
+    WebResourceResponse emptyCss() {
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("Cache-Control", "max-age=86400");
+        return new WebResourceResponse("text/css", "utf-8", 200, "OK", map, new ByteArrayInputStream(new byte[0]));
+    }
+
+    static boolean blockedLegacyCss(String path) {
+        return "/Assets/vendors/base/vendors.bundle.css".equals(path)
+            || "/Assets/demo/demo3/base/style.bundle.css".equals(path);
+    }
+
     @Override // android.webkit.WebViewClient
     public WebResourceResponse shouldInterceptRequest(WebView webView, WebResourceRequest webResourceRequest) {
         String path;
         Uri url = webResourceRequest.getUrl();
-        if (portal(url) && "GET".equals(webResourceRequest.getMethod()) && (path = url.getPath()) != null && path.startsWith(VIRTUAL)) {
-            return serve(path);
+        if (portal(url) && "GET".equals(webResourceRequest.getMethod()) && (path = url.getPath()) != null) {
+            if (path.startsWith(VIRTUAL)) {
+                return serve(path);
+            }
+            if (blockedLegacyCss(path)) {
+                return emptyCss();
+            }
         }
         return null;
     }
@@ -123,6 +139,7 @@ public class Client extends WebViewClient {
     @Override // android.webkit.WebViewClient
     public void onPageCommitVisible(WebView webView, String str) {
         if (portal(Uri.parse(str))) {
+            this.owner.perform(4);
             webView.evaluateJavascript(this.owner.early, null);
         }
     }

@@ -824,21 +824,23 @@ function MarksPage() {
               Quizzes, assignments, mids, finals. Dil thaam ke marks dekhein.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <SuperTabs
-              tabs={semesters}
-              activeTab={semesters.find((s) => s.selected)?.value}
-              onTabChange={(value) => {
-                if (hiddenFormRef.current) {
-                  const select = hiddenFormRef.current.querySelector<HTMLSelectElement>("select");
-                  if (select) {
-                    select.value = value;
-                    const form = hiddenFormRef.current.querySelector<HTMLFormElement>("form");
-                    if (form) form.submit();
+          <div className="flex w-full items-center justify-between gap-2.5 sm:w-auto sm:justify-start sm:gap-3">
+            <div className="min-w-0 flex-1 overflow-x-auto scrollbar-hide sm:flex-initial">
+              <SuperTabs
+                tabs={semesters}
+                activeTab={semesters.find((s) => s.selected)?.value}
+                onTabChange={(value) => {
+                  if (hiddenFormRef.current) {
+                    const select = hiddenFormRef.current.querySelector<HTMLSelectElement>("select");
+                    if (select) {
+                      select.value = value;
+                      const form = hiddenFormRef.current.querySelector<HTMLFormElement>("form");
+                      if (form) form.submit();
+                    }
                   }
-                }
-              }}
-            />
+                }}
+              />
+            </div>
 
             <BookmarksMenu
               markedItems={markedItems}

@@ -7,12 +7,20 @@ import { PageSkeleton } from "../components/ui/Skeleton";
 import { BookOpen, Layers, CheckCircle2, TrendingUp, GraduationCap } from "lucide-react";
 import { parseStudyPlanPage } from "../parsers/studyPlan";
 import { findFlexPageRoot } from "../parsers/dom";
+import { useAiSync } from "../hooks/useAiSync";
 
 function StudyPlanPage() {
   const [loading, setLoading] = useState(true);
   const [semesters, setSemesters] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [activeSemIdx, setActiveSemIdx] = useState(0);
+
+  useAiSync({
+    data: semesters,
+    dataKey: "studyPlan",
+    syncKey: "studyPlan",
+    isEnabled: semesters.length > 0,
+  });
 
   useEffect(() => {
     const parseData = () => {

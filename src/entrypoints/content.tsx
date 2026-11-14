@@ -7,20 +7,57 @@ import PathRouter from "../components/PathRouter";
 import { getExtensionUrl } from "../utils/extensionApi";
 import { clearActiveStudentId } from "../utils/studentIdentity";
 import { cleanStorageOnce } from "../utils/clean";
+import { isInternalNavigationAnchor, startNavigationLoading } from "../utils/navigationLoading";
 import "../styles/tailwind.css";
 
 export default defineContentScript({
   matches: ["https://flexstudent.nu.edu.pk/*"],
   async main() {
+    const hasNativeLoader = Boolean((globalThis as { SFNative?: unknown }).SFNative);
+
     try {
       if (await cleanStorageOnce()) {
         sessionStorage.clear();
-        window.location.reload();
-        return;
+        if (!hasNativeLoader) {
+          window.location.reload();
+          return;
+        }
       }
     } catch (error) {
       console.error("SuperFlex storage reset failed", error);
     }
+
+    const loginPaths = new Set(["/login", "/login/index", "/login/logout"]);
+    const isLoginPage = loginPaths.has(window.location.pathname.replace(/\/$/, "").toLowerCase());
+
+    const isSessionExpired = () => {
+      const txt = (
+        (document.body?.textContent || "") +
+        " " +
+        (document.title || "") +
+        " " +
+        (document.querySelector<HTMLElement>("h1")?.textContent || "")
+      )
+        .toLowerCase()
+        .replace(/\s+/g, " ");
+
+      return [
+        "server error",
+        "runtime error",
+        "internal server error",
+        "server error in '/' application",
+        "application error",
+        "custom error settings",
+      ].some((err) => txt.includes(err));
+    };
+
+    if (!isLoginPage && isSessionExpired()) {
+      startNavigationLoading();
+      window.location.replace("/Login");
+      return;
+    }
+
+    if (isLoginPage) clearActiveStudentId();
 
     (() => {
       const scriptBridge = document.createElement("script");
@@ -67,10 +104,6 @@ export default defineContentScript({
         }
       });
     }
-
-    const loginPaths = new Set(["/login", "/login/index", "/login/logout"]);
-    const isLoginPage = loginPaths.has(window.location.pathname.replace(/\/$/, "").toLowerCase());
-    if (isLoginPage) clearActiveStudentId();
 
     if (document.getElementById("overlay23")) {
       document.getElementById("overlay23").remove();
@@ -123,18 +156,38 @@ export default defineContentScript({
       document.body.style.backgroundColor = "transparent";
     }
 
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const anchor = target.closest("a[href]");
+      if (!(anchor instanceof HTMLAnchorElement)) return;
+      if (isInternalNavigationAnchor(anchor, event)) {
+        startNavigationLoading();
+      }
+    });
+
     root.render(
       <>
-        <LoadingOverlay />
+        {!hasNativeLoader && <LoadingOverlay />}
         {isLoginPage ? <LoginPageStyles /> : <PathRouter />}
       </>,
     );
 
+    const revealDelayMs = hasNativeLoader ? 120 : 450;
+
     setTimeout(() => {
       document.body.classList.add("!visible");
-      try {
-        (globalThis as any).SFNative?.ready?.();
-      } catch {}
-    }, 450);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            try {
+              (globalThis as { SFNative?: { ready?: () => void } }).SFNative?.ready?.();
+            } catch {
+              // Ignore native bridge errors in browser environments.
+            }
+          }, 120);
+        });
+      });
+    }, revealDelayMs);
   },
 });

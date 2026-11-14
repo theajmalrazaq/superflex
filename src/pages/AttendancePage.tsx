@@ -346,20 +346,23 @@ function AttendancePage() {
               80% or RIP? Dekh le bhai, aur kitni classes bunk kar sakta hai.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex w-full items-center justify-between gap-2.5 sm:w-auto sm:justify-start sm:gap-3">
             {semesters.length > 1 && (
-              <SuperTabs
-                tabs={semesters}
-                activeTab={semesters.find((semester) => semester.selected)?.value}
-                size="sm"
-                className="!border-0 !bg-white/55 !backdrop-blur-xl dark:!bg-black/25 dark:!backdrop-blur-xl"
-                onTabChange={(value) => {
-                  const select = hiddenFormRef.current?.querySelector<HTMLSelectElement>("select");
-                  if (!select) return;
-                  select.value = value;
-                  hiddenFormRef.current?.querySelector<HTMLFormElement>("form")?.submit();
-                }}
-              />
+              <div className="min-w-0 flex-1 overflow-x-auto scrollbar-hide sm:flex-initial">
+                <SuperTabs
+                  tabs={semesters}
+                  activeTab={semesters.find((semester) => semester.selected)?.value}
+                  size="sm"
+                  className="!border-0 !bg-white/55 !backdrop-blur-xl dark:!bg-black/25 dark:!backdrop-blur-xl"
+                  onTabChange={(value) => {
+                    const select =
+                      hiddenFormRef.current?.querySelector<HTMLSelectElement>("select");
+                    if (!select) return;
+                    select.value = value;
+                    hiddenFormRef.current?.querySelector<HTMLFormElement>("form")?.submit();
+                  }}
+                />
+              </div>
             )}
             <BookmarksMenu
               markedRecords={markedRecords}

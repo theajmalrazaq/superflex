@@ -14,14 +14,13 @@ import CourseWithdrawPage from "../pages/CourseWithdrawPage";
 import GradeChangePage from "../pages/GradeChangePage";
 import StudyPlanPage from "../pages/StudyPlanPage";
 import ChangePasswordPage from "../pages/ChangePasswordPage";
-import SessionExpirePage from "../pages/SessionExpirePage";
 import NotFoundPage from "../pages/NotFoundPage";
 import SuperFlexAI from "./SuperFlexAI";
 import TeacherSettingsController from "./TeacherSettingsController";
+import { startNavigationLoading } from "../utils/navigationLoading";
 
 function PathRouter() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
-  const [isSessionExpired, setIsSessionExpired] = useState(false);
 
   useEffect(() => {
     const handleLocationChange = () => {
@@ -48,19 +47,9 @@ function PathRouter() {
         "custom error settings",
       ].some((err) => txt.includes(err));
 
-      setIsSessionExpired(isError);
       if (isError) {
-        Object.assign(document.body.style, {
-          backgroundColor: "black",
-          backgroundImage: "none",
-          fontFamily: "'Google Sans Flex', sans-serif",
-        });
-        document.body.removeAttribute("bgcolor");
-        document.body.classList.add("!bg-background", "!overflow-hidden", "!font-sans");
-        Array.from(document.body.children).forEach((c) => {
-          if (!["react-chrome-app", "SCRIPT", "LINK"].includes(c.id || c.tagName))
-            (c as HTMLElement).style.display = "none";
-        });
+        startNavigationLoading();
+        window.location.replace("/Login");
       }
     };
 
@@ -73,10 +62,6 @@ function PathRouter() {
   }, [currentPath]);
 
   const renderComponent = () => {
-    if (isSessionExpired) {
-      return <SessionExpirePage />;
-    }
-
     if (currentPath === "/" || currentPath.startsWith("/?dump=")) {
       return <HomePage />;
     }

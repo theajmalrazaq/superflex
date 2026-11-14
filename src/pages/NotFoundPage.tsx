@@ -19,7 +19,7 @@ const NotFoundPage = () => {
   }, []);
 
   return (
-    <PageLayout currentPage={window.location.pathname}>
+    <PageLayout currentPage={window.location.pathname} centered fullWidth>
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-140px)] p-6 space-y-8 animate-in fade-in duration-700 font-sans">
         <div className="relative z-10 text-center space-y-6 max-w-lg">
           <div className="mx-auto w-20 h-20 rounded-3xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">

@@ -34,6 +34,7 @@ import { sidebarLinksSchema } from "../stores/preferencesSchemas";
 import { readLocalJson } from "../utils/jsonStorage";
 import { getPendingUpdates } from "../utils/academicSnapshot";
 import { useProfileImage } from "../hooks/useProfileImage";
+import { startNavigationLoading } from "../utils/navigationLoading";
 
 const LINK_GROUPS = {
   Home: "Overview",
@@ -193,6 +194,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const themeMode = usePreferencesStore((state) => state.themeMode);
   const setThemeMode = usePreferencesStore((state) => state.setThemeMode);
+  const aiEnabled = usePreferencesStore((state) => state.aiEnabled);
   const [pendingUpdates, setPendingUpdates] = useState(null);
 
   useEffect(() => {
@@ -295,7 +297,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
     document.querySelector<HTMLElement>("#m_aside_left_close_btn")?.remove();
   }, [menuLinks]);
 
-  const remainingLinks = useMemo(() => {
+  const baseRemainingLinks = useMemo(() => {
     const bottomNavKeys = new Set([
       "home",
       "attendance",
@@ -323,6 +325,16 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
     return links;
   }, [menuLinks]);
 
+  const promotedNavLink = useMemo(
+    () => (!aiEnabled ? baseRemainingLinks[0] || null : null),
+    [aiEnabled, baseRemainingLinks],
+  );
+
+  const remainingLinks = useMemo(
+    () => (promotedNavLink ? baseRemainingLinks.slice(1) : baseRemainingLinks),
+    [baseRemainingLinks, promotedNavLink],
+  );
+
   useEffect(() => {
     if (!plusMenuOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -343,6 +355,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
       return;
     }
     if (href && href !== "#") {
+      startNavigationLoading();
       window.location.href = href;
     }
   };
@@ -499,6 +512,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
     const currentDump = new URLSearchParams(window.location.search).get("dump");
     if (currentDump) url.searchParams.set("dump", currentDump);
     url.searchParams.set("tab", "info");
+    startNavigationLoading();
     window.location.href = url.toString();
   };
 
@@ -512,7 +526,15 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
       menuLinks.find((l) => l.text.trim() === name)?.href || `${window.location.origin}${fallback}`;
     const lowerPage = (currentPage || "").toLowerCase();
 
-    return [
+    const coreItems: Array<{
+      key: string;
+      label: string;
+      href: string;
+      action?: string;
+      icon: typeof House | typeof OctopusIcon;
+      active: boolean;
+      hasUpdate: boolean;
+    }> = [
       {
         key: "home",
         label: "Home",
@@ -545,17 +567,44 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
         active: Boolean(lowerPage && lowerPage.includes("transcript")),
         hasUpdate: false,
       },
+    ];
+
+    if (aiEnabled) {
+      return [
+        ...coreItems,
+        {
+          key: "octopus",
+          label: "Octopus AI",
+          href: "#",
+          action: "octopus",
+          icon: OctopusIcon,
+          active: false,
+          hasUpdate: false,
+        },
+      ];
+    }
+
+    const fallbackLink: { text: string; href: string; path: string; action?: string } = {
+      text: "Fee Details",
+      href: findHref("Fee Details", "/Student/FeeDetails"),
+      path: "/Student/FeeDetails",
+    };
+    const replacement = promotedNavLink || fallbackLink;
+    const replacementName = replacement.text.trim();
+
+    return [
+      ...coreItems,
       {
-        key: "octopus",
-        label: "Octopus AI",
-        href: "#",
-        action: "octopus",
-        icon: OctopusIcon,
-        active: false,
-        hasUpdate: false,
+        key: replacementName.toLowerCase().replace(/[^a-z0-9]+/g, "-") || "more-link",
+        label: replacementName,
+        href: replacement.href,
+        action: replacement.action,
+        icon: ICONS[replacementName] || DEFAULT_ICON,
+        active: isLinkActive(replacement),
+        hasUpdate: checkHasUpdate(replacement),
       },
     ];
-  }, [menuLinks, currentPage, isHomePage, pendingUpdates]);
+  }, [menuLinks, currentPage, isHomePage, pendingUpdates, aiEnabled, promotedNavLink]);
 
   return (
     <>
@@ -572,7 +621,7 @@ function NavBar({ currentPage = "", onAttendanceLinkFound, onLinksFound }: NavBa
       </aside>
 
       {!isHomePage && (
-        <header className="relative z-30 flex items-center justify-between px-4 pb-1 pt-3.5 lg:hidden">
+        <header className="relative z-30 flex items-center justify-between px-4 pb-1 pt-[max(1.75rem,env(safe-area-inset-top))] lg:hidden">
           <a
             href="/"
             aria-label="Back to Home"
