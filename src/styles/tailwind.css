@@ -231,6 +231,11 @@ html {
     min-height: 44px !important;
     border-radius: 12px !important;
     padding: 8px 14px 8px 12px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px !important;
+    white-space: nowrap !important;
     box-shadow: none !important;
     text-shadow: none !important;
     font-size: 0.8125rem !important;
@@ -579,8 +584,22 @@ h6 {
     transform: translateX(-50%) !important;
     width: -moz-fit-content !important;
     width: fit-content !important;
-    max-width: calc(100vw - 32px) !important;
+    max-width: calc(100vw - 20px) !important;
     align-items: center !important;
+  }
+
+  #toast-container > div,
+  .toast {
+    max-width: calc(100vw - 20px) !important;
+    padding: 7px 12px 7px 10px !important;
+    gap: 8px !important;
+    white-space: nowrap !important;
+  }
+
+  .toast-message {
+    font-size: 0.78125rem !important;
+    max-width: calc(100vw - 92px) !important;
+    white-space: nowrap !important;
   }
 }
 
@@ -599,14 +618,11 @@ h6 {
   min-height: 44px !important;
   border-radius: 12px !important;
   padding: 8px 14px 8px 12px !important;
-  display: grid !important;
-  grid-template-columns: 28px auto auto !important;
-  grid-template-areas:
-    "icon title close"
-    "icon message close" !important;
+  display: flex !important;
+  flex-direction: row !important;
   align-items: center !important;
-  column-gap: 10px !important;
-  row-gap: 2px !important;
+  gap: 10px !important;
+  white-space: nowrap !important;
   background-color: rgba(255, 255, 255, 0.96) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
@@ -658,7 +674,7 @@ body.superflex-login-dark .toast {
 .toast::before {
   content: "" !important;
   display: flex !important;
-  grid-area: icon !important;
+  flex-shrink: 0 !important;
   width: 28px !important;
   height: 28px !important;
   min-width: 28px !important;
@@ -678,36 +694,42 @@ body.superflex-login-dark .toast {
 }
 
 .toast-title {
-  grid-area: title !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
   font-family: "Google Sans Flex", sans-serif !important;
   font-weight: 700 !important;
-  font-size: 0.875rem !important;
+  font-size: 0.8125rem !important;
   color: inherit !important;
   margin: 0 !important;
-  line-height: 1.25 !important;
+  line-height: 1 !important;
 }
 
 .toast-message {
-  grid-area: message !important;
+  display: inline-block !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: min(calc(100vw - 110px), 420px) !important;
   font-family: "Google Sans Flex", sans-serif !important;
   font-weight: 600 !important;
   font-size: 0.8125rem !important;
-  line-height: 1.4 !important;
+  line-height: 1 !important;
   color: inherit !important;
-  opacity: 0.9 !important;
+  opacity: 0.95 !important;
   margin: 0 !important;
   letter-spacing: -0.01em !important;
 }
 
 .toast:not(:has(.toast-title)) .toast-message,
 #toast-container > div:not(:has(.toast-title)) .toast-message {
-  grid-row: 1 / -1 !important;
+  margin: 0 !important;
 }
 
 .toast-close-button {
-  grid-area: close !important;
   position: relative !important;
   display: inline-flex !important;
+  flex-shrink: 0 !important;
   align-items: center !important;
   justify-content: center !important;
   width: 22px !important;
@@ -724,7 +746,7 @@ body.superflex-login-dark .toast {
   cursor: pointer !important;
   padding: 0 !important;
   line-height: 1 !important;
-  margin-left: 6px !important;
+  margin-left: 2px !important;
   border-radius: 50% !important;
   transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s ease, transform 0.15s ease !important;
 }

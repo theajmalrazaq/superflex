@@ -2,6 +2,7 @@ import { usePreferencesStore } from "../stores/preferencesStore";
 import { defineContentScript } from "wxt/utils/define-content-script";
 import { createRoot } from "react-dom/client";
 import LoadingOverlay from "../components/ui/LoadingOverlay";
+import PullToRefresh from "../components/ui/PullToRefresh";
 import LoginPageStyles from "../components/LoginPageStyles";
 import PathRouter from "../components/PathRouter";
 import { getExtensionUrl } from "../utils/extensionApi";
@@ -202,6 +203,7 @@ export default defineContentScript({
 
     root.render(
       <>
+        <PullToRefresh />
         {!hasNativeLoader && <LoadingOverlay />}
         {isLoginPage ? <LoginPageStyles /> : <PathRouter />}
       </>,
