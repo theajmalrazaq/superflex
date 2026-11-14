@@ -107,14 +107,19 @@ export default function PullToRefresh() {
 
   return (
     <div
-      className="pointer-events-none fixed top-0 left-1/2 z-[99999999] flex -translate-x-1/2 items-center justify-center transition-all duration-150 ease-out"
+      className="pointer-events-none fixed top-0 inset-x-0 w-full z-[99999999] flex justify-center items-start transition-transform duration-100 ease-out"
       style={{
-        transform: `translate(-50%, ${pullY}px) scale(${scale})`,
+        transform: `translateY(${pullY}px)`,
         opacity,
       }}
       aria-hidden="true"
     >
-      <div className="flex h-10 w-10 items-center justify-center rounded-[28%] border border-black/10 bg-white/95 text-slate-800 shadow-lg shadow-black/10 backdrop-blur-md dark:border-white/15 dark:bg-[#0c0d12]/95 dark:text-white dark:shadow-black/30">
+      <div
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[28%] border border-black/10 bg-white/95 text-slate-800 shadow-lg shadow-black/10 backdrop-blur-md dark:border-white/15 dark:bg-[#0c0d12]/95 dark:text-white dark:shadow-black/30"
+        style={{
+          transform: `scale(${scale})`,
+        }}
+      >
         <RefreshCw
           size={18}
           className={isRefreshing ? "animate-spin text-primary" : "text-current transition-transform"}
