@@ -166,6 +166,40 @@ export default defineContentScript({
       }
     });
 
+    const toastObserver = new MutationObserver(() => {
+      const toastContainer = document.getElementById("toast-container");
+      if (
+        toastContainer &&
+        toastContainer.parentElement &&
+        toastContainer.parentElement !== document.body
+      ) {
+        document.body.appendChild(toastContainer);
+      }
+      if (toastContainer) {
+        toastContainer.querySelectorAll<HTMLElement>(".toast").forEach((toast) => {
+          const existingBtn = toast.querySelector<HTMLElement>(".toast-close-button");
+          if (!existingBtn) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "toast-close-button";
+            btn.setAttribute("aria-label", "Dismiss notification");
+            btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+            btn.addEventListener("click", (e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              toast.style.opacity = "0";
+              toast.style.transform = "translateY(-6px) scale(0.96)";
+              setTimeout(() => toast.remove(), 200);
+            });
+            toast.appendChild(btn);
+          } else if (!existingBtn.querySelector("svg")) {
+            existingBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+          }
+        });
+      }
+    });
+    toastObserver.observe(document.documentElement, { childList: true, subtree: true });
+
     root.render(
       <>
         {!hasNativeLoader && <LoadingOverlay />}

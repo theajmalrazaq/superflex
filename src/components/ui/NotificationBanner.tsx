@@ -82,12 +82,12 @@ const NotificationBanner = ({
           <div
             key={idx}
             role="status"
-            className={`relative flex items-center gap-3.5 overflow-hidden rounded-[22px] border bg-white/95 p-4 text-[#101027] backdrop-blur-md dark:bg-[#0c0d12]/95 dark:text-[#f5f6fb] sm:gap-4 sm:rounded-[24px] sm:p-5 ${borderClass} shadow-xs animate-in fade-in slide-in-from-top-2 duration-300`}
+            className={`relative flex items-center gap-3 overflow-hidden rounded-[20px] border bg-white/95 p-3.5 text-[#101027] backdrop-blur-md dark:bg-[#0c0d12]/95 dark:text-[#f5f6fb] sm:gap-3.5 sm:rounded-[22px] sm:p-4 ${borderClass} shadow-none animate-in fade-in slide-in-from-top-2 duration-300`}
           >
             <div
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[28%] sm:h-11 sm:w-11 ${iconBgClass}`}
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[28%] sm:h-10 sm:w-10 ${iconBgClass}`}
             >
-              <IconComponent size={20} className="sm:h-[22px] sm:w-[22px]" />
+              <IconComponent size={18} className="sm:h-5 sm:w-5" />
             </div>
 
             <div className="min-w-0 flex-1 space-y-1">

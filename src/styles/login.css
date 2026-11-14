@@ -954,23 +954,35 @@ body.superflex-login-page.superflex-login-dark #login-popup .input-group button 
   color: #c1baff !important;
 }
 
-html.dark body.superflex-login-page #login-popup .m-alert,
-html.dark body.superflex-login-page #login-popup .alert,
-html.dark body.superflex-login-page #forgot-password-popup .m-alert,
-html.dark body.superflex-login-page #forgot-password-popup .alert,
-body.superflex-login-page.superflex-login-dark #login-popup .m-alert,
-body.superflex-login-page.superflex-login-dark #login-popup .alert,
-body.superflex-login-page.superflex-login-dark #forgot-password-popup .m-alert,
-body.superflex-login-page.superflex-login-dark #forgot-password-popup .alert,
-html.dark body.superflex-login-page #login-popup .m-alert *,
-html.dark body.superflex-login-page #login-popup .alert *,
-html.dark body.superflex-login-page #forgot-password-popup .m-alert *,
-html.dark body.superflex-login-page #forgot-password-popup .alert *,
-body.superflex-login-page.superflex-login-dark #login-popup .m-alert *,
-body.superflex-login-page.superflex-login-dark #login-popup .alert *,
-body.superflex-login-page.superflex-login-dark #forgot-password-popup .m-alert *,
-body.superflex-login-page.superflex-login-dark #forgot-password-popup .alert * {
-  color: #fff !important;
+body.superflex-login-page .m-alert,
+body.superflex-login-page .alert,
+body.superflex-login-page [data-valmsg-for],
+body.superflex-login-page .field-validation-error,
+body.superflex-login-page .validation-summary-errors,
+body.superflex-login-page #login-popup .m-alert,
+body.superflex-login-page #login-popup .alert,
+body.superflex-login-page #forgot-password-popup .m-alert,
+body.superflex-login-page #forgot-password-popup .alert,
+body.superflex-login-page #m_inputmask_4-error,
+body.superflex-login-page #pass-error,
+body.superflex-login-page #captcha-error,
+body.superflex-login-page #Captcha-error,
+body.superflex-login-page .help-block-error,
+body.superflex-login-page label.error,
+body.superflex-login-page span.error {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+body.superflex-login-page .flipInX,
+body.superflex-login-page .animated {
+  animation: none !important;
+  transform: none !important;
 }
 
 body.superflex-login-page.superflex-login-dark .login-outer-footer a,

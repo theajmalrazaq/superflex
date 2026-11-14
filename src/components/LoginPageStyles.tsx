@@ -19,6 +19,131 @@ function LoginPageStyles() {
     document.body.classList.add("!min-h-screen", "!overflow-x-hidden");
     document.body.style.color = "#101010";
 
+    const showToast = (
+      message: string,
+      type: "success" | "error" | "warning" | "info" = "success",
+    ) => {
+      let container = document.getElementById("toast-container");
+      if (!container) {
+        container = document.createElement("div");
+        container.id = "toast-container";
+        container.className = "toast-top-center";
+        document.body.appendChild(container);
+      }
+
+      const toast = document.createElement("div");
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `
+        <div class="toast-message">${message}</div>
+        <button type="button" class="toast-close-button" aria-label="Dismiss notification">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      `;
+
+      const dismissBtn = toast.querySelector(".toast-close-button");
+      dismissBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-6px) scale(0.96)";
+        setTimeout(() => toast.remove(), 200);
+      });
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-6px) scale(0.96)";
+        setTimeout(() => toast.remove(), 250);
+      }, 4000);
+    };
+
+    const lastToastRef = { text: "", time: 0 };
+    const notifyToast = (
+      message: string,
+      type: "success" | "error" | "warning" | "info" = "error",
+    ) => {
+      const cleanMsg = message.trim();
+      if (!cleanMsg || cleanMsg.length < 3) return;
+      const now = Date.now();
+      if (lastToastRef.text === cleanMsg && now - lastToastRef.time < 3500) {
+        return;
+      }
+      lastToastRef.text = cleanMsg;
+      lastToastRef.time = now;
+      showToast(cleanMsg, type);
+    };
+
+    const harvestAndMoveLoginErrors = () => {
+      const errorSelectors = [
+        ".m-alert",
+        ".alert",
+        "[data-valmsg-for]",
+        ".field-validation-error",
+        ".validation-summary-errors",
+        "#m_inputmask_4-error",
+        "#pass-error",
+        "#captcha-error",
+        "#Captcha-error",
+        ".help-block-error",
+        ".m-form__help.m--font-danger",
+        "label.error",
+        "span.error",
+      ];
+
+      const foundElements = document.querySelectorAll<HTMLElement>(
+        errorSelectors.join(", "),
+      );
+
+      foundElements.forEach((el) => {
+        const container = el.closest(
+          "#login-popup, #forgot-password-popup, .m-login__signin, .m-login__forget-password, form",
+        );
+        if (!container) return;
+
+        const clone = el.cloneNode(true) as HTMLElement;
+        clone
+          .querySelectorAll("button, .close, .m-alert__close, .m-alert__icon, svg, script")
+          .forEach((sub) => sub.remove());
+
+        let rawText = clone.textContent || "";
+        rawText = rawText
+          .replace(/Alert!/gi, "")
+          .replace(/Close/gi, "")
+          .replace(/&nbsp;/gi, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+
+        if (rawText && rawText.length >= 3) {
+          const isSuccess =
+            el.classList.contains("alert-success") ||
+            el.classList.contains("m-alert--success") ||
+            /\b(success|successfully)\b/i.test(rawText);
+          const isWarning =
+            el.classList.contains("alert-warning") ||
+            el.classList.contains("m-alert--warning");
+
+          const type: "success" | "error" | "warning" = isSuccess
+            ? "success"
+            : isWarning
+              ? "warning"
+              : "error";
+
+          notifyToast(rawText, type);
+        }
+
+        el.remove();
+      });
+    };
+
+    harvestAndMoveLoginErrors();
+    setTimeout(harvestAndMoveLoginErrors, 100);
+    setTimeout(harvestAndMoveLoginErrors, 500);
+
+    const loginErrorObserver = new MutationObserver(() => {
+      harvestAndMoveLoginErrors();
+    });
+    loginErrorObserver.observe(document.body, { childList: true, subtree: true });
+
     document
       .querySelectorAll<HTMLElement>(
         ".m-grid.m-grid--hor:not(.m-grid--desktop):not(.m-grid--desktop-and-tablet):not(.m-grid--tablet):not(.m-grid--tablet-and-mobile):not(.m-grid--mobile) > .m-grid__item.m-grid__item--fluid",
@@ -349,6 +474,7 @@ function LoginPageStyles() {
         button.innerHTML = originalContent;
         button.classList.remove("superflex-login-submitting");
         updateLoginButtonState();
+        harvestAndMoveLoginErrors();
       };
 
       const scheduleLoginButtonReset = () => {
@@ -396,12 +522,13 @@ function LoginPageStyles() {
             isSubmitting = true;
             button.disabled = true;
             button.innerHTML = `
-              <div class="flex items-center justify-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
-                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+              <span class="inline-flex items-center justify-center gap-2.5">
+                <svg class="h-4 w-4 animate-spin text-current shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="2.5" class="opacity-20"></circle>
+                  <path d="M21.5 12a9.5 9.5 0 0 0-9.5-9.5"></path>
                 </svg>
-                <span>Securing login...</span>
-              </div>`;
+                <span class="text-sm font-bold tracking-tight">Securing login...</span>
+              </span>`;
 
             const saved = await saveCredentials(username, password);
             if (!saved) {
@@ -430,12 +557,13 @@ function LoginPageStyles() {
           isSubmitting = true;
           loadingStartedAt = performance.now();
           button.innerHTML = `
-            <div class="flex items-center justify-center gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
-                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+            <span class="inline-flex items-center justify-center gap-2.5">
+              <svg class="h-4 w-4 animate-spin text-current shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="2.5" class="opacity-20"></circle>
+                <path d="M21.5 12a9.5 9.5 0 0 0-9.5-9.5"></path>
               </svg>
-              <span>Logging in...</span>
-            </div>
+              <span class="text-sm font-bold tracking-tight">Logging in...</span>
+            </span>
           `;
           button.classList.add("superflex-login-submitting");
         },
@@ -627,11 +755,16 @@ function LoginPageStyles() {
         forgotPasswordSection.classList.remove("!hidden");
       });
 
-      const cancelButton = forgotPasswordSection.querySelector<HTMLButtonElement>(
+      const rawCancelButton = forgotPasswordSection.querySelector<HTMLButtonElement>(
         "#m_login_forget_password_cancel",
       );
-      if (cancelButton) {
+      let cancelButton: HTMLButtonElement | null = null;
+      if (rawCancelButton) {
+        cancelButton = rawCancelButton.cloneNode(true) as HTMLButtonElement;
+        cancelButton.id = "superflex_login_forget_password_cancel";
         cancelButton.type = "button";
+        rawCancelButton.parentElement?.replaceChild(cancelButton, rawCancelButton);
+
         cancelButton.className = "forgot-back-button";
         cancelButton.removeAttribute("style");
         cancelButton.setAttribute("aria-label", "Back to sign in");
@@ -644,21 +777,35 @@ function LoginPageStyles() {
         `;
         const forgotHead = forgotPasswordSection.querySelector<HTMLElement>(".m-login__head");
         forgotHead?.insertBefore(cancelButton, forgotHead.firstChild);
-        cancelButton.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
+        cancelButton.addEventListener(
+          "click",
+          (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if ("stopImmediatePropagation" in e) {
+              (e as { stopImmediatePropagation: () => void }).stopImmediatePropagation();
+            }
 
-          forgotPasswordSection.classList.add("!hidden");
-          if (bglogin) {
-            bglogin.classList.remove("!hidden");
-          }
-        });
+            forgotPasswordSection.classList.add("!hidden");
+            if (bglogin) {
+              bglogin.classList.remove("!hidden");
+            }
+          },
+          { capture: true },
+        );
       }
 
-      const requestButton =
-        forgotPasswordSection.querySelector<HTMLElement>("#m_login_forget_password_submit") ||
-        forgotPasswordSection.querySelector<HTMLElement>("button[type='submit']");
-      if (requestButton) {
+      const rawRequestButton =
+        forgotPasswordSection.querySelector<HTMLButtonElement>(
+          "#m_login_forget_password_submit, button[type='submit']",
+        );
+      let requestButton: HTMLButtonElement | null = null;
+      if (rawRequestButton) {
+        requestButton = rawRequestButton.cloneNode(true) as HTMLButtonElement;
+        requestButton.id = "superflex_login_forget_password_submit";
+        requestButton.type = "button";
+        rawRequestButton.parentElement?.replaceChild(requestButton, rawRequestButton);
+
         requestButton.classList.add(
           "login-primary-btn",
           "!font-bold",
@@ -686,73 +833,119 @@ function LoginPageStyles() {
         `;
       }
 
-      const showToast = (message: string, type: "success" | "error" = "success") => {
-        const toast = document.createElement("div");
-        toast.className =
-          "fixed bottom-10 left-1/2 -translate-x-1/2 z-[99999] px-5 py-3 rounded-2xl border flex items-center gap-3 animate-in slide-in-from-bottom-5 duration-300 ease-out transition-all shadow-lg backdrop-blur-md";
-
-        const isDark =
-          document.documentElement.classList.contains("dark") ||
-          document.body.classList.contains("superflex-login-dark");
-
-        if (type === "success") {
-          toast.className += isDark
-            ? " bg-[#0c0d12]/95 border-emerald-500/35 text-[#f5f6fb]"
-            : " bg-white/95 border-emerald-500/30 text-[#101027]";
-          toast.innerHTML = `
-            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-[28%] ${isDark ? "bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/30" : "bg-emerald-500/10 text-emerald-600 ring-1 ring-emerald-500/20"}">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
-            </div>
-            <span class="text-xs sm:text-[13px] font-semibold tracking-tight">${message}</span>
-          `;
-        } else {
-          toast.className += isDark
-            ? " bg-[#0c0d12]/95 border-rose-500/35 text-[#f5f6fb]"
-            : " bg-white/95 border-rose-500/30 text-[#101027]";
-          toast.innerHTML = `
-            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-[28%] ${isDark ? "bg-rose-500/20 text-rose-400 ring-1 ring-rose-500/30" : "bg-rose-500/10 text-rose-600 ring-1 ring-rose-500/20"}">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            </div>
-            <span class="text-xs sm:text-[13px] font-semibold tracking-tight">${message}</span>
-          `;
-        }
-
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-          toast.classList.add("opacity-0", "translate-y-2");
-          setTimeout(() => toast.remove(), 400);
-        }, 4000);
-      };
-
       if (requestButton) {
-        requestButton.addEventListener("click", () => {
-          const emailInput =
-            forgotPasswordSection.querySelector<HTMLInputElement>("input[type='email']") ||
-            forgotPasswordSection.querySelector<HTMLInputElement>("input[name='Email']");
-          if (emailInput && emailInput.value.trim().length > 0) {
-            const originalContent = requestButton.innerHTML;
-            requestButton.innerHTML = `
-              <div class="flex items-center justify-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
-                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-                </svg>
-                <span>Sending...</span>
-              </div>
-            `;
-            requestButton.classList.add("!opacity-80", "!pointer-events-none");
-
-            setTimeout(() => {
-              showToast("Password reset link sent to your email!");
-              setTimeout(() => {
-                if (cancelButton) cancelButton.click();
-
-                requestButton.innerHTML = originalContent;
-                requestButton.classList.remove("!opacity-80", "!pointer-events-none");
-              }, 1500);
-            }, 1000);
+        const handlePasswordReset = async (e?: Event) => {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if ("stopImmediatePropagation" in e) {
+              (e as { stopImmediatePropagation: () => void }).stopImmediatePropagation();
+            }
           }
-        });
+
+          const emailInput = forgotPasswordSection.querySelector<HTMLInputElement>(
+            "input[name='email'], input[name='Email'], #m_email, input[type='email'], input[type='text']",
+          );
+          const emailVal = emailInput?.value.trim() || "";
+          if (!emailVal) {
+            showToast("Please enter your FLEX email address.", "error");
+            emailInput?.focus();
+            return;
+          }
+
+          const originalContent = requestButton.innerHTML;
+          const originalDisabled = (requestButton as HTMLButtonElement).disabled;
+          (requestButton as HTMLButtonElement).disabled = true;
+          requestButton.classList.add("!opacity-80", "!cursor-wait", "!pointer-events-none");
+          requestButton.innerHTML = `
+            <span class="inline-flex items-center justify-center gap-2.5">
+              <svg class="h-4 w-4 animate-spin text-current shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="2.5" class="opacity-20"></circle>
+                <path d="M21.5 12a9.5 9.5 0 0 0-9.5-9.5"></path>
+              </svg>
+              <span class="text-sm font-bold tracking-tight">Requesting Link...</span>
+            </span>
+          `;
+
+          const params = new URLSearchParams();
+          const forgotFormEl = forgotPasswordSection.querySelector<HTMLElement>("form, .m-login__form");
+          if (forgotFormEl) {
+            forgotFormEl.querySelectorAll<HTMLInputElement>("input").forEach((inp) => {
+              if (inp.name && inp.value) {
+                params.set(inp.name, inp.value.trim());
+              }
+            });
+          }
+          if (!params.has("email") || !params.get("email")) {
+            params.set("email", emailVal);
+          }
+
+          try {
+            const response = await fetch("/Login/ForgotPassword", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "X-Requested-With": "XMLHttpRequest",
+                Accept: "application/json, text/javascript, */*; q=0.01",
+              },
+              body: params.toString(),
+            });
+
+            const contentType = response.headers.get("content-type") || "";
+            let data: { status?: string; msg?: string; message?: string } | null = null;
+            if (contentType.includes("json")) {
+              data = await response.json().catch(() => null);
+            } else {
+              const text = await response.text().catch(() => "");
+              try {
+                data = JSON.parse(text);
+              } catch {
+                data = { msg: text };
+              }
+            }
+
+            const statusStr = String(data?.status || "").toLowerCase();
+            const msgStr = data?.msg || data?.message || "";
+            const isSuccess =
+              response.ok &&
+              (statusStr === "done" ||
+                statusStr === "success" ||
+                (Boolean(msgStr) && !/fail|error|invalid|not found/i.test(msgStr)));
+
+            const message =
+              msgStr ||
+              (isSuccess
+                ? "Cool! Password has been sent to your email."
+                : "Unable to process password reset. Please verify your email.");
+
+            showToast(message, isSuccess ? "success" : "error");
+
+            if (isSuccess) {
+              if (emailInput) emailInput.value = "";
+              setTimeout(() => {
+                forgotPasswordSection.classList.add("!hidden");
+                if (bglogin) {
+                  bglogin.classList.remove("!hidden");
+                }
+              }, 2200);
+            }
+          } catch {
+            showToast("Network error. Please try again.", "error");
+          } finally {
+            (requestButton as HTMLButtonElement).disabled = originalDisabled;
+            requestButton.classList.remove("!opacity-80", "!cursor-wait", "!pointer-events-none");
+            requestButton.innerHTML = originalContent;
+          }
+        };
+
+        requestButton.addEventListener("click", handlePasswordReset, { capture: true });
+
+        const forgotFormEl = forgotPasswordSection.querySelector<HTMLFormElement>(
+          "form, .m-login__form",
+        );
+        if (forgotFormEl) {
+          forgotFormEl.addEventListener("submit", handlePasswordReset, { capture: true });
+        }
       }
     }
 
@@ -1086,6 +1279,7 @@ function LoginPageStyles() {
 
     return () => {
       cancelAnimationFrame(readyFrame);
+      loginErrorObserver.disconnect();
       loginButtonObservers.forEach((observer) => observer.disconnect());
       cardResizeObserver.disconnect();
       cloudLayer.remove();

@@ -253,6 +253,27 @@ const streamGeminiContent = async (modelId, apiKey, payload, onChunk) => {
 };
 
 export default defineBackground(() => {
+  const purgeLegacyPermissions = () => {
+    if (typeof chrome !== "undefined" && chrome.permissions?.remove) {
+      chrome.permissions.remove(
+        {
+          origins: [
+            "http://localhost/*",
+            "https://*.puter.site/*",
+            "https://api-gateway.umami.dev/*",
+            "https://api.groq.com/*",
+          ],
+        },
+        () => void chrome.runtime?.lastError,
+      );
+    }
+  };
+
+  chrome.runtime.onInstalled?.addListener(() => {
+    purgeLegacyPermissions();
+  });
+  purgeLegacyPermissions();
+
   chrome.runtime.onConnect.addListener((port) => {
     if (port.name !== "SUPERFLEX_AI_STREAM") return;
     if (!isPortalSender(port.sender)) {
@@ -398,33 +419,41 @@ export default defineBackground(() => {
           sendResponse({ reset: false });
           return;
         }
-        chrome.browsingData.remove(
-          { origins: [PORTAL_ORIGIN] },
-          {
-            cache: true,
-            cacheStorage: true,
-            cookies: true,
-            fileSystems: true,
-            indexedDB: true,
-            localStorage: true,
-            serviceWorkers: true,
-          },
-          () => {
+        const doClearStorage = () => {
+          chrome.storage.local.clear(() => {
             if (chrome.runtime.lastError) {
               sendResponse({ error: chrome.runtime.lastError.message });
               return;
             }
-            chrome.storage.local.clear(() => {
+            chrome.storage.local.set({ [STORAGE_RESET_FLAG]: true }, () =>
+              sendResponse({ reset: !chrome.runtime.lastError }),
+            );
+          });
+        };
+
+        if (chrome.browsingData?.remove) {
+          chrome.browsingData.remove(
+            { origins: [PORTAL_ORIGIN] },
+            {
+              cache: true,
+              cacheStorage: true,
+              cookies: true,
+              fileSystems: true,
+              indexedDB: true,
+              localStorage: true,
+              serviceWorkers: true,
+            },
+            () => {
               if (chrome.runtime.lastError) {
                 sendResponse({ error: chrome.runtime.lastError.message });
                 return;
               }
-              chrome.storage.local.set({ [STORAGE_RESET_FLAG]: true }, () =>
-                sendResponse({ reset: !chrome.runtime.lastError }),
-              );
-            });
-          },
-        );
+              doClearStorage();
+            },
+          );
+        } else {
+          doClearStorage();
+        }
       });
       return true;
     }

@@ -8,7 +8,7 @@ export default defineConfig({
   manifest: {
     name: "SuperFlex",
     description: "A modern UI overlay and AI academic assistant for the Flex Student Portal.",
-    permissions: ["tabs", "storage", "browsingData"],
+    permissions: ["storage"],
     icons: {
       16: "assets/favicon.png",
       32: "assets/favicon.png",
@@ -16,13 +16,7 @@ export default defineConfig({
       128: "assets/favicon.png",
     },
     host_permissions: [
-      "https://flexstudent.nu.edu.pk/*",
-      "https://khi.nu.edu.pk/*",
-      "https://lhr.nu.edu.pk/*",
-      "https://isb.nu.edu.pk/*",
-      "https://cfd.nu.edu.pk/*",
-      "https://mtn.nu.edu.pk/*",
-      "https://pwr.nu.edu.pk/*",
+      "https://*.nu.edu.pk/*",
       "https://generativelanguage.googleapis.com/*",
     ],
     web_accessible_resources: [
