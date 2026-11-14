@@ -518,7 +518,8 @@
         background: rgba(35, 0, 82, 0.08);
       }
 
-      #download-apk-btn {
+      #download-apk-btn,
+      #download-prerelease-btn {
         color: #230052;
         background: rgba(255, 255, 255, 0.72);
         border: 1px solid rgba(35, 0, 82, 0.12);
@@ -683,7 +684,8 @@
         -webkit-text-fill-color: currentColor !important;
         color: inherit;
       }
-      #download-apk-btn {
+      #download-apk-btn,
+      #download-prerelease-btn {
         color: #230052;
         background: transparent;
         background-image: none;
@@ -694,11 +696,14 @@
         user-select: none;
       }
       #download-apk-btn:hover,
-      #download-apk-btn span {
+      #download-apk-btn span,
+      #download-prerelease-btn:hover,
+      #download-prerelease-btn span {
         background: transparent !important;
         background-image: none !important;
       }
-      #download-apk-btn svg {
+      #download-apk-btn svg,
+      #download-prerelease-btn svg {
         color: #6551bd;
       }
       #features .text-\[\#a098ff\] {
@@ -1093,10 +1098,13 @@
         color: #0a192f;
       }
       html.dark #download-apk-btn,
-      html.dark #download-apk-btn span {
+      html.dark #download-apk-btn span,
+      html.dark #download-prerelease-btn,
+      html.dark #download-prerelease-btn span {
         color: #fff !important;
       }
-      html.dark #download-apk-btn svg {
+      html.dark #download-apk-btn svg,
+      html.dark #download-prerelease-btn svg {
         color: #fff !important;
       }
       html.dark #version-text {
@@ -1133,10 +1141,13 @@
         color: #0a192f;
       }
       html.dark #download-apk-btn,
-      html.dark #download-apk-btn span {
+      html.dark #download-apk-btn span,
+      html.dark #download-prerelease-btn,
+      html.dark #download-prerelease-btn span {
         color: #fff !important;
       }
-      html.dark #download-apk-btn:hover {
+      html.dark #download-apk-btn:hover,
+      html.dark #download-prerelease-btn:hover {
         color: #e5e7eb !important;
       }
       html.dark #features .feature-card-header > div:first-child {
@@ -1520,7 +1531,7 @@
 
           <div
             id="hero-buttons-container"
-            class="flex flex-col sm:flex-row gap-4 justify-center mt-8 hero-buttons px-4 sm:px-6 w-full sm:w-auto"
+            class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center items-center mt-8 hero-buttons px-4 sm:px-6 w-full sm:w-auto"
           >
             <a
               id="add-to-chrome-btn"
@@ -1544,6 +1555,32 @@
                 <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
                 <polyline points="10 17 15 12 10 7" />
                 <line x1="15" y1="12" x2="3" y2="12" />
+              </svg>
+            </a>
+            <a
+              id="download-prerelease-btn"
+              href="https://github.com/theajmalrazaq/superflex/releases"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group relative bg-transparent px-8 py-3.5 rounded-2xl text-white hover:bg-transparent transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto whitespace-nowrap h-[52px]"
+              style="font-family: &quot;Google Sans Flex&quot;, sans-serif"
+            >
+              <span class="text-sm font-medium">Download Pre-Release</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="w-5 h-5 text-[#a098ff]"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
             </a>
             <a
