@@ -5,7 +5,7 @@ import docsHtml from "../../docs/docs.html?raw";
 import themeScript from "../../docs/scripts/generated/theme.js?raw";
 import homeScript from "../../docs/scripts/generated/index.js?raw";
 import docsScript from "../../docs/scripts/generated/docs.js?raw";
-import reviews from "../../public/reviews.json";
+import reviews from "../../docs/reviews.json";
 
 function openPage(
   html: string,

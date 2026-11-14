@@ -226,7 +226,6 @@ function main() {
   writeFileSync(join(web, "superflex.js"), parts.join("\n"));
   cpSync(join(dist, "content-scripts", "content.css"), join(web, "content.css"));
   cpSync(join(dist, "bridge.js"), join(web, "bridge.js"));
-  cpSync(join(dist, "reviews.json"), join(web, "reviews.json"));
   cpSync(join(dist, "assets"), join(web, "assets"), { recursive: true });
   writeFileSync(join(web, "splash.html"), buildSplashHtml());
   writeFileSync(join(web, "early.js"), read(join(shimdir, "early.js")));

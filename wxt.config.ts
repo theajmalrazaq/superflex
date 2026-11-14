@@ -26,7 +26,6 @@ export default defineConfig({
           "assets/favicon.svg",
           "assets/logo.svg",
           "assets/clouds/cloud-2.webp",
-          "reviews.json",
           "bridge.js",
         ],
         matches: ["<all_urls>"],

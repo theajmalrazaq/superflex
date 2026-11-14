@@ -1,5 +1,5 @@
 import { reviewsSchema, type Review } from "../../src/schemas/reviews";
-import reviewData from "../../public/reviews.json";
+import reviewData from "../reviews.json";
 import { initSiteNavigation } from "./navigation";
 
 initSiteNavigation();

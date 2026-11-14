@@ -74,7 +74,7 @@ def run():
         results.append(check("css loaded", page.evaluate("!!document.getElementById('sf-css')")))
         results.append(check("getURL maps to virtual path", page.evaluate("chrome.runtime.getURL('assets/favicon.svg')") == "https://flexstudent.nu.edu.pk/__superflex__/assets/favicon.svg"))
         results.append(check("manifest version", page.evaluate("chrome.runtime.getManifest().version") == json.load(open(Path(__file__).resolve().parents[2] / "package.json"))["version"]))
-        status = page.evaluate("fetch('/__superflex__/reviews.json').then(function(r){return r.status})")
+        status = page.evaluate("fetch('/__superflex__/bridge.js').then(function(r){return r.status})")
         results.append(check("asset served", status == 200))
 
         page.evaluate("new Promise(function(done){chrome.storage.local.set({probe:{a:1}},function(){done(true)})})")
